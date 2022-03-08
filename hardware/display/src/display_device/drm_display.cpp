@@ -133,7 +133,7 @@ int32_t DrmDisplay::SetDisplayPowerStatus(DispPowerStatus status)
         DISPLAY_LOGE("ioctl fb0 failed\n");
         return DISPLAY_FAILURE;
     }
-    
+
     return DISPLAY_SUCCESS;
 }
 
