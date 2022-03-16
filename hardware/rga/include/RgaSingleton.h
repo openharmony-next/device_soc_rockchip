@@ -60,10 +60,11 @@ private:
 #pragma clang diagnostic pop
 #endif
 
-#define RGA_SINGLETON_STATIC_INSTANCE(TYPE)                 \
+#define RGA_SINGLETON_STATIC_INSTANCE(TYPE) do { \
     template<> ::Mutex  \
         (::Singleton< TYPE >::sLock)(::Mutex::PRIVATE);  \
     template<> TYPE* ::Singleton< TYPE >::sInstance(nullptr);  /* NOLINT */ \
-    template class ::Singleton< TYPE >;
+    template class ::Singleton< TYPE >; \
+} while (0)
 
 #endif //_LIBS_RGA_SINGLETON_H
