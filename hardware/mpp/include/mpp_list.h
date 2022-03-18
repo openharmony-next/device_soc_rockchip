@@ -108,11 +108,11 @@ struct list_head {
 #define list_last_entry(ptr, type, member) \
         list_entry((ptr)->prev, type, member)
 
-#define list_first_entry_or_null(ptr, type, member)({ \
+#define list_first_entry_or_null(ptr, type, member) do { \
         struct list_head *head__ = (ptr); \
         struct list_head *pos__ = head__->next; \
         pos__ != head__ ? list_entry(pos__, type, member) : NULL; \
-})
+} while (0)
 
 #define list_next_entry(pos, type, member) \
         list_entry((pos)->member.next, type, member)

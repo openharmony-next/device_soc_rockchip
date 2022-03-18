@@ -33,7 +33,7 @@
 #include "rga.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 /*
@@ -49,10 +49,10 @@ extern "C"{
     c_RkRgaGetContext(ctx); \
     ret; \
 })
-#define RgaDeInit(ctx) { \
+#define RgaDeInit(ctx) do { \
     (void)(ctx);        /* unused */ \
     c_RkRgaDeInit(); \
-}
+} while (0)
 #define RgaBlit(...) c_RkRgaBlit(__VA_ARGS__)
 #define RgaCollorFill(...) c_RkRgaColorFill(__VA_ARGS__)
 #define RgaFlush() c_RkRgaFlush()

@@ -493,7 +493,7 @@ int RGA_set_alpha_en_info(
     unsigned int  global_a_value,
     unsigned int  PD_en,             /* porter duff alpha mode en */
     unsigned int  PD_mode,
-    unsigned int  dst_alpha_en );    /* use dst alpha  */
+    unsigned int  dst_alpha_en);     /* use dst alpha  */
 
 int RGA_set_rop_en_info(
     struct rga_req *msg,
