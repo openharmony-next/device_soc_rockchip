@@ -67,4 +67,4 @@ private:
     template class ::Singleton< TYPE >; \
 } while (0)
 
-#endif //_LIBS_RGA_SINGLETON_H
+#endif // _LIBS_RGA_SINGLETON_H

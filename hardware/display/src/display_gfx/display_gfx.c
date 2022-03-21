@@ -131,7 +131,7 @@ RgaSURF_FORMAT colorSpaceModeChange(PixelFormat color, uint8_t *isYuv)
             rkFormat = RK_FORMAT_VYUY_422;
             *isYuv = 1;
             break;
-    default:
+        default:
 //          PIXEL_FMT_CLUT8:        /**< CLUT8 format */
 //          PIXEL_FMT_CLUT1,            /**< CLUT1 format */
 //          PIXEL_FMT_CLUT4,            /**< CLUT4 format */
@@ -144,7 +144,7 @@ RgaSURF_FORMAT colorSpaceModeChange(PixelFormat color, uint8_t *isYuv)
 //          PIXEL_FMT_BGRX_5551,        /**< BGRX5551 format */
 //          PIXEL_FMT_YUV_422_I,        /**< YUV422 interleaved format */
             rkFormat = RK_FORMAT_UNKNOWN;
-        break;
+            break;
     }
     return rkFormat;
 }
@@ -383,8 +383,8 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             usage |= rkMirrorType;
     }
     if (opt->enableScale) {
-        DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", srcRgaBuffer.width, srcRgaBuffer.height, dstRgaBuffer.width,
-                     dstRgaBuffer.height);
+        DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", \
+            srcRgaBuffer.width, srcRgaBuffer.height, dstRgaBuffer.width, dstRgaBuffer.height);
     }
     usage |= IM_SYNC;
     if (isYuv == 1) {

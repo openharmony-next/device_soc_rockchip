@@ -190,7 +190,7 @@ typedef enum {
     RGA_ALL,
 } IM_INFORMATION;
 
-/*rga version index*/
+/* rga version index */
 typedef enum {
     RGA_V_ERR                  = 0x0,
     RGA_1                      = 0x1,
@@ -258,7 +258,7 @@ typedef struct {
  * @return error message string
  */
 #define imStrError(...) \
-    ({ \
+    ( { \
         const char* err; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -278,7 +278,7 @@ IM_API const char* imStrError_t(IM_STATUS status);
  * @return rga_buffer_t
  */
 #define wrapbuffer_virtualaddr(vir_addr, width, height, format, ...) \
-    ({ \
+    ( { \
         rga_buffer_t buffer; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -293,7 +293,7 @@ IM_API const char* imStrError_t(IM_STATUS status);
     })
 
 #define wrapbuffer_physicaladdr(phy_addr, width, height, format, ...) \
-    ({ \
+    ( { \
         rga_buffer_t buffer; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -308,7 +308,7 @@ IM_API const char* imStrError_t(IM_STATUS status);
     })
 
 #define wrapbuffer_fd(fd, width, height, format, ...) \
-    ({ \
+    ( { \
         rga_buffer_t buffer; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -383,7 +383,7 @@ IM_API const char* querystring(int name);
  * @returns no error or else negative error code.
  */
 #define imcheck(src, dst, src_rect, dst_rect, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_NOERROR; \
         rga_buffer_t pat; \
         im_rect pat_rect; \
@@ -408,7 +408,7 @@ IM_API const char* querystring(int name);
         ret; \
     })
 #define imcheck_composite(src, dst, pat, src_rect, dst_rect, pat_rect, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_NOERROR; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -423,7 +423,8 @@ IM_API const char* querystring(int name);
         ret; \
     })
 IM_API IM_STATUS imcheck_t(const rga_buffer_t src, const rga_buffer_t dst, const rga_buffer_t pat,
-                           const im_rect src_rect, const im_rect dst_rect, const im_rect pat_rect, const int mdoe_usage);
+                           const im_rect src_rect, const im_rect dst_rect, const im_rect pat_rect,
+                           const int mdoe_usage);
 
 /*
  * Resize
@@ -439,7 +440,7 @@ IM_API IM_STATUS imcheck_t(const rga_buffer_t src, const rga_buffer_t dst, const
  * @returns success or else negative error code.
  */
 #define imresize(src, dst, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         double args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(double); \
@@ -465,7 +466,8 @@ IM_API IM_STATUS imcheck_t(const rga_buffer_t src, const rga_buffer_t dst, const
                    (direction) == IM_UP_SCALE ? 0.5 : 2, \
                    INTER_LINEAR, 1)
 
-IM_API IM_STATUS imresize_t(const rga_buffer_t src, rga_buffer_t dst, double fx, double fy, int interpolation, int sync);
+IM_API IM_STATUS imresize_t(const rga_buffer_t src, rga_buffer_t dst, double fx,
+                            double fy, int interpolation, int sync);
 
 /*
  * Crop
@@ -479,7 +481,7 @@ IM_API IM_STATUS imresize_t(const rga_buffer_t src, rga_buffer_t dst, double fx,
  * @returns success or else negative error code.
  */
 #define imcrop(src, dst, rect, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -511,7 +513,7 @@ IM_API IM_STATUS imcrop_t(const rga_buffer_t src, rga_buffer_t dst, im_rect rect
  * @returns success or else negative error code.
  */
 #define imrotate(src, dst, rotation, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -542,7 +544,7 @@ IM_API IM_STATUS imrotate_t(const rga_buffer_t src, rga_buffer_t dst, int rotati
  * @returns success or else negative error code.
  */
 #define imflip(src, dst, mode, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -572,7 +574,7 @@ IM_API IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, i
  * @returns success or else negative error code.
  */
 #define imfill(buf, rect, color, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -588,7 +590,7 @@ IM_API IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, i
     })
 
 #define imreset(buf, rect, color, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -604,7 +606,7 @@ IM_API IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, i
     })
 
 #define imdraw(buf, rect, color, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -632,7 +634,7 @@ IM_API IM_STATUS imfill_t(rga_buffer_t dst, im_rect rect, int color, int sync);
  * @returns success or else negative error code.
  */
 #define impalette(src, dst, lut,  ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -661,7 +663,7 @@ IM_API IM_STATUS impalette_t(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t lu
  * @returns success or else negative error code.
  */
 #define imtranslate(src, dst, x, y, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -688,7 +690,7 @@ IM_API IM_STATUS imtranslate_t(const rga_buffer_t src, rga_buffer_t dst, int x, 
  * @returns success or else negative error code.
  */
 #define imcopy(src, dst, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -719,7 +721,7 @@ IM_API IM_STATUS imcopy_t(const rga_buffer_t src, rga_buffer_t dst, int sync);
  * @returns success or else negative error code.
  */
 #define imblend(srcA, dst, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         rga_buffer_t srcB; \
         errno_t eok = memset_s(&srcB, sizeof(rga_buffer_t), 0x00, sizeof(rga_buffer_t)); \
@@ -741,7 +743,7 @@ IM_API IM_STATUS imcopy_t(const rga_buffer_t src, rga_buffer_t dst, int sync);
         ret; \
     })
 #define imcomposite(srcA, srcB, dst, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -773,7 +775,7 @@ IM_API IM_STATUS imblend_t(const rga_buffer_t srcA, const rga_buffer_t srcB, rga
  * @returns success or else negative error code.
  */
 #define imcolorkey(src, dst, range, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -806,7 +808,7 @@ IM_API IM_STATUS imcolorkey_t(const rga_buffer_t src, rga_buffer_t dst, im_color
  * @returns success or else negative error code.
  */
 #define imcvtcolor(src, dst, sfmt, dfmt, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -837,7 +839,7 @@ IM_API IM_STATUS imcvtcolor_t(rga_buffer_t src, rga_buffer_t dst, int sfmt, int 
  * @returns success or else negative error code.
  */
 #define imquantize(src, dst, nn_info, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -866,7 +868,7 @@ IM_API IM_STATUS imquantize_t(const rga_buffer_t src, rga_buffer_t dst, im_nn_t 
  * @returns success or else negative error code.
  */
 #define imrop(src, dst, rop_code, ...) \
-    ({ \
+    ( { \
         IM_STATUS ret = IM_STATUS_SUCCESS; \
         int args[] = {__VA_ARGS__}; \
         int argc = sizeof(args)/sizeof(int); \
@@ -893,7 +895,8 @@ IM_API IM_STATUS imrop_t(const rga_buffer_t src, rga_buffer_t dst, int rop_code,
  *
  * @returns success or else negative error code.
  */
-IM_API IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rect srect, im_rect drect, im_rect prect, int usage);
+IM_API IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat,
+                           im_rect srect, im_rect drect, im_rect prect, int usage);
 
 /*
  * block until all execution is complete

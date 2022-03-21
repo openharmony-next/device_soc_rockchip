@@ -41,7 +41,8 @@
 class RockchipRga : public Singleton<RockchipRga> {
 public:
 
-    static inline RockchipRga& get() {
+    static inline RockchipRga& get()
+    {
         return getInstance();
     }
 
