@@ -142,8 +142,8 @@ int32_t HdiLayer::SetLayerDirtyRegion(IRect *region)
 
 int32_t HdiLayer::SetLayerVisibleRegion(uint32_t num, IRect *rect)
 {
-    DISPLAY_DEBUGLOG("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId, rect->x,
-        rect->y, rect->w, rect->h);
+    DISPLAY_DEBUGLOG("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
+        rect->x, rect->y, rect->w, rect->h);
     return DISPLAY_SUCCESS;
 }
 
