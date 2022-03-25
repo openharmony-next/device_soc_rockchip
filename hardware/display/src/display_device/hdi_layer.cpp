@@ -153,7 +153,7 @@ int32_t HdiLayer::SetLayerBuffer(const BufferHandle *buffer, int32_t fence)
     DISPLAY_CHK_RETURN((buffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("buffer is nullptr"));
     std::unique_ptr<HdiLayerBuffer> layerbuffer = std::make_unique<HdiLayerBuffer>(*buffer);
     mHdiBuffer = std::move(layerbuffer);
-    mAcquireFence = fence;
+    mAcquireFence = dup(fence);
     return DISPLAY_SUCCESS;
 }
 
