@@ -14,9 +14,12 @@
  */
 
 #include "drm_connector.h"
+#include <xf86drm.h>
+#include <xf86drmMode.h>
 #include <cinttypes>
 #include <securec.h>
 #include "drm_device.h"
+#include "drm_vsync_worker.h"
 
 namespace OHOS {
 namespace HDI {
@@ -53,7 +56,7 @@ DrmConnector::DrmConnector(drmModeConnector c, FdPtr &fd)
 
 void DrmConnector::InitModes(drmModeConnector c)
 {
-    DISPLAY_DEBUGLOG("id %{public}d", mId);
+    DISPLAY_DEBUGLOG("id %{public}d  mode size %{public}d", mId, c.count_modes);
     mModes.clear();
     mPreferenceId = INVALID_MODE_ID;
     for (int i = 0; i < c.count_modes; i++) {
@@ -251,21 +254,85 @@ int32_t DrmConnector::UpdateModes()
     return DISPLAY_SUCCESS;
 }
 
-bool DrmConnector::HandleHotplug()
+std::shared_ptr<DrmCrtc> DrmConnector::UpdateCrtcId(IdMapPtr<DrmEncoder> &encoders,
+    IdMapPtr<DrmCrtc> &crtcs, bool plugIn, drmModeConnectorPtr c, int *crtc_id)
 {
+    std::shared_ptr<DrmCrtc> crtc = nullptr;
+    int  encoderid = c->encoders[0];
+    auto encoderIter = encoders.find(encoderid);
+    if (encoderIter == encoders.end()) {
+        DISPLAY_LOGW("can not find encoder for id : %{public}d", encoderid);
+        return crtc;
+    }
+
+    auto &encoder = encoderIter->second;
+    int possibleCrtcs = encoder->GetPossibleCrtcs();
+
+    for (auto crtcIter = crtcs.begin(); crtcIter != crtcs.end(); ++crtcIter) {
+        auto &posCrts = crtcIter->second;
+        if (possibleCrtcs == (1<<posCrts->GetPipe())) {
+            DISPLAY_DEBUGLOG("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
+            crtc = posCrts;
+            *crtc_id = posCrts->GetId();
+        }
+    }
+    if (plugIn) {
+        encoder->SetCrtcId(*crtc_id);
+        mEncoderId = c->encoders[0];
+    } else if (!plugIn) {
+        *crtc_id = 0;
+        mEncoderId = 0;
+        encoder->SetCrtcId(0);
+    }
+    return crtc;
+}
+
+bool DrmConnector::HandleHotplug(IdMapPtr<DrmEncoder> &encoders,
+    IdMapPtr<DrmCrtc> &crtcs, bool plugIn)
+{
+    DISPLAY_DEBUGLOG("plug %{public}d", plugIn);
     int drmFd = mDrmFdPtr->GetFd();
+    int ret;
+    int crtc_id = 0;
+    std::shared_ptr<DrmCrtc> crtc;
+    uint32_t blob_id;
+    drmModeAtomicReq *pset = drmModeAtomicAlloc();
+    DISPLAY_CHK_RETURN((pset == nullptr), DISPLAY_NULL_PTR,
+        DISPLAY_LOGE("drm atomic alloc failed errno %{public}d", errno));
+
     drmModeConnectorPtr c = drmModeGetConnector(drmFd, mId);
     DISPLAY_CHK_RETURN((c == nullptr), false, DISPLAY_LOGE("can not get connector"));
     if (mConnectState == c->connection) {
         drmModeFreeConnector(c);
         return false;
     } else {
+        crtc = UpdateCrtcId(encoders, crtcs, plugIn, c, &crtc_id);
+        if (crtc == nullptr) {
+            return DISPLAY_FAILURE;
+        }
+        DISPLAY_DEBUGLOG("get crtc id %{public}d ", crtc_id);
+
+        DrmVsyncWorker::GetInstance().EnableVsync(plugIn);
+        drmModeCreatePropertyBlob(drmFd, &c->modes[0],
+            sizeof(c->modes[0]), &blob_id);
+        ret = drmModeAtomicAddProperty(pset, crtc->GetId(), crtc->GetActivePropId(), (int)plugIn);
+        ret |= drmModeAtomicAddProperty(pset, crtc->GetId(), crtc->GetModePropId(), blob_id);
+        ret |= drmModeAtomicAddProperty(pset, GetId(), GetPropCrtcId(), crtc_id);
+        DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
+            DISPLAY_LOGE("can not add the crtc id prop %{public}d", errno));
+
+        ret = drmModeAtomicCommit(drmFd, pset, DRM_MODE_ATOMIC_ALLOW_MODESET, nullptr);
+        DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
+            DISPLAY_LOGE("can not add the crtc id prop %{public}d", errno));
+        drmModeAtomicFree(pset);
+
         mConnectState = c->connection;
         InitModes(*c);
         drmModeFreeConnector(c);
         return true;
     }
 }
+
 int32_t DrmConnector::GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *modes)
 {
     DISPLAY_CHK_RETURN((num == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("num is nullptr"));

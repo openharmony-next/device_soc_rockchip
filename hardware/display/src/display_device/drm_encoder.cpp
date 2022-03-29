@@ -33,8 +33,13 @@ int32_t DrmEncoder::PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
     auto crtcIter = crtcs.find(mCrtcId);
     if (crtcIter == crtcs.end()) {
         DISPLAY_LOGW("can not find crtc for id %{public}d", mCrtcId);
-        crtcIter = crtcs.begin();
-        return DISPLAY_FAILURE;
+        for (crtcIter = crtcs.begin(); crtcIter != crtcs.end(); ++crtcIter) {
+            auto &posCrts = crtcIter->second;
+            if (mPossibleCrtcs == (1<<posCrts->GetPipe())) {
+                DISPLAY_DEBUGLOG("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
+                break;
+            }
+        }
     }
     DISPLAY_CHK_RETURN((crtcIter == crtcs.end()), DISPLAY_FAILURE,
         DISPLAY_LOGE("have no crtc %{public}zu ", crtcs.size()));

@@ -300,7 +300,7 @@ bool DrmDevice::HandleHotplug(uint32_t dispId, bool plugIn)
         for (auto &connectorPair : mConnectors) {
             auto connector = connectorPair.second;
             if (connectorId == connector->GetId()) {
-                if (connector->HandleHotplug() == true) {
+                if (connector->HandleHotplug(mEncoders, mCrtcs, plugIn) == true) {
                     connector->Init(*this);
                     return true;
                 }

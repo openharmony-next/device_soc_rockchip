@@ -76,6 +76,10 @@ public:
     {
         return mEncoderId;
     }
+    void SetEncoderId(uint32_t id)
+    {
+        mEncoderId = id;
+    }
     void GetDisplayCap(DisplayCapability &cap);
     int32_t Init(DrmDevice &drmDevice);
     int32_t PickIdleCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId);
@@ -100,8 +104,9 @@ public:
     }
     int32_t SetDpmsState(uint64_t dmps);
     bool IsConnected();
-    bool HandleHotplug();
-
+    bool HandleHotplug(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<DrmCrtc> &crtcs, bool plugIn);
+    std::shared_ptr<DrmCrtc> UpdateCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<DrmCrtc> &crtcs,
+        bool plugIn, drmModeConnectorPtr c, int *crtc_id);
     int32_t GetBrightness(uint32_t& level);
     int32_t SetBrightness(uint32_t level);
 
