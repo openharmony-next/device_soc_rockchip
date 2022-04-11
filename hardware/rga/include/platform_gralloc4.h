@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ * Copyright (C) 2017-2018 RockChip Limited. All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +24,7 @@
  *          < 习语 和 缩略语 > :
  *
  *          -----------------------------------------------------------------------------------
- *  Usage:
+ *  Usage:        
  *
  *  Note:
  *
@@ -32,7 +33,7 @@
  *  Log:
  *      init.
     ----Fri Aug 28 10:10:14 2020
- *
+ *      
  *  --------------------------------------------------------------------------------------------------------
  */
 
@@ -45,7 +46,7 @@
  *  Include Files
  * ---------------------------------------------------------------------------------------------------------
  */
-#include <linux/kernel.h>
+// #include <linux/kernel.h>
 
 #include <stdint.h>
 
@@ -72,11 +73,6 @@ namespace gralloc4 {
  * ---------------------------------------------------------------------------------------------------------
  */
 
-/*
- * 获取 'handle' 引用的 graphic_buffer 的 internal_format.
- */
-uint64_t get_internal_format(buffer_handle_t handle);
-
 int get_width(buffer_handle_t handle, uint64_t* width);
 
 int get_height(buffer_handle_t handle, uint64_t* height);
@@ -93,14 +89,28 @@ int get_allocation_size(buffer_handle_t handle, uint64_t* usage);
 
 int get_share_fd(buffer_handle_t handle, int* share_fd);
 
-void unlock(buffer_handle_t bufferHandle);
+using android::status_t;
+
+status_t importBuffer(buffer_handle_t rawHandle, buffer_handle_t* outHandle);
 
 void freeBuffer(buffer_handle_t handle);
+
+status_t lock(buffer_handle_t bufferHandle,
+              uint64_t usage,
+              int x,
+              int y,
+              int w,
+              int h,
+              void** outData);
+
+void unlock(buffer_handle_t bufferHandle);
 
 /* ---------------------------------------------------------------------------------------------------------
  *  Inline Functions Implementation
  * ---------------------------------------------------------------------------------------------------------
  */
+
 }
 
 #endif /* __PLATFORM_GRALLOC4_H__ */
+
