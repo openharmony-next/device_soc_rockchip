@@ -19,30 +19,9 @@
 #ifndef _rk_drm_rga_
 #define _rk_drm_rga_
 
-#include <stdint.h>
-#include <errno.h>
-//#include <sys/cdefs.h>
-
-#include "rga.h"
-
-#ifdef ANDROID
-#define DRMRGA_HARDWARE_MODULE_ID "librga"
-
-#include <hardware/gralloc.h>
-#include <hardware/hardware.h>
-#include <system/graphics.h>
-#include <cutils/native_handle.h>
-
-#ifdef ANDROID_12
-#include <hardware/hardware_rockchip.h>
-#endif
-
-#endif
-
-#ifndef ANDROID /* LINUX */
 /* flip source image horizontally (around the vertical axis) */
 #define HAL_TRANSFORM_FLIP_H     0x01
-/* flip source image vertically (around the horizontal axis)*/
+/* flip source image vertically (around the horizontal axis) */
 #define HAL_TRANSFORM_FLIP_V     0x02
 /* rotate source image 90 degrees clockwise */
 #define HAL_TRANSFORM_ROT_90     0x04
@@ -50,16 +29,12 @@
 #define HAL_TRANSFORM_ROT_180    0x03
 /* rotate source image 270 degrees clockwise */
 #define HAL_TRANSFORM_ROT_270    0x07
-#endif
 
 #define HAL_TRANSFORM_FLIP_H_V   0x08
 
 /*****************************************************************************/
 
 /* for compatibility */
-#define DRM_RGA_MODULE_API_VERSION      HWC_MODULE_API_VERSION_0_1
-#define DRM_RGA_DEVICE_API_VERSION      HWC_DEVICE_API_VERSION_0_1
-#define DRM_RGA_API_VERSION             HWC_DEVICE_API_VERSION
 
 #define DRM_RGA_TRANSFORM_ROT_MASK      0x0000000F
 #define DRM_RGA_TRANSFORM_ROT_0         0x00000000
@@ -72,7 +47,7 @@
 #define DRM_RGA_TRANSFORM_FLIP_V        HAL_TRANSFORM_FLIP_V
 
 enum {
-    AWIDTH                      = 0,
+    AWIDTH = 0,
     AHEIGHT,
     ASTRIDE,
     AFORMAT,
@@ -81,7 +56,6 @@ enum {
 };
 /*****************************************************************************/
 
-#ifndef ANDROID
 /* memory type definitions. */
 enum drm_rockchip_gem_mem_type {
     /* Physically Continuous memory and used as default. */
@@ -103,7 +77,6 @@ typedef struct bo {
     size_t pitch;
     unsigned handle;
 } bo_t;
-#endif
 
 /*
    @value size:     user not need care about.For avoid read/write out of memory
@@ -148,11 +121,7 @@ typedef struct rga_info {
     int fd;
     void *virAddr;
     void *phyAddr;
-#ifndef ANDROID /* LINUX */
     unsigned hnd;
-#else /* Android */
-    buffer_handle_t hnd;
-#endif
     int format;
     rga_rect_t rect;
     unsigned int blend;
@@ -171,27 +140,7 @@ typedef struct rga_info {
     rga_nn_t nn;
     rga_dither_t dither;
     int rop_code;
-	int rd_mode;
-	unsigned short is_10b_compact;
-	unsigned short is_10b_endian;
-
-	int in_fence_fd;
-	int out_fence_fd;
-
-	int core;
-	int priority;
-
-	unsigned short enable;
-
-    int handle;
-
-    struct rga_mosaic_info mosaic_info;
-
-    struct rga_osd_info osd_info;
-
-    struct rga_pre_intr_info pre_intr;
-
-	char reserve[410];
+    int reserve[127];
 } rga_info_t;
 
 
@@ -208,11 +157,11 @@ typedef struct drm_rga {
    rga_set_rect(rects.src,0,0,1920,1080,1920,NV12);
    mean to set the src rect to the value.
  */
-static inline int rga_set_rect(rga_rect_t *rect,
-                               int x, int y, int w, int h, int sw, int sh, int f) {
-    if (!rect)
+static inline int rga_set_rect(rga_rect_t *rect, int x, int y, int w, int h, int sw, int sh, int f)
+{
+    if (!rect) {
         return -EINVAL;
-
+    }
     rect->xoffset = x;
     rect->yoffset = y;
     rect->width = w;
@@ -220,20 +169,19 @@ static inline int rga_set_rect(rga_rect_t *rect,
     rect->wstride = sw;
     rect->hstride = sh;
     rect->format = f;
-
     return 0;
 }
 
-#ifndef ANDROID /* LINUX */
-static inline void rga_set_rotation(rga_info_t *info, int angle) {
-    if (angle == 90)
+static inline void rga_set_rotation(rga_info_t *info, int angle)
+{
+    if (angle == 90) { // 90:HAL_TRANSFORM_ROT
         info->rotation = HAL_TRANSFORM_ROT_90;
-    else if (angle == 180)
+    } else if (angle == 180) { // 180:HAL_TRANSFORM_ROT
         info->rotation = HAL_TRANSFORM_ROT_180;
-    else if (angle == 270)
+    } else if (angle == 270) { // 270:HAL_TRANSFORM_ROT
         info->rotation = HAL_TRANSFORM_ROT_270;
+    }
 }
-#endif
 /*****************************************************************************/
 
 #endif

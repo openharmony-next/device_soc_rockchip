@@ -20,7 +20,6 @@
 #ifndef _LIBS_RGA_MUTEX_H
 #define _LIBS_RGA_MUTEX_H
 
-#ifndef ANDROID
 #include <stdint.h>
 #include <sys/types.h>
 #include <time.h>
@@ -88,7 +87,7 @@ class Condition;
  * recursive, i.e. the same thread can't lock it multiple times.
  */
 class CAPABILITY("mutex") Mutex {
-  public:
+public:
     enum {
         PRIVATE = 0,
         SHARED = 1
@@ -111,25 +110,28 @@ class CAPABILITY("mutex") Mutex {
     // Manages the mutex automatically. It'll be locked when Autolock is
     // constructed and released when Autolock goes out of scope.
     class SCOPED_CAPABILITY Autolock {
-      public:
-        inline explicit Autolock(Mutex& mutex) ACQUIRE(mutex) : mLock(mutex) {
+    public:
+        inline explicit Autolock(Mutex& mutex) ACQUIRE(mutex) : mLock(mutex)
+        {
             mLock.lock();
         }
-        inline explicit Autolock(Mutex* mutex) ACQUIRE(mutex) : mLock(*mutex) {
+        inline explicit Autolock(Mutex* mutex) ACQUIRE(mutex) : mLock(*mutex)
+        {
             mLock.lock();
         }
-        inline ~Autolock() RELEASE() {
+        inline ~Autolock() RELEASE()
+        {
             mLock.unlock();
         }
 
-      private:
+    private:
         Mutex& mLock;
         // Cannot be copied or moved - declarations only
         Autolock(const Autolock&);
         Autolock& operator=(const Autolock&);
     };
 
-  private:
+private:
     friend class Condition;
 
     // A mutex cannot be copied
@@ -140,13 +142,16 @@ class CAPABILITY("mutex") Mutex {
 };
 
 // ---------------------------------------------------------------------------
-inline Mutex::Mutex() {
+inline Mutex::Mutex()
+{
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(__attribute__((unused)) const char* name) {
+inline Mutex::Mutex(__attribute__((unused)) const char* name)
+{
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(int type, __attribute__((unused)) const char* name) {
+inline Mutex::Mutex(int type, __attribute__((unused)) const char* name)
+{
     if (type == SHARED) {
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
@@ -157,25 +162,30 @@ inline Mutex::Mutex(int type, __attribute__((unused)) const char* name) {
         pthread_mutex_init(&mMutex, nullptr);
     }
 }
-inline Mutex::~Mutex() {
+inline Mutex::~Mutex()
+{
     pthread_mutex_destroy(&mMutex);
 }
-inline int32_t Mutex::lock() {
+inline int32_t Mutex::lock()
+{
     return -pthread_mutex_lock(&mMutex);
 }
-inline void Mutex::unlock() {
+inline void Mutex::unlock()
+{
     pthread_mutex_unlock(&mMutex);
 }
-inline int32_t Mutex::tryLock() {
+inline int32_t Mutex::tryLock()
+{
     return -pthread_mutex_trylock(&mMutex);
 }
-inline int32_t Mutex::timedLock(int64_t timeoutNs) {
+inline int32_t Mutex::timedLock(int64_t timeoutNs)
+{
     timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
-    timeoutNs += now.tv_sec*1000000000 + now.tv_nsec;
+    timeoutNs += now.tv_sec * 1000000000 + now.tv_nsec; // 1000000000:unit conversion
     const struct timespec ts = {
-        /* .tv_sec = */ static_cast<time_t>(timeoutNs / 1000000000),
-        /* .tv_nsec = */ static_cast<long>(timeoutNs % 1000000000),
+        static_cast<time_t>(timeoutNs / 1000000000), // 1000000000:unit conversion
+        static_cast<long>(timeoutNs % 1000000000), // 1000000000:unit conversion
     };
     return -pthread_mutex_timedlock(&mMutex, &ts);
 }
@@ -189,5 +199,4 @@ inline int32_t Mutex::timedLock(int64_t timeoutNs) {
  */
 
 typedef Mutex::Autolock AutoMutex;
-#endif // __ANDROID_VNDK__
 #endif // _LIBS_RGA_MUTEX_H
