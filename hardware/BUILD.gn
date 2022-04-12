@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 group("hardware_group") {
   deps = [
+    "//device/soc/rockchip/hardware/gpu:mali-bifrost-g52-g2p0-ohos",
     "//device/soc/rockchip/hardware/isp:isp",
     "//device/soc/rockchip/hardware/mpp:mpp",
     "//device/soc/rockchip/hardware/wifi:ap6xxx",
