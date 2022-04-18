@@ -29,7 +29,7 @@ ohos_prebuilt_shared_library("mali-bifrost-g52-g2p0-ohos") {
   if (target_cpu == "arm") {
     source = "lib/libmali-bifrost-g52-g2p0-ohos.so"
   } else if (target_cpu == "arm64") {
-    source = "lib64/libmali-bifrost-g52-g2p0-wayland.so"
+    source = "lib64/libmali-bifrost-g52-g2p0-ohos.so"
   }
   install_images = [ chipset_base_dir ]
   relative_install_dir = "chipsetsdk"
