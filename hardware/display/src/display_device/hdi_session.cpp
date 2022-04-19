@@ -48,7 +48,7 @@ void HdiSession::Init()
             mHdiDisplays[display.first] = display.second;
         }
     }
-    std::shared_ptr<HdiNetLinkMonitor> mNetLinkMonitor = std::make_shared<HdiNetLinkMonitor>();
+    mNetLinkMonitor = std::make_shared<HdiNetLinkMonitor>();
     mNetLinkMonitor->Init();
 }
 
