@@ -21,6 +21,7 @@
 #include "display_device.h"
 #include "hdi_device_interface.h"
 #include "hdi_display.h"
+#include "hdi_netlink_monitor.h"
 
 namespace OHOS {
 namespace HDI {
@@ -62,6 +63,7 @@ public:
     void HandleHotplug(bool plugIn);
 
 private:
+    std::shared_ptr<HdiNetLinkMonitor> mNetLinkMonitor;
     std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> mHdiDisplays;
     std::vector<std::shared_ptr<HdiDeviceInterface>> mHdiDevices;
     std::unordered_map<HotPlugCallback, void *> mHotPlugCallBacks;
