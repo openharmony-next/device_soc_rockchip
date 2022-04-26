@@ -36,12 +36,12 @@ extern "C" {
 #define DISPLAY_UNUSED(x) (void)(x)
 #endif
 
-#define __FILENAME__ (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
+#define FILENAME (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
 
 #ifndef DISPLAY_DEBUGLOG
 #define DISPLAY_DEBUGLOG(format, ...) \
     do { \
-        HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
+        HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, FILENAME, __LINE__, \
             ##__VA_ARGS__); \
     } while (0)
 #endif
@@ -49,7 +49,7 @@ extern "C" {
 #ifndef DISPLAY_LOGI
 #define DISPLAY_LOGI(format, ...) \
     do { \
-        HILOG_INFO(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
+        HILOG_INFO(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, FILENAME, __LINE__, \
             ##__VA_ARGS__); \
     } while (0)
 #endif
@@ -57,7 +57,7 @@ extern "C" {
 #ifndef DISPLAY_LOGW
 #define DISPLAY_LOGW(format, ...) \
     do { \
-        HILOG_WARN(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
+        HILOG_WARN(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, FILENAME, __LINE__, \
             ##__VA_ARGS__); \
     } while (0)
 #endif
@@ -69,7 +69,7 @@ extern "C" {
             "\033[0;32;31m" \
             "[%{public}s@%{public}s:%{public}d] " format "\033[m" \
             "\n", \
-            __FUNCTION__, __FILENAME__, __LINE__, ##__VA_ARGS__); \
+            __FUNCTION__, FILENAME, __LINE__, ##__VA_ARGS__); \
     } while (0)
 #endif
 

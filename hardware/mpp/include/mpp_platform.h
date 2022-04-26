@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __MPP_PLATFORM__
-#define __MPP_PLATFORM__
+#ifndef MPP_PLATFORM
+#define MPP_PLATFORM
 
 #include "rk_type.h"
 #include "mpp_soc.h"

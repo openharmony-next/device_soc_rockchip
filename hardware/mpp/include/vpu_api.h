@@ -426,12 +426,12 @@ RK_S32 vpu_close_context(struct VpuCodecContext **ctx);
     RK_S32 (*get_unused_num)(vpu_display_mem_pool *p); \
     RK_S32 buff_size; \
     float version; \
-    RK_S32 res[18];
+    RK_S32 res[18]
 
 typedef struct vpu_display_mem_pool vpu_display_mem_pool;
 
 struct vpu_display_mem_pool {
-    vpu_display_mem_pool_FIELDS
+    vpu_display_mem_pool_FIELDS;
 };
 
 #ifdef __cplusplus

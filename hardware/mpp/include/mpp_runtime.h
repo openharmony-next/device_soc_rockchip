@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __MPP_RUNTIME__
-#define __MPP_RUNTIME__
+#ifndef MPP_RUNTIME
+#define MPP_RUNTIME
 
 #include "mpp_buffer.h"
 

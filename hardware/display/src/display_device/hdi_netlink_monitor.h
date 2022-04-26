@@ -15,6 +15,7 @@
 
 #ifndef HDI_NETLINK_NONITOR_H
 #define HDI_NETLINK_NONITOR_H
+#include <thread>
 
 namespace OHOS {
 namespace HDI {
