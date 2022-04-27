@@ -155,8 +155,8 @@
 #define container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
-#define __RETURN                __Return
-#define __FAILED                __Failed
+#define RETURN                __Return
+#define FAILED                __Failed
 
 #define ARG_T(t)                t
 #define ARG_N(a, b, c, d, N, ...)    N

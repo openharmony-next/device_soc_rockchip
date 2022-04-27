@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#ifndef _RGA_DRIVER_H_
-#define _RGA_DRIVER_H_
+#ifndef RGA_DRIVER_H
+#define RGA_DRIVER_H
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C"
