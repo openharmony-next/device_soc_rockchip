@@ -390,8 +390,7 @@ DrmModeBlock::DrmModeBlock(DrmMode &mode)
 int32_t DrmModeBlock::Init(DrmMode &mode)
 {
     int ret;
-    int drmFd;
-    drmFd = DrmDevice::GetDrmFd();
+    int drmFd = DrmDevice::GetDrmFd();
     DISPLAY_CHK_RETURN((drmFd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the drm fd is invalid"));
     drmModeModeInfo modeInfo = *(mode.GetModeInfoPtr());
     ret = drmModeCreatePropertyBlob(drmFd, static_cast<void *>(&modeInfo), sizeof(modeInfo), &mBlockId);
@@ -403,8 +402,7 @@ int32_t DrmModeBlock::Init(DrmMode &mode)
 DrmModeBlock::~DrmModeBlock()
 {
     DISPLAY_DEBUGLOG("mBlockId %{public}d", mBlockId);
-    int drmFd;
-    drmFd = DrmDevice::GetDrmFd();
+    int drmFd = DrmDevice::GetDrmFd();
     if ((mBlockId != DRM_INVALID_ID) && (drmFd >= 0)) {
         int ret = drmModeDestroyPropertyBlob(drmFd, mBlockId);
         if (ret != 0) {

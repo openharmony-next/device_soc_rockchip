@@ -38,7 +38,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 #include "RgaSingleton.h"
 
-class RockchipRga : public Singleton<RockchipRga> {
+class RockchipRga : public RgaSingleton<RockchipRga> {
 public:
 
     static inline RockchipRga& get()
@@ -86,6 +86,6 @@ private:
     int mLogAlways;
     void *mContext;
 
-    friend class Singleton<RockchipRga>;
+    friend class RgaSingleton<RockchipRga>;
 };
 #endif
