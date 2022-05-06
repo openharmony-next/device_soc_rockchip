@@ -12,3 +12,4 @@
 # limitations under the License.
 
 usb_default_config_path = "//device/soc/rockchip/common/hal/usb/rk3568/include"
+display_device_hal = "soc/rockchip/hardware"
