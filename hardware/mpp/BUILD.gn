@@ -18,7 +18,7 @@ ohos_prebuilt_shared_library("libmpp") {
   if (target_cpu == "arm") {
     source = "lib/librockchip_mpp.z.so"
   } else {
-    source = "lib64/librockchip_mpp.so"
+    source = "lib64/librockchip_mpp.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
