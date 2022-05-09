@@ -27,7 +27,7 @@
 #endif
 
 template <typename TYPE>
-class Singleton {
+class RgaSingleton {
 public:
     static TYPE& getInstance()
     {
@@ -46,12 +46,12 @@ public:
     }
 
 protected:
-    ~Singleton() { }
-    Singleton() { }
+    ~RgaSingleton() { }
+    RgaSingleton() { }
 
 private:
-    Singleton(const Singleton&);
-    Singleton& operator = (const Singleton&);
+    RgaSingleton(const RgaSingleton&);
+    RgaSingleton& operator = (const RgaSingleton&);
     static Mutex sLock;
     static TYPE* sInstance;
 };
@@ -61,10 +61,10 @@ private:
 #endif
 
 #define RGA_SINGLETON_STATIC_INSTANCE(TYPE) do { \
-    template<> ::Mutex  \
-        (::Singleton< TYPE >::sLock)(::Mutex::PRIVATE);  \
-    template<> TYPE* ::Singleton< TYPE >::sInstance(nullptr);  /* NOLINT */ \
-    template class ::Singleton< TYPE >; \
+    template<> ::RgaMutex  \
+        (::RgaSingleton< TYPE >::sLock)(::RgaMutex::PRIVATE);  \
+    template<> TYPE* ::RgaSingleton< TYPE >::sInstance(nullptr);  /* NOLINT */ \
+    template class ::RgaSingleton< TYPE >; \
 } while (0)
 
 #endif // _LIBS_RGA_SINGLETON_H

@@ -332,7 +332,7 @@ static inline RK_U32 hash_64(RK_U64 val, unsigned int bits)
 {
 #if __SIZEOF_POINTER__ == 8 // 8:sizeof pointer
     /* 64x64-bit multiply is efficient on all 64-bit processors */
-    return val * GOLDEN_RATIO_64 >> (64 - bits);
+    return val * (GOLDEN_RATIO_64 >> (64 - bits));
 #else
     /* Hash 64 bits using only 32x32-bit multiply. */
     return hash_32((RK_U32)val ^ ((val >> 32) * GOLDEN_RATIO_32), bits);
