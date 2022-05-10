@@ -28,6 +28,7 @@
                 <policyitem type="copyright" name="Rockchip Electronics Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
                 <policyitem type="copyright" name="HiHope Open Source Organization ." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Hihope"/>
                 <policyitem type="copyright" name="Institute of Software, CAS." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By ISCAS"/>           
+                <policyitem type="copyright" name="Shenzhen Kaihong DID Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>           
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
 		<policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
                 <policyitem type="license" name="MIT" path=".*" desc="Intel code"/>
