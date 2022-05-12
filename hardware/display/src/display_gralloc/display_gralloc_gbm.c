@@ -26,7 +26,6 @@
 #include <xf86drm.h>
 #include <securec.h>
 #include <linux/dma-buf.h>
-#include "wayland_drm_auth_client.h"
 #include "drm_fourcc.h"
 #include "hisilicon_drm.h"
 #include "hi_gbm.h"
@@ -193,11 +192,6 @@ static int32_t InitGbmDevice(const char *drmFile, GrallocManager *grallocManager
             DISPLAY_LOGE("drm file:%{public}s open failed %{public}s", drmFile, strerror(errno));
             return DISPLAY_FD_ERR;
         }
-	/*
-        if (WaylandDrmAuth(drmFd) != AUTH_SCUCCESS) {
-            DISPLAY_LOGE("drm authentication failed, may have no permission to allocate memory");
-        }
-	*/
         drmDropMaster(drmFd);
         struct gbm_device *gbmDevice = hdi_gbm_create_device(drmFd);
         grallocManager->drmFd = drmFd;
