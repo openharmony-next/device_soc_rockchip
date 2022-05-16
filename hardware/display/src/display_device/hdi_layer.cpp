@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "hdi_layer.h"
 #include <unistd.h>
+#include <libsync.h>
 #include <cerrno>
 
 namespace OHOS {
@@ -198,6 +199,16 @@ void HdiLayer::ClearColor(uint32_t color)
             SetPixel(handle, x, y, color);
         }
     }
+}
+
+void HdiLayer::WaitAcquireFence()
+{
+    int fd = GetAcquireFenceFd();
+    if (fd < 0) {
+        DISPLAY_LOGE("fd is invalid");
+        return;
+    }
+    sync_wait(fd, mFenceTimeOut);
 }
 } // namespace OHOS
 } // namespace HDI
