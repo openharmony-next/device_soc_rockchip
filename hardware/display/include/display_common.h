@@ -38,11 +38,16 @@ extern "C" {
 
 #define FILENAME (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
 
+#ifndef DISPLAY_DEBUGLOG_SWITCH
+#define DISPLAY_DEBUGLOG_SWITCH 0
+#endif
 #ifndef DISPLAY_DEBUGLOG
 #define DISPLAY_DEBUGLOG(format, ...) \
     do { \
+        if (DISPLAY_DEBUGLOG_SWITCH) { \
         HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, FILENAME, __LINE__, \
             ##__VA_ARGS__); \
+        } \
     } while (0)
 #endif
 
