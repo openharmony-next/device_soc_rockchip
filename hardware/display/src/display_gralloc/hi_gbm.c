@@ -131,12 +131,12 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     dumb.flags = 0;
     dumb.bpp = fmtInfo->bitsPerPixel;
     ret = drmIoctl(gbm->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
-    DISPLAY_LOGI("fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d bpp: %{public}u pitch %{public}d "
-        "size %{public}llu",
+    DISPLAY_DEBUGLOG("fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d bpp: %{public}u pitch"
+        "%{public}d size %{public}llu",
         format, dumb.width, dumb.height, dumb.bpp, dumb.pitch, dumb.size);
     DISPLAY_CHK_RETURN((ret != 0), NULL, DISPLAY_LOGE("DRM_IOCTL_MODE_CREATE_DUMB failed errno %{public}d", errno));
     InitGbmBo(bo, &dumb);
-    DISPLAY_LOGI(
+    DISPLAY_DEBUGLOG(
         "fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d  stride %{public}d size %{public}u", format,
         bo->width, bo->height, bo->stride, bo->size);
     return bo;
