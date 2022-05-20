@@ -128,7 +128,7 @@ int32_t DrmConnector::SetBrightness(uint32_t level)
     if (brFd <= 0) {
         brFd = open("/sys/class/backlight/backlight/brightness", O_RDWR);
         if (brFd < 0) {
-            DISPLAY_LOGE("oepn Brightness file failed\n");
+            DISPLAY_LOGE("open brightness file failed\n");
             return DISPLAY_NOT_SUPPORT;
         }
     }
