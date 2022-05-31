@@ -22,6 +22,7 @@
 #include "mpp_buffer.h"
 #include "rk_mpi.h"
 #include "mpp_common.h"
+#include "mpp_packet.h"
 #include "mpi_enc_utils.h"
 
 static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, RK_S32 gop_mode)
@@ -684,21 +685,6 @@ int hal_mpp_get_sps(void *ctx, unsigned char *buf, size_t *buf_size)
     return ret;
 }
 
-#define VIRTUAL_ADDR_LOW_BYTE_MASK 0xFFFFFFFF
-#define VIRTUAL_ADDR_HIGH_BYTE 0x7F00000000
-
-void *complete_addr(void *ptr)
-{
-    if (ptr == NULL) {
-        return NULL;
-    }
-
-    unsigned long originAddr = (unsigned long)ptr;
-    originAddr &= VIRTUAL_ADDR_LOW_BYTE_MASK;
-    originAddr |= VIRTUAL_ADDR_HIGH_BYTE;
-    return (void *)originAddr;
-}
-
 int hal_mpp_encode(void *ctx, int dma_fd, unsigned char *buf, size_t *buf_size)
 {
     if (!ctx) {
@@ -822,7 +808,6 @@ int hal_mpp_encode(void *ctx, int dma_fd, unsigned char *buf, size_t *buf_size)
         return ret;
     }
 
-    ptr = complete_addr(ptr);
     eok = memcpy_s(buf, len, ptr, len);
     if (eok != EOK) {
         mpp_err("memcpy_s failed\n");
