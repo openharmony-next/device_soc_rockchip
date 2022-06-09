@@ -71,7 +71,8 @@ ohos_shared_library("display_gralloc") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
@@ -100,7 +101,8 @@ ohos_shared_library("display_gfx") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
@@ -151,7 +153,8 @@ ohos_shared_library("display_device") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
