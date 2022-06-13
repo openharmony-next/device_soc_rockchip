@@ -174,12 +174,11 @@ int32_t rkFillRect(ISurface *iSurface, IRect *rect, uint32_t color, GfxOpt *opt)
     dst.phy_addr = 0; // (void*)iSurface->phyAddr;
     dst.vir_addr = 0; // iSurface->virAddr;
     dst.fd = (int32_t)iSurface->phyAddr;
-    if (*((int32_t*)dst.phy_addr) == 0 && dst.fd == 0 && dst.vir_addr == NULL) {
-        DISPLAY_LOGE("source iSurface address error");
+    if (dst.fd == 0) {
+        DISPLAY_LOGE("source fd is invalid");
         return DISPLAY_PARAM_ERR;
     }
-    DISPLAY_DEBUGLOG("gfx vir %{public}p phy 0x%{public}x fd %{public}d",
-        dst.vir_addr, *((int32_t*)dst.phy_addr), dst.fd);
+    DISPLAY_DEBUGLOG("fd %{public}d", dst.fd);
     dst.width = iSurface->width;
     dst.height = iSurface->height;
     dst.wstride = ALIGN_UP(iSurface->width, 16);
@@ -342,8 +341,8 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     srcRgaBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
     srcRgaBuffer.fd = (int32_t)srcSurface->phyAddr;
 
-    if (*((int32_t*)srcRgaBuffer.phy_addr) == 0 && srcRgaBuffer.fd == 0 && srcRgaBuffer.vir_addr == NULL) {
-        DISPLAY_LOGE("source iSurface address error");
+    if (srcRgaBuffer.fd == 0) {
+        DISPLAY_LOGE("source fd is invalid");
         return DISPLAY_PARAM_ERR;
     }
 
