@@ -24,7 +24,17 @@ ohos_prebuilt_shared_library("libmpp") {
   part_name = "rockchip_products"
   install_enable = true
 }
-
+ohos_prebuilt_shared_library("libvpu") {
+  if (target_cpu == "arm64") {
+    source = "lib64/librockchip_vpu.z.so"
+  }
+  install_images = [ chipset_base_dir ]
+  part_name = "rockchip_products"
+  install_enable = true
+}
 group("mpp") {
-  deps = [ ":libmpp" ]
+  deps = [
+    ":libmpp",
+    ":libvpu",
+  ]
 }

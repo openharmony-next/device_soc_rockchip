@@ -18,6 +18,7 @@ group("hardware_group") {
     "//device/soc/rockchip/rk3568/hardware/gpu:mali-bifrost-g52-g2p0-ohos",
     "//device/soc/rockchip/rk3568/hardware/isp:isp",
     "//device/soc/rockchip/rk3568/hardware/mpp:mpp",
+    "//device/soc/rockchip/rk3568/hardware/omx_il:omx_il",
     "//device/soc/rockchip/rk3568/hardware/wifi:ap6xxx",
   ]
 }
