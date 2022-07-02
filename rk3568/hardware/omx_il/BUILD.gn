@@ -17,6 +17,8 @@ import("//build/ohos/ndk/ndk.gni")
 ohos_prebuilt_shared_library("libOMX_Core") {
   if (target_cpu == "arm64") {
     source = "lib64/libOMX_Core.z.so"
+  } else {
+    source = "lib/libOMX_Core.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
@@ -26,6 +28,8 @@ ohos_prebuilt_shared_library("libOMX_Core") {
 ohos_prebuilt_shared_library("libOMX_Pluginhw") {
   if (target_cpu == "arm64") {
     source = "lib64/libOMX_Pluginhw.z.so"
+  } else {
+    source = "lib/libOMX_Pluginhw.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
@@ -35,6 +39,8 @@ ohos_prebuilt_shared_library("libOMX_Pluginhw") {
 ohos_prebuilt_shared_library("libomxvpu_dec") {
   if (target_cpu == "arm64") {
     source = "lib64/libomxvpu_dec.z.so"
+  } else {
+    source = "lib/libomxvpu_dec.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
@@ -44,6 +50,8 @@ ohos_prebuilt_shared_library("libomxvpu_dec") {
 ohos_prebuilt_shared_library("libomxvpu_enc") {
   if (target_cpu == "arm64") {
     source = "lib64/libomxvpu_enc.z.so"
+  } else {
+    source = "lib/libomxvpu_enc.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
@@ -53,6 +61,8 @@ ohos_prebuilt_shared_library("libomxvpu_enc") {
 ohos_prebuilt_shared_library("libRkOMX_Resourcemanager") {
   if (target_cpu == "arm64") {
     source = "lib64/libRkOMX_Resourcemanager.z.so"
+  } else {
+    source = "lib/libRkOMX_Resourcemanager.z.so"
   }
   install_images = [ chipset_base_dir ]
   part_name = "rockchip_products"
