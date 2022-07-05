@@ -1539,17 +1539,6 @@ OMX_ERRORTYPE Rkvpu_Enc_Terminate(OMX_COMPONENTTYPE *pOMXComponent)
     RKVPU_OMX_VIDEOENC_COMPONENT *pVideoEnc = (RKVPU_OMX_VIDEOENC_COMPONENT *)pRockchipComponent->hComponentHandle;
 
     FunctionIn();
-    if (pVideoEnc->vpu_ctx) {
-        if (pVideoEnc->rkvpu_close_cxt) {
-            pVideoEnc->rkvpu_close_cxt(&pVideoEnc->vpu_ctx);
-        }
-        pVideoEnc->vpu_ctx = NULL;
-        if (pVideoEnc->rkapi_hdl) {
-            dlclose(pVideoEnc->rkapi_hdl);
-            pVideoEnc->rkapi_hdl = NULL;
-        }
-    }
-
     if (pVideoEnc->bSpsPpsbuf) {
         Rockchip_OSAL_Free(pVideoEnc->bSpsPpsbuf);
         pVideoEnc->bSpsPpsbuf = NULL;
@@ -1561,6 +1550,16 @@ OMX_ERRORTYPE Rkvpu_Enc_Terminate(OMX_COMPONENTTYPE *pOMXComponent)
         pVideoEnc->enc_vpumem = NULL;
     }
 
+    if (pVideoEnc->vpu_ctx) {
+        if (pVideoEnc->rkvpu_close_cxt) {
+            pVideoEnc->rkvpu_close_cxt(&pVideoEnc->vpu_ctx);
+        }
+        pVideoEnc->vpu_ctx = NULL;
+        if (pVideoEnc->rkapi_hdl) {
+            dlclose(pVideoEnc->rkapi_hdl);
+            pVideoEnc->rkapi_hdl = NULL;
+        }
+    }
     if (pVideoEnc->rga_ctx != NULL) {
 #ifdef SUPPORT_RGA
         rga_dev_close(pVideoEnc->rga_ctx);

@@ -12,9 +12,9 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-shared_library("OMX_Pluginhw") {
+ohos_shared_library("libOMX_Pluginhw") {
   sources = [ "OMXPlugin.cpp" ]
   include_dirs = [
     ".",
@@ -23,6 +23,7 @@ shared_library("OMX_Pluginhw") {
     "//utils/native/base/include",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/hdf_core/framework/include/utils",
   ]
 
   cflags_cc = [
@@ -32,4 +33,18 @@ shared_library("OMX_Pluginhw") {
   ]
 
   deps = [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+group("lib_omx") {
+  if (product_name == "rk3568") {
+    deps = [
+      "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/dec:libomxvpu_dec",
+      "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/enc:libomxvpu_enc",
+      "//device/soc/rockchip/rk3568/hardware/omx_il/core:libOMX_Core",
+      "//device/soc/rockchip/rk3568/hardware/omx_il/libOMXPlugin:libOMX_Pluginhw",
+    ]
+  }
 }

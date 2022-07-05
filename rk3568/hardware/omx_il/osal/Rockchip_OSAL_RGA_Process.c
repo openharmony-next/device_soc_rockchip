@@ -134,7 +134,7 @@ OMX_S32 rga_copy(RockchipVideoPlane *plane, VPUMemLinear_t *vpumem, uint32_t Wid
         Rga_Request.dst.uv_addr  = vpumem->phy_addr;
     } else {
         Rga_Request.dst.yrgb_addr = vpumem->phy_addr;
-        Rga_Request.dst.uv_addr  = (OMX_U32)vpumem->vir_addr;
+        Rga_Request.dst.uv_addr  = (unsigned long)vpumem->vir_addr;
     }
 #endif
     Rga_Request.dst.v_addr   = 0;
@@ -155,7 +155,7 @@ OMX_S32 rga_copy(RockchipVideoPlane *plane, VPUMemLinear_t *vpumem, uint32_t Wid
     Rga_Request.render_mode = 5; // 5:value of render_mode
     Rga_Request.render_mode |= RGA_BUF_GEM_TYPE_DMA;
     if (plane->type == ANB_PRIVATE_BUF_VIRTUAL) {
-        Rga_Request.src.uv_addr = (OMX_U32)plane->addr;
+        Rga_Request.src.uv_addr = (unsigned long)plane->addr;
         Rga_Request.mmu_info.mmu_en = 1;
         Rga_Request.mmu_info.mmu_flag = ((2 & 0x3) << 4) | 1; // 2:byte alignment, 4:byte alignment
         if (VPUMemJudgeIommu()) {
@@ -230,14 +230,14 @@ OMX_S32 rga_crop_scale(RockchipVideoPlane *plane,
         Rga_Request.dst.uv_addr  = vpumem->phy_addr + plane->stride * orgin_h;
     } else {
         Rga_Request.line_draw_info.color |= (vpumem->phy_addr & 0xffff) << 16; // 16:byte alignment
-        Rga_Request.dst.uv_addr  = (OMX_U32)vpumem->vir_addr;
+        Rga_Request.dst.uv_addr  = (unsigned long)vpumem->vir_addr;
     }
 #else
     if (!VPUMemJudgeIommu()) {
         Rga_Request.dst.uv_addr  = vpumem->phy_addr;
     } else {
         Rga_Request.dst.yrgb_addr = vpumem->phy_addr;
-        Rga_Request.dst.uv_addr  = (OMX_U32)vpumem->vir_addr;
+        Rga_Request.dst.uv_addr  = (unsigned long)vpumem->vir_addr;
     }
 #endif
     Rga_Request.dst.v_addr   = 0;
@@ -259,7 +259,7 @@ OMX_S32 rga_crop_scale(RockchipVideoPlane *plane,
     Rga_Request.cosa = 65536; // 65536:2^16
 
     if (plane->type == ANB_PRIVATE_BUF_VIRTUAL) {
-        Rga_Request.src.uv_addr = (OMX_U32)plane->addr;
+        Rga_Request.src.uv_addr = (unsigned long)plane->addr;
         Rga_Request.mmu_info.mmu_en = 1;
         Rga_Request.mmu_info.mmu_flag = ((2 & 0x3) << 4) | 1; // 2:byte alignment, 4:byte alignment
         if (VPUMemJudgeIommu()) {
@@ -321,7 +321,7 @@ OMX_S32 rga_convert(rga_info_t *src, rga_info_t *dst, int rga_fd)
         Rga_Request.src.uv_addr  = src->fd;
     } else {
         Rga_Request.src.yrgb_addr = src->fd;
-        Rga_Request.src.uv_addr  = (OMX_U32)src->vir_addr;
+        Rga_Request.src.uv_addr  = (unsigned long)src->vir_addr;
     }
 #endif
     Rga_Request.src.v_addr   = 0;
@@ -357,10 +357,10 @@ OMX_S32 rga_convert(rga_info_t *src, rga_info_t *dst, int rga_fd)
         Rga_Request.mmu_info.mmu_flag  = ((2 & 0x3) << 4) | 1; // 2:byte alignment, 4:byte alignment
         Rga_Request.mmu_info.mmu_en = 1;
         if (src->type == ANB_PRIVATE_BUF_VIRTUAL) {
-            Rga_Request.src.uv_addr  =  (OMX_U32)(src->vir_addr);
+            Rga_Request.src.uv_addr  =  (unsigned long)(src->vir_addr);
             Rga_Request.mmu_info.mmu_flag |= ((1 << 31) | (1 << 8)); // 31:byte alignment, 8:byte alignment
         } else {
-            Rga_Request.dst.uv_addr  =  (OMX_U32)(dst->vir_addr);
+            Rga_Request.dst.uv_addr  =  (unsigned long)(dst->vir_addr);
             Rga_Request.mmu_info.mmu_flag |= ((1 << 31) | (1 << 10)); // 31:byte alignment, 10:byte alignment
         }
         if (VPUMemJudgeIommu()) {
