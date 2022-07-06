@@ -53,7 +53,7 @@ public:
     int32_t Init() override;
     int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer) override;
     int32_t Apply(bool modeSet) override;
-    int32_t UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock, drmModeAtomicReq &pset);
+    int32_t UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock);
 
 private:
     int32_t ApplyPlane(HdiDrmLayer &layer, HdiLayer &hlayer, DrmPlane &drmPlane, drmModeAtomicReqPtr pset);

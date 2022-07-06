@@ -98,7 +98,6 @@ bool DrmCrtc::CanBind()
 int32_t DrmCrtc::SetActivieMode(int32_t id)
 {
     DISPLAY_DEBUGLOG("set activie modeid to %{public}d", id);
-    DISPLAY_CHK_RETURN((id > 0), DISPLAY_PARAM_ERR, DISPLAY_LOGE("id %{public}d is invalid ", id));
     if (mActiveModeId != id) {
         mNeedModeSet = true;
     }

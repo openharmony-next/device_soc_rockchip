@@ -166,31 +166,39 @@ int32_t HdiDrmComposition::ApplyPlane(HdiDrmLayer &layer,
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiDrmComposition::UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock, drmModeAtomicReq &pset)
+int32_t HdiDrmComposition::UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock)
 {
     // set the mode
     DISPLAY_DEBUGLOG();
     if (mCrtc->NeedModeSet()) {
+        int drmFd = mDrmDevice->GetDrmFd();
+        drmModeAtomicReqPtr pset = drmModeAtomicAlloc();
         modeBlock = mConnector->GetModeBlockFromId(mCrtc->GetActiveModeId());
         if ((modeBlock != nullptr) && (modeBlock->GetBlockId() != DRM_INVALID_ID)) {
             // set to active
             DISPLAY_DEBUGLOG("set crtc to active");
-            int ret = drmModeAtomicAddProperty(&pset, mCrtc->GetId(), mCrtc->GetActivePropId(), 1);
+            int ret = drmModeAtomicAddProperty(pset, mCrtc->GetId(), mCrtc->GetActivePropId(), 1);
             DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
                 DISPLAY_LOGE("can not add the active prop errno %{public}d", errno));
 
             // set the mode id
             DISPLAY_DEBUGLOG("set the mode");
-            ret = drmModeAtomicAddProperty(&pset, mCrtc->GetId(), mCrtc->GetModePropId(), modeBlock->GetBlockId());
+            ret = drmModeAtomicAddProperty(pset, mCrtc->GetId(), mCrtc->GetModePropId(), modeBlock->GetBlockId());
             DISPLAY_DEBUGLOG("set the mode planeId %{public}d, propId %{public}d, GetBlockId: %{public}d",
                 mCrtc->GetId(), mCrtc->GetModePropId(), modeBlock->GetBlockId());
             DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
                 DISPLAY_LOGE("can not add the mode prop errno %{public}d", errno));
-            ret = drmModeAtomicAddProperty(&pset, mConnector->GetId(), mConnector->GetPropCrtcId(), mCrtc->GetId());
+            ret = drmModeAtomicAddProperty(pset, mConnector->GetId(), mConnector->GetPropCrtcId(), mCrtc->GetId());
             DISPLAY_DEBUGLOG("set the connector id: %{public}d, propId %{public}d, crtcId %{public}d",
                 mConnector->GetId(), mConnector->GetPropCrtcId(), mCrtc->GetId());
             DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
                 DISPLAY_LOGE("can not add the crtc id prop %{public}d", errno));
+
+            uint32_t flags = DRM_MODE_ATOMIC_ALLOW_MODESET;
+            ret = drmModeAtomicCommit(drmFd, pset, flags, nullptr);
+            DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE,
+                DISPLAY_LOGE("drmModeAtomicCommit failed %{public}d errno %{public}d", ret, errno));
+            mCrtc->ClearModeSet();
         }
     }
     return DISPLAY_SUCCESS;
@@ -253,7 +261,10 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     int ret = 0;
     std::unique_ptr<DrmModeBlock> modeBlock;
     int drmFd = mDrmDevice->GetDrmFd();
-    
+
+    ret = UpdateMode(modeBlock);
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("update mode failed"));
+
     DISPLAY_DEBUGLOG("mPlane size: %{public}zd mCompLayers size: %{public}zd", mPlanes.size(), mCompLayers.size());
     DISPLAY_CHK_RETURN((mPlanes.size() < mCompLayers.size()), DISPLAY_FAILURE, DISPLAY_LOGE("plane not enough"));
     drmModeAtomicReqPtr pset = drmModeAtomicAlloc();
@@ -279,8 +290,18 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     /* Remove useless planes from the drm */
     RemoveUnusePlane(atomicReqPtr.Get());
 
-    ret = UpdateMode(modeBlock, *(atomicReqPtr.Get()));
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("update mode failed"));
+    ret = drmModeAtomicAddProperty(pset, mConnector->GetId(), mConnector->GetPropCrtcId(), mCrtc->GetId());
+    DISPLAY_LOGI("set the connector id: %{public}d, propId %{public}d, crtcId %{public}d", mConnector->GetId(),
+        mConnector->GetPropCrtcId(), mCrtc->GetId());
+    DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
+        DISPLAY_LOGE("can not add the crtc id prop %{public}d", errno));
+
+    // set to active
+    DISPLAY_DEBUGLOG("set crtc to active");
+    ret = drmModeAtomicAddProperty(pset, mCrtc->GetId(), mCrtc->GetActivePropId(), 1);
+    DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
+        DISPLAY_LOGE("can not add the active prop errno %{public}d", errno));
+
     uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
 
     ret = drmModeAtomicCommit(drmFd, atomicReqPtr.Get(), flags, nullptr);
