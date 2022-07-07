@@ -17,6 +17,7 @@
 #define __VPU_API_H__
 
 #include "rk_type.h"
+#include "mpp_err.h"
 
 /**
  * @brief rockchip media process interface
@@ -91,6 +92,8 @@ typedef enum VPU_API_CMD {
     VPU_API_SET_OUTPUT_BLOCK,
     VPU_API_GET_EOS_STATUS,
     VPU_API_SET_OUTPUT_MODE,
+
+    VPU_API_DEC_GET_DPB_SIZE = 0X100, // add by zhanghanmeng
 
     /* get sps/pps header */
     VPU_API_GET_EXTRA_INFO = 0x200,
@@ -238,9 +241,8 @@ typedef enum OMX_RK_VIDEO_CODINGTYPE {
     OMX_RK_VIDEO_CodingVP6,
     OMX_RK_VIDEO_CodingHEVC,                            /**< H.265/HEVC */
     OMX_RK_VIDEO_CodingAVS,                             /**< AVS+ */
-    OMX_RK_VIDEO_CodingKhronosExtensions = 0x6F000000,  /**< Reserved region for introducing Khronos
-							     Standard Extensions */
-    OMX_RK_VIDEO_CodingVendorStartUnused = 0x7F000000,  /**< Reserved region for introducing Vendor Extensions */
+    OMX_RK_VIDEO_CodingKhronosExtensions = 0x6F000000,
+    OMX_RK_VIDEO_CodingVendorStartUnused = 0x7F000000,
     OMX_RK_VIDEO_CodingMax = 0x7FFFFFFF
 } OMX_RK_VIDEO_CODINGTYPE;
 
@@ -268,6 +270,7 @@ typedef enum VPU_API_ERR {
 typedef enum VPU_FRAME_ERR {
     VPU_FRAME_ERR_UNKNOW           = 0x0001,
     VPU_FRAME_ERR_UNSUPPORT        = 0x0002,
+
 } VPU_FRAME_ERR;
 
 typedef struct EncParameter {
@@ -426,12 +429,12 @@ RK_S32 vpu_close_context(struct VpuCodecContext **ctx);
     RK_S32 (*get_unused_num)(vpu_display_mem_pool *p); \
     RK_S32 buff_size; \
     float version; \
-    RK_S32 res[18]
+    RK_S32 res[18];
 
 typedef struct vpu_display_mem_pool vpu_display_mem_pool;
 
 struct vpu_display_mem_pool {
-    vpu_display_mem_pool_FIELDS;
+    vpu_display_mem_pool_FIELDS
 };
 
 #ifdef __cplusplus
@@ -465,4 +468,4 @@ void release_vpu_memory_pool_allocator(vpu_display_mem_pool *ipool);
 }
 #endif
 
-#endif /* __VPU_API_H__ */
+#endif

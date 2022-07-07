@@ -13,9 +13,9 @@
 
 import("//build/ohos.gni")
 import("//device/soc/rockchip/rk3568/hardware/omx_il/rk_omx.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-shared_library("omxvpu_dec") {
+ohos_shared_library("libomxvpu_dec") {
   sources = [
     "Rkvpu_OMX_Vdec.c",
     "Rkvpu_OMX_VdecControl.c",
@@ -31,14 +31,15 @@ shared_library("omxvpu_dec") {
     "//device/hihope/rk3568/hardware/rga/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
     "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
     "//utils/native/base/include",
-    "//vendor/hihope/rk3568/mpp/legacy",
-    "//vendor/hihope/rk3568/mpp/inc",
+    "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy",
+    "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/adapter/uhdf2/osal/include/",
   ]
 
   cflags = [
@@ -74,9 +75,11 @@ shared_library("omxvpu_dec") {
 
   deps = [
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/common:RkOMX_Basecomponent",
-    "//device/soc/rockchip/rk3568/hardware/omx_il/component/common:RkOMX_Resourcemanager",
+    "//device/soc/rockchip/rk3568/hardware/omx_il/component/common:libRkOMX_Resourcemanager",
     "//device/soc/rockchip/rk3568/hardware/omx_il/osal:RkOMX_OSAL",
     "//device/soc/rockchip/rk3568/hardware/rga:librga",
-    "//vendor/hihope/rk3568/mpp/mpp/legacy:rockchip_vpu",
   ]
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
 }
