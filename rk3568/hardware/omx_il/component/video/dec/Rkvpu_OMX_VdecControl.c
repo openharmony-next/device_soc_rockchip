@@ -1926,30 +1926,6 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
         }
             break;
 #endif
-        case OMX_IndexParamRkDescribeColorAspects: {
-            OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS *colorAspectsParams =
-                (OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS *)pComponentConfigStructure;
-
-            ret = Rockchip_OMX_Check_SizeVersion((void *)colorAspectsParams,
-                sizeof(OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS));
-            if (ret != OMX_ErrorNone) {
-                goto EXIT;
-            }
-            if (colorAspectsParams->nPortIndex != OUTPUT_PORT_INDEX) {
-                return OMX_ErrorBadParameter;
-            }
-
-            colorAspectsParams->sAspects.mRange = pVideoDec->mFinalColorAspects.mRange;
-            colorAspectsParams->sAspects.mPrimaries = pVideoDec->mFinalColorAspects.mPrimaries;
-            colorAspectsParams->sAspects.mTransfer = pVideoDec->mFinalColorAspects.mTransfer;
-            colorAspectsParams->sAspects.mMatrixCoeffs = pVideoDec->mFinalColorAspects.mMatrixCoeffs;
-
-            if (colorAspectsParams->bRequestingDataSpace || colorAspectsParams->bDataSpaceChanged) {
-                return OMX_ErrorUnsupportedSetting;
-            }
-        }
-            break;
-
         default:
             switch (nIndexExt) {
                 case OMX_IndexParamRkDescribeColorAspects: {
