@@ -11,5 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usb_default_config_path = "//device/soc/rockchip/rk3399/common/hal/usb/rk3568/include"
+usb_default_config_path =
+    "//device/soc/rockchip/rk3399/common/hal/usb/rk3568/include"
 display_device_hal = "soc/rockchip/rk3399/hardware"
