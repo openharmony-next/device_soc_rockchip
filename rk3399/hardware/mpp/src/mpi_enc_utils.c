@@ -418,21 +418,27 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
             break;
         case MPP_ENC_RC_MODE_CBR : {
             /* CBR mode has narrow bound */
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16); // mpp cfg value: p->bps * 17 / 16
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 15 / 16); // mpp cfg value: p->bps * 15 / 16
+            // mpp cfg value: p->bps * 17 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16);
+            // mpp cfg value: p->bps * 15 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 15 / 16);
         }
             break;
         case MPP_ENC_RC_MODE_VBR :
         case MPP_ENC_RC_MODE_AVBR : {
             /* VBR mode has wide bound */
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16); // mpp cfg value: p->bps * 17 / 16
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 1 / 16);  // mpp cfg value: p->bps * 1 / 16
+            // mpp cfg value: p->bps * 17 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16);
+            // mpp cfg value: p->bps * 1 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 1 / 16);
         }
             break;
         default : {
             /* default use CBR mode */
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16); // mpp cfg value: p->bps * 17 / 16
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 15 / 16); // mpp cfg value: p->bps * 15 / 16
+            // mpp cfg value: p->bps * 17 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 16);
+            // mpp cfg value: p->bps * 15 / 16
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 15 / 16);
         }
             break;
     }
