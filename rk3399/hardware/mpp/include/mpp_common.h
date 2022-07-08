@@ -208,7 +208,7 @@ static __inline RK_S32 mpp_clip(RK_S32 a, RK_S32 amin, RK_S32 amax)
 
 static __inline RK_U32 mpp_is_32bit(void)
 {
-    return ((sizeof(void *) == 4) ? (1) : (0));
+    return ((sizeof(void *) == 4) ? (1) : (0)); //4 bytes
 }
 
 RK_S32 axb_div_c(RK_S32 a, RK_S32 b, RK_S32 c);

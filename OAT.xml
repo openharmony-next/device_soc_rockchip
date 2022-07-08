@@ -32,9 +32,11 @@
                 <policyitem type="copyright" name="Institute of Software, CAS." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By ISCAS"/>           
                 <policyitem type="copyright" name="Shenzhen Kaihong DID Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>           
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
-		<policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
+		        <policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
                 <policyitem type="license" name="MIT" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="Intel Corporation" path=".*" desc="Intel code"/>
+                <policyitem type="copyright" name="iSoftStone Information Technology (Group) Co.,Ltd. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/> 
+                
 	        </policy>
         </policylist>
         <filefilterlist>
@@ -96,7 +98,12 @@
                 <filteritem type="filepath" name="rk3568/hardware/gra/lib/*" desc="gra 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
-                <filteritem type="filepath" name="rk3568/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>              
+                <filteritem type="filepath" name="rk3399/hardware/mpp/lib/librockchip_mpp.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3399/hardware/mpp/lib64/librockchip_mpp.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3399/hardware/mpp/lib64/librockchip_vpu.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3399/hardware/rga/lib/librga.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3399/hardware/rga/lib64/librga.z.so" desc="lib files"/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
