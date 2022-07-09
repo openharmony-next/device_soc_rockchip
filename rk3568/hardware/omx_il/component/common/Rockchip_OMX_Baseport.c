@@ -824,7 +824,7 @@ OMX_ERRORTYPE Rockchip_OMX_Port_Constructor(OMX_HANDLETYPE hComponent)
         pRockchipPort = NULL;
         goto EXIT;
     }
-    ret = Rockchip_OSAL_SignalCreate(&pRockchipOutputPort->unloadedResource);
+    ret = Rockchip_OSAL_SemaphoreCreate(&pRockchipOutputPort->unloadedResource);
     if (ret != OMX_ErrorNone) {
         Rockchip_OSAL_SemaphoreTerminate(pRockchipOutputPort->loadedResource);
         pRockchipOutputPort->loadedResource = NULL;

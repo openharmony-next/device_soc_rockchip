@@ -88,6 +88,8 @@ typedef struct _RKVPU_OMX_VIDEOENC_COMPONENT {
 
     OMX_BOOL bStoreMetaData;
 
+    OMX_BOOL bOhosDynamicBuffer;
+
     OMX_BOOL bPrependSpsPpsToIdr;
 
     OMX_BOOL bRkWFD;

@@ -48,7 +48,12 @@
 #include "Rockchip_OSAL_ColorUtils.h"
 #include "Rockchip_OSAL_OHOS.h"
 #include "Rkvpu_OMX_VdecControl.h"
-
+#ifdef OHOS_BUFFER_HANDLE
+#include <display_gralloc.h>
+#include <buffer_handle.h>
+#include <display_type.h>
+#include <codec_omx_ext.h>
+#endif
 #include "vpu.h"
 #include "vpu_mem_pool.h"
 #include "vpu_mem.h"
@@ -120,13 +125,9 @@ static const CodecProfileLevel kH265ProfileLevels[] = {
     { OMX_VIDEO_HEVCProfileMain10, OMX_VIDEO_HEVCMainTierLevel51 },
 };
 
-OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(
-    OMX_IN OMX_HANDLETYPE            hComponent,
-    OMX_INOUT OMX_BUFFERHEADERTYPE **ppBufferHdr,
-    OMX_IN OMX_U32                   nPortIndex,
-    OMX_IN OMX_PTR                   pAppPrivate,
-    OMX_IN OMX_U32                   nSizeBytes,
-    OMX_IN OMX_U8                   *pBuffer)
+OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(OMX_IN OMX_HANDLETYPE hComponent,
+    OMX_INOUT OMX_BUFFERHEADERTYPE **ppBufferHdr, OMX_IN OMX_U32 nPortIndex,
+    OMX_IN OMX_PTR pAppPrivate, OMX_IN OMX_U32 nSizeBytes, OMX_IN OMX_U8 *pBuffer)
 {
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
@@ -138,16 +139,19 @@ OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(
     FunctionIn();
 
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check version ret err");
         goto EXIT;
     }
 
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
@@ -155,21 +159,25 @@ OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(
 
     pRockchipPort = &pRockchipComponent->pRockchipPort[nPortIndex];
     if (nPortIndex >= pRockchipComponent->portParam.nPorts) {
+        omx_err_f("nPortIndex is %d", nPortIndex);
         ret = OMX_ErrorBadPortIndex;
         goto EXIT;
     }
     if (pRockchipPort->portState != OMX_StateIdle) {
+        omx_err_f("portState is %d", pRockchipPort->portState);
         ret = OMX_ErrorIncorrectStateOperation;
         goto EXIT;
     }
 
     if (CHECK_PORT_TUNNELED(pRockchipPort) && CHECK_PORT_BUFFER_SUPPLIER(pRockchipPort)) {
+        omx_err_f("port is tunneled or suffer");
         ret = OMX_ErrorBadPortIndex;
         goto EXIT;
     }
 
     temp_bufferHeader = (OMX_BUFFERHEADERTYPE *)Rockchip_OSAL_Malloc(sizeof(OMX_BUFFERHEADERTYPE));
     if (temp_bufferHeader == NULL) {
+        omx_err_f("temp_bufferHeader is null");
         ret = OMX_ErrorInsufficientResources;
         goto EXIT;
     }
@@ -188,7 +196,6 @@ OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(
             if (nPortIndex == INPUT_PORT_INDEX)
                 temp_bufferHeader->nInputPortIndex = INPUT_PORT_INDEX;
             else {
-                omx_trace("bufferHeader[%ld] = %p ", i, temp_bufferHeader);
                 temp_bufferHeader->nOutputPortIndex = OUTPUT_PORT_INDEX;
             }
             VIDEO_DBG(VIDEO_DBG_LOG_BUFFER,
@@ -210,7 +217,7 @@ OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(
             goto EXIT;
         }
     }
-
+    omx_err_f("buffer is enough");
     Rockchip_OSAL_Free(temp_bufferHeader);
     ret = OMX_ErrorInsufficientResources;
 
@@ -219,12 +226,9 @@ EXIT:
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(
-    OMX_IN OMX_HANDLETYPE            hComponent,
-    OMX_INOUT OMX_BUFFERHEADERTYPE **ppBuffer,
-    OMX_IN OMX_U32                   nPortIndex,
-    OMX_IN OMX_PTR                   pAppPrivate,
-    OMX_IN OMX_U32                   nSizeBytes)
+OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(OMX_IN OMX_HANDLETYPE hComponent,
+    OMX_INOUT OMX_BUFFERHEADERTYPE **ppBuffer, OMX_IN OMX_U32 nPortIndex,
+    OMX_IN OMX_PTR pAppPrivate, OMX_IN OMX_U32 nSizeBytes)
 {
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
@@ -236,37 +240,36 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(
     int                    temp_buffer_fd = -1;
     OMX_U32                i = 0;
     MEMORY_TYPE            mem_type = NORMAL_MEMORY;
-
     FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("hComponent is null");
         goto EXIT;
     }
-
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
-
     pRockchipPort = &pRockchipComponent->pRockchipPort[nPortIndex];
     if (nPortIndex >= pRockchipComponent->portParam.nPorts) {
+        omx_err_f("nPortIndex is %d", nPortIndex);
         ret = OMX_ErrorBadPortIndex;
         goto EXIT;
     }
-
     if (CHECK_PORT_TUNNELED(pRockchipPort) && CHECK_PORT_BUFFER_SUPPLIER(pRockchipPort)) {
+        omx_err_f("port check err");
         ret = OMX_ErrorBadPortIndex;
         goto EXIT;
     }
-
 #if 1
     if ((pVideoDec->bDRMPlayerMode == OMX_TRUE) && (nPortIndex == INPUT_PORT_INDEX)) {
         mem_type = SECURE_MEMORY;
@@ -276,7 +279,6 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(
         mem_type = SYSTEM_MEMORY;
     }
 #endif
-
     if (pVideoDec->bDRMPlayerMode == OMX_TRUE) {
         omx_trace("Rkvpu_OMX_AllocateBuffer bDRMPlayerMode");
         temp_buffer = (OMX_U8 *)Rockchip_OSAL_SharedMemory_Alloc(pVideoDec->hSharedMemory, nSizeBytes, mem_type);
@@ -288,35 +290,38 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(
     } else {
         temp_buffer = (OMX_U8 *)Rockchip_OSAL_Malloc(nSizeBytes);
         if (temp_buffer == NULL) {
+            omx_err_f("temp_buffer is null");
             ret = OMX_ErrorInsufficientResources;
             goto EXIT;
         }
     }
-
     temp_bufferHeader = (OMX_BUFFERHEADERTYPE *)Rockchip_OSAL_Malloc(sizeof(OMX_BUFFERHEADERTYPE));
     if (temp_bufferHeader == NULL) {
+        omx_err_f("temp_bufferHeader is null");
         Rockchip_OSAL_Free(temp_buffer);
         ret = OMX_ErrorInsufficientResources;
         goto EXIT;
     }
     Rockchip_OSAL_Memset(temp_bufferHeader, 0, sizeof(OMX_BUFFERHEADERTYPE));
-
     for (i = 0; i < pRockchipPort->portDefinition.nBufferCountActual; i++) {
         if (pRockchipPort->bufferStateAllocate[i] == BUFFER_STATE_FREE) {
             pRockchipPort->extendBufferHeader[i].OMXBufferHeader = temp_bufferHeader;
             pRockchipPort->extendBufferHeader[i].buf_fd[0] = temp_buffer_fd;
             pRockchipPort->bufferStateAllocate[i] = (BUFFER_STATE_ALLOCATED | HEADER_STATE_ALLOCATED);
             INIT_SET_SIZE_VERSION(temp_bufferHeader, OMX_BUFFERHEADERTYPE);
-            omx_err("buf_fd: 0x%x, OMXBufferHeader:%p", temp_buffer_fd, temp_bufferHeader);
+            omx_info_f("buf_fd: 0x%x, OMXBufferHeader:%p", temp_buffer_fd, temp_bufferHeader);
             temp_bufferHeader->pBuffer = temp_buffer;
             temp_bufferHeader->nAllocLen      = nSizeBytes;
             temp_bufferHeader->pAppPrivate    = pAppPrivate;
-            if (nPortIndex == INPUT_PORT_INDEX)
+            omx_info_f("nPortIndex is %d", nPortIndex);
+            if (nPortIndex == INPUT_PORT_INDEX) {
                 temp_bufferHeader->nInputPortIndex = INPUT_PORT_INDEX;
-            else
+            } else {
                 temp_bufferHeader->nOutputPortIndex = OUTPUT_PORT_INDEX;
+            }
             pRockchipPort->assignedBufferNum++;
             if (pRockchipPort->assignedBufferNum == pRockchipPort->portDefinition.nBufferCountActual) {
+                omx_info_f("bPopulated is OMX_TRUE");
                 pRockchipPort->portDefinition.bPopulated = OMX_TRUE;
                 Rockchip_OSAL_SemaphorePost(pRockchipPort->loadedResource);
             }
@@ -325,10 +330,9 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(
             goto EXIT;
         }
     }
-
+    omx_err_f("buffer is enough");
     Rockchip_OSAL_Free(temp_bufferHeader);
     Rockchip_OSAL_Free(temp_buffer);
-
     ret = OMX_ErrorInsufficientResources;
 
 EXIT:
@@ -336,10 +340,8 @@ EXIT:
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(
-    OMX_IN OMX_HANDLETYPE hComponent,
-    OMX_IN OMX_U32        nPortIndex,
-    OMX_IN OMX_BUFFERHEADERTYPE *pBufferHdr)
+OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(OMX_IN OMX_HANDLETYPE hComponent,
+    OMX_IN OMX_U32 nPortIndex, OMX_IN OMX_BUFFERHEADERTYPE *pBufferHdr)
 {
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
@@ -347,33 +349,34 @@ OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(
     RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec = NULL;
     ROCKCHIP_OMX_BASEPORT      *pRockchipPort = NULL;
     OMX_U32                i = 0;
-
     FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("size version check err");
         goto EXIT;
     }
-
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
     pRockchipPort = &pRockchipComponent->pRockchipPort[nPortIndex];
-
     if (CHECK_PORT_TUNNELED(pRockchipPort) && CHECK_PORT_BUFFER_SUPPLIER(pRockchipPort)) {
+        omx_err_f("port check error");
         ret = OMX_ErrorBadPortIndex;
         goto EXIT;
     }
 
     if ((pRockchipPort->portState != OMX_StateLoaded) && (pRockchipPort->portState != OMX_StateInvalid)) {
+        omx_err_f("portState is %d", pRockchipPort->portState);
         (*(pRockchipComponent->pCallbacks->EventHandler)) (pOMXComponent,
             pRockchipComponent->callbackData,
             (OMX_U32)OMX_EventError,
@@ -406,6 +409,7 @@ OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(
                     Rockchip_OSAL_Free(pRockchipPort->extendBufferHeader[i].OMXBufferHeader);
                     pRockchipPort->extendBufferHeader[i].OMXBufferHeader = NULL;
                     pBufferHdr = NULL;
+                    omx_info_f("free buffer %d", i);
                 }
                 pRockchipPort->bufferStateAllocate[i] = BUFFER_STATE_FREE;
                 ret = OMX_ErrorNone;
@@ -413,18 +417,16 @@ OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(
             }
         }
     }
-
 EXIT:
     if (ret == OMX_ErrorNone) {
+        omx_trace_f("ret is OMX_ErrorNone");
         if (pRockchipPort->assignedBufferNum == 0) {
             omx_trace("pRockchipPort->unloadedResource signal set");
             Rockchip_OSAL_SemaphorePost(pRockchipPort->unloadedResource);
             pRockchipPort->portDefinition.bPopulated = OMX_FALSE;
         }
     }
-
     FunctionOut();
-
     return ret;
 }
 
@@ -443,27 +445,18 @@ EXIT:
 OMX_ERRORTYPE Rkvpu_OMX_FreeTunnelBuffer(ROCKCHIP_OMX_BASEPORT *pOMXBasePort, OMX_U32 nPortIndex)
 {
     OMX_ERRORTYPE                 ret = OMX_ErrorNone;
-    (void) pOMXBasePort;
-    (void) nPortIndex;
+    omx_err_f("This is not implemented");
     ret = OMX_ErrorTunnelingUnsupported;
     goto EXIT;
 EXIT:
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_ComponentTunnelRequest(
-    OMX_IN OMX_HANDLETYPE hComp,
-    OMX_IN OMX_U32        nPort,
-    OMX_IN OMX_HANDLETYPE hTunneledComp,
-    OMX_IN OMX_U32        nTunneledPort,
-    OMX_INOUT OMX_TUNNELSETUPTYPE *pTunnelSetup)
+OMX_ERRORTYPE Rkvpu_OMX_ComponentTunnelRequest(OMX_IN OMX_HANDLETYPE hComp, OMX_IN OMX_U32 nPort,
+    OMX_IN OMX_HANDLETYPE hTunneledComp, OMX_IN OMX_U32 nTunneledPort, OMX_INOUT OMX_TUNNELSETUPTYPE *pTunnelSetup)
 {
     OMX_ERRORTYPE ret = OMX_ErrorNone;
-    (void) hComp;
-    (void) nPort;
-    (void) hTunneledComp;
-    (void) nTunneledPort;
-    (void) pTunnelSetup;
+    omx_err_f("This is not implemented");
     ret = OMX_ErrorTunnelingUnsupported;
     goto EXIT;
 EXIT:
@@ -473,27 +466,25 @@ EXIT:
 OMX_ERRORTYPE Rkvpu_OMX_GetFlushBuffer(ROCKCHIP_OMX_BASEPORT *pRockchipPort, ROCKCHIP_OMX_DATABUFFER *pDataBuffer[])
 {
     OMX_ERRORTYPE ret = OMX_ErrorNone;
-
     FunctionIn();
-
     *pDataBuffer = NULL;
-
     if (pRockchipPort->portWayType == WAY1_PORT) {
+        omx_trace("pRockchipPort->portWayType is WAY1_PORT");
         *pDataBuffer = &pRockchipPort->way.port1WayDataBuffer.dataBuffer;
     } else if (pRockchipPort->portWayType == WAY2_PORT) {
+        omx_trace("pRockchipPort->portWayType is WAY2_PORT");
         pDataBuffer[0] = &(pRockchipPort->way.port2WayDataBuffer.inputDataBuffer);
         pDataBuffer[1] = &(pRockchipPort->way.port2WayDataBuffer.outputDataBuffer);
     }
-
     goto EXIT;
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
 OMX_ERRORTYPE Rkvpu_OMX_FlushPort(OMX_COMPONENTTYPE *pOMXComponent, OMX_S32 portIndex)
 {
+    FunctionIn();
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     ROCKCHIP_OMX_BASEPORT      *pRockchipPort = NULL;
@@ -502,15 +493,12 @@ OMX_ERRORTYPE Rkvpu_OMX_FlushPort(OMX_COMPONENTTYPE *pOMXComponent, OMX_S32 port
     ROCKCHIP_OMX_MESSAGE       *message = NULL;
     OMX_S32                semValue = 0;
     int i = 0, maxBufferNum = 0;
-    FunctionIn();
-
     pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
-
     while (Rockchip_OSAL_GetElemNum(&pRockchipPort->bufferQ) > 0) {
         Rockchip_OSAL_Get_SemaphoreCount(pRockchipComponent->pRockchipPort[portIndex].bufferSemID, &semValue);
-        if (semValue == 0)
+        if (semValue == 0) {
             Rockchip_OSAL_SemaphorePost(pRockchipComponent->pRockchipPort[portIndex].bufferSemID);
-
+        }
         Rockchip_OSAL_SemaphoreWait(pRockchipComponent->pRockchipPort[portIndex].bufferSemID);
         message = (ROCKCHIP_OMX_MESSAGE *)Rockchip_OSAL_Dequeue(&pRockchipPort->bufferQ);
         if ((message != NULL) && (message->messageType != ROCKCHIP_OMX_CommandFakeBuffer)) {
@@ -612,17 +600,19 @@ OMX_ERRORTYPE Rkvpu_OMX_BufferFlush(OMX_COMPONENTTYPE *pOMXComponent, OMX_S32 nP
     ROCKCHIP_OMX_BASEPORT      *pInputPort  = NULL;
 
     FunctionIn();
-
     if (pOMXComponent == NULL) {
+        omx_err_f("pOMXComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check version ret err");
         goto EXIT;
     }
 
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
@@ -751,57 +741,106 @@ OMX_ERRORTYPE Rkvpu_InputBufferReturn(OMX_COMPONENTTYPE *pOMXComponent, ROCKCHIP
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     ROCKCHIP_OMX_BASEPORT      *rockchipOMXInputPort = &pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX];
     OMX_BUFFERHEADERTYPE     *bufferHeader = NULL;
-
     FunctionIn();
-
     bufferHeader = dataBuffer->bufferHeader;
-
     if (bufferHeader != NULL) {
+        omx_trace("bufferHeader is %p", bufferHeader);
         if (rockchipOMXInputPort->markType.hMarkTargetComponent != NULL) {
-            bufferHeader->hMarkTargetComponent      = rockchipOMXInputPort->markType.hMarkTargetComponent;
-            bufferHeader->pMarkData                 = rockchipOMXInputPort->markType.pMarkData;
+            omx_trace("hMarkTargetComponent is %p", rockchipOMXInputPort->markType.hMarkTargetComponent);
+            bufferHeader->hMarkTargetComponent = rockchipOMXInputPort->markType.hMarkTargetComponent;
+            bufferHeader->pMarkData = rockchipOMXInputPort->markType.pMarkData;
             rockchipOMXInputPort->markType.hMarkTargetComponent = NULL;
             rockchipOMXInputPort->markType.pMarkData = NULL;
         }
-
         if (bufferHeader->hMarkTargetComponent != NULL) {
+            omx_trace("bufferHeader->hMarkTargetComponent is %p", bufferHeader->hMarkTargetComponent);
             if (bufferHeader->hMarkTargetComponent == pOMXComponent) {
-                pRockchipComponent->pCallbacks->EventHandler(pOMXComponent,
-                    pRockchipComponent->callbackData,
-                    OMX_EventMark,
-                    0, 0, bufferHeader->pMarkData);
+                omx_trace("EventHandler OMX_EventMark");
+                pRockchipComponent->pCallbacks->EventHandler(pOMXComponent, pRockchipComponent->callbackData,
+                    OMX_EventMark, 0, 0, bufferHeader->pMarkData);
             } else {
                 pRockchipComponent->propagateMarkType.hMarkTargetComponent = bufferHeader->hMarkTargetComponent;
                 pRockchipComponent->propagateMarkType.pMarkData = bufferHeader->pMarkData;
             }
         }
-
         bufferHeader->nFilledLen = 0;
         bufferHeader->nOffset = 0;
-
+        omx_trace("input buffer return");
         Rkvpu_OMX_InputBufferReturn(pOMXComponent, bufferHeader);
     }
-
     /* reset dataBuffer */
     Rockchip_ResetDataBuffer(dataBuffer);
-
     goto EXIT;
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
 OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
     OMX_BUFFERHEADERTYPE *pOutputBuffer, VPU_FRAME *pframe)
 {
+    FunctionIn();
     OMX_ERRORTYPE                  ret                = OMX_ErrorNone;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
 #if AVS100
     RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
 #endif
     ROCKCHIP_OMX_BASEPORT *pOutputPort = &pRockchipComponent->pRockchipPort[OUTPUT_PORT_INDEX];
+    
+#ifdef OHOS_BUFFER_HANDLE
+    if (pVideoDec->bOhosBufferHandle == OMX_TRUE) {
+        omx_info("bOhosBufferHandle is TRUE");
+        OMX_U32 mWidth = pOutputPort->portDefinition.format.video.nFrameWidth;
+        OMX_U32 mHeight = pOutputPort->portDefinition.format.video.nFrameHeight;
+        OMX_U32 mStride = 0;
+        OMX_U32 mSliceHeight =  0;
+        mStride = Get_Video_HorAlign(pVideoDec->codecId, mWidth, mHeight, pVideoDec->codecProfile);
+        mSliceHeight = Get_Video_VerAlign(pVideoDec->codecId, mHeight, pVideoDec->codecProfile);
 
+        BufferHandle* bufferHandle = (BufferHandle*)pOutputBuffer->pBuffer;
+        
+        if (bufferHandle == NULL) {
+            omx_err("bufferHandle is null");
+            return OMX_ErrorBadParameter;
+        }
+        
+        if (bufferHandle->format != PIXEL_FMT_YCRCB_420_SP && bufferHandle->format != PIXEL_FMT_YCBCR_420_SP &&
+            bufferHandle->format != PIXEL_FMT_YCBCR_420_P && bufferHandle->format != PIXEL_FMT_YCRCB_420_P) {
+            omx_err("bufferhandle format is %d", bufferHandle->format);
+        }
+
+        pOutputBuffer->nFilledLen = bufferHandle->stride * bufferHandle->height;
+        VPUMemLink(&pframe->vpumem);
+        VPUMemInvalidate(&pframe->vpumem);
+        rga_buffer_t src;
+        rga_buffer_t dst;
+        im_rect rect;
+        Rockchip_OSAL_Memset(&src, 0, sizeof(src));
+        Rockchip_OSAL_Memset(&dst, 0, sizeof(dst));
+        src.fd = pframe->vpumem.phy_addr;
+        src.wstride  = pframe->FrameWidth;
+        src.hstride  = pframe->FrameHeight;
+        src.width    = mWidth;
+        src.height   = mHeight;
+        src.format   = RK_FORMAT_YCbCr_420_SP;
+        dst.fd = bufferHandle->fd;
+        dst.wstride  = mStride;
+        dst.hstride  = mSliceHeight;
+        dst.width    = mWidth;
+        dst.height   = mHeight;
+        dst.format   = RK_FORMAT_YCbCr_420_SP;
+        rect.x = 0;
+        rect.y = 0;
+        rect.width = mWidth;
+        rect.height = mHeight;
+        imcrop(src, dst, rect);
+        VPUFreeLinear(&pframe->vpumem);
+        FunctionOut();
+        return ret;
+    } else {
+        omx_info("bOhosBufferHandle is FALSE");
+    }
+#endif // OHOS_BUFFER_HANDLE
 #ifdef USE_STOREMETADATA
     if (pVideoDec->bStoreMetaData == OMX_TRUE) {
         OMX_U32 mWidth = pOutputPort->portDefinition.format.video.nFrameWidth;
@@ -833,6 +872,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
             VPUFreeLinear(&pframe->vpumem);
             Rockchip_OSAL_UnlockANB(pGrallocHandle);
         }
+        FunctionOut();
         return ret;
     }
 #endif
@@ -879,6 +919,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
             VPUFreeLinear(&pframe->vpumem);
         }
         Rockchip_OSAL_UnlockANB(pOutputBuffer->pBuffer);
+        FunctionOut();
         return ret;
     }
 #endif
@@ -1149,12 +1190,11 @@ OMX_ERRORTYPE Rkvpu_OutputBufferGetQueue(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCo
     ROCKCHIP_OMX_BASEPORT   *pRockchipPort = &pRockchipComponent->pRockchipPort[OUTPUT_PORT_INDEX];
     ROCKCHIP_OMX_MESSAGE    *message = NULL;
     ROCKCHIP_OMX_DATABUFFER *outputUseBuffer = NULL;
-
     FunctionIn();
-
     outputUseBuffer = &(pRockchipPort->way.port2WayDataBuffer.outputDataBuffer);
 
     if (pRockchipComponent->currentState != OMX_StateExecuting) {
+        omx_err_f("currentState is %d", pRockchipComponent->currentState);
         ret = OMX_ErrorUndefined;
         goto EXIT;
     } else if ((pRockchipComponent->transientState != ROCKCHIP_OMX_TransStateExecutingToIdle) &&
@@ -1163,21 +1203,22 @@ OMX_ERRORTYPE Rkvpu_OutputBufferGetQueue(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCo
         if (outputUseBuffer->dataValid != OMX_TRUE) {
             message = (ROCKCHIP_OMX_MESSAGE *)Rockchip_OSAL_Dequeue(&pRockchipPort->bufferQ);
             if (message == NULL) {
+                omx_err_f("message is null");
                 ret = OMX_ErrorUndefined;
                 goto EXIT;
             }
             if (message->messageType == ROCKCHIP_OMX_CommandFakeBuffer) {
+                omx_err_f("messageType == ROCKCHIP_OMX_CommandFakeBuffer");
                 Rockchip_OSAL_Free(message);
                 ret = OMX_ErrorCodecFlush;
                 goto EXIT;
             }
-
+            outputUseBuffer->dataValid     = OMX_TRUE;
+            outputUseBuffer->dataLen       = 0;
+            outputUseBuffer->usedDataLen   = 0;
             outputUseBuffer->bufferHeader  = (OMX_BUFFERHEADERTYPE *)(message->pCmdData);
             outputUseBuffer->allocSize     = outputUseBuffer->bufferHeader->nAllocLen;
-            outputUseBuffer->dataLen       = 0; // dataBuffer->bufferHeader->nFilledLen;
             outputUseBuffer->remainDataLen = outputUseBuffer->dataLen;
-            outputUseBuffer->usedDataLen   = 0; // dataBuffer->bufferHeader->nOffset;
-            outputUseBuffer->dataValid     = OMX_TRUE;
             Rockchip_OSAL_Free(message);
         }
         ret = OMX_ErrorNone;
@@ -1229,9 +1270,7 @@ OMX_ERRORTYPE Rkvpu_CodecBufferReset(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCompon
     ROCKCHIP_OMX_BASEPORT   *pRockchipPort = NULL;
 
     FunctionIn();
-
     pRockchipPort = &pRockchipComponent->pRockchipPort[PortIndex];
-
     ret = Rockchip_OSAL_ResetQueue(&pRockchipPort->codecBufferQ);
     if (ret != 0) {
         ret = OMX_ErrorUndefined;
@@ -1240,52 +1279,53 @@ OMX_ERRORTYPE Rkvpu_CodecBufferReset(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCompon
     while (1) {
         OMX_S32 cnt = 0;
         Rockchip_OSAL_Get_SemaphoreCount(pRockchipPort->codecSemID, (OMX_S32*)&cnt);
-        if (cnt > 0)
+        if (cnt > 0) {
+            omx_info_f("cnt >0, wait");
             Rockchip_OSAL_SemaphoreWait(pRockchipPort->codecSemID);
-        else
+        } else {
+            omx_info_f("cnt = 0 , do not wait");
             break;
+        }
     }
     ret = OMX_ErrorNone;
-
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_GetParameter(
-    OMX_IN OMX_HANDLETYPE hComponent,
-    OMX_IN OMX_INDEXTYPE  nParamIndex,
-    OMX_INOUT OMX_PTR     ComponentParameterStructure)
+OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OMX_INDEXTYPE  nParamIndex,
+    OMX_INOUT OMX_PTR ComponentParameterStructure)
 {
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = NULL;
-
     FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check size error");
         goto EXIT;
     }
 
     if (pOMXComponent->pComponentPrivate == NULL) {
         ret = OMX_ErrorBadParameter;
+        omx_err_f("pComponentPrivate is null");
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
-
     if (pRockchipComponent->currentState == OMX_StateInvalid) {
         ret = OMX_ErrorInvalidState;
+        omx_err_f("currentState is OMX_StateInvalid");
         goto EXIT;
     }
 
     if (ComponentParameterStructure == NULL) {
+        omx_err_f("ComponentParameterStructure is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
@@ -1295,39 +1335,37 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(
             OMX_PORT_PARAM_TYPE *portParam = (OMX_PORT_PARAM_TYPE *)ComponentParameterStructure;
             ret = Rockchip_OMX_Check_SizeVersion(portParam, sizeof(OMX_PORT_PARAM_TYPE));
             if (ret != OMX_ErrorNone) {
+                omx_err_f("check version ret err");
                 goto EXIT;
             }
-
             portParam->nPorts           = pRockchipComponent->portParam.nPorts;
             portParam->nStartPortNumber = pRockchipComponent->portParam.nStartPortNumber;
             ret = OMX_ErrorNone;
+            break;
         }
-        break;
         case OMX_IndexParamVideoPortFormat: {
             OMX_VIDEO_PARAM_PORTFORMATTYPE *portFormat = (OMX_VIDEO_PARAM_PORTFORMATTYPE *)ComponentParameterStructure;
-            OMX_U32                         portIndex = portFormat->nPortIndex;
-            OMX_U32                         index    = portFormat->nIndex;
+            OMX_U32 portIndex = portFormat->nPortIndex, index = portFormat->nIndex, supportFormatNum = 0;
             ROCKCHIP_OMX_BASEPORT               *pRockchipPort = NULL;
             OMX_PARAM_PORTDEFINITIONTYPE   *portDefinition = NULL;
-            OMX_U32                         supportFormatNum = 0; /* supportFormatNum = N-1 */
 #ifdef USE_ANB
             RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec =
                 (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
 #endif
             ret = Rockchip_OMX_Check_SizeVersion(portFormat, sizeof(OMX_VIDEO_PARAM_PORTFORMATTYPE));
             if (ret != OMX_ErrorNone) {
+                omx_err_f("check size ret err");
                 goto EXIT;
             }
-
             if ((portIndex >= pRockchipComponent->portParam.nPorts)) {
+                omx_err_f("portIndex is %d", portIndex);
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
             }
-
-
             if (portIndex == INPUT_PORT_INDEX) {
                 supportFormatNum = INPUT_PORT_SUPPORTFORMAT_NUM_MAX - 1;
                 if (index > supportFormatNum) {
+                    omx_err_f("index is too large");
                     ret = OMX_ErrorNoMore;
                     goto EXIT;
                 }
@@ -1341,40 +1379,128 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(
             } else if (portIndex == OUTPUT_PORT_INDEX) {
                 pRockchipPort = &pRockchipComponent->pRockchipPort[OUTPUT_PORT_INDEX];
                 portDefinition = &pRockchipPort->portDefinition;
-
                 if (pRockchipPort->bStoreMetaData == OMX_FALSE) {
                     switch (index) {
-                        case supportFormat_0:
+                        case supportFormat_0: {
                             portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
                             portFormat->eColorFormat       = OMX_COLOR_FormatYUV420SemiPlanar;
                             portFormat->xFramerate         = portDefinition->format.video.xFramerate;
+                            omx_info_f("index is supportFormat_0");
                             break;
-                        default:
+                        }
+                        default: {
                             if (index > supportFormat_0) {
+                                omx_err_f("nomore index supported");
                                 ret = OMX_ErrorNoMore;
                                 goto EXIT;
                             }
                             break;
+                        }
                     }
                 } else {
                     switch (index) {
-                        case supportFormat_0:
+                        case supportFormat_0: {
                             portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
                             portFormat->eColorFormat       = OMX_COLOR_FormatYUV420SemiPlanar;
                             portFormat->xFramerate         = portDefinition->format.video.xFramerate;
+                            omx_info_f("index is supportFormat_0");
                             break;
-                        default:
+                        }
+                        default: {
                             if (index > supportFormat_0) {
+                                omx_err_f("nomore index supported");
                                 ret = OMX_ErrorNoMore;
                                 goto EXIT;
                             }
                             break;
+                        }
                     }
                 }
             }
             ret = OMX_ErrorNone;
+            break;
         }
-        break;
+#ifdef OHOS_BUFFER_HANDLE
+    case OMX_IndexParamSupportBufferType: {
+        omx_info("%s:OMX_IndexParamSupportBufferType", __func__);
+        struct SupportBufferType *bufferTyps = (struct SupportBufferType *)ComponentParameterStructure;
+        if (bufferTyps == NULL) {
+            omx_err_f("bufferTyps is null");
+            ret = OMX_ErrorBadParameter;
+            goto EXIT;
+        }
+        OMX_U32                       portIndex = bufferTyps->portIndex;
+        if (portIndex >= pRockchipComponent->portParam.nPorts) {
+            ret = OMX_ErrorBadPortIndex;
+            goto EXIT;
+        }
+        ret = Rockchip_OMX_Check_SizeVersion(bufferTyps, sizeof(struct SupportBufferType));
+        if (ret != OMX_ErrorNone) {
+            goto EXIT;
+        }
+        bufferTyps->bufferTypes = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
+        if (portIndex == OUTPUT_PORT_INDEX) {
+            bufferTyps->bufferTypes  |= CODEC_BUFFER_TYPE_HANDLE;
+        }
+        ret = OMX_ErrorNone;
+        } break;
+    case OMX_IndexParamGetBufferHandleUsage: {
+        struct GetBufferHandleUsageParams *usage = (struct GetBufferHandleUsageParams *)ComponentParameterStructure;
+        if (usage == NULL) {
+            omx_err_f("usage is null");
+            ret = OMX_ErrorBadParameter;
+            goto EXIT;
+        }
+        OMX_U32                       portIndex = usage->portIndex;
+        if (portIndex >= pRockchipComponent->portParam.nPorts || portIndex == INPUT_PORT_INDEX) {
+            ret = OMX_ErrorBadPortIndex;
+            goto EXIT;
+        }
+        
+        ret = Rockchip_OMX_Check_SizeVersion(usage, sizeof(struct GetBufferHandleUsageParams));
+        if (ret != OMX_ErrorNone) {
+            goto EXIT;
+        }
+
+        usage->usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+        ret = OMX_ErrorNone;
+        } break;
+    case OMX_IndexCodecVideoPortFormat: {
+            struct CodecVideoPortFormatParam *videoFormat =
+                (struct CodecVideoPortFormatParam *)ComponentParameterStructure;
+            if (videoFormat == NULL) {
+                omx_err_f("videoFormat is null");
+                ret = OMX_ErrorBadParameter;
+                goto EXIT;
+            }
+            OMX_U32 portIndex = videoFormat->portIndex;
+            if (portIndex >= pRockchipComponent->portParam.nPorts) {
+                ret = OMX_ErrorBadPortIndex;
+                goto EXIT;
+            }
+
+            ret = Rockchip_OMX_Check_SizeVersion(videoFormat, sizeof(struct CodecVideoPortFormatParam));
+            if (ret != OMX_ErrorNone) {
+                goto EXIT;
+            }
+            ROCKCHIP_OMX_BASEPORT *pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
+            OMX_PARAM_PORTDEFINITIONTYPE *portDefinition = &pRockchipPort->portDefinition;
+            if (portIndex == INPUT_PORT_INDEX) {
+                videoFormat->codecColorFormat =
+                    Rockchip_OSAL_OmxColorFormat2CodecFormat(portDefinition->format.video.eColorFormat);
+                ;
+                videoFormat->codecCompressFormat = portDefinition->format.video.eCompressionFormat;
+                videoFormat->framerate = portDefinition->format.video.xFramerate;
+            } else {
+                videoFormat->codecColorFormat =
+                    Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                videoFormat->framerate = portDefinition->format.video.xFramerate;
+                videoFormat->codecCompressFormat = OMX_VIDEO_CodingUnused;
+            }
+            ret = OMX_ErrorNone;
+
+        } break;
+#endif
 #ifdef USE_ANB
         case OMX_IndexParamGetAndroidNativeBufferUsage:
         case OMX_IndexParamdescribeColorFormat: {
@@ -1552,8 +1678,8 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(
                 return OMX_ErrorNoMore;
             }
             return OMX_ErrorNone;
+            break;
         }
-        break;
         case OMX_IndexParamVideoHDRRockchipExtensions: {
             OMX_EXTENSION_VIDEO_PARAM_HDR *hdrParams =
                 (OMX_EXTENSION_VIDEO_PARAM_HDR *) ComponentParameterStructure;
@@ -1568,53 +1694,51 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(
             hdrParams->eColorSpace = pVideoDec->extColorSpace;
             hdrParams->eDyncRange = pVideoDec->extDyncRange;
             ret = OMX_ErrorNone;
+            break;
         }
-        break;
         default: {
             ret = Rockchip_OMX_GetParameter(hComponent, nParamIndex, ComponentParameterStructure);
+            omx_info_f("Rockchip_OMX_GetParameter ret value is %d", ret);
+            break;
         }
-        break;
     }
-
 EXIT:
     FunctionOut();
-
     return ret;
 }
-OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
-    OMX_IN OMX_HANDLETYPE hComponent,
-    OMX_IN OMX_INDEXTYPE  nIndex,
-    OMX_IN OMX_PTR        ComponentParameterStructure)
+OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
+    OMX_IN OMX_INDEXTYPE nIndex, OMX_IN OMX_PTR ComponentParameterStructure)
 {
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = NULL;
-
     FunctionIn();
-
     if (hComponent == NULL) {
         ret = OMX_ErrorBadParameter;
+        omx_err_f("hComponent is null");
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("version check err");
         goto EXIT;
     }
-
     if (pOMXComponent->pComponentPrivate == NULL) {
         ret = OMX_ErrorBadParameter;
+        omx_err_f("pComponentPrivate is null");
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
-
     if (pRockchipComponent->currentState == OMX_StateInvalid) {
         ret = OMX_ErrorInvalidState;
+        omx_err_f("currentState is OMX_StateInvalid");
         goto EXIT;
     }
 
     if (ComponentParameterStructure == NULL) {
         ret = OMX_ErrorBadParameter;
+        omx_err_f("ComponentParameterStructure is null");
         goto EXIT;
     }
 
@@ -1627,10 +1751,12 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
 
             ret = Rockchip_OMX_Check_SizeVersion(portFormat, sizeof(OMX_VIDEO_PARAM_PORTFORMATTYPE));
             if (ret != OMX_ErrorNone) {
+                omx_err_f("version check error");
                 goto EXIT;
             }
 
             if ((portIndex >= pRockchipComponent->portParam.nPorts)) {
+                omx_err_f("protIndex is %d", portIndex);
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
             } else {
@@ -1652,11 +1778,13 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
             ROCKCHIP_OMX_BASEPORT             *pRockchipPort;
 
             if (portIndex >= pRockchipComponent->portParam.nPorts) {
+                omx_err_f("protIndex is %d", portIndex);
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
             }
             ret = Rockchip_OMX_Check_SizeVersion(pPortDefinition, sizeof(OMX_PARAM_PORTDEFINITIONTYPE));
             if (ret != OMX_ErrorNone) {
+                omx_err_f("version check error");
                 goto EXIT;
             }
 
@@ -1665,6 +1793,7 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
             if ((pRockchipComponent->currentState != OMX_StateLoaded) &&
                 (pRockchipComponent->currentState != OMX_StateWaitForResources)) {
                 if (pRockchipPort->portDefinition.bEnabled == OMX_TRUE) {
+                    omx_err_f("portDefinition.bEnabled is TRUE");
                     ret = OMX_ErrorIncorrectStateOperation;
                     goto EXIT;
                 }
@@ -1672,17 +1801,79 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
 
             ret = Rkvpu_UpdatePortDefinition(hComponent, pPortDefinition, portIndex);
             if (OMX_ErrorNone != ret) {
+                omx_err_f("Rkvpu_UpdatePortDefinition ret error");
                 goto EXIT;
             }
         }
         break;
+#ifdef OHOS_BUFFER_HANDLE
+        case OMX_IndexParamUseBufferType: {
+            struct UseBufferType *bufferType = (struct UseBufferType *)ComponentParameterStructure;
+            if (bufferType == NULL) {
+                omx_err_f("bufferType is null");
+                ret = OMX_ErrorBadParameter;
+                goto EXIT;
+            }
+            
+            OMX_U32  portIndex = bufferType->portIndex;
+            if (portIndex >= pRockchipComponent->portParam.nPorts) {
+                omx_err_f("portIndex is %d", portIndex);
+                ret = OMX_ErrorBadPortIndex;
+                goto EXIT;
+            }
+            ret = Rockchip_OMX_Check_SizeVersion(bufferType, sizeof(struct UseBufferType));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("check version ret err");
+                goto EXIT;
+            }
+            if (((bufferType->bufferType & CODEC_BUFFER_TYPE_HANDLE) == CODEC_BUFFER_TYPE_HANDLE) &&
+                portIndex == OUTPUT_PORT_INDEX) {
+                RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec =
+                    (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
+                pVideoDec->bOhosBufferHandle = OMX_TRUE;
+            }
+            break;
+        }
+        case OMX_IndexCodecVideoPortFormat: {
+            struct CodecVideoPortFormatParam *videoFormat =
+                (struct CodecVideoPortFormatParam *)ComponentParameterStructure;
+            if (videoFormat == NULL) {
+                omx_err_f("videoFormat is null");
+                ret = OMX_ErrorBadParameter;
+                goto EXIT;
+            }
+            OMX_U32 portIndex = videoFormat->portIndex;
+            if (portIndex >= pRockchipComponent->portParam.nPorts) {
+                omx_err_f("portIndex is %d", portIndex);
+                ret = OMX_ErrorBadPortIndex;
+                goto EXIT;
+            }
+            ret = Rockchip_OMX_Check_SizeVersion(videoFormat, sizeof(struct CodecVideoPortFormatParam));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("check version ret err");
+                goto EXIT;
+            }
+            ROCKCHIP_OMX_BASEPORT *pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
+            OMX_PARAM_PORTDEFINITIONTYPE *portDefinition = &pRockchipPort->portDefinition;
+            portDefinition->format.video.eColorFormat =
+                Rochip_OSAL_CodecFormat2OmxColorFormat(videoFormat->codecColorFormat);
+            portDefinition->format.video.xFramerate = videoFormat->framerate;
+            portDefinition->format.video.eCompressionFormat = videoFormat->codecCompressFormat;
+            ret = OMX_ErrorNone;
+            break;
+        }
+#endif
 #ifdef USE_ANB
         case OMX_IndexParamEnableAndroidBuffers:
+            omx_trace("OMX_IndexParamEnableAndroidBuffers!!");
         case OMX_IndexParamUseAndroidNativeBuffer:
+            omx_trace("OMX_IndexParamUseAndroidNativeBuffer!!");
         case OMX_IndexParamStoreMetaDataBuffer:
+            omx_trace("OMX_IndexParamStoreMetaDataBuffer!!");
         case OMX_IndexParamprepareForAdaptivePlayback:
+            omx_trace("OMX_IndexParamprepareForAdaptivePlayback!!");
         case OMX_IndexParamAllocateNativeHandle: {
-            omx_trace("Rockchip_OSAL_SetANBParameter!!");
+            omx_trace("OMX_IndexParamAllocateNativeHandle!!");
             ret = Rockchip_OSAL_SetANBParameter(hComponent, nIndex, ComponentParameterStructure);
         }
         break;
@@ -1851,47 +2042,48 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(
 
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
-    OMX_HANDLETYPE hComponent,
-    OMX_INDEXTYPE nIndex,
-    OMX_PTR pComponentConfigStructure)
+OMX_ERRORTYPE Rkvpu_OMX_GetConfig(OMX_HANDLETYPE hComponent,
+    OMX_INDEXTYPE nIndex, OMX_PTR pComponentConfigStructure)
 {
+    FunctionIn();
     OMX_ERRORTYPE          ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = NULL;
     RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec = NULL;
-
-    FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check version ret err");
         goto EXIT;
     }
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     if (pComponentConfigStructure == NULL) {
+        omx_err_f("pComponentConfigStructure is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     if (pRockchipComponent->currentState == OMX_StateInvalid) {
+        omx_err_f("currentState == OMX_StateInvalid");
         ret = OMX_ErrorInvalidState;
         goto EXIT;
     }
 
     pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
     if (pVideoDec == NULL) {
+        omx_err_f("pVideoDec is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
@@ -1905,14 +2097,15 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
             pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
 
             if (rectParams->nPortIndex != OUTPUT_PORT_INDEX) {
+                omx_err_f("nPortIndex is not OUTPUT_PORT_INDEX");
                 return OMX_ErrorUndefined;
             }
             /* Avoid rectParams->nWidth and rectParams->nHeight to be set as 0 */
-            if (pRockchipPort->cropRectangle.nHeight > 0 && pRockchipPort->cropRectangle.nWidth > 0)
+            if (pRockchipPort->cropRectangle.nHeight > 0 && pRockchipPort->cropRectangle.nWidth > 0) {
                 Rockchip_OSAL_Memcpy(rectParams, &(pRockchipPort->cropRectangle), sizeof(OMX_CONFIG_RECTTYPE));
-            else
+            } else {
                 rectParams->nWidth = rectParams->nHeight = 1;
-
+            }
             // fbc output buffer offset X/Y
             int32_t depth = (pVideoDec->bIs10bit) ? OMX_DEPTH_BIT_10 : OMX_DEPTH_BIT_8;
             if (Rockchip_OSAL_Check_Use_FBCMode(pVideoDec->codecId, depth, pRockchipPort)) {
@@ -1923,8 +2116,9 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
             }
             omx_info("rectParams:%d %d %d %d", rectParams->nLeft, rectParams->nTop,
                 rectParams->nWidth, rectParams->nHeight);
-        }
             break;
+        }
+           
 #endif
         default:
             switch (nIndexExt) {
@@ -1935,9 +2129,11 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
                     ret = Rockchip_OMX_Check_SizeVersion((void *)colorAspectsParams,
                         sizeof(OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS));
                     if (ret != OMX_ErrorNone) {
+                        omx_err_f("check version ret err");
                         goto EXIT;
                     }
                     if (colorAspectsParams->nPortIndex != OUTPUT_PORT_INDEX) {
+                        omx_err_f("nPortIndex is not OUTPUT_PORT_INDEX");
                         return OMX_ErrorBadParameter;
                     }
 
@@ -1947,6 +2143,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
                     colorAspectsParams->sAspects.mMatrixCoeffs = pVideoDec->mFinalColorAspects.mMatrixCoeffs;
 
                     if (colorAspectsParams->bRequestingDataSpace || colorAspectsParams->bDataSpaceChanged) {
+                        omx_err_f("unsupported");
                         return OMX_ErrorUnsupportedSetting;
                     }
                 }
@@ -1959,46 +2156,47 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
 
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_SetConfig(
-    OMX_HANDLETYPE hComponent,
-    OMX_INDEXTYPE nIndex,
-    OMX_PTR pComponentConfigStructure)
+OMX_ERRORTYPE Rkvpu_OMX_SetConfig(OMX_HANDLETYPE hComponent,
+    OMX_INDEXTYPE nIndex, OMX_PTR pComponentConfigStructure)
 {
+    FunctionIn();
     OMX_ERRORTYPE           ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = NULL;
     RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec = NULL;
-
-    FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponent is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check version ret err");
         goto EXIT;
     }
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
     if (pComponentConfigStructure == NULL) {
+        omx_err_f("pComponentConfigStructure is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     if (pRockchipComponent->currentState == OMX_StateInvalid) {
+        omx_err_f("currentState == OMX_StateInvalid)");
         ret = OMX_ErrorInvalidState;
         goto EXIT;
     }
     pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
     if (pVideoDec == NULL) {
+        omx_err_f("pVideoDec is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
@@ -2011,9 +2209,11 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(
             ret = Rockchip_OMX_Check_SizeVersion((void *)colorAspectsParams,
                 sizeof(OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS));
             if (ret != OMX_ErrorNone) {
+                omx_err_f("check version ret err");
                 goto EXIT;
             }
             if (colorAspectsParams->nPortIndex != OUTPUT_PORT_INDEX) {
+                omx_err_f("nPortIndex is not OUTPUT_PORT_INDEX");
                 return OMX_ErrorBadParameter;
             }
             // Update color aspects if necessary.
@@ -2041,27 +2241,20 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(
             ret = Rockchip_OMX_SetConfig(hComponent, nIndex, pComponentConfigStructure);
             break;
     }
-
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
-OMX_ERRORTYPE Rkvpu_OMX_ComponentRoleEnum(
-    OMX_HANDLETYPE hComponent,
-    OMX_U8        *cRole,
-    OMX_U32        nIndex)
+OMX_ERRORTYPE Rkvpu_OMX_ComponentRoleEnum(OMX_HANDLETYPE hComponent, OMX_U8 *cRole, OMX_U32 nIndex)
 {
     OMX_ERRORTYPE             ret               = OMX_ErrorNone;
-
     FunctionIn();
-
     if ((hComponent == NULL) || (cRole == NULL)) {
+        omx_err_f("hComponent or cRole is null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
-
     if (nIndex == 0) {
         Rockchip_OSAL_Strcpy((char *)cRole, RK_OMX_COMPONENT_H264_DEC_ROLE);
         ret = OMX_ErrorNone;
@@ -2103,43 +2296,42 @@ OMX_ERRORTYPE Rkvpu_OMX_ComponentRoleEnum(
     }
 EXIT:
     FunctionOut();
-
     return ret;
 }
 
-
-OMX_ERRORTYPE Rkvpu_OMX_GetExtensionIndex(
-    OMX_IN OMX_HANDLETYPE  hComponent,
-    OMX_IN OMX_STRING      cParameterName,
-    OMX_OUT OMX_INDEXTYPE *pIndexType)
+OMX_ERRORTYPE Rkvpu_OMX_GetExtensionIndex(OMX_IN OMX_HANDLETYPE  hComponent,
+    OMX_IN OMX_STRING cParameterName, OMX_OUT OMX_INDEXTYPE *pIndexType)
 {
+    FunctionIn();
     OMX_ERRORTYPE           ret = OMX_ErrorNone;
     OMX_COMPONENTTYPE     *pOMXComponent = NULL;
     ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent = NULL;
-
-    FunctionIn();
-
     if (hComponent == NULL) {
+        omx_err_f("hComponentis null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pOMXComponent = (OMX_COMPONENTTYPE *)hComponent;
     ret = Rockchip_OMX_Check_SizeVersion(pOMXComponent, sizeof(OMX_COMPONENTTYPE));
     if (ret != OMX_ErrorNone) {
+        omx_err_f("check version ret err");
         goto EXIT;
     }
 
     if (pOMXComponent->pComponentPrivate == NULL) {
+        omx_err_f("pComponentPrivate null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
 
     if ((cParameterName == NULL) || (pIndexType == NULL)) {
+        omx_err_f("cParameterName or pIndexType null");
         ret = OMX_ErrorBadParameter;
         goto EXIT;
     }
     if (pRockchipComponent->currentState == OMX_StateInvalid) {
+        omx_err_f("currentState == OMX_StateInvalid");
         ret = OMX_ErrorInvalidState;
         goto EXIT;
     }
@@ -2207,7 +2399,6 @@ OMX_ERRORTYPE Rkvpu_OMX_GetExtensionIndex(
 
 EXIT:
     FunctionOut();
-
     return ret;
 }
 

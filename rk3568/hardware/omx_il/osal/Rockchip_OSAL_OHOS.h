@@ -29,7 +29,9 @@
 #include "OMX_Index.h"
 #include "IndexExt.h"
 #include "securec.h"
-
+#ifdef OHOS_BUFFER_HANDLE
+#include <buffer_handle.h>
+#endif
 typedef unsigned int uint32_t;
 typedef signed int int32_t;
 
@@ -71,6 +73,12 @@ OMX_ERRORTYPE Rockchip_OSAL_SetPrependSPSPPSToIDR(OMX_PTR pComponentParameterStr
                                                   OMX_PTR pbPrependSpsPpsToIdr);
 
 OMX_ERRORTYPE Rockchip_OSAL_CheckBuffType(OMX_U32 type);
+
+#ifdef OHOS_BUFFER_HANDLE
+OMX_COLOR_FORMATTYPE Rockchip_OSAL_GetBufferHandleColorFormat(BufferHandle* bufferHandle);
+OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFormat);
+OMX_COLOR_FORMATTYPE Rochip_OSAL_CodecFormat2OmxColorFormat(OMX_U32 codecFormat);
+#endif
 
 OMX_COLOR_FORMATTYPE Rockchip_OSAL_Hal2OMXPixelFormat(unsigned int hal_format);
 

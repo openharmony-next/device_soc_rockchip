@@ -24,15 +24,15 @@
  *   2013.11.26 : Create
  */
 
+#include "Rockchip_OSAL_Log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "Rockchip_OSAL_Env.h"
-#include "Rockchip_OSAL_Log.h"
 
 #ifndef OHOS
-#include <utils/Log.h>
 #include <android/log.h>
+#include <utils/Log.h>
 
 void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *tag, const char *msg, ...)
 {
@@ -48,15 +48,15 @@ void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *t
             if (value) {
                 __android_log_vprint(ANDROID_LOG_DEBUG, tag, msg, argptr);
             }
-        }
             break;
+        }
         case ROCKCHIP_LOG_DEBUG: {
             Rockchip_OSAL_GetEnvU32("vendor.omx.log.debug", &value, 0);
             if (value & flag) {
                 __android_log_vprint(ANDROID_LOG_DEBUG, tag, msg, argptr);
             }
-        }
             break;
+        }
         case ROCKCHIP_LOG_INFO:
             __android_log_vprint(ANDROID_LOG_INFO, tag, msg, argptr);
             break;
@@ -76,45 +76,78 @@ void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *t
 #else
 #include <hdf_log.h>
 #define MPP_LOG_MAX_LEN 256
-#define DESTMAX 1
-
 void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *tag, const char *msg, ...)
 {
-    va_list argptr;
-    va_start(argptr, msg);
+#ifdef LOG_FILE
+    static FILE *fp = NULL;
+    if (fp == NULL) {
+        fp = fopen("/data/omx.log", "a");
+        if (fp == NULL) {
+            HDF_LOGE("%{public}s, open file failed", __func__);
+            return;
+        }
+    }
 
+#endif
+    va_list ap;
+    va_start(ap, msg);
     char str[MPP_LOG_MAX_LEN] = {0};
-    if (memset_s(str, sizeof(str), 0, MPP_LOG_MAX_LEN) != EOK) {
-        return ;
+    if (vsnprintf_s(str, sizeof(str), sizeof(str), msg, ap) <= 0) {
+        HDF_LOGE("%{public}s, vsnprintf ret failed", __func__);
+        va_end(ap);
+        return;
     }
-    char outputStr[MPP_LOG_MAX_LEN + 100] = {0};
-    if (memset_s(outputStr, sizeof(outputStr), 0, MPP_LOG_MAX_LEN + 100) != EOK) { // 100:byte alignment
-        return ;
-    }
-
-    if (sprintf_s(str, sizeof(str), "%s %s", tag, msg) != EOK) {
-        return ;
-    }
-
+    va_end(ap);
     switch (logLevel) {
-        case ROCKCHIP_LOG_TRACE:
-            HDF_LOGI(str, argptr);
+        case ROCKCHIP_LOG_TRACE: {
+#ifdef LOG_FILE
+            fwrite(str, strlen(str), 1, fp);
+            fflush(fp);
+#else
+            HDF_LOGI("%{public}s %{public}s", tag, str);
+#endif
             break;
-        case ROCKCHIP_LOG_DEBUG:
-            HDF_LOGD(str, argptr);
+        }
+
+        case ROCKCHIP_LOG_DEBUG: {
+#ifdef LOG_FILE
+            fwrite(str, strlen(str), 1, fp);
+            fflush(fp);
+#else
+            HDF_LOGD("%{public}s %{public}s", tag, str);
+#endif
             break;
-        case ROCKCHIP_LOG_INFO:
-            HDF_LOGI(str, argptr);
+        }
+
+        case ROCKCHIP_LOG_INFO: {
+#ifdef LOG_FILE
+            fwrite(str, strlen(str), 1, fp);
+            fflush(fp);
+#else
+            HDF_LOGI("%{public}s %{public}s", tag, str);
+#endif
             break;
-        case ROCKCHIP_LOG_WARNING:
-            HDF_LOGW(str, argptr);
+        }
+        case ROCKCHIP_LOG_WARNING: {
+#ifdef LOG_FILE
+            fwrite(str, strlen(str), 1, fp);
+            fflush(fp);
+#else
+            HDF_LOGW("%{public}s %{public}s", tag, str);
+#endif
             break;
-        case ROCKCHIP_LOG_ERROR:
-            HDF_LOGE(str, argptr);
+        }
+        case ROCKCHIP_LOG_ERROR: {
+#ifdef LOG_FILE
+            fwrite(str, strlen(str), 1, fp);
+            fflush(fp);
+#else
+            HDF_LOGE("%{public}s %{public}s", tag, str);
+#endif
             break;
+        }
         default:
             break;
     }
-    va_end(argptr);
 }
 #endif

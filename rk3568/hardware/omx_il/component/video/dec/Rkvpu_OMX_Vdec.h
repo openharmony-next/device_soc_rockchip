@@ -78,6 +78,7 @@ typedef struct _RKVPU_OMX_VIDEODEC_COMPONENT {
     OMX_BOOL bDecSendEOS;
 
     OMX_BOOL bStoreMetaData;
+    OMX_BOOL bOhosBufferHandle;
     OMX_BOOL bPvr_Flag;
     OMX_PTR  vpumem_handle;
     OMX_U32 maxCount; // when buffer in AL big than 8,if max timeout no consume we continue send one buffer to AL
