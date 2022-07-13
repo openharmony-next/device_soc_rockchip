@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-extern const MppDevApi vcodec_service_api;
+
 
 #ifdef  __cplusplus
 }

@@ -17,9 +17,6 @@
 #define __RK_MPI_CMD_H__
 
 
-#include "rk_vdec_cmd.h"
-#include "rk_vdec_cfg.h"
-#include "rk_venc_cmd.h"
 #include "rk_venc_cfg.h"
 #include "rk_venc_ref.h"
 

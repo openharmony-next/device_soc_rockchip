@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-const uint32_t INVALIDE_LAYER_ID = 0xffffffff;
-const uint32_t FENCE_TIMEOUT = 3000;
+#define INVALIDE_LAYER_ID  (0xffffffff)
+#define FENCE_TIMEOUT  (3000)
 struct HdiLayerBuffer {
 public:
     explicit HdiLayerBuffer(const BufferHandle &hdl);

@@ -31,26 +31,26 @@
 #define mpp_log(fmt, ...)   _mpp_log(MODULE_TAG, fmt, NULL, ## __VA_ARGS__)
 #define mpp_err(fmt, ...)   _mpp_err(MODULE_TAG, fmt, NULL, ## __VA_ARGS__)
 
-#define _mpp_dbg(debug, flag, fmt, ...) \
+#define _mpp_dbg( flag, fmt, ...) \
     do { \
-            if (debug & flag) \
+            if ( flag) \
             mpp_log(fmt, ## __VA_ARGS__); \
     } while (0)
 
-#define mpp_dbg(flag, fmt, ...) _mpp_dbg(mpp_debug, flag, fmt, ## __VA_ARGS__)
+#define mpp_dbg(flag, fmt, ...) _mpp_dbg(flag, fmt, ## __VA_ARGS__)
 
 /*
  * _f function will add function name to the log
  */
 #define mpp_log_f(fmt, ...)  _mpp_log(MODULE_TAG, fmt, __FUNCTION__, ## __VA_ARGS__)
 #define mpp_err_f(fmt, ...)  _mpp_err(MODULE_TAG, fmt, __FUNCTION__, ## __VA_ARGS__)
-#define _mpp_dbg_f(debug, flag, fmt, ...) \
+#define _mpp_dbg_f(flag, fmt, ...) \
     do { \
-            if (debug & flag) \
+            if ( flag) \
             mpp_log_f(fmt, ## __VA_ARGS__); \
     } while (0)
 
-#define mpp_dbg_f(flag, fmt, ...) _mpp_dbg_f(mpp_debug, flag, fmt, ## __VA_ARGS__)
+#define mpp_dbg_f(flag, fmt, ...) _mpp_dbg_f(flag, fmt, ## __VA_ARGS__)
 
 
 #define MPP_DBG_TIMING                  (0x00000001)
@@ -101,7 +101,7 @@
  */
 
 #define mpp_abort() do {                \
-    if (mpp_debug & MPP_ABORT) {        \
+    if ( MPP_ABORT) {        \
         abort();                        \
     }                                   \
 } while (0)
@@ -122,7 +122,6 @@
 extern "C" {
 #endif
 
-extern RK_U32 mpp_debug;
 
 void mpp_log_set_flag(RK_U32 flag);
 RK_U32 mpp_log_get_flag(void);

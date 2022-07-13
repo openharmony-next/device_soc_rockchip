@@ -267,6 +267,17 @@ static void InitBufferHandle(struct gbm_bo *bo, int fd, const AllocInfo *info, P
     bufferHandle->size = hdi_gbm_bo_get_stride(bo) * hdi_gbm_bo_get_height(bo);
 }
 
+#define ERRHANDLE(fd, bo)       \
+    {\
+        close(fd);                \
+        hdi_gbm_bo_destroy(bo);   \
+        if (priBuffer != NULL) {  \
+            free(priBuffer);      \
+        }                         \
+        GRALLOC_UNLOCK();         \
+        return DISPLAY_FAILURE;   \
+    }
+
 int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer)
 {
     DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("info is null"));
@@ -294,28 +305,21 @@ int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer)
 
     priBuffer = (PriBufferHandle *)malloc(sizeof(PriBufferHandle));
     DISPLAY_CHK_RETURN((priBuffer == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("bufferhandle malloc failed"); \
-        goto error);
+        ERRHANDLE(fd, bo));
 
     errno_t eok = memset_s(priBuffer, sizeof(PriBufferHandle), 0, sizeof(PriBufferHandle));
     if (eok != EOK) {
         DISPLAY_LOGE("memset_s failed");
     }
     DISPLAY_CHK_RETURN((eok != EOK), DISPLAY_PARAM_ERR, DISPLAY_LOGE("memset_s failed"); \
-        goto error);
+        ERRHANDLE(fd, bo));
 
     InitBufferHandle(bo, fd, info, priBuffer);
     *buffer = &priBuffer->hdl;
     hdi_gbm_bo_destroy(bo);
     GRALLOC_UNLOCK();
     return DISPLAY_SUCCESS;
-error:
-    close(fd);
-    hdi_gbm_bo_destroy(bo);
-    if (priBuffer != NULL) {
-        free(priBuffer);
-    }
-    GRALLOC_UNLOCK();
-    return DISPLAY_FAILURE;
+  
 }
 
 static void CloseBufferHandle(BufferHandle *handle)
