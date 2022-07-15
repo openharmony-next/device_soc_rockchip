@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-#define INVALIDE_DISPLAY_ID  (0xffffffff)
+const uint32_t INVALIDE_DISPLAY_ID = 0xffffffff;
 #define DISPLAY_TYPE_DRM  (1 << 31)
 
 class VsyncCallBack {

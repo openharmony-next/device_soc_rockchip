@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-#define INVALID_DRM_ID (0)
+const int INVALID_DRM_ID = 0;
 class DrmGemBuffer {
 public:
     DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl);
