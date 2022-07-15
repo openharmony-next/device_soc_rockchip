@@ -47,7 +47,7 @@ static_library("RkOMX_OSAL") {
     "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
     "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
-    "//foundation/multimedia/media_standard/services/utils/include",
+    "//foundation/multimedia/player_framework/services/utils/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
     "//utils/native/base/include",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
