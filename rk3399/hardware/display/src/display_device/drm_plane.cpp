@@ -153,15 +153,14 @@ int32_t DrmPlane::Init(DrmDevice &drmDevice)
         find_name = 0;
 
         for (auto &drmEnum : prop.enums) {
-            if (!strncmp(drmEnum.name.c_str(), (const char*)planeTypeNames[i].name,
-                                strlen(planeTypeNames[i].name))) {
+            if (!strncmp(drmEnum.name.c_str(), (const char*)planeTypeNames[i].name, strlen(planeTypeNames[i].name))) {
                 find_name = (1LL << drmEnum.value);
             }
         }
 
         if (find_name) {
             DISPLAY_LOGI("find plane id %{public}d, type %{public}x %{public}s",
-                                    GetId(), planeTypeNames[i].type, planeTypeNames[i].name);
+                GetId(), planeTypeNames[i].type, planeTypeNames[i].name);
             mWinType = planeTypeNames[i].type;
             mName = planeTypeNames[i].name;
             break;
