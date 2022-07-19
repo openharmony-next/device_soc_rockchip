@@ -583,10 +583,10 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
         omx_info("out buffer position: in app and display num = %ld", numInOmxAl);
         omx_info("out buffer position: in omx and vpu num = %ld", maxBufferNum - numInOmxAl);
         omx_info("out buffer position: in component num = %ld", pOWnBycomponetNum);
-
-        bufferUnusedInVpu = pMem_pool->get_unused_num(pMem_pool);
-
-        omx_info("out buffer position: in vpu unused buffer = %ld", bufferUnusedInVpu);
+        if (pMem_pool) {
+            bufferUnusedInVpu = pMem_pool->get_unused_num(pMem_pool);
+            omx_info("out buffer position: in vpu unused buffer = %ld", bufferUnusedInVpu);
+        }
     }
     if (pOutputPort->bufferProcessType == BUFFER_SHARE) {
         OMX_S32 dec_ret = 0;
@@ -1454,7 +1454,7 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentConstructor(OMX_HANDLETYPE hComponent, OMX_S
     pVideoDec->bDecSendEOS = OMX_FALSE;
     pVideoDec->bPvr_Flag = OMX_FALSE;
     pVideoDec->bFastMode = OMX_FALSE;
-
+    pVideoDec->bOhosBufferHandle = OMX_FALSE;
     pVideoDec->fp_in = NULL;
     pVideoDec->fp_out = NULL;
     pVideoDec->b4K_flags = OMX_FALSE;
@@ -1764,6 +1764,9 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentDeInit(OMX_HANDLETYPE hComponent)
         Rockchip_OSAL_SetEnvU32("sys.gpu.frames_num_to_skip_KD", 0);
 #endif
         pVideoDec->b4K_flags = OMX_FALSE;
+    }
+    if (pRockchipComponent->pRockchipPort == NULL) {
+        return ret;
     }
     pInputPort = &pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX];
     if (pVideoDec->bIsPowerControl == OMX_TRUE) {

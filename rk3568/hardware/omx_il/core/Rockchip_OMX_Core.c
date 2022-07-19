@@ -262,7 +262,7 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_FreeHandle(OMX_IN OMX_HANDLETYPE hCompone
 
     Rockchip_OMX_ComponentUnload(deleteComponent);
     Rockchip_OSAL_Free(deleteComponent);
-
+    omx_err("OMX_FreeHandle : %s", "OMX_ErrorNone");
 EXIT:
     FunctionOut();
 
