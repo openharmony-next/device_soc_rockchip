@@ -17,8 +17,8 @@
  */
 
 
-#ifndef _LIBS_RGA_MUTEX_H
-#define _LIBS_RGA_MUTEX_H
+#ifndef _LIBS_MUTEX_H
+#define _LIBS_MUTEX_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -199,4 +199,4 @@ inline int32_t Mutex::timedLock(int64_t timeoutNs)
  */
 
 typedef Mutex::Autolock AutoMutex;
-#endif // _LIBS_RGA_MUTEX_H
+#endif // _LIBS_MUTEX_H

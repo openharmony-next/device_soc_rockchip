@@ -20,7 +20,7 @@
 #include "buffer_handle.h"
 #include "display_common.h"
 #include "hdi_device_common.h"
-#include "hdi_shared_fd.h"
+#include "hdi_fd.h"
 
 namespace OHOS {
 namespace HDI {

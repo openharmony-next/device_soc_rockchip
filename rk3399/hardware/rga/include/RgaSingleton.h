@@ -19,7 +19,7 @@
 #ifndef _LIBS_RGA_SINGLETON_H
 #define _LIBS_RGA_SINGLETON_H
 
-#include "RgaMutex.h"
+#include "Mutex.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
