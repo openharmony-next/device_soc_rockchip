@@ -30,6 +30,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#ifdef OHOS_BUFFER_HANDLE
+#include <display_type.h>
+#include <buffer_handle.h>
+#endif
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OSAL_Semaphore.h"
 #include "Rockchip_OMX_Baseport.h"
@@ -251,6 +255,117 @@ OMX_ERRORTYPE Rockchip_OSAL_SetPrependSPSPPSToIDR(
 EXIT:
     return ret;
 }
+
+#ifdef OHOS_BUFFER_HANDLE
+OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFormat)
+{
+    OMX_U32 codecFormat = PIXEL_FMT_BUTT;
+    switch (omxColorFormat)
+    {
+    case OMX_COLOR_Format16bitRGB565:
+        codecFormat = PIXEL_FMT_RGB_565;
+        break;
+    case OMX_COLOR_Format12bitRGB444:
+        codecFormat = PIXEL_FMT_RGB_444;
+        break;
+    case OMX_COLOR_Format24bitRGB888:
+        codecFormat = PIXEL_FMT_RGB_888;
+        break;
+    case OMX_COLOR_Format16bitBGR565:
+        codecFormat = PIXEL_FMT_BGR_565;
+        break;
+    case OMX_COLOR_Format32bitBGRA8888:
+        codecFormat = PIXEL_FMT_BGRA_8888;
+        break;
+    case OMX_COLOR_FormatYUV422SemiPlanar:
+        codecFormat = PIXEL_FMT_YCBCR_422_SP;
+        break;
+    case OMX_COLOR_FormatYUV420SemiPlanar:
+        codecFormat = PIXEL_FMT_YCBCR_420_SP;
+        break;
+    case OMX_COLOR_FormatYUV422Planar:
+        codecFormat = PIXEL_FMT_YCBCR_422_P;
+        break;
+    case OMX_COLOR_FormatYUV420Planar:
+        codecFormat = PIXEL_FMT_YCBCR_420_P;
+        break;
+    case OMX_COLOR_FormatYCbYCr:
+        codecFormat = PIXEL_FMT_YUYV_422_PKG;
+        break;
+    case OMX_COLOR_FormatCbYCrY:
+        codecFormat = PIXEL_FMT_UYVY_422_PKG;
+        break;
+    case OMX_COLOR_FormatYCrYCb:
+        codecFormat = PIXEL_FMT_YVYU_422_PKG;
+        break;
+    case OMX_COLOR_FormatCrYCbY:
+        codecFormat = PIXEL_FMT_VYUY_422_PKG;
+        break;
+    default:
+        omx_err("%s: undefined omxColorFormat[%d]", __func__, omxColorFormat);
+        break;
+    }
+    return codecFormat;
+}
+OMX_COLOR_FORMATTYPE Rochip_OSAL_CodecFormat2OmxColorFormat(OMX_U32 codecFormat)
+{
+    OMX_COLOR_FORMATTYPE omxColorFormat = OMX_COLOR_FormatUnused;
+    switch (codecFormat)
+    {
+    case PIXEL_FMT_RGB_565:
+        omxColorFormat = OMX_COLOR_Format16bitRGB565;
+        break;
+    case PIXEL_FMT_RGB_444:
+        omxColorFormat = OMX_COLOR_Format12bitRGB444;
+        break;
+    case PIXEL_FMT_RGB_888:
+        omxColorFormat = OMX_COLOR_Format24bitRGB888;
+        break;
+    case PIXEL_FMT_BGR_565:
+        omxColorFormat = OMX_COLOR_Format16bitBGR565;
+        break;
+    case PIXEL_FMT_BGRA_8888:
+        omxColorFormat = OMX_COLOR_Format32bitBGRA8888;
+        break;
+    case PIXEL_FMT_YCBCR_422_SP:
+        omxColorFormat = OMX_COLOR_FormatYUV422SemiPlanar;
+        break;
+    case PIXEL_FMT_YCBCR_420_SP:
+        omxColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+        break;
+    case PIXEL_FMT_YCBCR_422_P:
+        omxColorFormat = OMX_COLOR_FormatYUV422Planar;
+        break;
+    case PIXEL_FMT_YCBCR_420_P:
+        omxColorFormat = OMX_COLOR_FormatYUV420Planar;
+        break;
+    case PIXEL_FMT_YUYV_422_PKG:
+        omxColorFormat = OMX_COLOR_FormatYCbYCr;
+        break;
+    case PIXEL_FMT_UYVY_422_PKG:
+        omxColorFormat = OMX_COLOR_FormatCbYCrY;
+        break;
+    case PIXEL_FMT_YVYU_422_PKG:
+        omxColorFormat = OMX_COLOR_FormatYCrYCb;
+        break;
+    case PIXEL_FMT_VYUY_422_PKG:
+        omxColorFormat = OMX_COLOR_FormatCrYCbY;
+        break;
+    default:
+        omx_err("%s: undefined codecColorFormat[%d]", __func__, omxColorFormat);
+        break;
+    }
+    return omxColorFormat;
+}
+OMX_COLOR_FORMATTYPE Rockchip_OSAL_GetBufferHandleColorFormat(BufferHandle* bufferHandle)
+{
+    if (bufferHandle == NULL) {
+        omx_err_f("bufferHandle is null");
+        return OMX_COLOR_FormatUnused;
+    }
+    return Rochip_OSAL_CodecFormat2OmxColorFormat(bufferHandle->format);
+}
+#endif
 
 OMX_COLOR_FORMATTYPE Rockchip_OSAL_Hal2OMXPixelFormat(
     unsigned int hal_format)
