@@ -23,7 +23,7 @@
 
 #define HDF_LOG_TAG codec_hdi_mpp
 #define BITWISE_LEFT_SHIFT_WITH_ONE    (1 << 20)
-#define SLEEP_INTERVAL_MILLISECONDS    1000
+#define SLEEP_INTERVAL_MICROSECONDS    1000
 #define BUFFER_GROUP_LIMIT_NUM         24
 
 RKHdiBaseComponent *g_pBaseComponent = NULL;
@@ -130,7 +130,7 @@ MppCodingType GetMppCodingType(const char* name)
     return MPP_VIDEO_CodingMax;
 }
 
-int32_t CodecCreate(const char* name, const Param *attr, int32_t len, CODEC_HANDLETYPE *handle)
+int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = NULL;
@@ -243,18 +243,21 @@ int32_t SetExtMppParam(Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
-        case KEY_SPLIT_PARSE_RK:
+        case KEY_EXT_SPLIT_PARSE_RK:
             ret = SetSplitParse(g_pBaseComponent, g_pBaseComponent->cfg);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set split parse failed", __func__);
             }
             break;
-        case KEY_DEC_FRAME_NUM_RK:
-        case KEY_ENC_FRAME_NUM_RK:
+        case KEY_EXT_DEC_FRAME_NUM_RK:
+        case KEY_EXT_ENC_FRAME_NUM_RK:
             ret = SetCodecFrameNum(g_pBaseComponent, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set frame number failed", __func__);
             }
+            break;
+        case KEY_EXT_SETUP_DROP_MODE_RK:
+            SetParamDrop(g_pBaseComponent, param);
             break;
         case KEY_EXT_ENC_VALIDATE_SETUP_RK:
             ret = ValidateEncSetup(g_pBaseComponent, param);
@@ -262,7 +265,7 @@ int32_t SetExtMppParam(Param *param)
                 HDF_LOGE("%{public}s: config validata setup failed", __func__);
             }
             break;
-        case KEY_ENC_SETUP_AVC_RK:
+        case KEY_EXT_ENC_SETUP_AVC_RK:
             ret = SetEncSetupAVC(g_pBaseComponent, param);
             break;
         default:
@@ -278,23 +281,20 @@ int32_t SetMppParam(Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
-        case KEY_WIDTH:
+        case KEY_VIDEO_WIDTH:
             SetParamWidth(g_pBaseComponent, param);
             break;
-        case KEY_HEIGHT:
+        case KEY_VIDEO_HEIGHT:
             SetParamHeight(g_pBaseComponent, param);
             break;
         case KEY_PIXEL_FORMAT:
             SetParamPixleFmt(g_pBaseComponent, param);
             break;
-        case KEY_STRIDE:
+        case KEY_VIDEO_STRIDE:
             SetParamStride(g_pBaseComponent, param);
             break;
         case KEY_VIDEO_FRAME_RATE:
             SetParamFps(g_pBaseComponent, param);
-            break;
-        case KEY_EXT_SETUP_DROP_MODE_RK:
-            SetParamDrop(g_pBaseComponent, param);
             break;
         case KEY_VIDEO_RC_MODE:
             SetParamRateControl(g_pBaseComponent, param);
@@ -351,7 +351,7 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
                 return HDF_FAILURE;
             }
             break;
-        case KEY_DEFAULT_CFG_RK:
+        case KEY_EXT_DEFAULT_CFG_RK:
             ret = GetDefaultConfig(g_pBaseComponent);
             if (ret != 0) {
                 HDF_LOGE("%{public}s: config get default config failed", __func__);
@@ -413,25 +413,23 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
             return HDF_FAILURE;
     }
 
-    UINTPTR comp = ctx;
-    UINTPTR appData = NULL;
+    UINTPTR userData = NULL;
     EventType event = EVENT_FLUSH_COMPLETE;
-    uint32_t data1 = 0;
-    uint32_t data2 = 0;
-    UINTPTR eventData = NULL;
-    g_pBaseComponent->pCallbacks->OnEvent(comp, appData, event, data1, data2, eventData);
+    uint32_t length = 0;
+    int32_t *eventData = NULL;
+    g_pBaseComponent->pCallbacks->OnEvent(userData, event, length, eventData);
 
     return HDF_SUCCESS;
 }
 
-int32_t DecodeInitPacket(MppPacket *pPacket, InputInfo *inputData, RK_U32 pkt_eos)
+int32_t DecodeInitPacket(MppPacket *pPacket, CodecBuffer *inputData, RK_U32 pkt_eos)
 {
     MPP_RET ret = MPP_OK;
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
-    uint8_t *inBuffer = inputData->buffers->addr;
-    uint32_t inBufferSize = inputData->buffers->size;
+    uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
+    uint32_t inBufferSize = inputData->buffer[0].capacity;
 
-    ret = mppApi->HdiMppPacketInit(pPacket, inputData->buffers->addr, inputData->buffers->size);
+    ret = mppApi->HdiMppPacketInit(pPacket, inBuffer, inBufferSize);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpp packet_init failed", __func__);
         return HDF_FAILURE;
@@ -460,7 +458,7 @@ MPP_RET DecodeGetFrame(MppCtx ctx, MppFrame *frame)
         }
         if (retryTimes > 0) {
             retryTimes--;
-            usleep(SLEEP_INTERVAL_MILLISECONDS);
+            usleep(SLEEP_INTERVAL_MICROSECONDS);
         } else {
             HDF_LOGE("%{public}s: decode_get_frame failed too much time", __func__);
             break;
@@ -518,7 +516,7 @@ int32_t HandleDecodeFrameInfoChange(MppFrame frame, MppCtx ctx)
     return HDF_SUCCESS;
 }
 
-void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, OutputInfo *outInfo)
+void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outInfo)
 {
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
     RK_U32 err_info = mppApi->HdiMppFrameGetErrinfo(frame);
@@ -531,31 +529,36 @@ void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, OutputInfo *outInf
         // call back have out data
         MppBuffer buffer = mppApi->HdiMppFrameGetBuffer(frame);
         RK_U8 *base = (RK_U8 *)mppApi->HdiMppBufferGetPtrWithCaller(buffer, __func__);
-        RK_U32 outBufferSize = mppApi->HdiMppFrameGetBufferSize(frame);
-        UINTPTR comp = NULL;
-        UINTPTR appData = NULL;
-        if ((outInfo->buffers->addr) && (outInfo->buffers->size != 0) && (outBufferSize != 0)) {
-            int32_t ret = memcpy_s(outInfo->buffers->addr, outInfo->buffers->size, base, outBufferSize);
+        RK_U32 bufferSize = mppApi->HdiMppFrameGetBufferSize(frame);
+        uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
+        uint32_t outBufferSize = outInfo->buffer[0].capacity;
+        if (outBuffer != NULL && outBufferSize != 0 && base != NULL && bufferSize != 0) {
+            int32_t ret = memcpy_s(outBuffer, outBufferSize, base, bufferSize);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
             }
-            outInfo->buffers->length = outBufferSize;
+            outInfo->buffer[0].length = bufferSize;
+        } else {
+            HDF_LOGE("%{public}s: output data not copy!", __func__);
         }
         if (frm_eos != 0) {
             outInfo->flag |= STREAM_FLAG_EOS;
             HDF_LOGI("%{public}s: dec reach STREAM_FLAG_EOS, frame count : %{public}d, error count : %{public}d",
                 __func__, g_pBaseComponent->frameCount, g_pBaseComponent->frameErr);
         }
-        g_pBaseComponent->pCallbacks->OutputBufferAvailable(comp, appData, outInfo);
+        UINTPTR userData = NULL;
+        int32_t acquireFd = 1;
+        g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
     }
 }
 
-int32_t HandleDecodedFrame(MppFrame frame, MppCtx ctx, int32_t frm_eos, OutputInfo *outInfo)
+int32_t HandleDecodedFrame(MppFrame frame, MppCtx ctx, int32_t frm_eos, CodecBuffer *outInfo)
 {
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
     if (frame) {
         if (mppApi->HdiMppFrameGetInfoChange(frame)) {
             if (HandleDecodeFrameInfoChange(frame, ctx) != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: func failed!", __func__);
                 return HDF_FAILURE;
             }
         } else {
@@ -573,7 +576,7 @@ int32_t HandleDecodedFrame(MppFrame frame, MppCtx ctx, int32_t frm_eos, OutputIn
     return HDF_SUCCESS;
 }
 
-RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, OutputInfo *outInfo)
+RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, CodecBuffer *outInfo)
 {
     MPP_RET ret = MPP_OK;
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
@@ -584,18 +587,18 @@ RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, Outp
         RK_S32 get_frm = 0;
         ret = DecodeGetFrame(ctx, &frame);
         if (ret != MPP_OK) {
-            HDF_LOGE("%{public}s: decode_get_frame failed ret %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: decode_get_frame failed, ret:%{public}d", __func__, ret);
             break;
         }
         if (frame) {
             frm_eos = mppApi->HdiMppFrameGetEos(frame);
             get_frm = 1;
-        }
-        if (HandleDecodedFrame(frame, ctx, frm_eos, outInfo) != HDF_SUCCESS) {
-            break;
+            if (HandleDecodedFrame(frame, ctx, frm_eos, outInfo) != HDF_SUCCESS) {
+                break;
+            }
         }
         if (pkt_eos != 0 && pkt_done != 0 && frm_eos == 0) {
-            usleep(SLEEP_INTERVAL_MILLISECONDS);
+            usleep(SLEEP_INTERVAL_MICROSECONDS);
             continue;
         }
         if (frm_eos) {
@@ -615,7 +618,7 @@ RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, Outp
     return frm_eos;
 }
 
-int32_t CodecDecode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo outInfo, uint32_t timeoutMs)
+int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer* outInfo, uint32_t timeoutMs)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
@@ -624,9 +627,10 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
     RK_U32 loop_end = 0;
     RK_U32 frm_eos;
     RK_U32 pkt_done = 0;
-    RK_U32 pkt_eos = (inputData.flag == STREAM_FLAG_EOS) ? 1 : 0;
+    RK_U32 pkt_eos = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
 
-    if (DecodeInitPacket(&packet, &inputData, pkt_eos) != HDF_SUCCESS) {
+    if (DecodeInitPacket(&packet, inputData, pkt_eos) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Init packet failed!", __func__);
         return HDF_FAILURE;
     }
 
@@ -638,7 +642,7 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
             }
         }
 
-        frm_eos = CodecDecodeGetFrameLoop(ctx, pkt_done, pkt_eos, &outInfo);
+        frm_eos = CodecDecodeGetFrameLoop(ctx, pkt_done, pkt_eos, outInfo);
         if ((g_pBaseComponent->frameNum > 0 && (g_pBaseComponent->frameCount >= g_pBaseComponent->frameNum)) ||
             ((g_pBaseComponent->frameNum == 0) && frm_eos != 0)) {
             loop_end = 1;
@@ -647,9 +651,11 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
         if (pkt_done) {
             break;
         }
-        usleep(SLEEP_INTERVAL_MILLISECONDS);
+        usleep(SLEEP_INTERVAL_MICROSECONDS);
     } while (1);
-    g_pBaseComponent->pCallbacks->InputBufferAvailable(NULL, NULL, &inputData);
+    UINTPTR userData = NULL;
+    int32_t acquireFd = 1;
+    g_pBaseComponent->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
 
     if (loop_end != 1) {
         return HDF_FAILURE;
@@ -657,7 +663,7 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
     return HDF_SUCCESS;
 }
 
-int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, InputInfo *inputData)
+int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData)
 {
     MPP_RET ret = MPP_OK;
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
@@ -680,7 +686,9 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, InputInfo *inputData)
             HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
             return HDF_FAILURE;
         }
-        int32_t ret = memcpy_s(buf, inputData->buffers->size, inputData->buffers->addr, inputData->buffers->size);
+        uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
+        uint32_t inBufferSize = inputData->buffer[0].capacity;
+        int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
         }
@@ -693,7 +701,7 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, InputInfo *inputData)
     return HDF_SUCCESS;
 }
 
-int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, OutputInfo *outInfo)
+int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, CodecBuffer *outInfo)
 {
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
     void *ptr   = mppApi->HdiMppPacketGetPos(packet);
@@ -701,13 +709,16 @@ int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, OutputInfo *outInf
     pkt_eos = mppApi->HdiMppPacketGetEos(packet);
 
     // call back have out data
-    UINTPTR comp = NULL;
-    UINTPTR appData = NULL;
-    outInfo->buffers->length = len;
-    if ((outInfo->buffers->addr) && (outInfo->buffers->size != 0) && (len != 0)) {
-        int32_t ret = memcpy_s(outInfo->buffers->addr, len, ptr, len);
+    UINTPTR userData = NULL;
+    int32_t acquireFd = 1;
+    uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
+    uint32_t outBufferSize = outInfo->buffer[0].capacity;
+    outInfo->buffer[0].length = len;
+    if (outBuffer != NULL && outBufferSize != 0 && ptr != NULL && len != 0) {
+        int32_t ret = memcpy_s(outBuffer, outBufferSize, ptr, len);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: dst bufferSize:%{public}d, src data len: %{public}d", __func__, outBufferSize, len);
         }
     }
     if (pkt_eos != 0) {
@@ -715,12 +726,12 @@ int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, OutputInfo *outInf
         HDF_LOGI("%{public}s: enc reach STREAM_FLAG_EOS, frame count : %{public}d",
             __func__, g_pBaseComponent->frameCount);
     }
-    g_pBaseComponent->pCallbacks->OutputBufferAvailable(comp, appData, outInfo);
+    g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
 
     return HDF_SUCCESS;
 }
 
-RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, OutputInfo *outInfo)
+RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, CodecBuffer *outInfo)
 {
     MPP_RET ret = MPP_OK;
     MppApi *mpi = g_pBaseComponent->mpi;
@@ -758,7 +769,7 @@ RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, OutputInfo *outInfo)
     return pkt_eos;
 }
 
-int32_t CodecEncode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo outInfo, uint32_t timeoutMs)
+int32_t CodecEncode(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer *outInfo, uint32_t timeoutMs)
 {
     MPP_RET ret = MPP_OK;
     MppApi *mpi = g_pBaseComponent->mpi;
@@ -767,9 +778,11 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
     MppCtx ctx = handle;
     RK_U32 pkt_eos = 0;
     RK_U32 loop_end = 0;
-    RK_U32 frm_eos  = (inputData.flag == STREAM_FLAG_EOS) ? 1 : 0;
+    RK_U32 frm_eos  = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
+    UINTPTR userData = NULL;
+    int32_t acquireFd = 1;
 
-    if (EncodeInitFrame(&frame, frm_eos, &inputData) != HDF_SUCCESS) {
+    if (EncodeInitFrame(&frame, frm_eos, inputData) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
 
@@ -780,9 +793,9 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
         return HDF_FAILURE;
     }
     mppApi->HdiMppFrameDeinit(&frame);
-    pkt_eos = CodecEncodeGetPacketLoop(ctx, &outInfo);
+    pkt_eos = CodecEncodeGetPacketLoop(ctx, outInfo);
 
-    g_pBaseComponent->pCallbacks->InputBufferAvailable(NULL, NULL, &inputData);
+    g_pBaseComponent->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
     if (g_pBaseComponent->frameNum > 0 && g_pBaseComponent->frameCount >= g_pBaseComponent->frameNum) {
         loop_end = 1;
     }
@@ -797,7 +810,7 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo out
     return HDF_SUCCESS;
 }
 
-int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, OutputInfo outInfo, uint32_t timeoutMs)
+int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t timeoutMs)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
@@ -818,16 +831,18 @@ int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, OutputInfo outInfo, uint32_t 
         size_t len  = mppApi->HdiMppPacketGetLength(packet);
 
         // call back have out data
-        UINTPTR comp = NULL;
-        UINTPTR appData = NULL;
-        outInfo.buffers->length = len;
-        if ((outInfo.buffers->addr) && (outInfo.buffers->size != 0) && (len != 0)) {
-            int32_t ret = memcpy_s(outInfo.buffers->addr, len, ptr, len);
+        UINTPTR userData = NULL;
+        int32_t acquireFd = 1;
+        uint8_t *outBuffer = (uint8_t *)outInfo.buffer[0].buf;
+        uint32_t outBufferSize = outInfo.buffer[0].capacity;
+        outInfo.buffer[0].length = len;
+        if (outBuffer != NULL && outBufferSize != 0 && ptr != NULL && len != 0) {
+            int32_t ret = memcpy_s(outBuffer, len, ptr, len);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
             }
         }
-        g_pBaseComponent->pCallbacks->OutputBufferAvailable(comp, appData, &outInfo);
+        g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, &outInfo, &acquireFd);
     }
 
     mppApi->HdiMppPacketDeinit(&packet);

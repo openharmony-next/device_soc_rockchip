@@ -47,13 +47,12 @@ int32_t SetSplitParse(RKHdiBaseComponent *pBaseComponent, MppDecCfg cfg)
     ret = pBaseComponent->mpi->control(ctx, MPP_DEC_SET_CFG, cfg);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: failed to set cfg %{public}p ret %{public}d", __func__, cfg, ret);
-        UINTPTR comp = ctx;
-        UINTPTR appData = NULL;
+        UINTPTR userData = NULL;
         EventType event = EVENT_ERROR;
-        uint32_t data1 = 0;
-        uint32_t data2 = 0;
-        UINTPTR eventData = NULL;
-        pBaseComponent->pCallbacks->OnEvent(comp, appData, event, data1, data2, eventData);
+        uint32_t length = 0;
+        int32_t *eventData = NULL;
+
+        pBaseComponent->pCallbacks->OnEvent(userData, event, length, eventData);
         return HDF_FAILURE;
     }
 
@@ -104,35 +103,35 @@ int32_t GetBufferSize(RKHdiBaseComponent *pBaseComponent, Param *params)
 CodecPixelFormat ConvertRKFormat2HdiFormat(MppFrameFormat fmtRK)
 {
     if (fmtRK == MPP_FMT_YUV420SP) {
-        return YVU_SEMIPLANAR_420;
+        return PIXEL_FORMAT_YCBCR_420_SP;
     } else {
-        return PIX_FORMAT_INVALID;
+        return PIXEL_FORMAT_NONE;
     }
 }
 
 MppFrameFormat ConvertHdiFormat2RKFormat(CodecPixelFormat fmtHDI)
 {
-    if (fmtHDI == YVU_SEMIPLANAR_420) {
+    if (fmtHDI == PIXEL_FORMAT_YCBCR_420_SP) {
         return MPP_FMT_YUV420SP;
     } else {
         return MPP_FMT_BUTT;
     }
 }
 
-MppEncRcMode ConvertHdiRcMode2RKRcMode(VenCodeRcMode hdiRcMode)
+MppEncRcMode ConvertHdiRcMode2RKRcMode(VideoCodecRcMode hdiRcMode)
 {
     MppEncRcMode rkRcMode = MPP_ENC_RC_MODE_VBR;
     switch (hdiRcMode) {
-        case VENCOD_RC_CBR:
+        case VID_CODEC_RC_CBR:
             rkRcMode = MPP_ENC_RC_MODE_CBR;
             break;
-        case VENCOD_RC_VBR:
+        case VID_CODEC_RC_VBR:
             rkRcMode = MPP_ENC_RC_MODE_VBR;
             break;
-        case VENCOD_RC_AVBR:
+        case VID_CODEC_RC_AVBR:
             rkRcMode = MPP_ENC_RC_MODE_AVBR;
             break;
-        case VENCOD_RC_FIXQP:
+        case VID_CODEC_RC_FIXQP:
             rkRcMode = MPP_ENC_RC_MODE_FIXQP;
             break;
         default:
@@ -141,14 +140,14 @@ MppEncRcMode ConvertHdiRcMode2RKRcMode(VenCodeRcMode hdiRcMode)
     return rkRcMode;
 }
 
-MppEncRcGopMode ConvertHdiGopMode2RKGopMode(VenCodeGopMode hdiGopMode)
+MppEncRcGopMode ConvertHdiGopMode2RKGopMode(VideoCodecGopMode hdiGopMode)
 {
     MppEncRcGopMode rkGopMode = MPP_ENC_RC_NORMAL_P;
     switch (hdiGopMode) {
-        case VENCOD_GOPMODE_NORMALP:
+        case VID_CODEC_GOPMODE_NORMALP:
             rkGopMode = MPP_ENC_RC_NORMAL_P;
             break;
-        case VENCOD_GOPMODE_SMARTP:
+        case VID_CODEC_GOPMODE_SMARTP:
             rkGopMode = MPP_ENC_RC_SMART_P;
             break;
         default:
@@ -261,7 +260,7 @@ int32_t GetDecOutputPixelFormat(RKHdiBaseComponent *pBaseComponent, Param *param
 
     RKMppApi *mppApi = pBaseComponent->mppApi;
     MppFrameFormat fmtRK  = MPP_FMT_YUV420SP;
-    CodecPixelFormat format = YVU_SEMIPLANAR_420;
+    CodecPixelFormat format = PIXEL_FORMAT_YCBCR_420_SP;
     if (pBaseComponent->frame) {
         fmtRK = mppApi->HdiMppFrameGetFormat(pBaseComponent->frame);
         format = ConvertRKFormat2HdiFormat(fmtRK);
