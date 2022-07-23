@@ -36,7 +36,8 @@
                 <policyitem type="license" name="MIT" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="Intel Corporation" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="iSoftStone Information Technology (Group) Co.,Ltd. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/> 
-                
+		<policyitem type="copyright" name="FuZhou Lockzhiner Electronic Co., Ltd. All rights reserved." path=".*" desc=""/>
+                <policyitem type="copyright" name="Lockzhiner Electronics Co., Ltd." path=".*" desc=""/>
 	        </policy>
         </policylist>
         <filefilterlist>
@@ -64,11 +65,59 @@
 		<!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
+	    	<filteritem type="filepath" name="rk2206/hardware/build.py" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/main/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/network/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/uart/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.defconfig.series" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/fs/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/liteos_m/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.series" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/startup/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.soc" desc=""/>
+                <filteritem type="filepath" name="rk2206/board.gni" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/gpio/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/communication/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/i2c/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/communication/wifi_lite/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_config/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/system/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/spi/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/BUILD.gn" desc=""/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
+	    	<filteritem type="filepath" name="rk2206/hardware/build.py" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/main/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/network/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/uart/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.defconfig.series" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/fs/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/liteos_m/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.series" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/startup/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/Kconfig.liteos_m.soc" desc=""/>
+                <filteritem type="filepath" name="rk2206/board.gni" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/gpio/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/communication/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/i2c/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/adapter/hals/communication/wifi_lite/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_config/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/system/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/hdf_driver/spi/BUILD.gn" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/platform/BUILD.gn" desc=""/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
@@ -104,6 +153,11 @@
                 <filteritem type="filepath" name="rk3399/hardware/mpp/lib64/librockchip_vpu.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3399/hardware/rga/lib/librga.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3399/hardware/rga/lib64/librga.z.so" desc="lib files"/>
+		<filteritem type="filepath" name="rk2206/tools/package/firmware_merger" desc=""/>
+                <filteritem type="filepath" name="rk2206/tools/package/resource_header_tool" desc=""/>
+                <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.aarch64" desc=""/>
+                <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.aarch64.enc" desc=""/>
+                <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.mac" desc=""/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
