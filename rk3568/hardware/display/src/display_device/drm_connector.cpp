@@ -113,7 +113,6 @@ int32_t DrmConnector::GetBrightness(uint32_t& level)
     return DISPLAY_SUCCESS;
 }
 
-const int BACKLIGHT_MIN = 10;
 int32_t DrmConnector::SetBrightness(uint32_t level)
 {
     static int32_t brFd = 0;
@@ -136,9 +135,6 @@ int32_t DrmConnector::SetBrightness(uint32_t level)
     if (ret != EOK) {
         DISPLAY_LOGE("memset_s failed\n");
         return DISPLAY_FAILURE;
-    }
-    if (level < BACKLIGHT_MIN) {
-        level = BACKLIGHT_MIN;
     }
     int bytes = sprintf_s(buffer, sizeof(buffer), "%d\n", level);
     if (bytes < 0) {
