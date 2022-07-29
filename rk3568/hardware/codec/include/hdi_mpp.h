@@ -18,19 +18,8 @@
 
 #include "codec_type.h"
 #include "rk_mpi.h"
+#include "hdi_mpp_ext_param_keys.h"
 #include "hdi_mpp_mpi.h"
-
-typedef enum {
-    KEY_START = 0xF000,
-    KEY_DEFAULT_CFG_RK,             /**< Default config. Used for RK codec. */
-    KEY_SPLIT_PARSE_RK,             /**< Split parse. Used for RK codec. */
-    KEY_DEC_FRAME_NUM_RK,           /**< Decode frame number. Used for RK codec. */
-    KEY_EXT_SETUP_DROP_MODE_RK,     /**< Drop mode setup. Used for RK codec. */
-    KEY_EXT_ENC_VALIDATE_SETUP_RK,  /**< Validate config setup. Used for RK codec. */
-    KEY_ENC_SETUP_AVC_RK,           /**< AVC config setup. Used for RK codec. */
-    KEY_ENC_FRAME_NUM_RK,           /**< Frame num setup. Used for RK codec. */
-    KEY_END = 0xFFFF,
-} ParamExtKey;
 
 typedef struct {
     int32_t profile;
@@ -74,7 +63,7 @@ typedef struct {
 } RKHdiRcSetup;
 
 typedef struct {
-    VenCodeGopMode gopMode;
+    VideoCodecGopMode gopMode;
     uint32_t gopLen;
     int32_t gop;
     int32_t viLen;

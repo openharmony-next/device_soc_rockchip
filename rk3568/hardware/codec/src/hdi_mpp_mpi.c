@@ -158,9 +158,4 @@ void ReleaseMppApi(RKMppApi *mppApi)
         memset_s(mppApi, sizeof(RKMppApi), 0, sizeof(RKMppApi));
         free(mppApi);
     }
-
-    if (mLibHandle != NULL) {
-        dlclose(mLibHandle);
-        mLibHandle = NULL;
-    }
 }
