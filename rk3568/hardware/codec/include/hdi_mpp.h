@@ -72,7 +72,7 @@ typedef struct {
 typedef struct {
     int32_t mimeCodecType;
     RKHdiEncSetupAVC avcSetup;
-} RKHdiCodecTypeSetup;
+} RKHdiCodecMimeSetup;
 
 typedef struct {
     int32_t splitMode;
@@ -82,13 +82,15 @@ typedef struct {
 typedef struct {
     int32_t width;
     int32_t height;
+    int32_t codecType;
+    uint32_t split;
     RKHdiStrideSetup stride;
     CodecPixelFormat fmt;
     RKHdiFpsSetup fps;
     RKHdiDropSetup drop;
     RKHdiRcSetup rc;
     RKHdiGopSetup gop;
-    RKHdiCodecTypeSetup codecType;
+    RKHdiCodecMimeSetup codecMime;
 } RKHdiEncodeSetup;
 
 typedef struct {
@@ -99,6 +101,7 @@ typedef struct {
     MppCodingType codingType;
     CodecCallback *pCallbacks;
     MppDecCfg cfg;
+    RKHdiEncodeSetup setup;
     MppApi *mpi;
 
     MppBufferGroup frmGrp;
@@ -115,10 +118,6 @@ typedef struct {
     size_t frameSize;
     MppBuffer pktBuf;
 
-    RK_U32 width;
-    RK_U32 height;
-    RK_U32 horStride;
-    RK_U32 verStride;
     MppFrameFormat fmt;
 } RKHdiBaseComponent;
 

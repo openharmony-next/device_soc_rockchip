@@ -18,7 +18,6 @@ ohos_shared_library("libcodec_oem_interface") {
   include_dirs = [
     "include",
     "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/display/interfaces/include",
     "//device/soc/rockchip/rk3568/hardware/mpp/include",
   ]
   sources = [
@@ -47,6 +46,7 @@ ohos_shared_library("libcodec_oem_interface") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
