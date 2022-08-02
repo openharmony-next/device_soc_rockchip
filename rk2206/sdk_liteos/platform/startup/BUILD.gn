@@ -23,7 +23,5 @@ build_ext_component("board_ld") {
 }
 
 kernel_module("platform_startup") {
-  sources = [
-    "startup_rk2206.S",
-  ]
+  sources = [ "startup_rk2206.S" ]
 }

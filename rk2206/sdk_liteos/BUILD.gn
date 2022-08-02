@@ -14,31 +14,22 @@
 #
 
 if (ohos_kernel_type == "liteos_m") {
-    import("//build/lite/config/component/lite_component.gni")
-    import("//build/lite/config/subsystem/lite_subsystem.gni")
-    import("//kernel/liteos_m/liteos.gni")
+  import("//build/lite/config/component/lite_component.gni")
+  import("//build/lite/config/subsystem/lite_subsystem.gni")
+  import("//kernel/liteos_m/liteos.gni")
 
-    copy("link-script") {
-        deps = [
-            "platform/startup:board_ld",
-        ]
-        sources = [ 
-            "platform/startup/board.ld" 
-        ]
-        outputs = [ 
-            "$root_build_dir/bin/board.ld"
-        ]
-    }
+  copy("link-script") {
+    deps = [ "platform/startup:board_ld" ]
+    sources = [ "platform/startup/board.ld" ]
+    outputs = [ "$root_build_dir/bin/board.ld" ]
+  }
 
-    module_name = get_path_info(rebase_path("."), "name")
-    module_group(module_name) {
-        deps = [
-            ":link-script",
-        ]
-
-        modules = [
-            "platform",
-            "liteos_m",
-        ]
-    }
+  module_name = get_path_info(rebase_path("."), "name")
+  module_group(module_name) {
+    deps = [ ":link-script" ]
+    modules = [
+      "platform",
+      "liteos_m",
+    ]
+  }
 }

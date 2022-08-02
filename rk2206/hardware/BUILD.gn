@@ -13,29 +13,24 @@
 # limitations under the License.
 #
 
-import("//kernel/liteos_m/liteos.gni")
 import("//device/soc/rockchip/rk2206/board.gni")
+import("//kernel/liteos_m/liteos.gni")
 
 config("public") {
-  include_dirs = [ 
+  include_dirs = [
     "./include",
     "./lib/CMSIS/Device/RK2206/Include",
   ]
 }
 
 action("hardware") {
-    script = "//build/lite/run_shell_cmd.py"
-    sources = [
-        "libhardware.a",
-    ]
-    outputs = [
-        "${root_out_dir}/libs/",
-    ]
-    args = [
-        "cp",
-        "-f",
-        rebase_path(sources[0]),
-        rebase_path(outputs[0]),
-    ]
+  script = "//build/lite/run_shell_cmd.py"
+  sources = [ "libhardware.a" ]
+  outputs = [ "${root_out_dir}/libs/" ]
+  args = [
+    "cp",
+    "-f",
+    rebase_path(sources[0]),
+    rebase_path(outputs[0]),
+  ]
 }
-

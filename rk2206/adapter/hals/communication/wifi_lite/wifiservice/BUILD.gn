@@ -37,6 +37,7 @@ if (ohos_kernel_type == "liteos_m") {
   ndk_lib("wifiservice_ndk") {
     deps = [ ":wifiservice" ]
 
-    head_files = [ "//foundation/communication/wifi_lite/interfaces/wifiservice" ]
+    head_files =
+        [ "//foundation/communication/wifi_lite/interfaces/wifiservice" ]
   }
 }

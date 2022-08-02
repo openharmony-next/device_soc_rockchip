@@ -20,7 +20,5 @@ config("public") {
 }
 
 kernel_module("platform_main") {
-  sources = [
-    "main.c",
-  ]
+  sources = [ "main.c" ]
 }

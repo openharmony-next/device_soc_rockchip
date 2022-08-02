@@ -17,10 +17,11 @@ import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
 module_name = get_path_info(rebase_path("."), "name")
 module_group(module_name) {
-    modules = [
-        "gpio",
-        #"i2c",
-        "spi",
-        "fs",
-    ]
+  modules = [
+    "gpio",
+
+    #"i2c",
+    "spi",
+    "fs",
+  ]
 }

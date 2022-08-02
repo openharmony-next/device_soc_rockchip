@@ -16,19 +16,16 @@
 import("//kernel/liteos_m/liteos.gni")
 
 config("public") {
-    include_dirs = [ 
-        ".",
-        "//foundation/communication/wifi_lite/interfaces/wifiservice",
-    ]
+  include_dirs = [
+    ".",
+    "//foundation/communication/wifi_lite/interfaces/wifiservice",
+  ]
 }
 
 kernel_module("platform_network") {
-    sources = [
-        "config_network.c",
-    ]
-
-    include_dirs = [
-        "//third_party/cJSON",
-        "//foundation/communication/wifi_lite/interfaces/wifiservice",
-    ]
+  sources = [ "config_network.c" ]
+  include_dirs = [
+    "//third_party/cJSON",
+    "//foundation/communication/wifi_lite/interfaces/wifiservice",
+  ]
 }

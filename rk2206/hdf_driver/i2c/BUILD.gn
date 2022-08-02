@@ -15,12 +15,11 @@
 
 import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
-module_switch = defined(LOSCFG_SOC_SERIES_RK22XX) && defined(LOSCFG_DRIVERS_HDF_PLATFORM) && defined(LOSCFG_DRIVERS_HDF_PLATFORM_I2C)
+module_switch =
+    defined(LOSCFG_SOC_SERIES_RK22XX) && defined(LOSCFG_DRIVERS_HDF_PLATFORM) &&
+    defined(LOSCFG_DRIVERS_HDF_PLATFORM_I2C)
 module_name = get_path_info(rebase_path("."), "name")
 hdf_driver(module_name) {
-  sources = [
-    "i2c_driver.c",
-  ]
-  
+  sources = [ "i2c_driver.c" ]
   include_dirs = [ "." ]
 }

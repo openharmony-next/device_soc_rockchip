@@ -15,12 +15,11 @@
 
 import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
-module_switch = defined(LOSCFG_SOC_SERIES_RK22XX) && defined(LOSCFG_DRIVERS_HDF_PLATFORM) && defined(LOSCFG_DRIVERS_HDF_PLATFORM_SPI)
+module_switch =
+    defined(LOSCFG_SOC_SERIES_RK22XX) && defined(LOSCFG_DRIVERS_HDF_PLATFORM) &&
+    defined(LOSCFG_DRIVERS_HDF_PLATFORM_SPI)
 module_name = get_path_info(rebase_path("."), "name")
 hdf_driver(module_name) {
-  sources = [
-    "spi_driver.c",
-  ]
-  
+  sources = [ "spi_driver.c" ]
   include_dirs = [ "." ]
 }
