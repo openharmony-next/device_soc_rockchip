@@ -60,6 +60,8 @@
                 <filteritem type="filepath" name="rk3568/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/proc/sys/net/ipv4/ping_group_range/*" desc="project configuration file"/>
+                <filteritem type="filepath" name="rk2206/hardware/End User License Agreement.md" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/loader/End User License Agreement.md" desc=""/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
 		<!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
@@ -158,6 +160,8 @@
                 <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.aarch64" desc=""/>
                 <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.aarch64.enc" desc=""/>
                 <filteritem type="filepath" name="rk2206/tools/linux/bin/flash.mac" desc=""/>
+                <filteritem type="filepath" name="rk2206/sdk_liteos/loader/.*" desc=""/>
+                <filteritem type="filepath" name="rk2206/hardware/libhardware.a" desc=""/>
                 <!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
