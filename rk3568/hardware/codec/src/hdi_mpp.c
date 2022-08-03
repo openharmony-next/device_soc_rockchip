@@ -293,12 +293,6 @@ int32_t SetExtMppParam(Param *param)
         case KEY_EXT_ENC_SETUP_AVC_RK:
             ret = SetParamEncSetupAVC(g_pBaseComponent, param);
             break;
-        case KEY_EXT_DEFAULT_CFG_RK:
-            ret = GetDefaultConfig(g_pBaseComponent);
-            if (ret != 0) {
-                HDF_LOGE("%{public}s: config get default config failed", __func__);
-            }
-            break;
         default:
             HDF_LOGE("%{public}s: param key unsupport, key:%{public}d", __func__, paramKey);
             return HDF_FAILURE;
@@ -371,6 +365,12 @@ int32_t GetExtMppParam(Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
+        case KEY_EXT_DEFAULT_CFG_RK:
+            ret = GetDefaultConfig(g_pBaseComponent);
+            if (ret != 0) {
+                HDF_LOGE("%{public}s: config get default config failed", __func__);
+            }
+            break;
         case KEY_EXT_SPLIT_PARSE_RK:
             ret = GetParamSplitParse(g_pBaseComponent, param);
             if (ret != HDF_SUCCESS) {
