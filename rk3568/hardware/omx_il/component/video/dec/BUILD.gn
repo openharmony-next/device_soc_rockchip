@@ -83,8 +83,8 @@ ohos_shared_library("libomxvpu_dec") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_display_gralloc",
-      "utils_base:utils",
     ]
   }
 
