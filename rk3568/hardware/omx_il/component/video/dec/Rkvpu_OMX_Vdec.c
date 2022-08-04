@@ -1741,6 +1741,9 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentDeInit(OMX_HANDLETYPE hComponent)
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
 
     pVideoDec = (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
+    if (pVideoDec == NULL) {
+        goto EXIT;
+    }
     if (pVideoDec->hSharedMemory != NULL) {
         Rockchip_OSAL_SharedMemory_Close(pVideoDec->hSharedMemory, pVideoDec->bDRMPlayerMode);
         pVideoDec->hSharedMemory = NULL;
