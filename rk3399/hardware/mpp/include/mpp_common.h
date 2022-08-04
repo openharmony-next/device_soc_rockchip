@@ -162,7 +162,7 @@
 #define ARG_N(a, b, c, d, N, ...)    N
 #define ARG_N_HELPER(...)       ARG_T(ARG_N(__VA_ARGS__))
 #define COUNT_ARG(...)          ARG_N_HELPER(__VA_ARGS__, 4, 3, 2, 1, 0)
-
+#define SZ_POINTER			(4)
 #define SZ_1K                   (1024)
 #define SZ_2K                   (SZ_1K*2)
 #define SZ_4K                   (SZ_1K*4)
@@ -208,7 +208,7 @@ static __inline RK_S32 mpp_clip(RK_S32 a, RK_S32 amin, RK_S32 amax)
 
 static __inline RK_U32 mpp_is_32bit(void)
 {
-    return ((sizeof(void *) == 4) ? (1) : (0));
+    return ((sizeof(void *) == SZ_POINTER) ? (1) : (0));
 }
 
 RK_S32 axb_div_c(RK_S32 a, RK_S32 b, RK_S32 c);
