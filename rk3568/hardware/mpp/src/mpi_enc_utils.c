@@ -25,6 +25,28 @@
 #include "mpp_packet.h"
 #include "mpi_enc_utils.h"
 
+#define GOP_MODE_TSVC4 3
+#define GOP_MODE_TSVC3 2
+#define GOP_MODE_TSVC2 1
+
+#define TEMPORAL_ID_0 0
+#define TEMPORAL_ID_1 1
+#define TEMPORAL_ID_2 2
+#define TEMPORAL_ID_3 3
+
+#define REF_NUM_0  0
+#define REF_NUM_1  1
+#define REF_NUM_2  2
+#define REF_NUM_3  3
+#define REF_NUM_4  4
+#define REF_NUM_5  5
+#define REF_NUM_6  6
+#define REF_NUM_7  7
+#define REF_NUM_8  8
+
+#define ST_COUNT_3 3
+#define ST_COUNT_5 5
+
 static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, RK_S32 gop_mode)
 {
     MppEncRefLtFrmCfg lt_ref[4];
@@ -45,7 +67,7 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, RK_S32 gop_mode)
     }
 
     switch (gop_mode) {
-        case 3 : {
+        case GOP_MODE_TSVC4 : {
             // tsvc4
             //      /-> P1      /-> P3        /-> P5      /-> P7
             //     /           /             /           /
@@ -57,71 +79,71 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, RK_S32 gop_mode)
             lt_cnt = 1;
 
             /* set 8 frame lt-ref gap */
-            lt_ref[0].lt_idx        = 0;
-            lt_ref[0].temporal_id   = 0;
-            lt_ref[0].ref_mode      = REF_TO_PREV_LT_REF;
-            lt_ref[0].lt_gap        = 8; // 8:set 8 frame
-            lt_ref[0].lt_delay      = 0;
+            lt_ref[REF_NUM_0].lt_idx        = 0;
+            lt_ref[REF_NUM_0].temporal_id   = TEMPORAL_ID_0;
+            lt_ref[REF_NUM_0].ref_mode      = REF_TO_PREV_LT_REF;
+            lt_ref[REF_NUM_0].lt_gap        = 8; // 8:set 8 frame
+            lt_ref[REF_NUM_0].lt_delay      = 0;
 
             st_cnt = 9;
             /* set tsvc4 st-ref struct */
             /* st 0 layer 0 - ref */
-            st_ref[0].is_non_ref    = 0;
-            st_ref[0].temporal_id   = 0;
-            st_ref[0].ref_mode      = REF_TO_TEMPORAL_LAYER;
-            st_ref[0].ref_arg       = 0;
-            st_ref[0].repeat        = 0;
+            st_ref[REF_NUM_0].is_non_ref    = 0;
+            st_ref[REF_NUM_0].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_0].ref_mode      = REF_TO_TEMPORAL_LAYER;
+            st_ref[REF_NUM_0].ref_arg       = 0;
+            st_ref[REF_NUM_0].repeat        = 0;
             /* st 1 layer 3 - non-ref */
-            st_ref[1].is_non_ref    = 1;
-            st_ref[1].temporal_id   = 3;
-            st_ref[1].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[1].ref_arg       = 0;
-            st_ref[1].repeat        = 0;
+            st_ref[REF_NUM_1].is_non_ref    = 1;
+            st_ref[REF_NUM_1].temporal_id   = TEMPORAL_ID_3;
+            st_ref[REF_NUM_1].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_1].ref_arg       = 0;
+            st_ref[REF_NUM_1].repeat        = 0;
             /* st 2 layer 2 - ref */
-            st_ref[2].is_non_ref    = 0;
-            st_ref[2].temporal_id   = 2;
-            st_ref[2].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[2].ref_arg       = 0;
-            st_ref[2].repeat        = 0;
+            st_ref[REF_NUM_2].is_non_ref    = 0;
+            st_ref[REF_NUM_2].temporal_id   = TEMPORAL_ID_2;
+            st_ref[REF_NUM_2].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_2].ref_arg       = 0;
+            st_ref[REF_NUM_2].repeat        = 0;
             /* st 3 layer 3 - non-ref */
-            st_ref[3].is_non_ref    = 1;
-            st_ref[3].temporal_id   = 3;
-            st_ref[3].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[3].ref_arg       = 0;
-            st_ref[3].repeat        = 0;
+            st_ref[REF_NUM_3].is_non_ref    = 1;
+            st_ref[REF_NUM_3].temporal_id   = TEMPORAL_ID_3;
+            st_ref[REF_NUM_3].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_3].ref_arg       = 0;
+            st_ref[REF_NUM_3].repeat        = 0;
             /* st 4 layer 1 - ref */
-            st_ref[4].is_non_ref    = 0;
-            st_ref[4].temporal_id   = 1;
-            st_ref[4].ref_mode      = REF_TO_PREV_LT_REF;
-            st_ref[4].ref_arg       = 0;
-            st_ref[4].repeat        = 0;
+            st_ref[REF_NUM_4].is_non_ref    = 0;
+            st_ref[REF_NUM_4].temporal_id   = TEMPORAL_ID_1;
+            st_ref[REF_NUM_4].ref_mode      = REF_TO_PREV_LT_REF;
+            st_ref[REF_NUM_4].ref_arg       = 0;
+            st_ref[REF_NUM_4].repeat        = 0;
             /* st 5 layer 3 - non-ref */
-            st_ref[5].is_non_ref    = 1;
-            st_ref[5].temporal_id   = 3;
-            st_ref[5].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[5].ref_arg       = 0;
-            st_ref[5].repeat        = 0;
+            st_ref[REF_NUM_5].is_non_ref    = 1;
+            st_ref[REF_NUM_5].temporal_id   = TEMPORAL_ID_3;
+            st_ref[REF_NUM_5].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_5].ref_arg       = 0;
+            st_ref[REF_NUM_5].repeat        = 0;
             /* st 6 layer 2 - ref */
-            st_ref[6].is_non_ref    = 0;
-            st_ref[6].temporal_id   = 2;
-            st_ref[6].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[6].ref_arg       = 0;
-            st_ref[6].repeat        = 0;
+            st_ref[REF_NUM_6].is_non_ref    = 0;
+            st_ref[REF_NUM_6].temporal_id   = TEMPORAL_ID_2;
+            st_ref[REF_NUM_6].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_6].ref_arg       = 0;
+            st_ref[REF_NUM_6].repeat        = 0;
             /* st 7 layer 3 - non-ref */
-            st_ref[7].is_non_ref    = 1;
-            st_ref[7].temporal_id   = 3;
-            st_ref[7].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[7].ref_arg       = 0;
-            st_ref[7].repeat        = 0;
+            st_ref[REF_NUM_7].is_non_ref    = 1;
+            st_ref[REF_NUM_7].temporal_id   = TEMPORAL_ID_3;
+            st_ref[REF_NUM_7].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_7].ref_arg       = 0;
+            st_ref[REF_NUM_7].repeat        = 0;
             /* st 8 layer 0 - ref */
-            st_ref[8].is_non_ref    = 0;
-            st_ref[8].temporal_id   = 0;
-            st_ref[8].ref_mode      = REF_TO_TEMPORAL_LAYER;
-            st_ref[8].ref_arg       = 0;
-            st_ref[8].repeat        = 0;
+            st_ref[REF_NUM_8].is_non_ref    = 0;
+            st_ref[REF_NUM_8].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_8].ref_mode      = REF_TO_TEMPORAL_LAYER;
+            st_ref[REF_NUM_8].ref_arg       = 0;
+            st_ref[REF_NUM_8].repeat        = 0;
         }
             break;
-        case 2 : {
+        case GOP_MODE_TSVC3 : {
             // tsvc3
             //     /-> P1      /-> P3
             //    /           /
@@ -130,67 +152,67 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, RK_S32 gop_mode)
             // P0/---------------------> P4
             lt_cnt = 0;
 
-            st_cnt = 5;
+            st_cnt = ST_COUNT_5;
             /* set tsvc4 st-ref struct */
             /* st 0 layer 0 - ref */
-            st_ref[0].is_non_ref    = 0;
-            st_ref[0].temporal_id   = 0;
-            st_ref[0].ref_mode      = REF_TO_TEMPORAL_LAYER;
-            st_ref[0].ref_arg       = 0;
-            st_ref[0].repeat        = 0;
+            st_ref[REF_NUM_0].is_non_ref    = 0;
+            st_ref[REF_NUM_0].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_0].ref_mode      = REF_TO_TEMPORAL_LAYER;
+            st_ref[REF_NUM_0].ref_arg       = 0;
+            st_ref[REF_NUM_0].repeat        = 0;
             /* st 1 layer 2 - non-ref */
-            st_ref[1].is_non_ref    = 1;
-            st_ref[1].temporal_id   = 2;
-            st_ref[1].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[1].ref_arg       = 0;
-            st_ref[1].repeat        = 0;
+            st_ref[REF_NUM_1].is_non_ref    = 1;
+            st_ref[REF_NUM_1].temporal_id   = TEMPORAL_ID_2;
+            st_ref[REF_NUM_1].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_1].ref_arg       = 0;
+            st_ref[REF_NUM_1].repeat        = 0;
             /* st 2 layer 1 - ref */
-            st_ref[2].is_non_ref    = 0;
-            st_ref[2].temporal_id   = 1;
-            st_ref[2].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[2].ref_arg       = 0;
-            st_ref[2].repeat        = 0;
+            st_ref[REF_NUM_2].is_non_ref    = 0;
+            st_ref[REF_NUM_2].temporal_id   = TEMPORAL_ID_1;
+            st_ref[REF_NUM_2].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_2].ref_arg       = 0;
+            st_ref[REF_NUM_2].repeat        = 0;
             /* st 3 layer 2 - non-ref */
-            st_ref[3].is_non_ref    = 1;
-            st_ref[3].temporal_id   = 2;
-            st_ref[3].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[3].ref_arg       = 0;
-            st_ref[3].repeat        = 0;
+            st_ref[REF_NUM_3].is_non_ref    = 1;
+            st_ref[REF_NUM_3].temporal_id   = TEMPORAL_ID_2;
+            st_ref[REF_NUM_3].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_3].ref_arg       = 0;
+            st_ref[REF_NUM_3].repeat        = 0;
             /* st 4 layer 0 - ref */
-            st_ref[4].is_non_ref    = 0;
-            st_ref[4].temporal_id   = 0;
-            st_ref[4].ref_mode      = REF_TO_TEMPORAL_LAYER;
-            st_ref[4].ref_arg       = 0;
-            st_ref[4].repeat        = 0;
+            st_ref[REF_NUM_4].is_non_ref    = 0;
+            st_ref[REF_NUM_4].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_4].ref_mode      = REF_TO_TEMPORAL_LAYER;
+            st_ref[REF_NUM_4].ref_arg       = 0;
+            st_ref[REF_NUM_4].repeat        = 0;
         }
             break;
-        case 1 : {
+        case GOP_MODE_TSVC2 : {
             // tsvc2
             //   /-> P1
             //  /
             // P0--------> P2
             lt_cnt = 0;
 
-            st_cnt = 3;
+            st_cnt = ST_COUNT_3;
             /* set tsvc4 st-ref struct */
             /* st 0 layer 0 - ref */
-            st_ref[0].is_non_ref    = 0;
-            st_ref[0].temporal_id   = 0;
-            st_ref[0].ref_mode      = REF_TO_TEMPORAL_LAYER;
-            st_ref[0].ref_arg       = 0;
-            st_ref[0].repeat        = 0;
+            st_ref[REF_NUM_0].is_non_ref    = 0;
+            st_ref[REF_NUM_0].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_0].ref_mode      = REF_TO_TEMPORAL_LAYER;
+            st_ref[REF_NUM_0].ref_arg       = 0;
+            st_ref[REF_NUM_0].repeat        = 0;
             /* st 1 layer 2 - non-ref */
-            st_ref[1].is_non_ref    = 1;
-            st_ref[1].temporal_id   = 1;
-            st_ref[1].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[1].ref_arg       = 0;
-            st_ref[1].repeat        = 0;
+            st_ref[REF_NUM_1].is_non_ref    = 1;
+            st_ref[REF_NUM_1].temporal_id   = TEMPORAL_ID_1;
+            st_ref[REF_NUM_1].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_1].ref_arg       = 0;
+            st_ref[REF_NUM_1].repeat        = 0;
             /* st 2 layer 1 - ref */
-            st_ref[2].is_non_ref    = 0;
-            st_ref[2].temporal_id   = 0;
-            st_ref[2].ref_mode      = REF_TO_PREV_REF_FRM;
-            st_ref[2].ref_arg       = 0;
-            st_ref[2].repeat        = 0;
+            st_ref[REF_NUM_2].is_non_ref    = 0;
+            st_ref[REF_NUM_2].temporal_id   = TEMPORAL_ID_0;
+            st_ref[REF_NUM_2].ref_mode      = REF_TO_PREV_REF_FRM;
+            st_ref[REF_NUM_2].ref_arg       = 0;
+            st_ref[REF_NUM_2].repeat        = 0;
         }
             break;
         default : {
