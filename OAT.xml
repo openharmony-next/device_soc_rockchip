@@ -52,6 +52,8 @@
                 <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/display/lib/*" desc="display 32bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/display/lib64/*" desc="display 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/omx_il/lib/*" desc="omx 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/omx_il/lib64/*" desc="omx 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>
@@ -144,6 +146,8 @@
                 <filteritem type="filepath" name="rk3568/hardware/isp/*" desc="isp lib and bin files"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/display/lib/*" desc="display 32bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/display/lib64/*" desc="display 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/omx_il/lib/*" desc="omx 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/omx_il/lib64/*" desc="omx 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/gra/lib/*" desc="gra 32bit libs file"/>
