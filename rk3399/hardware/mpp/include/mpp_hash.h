@@ -37,6 +37,8 @@ extern "C" {
 #error __SIZEOF_POINTER__ not 4 or 8
 #endif
 
+#define typeof  __typeof__
+
 struct hlist_node {
     struct hlist_node *next, **pprev;
 };
@@ -70,7 +72,7 @@ static inline int hlist_unhashed(const struct hlist_node *h)
 
 static inline int hlist_empty(const struct hlist_head *h)
 {
-    return !READ_ONCE(h->first);
+    return !h->first;
 }
 
 static inline void _hlist_del(struct hlist_node *n)

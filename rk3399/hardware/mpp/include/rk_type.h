@@ -20,30 +20,33 @@
 
 #if defined(_WIN32) && !defined(__MINGW32CE__)
 
-typedef RK_U8 unsigned char;
-typedef RK_U16 unsigned short;
-typedef RK_U32 unsigned int;
-typedef RK_ULONG unsigned long;
-#define RK_U64 unsigned __int64
+typedef unsigned char           RK_U8;
+typedef unsigned short          RK_U16;
+typedef unsigned int            RK_U32;
+typedef unsigned long           RK_ULONG;
+typedef unsigned __int64        RK_U64;
 
-typedef RK_S8 signed char;
-typedef RK_S16 signed short;
-typedef RK_S32 signed int;
-typedef RK_LONG signed long;
-#define RK_S64 signed __int64
+typedef signed char             RK_S8;
+typedef signed short            RK_S16;
+typedef signed int              RK_S32;
+typedef signed long             RK_LONG;
+typedef signed __int64          RK_S64;
 
 #else
-typedef RK_U8 unsigned char;
-typedef RK_U16 unsigned short;
-typedef RK_U32 unsigned int;
-typedef RK_ULONG unsigned long;
-typedef RK_U64 unsigned long long int;
 
-typedef RK_S8 signed char;
-typedef RK_S16 signed short;
-typedef RK_S32 signed int;
-typedef RK_LONG signed long;
-typedef RK_S64 signed long long int;
+typedef unsigned char           RK_U8;
+typedef unsigned short          RK_U16;
+typedef unsigned int            RK_U32;
+typedef unsigned long           RK_ULONG;
+typedef unsigned long long int  RK_U64;
+
+
+typedef signed char             RK_S8;
+typedef signed short            RK_S16;
+typedef signed int              RK_S32;
+typedef signed long             RK_LONG;
+typedef signed long long int    RK_S64;
+
 #endif
 
 #ifndef MODULE_TAG
