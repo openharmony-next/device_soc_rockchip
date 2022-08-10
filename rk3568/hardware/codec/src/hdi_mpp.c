@@ -772,11 +772,12 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData
     mppApi->HdiMppFrameSetFormat(*pFrame, g_pBaseComponent->fmt);
     mppApi->HdiMppFrameSetEos(*pFrame, frm_eos);
 
-    MppBuffer buf = NULL;
-    if (frm_eos != 1) {
-        buf = mppApi->HdiMppBufferGetPtrWithCaller(g_pBaseComponent->frmBuf, __func__);
+    uint8_t *buf = NULL;
+    if ((uint8_t *)inputData->buffer[0].buf != NULL && inputData->buffer[0].length > 0) {
+        buf = (uint8_t *)mppApi->HdiMppBufferGetPtrWithCaller(g_pBaseComponent->frmBuf, __func__);
         if (buf == NULL) {
             HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
+            mppApi->HdiMppFrameDeinit(&pFrame);
             return HDF_FAILURE;
         }
         uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
@@ -784,11 +785,16 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData
         int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
+            mppApi->HdiMppFrameDeinit(&pFrame);
+            return HDF_FAILURE;
         }
         mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
     } else {
-        HDF_LOGI("%{public}s: find eos frame", __func__);
         mppApi->HdiMppFrameSetBuffer(*pFrame, NULL);
+        HDF_LOGI("%{public}s: receive empty frame", __func__);
+    }
+    if (frm_eos != 0) {
+        HDF_LOGI("%{public}s: receive eos frame", __func__);
     }
 
     return HDF_SUCCESS;
