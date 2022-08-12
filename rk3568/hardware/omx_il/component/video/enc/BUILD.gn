@@ -35,7 +35,7 @@ ohos_shared_library("libomxvpu_enc") {
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
     "//drivers/framework/include/utils",
     "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",

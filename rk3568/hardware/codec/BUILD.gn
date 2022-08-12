@@ -31,7 +31,6 @@ ohos_shared_library("libcodec_oem_interface") {
     "$hdf_uhdf_path/host:libhdf_host",
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "$hdf_uhdf_path/utils:libhdf_utils",
-    "//utils/native/base:utils",
   ]
 
   cflags_c = [
@@ -46,13 +45,17 @@ ohos_shared_library("libcodec_oem_interface") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+    ]
   }
 
   install_images = [ chipset_base_dir ]

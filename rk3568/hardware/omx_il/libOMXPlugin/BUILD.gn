@@ -20,7 +20,7 @@ ohos_shared_library("libOMX_Pluginhw") {
     ".",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/khronos",
     "//foundation/multimedia/player_framework/services/utils/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/hdf_core/framework/include/utils",
