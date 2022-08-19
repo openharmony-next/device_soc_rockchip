@@ -25,7 +25,7 @@ static_library("hal_iothardware") {
     "hal_reset.c",
   ]
   include_dirs = [
-    "//utils/native/lite/include",
+    "//commonlibrary/utils_lite/include",
     "//base/iot_hardware/peripheral/interfaces/kits",
     "//device/rockchip/rk2206/adapter/include",
   ]
