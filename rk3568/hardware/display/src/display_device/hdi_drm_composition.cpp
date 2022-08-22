@@ -291,7 +291,7 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     RemoveUnusePlane(atomicReqPtr.Get());
 
     ret = drmModeAtomicAddProperty(pset, mConnector->GetId(), mConnector->GetPropCrtcId(), mCrtc->GetId());
-    DISPLAY_LOGI("set the connector id: %{public}d, propId %{public}d, crtcId %{public}d", mConnector->GetId(),
+    DISPLAY_DEBUGLOG("set the connector id: %{public}d, propId %{public}d, crtcId %{public}d", mConnector->GetId(),
         mConnector->GetPropCrtcId(), mCrtc->GetId());
     DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not add the crtc id prop %{public}d", errno));
