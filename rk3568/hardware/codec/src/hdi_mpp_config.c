@@ -457,14 +457,14 @@ int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = pBaseComponent->ctx;
-    RK_U32 need_split = 1;
-    int32_t result = memcpy_s(&need_split, sizeof(RK_U32), param->val, param->size);
+    RK_U32 needSplit = 1;
+    int32_t result = memcpy_s(&needSplit, sizeof(RK_U32), param->val, param->size);
     if (result != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 
-    ret = pBaseComponent->mppApi->HdiMppDecCfgSetU32(pBaseComponent->cfg, "base:split_parse", need_split);
+    ret = pBaseComponent->mppApi->HdiMppDecCfgSetU32(pBaseComponent->cfg, "base:split_parse", needSplit);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: failed to set split_parse ret %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -482,7 +482,7 @@ int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param)
         return HDF_FAILURE;
     }
 
-    pBaseComponent->setup.split = need_split;
+    pBaseComponent->setup.split = needSplit;
     return HDF_SUCCESS;
 }
 
@@ -522,8 +522,8 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     MPP_RET ret = MPP_OK;
     RKMppApi *mppApi = pBaseComponent->mppApi;
-    RK_U32 split_mode = 0;
-    RK_U32 split_arg = 0;
+    RK_U32 splitMode = 0;
+    RK_U32 splitArg = 0;
 
     int32_t checkResult = CheckSetup(pBaseComponent);
     if (checkResult != HDF_SUCCESS) {
@@ -531,13 +531,13 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
         return checkResult;
     }
 
-    mppApi->HdiMppEnvGetU32("split_mode", &split_mode, MPP_ENC_SPLIT_NONE);
-    mppApi->HdiMppEnvGetU32("split_arg", &split_arg, 0);
-    if (split_mode) {
-        HDF_LOGI("%{public}s: %{public}p split_mode %{public}d split_arg %{public}d",
-            __func__, pBaseComponent->ctx, split_mode, split_arg);
-        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "split:mode", split_mode);
-        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "split:arg", split_arg);
+    mppApi->HdiMppEnvGetU32("split_mode", &splitMode, MPP_ENC_SPLIT_NONE);
+    mppApi->HdiMppEnvGetU32("split_arg", &splitArg, 0);
+    if (splitMode) {
+        HDF_LOGI("%{public}s: %{public}p splitMode %{public}d splitArg %{public}d",
+            __func__, pBaseComponent->ctx, splitMode, splitArg);
+        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "split:mode", splitMode);
+        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "split:arg", splitArg);
     }
 
     ret = pBaseComponent->mpi->control(pBaseComponent->ctx, MPP_ENC_SET_CFG, pBaseComponent->cfg);
@@ -547,16 +547,16 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
     }
 
     /* optional */
-    MppEncSeiMode sei_mode = MPP_ENC_SEI_MODE_ONE_FRAME;
-    ret = pBaseComponent->mpi->control(pBaseComponent->ctx, MPP_ENC_SET_SEI_CFG, &sei_mode);
+    MppEncSeiMode seiMode = MPP_ENC_SEI_MODE_ONE_FRAME;
+    ret = pBaseComponent->mpi->control(pBaseComponent->ctx, MPP_ENC_SET_SEI_CFG, &seiMode);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpi control enc set sei cfg failed ret %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 
     if ((pBaseComponent->codingType == MPP_VIDEO_CodingAVC) || (pBaseComponent->codingType == MPP_VIDEO_CodingHEVC)) {
-        MppEncHeaderMode header_mode = MPP_ENC_HEADER_MODE_EACH_IDR;
-        ret = pBaseComponent->mpi->control(pBaseComponent->ctx, MPP_ENC_SET_HEADER_MODE, &header_mode);
+        MppEncHeaderMode headerMode = MPP_ENC_HEADER_MODE_EACH_IDR;
+        ret = pBaseComponent->mpi->control(pBaseComponent->ctx, MPP_ENC_SET_HEADER_MODE, &headerMode);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: mpi control enc set header mode failed ret %{public}d", __func__, ret);
             return HDF_FAILURE;
@@ -598,12 +598,12 @@ int32_t GetParamBufferSize(RKHdiBaseComponent *pBaseComponent, Param *param)
     }
 
     RKMppApi *mppApi = pBaseComponent->mppApi;
-    RK_U32 buf_size = 0;
+    RK_U32 bufSize = 0;
     if (pBaseComponent->frame) {
-        buf_size = mppApi->HdiMppFrameGetBufferSize(pBaseComponent->frame);
+        bufSize = mppApi->HdiMppFrameGetBufferSize(pBaseComponent->frame);
     }
 
-    int32_t ret = memcpy_s(param->val, param->size, &buf_size, sizeof(RK_U32));
+    int32_t ret = memcpy_s(param->val, param->size, &bufSize, sizeof(RK_U32));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;

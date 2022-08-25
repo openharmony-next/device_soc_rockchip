@@ -19,6 +19,8 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "hdi_mpp_config.h"
+#include "im2d.h"
+#include "rga.h"
 #include "rk_vdec_cfg.h"
 
 #define HDF_LOG_TAG codec_hdi_mpp
@@ -606,6 +608,46 @@ int32_t HandleDecodeFrameInfoChange(MppFrame frame, MppCtx ctx)
     return HDF_SUCCESS;
 }
 
+static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
+{
+    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    MppBuffer mppBuffer = mppApi->HdiMppFrameGetBuffer(frame);
+    rga_buffer_t src;
+    rga_buffer_t dst;
+    im_rect rect;
+    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
+    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
+    
+    int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s src failed, error code: %{public}d", __func__, err);
+        return IM_STATUS_FAILED;
+    }
+    memset_s(&dst, sizeof(dst), 0, sizeof(dst));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
+        return IM_STATUS_FAILED;
+    }
+
+    src.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
+    src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
+    src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
+    src.width    = width;
+    src.height   = height;
+    src.format   = RK_FORMAT_YCbCr_420_SP;
+    dst.fd = ((BufferHandle *)outInfo->buffer[0].buf)->fd;
+    dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
+    dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
+    dst.width    = width;
+    dst.height   = height;
+    dst.format   = RK_FORMAT_YCbCr_420_SP;
+    rect.x = 0;
+    rect.y = 0;
+    rect.width = width;
+    rect.height = height;
+    return imcrop(src, dst, rect);
+}
+
 void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outInfo)
 {
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
@@ -615,15 +657,27 @@ void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outIn
     
     if ((err_info | discard) != 0) {
         g_pBaseComponent->frameErr++;
+        HDF_LOGE("%{public}s: bad output data, err_info: %{public}d", __func__, err_info);
+        return;
+    }
+    if (outInfo == NULL || outInfo->bufferCnt == 0) {
+        HDF_LOGE("%{public}s: outInfo param invalid!", __func__);
+        return;
+    }
+    // have output data
+    if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        IM_STATUS ret = PutDecodeFrameToOutput(frame, outInfo);
+        if (ret != IM_STATUS_SUCCESS) {
+            HDF_LOGE("%{public}s: copy decode output data failed, error code: %{public}d", __func__, ret);
+        }
     } else {
-        // call back have out data
         MppBuffer buffer = mppApi->HdiMppFrameGetBuffer(frame);
         RK_U8 *base = (RK_U8 *)mppApi->HdiMppBufferGetPtrWithCaller(buffer, __func__);
         RK_U32 bufferSize = mppApi->HdiMppFrameGetBufferSize(frame);
         uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
         uint32_t outBufferSize = outInfo->buffer[0].capacity;
         if (outBuffer != NULL && outBufferSize != 0 && base != NULL && bufferSize != 0) {
-            int32_t ret = memcpy_s(outBuffer, outBufferSize, base, bufferSize);
+            int32_t ret = memcpy_s(outBuffer, outBufferSize, base, outBufferSize);
             if (ret == EOK) {
                 outInfo->buffer[0].length = bufferSize;
             } else {
@@ -632,17 +686,19 @@ void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outIn
                     outBufferSize, bufferSize);
             }
         } else {
-            HDF_LOGE("%{public}s: output data not copy, buffer incorrect!", __func__);
+            if (frm_eos == 0) {
+                HDF_LOGE("%{public}s: output data not copy, buffer incorrect!", __func__);
+            }
         }
-        if (frm_eos != 0) {
-            outInfo->flag |= STREAM_FLAG_EOS;
-            HDF_LOGI("%{public}s: dec reach STREAM_FLAG_EOS, frame count : %{public}d, error count : %{public}d",
-                __func__, g_pBaseComponent->frameCount, g_pBaseComponent->frameErr);
-        }
-        UINTPTR userData = NULL;
-        int32_t acquireFd = 1;
-        g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
     }
+
+    if (frm_eos != 0) {
+        outInfo->flag |= STREAM_FLAG_EOS;
+        HDF_LOGI("%{public}s: dec reach STREAM_FLAG_EOS, frame count : %{public}d, error count : %{public}d",
+            __func__, g_pBaseComponent->frameCount, g_pBaseComponent->frameErr);
+    }
+    int32_t acquireFd = 1;
+    g_pBaseComponent->pCallbacks->OutputBufferAvailable((UINTPTR)NULL, outInfo, &acquireFd);
 }
 
 int32_t HandleDecodedFrame(MppFrame frame, MppCtx ctx, int32_t frm_eos, CodecBuffer *outInfo)
@@ -746,9 +802,8 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
         }
         usleep(SLEEP_INTERVAL_MICROSECONDS);
     } while (1);
-    UINTPTR userData = NULL;
     int32_t acquireFd = 1;
-    g_pBaseComponent->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
+    g_pBaseComponent->pCallbacks->InputBufferAvailable((UINTPTR)NULL, inputData, &acquireFd);
 
     if (loop_end != 1) {
         return HDF_FAILURE;
@@ -756,10 +811,53 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
     return HDF_SUCCESS;
 }
 
+static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, CodecBuffer *inputInfo)
+{
+    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    rga_buffer_t src;
+    rga_buffer_t dst;
+    im_rect rect;
+    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
+    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
+    
+    int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s src failed, error code: %{public}d", __func__, err);
+        return IM_STATUS_FAILED;
+    }
+    err = memset_s(&dst, sizeof(dst), 0, sizeof(dst));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
+        return IM_STATUS_FAILED;
+    }
+
+    src.fd = ((BufferHandle *)inputInfo->buffer[0].buf)->fd;
+    src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
+    src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
+    src.width    = width;
+    src.height   = height;
+    src.format   = RK_FORMAT_YCbCr_420_SP;
+    dst.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
+    dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
+    dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
+    dst.width    = width;
+    dst.height   = height;
+    dst.format   = RK_FORMAT_YCbCr_420_SP;
+    rect.x = 0;
+    rect.y = 0;
+    rect.width = width;
+    rect.height = height;
+    return imcrop(src, dst, rect);
+}
+
 int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData)
 {
     MPP_RET ret = MPP_OK;
     RKMppApi *mppApi = g_pBaseComponent->mppApi;
+
+    if (frm_eos != 0) {
+        HDF_LOGI("%{public}s: receive eos frame", __func__);
+    }
     ret = mppApi->HdiMppFrameInit(pFrame);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpp_frame_init failed", __func__);
@@ -772,29 +870,37 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData
     mppApi->HdiMppFrameSetFormat(*pFrame, g_pBaseComponent->fmt);
     mppApi->HdiMppFrameSetEos(*pFrame, frm_eos);
 
-    uint8_t *buf = NULL;
-    if ((uint8_t *)inputData->buffer[0].buf != NULL && inputData->buffer[0].length > 0) {
-        buf = (uint8_t *)mppApi->HdiMppBufferGetPtrWithCaller(g_pBaseComponent->frmBuf, __func__);
-        if (buf == NULL) {
-            HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
+    if (inputData->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        IM_STATUS status = GetEncodeFrameFromInput(*pFrame, g_pBaseComponent->frmBuf, inputData);
+        if (status == IM_STATUS_SUCCESS) {
+            mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
+        } else {
             mppApi->HdiMppFrameDeinit(&pFrame);
+            HDF_LOGE("%{public}s: copy encode input data failed, error code: %{public}d", __func__, ret);
             return HDF_FAILURE;
         }
-        uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
-        uint32_t inBufferSize = inputData->buffer[0].length;
-        int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
-        if (ret != EOK) {
-            HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
-            mppApi->HdiMppFrameDeinit(&pFrame);
-            return HDF_FAILURE;
-        }
-        mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
     } else {
-        mppApi->HdiMppFrameSetBuffer(*pFrame, NULL);
-        HDF_LOGI("%{public}s: receive empty frame", __func__);
-    }
-    if (frm_eos != 0) {
-        HDF_LOGI("%{public}s: receive eos frame", __func__);
+        uint8_t *buf = NULL;
+        if ((uint8_t *)inputData->buffer[0].buf != NULL && inputData->buffer[0].length > 0) {
+            buf = (uint8_t *)mppApi->HdiMppBufferGetPtrWithCaller(g_pBaseComponent->frmBuf, __func__);
+            if (buf == NULL) {
+                HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
+                mppApi->HdiMppFrameDeinit(&pFrame);
+                return HDF_FAILURE;
+            }
+            uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
+            uint32_t inBufferSize = inputData->buffer[0].length;
+            int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
+            if (ret != EOK) {
+                HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
+                mppApi->HdiMppFrameDeinit(&pFrame);
+                return HDF_FAILURE;
+            }
+            mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
+        } else {
+            mppApi->HdiMppFrameSetBuffer(*pFrame, NULL);
+            HDF_LOGI("%{public}s: receive empty frame", __func__);
+        }
     }
 
     return HDF_SUCCESS;
@@ -880,9 +986,15 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer
     MppCtx ctx = handle;
     RK_U32 pkt_eos = 0;
     RK_U32 loop_end = 0;
-    RK_U32 frm_eos  = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
+    RK_U32 frm_eos = 0;
     UINTPTR userData = NULL;
     int32_t acquireFd = 1;
+
+    if (inputData == NULL || inputData->bufferCnt == 0) {
+        HDF_LOGE("%{public}s: inputData param invalid!", __func__);
+        return HDF_FAILURE;
+    }
+    frm_eos = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
 
     if (EncodeInitFrame(&frame, frm_eos, inputData) != HDF_SUCCESS) {
         return HDF_FAILURE;
