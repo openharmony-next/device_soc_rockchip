@@ -20,7 +20,8 @@ ohos_prebuilt_shared_library("librga") {
   } else if (target_cpu == "arm64") {
     source = "lib64/librga.z.so"
   }
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_camera"
   install_enable = true
