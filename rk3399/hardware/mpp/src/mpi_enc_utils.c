@@ -23,8 +23,8 @@
 #include "rk_mpi.h"
 #include "mpp_common.h"
 #include "mpp_packet.h"
-#include "mpi_enc_utils.h"
 #include "mpp_env.h"
+#include "mpi_enc_utils.h"
 
 #define GOP_MODE_TSVC4 3
 #define GOP_MODE_TSVC3 2
