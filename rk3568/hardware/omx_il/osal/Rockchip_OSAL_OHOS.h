@@ -28,7 +28,6 @@
 #include "OMX_Core.h"
 #include "OMX_Index.h"
 #include "IndexExt.h"
-#include "securec.h"
 #ifdef OHOS_BUFFER_HANDLE
 #include <buffer_handle.h>
 #endif

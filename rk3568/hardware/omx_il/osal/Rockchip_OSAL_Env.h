@@ -18,7 +18,6 @@
 #ifndef _ROCKCHIP_OSAL_ENV_H_
 #define _ROCKCHIP_OSAL_ENV_H_
 
-#include "securec.h"
 #include "OMX_Core.h"
 
 #ifdef __cplusplus

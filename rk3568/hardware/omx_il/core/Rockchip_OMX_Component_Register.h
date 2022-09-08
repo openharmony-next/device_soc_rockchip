@@ -31,7 +31,6 @@
 #include "OMX_Types.h"
 #include "OMX_Core.h"
 #include "OMX_Component.h"
-#include "securec.h"
 
 typedef struct _RockchipRegisterComponentType {
     OMX_U8  componentName[MAX_OMX_COMPONENT_NAME_SIZE];

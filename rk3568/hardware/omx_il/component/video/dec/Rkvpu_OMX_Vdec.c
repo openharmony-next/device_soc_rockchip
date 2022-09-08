@@ -25,7 +25,7 @@
  */
 #undef  ROCKCHIP_LOG_TAG
 #define ROCKCHIP_LOG_TAG    "omx_vdec"
-
+#include <securec.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -27,7 +27,6 @@
 #ifndef RKVPU_OMX_VIDEO_DECODECONTROL
 #define RKVPU_OMX_VIDEO_DECODECONTROL
 
-#include "securec.h"
 #include "OMX_Component.h"
 #include "Rockchip_OMX_Def.h"
 #include "Rockchip_OSAL_Queue.h"

@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "securec.h"
 #include "OMX_Types.h"
 #include "OMX_Video.h"
 #include "VideoExt.h"

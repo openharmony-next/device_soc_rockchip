@@ -25,6 +25,8 @@
  */
 
 #include "Rockchip_OSAL_Log.h"
+#include <hdf_log.h>
+#include <securec.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

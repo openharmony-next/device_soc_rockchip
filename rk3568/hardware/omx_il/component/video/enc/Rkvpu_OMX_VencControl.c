@@ -42,7 +42,6 @@
 #include "Rockchip_OSAL_Queue.h"
 #ifdef OHOS_BUFFER_HANDLE
 #include <buffer_handle.h>
-#include <display_gralloc.h>
 #include <display_type.h>
 #include <codec_omx_ext.h>
 #endif

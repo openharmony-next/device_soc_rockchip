@@ -49,7 +49,6 @@
 #include "Rockchip_OSAL_OHOS.h"
 #include "Rkvpu_OMX_VdecControl.h"
 #ifdef OHOS_BUFFER_HANDLE
-#include <display_gralloc.h>
 #include <buffer_handle.h>
 #include <display_type.h>
 #include <codec_omx_ext.h>

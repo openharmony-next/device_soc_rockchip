@@ -27,13 +27,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <securec.h>
 #include <sys/time.h>
 
 #include "Rockchip_OSAL_Memory.h"
 #include "Rockchip_OSAL_Log.h"
 #include "Rockchip_OSAL_ETC.h"
-
-#include <hdf_log.h>
 
 static struct timeval perfStart[PERF_ID_MAX + 1], perfStop[PERF_ID_MAX + 1];
 static unsigned long perfTime[PERF_ID_MAX + 1], totalPerfTime[PERF_ID_MAX + 1];

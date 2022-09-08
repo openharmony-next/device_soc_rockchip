@@ -30,7 +30,6 @@
 
 #include "OMX_Types.h"
 #include "Rockchip_OSAL_Log.h"
-#include "securec.h"
 
 typedef enum _MEMORY_TYPE {
     NORMAL_MEMORY = 0x00,

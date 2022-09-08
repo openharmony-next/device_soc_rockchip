@@ -32,8 +32,6 @@
 #include "vpu_type.h"
 #include "OMX_Types.h"
 #include "Rockchip_OSAL_Memory.h"
-#include "securec.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

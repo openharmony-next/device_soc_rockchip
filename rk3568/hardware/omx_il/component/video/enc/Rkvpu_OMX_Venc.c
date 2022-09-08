@@ -25,7 +25,7 @@
  */
 #undef  ROCKCHIP_LOG_TAG
 #define ROCKCHIP_LOG_TAG    "omx_venc"
-
+#include <securec.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +60,6 @@
 #endif
 #ifdef OHOS_BUFFER_HANDLE
 #include <buffer_handle.h>
-#include <display_gralloc.h>
 #include <display_type.h>
 #endif
 /* Using for the encode rate statistic */

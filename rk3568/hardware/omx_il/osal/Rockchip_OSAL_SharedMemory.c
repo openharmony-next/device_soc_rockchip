@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <securec.h>
 #include <pthread.h>
 #include <unistd.h>
 #ifndef OHOS
@@ -46,7 +47,6 @@
 #include "drm.h"
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OSAL_SharedMemory.h"
-
 #define ROCKCHIP_LOG_OFF
 #include "Rockchip_OSAL_Log.h"
 
