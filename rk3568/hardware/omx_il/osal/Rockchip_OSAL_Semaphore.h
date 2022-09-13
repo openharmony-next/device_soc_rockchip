@@ -30,7 +30,6 @@
 
 #include "OMX_Types.h"
 #include "OMX_Core.h"
-#include "securec.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -29,7 +29,6 @@
 #define Rockchip_OSAL_LIBRARY
 
 #include "OMX_Types.h"
-#include "securec.h"
 
 #ifdef __cplusplus
 extern "C" {

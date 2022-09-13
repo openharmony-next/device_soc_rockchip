@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "securec.h"
 #include "Rockchip_OSAL_Memory.h"
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OSAL_Queue.h"

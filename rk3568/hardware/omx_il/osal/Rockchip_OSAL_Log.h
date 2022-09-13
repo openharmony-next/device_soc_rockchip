@@ -27,10 +27,8 @@
 #ifndef ROCKCHIP_OSAL_LOG
 #define ROCKCHIP_OSAL_LOG
 
-#include <hdf_log.h>
 #include "OMX_Core.h"
 #include "OMX_Types.h"
-#include "securec.h"
 
 #ifdef __cplusplus
 extern "C" {

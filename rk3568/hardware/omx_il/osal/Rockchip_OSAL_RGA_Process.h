@@ -29,7 +29,6 @@
 #include "vpu_type.h"
 #include "Rockchip_OMX_Def.h"
 #include "vpu_global.h"
-#include "securec.h"
 
 typedef unsigned int uint32_t;
 

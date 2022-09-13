@@ -35,25 +35,23 @@ ohos_static_library("RkOMX_OSAL") {
 
   include_dirs = [
     ".",
+    "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy",
+    "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/common",
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/dec",
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/enc",
-    "//device/hihope/rk3568/hardware/rga/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/khronos",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/rockchip",
-    "//foundation/ace/ace_engine/frameworks/base/utils",
-    "//third_party/libdrm/include/drm",
-    "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy",
-    "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
-    "//foundation/multimedia/player_framework/services/utils/include",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/librkvpu",
     "//device/soc/rockchip/rk3568/hardware/rga/include",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/adapter/uhdf2/osal/include",
+    "//drivers/peripheral/base",
+    "//drivers/peripheral/display/interfaces/include",
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/adapter/uhdf2/osal/include/",
+    "//utils/native/base/include",
   ]
 
   cflags = [
@@ -90,16 +88,8 @@ ohos_static_library("RkOMX_OSAL") {
   cflags += [ "-DOHOS_BUFFER_HANDLE" ]
   cflags_cc += [ "-DOHOS_BUFFER_HANDLE" ]
 
-  deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy:librockchip_vpu",
-    "//device/soc/rockchip/rk3568/hardware/rga:librga",
-  ]
+  deps =
+      [ "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy:librockchip_vpu" ]
 
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "drivers_peripheral_display:hdi_display_gralloc",
-    ]
-  }
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }

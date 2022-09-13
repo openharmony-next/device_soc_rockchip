@@ -18,6 +18,7 @@
 #undef  ROCKCHIP_LOG_TAG
 #define ROCKCHIP_LOG_TAG    "omx_osal_rga"
 
+#include <securec.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>

@@ -29,7 +29,6 @@
 
 #include "OMX_Types.h"
 #include "OMX_Core.h"
-#include "securec.h"
 
 #define QUEUE_ELEMENTS        10
 #define MAX_QUEUE_ELEMENTS    40

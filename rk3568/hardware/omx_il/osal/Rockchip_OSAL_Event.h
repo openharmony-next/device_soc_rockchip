@@ -29,7 +29,6 @@
 #define Rockchip_OSAL_EVENT
 
 #include <pthread.h>
-#include "securec.h"
 #include "OMX_Types.h"
 #include "OMX_Core.h"
 

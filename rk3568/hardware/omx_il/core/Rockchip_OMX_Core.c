@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <hdf_log.h>
 #include "Rockchip_OMX_Component_Register.h"
 #include "Rockchip_OSAL_Memory.h"
 #include "Rockchip_OSAL_Mutex.h"

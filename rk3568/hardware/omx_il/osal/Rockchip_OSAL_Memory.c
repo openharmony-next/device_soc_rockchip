@@ -23,11 +23,7 @@
  * @history
  *   2013.11.26 : Create
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <securec.h>
 #include "Rockchip_OSAL_Memory.h"
 
 #define ROCKCHIP_LOG_OFF

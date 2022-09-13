@@ -36,7 +36,6 @@
 #include "vpu_global.h"
 #include "OMX_IndexExt.h"
 #include "IndexExt.h"
-#include "securec.h"
 
 #ifdef __cplusplus
 extern "C" {
