@@ -51,7 +51,7 @@ ohos_static_library("RkOMX_OSAL") {
     "//drivers/peripheral/display/interfaces/include",
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
   cflags = [
