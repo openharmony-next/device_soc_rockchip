@@ -34,7 +34,6 @@
 #include "Rockchip_OSAL_Memory.h"
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OSAL_Log.h"
-#include "git_info.h"
 
 #define MAX_RESOURCE_VIDEO_DEC 6 /* for Android */
 #define MAX_RESOURCE_VIDEO_ENC 4 /* for Android */
@@ -282,7 +281,6 @@ OMX_ERRORTYPE Rockchip_OMX_Check_Resource(OMX_COMPONENTTYPE *pOMXComponent)
     Rockchip_OSAL_MutexLock(ghVideoRMComponentListMutex);
 
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
-    pRockchipComponent->rkversion = OMX_COMPILE_INFO;
 
     if (pRockchipComponent->codecType == HW_VIDEO_DEC_CODEC) {
         pComponentTemp = gpVideoDecRMComponentList;
@@ -337,7 +335,6 @@ OMX_ERRORTYPE Rockchip_OMX_Get_Resource(OMX_COMPONENTTYPE *pOMXComponent)
     Rockchip_OSAL_MutexLock(ghVideoRMComponentListMutex);
 
     pRockchipComponent = (ROCKCHIP_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
-    pRockchipComponent->rkversion = OMX_COMPILE_INFO;
 
     if (pRockchipComponent->codecType == HW_VIDEO_DEC_CODEC) {
         pComponentTemp = gpVideoDecRMComponentList;
