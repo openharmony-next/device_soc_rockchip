@@ -37,7 +37,6 @@
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OMX_Basecomponent.h"
 #include "Rockchip_OSAL_OHOS.h"
-#include "git_info.h"
 #include "Rockchip_OSAL_Log.h"
 #include "omx_video_global.h"
 
