@@ -18,7 +18,7 @@ import("//build/lite/config/component/lite_component.gni")
 static_library("hal_file_static") {
   sources = [ "hal_file.c" ]
   include_dirs = [
-    "//utils/native/lite/hals/file",
+    "//commonlibrary/utils_lite/hals/file",
     "//device/soc/rockchip/rk2206/hardware/include",
     "//device/soc/rockchip/rk2206/sdk_liteos/liteos_m",
     "//kernel/liteos_m/components/fs",
