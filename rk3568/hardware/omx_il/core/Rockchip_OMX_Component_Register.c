@@ -35,7 +35,6 @@
 #include <errno.h>
 #include <assert.h>
 #include <dirent.h>
-#include "git_info.h"
 
 #include "OMX_Component.h"
 #include "Rockchip_OSAL_Memory.h"
@@ -207,7 +206,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentLoad(ROCKCHIP_OMX_COMPONENT *rockchip_compon
         }
         rockchip_component->libHandle = libHandle;
         rockchip_component->pOMXComponent = pOMXComponent;
-        rockchip_component->rkversion = OMX_COMPILE_INFO;
         ret = OMX_ErrorNone;
     }
 

@@ -32,7 +32,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/prctl.h>
-#include "git_info.h"
 
 #include "Rockchip_OSAL_Event.h"
 #include "Rockchip_OSAL_Thread.h"
@@ -1536,7 +1535,6 @@ OMX_ERRORTYPE Rockchip_OMX_BaseComponent_Constructor(
         goto EXIT;
     }
     Rockchip_OSAL_Memset(pRockchipComponent, 0, sizeof(ROCKCHIP_OMX_BASECOMPONENT));
-    pRockchipComponent->rkversion = OMX_COMPILE_INFO;
     pOMXComponent->pComponentPrivate = (OMX_PTR)pRockchipComponent;
 
     ret = Rockchip_OSAL_SemaphoreCreate(&pRockchipComponent->msgSemaphoreHandle);

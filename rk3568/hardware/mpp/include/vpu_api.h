@@ -93,7 +93,7 @@ typedef enum VPU_API_CMD {
     VPU_API_GET_EOS_STATUS,
     VPU_API_SET_OUTPUT_MODE,
 
-    VPU_API_DEC_GET_DPB_SIZE = 0X100, // add by zhanghanmeng
+    VPU_API_DEC_GET_DPB_SIZE = 0X100,
 
     /* get sps/pps header */
     VPU_API_GET_EXTRA_INFO = 0x200,
