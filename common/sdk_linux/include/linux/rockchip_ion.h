@@ -23,16 +23,16 @@
 #endif
 
 struct ion_phys_data {
-	ion_user_handle_t handle;
-	unsigned long phys;
-	unsigned long size;
+    ion_user_handle_t handle;
+    unsigned long phys;
+    unsigned long size;
 };
 
 #define ION_IOC_ROCKCHIP_MAGIC 'R'
 
 /* Get phys addr of the handle specified. */
-#define ION_IOC_GET_PHYS	_IOWR(ION_IOC_ROCKCHIP_MAGIC, 0, \
-						struct ion_phys_data)
+#define ION_IOC_GET_PHYS    _IOWR(ION_IOC_ROCKCHIP_MAGIC, 0, \
+                        struct ion_phys_data)
 
 extern struct ion_device *rockchip_ion_dev;
 

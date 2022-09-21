@@ -153,7 +153,7 @@ void kbase_ctx_sched_restore_all_as(struct kbase_device *kbdev);
  * in as_nr.
  */
 struct kbase_context *kbase_ctx_sched_as_to_ctx_refcount(
-		struct kbase_device *kbdev, size_t as_nr);
+        struct kbase_device *kbdev, size_t as_nr);
 
 /**
  * kbase_ctx_sched_as_to_ctx - Lookup a context based on its current address
@@ -165,7 +165,7 @@ struct kbase_context *kbase_ctx_sched_as_to_ctx_refcount(
  * indicating that no context was found in as_nr.
  */
 struct kbase_context *kbase_ctx_sched_as_to_ctx(struct kbase_device *kbdev,
-		size_t as_nr);
+        size_t as_nr);
 
 /**
  * kbase_ctx_sched_inc_refcount_nolock - Refcount a context as being busy,

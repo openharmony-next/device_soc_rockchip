@@ -59,10 +59,10 @@ struct kbase_jd_atom;
  * @KBASE_PM_CORE_STACK: Core stacks
  */
 enum kbase_pm_core_type {
-	KBASE_PM_CORE_L2 = L2_PRESENT_LO,
-	KBASE_PM_CORE_SHADER = SHADER_PRESENT_LO,
-	KBASE_PM_CORE_TILER = TILER_PRESENT_LO,
-	KBASE_PM_CORE_STACK = STACK_PRESENT_LO
+    KBASE_PM_CORE_L2 = L2_PRESENT_LO,
+    KBASE_PM_CORE_SHADER = SHADER_PRESENT_LO,
+    KBASE_PM_CORE_TILER = TILER_PRESENT_LO,
+    KBASE_PM_CORE_STACK = STACK_PRESENT_LO
 };
 
 /**
@@ -99,42 +99,42 @@ enum kbase_pm_core_type {
  *
  */
 struct kbasep_pm_metrics_data {
-	ktime_t time_period_start;
-	u32 time_busy;
-	u32 time_idle;
-	u32 prev_busy;
-	u32 prev_idle;
-	bool gpu_active;
-	u32 busy_cl[2];
-	u32 busy_gl;
-	u32 active_cl_ctx[2];
-	u32 active_gl_ctx[2]; /* GL jobs can only run on 2 of the 3 job slots */
-	spinlock_t lock;
+    ktime_t time_period_start;
+    u32 time_busy;
+    u32 time_idle;
+    u32 prev_busy;
+    u32 prev_idle;
+    bool gpu_active;
+    u32 busy_cl[2];
+    u32 busy_gl;
+    u32 active_cl_ctx[2];
+    u32 active_gl_ctx[2]; /* GL jobs can only run on 2 of the 3 job slots */
+    spinlock_t lock;
 
 #ifdef CONFIG_MALI_MIDGARD_DVFS
-	struct hrtimer timer;
-	bool timer_active;
+    struct hrtimer timer;
+    bool timer_active;
 #endif
 
-	void *platform_data;
-	struct kbase_device *kbdev;
+    void *platform_data;
+    struct kbase_device *kbdev;
 };
 
 union kbase_pm_policy_data {
-	struct kbasep_pm_policy_always_on always_on;
-	struct kbasep_pm_policy_coarse_demand coarse_demand;
-	struct kbasep_pm_policy_demand demand;
+    struct kbasep_pm_policy_always_on always_on;
+    struct kbasep_pm_policy_coarse_demand coarse_demand;
+    struct kbasep_pm_policy_demand demand;
 #if !MALI_CUSTOMER_RELEASE
-	struct kbasep_pm_policy_demand_always_powered demand_always_powered;
-	struct kbasep_pm_policy_fast_start fast_start;
+    struct kbasep_pm_policy_demand_always_powered demand_always_powered;
+    struct kbasep_pm_policy_fast_start fast_start;
 #endif
 };
 
 union kbase_pm_ca_policy_data {
-	struct kbasep_pm_ca_policy_fixed fixed;
-	struct kbasep_pm_ca_policy_devfreq devfreq;
+    struct kbasep_pm_ca_policy_fixed fixed;
+    struct kbasep_pm_ca_policy_devfreq devfreq;
 #if !MALI_CUSTOMER_RELEASE
-	struct kbasep_pm_ca_policy_random random;
+    struct kbasep_pm_ca_policy_random random;
 #endif
 };
 
@@ -249,85 +249,85 @@ union kbase_pm_ca_policy_data {
  * functions that would have been done under IRQ.
  */
 struct kbase_pm_backend_data {
-	const struct kbase_pm_ca_policy *ca_current_policy;
-	const struct kbase_pm_policy *pm_current_policy;
-	union kbase_pm_ca_policy_data ca_policy_data;
-	union kbase_pm_policy_data pm_policy_data;
-	bool ca_in_transition;
-	bool reset_done;
-	wait_queue_head_t reset_done_wait;
-	wait_queue_head_t l2_powered_wait;
-	int l2_powered;
-	int gpu_cycle_counter_requests;
-	spinlock_t gpu_cycle_counter_requests_lock;
+    const struct kbase_pm_ca_policy *ca_current_policy;
+    const struct kbase_pm_policy *pm_current_policy;
+    union kbase_pm_ca_policy_data ca_policy_data;
+    union kbase_pm_policy_data pm_policy_data;
+    bool ca_in_transition;
+    bool reset_done;
+    wait_queue_head_t reset_done_wait;
+    wait_queue_head_t l2_powered_wait;
+    int l2_powered;
+    int gpu_cycle_counter_requests;
+    spinlock_t gpu_cycle_counter_requests_lock;
 
-	u64 desired_shader_state;
-	u64 powering_on_shader_state;
-	u64 desired_tiler_state;
-	u64 powering_on_tiler_state;
-	u64 powering_on_l2_state;
+    u64 desired_shader_state;
+    u64 powering_on_shader_state;
+    u64 desired_tiler_state;
+    u64 powering_on_tiler_state;
+    u64 powering_on_l2_state;
 #ifdef CONFIG_MALI_CORESTACK
-	u64 powering_on_stack_state;
+    u64 powering_on_stack_state;
 #endif /* CONFIG_MALI_CORESTACK */
 
-	bool gpu_in_desired_state;
-	wait_queue_head_t gpu_in_desired_state_wait;
+    bool gpu_in_desired_state;
+    wait_queue_head_t gpu_in_desired_state_wait;
 
-	bool gpu_powered;
+    bool gpu_powered;
 
-	bool instr_enabled;
+    bool instr_enabled;
 
-	bool cg1_disabled;
+    bool cg1_disabled;
 
 #ifdef CONFIG_MALI_DEBUG
-	bool driver_ready_for_irqs;
+    bool driver_ready_for_irqs;
 #endif /* CONFIG_MALI_DEBUG */
 
-	spinlock_t gpu_powered_lock;
+    spinlock_t gpu_powered_lock;
 
 
-	struct kbasep_pm_metrics_data metrics;
+    struct kbasep_pm_metrics_data metrics;
 
-	int gpu_poweroff_pending;
-	int shader_poweroff_pending_time;
+    int gpu_poweroff_pending;
+    int shader_poweroff_pending_time;
 
-	struct hrtimer gpu_poweroff_timer;
-	struct workqueue_struct *gpu_poweroff_wq;
-	struct work_struct gpu_poweroff_work;
+    struct hrtimer gpu_poweroff_timer;
+    struct workqueue_struct *gpu_poweroff_wq;
+    struct work_struct gpu_poweroff_work;
 
-	u64 shader_poweroff_pending;
-	u64 tiler_poweroff_pending;
+    u64 shader_poweroff_pending;
+    u64 tiler_poweroff_pending;
 
-	bool poweroff_timer_needed;
-	bool poweroff_timer_running;
+    bool poweroff_timer_needed;
+    bool poweroff_timer_running;
 
-	bool poweroff_wait_in_progress;
-	bool poweron_required;
-	bool poweroff_is_suspend;
+    bool poweroff_wait_in_progress;
+    bool poweron_required;
+    bool poweroff_is_suspend;
 
-	struct workqueue_struct *gpu_poweroff_wait_wq;
-	struct work_struct gpu_poweroff_wait_work;
+    struct workqueue_struct *gpu_poweroff_wait_wq;
+    struct work_struct gpu_poweroff_wait_work;
 
-	wait_queue_head_t poweroff_wait;
+    wait_queue_head_t poweroff_wait;
 
-	int (*callback_power_on)(struct kbase_device *kbdev);
-	void (*callback_power_off)(struct kbase_device *kbdev);
-	void (*callback_power_suspend)(struct kbase_device *kbdev);
-	void (*callback_power_resume)(struct kbase_device *kbdev);
-	int (*callback_power_runtime_on)(struct kbase_device *kbdev);
-	void (*callback_power_runtime_off)(struct kbase_device *kbdev);
-	int (*callback_power_runtime_idle)(struct kbase_device *kbdev);
+    int (*callback_power_on)(struct kbase_device *kbdev);
+    void (*callback_power_off)(struct kbase_device *kbdev);
+    void (*callback_power_suspend)(struct kbase_device *kbdev);
+    void (*callback_power_resume)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_on)(struct kbase_device *kbdev);
+    void (*callback_power_runtime_off)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_idle)(struct kbase_device *kbdev);
 };
 
 
 /* List of policy IDs */
 enum kbase_pm_policy_id {
-	KBASE_PM_POLICY_ID_DEMAND = 1,
-	KBASE_PM_POLICY_ID_ALWAYS_ON,
-	KBASE_PM_POLICY_ID_COARSE_DEMAND,
+    KBASE_PM_POLICY_ID_DEMAND = 1,
+    KBASE_PM_POLICY_ID_ALWAYS_ON,
+    KBASE_PM_POLICY_ID_COARSE_DEMAND,
 #if !MALI_CUSTOMER_RELEASE
-	KBASE_PM_POLICY_ID_DEMAND_ALWAYS_POWERED,
-	KBASE_PM_POLICY_ID_FAST_START
+    KBASE_PM_POLICY_ID_DEMAND_ALWAYS_POWERED,
+    KBASE_PM_POLICY_ID_FAST_START
 #endif
 };
 
@@ -352,68 +352,68 @@ typedef u32 kbase_pm_policy_flags;
  *                      It is used purely for debugging.
  */
 struct kbase_pm_policy {
-	char *name;
+    char *name;
 
-	/**
-	 * Function called when the policy is selected
-	 *
-	 * This should initialize the kbdev->pm.pm_policy_data structure. It
-	 * should not attempt to make any changes to hardware state.
-	 *
-	 * It is undefined what state the cores are in when the function is
-	 * called.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 */
-	void (*init)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is selected
+     *
+     * This should initialize the kbdev->pm.pm_policy_data structure. It
+     * should not attempt to make any changes to hardware state.
+     *
+     * It is undefined what state the cores are in when the function is
+     * called.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     */
+    void (*init)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called when the policy is unselected.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 */
-	void (*term)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is unselected.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     */
+    void (*term)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to get the current shader core mask
-	 *
-	 * The returned mask should meet or exceed (kbdev->shader_needed_bitmap
-	 * | kbdev->shader_inuse_bitmap).
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 *
-	 * Return: The mask of shader cores to be powered
-	 */
-	u64 (*get_core_mask)(struct kbase_device *kbdev);
+    /**
+     * Function called to get the current shader core mask
+     *
+     * The returned mask should meet or exceed (kbdev->shader_needed_bitmap
+     * | kbdev->shader_inuse_bitmap).
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     *
+     * Return: The mask of shader cores to be powered
+     */
+    u64 (*get_core_mask)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to get the current overall GPU power state
-	 *
-	 * This function should consider the state of kbdev->pm.active_count. If
-	 * this count is greater than 0 then there is at least one active
-	 * context on the device and the GPU should be powered. If it is equal
-	 * to 0 then there are no active contexts and the GPU could be powered
-	 * off if desired.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 *
-	 * Return: true if the GPU should be powered, false otherwise
-	 */
-	bool (*get_core_active)(struct kbase_device *kbdev);
+    /**
+     * Function called to get the current overall GPU power state
+     *
+     * This function should consider the state of kbdev->pm.active_count. If
+     * this count is greater than 0 then there is at least one active
+     * context on the device and the GPU should be powered. If it is equal
+     * to 0 then there are no active contexts and the GPU could be powered
+     * off if desired.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     *
+     * Return: true if the GPU should be powered, false otherwise
+     */
+    bool (*get_core_active)(struct kbase_device *kbdev);
 
-	kbase_pm_policy_flags flags;
-	enum kbase_pm_policy_id id;
+    kbase_pm_policy_flags flags;
+    enum kbase_pm_policy_id id;
 };
 
 
 enum kbase_pm_ca_policy_id {
-	KBASE_PM_CA_POLICY_ID_FIXED = 1,
-	KBASE_PM_CA_POLICY_ID_DEVFREQ,
-	KBASE_PM_CA_POLICY_ID_RANDOM
+    KBASE_PM_CA_POLICY_ID_FIXED = 1,
+    KBASE_PM_CA_POLICY_ID_DEVFREQ,
+    KBASE_PM_CA_POLICY_ID_RANDOM
 };
 
 typedef u32 kbase_pm_ca_policy_flags;
@@ -442,78 +442,78 @@ typedef u32 kbase_pm_ca_policy_flags;
  *                      It is used purely for debugging.
  */
 struct kbase_pm_ca_policy {
-	char name[KBASE_PM_CA_MAX_POLICY_NAME_LEN + 1];
+    char name[KBASE_PM_CA_MAX_POLICY_NAME_LEN + 1];
 
-	/**
-	 * Function called when the policy is selected
-	 *
-	 * This should initialize the kbdev->pm.ca_policy_data structure. It
-	 * should not attempt to make any changes to hardware state.
-	 *
-	 * It is undefined what state the cores are in when the function is
-	 * called.
-	 *
-	 * @kbdev The kbase device structure for the device (must be a
-	 *        valid pointer)
-	 */
-	void (*init)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is selected
+     *
+     * This should initialize the kbdev->pm.ca_policy_data structure. It
+     * should not attempt to make any changes to hardware state.
+     *
+     * It is undefined what state the cores are in when the function is
+     * called.
+     *
+     * @kbdev The kbase device structure for the device (must be a
+     *        valid pointer)
+     */
+    void (*init)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called when the policy is unselected.
-	 *
-	 * @kbdev The kbase device structure for the device (must be a
-	 *        valid pointer)
-	 */
-	void (*term)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is unselected.
+     *
+     * @kbdev The kbase device structure for the device (must be a
+     *        valid pointer)
+     */
+    void (*term)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to get the current shader core availability mask
-	 *
-	 * When a change in core availability is occurring, the policy must set
-	 * kbdev->pm.ca_in_transition to true. This is to indicate that
-	 * reporting changes in power state cannot be optimized out, even if
-	 * kbdev->pm.desired_shader_state remains unchanged. This must be done
-	 * by any functions internal to the Core Availability Policy that change
-	 * the return value of kbase_pm_ca_policy::get_core_mask.
-	 *
-	 * @kbdev The kbase device structure for the device (must be a
-	 *              valid pointer)
-	 *
-	 * Return: The current core availability mask
-	 */
-	u64 (*get_core_mask)(struct kbase_device *kbdev);
+    /**
+     * Function called to get the current shader core availability mask
+     *
+     * When a change in core availability is occurring, the policy must set
+     * kbdev->pm.ca_in_transition to true. This is to indicate that
+     * reporting changes in power state cannot be optimized out, even if
+     * kbdev->pm.desired_shader_state remains unchanged. This must be done
+     * by any functions internal to the Core Availability Policy that change
+     * the return value of kbase_pm_ca_policy::get_core_mask.
+     *
+     * @kbdev The kbase device structure for the device (must be a
+     *              valid pointer)
+     *
+     * Return: The current core availability mask
+     */
+    u64 (*get_core_mask)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to update the current core status
-	 *
-	 * If none of the cores in core group 0 are ready or transitioning, then
-	 * the policy must ensure that the next call to get_core_mask does not
-	 * return 0 for all cores in core group 0. It is an error to disable
-	 * core group 0 through the core availability policy.
-	 *
-	 * When a change in core availability has finished, the policy must set
-	 * kbdev->pm.ca_in_transition to false. This is to indicate that
-	 * changes in power state can once again be optimized out when
-	 * kbdev->pm.desired_shader_state is unchanged.
-	 *
-	 * @kbdev:               The kbase device structure for the device
-	 *                       (must be a valid pointer)
-	 * @cores_ready:         The mask of cores currently powered and
-	 *                       ready to run jobs
-	 * @cores_transitioning: The mask of cores currently transitioning
-	 *                       power state
-	 */
-	void (*update_core_status)(struct kbase_device *kbdev, u64 cores_ready,
-						u64 cores_transitioning);
+    /**
+     * Function called to update the current core status
+     *
+     * If none of the cores in core group 0 are ready or transitioning, then
+     * the policy must ensure that the next call to get_core_mask does not
+     * return 0 for all cores in core group 0. It is an error to disable
+     * core group 0 through the core availability policy.
+     *
+     * When a change in core availability has finished, the policy must set
+     * kbdev->pm.ca_in_transition to false. This is to indicate that
+     * changes in power state can once again be optimized out when
+     * kbdev->pm.desired_shader_state is unchanged.
+     *
+     * @kbdev:               The kbase device structure for the device
+     *                       (must be a valid pointer)
+     * @cores_ready:         The mask of cores currently powered and
+     *                       ready to run jobs
+     * @cores_transitioning: The mask of cores currently transitioning
+     *                       power state
+     */
+    void (*update_core_status)(struct kbase_device *kbdev, u64 cores_ready,
+                        u64 cores_transitioning);
 
-	kbase_pm_ca_policy_flags flags;
+    kbase_pm_ca_policy_flags flags;
 
-	/**
-	 * Field indicating an ID for this policy. This is not necessarily the
-	 * same as its index in the list returned by kbase_pm_list_policies().
-	 * It is used purely for debugging.
-	 */
-	enum kbase_pm_ca_policy_id id;
+    /**
+     * Field indicating an ID for this policy. This is not necessarily the
+     * same as its index in the list returned by kbase_pm_list_policies().
+     * It is used purely for debugging.
+     */
+    enum kbase_pm_ca_policy_id id;
 };
 
 #endif /* _KBASE_PM_HWACCESS_DEFS_H_ */

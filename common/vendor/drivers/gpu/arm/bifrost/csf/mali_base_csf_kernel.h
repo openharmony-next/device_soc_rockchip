@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _BASE_CSF_KERNEL_H_
-#define _BASE_CSF_KERNEL_H_
+#ifndef BASE_CSF_KERNEL_H
+#define BASE_CSF_KERNEL_H
 
 /* Memory allocation, access/hint flags.
  *
@@ -148,7 +148,7 @@
  */
 #define BASEP_MEM_GROUP_ID_SHIFT 22
 #define BASE_MEM_GROUP_ID_MASK \
-	((base_mem_alloc_flags)0xF << BASEP_MEM_GROUP_ID_SHIFT)
+    ((base_mem_alloc_flags)0xF << BASEP_MEM_GROUP_ID_SHIFT)
 
 /* Must do CPU cache maintenance when imported memory is mapped/unmapped
  * on GPU. Currently applicable to dma-buf type only.
@@ -169,7 +169,7 @@
  * and may not be passed from user space.
  */
 #define BASEP_MEM_FLAGS_KERNEL_ONLY \
-	(BASEP_MEM_PERMANENT_KERNEL_MAPPING | BASEP_MEM_NO_USER_FREE)
+    (BASEP_MEM_PERMANENT_KERNEL_MAPPING | BASEP_MEM_NO_USER_FREE)
 
 /* A mask for all output bits, excluding IN/OUT bits.
  */
@@ -178,12 +178,12 @@
 /* A mask for all input bits, including IN/OUT bits.
  */
 #define BASE_MEM_FLAGS_INPUT_MASK \
-	(((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
+    (((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
 
 /* A mask of all currently reserved flags
  */
 #define BASE_MEM_FLAGS_RESERVED \
-	BASE_MEM_RESERVED_BIT_8 | BASE_MEM_RESERVED_BIT_20
+    BASE_MEM_RESERVED_BIT_8 | BASE_MEM_RESERVED_BIT_20
 
 #define BASEP_MEM_INVALID_HANDLE               (0ull  << 12)
 #define BASE_MEM_MMU_DUMP_HANDLE               (1ull  << 12)
@@ -195,11 +195,11 @@
 #define BASEP_MEM_CSF_USER_IO_PAGES_HANDLE     (48ul  << 12)
 #define BASE_MEM_COOKIE_BASE                   (64ul  << 12)
 #define BASE_MEM_FIRST_FREE_ADDRESS            ((BITS_PER_LONG << 12) + \
-						BASE_MEM_COOKIE_BASE)
+                        BASE_MEM_COOKIE_BASE)
 
 #define KBASE_CSF_NUM_USER_IO_PAGES_HANDLE \
-	((BASE_MEM_COOKIE_BASE - BASEP_MEM_CSF_USER_IO_PAGES_HANDLE) >> \
-	 LOCAL_PAGE_SHIFT)
+    ((BASE_MEM_COOKIE_BASE - BASEP_MEM_CSF_USER_IO_PAGES_HANDLE) >> \
+     LOCAL_PAGE_SHIFT)
 
 /**
  * Valid set of just-in-time memory allocation flags
@@ -227,7 +227,7 @@ typedef u32 base_context_create_flags;
  * One important side effect of this is that job submission is disabled.
  */
 #define BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED \
-	((base_context_create_flags)1 << 1)
+    ((base_context_create_flags)1 << 1)
 
 /* Create CSF event thread.
  *
@@ -244,22 +244,22 @@ typedef u32 base_context_create_flags;
 /* Bitmask used to encode a memory group ID in base_context_create_flags
  */
 #define BASEP_CONTEXT_MMU_GROUP_ID_MASK \
-	((base_context_create_flags)0xF << BASEP_CONTEXT_MMU_GROUP_ID_SHIFT)
+    ((base_context_create_flags)0xF << BASEP_CONTEXT_MMU_GROUP_ID_SHIFT)
 
 /* Bitpattern describing the base_context_create_flags that can be
  * passed to the kernel
  */
 #define BASEP_CONTEXT_CREATE_KERNEL_FLAGS \
-	(BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED | \
-	 BASEP_CONTEXT_MMU_GROUP_ID_MASK)
+    (BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED | \
+     BASEP_CONTEXT_MMU_GROUP_ID_MASK)
 
 /* Bitpattern describing the ::base_context_create_flags that can be
  * passed to base_context_init()
  */
 #define BASEP_CONTEXT_CREATE_ALLOWED_FLAGS \
-	(BASE_CONTEXT_CCTX_EMBEDDED | \
-	 BASE_CONTEXT_CSF_EVENT_THREAD | \
-	 BASEP_CONTEXT_CREATE_KERNEL_FLAGS)
+    (BASE_CONTEXT_CCTX_EMBEDDED | \
+     BASE_CONTEXT_CSF_EVENT_THREAD | \
+     BASEP_CONTEXT_CREATE_KERNEL_FLAGS)
 
 /* Enable additional tracepoints for latency measurements (TL_ATOM_READY,
  * TL_ATOM_DONE, TL_ATOM_PRIO_CHANGE, TL_ATOM_EVENT_POST)
@@ -278,9 +278,9 @@ typedef u32 base_context_create_flags;
 #define BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS (1 << 3)
 
 #define BASE_TLSTREAM_FLAGS_MASK (BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS | \
-		BASE_TLSTREAM_JOB_DUMPING_ENABLED | \
-		BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS | \
-		BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)
+        BASE_TLSTREAM_JOB_DUMPING_ENABLED | \
+        BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS | \
+        BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)
 
 /* Number of pages mapped into the process address space for a bound GPU
  * command queue. A pair of input/output pages and a Hw doorbell page
@@ -305,17 +305,17 @@ typedef u32 base_context_create_flags;
  * enum base_kcpu_command_type - Kernel CPU queue command type.
  */
 enum base_kcpu_command_type {
-	BASE_KCPU_COMMAND_TYPE_FENCE_SIGNAL,
-	BASE_KCPU_COMMAND_TYPE_FENCE_WAIT,
-	BASE_KCPU_COMMAND_TYPE_CQS_WAIT,
-	BASE_KCPU_COMMAND_TYPE_CQS_SET,
-	BASE_KCPU_COMMAND_TYPE_MAP_IMPORT,
-	BASE_KCPU_COMMAND_TYPE_UNMAP_IMPORT,
-	BASE_KCPU_COMMAND_TYPE_UNMAP_IMPORT_FORCE,
-	BASE_KCPU_COMMAND_TYPE_JIT_ALLOC,
-	BASE_KCPU_COMMAND_TYPE_JIT_FREE,
-	BASE_KCPU_COMMAND_TYPE_GROUP_SUSPEND,
-	BASE_KCPU_COMMAND_TYPE_ERROR_BARRIER,
+    BASE_KCPU_COMMAND_TYPE_FENCE_SIGNAL,
+    BASE_KCPU_COMMAND_TYPE_FENCE_WAIT,
+    BASE_KCPU_COMMAND_TYPE_CQS_WAIT,
+    BASE_KCPU_COMMAND_TYPE_CQS_SET,
+    BASE_KCPU_COMMAND_TYPE_MAP_IMPORT,
+    BASE_KCPU_COMMAND_TYPE_UNMAP_IMPORT,
+    BASE_KCPU_COMMAND_TYPE_UNMAP_IMPORT_FORCE,
+    BASE_KCPU_COMMAND_TYPE_JIT_ALLOC,
+    BASE_KCPU_COMMAND_TYPE_JIT_FREE,
+    BASE_KCPU_COMMAND_TYPE_GROUP_SUSPEND,
+    BASE_KCPU_COMMAND_TYPE_ERROR_BARRIER,
 };
 
 /**
@@ -339,114 +339,114 @@ enum base_kcpu_command_type {
  * BASE_QUEUE_GROUP_PRIORITY_COUNT in kbase must be updated.
  */
 enum base_queue_group_priority {
-	BASE_QUEUE_GROUP_PRIORITY_HIGH = 0,
-	BASE_QUEUE_GROUP_PRIORITY_MEDIUM,
-	BASE_QUEUE_GROUP_PRIORITY_LOW,
-	BASE_QUEUE_GROUP_PRIORITY_COUNT
+    BASE_QUEUE_GROUP_PRIORITY_HIGH = 0,
+    BASE_QUEUE_GROUP_PRIORITY_MEDIUM,
+    BASE_QUEUE_GROUP_PRIORITY_LOW,
+    BASE_QUEUE_GROUP_PRIORITY_COUNT
 };
 
 struct base_kcpu_command_fence_info {
-	u64 fence;
+    u64 fence;
 };
 
 struct base_cqs_wait {
-	u64 addr;
-	u32 val;
-	u32 padding;
+    u64 addr;
+    u32 val;
+    u32 padding;
 };
 
 struct base_kcpu_command_cqs_wait_info {
-	u64 objs;
-	u32 nr_objs;
-	u32 inherit_err_flags;
+    u64 objs;
+    u32 nr_objs;
+    u32 inherit_err_flags;
 };
 
 struct base_cqs_set {
-	u64 addr;
+    u64 addr;
 };
 
 struct base_kcpu_command_cqs_set_info {
-	u64 objs;
-	u32 nr_objs;
-	u32 propagate_flags;
+    u64 objs;
+    u32 nr_objs;
+    u32 propagate_flags;
 };
 
 /**
  * struct base_kcpu_command_import_info - structure which contains information
- *		about the imported buffer.
+ *        about the imported buffer.
  *
- * @handle:	Address of imported user buffer.
+ * @handle:    Address of imported user buffer.
  */
 struct base_kcpu_command_import_info {
-	u64 handle;
+    u64 handle;
 };
 
 /**
  * struct base_kcpu_command_jit_alloc_info - structure which contains
- *		information about jit memory allocation.
+ *        information about jit memory allocation.
  *
- * @info:	An array of elements of the
- *		struct base_jit_alloc_info type.
- * @count:	The number of elements in the info array.
- * @padding:	Padding to a multiple of 64 bits.
+ * @info:    An array of elements of the
+ *        struct base_jit_alloc_info type.
+ * @count:    The number of elements in the info array.
+ * @padding:    Padding to a multiple of 64 bits.
  */
 struct base_kcpu_command_jit_alloc_info {
-	u64 info;
-	u8 count;
-	u8 padding[7];
+    u64 info;
+    u8 count;
+    u8 padding[7];
 };
 
 /**
  * struct base_kcpu_command_jit_free_info - structure which contains
- *		information about jit memory which is to be freed.
+ *        information about jit memory which is to be freed.
  *
- * @ids:	An array containing the JIT IDs to free.
- * @count:	The number of elements in the ids array.
- * @padding:	Padding to a multiple of 64 bits.
+ * @ids:    An array containing the JIT IDs to free.
+ * @count:    The number of elements in the ids array.
+ * @padding:    Padding to a multiple of 64 bits.
  */
 struct base_kcpu_command_jit_free_info {
-	u64 ids;
-	u8 count;
-	u8 padding[7];
+    u64 ids;
+    u8 count;
+    u8 padding[7];
 };
 
 /**
  * struct base_kcpu_command_group_suspend_info - structure which contains
- *		suspend buffer data captured for a suspended queue group.
+ *        suspend buffer data captured for a suspended queue group.
  *
- * @buffer:		Pointer to an array of elements of the type char.
- * @size:		Number of elements in the @buffer array.
- * @group_handle:	Handle to the mapping of command stream group.
- * @padding:		padding to a multiple of 64 bits.
+ * @buffer:        Pointer to an array of elements of the type char.
+ * @size:        Number of elements in the @buffer array.
+ * @group_handle:    Handle to the mapping of command stream group.
+ * @padding:        padding to a multiple of 64 bits.
  */
 struct base_kcpu_command_group_suspend_info {
-	u64 buffer;
-	u32 size;
-	u8 group_handle;
-	u8 padding[3];
+    u64 buffer;
+    u32 size;
+    u8 group_handle;
+    u8 padding[3];
 };
 
 /**
  * struct base_kcpu_command - kcpu command.
  *
- * @type:	type of the kcpu command, one enum base_kcpu_command_type
- * @info:	structure which contains information about the kcpu command;
- *		actual type is determined by @p type
- * @padding:	padding to a multiple of 64 bits
+ * @type:    type of the kcpu command, one enum base_kcpu_command_type
+ * @info:    structure which contains information about the kcpu command;
+ *        actual type is determined by @p type
+ * @padding:    padding to a multiple of 64 bits
  */
 struct base_kcpu_command {
-	u8 type;
-	u8 padding[sizeof(u64) - sizeof(u8)];
-	union {
-		struct base_kcpu_command_fence_info fence;
-		struct base_kcpu_command_cqs_wait_info cqs_wait;
-		struct base_kcpu_command_cqs_set_info cqs_set;
-		struct base_kcpu_command_import_info import;
-		struct base_kcpu_command_jit_alloc_info jit_alloc;
-		struct base_kcpu_command_jit_free_info jit_free;
-		struct base_kcpu_command_group_suspend_info suspend_buf_copy;
-		u64 padding[2]; /* No sub-struct should be larger */
-	} info;
+    u8 type;
+    u8 padding[sizeof(u64) - sizeof(u8)];
+    union {
+        struct base_kcpu_command_fence_info fence;
+        struct base_kcpu_command_cqs_wait_info cqs_wait;
+        struct base_kcpu_command_cqs_set_info cqs_set;
+        struct base_kcpu_command_import_info import;
+        struct base_kcpu_command_jit_alloc_info jit_alloc;
+        struct base_kcpu_command_jit_free_info jit_free;
+        struct base_kcpu_command_group_suspend_info suspend_buf_copy;
+        u64 padding[2]; /* No sub-struct should be larger */
+    } info;
 };
 
 /**
@@ -456,8 +456,8 @@ struct base_kcpu_command {
  * @padding:  Padding to a multiple of 64 bits.
  */
 struct basep_cs_stream_control {
-	u32 features;
-	u32 padding;
+    u32 features;
+    u32 padding;
 };
 
 /**
@@ -469,10 +469,10 @@ struct basep_cs_stream_control {
  * @padding:      Padding to a multiple of 64 bits.
  */
 struct basep_cs_group_control {
-	u32 features;
-	u32 stream_num;
-	u32 suspend_size;
-	u32 padding;
+    u32 features;
+    u32 stream_num;
+    u32 suspend_size;
+    u32 padding;
 };
 
 /**
@@ -487,9 +487,9 @@ struct basep_cs_group_control {
  * @padding:      Padding to make multiple of 64bits
  */
 struct base_gpu_queue_group_error_fatal_payload {
-	u64 sideband;
-	u32 status;
-	u32 padding;
+    u64 sideband;
+    u32 status;
+    u32 padding;
 };
 
 /**
@@ -505,10 +505,10 @@ struct base_gpu_queue_group_error_fatal_payload {
  * @padding:      Padding to make multiple of 64bits
  */
 struct base_gpu_queue_error_fatal_payload {
-	u64 sideband;
-	u32 status;
-	u8 csi_index;
-	u8 padding[3];
+    u64 sideband;
+    u32 status;
+    u8 csi_index;
+    u8 padding[3];
 };
 
 /**
@@ -527,11 +527,11 @@ struct base_gpu_queue_error_fatal_payload {
  * This type is used for &struct_base_gpu_queue_group_error.error_type.
  */
 enum base_gpu_queue_group_error_type {
-	BASE_GPU_QUEUE_GROUP_ERROR_FATAL = 0,
-	BASE_GPU_QUEUE_GROUP_QUEUE_ERROR_FATAL,
-	BASE_GPU_QUEUE_GROUP_ERROR_TIMEOUT,
-	BASE_GPU_QUEUE_GROUP_ERROR_TILER_HEAP_OOM,
-	BASE_GPU_QUEUE_GROUP_ERROR_FATAL_COUNT
+    BASE_GPU_QUEUE_GROUP_ERROR_FATAL = 0,
+    BASE_GPU_QUEUE_GROUP_QUEUE_ERROR_FATAL,
+    BASE_GPU_QUEUE_GROUP_ERROR_TIMEOUT,
+    BASE_GPU_QUEUE_GROUP_ERROR_TILER_HEAP_OOM,
+    BASE_GPU_QUEUE_GROUP_ERROR_FATAL_COUNT
 };
 
 /**
@@ -547,12 +547,12 @@ enum base_gpu_queue_group_error_type {
  * @payload:      Input Payload
  */
 struct base_gpu_queue_group_error {
-	u8 error_type;
-	u8 padding[7];
-	union {
-		struct base_gpu_queue_group_error_fatal_payload fatal_group;
-		struct base_gpu_queue_error_fatal_payload fatal_queue;
-	} payload;
+    u8 error_type;
+    u8 padding[7];
+    union {
+        struct base_gpu_queue_group_error_fatal_payload fatal_group;
+        struct base_gpu_queue_error_fatal_payload fatal_queue;
+    } payload;
 };
 
 /**
@@ -566,9 +566,9 @@ struct base_gpu_queue_group_error {
  * This type is used for &struct_base_csf_notification.type.
  */
 enum base_csf_notification_type {
-	BASE_CSF_NOTIFICATION_EVENT = 0,
-	BASE_CSF_NOTIFICATION_GPU_QUEUE_GROUP_ERROR,
-	BASE_CSF_NOTIFICATION_COUNT
+    BASE_CSF_NOTIFICATION_EVENT = 0,
+    BASE_CSF_NOTIFICATION_GPU_QUEUE_GROUP_ERROR,
+    BASE_CSF_NOTIFICATION_COUNT
 };
 
 /**
@@ -583,16 +583,16 @@ enum base_csf_notification_type {
  * @payload:      Input Payload
  */
 struct base_csf_notification {
-	u8 type;
-	u8 padding[7];
-	union {
-		struct {
-			u8 handle;
-			u8 padding[7];
-			struct base_gpu_queue_group_error error;
-		} csg_error;
-		u8 align[56];
-	} payload;
+    u8 type;
+    u8 padding[7];
+    union {
+        struct {
+            u8 handle;
+            u8 padding[7];
+            struct base_gpu_queue_group_error error;
+        } csg_error;
+        u8 align[56];
+    } payload;
 };
 
 #endif /* _BASE_CSF_KERNEL_H_ */

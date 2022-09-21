@@ -32,45 +32,45 @@
 extern struct thermal_governor *__governor_thermal_table[];
 extern struct thermal_governor *__governor_thermal_table_end[];
 
-#define THERMAL_TABLE_ENTRY(table, name)			\
-	static typeof(name) *__thermal_table_entry_##name	\
-	__used __section("__" #table "_thermal_table") = &name
+#define THERMAL_TABLE_ENTRY(table, name)            \
+    static typeof(name) *__thermal_table_entry_##name    \
+    __used __section("__" #table "_thermal_table") = &name
 
-#define THERMAL_GOVERNOR_DECLARE(name)	THERMAL_TABLE_ENTRY(governor, name)
+#define THERMAL_GOVERNOR_DECLARE(name)    THERMAL_TABLE_ENTRY(governor, name)
 
-#define for_each_governor_table(__governor)		\
-	for (__governor = __governor_thermal_table;	\
-	     __governor < __governor_thermal_table_end;	\
-	     __governor++)
+#define for_each_governor_table(__governor)        \
+    for (__governor = __governor_thermal_table;    \
+         __governor < __governor_thermal_table_end;    \
+         __governor++)
 
 int for_each_thermal_zone(int (*cb)(struct thermal_zone_device *, void *),
-			  void *);
+              void *);
 
 int for_each_thermal_cooling_device(int (*cb)(struct thermal_cooling_device *,
-					      void *), void *);
+                          void *), void *);
 
 int for_each_thermal_governor(int (*cb)(struct thermal_governor *, void *),
-			      void *thermal_governor);
+                  void *thermal_governor);
 
 struct thermal_zone_device *thermal_zone_get_by_id(int id);
 
 struct thermal_attr {
-	struct device_attribute attr;
-	char name[THERMAL_NAME_LENGTH];
+    struct device_attribute attr;
+    char name[THERMAL_NAME_LENGTH];
 };
 
 static inline bool cdev_is_power_actor(struct thermal_cooling_device *cdev)
 {
-	return cdev->ops->get_requested_power && cdev->ops->state2power &&
-		cdev->ops->power2state;
+    return cdev->ops->get_requested_power && cdev->ops->state2power &&
+        cdev->ops->power2state;
 }
 
 int power_actor_get_max_power(struct thermal_cooling_device *cdev,
-			      u32 *max_power);
+                  u32 *max_power);
 int power_actor_get_min_power(struct thermal_cooling_device *cdev,
-			      u32 *min_power);
+                  u32 *min_power);
 int power_actor_set_power(struct thermal_cooling_device *cdev,
-			  struct thermal_instance *ti, u32 power);
+              struct thermal_instance *ti, u32 power);
 /**
  * struct thermal_trip - representation of a point in temperature domain
  * @np: pointer to struct device_node that this trip point was created from
@@ -79,18 +79,18 @@ int power_actor_set_power(struct thermal_cooling_device *cdev,
  * @type: trip point type
  */
 struct thermal_trip {
-	struct device_node *np;
-	int temperature;
-	int hysteresis;
-	enum thermal_trip_type type;
+    struct device_node *np;
+    int temperature;
+    int hysteresis;
+    enum thermal_trip_type type;
 };
 
 int get_tz_trend(struct thermal_zone_device *tz, int trip);
 
 struct thermal_instance *
 get_thermal_instance(struct thermal_zone_device *tz,
-		     struct thermal_cooling_device *cdev,
-		     int trip);
+             struct thermal_cooling_device *cdev,
+             int trip);
 
 /*
  * This structure is used to describe the behavior of
@@ -98,36 +98,36 @@ get_thermal_instance(struct thermal_zone_device *tz,
  * in a certain thermal zone
  */
 struct thermal_instance {
-	int id;
-	char name[THERMAL_NAME_LENGTH];
-	struct thermal_zone_device *tz;
-	struct thermal_cooling_device *cdev;
-	int trip;
-	bool initialized;
-	unsigned long upper;	/* Highest cooling state for this trip point */
-	unsigned long lower;	/* Lowest cooling state for this trip point */
-	unsigned long target;	/* expected cooling state */
-	char attr_name[THERMAL_NAME_LENGTH];
-	struct device_attribute attr;
-	char weight_attr_name[THERMAL_NAME_LENGTH];
-	struct device_attribute weight_attr;
-	struct list_head tz_node; /* node in tz->thermal_instances */
-	struct list_head cdev_node; /* node in cdev->thermal_instances */
-	unsigned int weight; /* The weight of the cooling device */
+    int id;
+    char name[THERMAL_NAME_LENGTH];
+    struct thermal_zone_device *tz;
+    struct thermal_cooling_device *cdev;
+    int trip;
+    bool initialized;
+    unsigned long upper;    /* Highest cooling state for this trip point */
+    unsigned long lower;    /* Lowest cooling state for this trip point */
+    unsigned long target;    /* expected cooling state */
+    char attr_name[THERMAL_NAME_LENGTH];
+    struct device_attribute attr;
+    char weight_attr_name[THERMAL_NAME_LENGTH];
+    struct device_attribute weight_attr;
+    struct list_head tz_node; /* node in tz->thermal_instances */
+    struct list_head cdev_node; /* node in cdev->thermal_instances */
+    unsigned int weight; /* The weight of the cooling device */
 };
 
 #define to_thermal_zone(_dev) \
-	container_of(_dev, struct thermal_zone_device, device)
+    container_of(_dev, struct thermal_zone_device, device)
 
-#define to_cooling_device(_dev)	\
-	container_of(_dev, struct thermal_cooling_device, device)
+#define to_cooling_device(_dev)    \
+    container_of(_dev, struct thermal_cooling_device, device)
 
 int thermal_register_governor(struct thermal_governor *);
 void thermal_unregister_governor(struct thermal_governor *);
 void thermal_zone_device_rebind_exception(struct thermal_zone_device *,
-					  const char *, size_t);
+                      const char *, size_t);
 void thermal_zone_device_unbind_exception(struct thermal_zone_device *,
-					  const char *, size_t);
+                      const char *, size_t);
 int thermal_zone_device_set_policy(struct thermal_zone_device *, char *);
 int thermal_build_list_of_policies(char *buf);
 
@@ -143,15 +143,15 @@ void thermal_cooling_device_destroy_sysfs(struct thermal_cooling_device *cdev);
 ssize_t trip_point_show(struct device *, struct device_attribute *, char *);
 ssize_t weight_show(struct device *, struct device_attribute *, char *);
 ssize_t weight_store(struct device *, struct device_attribute *, const char *,
-		     size_t);
+             size_t);
 
 #ifdef CONFIG_THERMAL_STATISTICS
 void thermal_cooling_device_stats_update(struct thermal_cooling_device *cdev,
-					 unsigned long new_state);
+                     unsigned long new_state);
 #else
 static inline void
 thermal_cooling_device_stats_update(struct thermal_cooling_device *cdev,
-				    unsigned long new_state) {}
+                    unsigned long new_state) {}
 #endif /* CONFIG_THERMAL_STATISTICS */
 
 /* device tree support */
@@ -165,17 +165,17 @@ of_thermal_get_trip_points(struct thermal_zone_device *);
 static inline int of_parse_thermal_zones(void) { return 0; }
 static inline int of_thermal_get_ntrips(struct thermal_zone_device *tz)
 {
-	return 0;
+    return 0;
 }
 static inline bool of_thermal_is_trip_valid(struct thermal_zone_device *tz,
-					    int trip)
+                        int trip)
 {
-	return false;
+    return false;
 }
 static inline const struct thermal_trip *
 of_thermal_get_trip_points(struct thermal_zone_device *tz)
 {
-	return NULL;
+    return NULL;
 }
 #endif
 

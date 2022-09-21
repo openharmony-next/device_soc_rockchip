@@ -89,13 +89,13 @@ union kbase_kinstr_jm_fd;
  *
  * Return: 0 on success, else error code.
  */
-int kbase_kinstr_jm_init(struct kbase_kinstr_jm **ctx);
+int kbase_kinstr_jm_init(struct kbase_kinstr_jm **const out_ctx);
 
 /**
  * kbase_kinstr_jm_term() - Terminate an instrumentation job manager context.
  * @ctx: Pointer to context to be terminated.
  */
-void kbase_kinstr_jm_term(struct kbase_kinstr_jm *ctx);
+void kbase_kinstr_jm_term(struct kbase_kinstr_jm *const ctx);
 
 /**
  * kbase_kinstr_jm_get_fd() - Retrieves a file descriptor that can be used to
@@ -106,7 +106,7 @@ void kbase_kinstr_jm_term(struct kbase_kinstr_jm *ctx);
  * Return: -1 on failure, valid file descriptor on success
  */
 int kbase_kinstr_jm_get_fd(struct kbase_kinstr_jm *const ctx,
-			   union kbase_kinstr_jm_fd *jm_fd_arg);
+               union kbase_kinstr_jm_fd *jm_fd_arg);
 
 /**
  * kbasep_kinstr_jm_atom_state() - Signifies that an atom has changed state
@@ -119,8 +119,8 @@ int kbase_kinstr_jm_get_fd(struct kbase_kinstr_jm *const ctx,
  * function directly.
  */
 void kbasep_kinstr_jm_atom_state(
-	struct kbase_jd_atom *const atom,
-	const enum kbase_kinstr_jm_reader_atom_state state);
+    struct kbase_jd_atom *const katom,
+    const enum kbase_kinstr_jm_reader_atom_state state);
 
 /* Allows ASM goto patching to reduce tracing overhead. This is
  * incremented/decremented when readers are created and terminated. This really
@@ -144,11 +144,11 @@ extern struct static_key basep_kinstr_jm_reader_static_key;
  * This uses a static key to reduce overhead when tracing is disabled
  */
 static inline void kbase_kinstr_jm_atom_state(
-	struct kbase_jd_atom *const atom,
-	const enum kbase_kinstr_jm_reader_atom_state state)
+    struct kbase_jd_atom *const atom,
+    const enum kbase_kinstr_jm_reader_atom_state state)
 {
-	if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
-		kbasep_kinstr_jm_atom_state(atom, state);
+    if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
+        kbasep_kinstr_jm_atom_state(atom, state);
 }
 
 /**
@@ -157,10 +157,10 @@ static inline void kbase_kinstr_jm_atom_state(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_state_queue(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state(
-		atom, KBASE_KINSTR_JM_READER_ATOM_STATE_QUEUE);
+    kbase_kinstr_jm_atom_state(
+        atom, KBASE_KINSTR_JM_READER_ATOM_STATE_QUEUE);
 }
 
 /**
@@ -169,10 +169,10 @@ static inline void kbase_kinstr_jm_atom_state_queue(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_state_start(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state(
-		atom, KBASE_KINSTR_JM_READER_ATOM_STATE_START);
+    kbase_kinstr_jm_atom_state(
+        atom, KBASE_KINSTR_JM_READER_ATOM_STATE_START);
 }
 
 /**
@@ -181,10 +181,10 @@ static inline void kbase_kinstr_jm_atom_state_start(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_state_stop(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state(
-		atom, KBASE_KINSTR_JM_READER_ATOM_STATE_STOP);
+    kbase_kinstr_jm_atom_state(
+        atom, KBASE_KINSTR_JM_READER_ATOM_STATE_STOP);
 }
 
 /**
@@ -193,10 +193,10 @@ static inline void kbase_kinstr_jm_atom_state_stop(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_state_complete(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state(
-		atom, KBASE_KINSTR_JM_READER_ATOM_STATE_COMPLETE);
+    kbase_kinstr_jm_atom_state(
+        atom, KBASE_KINSTR_JM_READER_ATOM_STATE_COMPLETE);
 }
 
 /**
@@ -206,7 +206,7 @@ static inline void kbase_kinstr_jm_atom_state_complete(
  */
 static inline void kbase_kinstr_jm_atom_queue(struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state_queue(atom);
+    kbase_kinstr_jm_atom_state_queue(atom);
 }
 
 /**
@@ -215,9 +215,9 @@ static inline void kbase_kinstr_jm_atom_queue(struct kbase_jd_atom *const atom)
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_complete(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state_complete(atom);
+    kbase_kinstr_jm_atom_state_complete(atom);
 }
 
 /**
@@ -225,9 +225,9 @@ static inline void kbase_kinstr_jm_atom_complete(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_sw_start(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state_start(atom);
+    kbase_kinstr_jm_atom_state_start(atom);
 }
 
 /**
@@ -235,9 +235,9 @@ static inline void kbase_kinstr_jm_atom_sw_start(
  * @atom: The atom that has changed state
  */
 static inline void kbase_kinstr_jm_atom_sw_stop(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	kbase_kinstr_jm_atom_state_stop(atom);
+    kbase_kinstr_jm_atom_state_stop(atom);
 }
 
 /**
@@ -247,17 +247,17 @@ static inline void kbase_kinstr_jm_atom_sw_stop(
  * This private implementation should not be called directly, it is protected
  * by a static key in kbase_kinstr_jm_atom_hw_submit(). Use that instead.
  */
-void kbasep_kinstr_jm_atom_hw_submit(struct kbase_jd_atom *const atom);
+void kbasep_kinstr_jm_atom_hw_submit(struct kbase_jd_atom *const katom);
 
 /**
  * kbase_kinstr_jm_atom_hw_submit() - A hardware atom has been submitted
  * @atom: The atom that has been submitted
  */
 static inline void kbase_kinstr_jm_atom_hw_submit(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
-		kbasep_kinstr_jm_atom_hw_submit(atom);
+    if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
+        kbasep_kinstr_jm_atom_hw_submit(atom);
 }
 
 /**
@@ -267,17 +267,17 @@ static inline void kbase_kinstr_jm_atom_hw_submit(
  * This private implementation should not be called directly, it is protected
  * by a static key in kbase_kinstr_jm_atom_hw_release(). Use that instead.
  */
-void kbasep_kinstr_jm_atom_hw_release(struct kbase_jd_atom *const atom);
+void kbasep_kinstr_jm_atom_hw_release(struct kbase_jd_atom *const katom);
 
 /**
  * kbase_kinstr_jm_atom_hw_release() - A hardware atom has been released
  * @atom: The atom that has been released
  */
 static inline void kbase_kinstr_jm_atom_hw_release(
-	struct kbase_jd_atom *const atom)
+    struct kbase_jd_atom *const atom)
 {
-	if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
-		kbasep_kinstr_jm_atom_hw_release(atom);
+    if (static_branch_unlikely(&basep_kinstr_jm_reader_static_key))
+        kbasep_kinstr_jm_atom_hw_release(atom);
 }
 
 #endif /* _KBASE_KINSTR_JM_H_ */

@@ -78,36 +78,36 @@ struct arbiter_if_dev;
  * arb_vm_gpu_stop() being called here.
  */
 struct arbiter_if_arb_vm_ops {
-	/**
-	 * arb_vm_gpu_stop() - Ask VM to stop using GPU
-	 * @dev: The arbif kernel module device.
-	 *
-	 * Informs KBase to stop using the GPU as soon as possible.
-	 * @Note: Once the driver is no longer using the GPU, a call to
-	 *        vm_arb_gpu_stopped is expected by the arbiter.
-	 */
-	void (*arb_vm_gpu_stop)(struct device *dev);
+    /**
+     * arb_vm_gpu_stop() - Ask VM to stop using GPU
+     * @dev: The arbif kernel module device.
+     *
+     * Informs KBase to stop using the GPU as soon as possible.
+     * @Note: Once the driver is no longer using the GPU, a call to
+     *        vm_arb_gpu_stopped is expected by the arbiter.
+     */
+    void (*arb_vm_gpu_stop)(struct device *dev);
 
-	/**
-	 * arb_vm_gpu_granted() - GPU has been granted to VM
-	 * @dev: The arbif kernel module device.
-	 *
-	 * Informs KBase that the GPU can now be used by the VM.
-	 */
-	void (*arb_vm_gpu_granted)(struct device *dev);
+    /**
+     * arb_vm_gpu_granted() - GPU has been granted to VM
+     * @dev: The arbif kernel module device.
+     *
+     * Informs KBase that the GPU can now be used by the VM.
+     */
+    void (*arb_vm_gpu_granted)(struct device *dev);
 
-	/**
-	 * arb_vm_gpu_lost() - VM has lost the GPU
-	 * @dev: The arbif kernel module device.
-	 *
-	 * This is called if KBase takes too long to respond to the arbiter
-	 * stop request.
-	 * Once this is called, KBase will assume that access to the GPU
-	 * has been lost and will fail all running jobs and reset its
-	 * internal state.
-	 * If successful, will respond with a vm_arb_gpu_stopped message.
-	 */
-	void (*arb_vm_gpu_lost)(struct device *dev);
+    /**
+     * arb_vm_gpu_lost() - VM has lost the GPU
+     * @dev: The arbif kernel module device.
+     *
+     * This is called if KBase takes too long to respond to the arbiter
+     * stop request.
+     * Once this is called, KBase will assume that access to the GPU
+     * has been lost and will fail all running jobs and reset its
+     * internal state.
+     * If successful, will respond with a vm_arb_gpu_stopped message.
+     */
+    void (*arb_vm_gpu_lost)(struct device *dev);
 };
 
 /**
@@ -120,48 +120,48 @@ struct arbiter_if_arb_vm_ops {
  * (via arbiter_if_arb_vm_ops above) in the context of these callbacks.
  */
 struct arbiter_if_vm_arb_ops {
-	/**
-	 * vm_arb_register_dev() - Register VM device driver callbacks.
-	 * @arbif_dev: The arbiter interface we are registering device callbacks
-	 * @dev: The device structure to supply in the callbacks.
-	 * @ops: The callbacks that the device driver supports
-	 *       (none are optional).
-	 */
-	int (*vm_arb_register_dev)(struct arbiter_if_dev *arbif_dev,
-		struct device *dev, struct arbiter_if_arb_vm_ops *ops);
+    /**
+     * vm_arb_register_dev() - Register VM device driver callbacks.
+     * @arbif_dev: The arbiter interface we are registering device callbacks
+     * @dev: The device structure to supply in the callbacks.
+     * @ops: The callbacks that the device driver supports
+     *       (none are optional).
+     */
+    int (*vm_arb_register_dev)(struct arbiter_if_dev *arbif_dev,
+        struct device *dev, struct arbiter_if_arb_vm_ops *ops);
 
-	/**
-	 * vm_arb_unregister_dev() - Unregister VM device driver callbacks.
-	 * @arbif_dev: The arbiter interface we are unregistering from.
-	 */
-	void (*vm_arb_unregister_dev)(struct arbiter_if_dev *arbif_dev);
+    /**
+     * vm_arb_unregister_dev() - Unregister VM device driver callbacks.
+     * @arbif_dev: The arbiter interface we are unregistering from.
+     */
+    void (*vm_arb_unregister_dev)(struct arbiter_if_dev *arbif_dev);
 
-	/**
-	 * vm_arb_gpu_request() - Ask the arbiter interface for GPU access.
-	 * @arbif_dev: The arbiter interface we want to issue the request.
-	 */
-	void (*vm_arb_gpu_request)(struct arbiter_if_dev *arbif_dev);
+    /**
+     * vm_arb_gpu_request() - Ask the arbiter interface for GPU access.
+     * @arbif_dev: The arbiter interface we want to issue the request.
+     */
+    void (*vm_arb_gpu_request)(struct arbiter_if_dev *arbif_dev);
 
-	/**
-	 * vm_arb_gpu_active() - Inform arbiter that the driver has gone active
-	 * @arbif_dev: The arbiter interface device.
-	 */
-	void (*vm_arb_gpu_active)(struct arbiter_if_dev *arbif_dev);
+    /**
+     * vm_arb_gpu_active() - Inform arbiter that the driver has gone active
+     * @arbif_dev: The arbiter interface device.
+     */
+    void (*vm_arb_gpu_active)(struct arbiter_if_dev *arbif_dev);
 
-	/**
-	 * vm_arb_gpu_idle() - Inform the arbiter that the driver has gone idle
-	 * @arbif_dev: The arbiter interface device.
-	 */
-	void (*vm_arb_gpu_idle)(struct arbiter_if_dev *arbif_dev);
+    /**
+     * vm_arb_gpu_idle() - Inform the arbiter that the driver has gone idle
+     * @arbif_dev: The arbiter interface device.
+     */
+    void (*vm_arb_gpu_idle)(struct arbiter_if_dev *arbif_dev);
 
-	/**
-	 * vm_arb_gpu_stopped() - Inform the arbiter that the driver has stopped
-	 *                        using the GPU
-	 * @arbif_dev: The arbiter interface device.
-	 * @gpu_required: The GPU is still needed to do more work.
-	 */
-	void (*vm_arb_gpu_stopped)(struct arbiter_if_dev *arbif_dev,
-		u8 gpu_required);
+    /**
+     * vm_arb_gpu_stopped() - Inform the arbiter that the driver has stopped
+     *                        using the GPU
+     * @arbif_dev: The arbiter interface device.
+     * @gpu_required: The GPU is still needed to do more work.
+     */
+    void (*vm_arb_gpu_stopped)(struct arbiter_if_dev *arbif_dev,
+        u8 gpu_required);
 };
 
 /**
@@ -174,8 +174,8 @@ struct arbiter_if_vm_arb_ops {
  * with an arbiter interface platform device
  */
 struct arbiter_if_dev {
-	struct arbiter_if_vm_arb_ops vm_ops;
-	void *priv_data;
+    struct arbiter_if_vm_arb_ops vm_ops;
+    void *priv_data;
 };
 
 #endif /* _MALI_KBASE_ARBITER_INTERFACE_H_ */

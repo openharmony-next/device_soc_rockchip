@@ -69,16 +69,16 @@
  * @vm_arb_users_waiting: Count of users waiting for GPU
  */
 struct kbase_arbiter_vm_state {
-	struct kbase_device *kbdev;
-	struct mutex vm_state_lock;
-	wait_queue_head_t vm_state_wait;
-	enum kbase_vm_state vm_state;
-	struct workqueue_struct *vm_arb_wq;
-	struct work_struct vm_suspend_work;
-	struct work_struct vm_resume_work;
-	bool vm_arb_starting;
-	bool vm_arb_stopping;
-	int vm_arb_users_waiting;
+    struct kbase_device *kbdev;
+    struct mutex vm_state_lock;
+    wait_queue_head_t vm_state_wait;
+    enum kbase_vm_state vm_state;
+    struct workqueue_struct *vm_arb_wq;
+    struct work_struct vm_suspend_work;
+    struct work_struct vm_resume_work;
+    bool vm_arb_starting;
+    bool vm_arb_stopping;
+    int vm_arb_users_waiting;
 };
 
 /**
@@ -88,8 +88,8 @@ struct kbase_arbiter_vm_state {
  * @arb_dev:                Pointer to the arbiter device
  */
 struct kbase_arbiter_device {
-	struct arbiter_if_dev *arb_if;
-	struct device *arb_dev;
+    struct arbiter_if_dev *arb_if;
+    struct device *arb_dev;
 };
 
 #endif /* _MALI_KBASE_ARBITER_DEFS_H_ */

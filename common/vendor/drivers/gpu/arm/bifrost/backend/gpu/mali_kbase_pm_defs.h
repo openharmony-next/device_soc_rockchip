@@ -56,10 +56,10 @@ struct kbase_jd_atom;
  * @KBASE_PM_CORE_STACK: Core stacks
  */
 enum kbase_pm_core_type {
-	KBASE_PM_CORE_L2 = L2_PRESENT_LO,
-	KBASE_PM_CORE_SHADER = SHADER_PRESENT_LO,
-	KBASE_PM_CORE_TILER = TILER_PRESENT_LO,
-	KBASE_PM_CORE_STACK = STACK_PRESENT_LO
+    KBASE_PM_CORE_L2 = L2_PRESENT_LO,
+    KBASE_PM_CORE_SHADER = SHADER_PRESENT_LO,
+    KBASE_PM_CORE_TILER = TILER_PRESENT_LO,
+    KBASE_PM_CORE_STACK = STACK_PRESENT_LO
 };
 
 /**
@@ -126,7 +126,7 @@ enum kbase_mcu_state {
  *                                      partial shader on/off, checking whether
  *                                      it's the desired state.
  * @KBASE_SHADERS_ON_CORESTACK_ON: The shaders and core stacks are on, and hwcnt
- *					already enabled.
+ *                    already enabled.
  * @KBASE_SHADERS_ON_CORESTACK_ON_RECHECK: The shaders and core stacks
  *                                      are on, hwcnt disabled, and checks
  *                                      to powering down or re-enabling
@@ -176,10 +176,10 @@ enum kbase_shader_core_state {
  *           with 800.
  */
 struct kbasep_pm_metrics {
-	u32 time_busy;
-	u32 time_idle;
-	u32 busy_cl[2];
-	u32 busy_gl;
+    u32 time_busy;
+    u32 time_idle;
+    u32 busy_cl[2];
+    u32 busy_gl;
 };
 
 /**
@@ -204,22 +204,22 @@ struct kbasep_pm_metrics {
  *  @dvfs_diff: different between the current and previous PM metrics.
  */
 struct kbasep_pm_metrics_state {
-	ktime_t time_period_start;
-	bool gpu_active;
-	u32 active_cl_ctx[2];
-	u32 active_gl_ctx[3];
-	spinlock_t lock;
+    ktime_t time_period_start;
+    bool gpu_active;
+    u32 active_cl_ctx[2];
+    u32 active_gl_ctx[3];
+    spinlock_t lock;
 
-	void *platform_data;
-	struct kbase_device *kbdev;
+    void *platform_data;
+    struct kbase_device *kbdev;
 
-	struct kbasep_pm_metrics values;
+    struct kbasep_pm_metrics values;
 
 #ifdef CONFIG_MALI_BIFROST_DVFS
-	struct hrtimer timer;
-	bool timer_active;
-	struct kbasep_pm_metrics dvfs_last;
-	struct kbasep_pm_metrics dvfs_diff;
+    struct hrtimer timer;
+    bool timer_active;
+    struct kbasep_pm_metrics dvfs_last;
+    struct kbasep_pm_metrics dvfs_diff;
 #endif
 };
 
@@ -239,23 +239,23 @@ struct kbasep_pm_metrics_state {
  * @needed: Whether the timer should restart itself
  */
 struct kbasep_pm_tick_timer_state {
-	struct workqueue_struct *wq;
-	struct work_struct work;
-	struct hrtimer timer;
+    struct workqueue_struct *wq;
+    struct work_struct work;
+    struct hrtimer timer;
 
-	ktime_t configured_interval;
-	unsigned int configured_ticks;
-	unsigned int remaining_ticks;
+    ktime_t configured_interval;
+    unsigned int configured_ticks;
+    unsigned int remaining_ticks;
 
-	bool cancel_queued;
-	bool needed;
+    bool cancel_queued;
+    bool needed;
 };
 
 union kbase_pm_policy_data {
-	struct kbasep_pm_policy_always_on always_on;
-	struct kbasep_pm_policy_coarse_demand coarse_demand;
+    struct kbasep_pm_policy_always_on always_on;
+    struct kbasep_pm_policy_coarse_demand coarse_demand;
 #if !MALI_CUSTOMER_RELEASE
-	struct kbasep_pm_policy_always_on_demand always_on_demand;
+    struct kbasep_pm_policy_always_on_demand always_on_demand;
 #endif
 };
 
@@ -395,95 +395,95 @@ union kbase_pm_policy_data {
  * re-issue the policy functions that would have been done under IRQ.
  */
 struct kbase_pm_backend_data {
-	const struct kbase_pm_policy *pm_current_policy;
-	union kbase_pm_policy_data pm_policy_data;
-	bool reset_done;
-	wait_queue_head_t reset_done_wait;
-	int gpu_cycle_counter_requests;
-	spinlock_t gpu_cycle_counter_requests_lock;
+    const struct kbase_pm_policy *pm_current_policy;
+    union kbase_pm_policy_data pm_policy_data;
+    bool reset_done;
+    wait_queue_head_t reset_done_wait;
+    int gpu_cycle_counter_requests;
+    spinlock_t gpu_cycle_counter_requests_lock;
 
-	wait_queue_head_t gpu_in_desired_state_wait;
+    wait_queue_head_t gpu_in_desired_state_wait;
 
-	bool gpu_powered;
-	bool gpu_ready;
+    bool gpu_powered;
+    bool gpu_ready;
 
-	u64 pm_shaders_core_mask;
+    u64 pm_shaders_core_mask;
 
-	bool cg1_disabled;
+    bool cg1_disabled;
 
 #ifdef CONFIG_MALI_BIFROST_DEBUG
-	bool driver_ready_for_irqs;
+    bool driver_ready_for_irqs;
 #endif /* CONFIG_MALI_BIFROST_DEBUG */
 
-	struct kbasep_pm_metrics_state metrics;
+    struct kbasep_pm_metrics_state metrics;
 
-	struct kbasep_pm_tick_timer_state shader_tick_timer;
+    struct kbasep_pm_tick_timer_state shader_tick_timer;
 
-	bool poweroff_wait_in_progress;
-	bool invoke_poweroff_wait_wq_when_l2_off;
-	bool poweron_required;
+    bool poweroff_wait_in_progress;
+    bool invoke_poweroff_wait_wq_when_l2_off;
+    bool poweron_required;
 
-	struct workqueue_struct *gpu_poweroff_wait_wq;
-	struct work_struct gpu_poweroff_wait_work;
+    struct workqueue_struct *gpu_poweroff_wait_wq;
+    struct work_struct gpu_poweroff_wait_work;
 
-	wait_queue_head_t poweroff_wait;
+    wait_queue_head_t poweroff_wait;
 
-	int (*callback_power_on)(struct kbase_device *kbdev);
-	void (*callback_power_off)(struct kbase_device *kbdev);
-	void (*callback_power_suspend)(struct kbase_device *kbdev);
-	void (*callback_power_resume)(struct kbase_device *kbdev);
-	int (*callback_power_runtime_on)(struct kbase_device *kbdev);
-	void (*callback_power_runtime_off)(struct kbase_device *kbdev);
-	int (*callback_power_runtime_idle)(struct kbase_device *kbdev);
-	int (*callback_soft_reset)(struct kbase_device *kbdev);
+    int (*callback_power_on)(struct kbase_device *kbdev);
+    void (*callback_power_off)(struct kbase_device *kbdev);
+    void (*callback_power_suspend)(struct kbase_device *kbdev);
+    void (*callback_power_resume)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_on)(struct kbase_device *kbdev);
+    void (*callback_power_runtime_off)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_idle)(struct kbase_device *kbdev);
+    int (*callback_soft_reset)(struct kbase_device *kbdev);
 
-	u64 ca_cores_enabled;
+    u64 ca_cores_enabled;
 
 #if MALI_USE_CSF
-	/* The current state of the micro-control unit, only applicable
-	 * to GPUs that has such a component
-	 */
-	enum kbase_mcu_state mcu_state;
+    /* The current state of the micro-control unit, only applicable
+     * to GPUs that has such a component
+     */
+    enum kbase_mcu_state mcu_state;
 #endif
-	enum kbase_l2_core_state l2_state;
-	enum kbase_shader_core_state shaders_state;
-	u64 shaders_avail;
-	u64 shaders_desired_mask;
+    enum kbase_l2_core_state l2_state;
+    enum kbase_shader_core_state shaders_state;
+    u64 shaders_avail;
+    u64 shaders_desired_mask;
 #if MALI_USE_CSF
-	/* True if the micro-control unit should be powered on */
-	bool mcu_desired;
+    /* True if the micro-control unit should be powered on */
+    bool mcu_desired;
 #endif
-	bool l2_desired;
-	bool l2_always_on;
-	bool shaders_desired;
+    bool l2_desired;
+    bool l2_always_on;
+    bool shaders_desired;
 
-	bool in_reset;
+    bool in_reset;
 
-	bool partial_shaderoff;
+    bool partial_shaderoff;
 
-	bool protected_entry_transition_override;
-	bool protected_transition_override;
-	int protected_l2_override;
+    bool protected_entry_transition_override;
+    bool protected_transition_override;
+    int protected_l2_override;
 
-	bool hwcnt_desired;
-	bool hwcnt_disabled;
-	struct work_struct hwcnt_disable_work;
+    bool hwcnt_desired;
+    bool hwcnt_disabled;
+    struct work_struct hwcnt_disable_work;
 
-	u64 gpu_clock_suspend_freq;
-	bool gpu_clock_slow_down_wa;
-	bool gpu_clock_slow_down_desired;
-	bool gpu_clock_slowed_down;
-	struct work_struct gpu_clock_control_work;
+    u64 gpu_clock_suspend_freq;
+    bool gpu_clock_slow_down_wa;
+    bool gpu_clock_slow_down_desired;
+    bool gpu_clock_slowed_down;
+    struct work_struct gpu_clock_control_work;
 };
 
 
 /* List of policy IDs */
 enum kbase_pm_policy_id {
-	KBASE_PM_POLICY_ID_COARSE_DEMAND,
+    KBASE_PM_POLICY_ID_COARSE_DEMAND,
 #if !MALI_CUSTOMER_RELEASE
-	KBASE_PM_POLICY_ID_ALWAYS_ON_DEMAND,
+    KBASE_PM_POLICY_ID_ALWAYS_ON_DEMAND,
 #endif
-	KBASE_PM_POLICY_ID_ALWAYS_ON
+    KBASE_PM_POLICY_ID_ALWAYS_ON
 };
 
 /**
@@ -504,57 +504,57 @@ enum kbase_pm_policy_id {
  *                      It is used purely for debugging.
  */
 struct kbase_pm_policy {
-	char *name;
+    char *name;
 
-	/**
-	 * Function called when the policy is selected
-	 *
-	 * This should initialize the kbdev->pm.pm_policy_data structure. It
-	 * should not attempt to make any changes to hardware state.
-	 *
-	 * It is undefined what state the cores are in when the function is
-	 * called.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 */
-	void (*init)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is selected
+     *
+     * This should initialize the kbdev->pm.pm_policy_data structure. It
+     * should not attempt to make any changes to hardware state.
+     *
+     * It is undefined what state the cores are in when the function is
+     * called.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     */
+    void (*init)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called when the policy is unselected.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 */
-	void (*term)(struct kbase_device *kbdev);
+    /**
+     * Function called when the policy is unselected.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     */
+    void (*term)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to find out if shader cores are needed
-	 *
-	 * This needs to at least satisfy kbdev->pm.backend.shaders_desired,
-	 * and so must never return false when shaders_desired is true.
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 *
-	 * Return: true if shader cores are needed, false otherwise
-	 */
-	bool (*shaders_needed)(struct kbase_device *kbdev);
+    /**
+     * Function called to find out if shader cores are needed
+     *
+     * This needs to at least satisfy kbdev->pm.backend.shaders_desired,
+     * and so must never return false when shaders_desired is true.
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     *
+     * Return: true if shader cores are needed, false otherwise
+     */
+    bool (*shaders_needed)(struct kbase_device *kbdev);
 
-	/**
-	 * Function called to get the current overall GPU power state
-	 *
-	 * This function must meet or exceed the requirements for power
-	 * indicated by kbase_pm_is_active().
-	 *
-	 * @kbdev: The kbase device structure for the device (must be a
-	 *         valid pointer)
-	 *
-	 * Return: true if the GPU should be powered, false otherwise
-	 */
-	bool (*get_core_active)(struct kbase_device *kbdev);
+    /**
+     * Function called to get the current overall GPU power state
+     *
+     * This function must meet or exceed the requirements for power
+     * indicated by kbase_pm_is_active().
+     *
+     * @kbdev: The kbase device structure for the device (must be a
+     *         valid pointer)
+     *
+     * Return: true if the GPU should be powered, false otherwise
+     */
+    bool (*get_core_active)(struct kbase_device *kbdev);
 
-	enum kbase_pm_policy_id id;
+    enum kbase_pm_policy_id id;
 };
 
 #endif /* _KBASE_PM_HWACCESS_DEFS_H_ */

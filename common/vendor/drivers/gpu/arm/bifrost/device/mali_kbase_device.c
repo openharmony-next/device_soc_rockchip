@@ -70,7 +70,7 @@ static int kbase_dev_nr;
 
 struct kbase_device *kbase_device_alloc(void)
 {
-	return kzalloc(sizeof(struct kbase_device), GFP_KERNEL);
+    return kzalloc(sizeof(struct kbase_device), GFP_KERNEL);
 }
 
 /**
@@ -82,330 +82,330 @@ struct kbase_device *kbase_device_alloc(void)
  */
 static int kbase_device_all_as_init(struct kbase_device *kbdev)
 {
-	int i, err = 0;
+    int i, err = 0;
 
-	for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
-		err = kbase_mmu_as_init(kbdev, i);
-		if (err)
-			break;
-	}
+    for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
+        err = kbase_mmu_as_init(kbdev, i);
+        if (err)
+            break;
+    }
 
-	if (err) {
-		while (i-- > 0)
-			kbase_mmu_as_term(kbdev, i);
-	}
+    if (err) {
+        while (i-- > 0)
+            kbase_mmu_as_term(kbdev, i);
+    }
 
-	return err;
+    return err;
 }
 
 static void kbase_device_all_as_term(struct kbase_device *kbdev)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < kbdev->nr_hw_address_spaces; i++)
-		kbase_mmu_as_term(kbdev, i);
+    for (i = 0; i < kbdev->nr_hw_address_spaces; i++)
+        kbase_mmu_as_term(kbdev, i);
 }
 
 int kbase_device_misc_init(struct kbase_device * const kbdev)
 {
-	int err;
+    int err;
 #ifdef CONFIG_ARM64
-	struct device_node *np = NULL;
+    struct device_node *np = NULL;
 #endif /* CONFIG_ARM64 */
 
-	spin_lock_init(&kbdev->mmu_mask_change);
-	mutex_init(&kbdev->mmu_hw_mutex);
+    spin_lock_init(&kbdev->mmu_mask_change);
+    mutex_init(&kbdev->mmu_hw_mutex);
 #ifdef CONFIG_ARM64
-	kbdev->cci_snoop_enabled = false;
-	np = kbdev->dev->of_node;
-	if (np != NULL) {
-		if (of_property_read_u32(np, "snoop_enable_smc",
-					&kbdev->snoop_enable_smc))
-			kbdev->snoop_enable_smc = 0;
-		if (of_property_read_u32(np, "snoop_disable_smc",
-					&kbdev->snoop_disable_smc))
-			kbdev->snoop_disable_smc = 0;
-		/* Either both or none of the calls should be provided. */
-		if (!((kbdev->snoop_disable_smc == 0
-			&& kbdev->snoop_enable_smc == 0)
-			|| (kbdev->snoop_disable_smc != 0
-			&& kbdev->snoop_enable_smc != 0))) {
-			WARN_ON(1);
-			err = -EINVAL;
-			goto fail;
-		}
-	}
+    kbdev->cci_snoop_enabled = false;
+    np = kbdev->dev->of_node;
+    if (np != NULL) {
+        if (of_property_read_u32(np, "snoop_enable_smc",
+                    &kbdev->snoop_enable_smc))
+            kbdev->snoop_enable_smc = 0;
+        if (of_property_read_u32(np, "snoop_disable_smc",
+                    &kbdev->snoop_disable_smc))
+            kbdev->snoop_disable_smc = 0;
+        /* Either both or none of the calls should be provided. */
+        if (!((kbdev->snoop_disable_smc == 0
+            && kbdev->snoop_enable_smc == 0)
+            || (kbdev->snoop_disable_smc != 0
+            && kbdev->snoop_enable_smc != 0))) {
+            WARN_ON(1);
+            err = -EINVAL;
+            goto fail;
+        }
+    }
 #endif /* CONFIG_ARM64 */
-	/* Get the list of workarounds for issues on the current HW
-	 * (identified by the GPU_ID register)
-	 */
-	err = kbase_hw_set_issues_mask(kbdev);
-	if (err)
-		goto fail;
+    /* Get the list of workarounds for issues on the current HW
+     * (identified by the GPU_ID register)
+     */
+    err = kbase_hw_set_issues_mask(kbdev);
+    if (err)
+        goto fail;
 
-	/* Set the list of features available on the current HW
-	 * (identified by the GPU_ID register)
-	 */
-	kbase_hw_set_features_mask(kbdev);
+    /* Set the list of features available on the current HW
+     * (identified by the GPU_ID register)
+     */
+    kbase_hw_set_features_mask(kbdev);
 
-	err = kbase_gpuprops_set_features(kbdev);
-	if (err)
-		goto fail;
+    err = kbase_gpuprops_set_features(kbdev);
+    if (err)
+        goto fail;
 
-	/* On Linux 4.0+, dma coherency is determined from device tree */
+    /* On Linux 4.0+, dma coherency is determined from device tree */
 #if defined(CONFIG_ARM64) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0)
-	set_dma_ops(kbdev->dev, &noncoherent_swiotlb_dma_ops);
+    set_dma_ops(kbdev->dev, &noncoherent_swiotlb_dma_ops);
 #endif
 
-	/* Workaround a pre-3.13 Linux issue, where dma_mask is NULL when our
-	 * device structure was created by device-tree
-	 */
-	if (!kbdev->dev->dma_mask)
-		kbdev->dev->dma_mask = &kbdev->dev->coherent_dma_mask;
+    /* Workaround a pre-3.13 Linux issue, where dma_mask is NULL when our
+     * device structure was created by device-tree
+     */
+    if (!kbdev->dev->dma_mask)
+        kbdev->dev->dma_mask = &kbdev->dev->coherent_dma_mask;
 
-	err = dma_set_mask(kbdev->dev,
-			DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-	if (err)
-		goto dma_set_mask_failed;
+    err = dma_set_mask(kbdev->dev,
+            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err)
+        goto dma_set_mask_failed;
 
-	err = dma_set_coherent_mask(kbdev->dev,
-			DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-	if (err)
-		goto dma_set_mask_failed;
+    err = dma_set_coherent_mask(kbdev->dev,
+            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err)
+        goto dma_set_mask_failed;
 
-	kbdev->nr_hw_address_spaces = kbdev->gpu_props.num_address_spaces;
+    kbdev->nr_hw_address_spaces = kbdev->gpu_props.num_address_spaces;
 
-	err = kbase_device_all_as_init(kbdev);
-	if (err)
-		goto dma_set_mask_failed;
+    err = kbase_device_all_as_init(kbdev);
+    if (err)
+        goto dma_set_mask_failed;
 
-	spin_lock_init(&kbdev->hwcnt.lock);
+    spin_lock_init(&kbdev->hwcnt.lock);
 
-	err = kbase_ktrace_init(kbdev);
-	if (err)
-		goto term_as;
+    err = kbase_ktrace_init(kbdev);
+    if (err)
+        goto term_as;
 
-	init_waitqueue_head(&kbdev->cache_clean_wait);
+    init_waitqueue_head(&kbdev->cache_clean_wait);
 
-	kbase_debug_assert_register_hook(&kbase_ktrace_hook_wrapper, kbdev);
+    kbase_debug_assert_register_hook(&kbase_ktrace_hook_wrapper, kbdev);
 
-	atomic_set(&kbdev->ctx_num, 0);
+    atomic_set(&kbdev->ctx_num, 0);
 
-	err = kbase_instr_backend_init(kbdev);
-	if (err)
-		goto term_trace;
+    err = kbase_instr_backend_init(kbdev);
+    if (err)
+        goto term_trace;
 
-	kbdev->pm.dvfs_period = DEFAULT_PM_DVFS_PERIOD;
+    kbdev->pm.dvfs_period = DEFAULT_PM_DVFS_PERIOD;
 
-	kbdev->reset_timeout_ms = DEFAULT_RESET_TIMEOUT_MS;
+    kbdev->reset_timeout_ms = DEFAULT_RESET_TIMEOUT_MS;
 
-	if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU))
-		kbdev->mmu_mode = kbase_mmu_mode_get_aarch64();
-	else
-		kbdev->mmu_mode = kbase_mmu_mode_get_lpae();
+    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU))
+        kbdev->mmu_mode = kbase_mmu_mode_get_aarch64();
+    else
+        kbdev->mmu_mode = kbase_mmu_mode_get_lpae();
 
-	mutex_init(&kbdev->kctx_list_lock);
-	INIT_LIST_HEAD(&kbdev->kctx_list);
+    mutex_init(&kbdev->kctx_list_lock);
+    INIT_LIST_HEAD(&kbdev->kctx_list);
 
-	spin_lock_init(&kbdev->hwaccess_lock);
+    spin_lock_init(&kbdev->hwaccess_lock);
 
-	return 0;
+    return 0;
 term_trace:
-	kbase_ktrace_term(kbdev);
+    kbase_ktrace_term(kbdev);
 term_as:
-	kbase_device_all_as_term(kbdev);
+    kbase_device_all_as_term(kbdev);
 dma_set_mask_failed:
 fail:
-	return err;
+    return err;
 }
 
 void kbase_device_misc_term(struct kbase_device *kbdev)
 {
-	KBASE_DEBUG_ASSERT(kbdev);
+    KBASE_DEBUG_ASSERT(kbdev);
 
-	WARN_ON(!list_empty(&kbdev->kctx_list));
+    WARN_ON(!list_empty(&kbdev->kctx_list));
 
 #if KBASE_KTRACE_ENABLE
-	kbase_debug_assert_register_hook(NULL, NULL);
+    kbase_debug_assert_register_hook(NULL, NULL);
 #endif
 
-	kbase_instr_backend_term(kbdev);
+    kbase_instr_backend_term(kbdev);
 
-	kbase_ktrace_term(kbdev);
+    kbase_ktrace_term(kbdev);
 
-	kbase_device_all_as_term(kbdev);
+    kbase_device_all_as_term(kbdev);
 }
 
 void kbase_device_free(struct kbase_device *kbdev)
 {
-	kfree(kbdev);
+    kfree(kbdev);
 }
 
 void kbase_device_id_init(struct kbase_device *kbdev)
 {
-	scnprintf(kbdev->devname, DEVNAME_SIZE, "%s%d", kbase_drv_name,
-			kbase_dev_nr);
-	kbdev->id = kbase_dev_nr;
+    scnprintf(kbdev->devname, DEVNAME_SIZE, "%s%d", kbase_drv_name,
+            kbase_dev_nr);
+    kbdev->id = kbase_dev_nr;
 }
 
 void kbase_increment_device_id(void)
 {
-	kbase_dev_nr++;
+    kbase_dev_nr++;
 }
 
 int kbase_device_hwcnt_backend_jm_init(struct kbase_device *kbdev)
 {
-	return kbase_hwcnt_backend_jm_create(kbdev, &kbdev->hwcnt_gpu_iface);
+    return kbase_hwcnt_backend_jm_create(kbdev, &kbdev->hwcnt_gpu_iface);
 }
 
 void kbase_device_hwcnt_backend_jm_term(struct kbase_device *kbdev)
 {
-	kbase_hwcnt_backend_jm_destroy(&kbdev->hwcnt_gpu_iface);
+    kbase_hwcnt_backend_jm_destroy(&kbdev->hwcnt_gpu_iface);
 }
 
 int kbase_device_hwcnt_context_init(struct kbase_device *kbdev)
 {
-	return kbase_hwcnt_context_init(&kbdev->hwcnt_gpu_iface,
-			&kbdev->hwcnt_gpu_ctx);
+    return kbase_hwcnt_context_init(&kbdev->hwcnt_gpu_iface,
+            &kbdev->hwcnt_gpu_ctx);
 }
 
 void kbase_device_hwcnt_context_term(struct kbase_device *kbdev)
 {
-	kbase_hwcnt_context_term(kbdev->hwcnt_gpu_ctx);
+    kbase_hwcnt_context_term(kbdev->hwcnt_gpu_ctx);
 }
 
 int kbase_device_hwcnt_virtualizer_init(struct kbase_device *kbdev)
 {
-	return kbase_hwcnt_virtualizer_init(kbdev->hwcnt_gpu_ctx,
-			KBASE_HWCNT_GPU_VIRTUALIZER_DUMP_THRESHOLD_NS,
-			&kbdev->hwcnt_gpu_virt);
+    return kbase_hwcnt_virtualizer_init(kbdev->hwcnt_gpu_ctx,
+            KBASE_HWCNT_GPU_VIRTUALIZER_DUMP_THRESHOLD_NS,
+            &kbdev->hwcnt_gpu_virt);
 }
 
 void kbase_device_hwcnt_virtualizer_term(struct kbase_device *kbdev)
 {
-	kbase_hwcnt_virtualizer_term(kbdev->hwcnt_gpu_virt);
+    kbase_hwcnt_virtualizer_term(kbdev->hwcnt_gpu_virt);
 }
 
 int kbase_device_timeline_init(struct kbase_device *kbdev)
 {
-	atomic_set(&kbdev->timeline_flags, 0);
-	return kbase_timeline_init(&kbdev->timeline, &kbdev->timeline_flags);
+    atomic_set(&kbdev->timeline_flags, 0);
+    return kbase_timeline_init(&kbdev->timeline, &kbdev->timeline_flags);
 }
 
 void kbase_device_timeline_term(struct kbase_device *kbdev)
 {
-	kbase_timeline_term(kbdev->timeline);
+    kbase_timeline_term(kbdev->timeline);
 }
 
 int kbase_device_vinstr_init(struct kbase_device *kbdev)
 {
-	return kbase_vinstr_init(kbdev->hwcnt_gpu_virt, &kbdev->vinstr_ctx);
+    return kbase_vinstr_init(kbdev->hwcnt_gpu_virt, &kbdev->vinstr_ctx);
 }
 
 void kbase_device_vinstr_term(struct kbase_device *kbdev)
 {
-	kbase_vinstr_term(kbdev->vinstr_ctx);
+    kbase_vinstr_term(kbdev->vinstr_ctx);
 }
 
 int kbase_device_io_history_init(struct kbase_device *kbdev)
 {
-	return kbase_io_history_init(&kbdev->io_history,
-			KBASEP_DEFAULT_REGISTER_HISTORY_SIZE);
+    return kbase_io_history_init(&kbdev->io_history,
+            KBASEP_DEFAULT_REGISTER_HISTORY_SIZE);
 }
 
 void kbase_device_io_history_term(struct kbase_device *kbdev)
 {
-	kbase_io_history_term(&kbdev->io_history);
+    kbase_io_history_term(&kbdev->io_history);
 }
 
 int kbase_device_misc_register(struct kbase_device *kbdev)
 {
-	return misc_register(&kbdev->mdev);
+    return misc_register(&kbdev->mdev);
 }
 
 void kbase_device_misc_deregister(struct kbase_device *kbdev)
 {
-	misc_deregister(&kbdev->mdev);
+    misc_deregister(&kbdev->mdev);
 }
 
 int kbase_device_list_init(struct kbase_device *kbdev)
 {
-	const struct list_head *dev_list;
+    const struct list_head *dev_list;
 
-	dev_list = kbase_device_get_list();
-	list_add(&kbdev->entry, &kbase_dev_list);
-	kbase_device_put_list(dev_list);
+    dev_list = kbase_device_get_list();
+    list_add(&kbdev->entry, &kbase_dev_list);
+    kbase_device_put_list(dev_list);
 
-	return 0;
+    return 0;
 }
 
 void kbase_device_list_term(struct kbase_device *kbdev)
 {
-	const struct list_head *dev_list;
+    const struct list_head *dev_list;
 
-	dev_list = kbase_device_get_list();
-	list_del(&kbdev->entry);
-	kbase_device_put_list(dev_list);
+    dev_list = kbase_device_get_list();
+    list_del(&kbdev->entry);
+    kbase_device_put_list(dev_list);
 }
 
 const struct list_head *kbase_device_get_list(void)
 {
-	mutex_lock(&kbase_dev_list_lock);
-	return &kbase_dev_list;
+    mutex_lock(&kbase_dev_list_lock);
+    return &kbase_dev_list;
 }
 KBASE_EXPORT_TEST_API(kbase_device_get_list);
 
 void kbase_device_put_list(const struct list_head *dev_list)
 {
-	mutex_unlock(&kbase_dev_list_lock);
+    mutex_unlock(&kbase_dev_list_lock);
 }
 KBASE_EXPORT_TEST_API(kbase_device_put_list);
 
 int kbase_device_early_init(struct kbase_device *kbdev)
 {
-	int err;
+    int err;
 
-	err = kbasep_platform_device_init(kbdev);
-	if (err)
-		return err;
+    err = kbasep_platform_device_init(kbdev);
+    if (err)
+        return err;
 
-	err = kbase_pm_runtime_init(kbdev);
-	if (err)
-		goto fail_runtime_pm;
+    err = kbase_pm_runtime_init(kbdev);
+    if (err)
+        goto fail_runtime_pm;
 
-	/* Ensure we can access the GPU registers */
-	kbase_pm_register_access_enable(kbdev);
+    /* Ensure we can access the GPU registers */
+    kbase_pm_register_access_enable(kbdev);
 
-	/* Find out GPU properties based on the GPU feature registers */
-	kbase_gpuprops_set(kbdev);
+    /* Find out GPU properties based on the GPU feature registers */
+    kbase_gpuprops_set(kbdev);
 
-	/* We're done accessing the GPU registers for now. */
-	kbase_pm_register_access_disable(kbdev);
+    /* We're done accessing the GPU registers for now. */
+    kbase_pm_register_access_disable(kbdev);
 
-	err = kbase_install_interrupts(kbdev);
-	if (err)
-		goto fail_interrupts;
+    err = kbase_install_interrupts(kbdev);
+    if (err)
+        goto fail_interrupts;
 
-	return 0;
+    return 0;
 
 fail_interrupts:
-	kbase_pm_runtime_term(kbdev);
+    kbase_pm_runtime_term(kbdev);
 fail_runtime_pm:
-	kbasep_platform_device_term(kbdev);
+    kbasep_platform_device_term(kbdev);
 
-	return err;
+    return err;
 }
 
 void kbase_device_early_term(struct kbase_device *kbdev)
 {
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-	if (kbdev->arb.arb_if)
-		kbase_arbiter_pm_release_interrupts(kbdev);
-	else
-		kbase_release_interrupts(kbdev);
+    if (kbdev->arb.arb_if)
+        kbase_arbiter_pm_release_interrupts(kbdev);
+    else
+        kbase_release_interrupts(kbdev);
 #else
-	kbase_release_interrupts(kbdev);
+    kbase_release_interrupts(kbdev);
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
-	kbase_pm_runtime_term(kbdev);
-	kbasep_platform_device_term(kbdev);
+    kbase_pm_runtime_term(kbdev);
+    kbasep_platform_device_term(kbdev);
 }

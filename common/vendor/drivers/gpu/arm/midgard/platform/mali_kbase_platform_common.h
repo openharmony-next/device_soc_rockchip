@@ -12,7 +12,8 @@
  * Boston, MA  02110-1301, USA.
  *
  */
-
+#ifndef MALI_KBASE_PLATFORM_COMMON_H
+#define MALI_KBASE_PLATFORM_COMMON_H
 #include <mali_kbase.h>
 
 
@@ -26,3 +27,5 @@
  */
 int kbase_platform_early_init(void);
 int kbase_platform_rk_init_opp_table(struct kbase_device *kbdev);
+
+#endif /* MALI_KBASE_PLATFORM_COMMON_H */

@@ -9,20 +9,20 @@
 #include <linux/kfifo.h>
 #include "common.h"
 
-#define RKISPP_STATS_READOUT_WORK_SIZE	\
-	(9 * sizeof(struct rkispp_stats_readout_work))
+#define RKISPP_STATS_READOUT_WORK_SIZE    \
+    (9 * sizeof(struct rkispp_stats_readout_work))
 
 struct rkispp_stats_vdev;
 
 enum rkispp_stats_readout_cmd {
-	RKISPP_READOUT_STATS,
+    RKISPP_READOUT_STATS,
 };
 
 struct rkispp_stats_readout_work {
-	enum rkispp_stats_readout_cmd readout;
-	unsigned long long timestamp;
-	unsigned int meas_type;
-	unsigned int frame_id;
+    enum rkispp_stats_readout_cmd readout;
+    unsigned long long timestamp;
+    unsigned int meas_type;
+    unsigned int frame_id;
 };
 
 /*
@@ -33,15 +33,15 @@ struct rkispp_stats_readout_work {
  * @readout_wq: workqueue for statistics information read
  */
 struct rkispp_stats_vdev {
-	struct rkispp_vdev_node vnode;
-	struct rkispp_device *dev;
+    struct rkispp_vdev_node vnode;
+    struct rkispp_device *dev;
 
-	spinlock_t irq_lock;
-	struct list_head stat;
-	struct rkispp_buffer *curr_buf;
-	struct rkispp_buffer *next_buf;
-	struct v4l2_format vdev_fmt;
-	bool streamon;
+    spinlock_t irq_lock;
+    struct list_head stat;
+    struct rkispp_buffer *curr_buf;
+    struct rkispp_buffer *next_buf;
+    struct v4l2_format vdev_fmt;
+    bool streamon;
 };
 
 void rkispp_stats_isr(struct rkispp_stats_vdev *stats_vdev, u32 mis);

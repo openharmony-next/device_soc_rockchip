@@ -24,26 +24,26 @@
 
 static void fixed_init(struct kbase_device *kbdev)
 {
-	kbdev->pm.backend.ca_in_transition = false;
+    kbdev->pm.backend.ca_in_transition = false;
 }
 
 static void fixed_term(struct kbase_device *kbdev)
 {
-	CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(kbdev);
 }
 
 static u64 fixed_get_core_mask(struct kbase_device *kbdev)
 {
-	return kbdev->gpu_props.props.raw_props.shader_present;
+    return kbdev->gpu_props.props.raw_props.shader_present;
 }
 
 static void fixed_update_core_status(struct kbase_device *kbdev,
-					u64 cores_ready,
-					u64 cores_transitioning)
+                    u64 cores_ready,
+                    u64 cores_transitioning)
 {
-	CSTD_UNUSED(kbdev);
-	CSTD_UNUSED(cores_ready);
-	CSTD_UNUSED(cores_transitioning);
+    CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(cores_ready);
+    CSTD_UNUSED(cores_transitioning);
 }
 
 /*
@@ -53,13 +53,13 @@ static void fixed_update_core_status(struct kbase_device *kbdev,
  * and name.
  */
 const struct kbase_pm_ca_policy kbase_pm_ca_fixed_policy_ops = {
-	"fixed",			/* name */
-	fixed_init,			/* init */
-	fixed_term,			/* term */
-	fixed_get_core_mask,		/* get_core_mask */
-	fixed_update_core_status,	/* update_core_status */
-	0u,				/* flags */
-	KBASE_PM_CA_POLICY_ID_FIXED,	/* id */
+    "fixed",            /* name */
+    fixed_init,            /* init */
+    fixed_term,            /* term */
+    fixed_get_core_mask,        /* get_core_mask */
+    fixed_update_core_status,    /* update_core_status */
+    0u,                /* flags */
+    KBASE_PM_CA_POLICY_ID_FIXED,    /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_ca_fixed_policy_ops);

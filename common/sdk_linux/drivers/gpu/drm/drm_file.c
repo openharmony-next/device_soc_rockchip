@@ -58,33 +58,33 @@ DEFINE_MUTEX(drm_global_mutex);
 
 bool drm_dev_needs_global_mutex(struct drm_device *dev)
 {
-	/*
-	 * Legacy drivers rely on all kinds of BKL locking semantics, don't
-	 * bother. They also still need BKL locking for their ioctls, so better
-	 * safe than sorry.
-	 */
-	if (drm_core_check_feature(dev, DRIVER_LEGACY))
-		return true;
+    /*
+     * Legacy drivers rely on all kinds of BKL locking semantics, don't
+     * bother. They also still need BKL locking for their ioctls, so better
+     * safe than sorry.
+     */
+    if (drm_core_check_feature(dev, DRIVER_LEGACY))
+        return true;
 
-	/*
-	 * The deprecated ->load callback must be called after the driver is
-	 * already registered. This means such drivers rely on the BKL to make
-	 * sure an open can't proceed until the driver is actually fully set up.
-	 * Similar hilarity holds for the unload callback.
-	 */
-	if (dev->driver->load || dev->driver->unload)
-		return true;
+    /*
+     * The deprecated ->load callback must be called after the driver is
+     * already registered. This means such drivers rely on the BKL to make
+     * sure an open can't proceed until the driver is actually fully set up.
+     * Similar hilarity holds for the unload callback.
+     */
+    if (dev->driver->load || dev->driver->unload)
+        return true;
 
-	/*
-	 * Drivers with the lastclose callback assume that it's synchronized
-	 * against concurrent opens, which again needs the BKL. The proper fix
-	 * is to use the drm_client infrastructure with proper locking for each
-	 * client.
-	 */
-	if (dev->driver->lastclose)
-		return true;
+    /*
+     * Drivers with the lastclose callback assume that it's synchronized
+     * against concurrent opens, which again needs the BKL. The proper fix
+     * is to use the drm_client infrastructure with proper locking for each
+     * client.
+     */
+    if (dev->driver->lastclose)
+        return true;
 
-	return false;
+    return false;
 }
 
 /**
@@ -154,81 +154,81 @@ bool drm_dev_needs_global_mutex(struct drm_device *dev)
  */
 struct drm_file *drm_file_alloc(struct drm_minor *minor)
 {
-	struct drm_device *dev = minor->dev;
-	struct drm_file *file;
-	int ret;
+    struct drm_device *dev = minor->dev;
+    struct drm_file *file;
+    int ret;
 
-	file = kzalloc(sizeof(*file), GFP_KERNEL);
-	if (!file)
-		return ERR_PTR(-ENOMEM);
+    file = kzalloc(sizeof(*file), GFP_KERNEL);
+    if (!file)
+        return ERR_PTR(-ENOMEM);
 
-	file->pid = get_pid(task_pid(current));
-	file->minor = minor;
+    file->pid = get_pid(task_pid(current));
+    file->minor = minor;
 
-	/* for compatibility root is always authenticated */
-	file->authenticated = capable(CAP_SYS_ADMIN);
+    /* for compatibility root is always authenticated */
+    file->authenticated = capable(CAP_SYS_ADMIN);
 
-	INIT_LIST_HEAD(&file->lhead);
-	INIT_LIST_HEAD(&file->fbs);
-	mutex_init(&file->fbs_lock);
-	INIT_LIST_HEAD(&file->blobs);
-	INIT_LIST_HEAD(&file->pending_event_list);
-	INIT_LIST_HEAD(&file->event_list);
-	init_waitqueue_head(&file->event_wait);
-	file->event_space = 4096; /* set aside 4k for event buffer */
+    INIT_LIST_HEAD(&file->lhead);
+    INIT_LIST_HEAD(&file->fbs);
+    mutex_init(&file->fbs_lock);
+    INIT_LIST_HEAD(&file->blobs);
+    INIT_LIST_HEAD(&file->pending_event_list);
+    INIT_LIST_HEAD(&file->event_list);
+    init_waitqueue_head(&file->event_wait);
+    file->event_space = 4096; /* set aside 4k for event buffer */
 
-	mutex_init(&file->event_read_lock);
+    mutex_init(&file->event_read_lock);
 
-	if (drm_core_check_feature(dev, DRIVER_GEM))
-		drm_gem_open(dev, file);
+    if (drm_core_check_feature(dev, DRIVER_GEM))
+        drm_gem_open(dev, file);
 
-	if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		drm_syncobj_open(file);
+    if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
+        drm_syncobj_open(file);
 
-	drm_prime_init_file_private(&file->prime);
+    drm_prime_init_file_private(&file->prime);
 
-	if (dev->driver->open) {
-		ret = dev->driver->open(dev, file);
-		if (ret < 0)
-			goto out_prime_destroy;
-	}
+    if (dev->driver->open) {
+        ret = dev->driver->open(dev, file);
+        if (ret < 0)
+            goto out_prime_destroy;
+    }
 
-	return file;
+    return file;
 
 out_prime_destroy:
-	drm_prime_destroy_file_private(&file->prime);
-	if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		drm_syncobj_release(file);
-	if (drm_core_check_feature(dev, DRIVER_GEM))
-		drm_gem_release(dev, file);
-	put_pid(file->pid);
-	kfree(file);
+    drm_prime_destroy_file_private(&file->prime);
+    if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
+        drm_syncobj_release(file);
+    if (drm_core_check_feature(dev, DRIVER_GEM))
+        drm_gem_release(dev, file);
+    put_pid(file->pid);
+    kfree(file);
 
-	return ERR_PTR(ret);
+    return ERR_PTR(ret);
 }
 
 static void drm_events_release(struct drm_file *file_priv)
 {
-	struct drm_device *dev = file_priv->minor->dev;
-	struct drm_pending_event *e, *et;
-	unsigned long flags;
+    struct drm_device *dev = file_priv->minor->dev;
+    struct drm_pending_event *e, *et;
+    unsigned long flags;
 
-	spin_lock_irqsave(&dev->event_lock, flags);
+    spin_lock_irqsave(&dev->event_lock, flags);
 
-	/* Unlink pending events */
-	list_for_each_entry_safe(e, et, &file_priv->pending_event_list,
-				 pending_link) {
-		list_del(&e->pending_link);
-		e->file_priv = NULL;
-	}
+    /* Unlink pending events */
+    list_for_each_entry_safe(e, et, &file_priv->pending_event_list,
+                 pending_link) {
+        list_del(&e->pending_link);
+        e->file_priv = NULL;
+    }
 
-	/* Remove unconsumed events */
-	list_for_each_entry_safe(e, et, &file_priv->event_list, link) {
-		list_del(&e->link);
-		kfree(e);
-	}
+    /* Remove unconsumed events */
+    list_for_each_entry_safe(e, et, &file_priv->event_list, link) {
+        list_del(&e->link);
+        kfree(e);
+    }
 
-	spin_unlock_irqrestore(&dev->event_lock, flags);
+    spin_unlock_irqrestore(&dev->event_lock, flags);
 }
 
 /**
@@ -246,67 +246,67 @@ static void drm_events_release(struct drm_file *file_priv)
  */
 void drm_file_free(struct drm_file *file)
 {
-	struct drm_device *dev;
+    struct drm_device *dev;
 
-	if (!file)
-		return;
+    if (!file)
+        return;
 
-	dev = file->minor->dev;
+    dev = file->minor->dev;
 
-	DRM_DEBUG("comm=\"%s\", pid=%d, dev=0x%lx, open_count=%d\n",
-		  current->comm, task_pid_nr(current),
-		  (long)old_encode_dev(file->minor->kdev->devt),
-		  atomic_read(&dev->open_count));
+    DRM_DEBUG("comm=\"%s\", pid=%d, dev=0x%lx, open_count=%d\n",
+          current->comm, task_pid_nr(current),
+          (long)old_encode_dev(file->minor->kdev->devt),
+          atomic_read(&dev->open_count));
 
-	if (drm_core_check_feature(dev, DRIVER_LEGACY) &&
-	    dev->driver->preclose)
-		dev->driver->preclose(dev, file);
+    if (drm_core_check_feature(dev, DRIVER_LEGACY) &&
+        dev->driver->preclose)
+        dev->driver->preclose(dev, file);
 
-	if (drm_core_check_feature(dev, DRIVER_LEGACY))
-		drm_legacy_lock_release(dev, file->filp);
+    if (drm_core_check_feature(dev, DRIVER_LEGACY))
+        drm_legacy_lock_release(dev, file->filp);
 
-	if (drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		drm_legacy_reclaim_buffers(dev, file);
+    if (drm_core_check_feature(dev, DRIVER_HAVE_DMA))
+        drm_legacy_reclaim_buffers(dev, file);
 
-	drm_events_release(file);
+    drm_events_release(file);
 
-	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
-		drm_fb_release(file);
-		drm_property_destroy_user_blobs(dev, file);
-	}
+    if (drm_core_check_feature(dev, DRIVER_MODESET)) {
+        drm_fb_release(file);
+        drm_property_destroy_user_blobs(dev, file);
+    }
 
-	if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		drm_syncobj_release(file);
+    if (drm_core_check_feature(dev, DRIVER_SYNCOBJ))
+        drm_syncobj_release(file);
 
-	if (drm_core_check_feature(dev, DRIVER_GEM))
-		drm_gem_release(dev, file);
+    if (drm_core_check_feature(dev, DRIVER_GEM))
+        drm_gem_release(dev, file);
 
-	drm_legacy_ctxbitmap_flush(dev, file);
+    drm_legacy_ctxbitmap_flush(dev, file);
 
-	if (drm_is_primary_client(file))
-		drm_master_release(file);
+    if (drm_is_primary_client(file))
+        drm_master_release(file);
 
-	if (dev->driver->postclose)
-		dev->driver->postclose(dev, file);
+    if (dev->driver->postclose)
+        dev->driver->postclose(dev, file);
 
-	drm_prime_destroy_file_private(&file->prime);
+    drm_prime_destroy_file_private(&file->prime);
 
-	WARN_ON(!list_empty(&file->event_list));
+    WARN_ON(!list_empty(&file->event_list));
 
-	put_pid(file->pid);
-	kfree(file);
+    put_pid(file->pid);
+    kfree(file);
 }
 
 static void drm_close_helper(struct file *filp)
 {
-	struct drm_file *file_priv = filp->private_data;
-	struct drm_device *dev = file_priv->minor->dev;
+    struct drm_file *file_priv = filp->private_data;
+    struct drm_device *dev = file_priv->minor->dev;
 
-	mutex_lock(&dev->filelist_mutex);
-	list_del(&file_priv->lhead);
-	mutex_unlock(&dev->filelist_mutex);
+    mutex_lock(&dev->filelist_mutex);
+    list_del(&file_priv->lhead);
+    mutex_unlock(&dev->filelist_mutex);
 
-	drm_file_free(file_priv);
+    drm_file_free(file_priv);
 }
 
 /*
@@ -317,9 +317,9 @@ static void drm_close_helper(struct file *filp)
 static int drm_cpu_valid(void)
 {
 #if defined(__sparc__) && !defined(__sparc_v9__)
-	return 0;		/* No cmpxchg before v9 sparc. */
+    return 0;        /* No cmpxchg before v9 sparc. */
 #endif
-	return 1;
+    return 1;
 }
 
 /*
@@ -334,63 +334,63 @@ static int drm_cpu_valid(void)
  */
 static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 {
-	struct drm_device *dev = minor->dev;
-	struct drm_file *priv;
-	int ret;
+    struct drm_device *dev = minor->dev;
+    struct drm_file *priv;
+    int ret;
 
-	if (filp->f_flags & O_EXCL)
-		return -EBUSY;	/* No exclusive opens */
-	if (!drm_cpu_valid())
-		return -EINVAL;
-	if (dev->switch_power_state != DRM_SWITCH_POWER_ON &&
-	    dev->switch_power_state != DRM_SWITCH_POWER_DYNAMIC_OFF)
-		return -EINVAL;
+    if (filp->f_flags & O_EXCL)
+        return -EBUSY;    /* No exclusive opens */
+    if (!drm_cpu_valid())
+        return -EINVAL;
+    if (dev->switch_power_state != DRM_SWITCH_POWER_ON &&
+        dev->switch_power_state != DRM_SWITCH_POWER_DYNAMIC_OFF)
+        return -EINVAL;
 
-	DRM_DEBUG("comm=\"%s\", pid=%d, minor=%d\n", current->comm,
-		  task_pid_nr(current), minor->index);
+    DRM_DEBUG("comm=\"%s\", pid=%d, minor=%d\n", current->comm,
+          task_pid_nr(current), minor->index);
 
-	priv = drm_file_alloc(minor);
-	if (IS_ERR(priv))
-		return PTR_ERR(priv);
+    priv = drm_file_alloc(minor);
+    if (IS_ERR(priv))
+        return PTR_ERR(priv);
 
-	if (drm_is_primary_client(priv)) {
-		ret = drm_master_open(priv);
-		if (ret) {
-			drm_file_free(priv);
-			return ret;
-		}
-	}
+    if (drm_is_primary_client(priv)) {
+        ret = drm_master_open(priv);
+        if (ret) {
+            drm_file_free(priv);
+            return ret;
+        }
+    }
 
-	filp->private_data = priv;
-	filp->f_mode |= FMODE_UNSIGNED_OFFSET;
-	priv->filp = filp;
+    filp->private_data = priv;
+    filp->f_mode |= FMODE_UNSIGNED_OFFSET;
+    priv->filp = filp;
 
-	mutex_lock(&dev->filelist_mutex);
-	list_add(&priv->lhead, &dev->filelist);
-	mutex_unlock(&dev->filelist_mutex);
+    mutex_lock(&dev->filelist_mutex);
+    list_add(&priv->lhead, &dev->filelist);
+    mutex_unlock(&dev->filelist_mutex);
 
 #ifdef __alpha__
-	/*
-	 * Default the hose
-	 */
-	if (!dev->hose) {
-		struct pci_dev *pci_dev;
+    /*
+     * Default the hose
+     */
+    if (!dev->hose) {
+        struct pci_dev *pci_dev;
 
-		pci_dev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, NULL);
-		if (pci_dev) {
-			dev->hose = pci_dev->sysdata;
-			pci_dev_put(pci_dev);
-		}
-		if (!dev->hose) {
-			struct pci_bus *b = list_entry(pci_root_buses.next,
-				struct pci_bus, node);
-			if (b)
-				dev->hose = b->sysdata;
-		}
-	}
+        pci_dev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, NULL);
+        if (pci_dev) {
+            dev->hose = pci_dev->sysdata;
+            pci_dev_put(pci_dev);
+        }
+        if (!dev->hose) {
+            struct pci_bus *b = list_entry(pci_root_buses.next,
+                struct pci_bus, node);
+            if (b)
+                dev->hose = b->sysdata;
+        }
+    }
 #endif
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -408,62 +408,62 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
  */
 int drm_open(struct inode *inode, struct file *filp)
 {
-	struct drm_device *dev;
-	struct drm_minor *minor;
-	int retcode;
-	int need_setup = 0;
+    struct drm_device *dev;
+    struct drm_minor *minor;
+    int retcode;
+    int need_setup = 0;
 
-	minor = drm_minor_acquire(iminor(inode));
-	if (IS_ERR(minor))
-		return PTR_ERR(minor);
+    minor = drm_minor_acquire(iminor(inode));
+    if (IS_ERR(minor))
+        return PTR_ERR(minor);
 
-	dev = minor->dev;
-	if (drm_dev_needs_global_mutex(dev))
-		mutex_lock(&drm_global_mutex);
+    dev = minor->dev;
+    if (drm_dev_needs_global_mutex(dev))
+        mutex_lock(&drm_global_mutex);
 
-	if (!atomic_fetch_inc(&dev->open_count))
-		need_setup = 1;
+    if (!atomic_fetch_inc(&dev->open_count))
+        need_setup = 1;
 
-	/* share address_space across all char-devs of a single device */
-	filp->f_mapping = dev->anon_inode->i_mapping;
+    /* share address_space across all char-devs of a single device */
+    filp->f_mapping = dev->anon_inode->i_mapping;
 
-	retcode = drm_open_helper(filp, minor);
-	if (retcode)
-		goto err_undo;
-	if (need_setup) {
-		retcode = drm_legacy_setup(dev);
-		if (retcode) {
-			drm_close_helper(filp);
-			goto err_undo;
-		}
-	}
+    retcode = drm_open_helper(filp, minor);
+    if (retcode)
+        goto err_undo;
+    if (need_setup) {
+        retcode = drm_legacy_setup(dev);
+        if (retcode) {
+            drm_close_helper(filp);
+            goto err_undo;
+        }
+    }
 
-	if (drm_dev_needs_global_mutex(dev))
-		mutex_unlock(&drm_global_mutex);
+    if (drm_dev_needs_global_mutex(dev))
+        mutex_unlock(&drm_global_mutex);
 
-	return 0;
+    return 0;
 
 err_undo:
-	atomic_dec(&dev->open_count);
-	if (drm_dev_needs_global_mutex(dev))
-		mutex_unlock(&drm_global_mutex);
-	drm_minor_release(minor);
-	return retcode;
+    atomic_dec(&dev->open_count);
+    if (drm_dev_needs_global_mutex(dev))
+        mutex_unlock(&drm_global_mutex);
+    drm_minor_release(minor);
+    return retcode;
 }
 EXPORT_SYMBOL(drm_open);
 
 void drm_lastclose(struct drm_device * dev)
 {
-	DRM_DEBUG("\n");
+    DRM_DEBUG("\n");
 
-	if (dev->driver->lastclose)
-		dev->driver->lastclose(dev);
-	DRM_DEBUG("driver lastclose completed\n");
+    if (dev->driver->lastclose)
+        dev->driver->lastclose(dev);
+    DRM_DEBUG("driver lastclose completed\n");
 
-	if (drm_core_check_feature(dev, DRIVER_LEGACY))
-		drm_legacy_dev_reinit(dev);
+    if (drm_core_check_feature(dev, DRIVER_LEGACY))
+        drm_legacy_dev_reinit(dev);
 
-	drm_client_dev_restore(dev);
+    drm_client_dev_restore(dev);
 }
 
 /**
@@ -482,26 +482,26 @@ void drm_lastclose(struct drm_device * dev)
  */
 int drm_release(struct inode *inode, struct file *filp)
 {
-	struct drm_file *file_priv = filp->private_data;
-	struct drm_minor *minor = file_priv->minor;
-	struct drm_device *dev = minor->dev;
+    struct drm_file *file_priv = filp->private_data;
+    struct drm_minor *minor = file_priv->minor;
+    struct drm_device *dev = minor->dev;
 
-	if (drm_dev_needs_global_mutex(dev))
-		mutex_lock(&drm_global_mutex);
+    if (drm_dev_needs_global_mutex(dev))
+        mutex_lock(&drm_global_mutex);
 
-	DRM_DEBUG("open_count = %d\n", atomic_read(&dev->open_count));
+    DRM_DEBUG("open_count = %d\n", atomic_read(&dev->open_count));
 
-	drm_close_helper(filp);
+    drm_close_helper(filp);
 
-	if (atomic_dec_and_test(&dev->open_count))
-		drm_lastclose(dev);
+    if (atomic_dec_and_test(&dev->open_count))
+        drm_lastclose(dev);
 
-	if (drm_dev_needs_global_mutex(dev))
-		mutex_unlock(&drm_global_mutex);
+    if (drm_dev_needs_global_mutex(dev))
+        mutex_unlock(&drm_global_mutex);
 
-	drm_minor_release(minor);
+    drm_minor_release(minor);
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_release);
 
@@ -522,20 +522,20 @@ EXPORT_SYMBOL(drm_release);
  */
 int drm_release_noglobal(struct inode *inode, struct file *filp)
 {
-	struct drm_file *file_priv = filp->private_data;
-	struct drm_minor *minor = file_priv->minor;
-	struct drm_device *dev = minor->dev;
+    struct drm_file *file_priv = filp->private_data;
+    struct drm_minor *minor = file_priv->minor;
+    struct drm_device *dev = minor->dev;
 
-	drm_close_helper(filp);
+    drm_close_helper(filp);
 
-	if (atomic_dec_and_mutex_lock(&dev->open_count, &drm_global_mutex)) {
-		drm_lastclose(dev);
-		mutex_unlock(&drm_global_mutex);
-	}
+    if (atomic_dec_and_mutex_lock(&dev->open_count, &drm_global_mutex)) {
+        drm_lastclose(dev);
+        mutex_unlock(&drm_global_mutex);
+    }
 
-	drm_minor_release(minor);
+    drm_minor_release(minor);
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_release_noglobal);
 
@@ -566,71 +566,77 @@ EXPORT_SYMBOL(drm_release_noglobal);
  * negative error code on failure.
  */
 ssize_t drm_read(struct file *filp, char __user *buffer,
-		 size_t count, loff_t *offset)
+         size_t count, loff_t *offset)
 {
-	struct drm_file *file_priv = filp->private_data;
-	struct drm_device *dev = file_priv->minor->dev;
-	ssize_t ret;
+    struct drm_file *file_priv = filp->private_data;
+    struct drm_device *dev = file_priv->minor->dev;
+    ssize_t ret;
 
-	ret = mutex_lock_interruptible(&file_priv->event_read_lock);
-	if (ret)
-		return ret;
+    ret = mutex_lock_interruptible(&file_priv->event_read_lock);
+    if (ret)
+        return ret;
 
-	for (;;) {
-		struct drm_pending_event *e = NULL;
+    for (;;) {
+        struct drm_pending_event *e = NULL;
 
-		spin_lock_irq(&dev->event_lock);
-		if (!list_empty(&file_priv->event_list)) {
-			e = list_first_entry(&file_priv->event_list,
-					struct drm_pending_event, link);
-			file_priv->event_space += e->event->length;
-			list_del(&e->link);
-		}
-		spin_unlock_irq(&dev->event_lock);
+        spin_lock_irq(&dev->event_lock);
+        if (!list_empty(&file_priv->event_list)) {
+            e = list_first_entry(&file_priv->event_list,
+                    struct drm_pending_event, link);
+            file_priv->event_space += e->event->length;
+            list_del(&e->link);
+        }
+        spin_unlock_irq(&dev->event_lock);
 
-		if (e == NULL) {
-			if (ret)
-				break;
+        if (e == NULL) {
+            if (ret)
+                break;
 
-			if (filp->f_flags & O_NONBLOCK) {
-				ret = -EAGAIN;
-				break;
-			}
+            if (filp->f_flags & O_NONBLOCK) {
+                ret = -EAGAIN;
+                break;
+            }
 
-			mutex_unlock(&file_priv->event_read_lock);
-			ret = wait_event_interruptible(file_priv->event_wait,
-						       !list_empty(&file_priv->event_list));
-			if (ret >= 0)
-				ret = mutex_lock_interruptible(&file_priv->event_read_lock);
-			if (ret)
-				return ret;
-		} else {
-			unsigned length = e->event->length;
+            mutex_unlock(&file_priv->event_read_lock);
+            ret = wait_event_interruptible(file_priv->event_wait,
+                               !list_empty(&file_priv->event_list));
+            if (ret >= 0)
+                ret = mutex_lock_interruptible(&file_priv->event_read_lock);
+            if (ret)
+                return ret;
+        } else {
+            unsigned length = e->event->length;
 
-			if (length > count - ret) {
-put_back_event:
-				spin_lock_irq(&dev->event_lock);
-				file_priv->event_space -= length;
-				list_add(&e->link, &file_priv->event_list);
-				spin_unlock_irq(&dev->event_lock);
-				wake_up_interruptible_poll(&file_priv->event_wait,
-					EPOLLIN | EPOLLRDNORM);
-				break;
-			}
+            if (length > count - ret) {
 
-			if (copy_to_user(buffer + ret, e->event, length)) {
-				if (ret == 0)
-					ret = -EFAULT;
-				goto put_back_event;
-			}
+                spin_lock_irq(&dev->event_lock);
+                file_priv->event_space -= length;
+                list_add(&e->link, &file_priv->event_list);
+                spin_unlock_irq(&dev->event_lock);
+                wake_up_interruptible_poll(&file_priv->event_wait,
+                    EPOLLIN | EPOLLRDNORM);
+                break;
+            }
 
-			ret += length;
-			kfree(e);
-		}
-	}
-	mutex_unlock(&file_priv->event_read_lock);
+            if (copy_to_user(buffer + ret, e->event, length)) {
+                if (ret == 0)
+                    ret = -EFAULT;
+                spin_lock_irq(&dev->event_lock);
+                file_priv->event_space -= length;
+                list_add(&e->link, &file_priv->event_list);
+                spin_unlock_irq(&dev->event_lock);
+                wake_up_interruptible_poll(&file_priv->event_wait,
+                    EPOLLIN | EPOLLRDNORM);
+                break;
+            }
 
-	return ret;
+            ret += length;
+            kfree(e);
+        }
+    }
+    mutex_unlock(&file_priv->event_read_lock);
+
+    return ret;
 }
 EXPORT_SYMBOL(drm_read);
 
@@ -652,15 +658,15 @@ EXPORT_SYMBOL(drm_read);
  */
 __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait)
 {
-	struct drm_file *file_priv = filp->private_data;
-	__poll_t mask = 0;
+    struct drm_file *file_priv = filp->private_data;
+    __poll_t mask = 0;
 
-	poll_wait(filp, &file_priv->event_wait, wait);
+    poll_wait(filp, &file_priv->event_wait, wait);
 
-	if (!list_empty(&file_priv->event_list))
-		mask |= EPOLLIN | EPOLLRDNORM;
+    if (!list_empty(&file_priv->event_list))
+        mask |= EPOLLIN | EPOLLRDNORM;
 
-	return mask;
+    return mask;
 }
 EXPORT_SYMBOL(drm_poll);
 
@@ -689,20 +695,20 @@ EXPORT_SYMBOL(drm_poll);
  * 0 on success or a negative error code on failure.
  */
 int drm_event_reserve_init_locked(struct drm_device *dev,
-				  struct drm_file *file_priv,
-				  struct drm_pending_event *p,
-				  struct drm_event *e)
+                  struct drm_file *file_priv,
+                  struct drm_pending_event *p,
+                  struct drm_event *e)
 {
-	if (file_priv->event_space < e->length)
-		return -ENOMEM;
+    if (file_priv->event_space < e->length)
+        return -ENOMEM;
 
-	file_priv->event_space -= e->length;
+    file_priv->event_space -= e->length;
 
-	p->event = e;
-	list_add(&p->pending_link, &file_priv->pending_event_list);
-	p->file_priv = file_priv;
+    p->event = e;
+    list_add(&p->pending_link, &file_priv->pending_event_list);
+    p->file_priv = file_priv;
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_event_reserve_init_locked);
 
@@ -731,18 +737,18 @@ EXPORT_SYMBOL(drm_event_reserve_init_locked);
  * 0 on success or a negative error code on failure.
  */
 int drm_event_reserve_init(struct drm_device *dev,
-			   struct drm_file *file_priv,
-			   struct drm_pending_event *p,
-			   struct drm_event *e)
+               struct drm_file *file_priv,
+               struct drm_pending_event *p,
+               struct drm_event *e)
 {
-	unsigned long flags;
-	int ret;
+    unsigned long flags;
+    int ret;
 
-	spin_lock_irqsave(&dev->event_lock, flags);
-	ret = drm_event_reserve_init_locked(dev, file_priv, p, e);
-	spin_unlock_irqrestore(&dev->event_lock, flags);
+    spin_lock_irqsave(&dev->event_lock, flags);
+    ret = drm_event_reserve_init_locked(dev, file_priv, p, e);
+    spin_unlock_irqrestore(&dev->event_lock, flags);
 
-	return ret;
+    return ret;
 }
 EXPORT_SYMBOL(drm_event_reserve_init);
 
@@ -756,21 +762,21 @@ EXPORT_SYMBOL(drm_event_reserve_init);
  * nonblocking operation could not be submitted and needed to be aborted.
  */
 void drm_event_cancel_free(struct drm_device *dev,
-			   struct drm_pending_event *p)
+               struct drm_pending_event *p)
 {
-	unsigned long flags;
+    unsigned long flags;
 
-	spin_lock_irqsave(&dev->event_lock, flags);
-	if (p->file_priv) {
-		p->file_priv->event_space += p->event->length;
-		list_del(&p->pending_link);
-	}
-	spin_unlock_irqrestore(&dev->event_lock, flags);
+    spin_lock_irqsave(&dev->event_lock, flags);
+    if (p->file_priv) {
+        p->file_priv->event_space += p->event->length;
+        list_del(&p->pending_link);
+    }
+    spin_unlock_irqrestore(&dev->event_lock, flags);
 
-	if (p->fence)
-		dma_fence_put(p->fence);
+    if (p->fence)
+        dma_fence_put(p->fence);
 
-	kfree(p);
+    kfree(p);
 }
 EXPORT_SYMBOL(drm_event_cancel_free);
 
@@ -787,34 +793,34 @@ EXPORT_SYMBOL(drm_event_cancel_free);
  * sends a valid timestamp.
  */
 void drm_send_event_helper(struct drm_device *dev,
-			   struct drm_pending_event *e, ktime_t timestamp)
+               struct drm_pending_event *e, ktime_t timestamp)
 {
-	assert_spin_locked(&dev->event_lock);
+    assert_spin_locked(&dev->event_lock);
 
-	if (e->completion) {
-		complete_all(e->completion);
-		e->completion_release(e->completion);
-		e->completion = NULL;
-	}
+    if (e->completion) {
+        complete_all(e->completion);
+        e->completion_release(e->completion);
+        e->completion = NULL;
+    }
 
-	if (e->fence) {
-		if (timestamp)
-			dma_fence_signal_timestamp(e->fence, timestamp);
-		else
-			dma_fence_signal(e->fence);
-		dma_fence_put(e->fence);
-	}
+    if (e->fence) {
+        if (timestamp)
+            dma_fence_signal_timestamp(e->fence, timestamp);
+        else
+            dma_fence_signal(e->fence);
+        dma_fence_put(e->fence);
+    }
 
-	if (!e->file_priv) {
-		kfree(e);
-		return;
-	}
+    if (!e->file_priv) {
+        kfree(e);
+        return;
+    }
 
-	list_del(&e->pending_link);
-	list_add_tail(&e->link,
-		      &e->file_priv->event_list);
-	wake_up_interruptible_poll(&e->file_priv->event_wait,
-		EPOLLIN | EPOLLRDNORM);
+    list_del(&e->pending_link);
+    list_add_tail(&e->link,
+              &e->file_priv->event_list);
+    wake_up_interruptible_poll(&e->file_priv->event_wait,
+        EPOLLIN | EPOLLRDNORM);
 }
 
 /**
@@ -834,9 +840,9 @@ void drm_send_event_helper(struct drm_device *dev,
  * completion of the asynchronous work unconditionally.
  */
 void drm_send_event_timestamp_locked(struct drm_device *dev,
-				     struct drm_pending_event *e, ktime_t timestamp)
+                     struct drm_pending_event *e, ktime_t timestamp)
 {
-	drm_send_event_helper(dev, e, timestamp);
+    drm_send_event_helper(dev, e, timestamp);
 }
 EXPORT_SYMBOL(drm_send_event_timestamp_locked);
 
@@ -856,7 +862,7 @@ EXPORT_SYMBOL(drm_send_event_timestamp_locked);
  */
 void drm_send_event_locked(struct drm_device *dev, struct drm_pending_event *e)
 {
-	drm_send_event_helper(dev, e, 0);
+    drm_send_event_helper(dev, e, 0);
 }
 EXPORT_SYMBOL(drm_send_event_locked);
 
@@ -877,11 +883,11 @@ EXPORT_SYMBOL(drm_send_event_locked);
  */
 void drm_send_event(struct drm_device *dev, struct drm_pending_event *e)
 {
-	unsigned long irqflags;
+    unsigned long irqflags;
 
-	spin_lock_irqsave(&dev->event_lock, irqflags);
-	drm_send_event_helper(dev, e, 0);
-	spin_unlock_irqrestore(&dev->event_lock, irqflags);
+    spin_lock_irqsave(&dev->event_lock, irqflags);
+    drm_send_event_helper(dev, e, 0);
+    spin_unlock_irqrestore(&dev->event_lock, irqflags);
 }
 EXPORT_SYMBOL(drm_send_event);
 
@@ -901,27 +907,27 @@ EXPORT_SYMBOL(drm_send_event);
  */
 struct file *mock_drm_getfile(struct drm_minor *minor, unsigned int flags)
 {
-	struct drm_device *dev = minor->dev;
-	struct drm_file *priv;
-	struct file *file;
+    struct drm_device *dev = minor->dev;
+    struct drm_file *priv;
+    struct file *file;
 
-	priv = drm_file_alloc(minor);
-	if (IS_ERR(priv))
-		return ERR_CAST(priv);
+    priv = drm_file_alloc(minor);
+    if (IS_ERR(priv))
+        return ERR_CAST(priv);
 
-	file = anon_inode_getfile("drm", dev->driver->fops, priv, flags);
-	if (IS_ERR(file)) {
-		drm_file_free(priv);
-		return file;
-	}
+    file = anon_inode_getfile("drm", dev->driver->fops, priv, flags);
+    if (IS_ERR(file)) {
+        drm_file_free(priv);
+        return file;
+    }
 
-	/* Everyone shares a single global address space */
-	file->f_mapping = dev->anon_inode->i_mapping;
+    /* Everyone shares a single global address space */
+    file->f_mapping = dev->anon_inode->i_mapping;
 
-	drm_dev_get(dev);
-	priv->filp = file;
+    drm_dev_get(dev);
+    priv->filp = file;
 
-	return file;
+    return file;
 }
 EXPORT_SYMBOL_FOR_TESTS_ONLY(mock_drm_getfile);
 
@@ -933,43 +939,43 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(mock_drm_getfile);
  * adapted from shmem_get_unmapped_area()
  */
 static unsigned long drm_addr_inflate(unsigned long addr,
-				      unsigned long len,
-				      unsigned long pgoff,
-				      unsigned long flags,
-				      unsigned long huge_size)
+                      unsigned long len,
+                      unsigned long pgoff,
+                      unsigned long flags,
+                      unsigned long huge_size)
 {
-	unsigned long offset, inflated_len;
-	unsigned long inflated_addr;
-	unsigned long inflated_offset;
+    unsigned long offset, inflated_len;
+    unsigned long inflated_addr;
+    unsigned long inflated_offset;
 
-	offset = (pgoff << PAGE_SHIFT) & (huge_size - 1);
-	if (offset && offset + len < 2 * huge_size)
-		return addr;
-	if ((addr & (huge_size - 1)) == offset)
-		return addr;
+    offset = (pgoff << PAGE_SHIFT) & (huge_size - 1);
+    if (offset && offset + len < 2 * huge_size)
+        return addr;
+    if ((addr & (huge_size - 1)) == offset)
+        return addr;
 
-	inflated_len = len + huge_size - PAGE_SIZE;
-	if (inflated_len > TASK_SIZE)
-		return addr;
-	if (inflated_len < len)
-		return addr;
+    inflated_len = len + huge_size - PAGE_SIZE;
+    if (inflated_len > TASK_SIZE)
+        return addr;
+    if (inflated_len < len)
+        return addr;
 
-	inflated_addr = current->mm->get_unmapped_area(NULL, 0, inflated_len,
-						       0, flags);
-	if (IS_ERR_VALUE(inflated_addr))
-		return addr;
-	if (inflated_addr & ~PAGE_MASK)
-		return addr;
+    inflated_addr = current->mm->get_unmapped_area(NULL, 0, inflated_len,
+                               0, flags);
+    if (IS_ERR_VALUE(inflated_addr))
+        return addr;
+    if (inflated_addr & ~PAGE_MASK)
+        return addr;
 
-	inflated_offset = inflated_addr & (huge_size - 1);
-	inflated_addr += offset - inflated_offset;
-	if (inflated_offset > offset)
-		inflated_addr += huge_size;
+    inflated_offset = inflated_addr & (huge_size - 1);
+    inflated_addr += offset - inflated_offset;
+    if (inflated_offset > offset)
+        inflated_addr += huge_size;
 
-	if (inflated_addr > TASK_SIZE - len)
-		return addr;
+    if (inflated_addr > TASK_SIZE - len)
+        return addr;
 
-	return inflated_addr;
+    return inflated_addr;
 }
 
 /**
@@ -995,67 +1001,67 @@ static unsigned long drm_addr_inflate(unsigned long addr,
  * Return: aligned user-space address.
  */
 unsigned long drm_get_unmapped_area(struct file *file,
-				    unsigned long uaddr, unsigned long len,
-				    unsigned long pgoff, unsigned long flags,
-				    struct drm_vma_offset_manager *mgr)
+                    unsigned long uaddr, unsigned long len,
+                    unsigned long pgoff, unsigned long flags,
+                    struct drm_vma_offset_manager *mgr)
 {
-	unsigned long addr;
-	unsigned long inflated_addr;
-	struct drm_vma_offset_node *node;
+    unsigned long addr;
+    unsigned long inflated_addr;
+    struct drm_vma_offset_node *node;
 
-	if (len > TASK_SIZE)
-		return -ENOMEM;
+    if (len > TASK_SIZE)
+        return -ENOMEM;
 
-	/*
-	 * @pgoff is the file page-offset the huge page boundaries of
-	 * which typically aligns to physical address huge page boundaries.
-	 * That's not true for DRM, however, where physical address huge
-	 * page boundaries instead are aligned with the offset from
-	 * buffer object start. So adjust @pgoff to be the offset from
-	 * buffer object start.
-	 */
-	drm_vma_offset_lock_lookup(mgr);
-	node = drm_vma_offset_lookup_locked(mgr, pgoff, 1);
-	if (node)
-		pgoff -= node->vm_node.start;
-	drm_vma_offset_unlock_lookup(mgr);
+    /*
+     * @pgoff is the file page-offset the huge page boundaries of
+     * which typically aligns to physical address huge page boundaries.
+     * That's not true for DRM, however, where physical address huge
+     * page boundaries instead are aligned with the offset from
+     * buffer object start. So adjust @pgoff to be the offset from
+     * buffer object start.
+     */
+    drm_vma_offset_lock_lookup(mgr);
+    node = drm_vma_offset_lookup_locked(mgr, pgoff, 1);
+    if (node)
+        pgoff -= node->vm_node.start;
+    drm_vma_offset_unlock_lookup(mgr);
 
-	addr = current->mm->get_unmapped_area(file, uaddr, len, pgoff, flags);
-	if (IS_ERR_VALUE(addr))
-		return addr;
-	if (addr & ~PAGE_MASK)
-		return addr;
-	if (addr > TASK_SIZE - len)
-		return addr;
+    addr = current->mm->get_unmapped_area(file, uaddr, len, pgoff, flags);
+    if (IS_ERR_VALUE(addr))
+        return addr;
+    if (addr & ~PAGE_MASK)
+        return addr;
+    if (addr > TASK_SIZE - len)
+        return addr;
 
-	if (len < HPAGE_PMD_SIZE)
-		return addr;
-	if (flags & MAP_FIXED)
-		return addr;
-	/*
-	 * Our priority is to support MAP_SHARED mapped hugely;
-	 * and support MAP_PRIVATE mapped hugely too, until it is COWed.
-	 * But if caller specified an address hint, respect that as before.
-	 */
-	if (uaddr)
-		return addr;
+    if (len < HPAGE_PMD_SIZE)
+        return addr;
+    if (flags & MAP_FIXED)
+        return addr;
+    /*
+     * Our priority is to support MAP_SHARED mapped hugely;
+     * and support MAP_PRIVATE mapped hugely too, until it is COWed.
+     * But if caller specified an address hint, respect that as before.
+     */
+    if (uaddr)
+        return addr;
 
-	inflated_addr = drm_addr_inflate(addr, len, pgoff, flags,
-					 HPAGE_PMD_SIZE);
+    inflated_addr = drm_addr_inflate(addr, len, pgoff, flags,
+                     HPAGE_PMD_SIZE);
 
-	if (IS_ENABLED(CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD) &&
-	    len >= HPAGE_PUD_SIZE)
-		inflated_addr = drm_addr_inflate(inflated_addr, len, pgoff,
-						 flags, HPAGE_PUD_SIZE);
-	return inflated_addr;
+    if (IS_ENABLED(CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD) &&
+        len >= HPAGE_PUD_SIZE)
+        inflated_addr = drm_addr_inflate(inflated_addr, len, pgoff,
+                         flags, HPAGE_PUD_SIZE);
+    return inflated_addr;
 }
 #else /* CONFIG_TRANSPARENT_HUGEPAGE */
 unsigned long drm_get_unmapped_area(struct file *file,
-				    unsigned long uaddr, unsigned long len,
-				    unsigned long pgoff, unsigned long flags,
-				    struct drm_vma_offset_manager *mgr)
+                    unsigned long uaddr, unsigned long len,
+                    unsigned long pgoff, unsigned long flags,
+                    struct drm_vma_offset_manager *mgr)
 {
-	return current->mm->get_unmapped_area(file, uaddr, len, pgoff, flags);
+    return current->mm->get_unmapped_area(file, uaddr, len, pgoff, flags);
 }
 #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
 EXPORT_SYMBOL_GPL(drm_get_unmapped_area);

@@ -25,26 +25,26 @@
  * otherwise it will fail to setup tracepoints correctly
  */
 
-#if !defined(_KBASE_DEBUG_LINUX_KTRACE_H_) || defined(TRACE_HEADER_MULTI_READ)
-#define _KBASE_DEBUG_LINUX_KTRACE_H_
+#if !defined(KBASE_DEBUG_LINUX_KTRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+#define KBASE_DEBUG_LINUX_KTRACE_H
 
 #if KBASE_KTRACE_TARGET_FTRACE
 
 DECLARE_EVENT_CLASS(mali_add_template,
-	TP_PROTO(struct kbase_context *kctx, u64 info_val),
-	TP_ARGS(kctx, info_val),
-	TP_STRUCT__entry(
-		__field(pid_t, kctx_tgid)
-		__field(u32, kctx_id)
-		__field(u64, info_val)
-	),
-	TP_fast_assign(
-		__entry->kctx_id = (kctx) ? kctx->id : 0u;
-		__entry->kctx_tgid = (kctx) ? kctx->tgid : 0;
-		__entry->info_val = info_val;
-	),
-	TP_printk("kctx=%d_%u info=0x%llx", __entry->kctx_tgid,
-			__entry->kctx_id, __entry->info_val)
+    TP_PROTO(struct kbase_context *kctx, u64 info_val),
+    TP_ARGS(kctx, info_val),
+    TP_STRUCT__entry(
+        __field(pid_t, kctx_tgid)
+        __field(u32, kctx_id)
+        __field(u64, info_val)
+    ),
+    TP_fast_assign(
+        __entry->kctx_id = (kctx) ? kctx->id : 0u;
+        __entry->kctx_tgid = (kctx) ? kctx->tgid : 0;
+        __entry->info_val = info_val;
+    ),
+    TP_printk("kctx=%d_%u info=0x%llx", __entry->kctx_tgid,
+            __entry->kctx_id, __entry->info_val)
 );
 
 /* DEFINE_MALI_ADD_EVENT is available also to backends for backend-specific
@@ -52,8 +52,8 @@ DECLARE_EVENT_CLASS(mali_add_template,
  */
 #define DEFINE_MALI_ADD_EVENT(name) \
 DEFINE_EVENT(mali_add_template, mali_##name, \
-	TP_PROTO(struct kbase_context *kctx, u64 info_val), \
-	TP_ARGS(kctx, info_val))
+    TP_PROTO(struct kbase_context *kctx, u64 info_val), \
+    TP_ARGS(kctx, info_val))
 DEFINE_MALI_ADD_EVENT(CORE_CTX_DESTROY);
 DEFINE_MALI_ADD_EVENT(CORE_CTX_HWINSTR_TERM);
 DEFINE_MALI_ADD_EVENT(CORE_GPU_IRQ);

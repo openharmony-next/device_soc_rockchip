@@ -19,7 +19,7 @@
  *          v1.0
  *  ----------------------------------------------------------------------------
  *  Log:
-	----Fri Nov 19 15:20:28 2010            v1.0
+    ----Fri Nov 19 15:20:28 2010            v1.0
  *
  *  ----------------------------------------------------------------------------
  */
@@ -51,12 +51,12 @@ extern "C" {
 #ifdef ENABLE_VERBOSE_LOG
 /** Verbose log. */
 #define V(fmt, args...) \
-	pr_debug("V : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
-			"\n",	\
-		__FILE__,	\
-		__LINE__,	\
-		__func__,	\
-		## args)
+    pr_debug("V : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
+            "\n",    \
+        __FILE__,    \
+        __LINE__,    \
+        __func__,    \
+        ## args)
 #else
 #define  V(...)  ((void)0)
 #endif
@@ -64,39 +64,39 @@ extern "C" {
 #ifdef ENABLE_DEBUG_LOG
 /** Debug log. */
 #define D(fmt, args...) \
-	pr_info("D : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
-			"\n",	\
-		__FILE__,	\
-		__LINE__,	\
-		__func__,	\
-		## args)
+    pr_info("D : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
+            "\n",    \
+        __FILE__,    \
+        __LINE__,    \
+        __func__,    \
+        ## args)
 #else
 #define  D(...)  ((void)0)
 #endif
 
 #define I(fmt, args...) \
-	pr_info("I : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
-			"\n", \
-		__FILE__, \
-		__LINE__, \
-		__func__, \
-		## args)
+    pr_info("I : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
+            "\n", \
+        __FILE__, \
+        __LINE__, \
+        __func__, \
+        ## args)
 
 #define W(fmt, args...) \
-	pr_warn("W : [File] : %s; [Line] : %d; [Func] : %s(); " \
-			fmt "\n", \
-		__FILE__, \
-		__LINE__, \
-		__func__, \
-		## args)
+    pr_warn("W : [File] : %s; [Line] : %d; [Func] : %s(); " \
+            fmt "\n", \
+        __FILE__, \
+        __LINE__, \
+        __func__, \
+        ## args)
 
 #define E(fmt, args...) \
-	pr_err("E : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
-			"\n", \
-		__FILE__, \
-		__LINE__, \
-		__func__, \
-		## args)
+    pr_err("E : [File] : %s; [Line] : %d; [Func] : %s(); " fmt \
+            "\n", \
+        __FILE__, \
+        __LINE__, \
+        __func__, \
+        ## args)
 
 /*-------------------------------------------------------*/
 
@@ -121,18 +121,18 @@ extern "C" {
 /** 使用 D(), 打印 char 字串. */
 #define D_STR(p_str) \
 do { \
-	if (!p_str) { \
-		D(#p_str " = NULL."); \
-	else \
-		D(#p_str " = '%s'.", p_str); \
+    if (!p_str) { \
+        D(#p_str " = NULL."); \
+    else \
+        D(#p_str " = '%s'.", p_str); \
 } while (0)
 
 #define E_STR(p_str) \
 do { \
-	if (!p_str) \
-		E(#p_str " = NULL."); \
-	else \
-		E(#p_str " = '%s'.", p_str); \
+    if (!p_str) \
+        E(#p_str " = NULL."); \
+    else \
+        E(#p_str " = '%s'.", p_str); \
 } while (0)
 
 #ifdef ENABLE_DEBUG_LOG
@@ -141,15 +141,15 @@ do { \
  */
 #define D_MEM(p_start, len) \
 do { \
-	int i = 0; \
-	char *p = (char *)(p_start); \
-	D("dump memory from addr of '" #p_start "', from %p, length %d' : ", \
-		(p_start), \
-		(len)); \
-	pr_debug("\t\t"); \
-	for (i = 0; i < (len); i++) \
-		pr_debug("0x%02x, ", p[i]); \
-	pr_debug("\n"); \
+    int i = 0; \
+    char *p = (char *)(p_start); \
+    D("dump memory from addr of '" #p_start "', from %p, length %d' : ", \
+        (p_start), \
+        (len)); \
+    pr_debug("\t\t"); \
+    for (i = 0; i < (len); i++) \
+        pr_debug("0x%02x, ", p[i]); \
+    pr_debug("\n"); \
 } while (0)
 #else
 #define  D_MEM(...)  ((void)0)
@@ -163,14 +163,14 @@ do { \
  * log 输出对应的 Error Caution,
  * 然后跳转 'label' 指定的代码处执行.
  * @param msg
- *	纯字串形式的提示信息.
+ *    纯字串形式的提示信息.
  * @param ret_var
- *	标识函数执行状态或者结果的变量,
- *	将被设置具体的 Error Code.
- *	通常是 'ret' or 'result'.
+ *    标识函数执行状态或者结果的变量,
+ *    将被设置具体的 Error Code.
+ *    通常是 'ret' or 'result'.
  * @param err_code
- *	表征特定 error 的常数标识,
- *	通常是 宏的形态.
+ *    表征特定 error 的常数标识,
+ *    通常是 宏的形态.
  * @param label
  *      程序将要跳转到的错误处理代码的标号,
  *      通常就是 'EXIT'.
@@ -180,11 +180,11 @@ do { \
  */
 #define SET_ERROR_AND_JUMP(msg_fmt, ret_var, err_code, label, args...) \
 do { \
-	E("To set '" #ret_var "' to %d('" #err_code "'), because : " msg_fmt, \
-		(err_code), \
-		## args); \
-	(ret_var) = (err_code); \
-	goto label; \
+    E("To set '" #ret_var "' to %d('" #err_code "'), because : " msg_fmt, \
+        (err_code), \
+        ## args); \
+    (ret_var) = (err_code); \
+    goto label; \
 } while (0)
 
 /* -----------------------------------------------------------------------------

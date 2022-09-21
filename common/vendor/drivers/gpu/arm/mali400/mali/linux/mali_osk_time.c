@@ -20,40 +20,40 @@
 
 mali_bool _mali_osk_time_after_eq(unsigned long ticka, unsigned long tickb)
 {
-	return time_after_eq(ticka, tickb) ?
-	       MALI_TRUE : MALI_FALSE;
+    return time_after_eq(ticka, tickb) ?
+           MALI_TRUE : MALI_FALSE;
 }
 
 unsigned long _mali_osk_time_mstoticks(u32 ms)
 {
-	return msecs_to_jiffies(ms);
+    return msecs_to_jiffies(ms);
 }
 
 u32 _mali_osk_time_tickstoms(unsigned long ticks)
 {
-	return jiffies_to_msecs(ticks);
+    return jiffies_to_msecs(ticks);
 }
 
 unsigned long _mali_osk_time_tickcount(void)
 {
-	return jiffies;
+    return jiffies;
 }
 
 void _mali_osk_time_ubusydelay(u32 usecs)
 {
-	udelay(usecs);
+    udelay(usecs);
 }
 
 u64 _mali_osk_time_get_ns(void)
 {
-	struct timespec64 tsval;
-	ktime_get_real_ts64(&tsval);
-	return (u64)timespec64_to_ns(&tsval);
+    struct timespec64 tsval;
+    ktime_get_real_ts64(&tsval);
+    return (u64)timespec64_to_ns(&tsval);
 }
 
 u64 _mali_osk_boot_time_get_ns(void)
 {
-	struct timespec64 tsval;
-	ktime_get_boottime_ts64(&tsval);
-	return (u64)timespec64_to_ns(&tsval);
+    struct timespec64 tsval;
+    ktime_get_boottime_ts64(&tsval);
+    return (u64)timespec64_to_ns(&tsval);
 }

@@ -40,9 +40,9 @@ struct kbase_context;
  * reservation objects.
  */
 struct kbase_dma_fence_resv_info {
-	struct reservation_object **resv_objs;
-	unsigned int dma_fence_resv_count;
-	unsigned long *dma_fence_excl_bitmap;
+    struct reservation_object **resv_objs;
+    unsigned int dma_fence_resv_count;
+    unsigned long *dma_fence_excl_bitmap;
 };
 
 /**
@@ -56,8 +56,8 @@ struct kbase_dma_fence_resv_info {
  * exclusive access in dma_fence_excl_bitmap.
  */
 void kbase_dma_fence_add_reservation(struct reservation_object *resv,
-				     struct kbase_dma_fence_resv_info *info,
-				     bool exclusive);
+                     struct kbase_dma_fence_resv_info *info,
+                     bool exclusive);
 
 /**
  * kbase_dma_fence_wait() - Creates a new fence and attaches it to the resv_objs
@@ -67,7 +67,7 @@ void kbase_dma_fence_add_reservation(struct reservation_object *resv,
  * Return: An error code or 0 if succeeds
  */
 int kbase_dma_fence_wait(struct kbase_jd_atom *katom,
-			 struct kbase_dma_fence_resv_info *info);
+             struct kbase_dma_fence_resv_info *info);
 
 /**
  * kbase_dma_fence_cancel_ctx() - Cancel all dma-fences blocked atoms on kctx
@@ -123,7 +123,7 @@ int kbase_dma_fence_init(struct kbase_context *kctx);
 
 static inline int kbase_dma_fence_init(struct kbase_context *kctx)
 {
-	return 0;
+    return 0;
 }
 
 static inline void kbase_dma_fence_term(struct kbase_context *kctx) {}

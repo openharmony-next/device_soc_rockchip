@@ -37,80 +37,74 @@
  * DESCRIBED IN mali_kbase_debug_ktrace_codes.h
  */
 
-#if 0 /* Dummy section to avoid breaking formatting */
-int dummy_array[] = {
-#endif
-	/*
-	 * Generic CSF events
-	 */
-	KBASE_KTRACE_CODE_MAKE_CODE(EVICT_CTX_SLOTS),
-	/* info_val[0:7]   == fw version_minor
-	 * info_val[15:8]  == fw version_major
-	 * info_val[63:32] == fw version_hash
-	 */
-	KBASE_KTRACE_CODE_MAKE_CODE(FIRMWARE_BOOT),
-	KBASE_KTRACE_CODE_MAKE_CODE(FIRMWARE_REBOOT),
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TOCK),
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TICK),
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_RESET),
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_EXIT_PROTM),
-	KBASE_KTRACE_CODE_MAKE_CODE(SYNC_UPDATE_EVENT),
+/*
+* Generic CSF events
+*/
+KBASE_KTRACE_CODE_MAKE_CODE(EVICT_CTX_SLOTS),
+/* info_val[0:7]   == fw version_minor
+* info_val[15:8]  == fw version_major
+* info_val[63:32] == fw version_hash
+*/
+KBASE_KTRACE_CODE_MAKE_CODE(FIRMWARE_BOOT),
+KBASE_KTRACE_CODE_MAKE_CODE(FIRMWARE_REBOOT),
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TOCK),
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TICK),
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_RESET),
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_EXIT_PROTM),
+KBASE_KTRACE_CODE_MAKE_CODE(SYNC_UPDATE_EVENT),
 
-	/*
-	 * Group events
-	 */
-	/* info_val[2:0] == CSG_REQ state issued
-	 * info_val[19:16] == as_nr
-	 * info_val[63:32] == endpoint config (max number of endpoints allowed)
-	 */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_START),
-	/* info_val == CSG_REQ state issued */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STOP),
-	/* info_val == CSG_ACK state */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STARTED),
-	/* info_val == CSG_ACK state */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STOPPED),
-	/* info_val == slot cleaned */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_CLEANED),
-	/* info_val == previous priority */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_PRIO_UPDATE),
-	/* info_val == CSG_REQ ^ CSG_ACK */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_SYNC_UPDATE_INTERRUPT),
-	/* info_val == CSG_REQ ^ CSG_ACK */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSG_IDLE_INTERRUPT),
-	KBASE_KTRACE_CODE_MAKE_CODE(GROUP_SYNC_UPDATE_DONE),
-	/* info_val == run state of the group */
-	KBASE_KTRACE_CODE_MAKE_CODE(GROUP_DESCHEDULE),
-	/* info_val == run state of the group */
-	KBASE_KTRACE_CODE_MAKE_CODE(GROUP_SCHEDULE),
-	/* info_val[31:0] == new run state of the evicted group
-	 * info_val[63:32] == number of runnable groups
-	 */
-	KBASE_KTRACE_CODE_MAKE_CODE(GROUP_EVICT_SCHED),
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_ENTER_PROTM),
-	/* info_val[31:0] == number of GPU address space slots in use
-	 * info_val[63:32] == number of runnable groups
-	 */
-	KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TOP_GRP),
+/*
+* Group events
+*/
+/* info_val[2:0] == CSG_REQ state issued
+* info_val[19:16] == as_nr
+* info_val[63:32] == endpoint config (max number of endpoints allowed)
+*/
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_START),
+/* info_val == CSG_REQ state issued */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STOP),
+/* info_val == CSG_ACK state */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STARTED),
+/* info_val == CSG_ACK state */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_STOPPED),
+/* info_val == slot cleaned */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SLOT_CLEANED),
+/* info_val == previous priority */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_PRIO_UPDATE),
+/* info_val == CSG_REQ ^ CSG_ACK */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_SYNC_UPDATE_INTERRUPT),
+/* info_val == CSG_REQ ^ CSG_ACK */
+KBASE_KTRACE_CODE_MAKE_CODE(CSG_IDLE_INTERRUPT),
+KBASE_KTRACE_CODE_MAKE_CODE(GROUP_SYNC_UPDATE_DONE),
+/* info_val == run state of the group */
+KBASE_KTRACE_CODE_MAKE_CODE(GROUP_DESCHEDULE),
+/* info_val == run state of the group */
+KBASE_KTRACE_CODE_MAKE_CODE(GROUP_SCHEDULE),
+/* info_val[31:0] == new run state of the evicted group
+* info_val[63:32] == number of runnable groups
+*/
+KBASE_KTRACE_CODE_MAKE_CODE(GROUP_EVICT_SCHED),
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_ENTER_PROTM),
+/* info_val[31:0] == number of GPU address space slots in use
+* info_val[63:32] == number of runnable groups
+*/
+KBASE_KTRACE_CODE_MAKE_CODE(SCHEDULER_TOP_GRP),
 
-	/*
-	 * Group + Queue events
-	 */
-	/* info_val == queue->enabled */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSI_START),
-	/* info_val == queue->enabled before stop */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSI_STOP),
-	KBASE_KTRACE_CODE_MAKE_CODE(CSI_STOP_REQUESTED),
-	/* info_val == CS_REQ ^ CS_ACK */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSI_FAULT_INTERRUPT),
-	/* info_val == CS_REQ ^ CS_ACK */
-	KBASE_KTRACE_CODE_MAKE_CODE(CSI_TILER_OOM_INTERRUPT),
-	/* info_val == group->run_State (for group the queue is bound to) */
-	KBASE_KTRACE_CODE_MAKE_CODE(QUEUE_START),
-	KBASE_KTRACE_CODE_MAKE_CODE(QUEUE_STOP),
+/*
+* Group + Queue events
+*/
+/* info_val == queue->enabled */
+KBASE_KTRACE_CODE_MAKE_CODE(CSI_START),
+/* info_val == queue->enabled before stop */
+KBASE_KTRACE_CODE_MAKE_CODE(CSI_STOP),
+KBASE_KTRACE_CODE_MAKE_CODE(CSI_STOP_REQUESTED),
+/* info_val == CS_REQ ^ CS_ACK */
+KBASE_KTRACE_CODE_MAKE_CODE(CSI_FAULT_INTERRUPT),
+/* info_val == CS_REQ ^ CS_ACK */
+KBASE_KTRACE_CODE_MAKE_CODE(CSI_TILER_OOM_INTERRUPT),
+/* info_val == group->run_State (for group the queue is bound to) */
+KBASE_KTRACE_CODE_MAKE_CODE(QUEUE_START),
+KBASE_KTRACE_CODE_MAKE_CODE(QUEUE_STOP),
 
-#if 0 /* Dummy section to avoid breaking formatting */
-};
-#endif
 
 /* ***** THE LACK OF HEADER GUARDS IS INTENTIONAL ***** */

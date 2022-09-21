@@ -28,7 +28,7 @@
  * @seqno: the sequence number of this fence inside the execution context
  */
 struct fence *drm_sw_fence_new(unsigned int context,
-			unsigned seqno);
+            unsigned seqno);
 
 /**
  * Signal and decrease reference count for a fence if it exists
@@ -39,19 +39,19 @@ struct fence *drm_sw_fence_new(unsigned int context,
  */
 static inline void drm_fence_signal_and_put(struct fence **fence)
 {
-	if (*fence) {
-		fence_signal(*fence);
-		fence_put(*fence);
-		*fence = NULL;
-	}
+    if (*fence) {
+        fence_signal(*fence);
+        fence_put(*fence);
+        *fence = NULL;
+    }
 }
 
 struct drm_reservation_cb;
 
 struct drm_reservation_fence_cb {
-	struct fence_cb base;
-	struct drm_reservation_cb *parent;
-	struct fence *fence;
+    struct fence_cb base;
+    struct drm_reservation_cb *parent;
+    struct fence *fence;
 };
 
 /**
@@ -60,7 +60,7 @@ struct drm_reservation_fence_cb {
  * @context: context provided by user at init time
  */
 typedef void (*drm_reservation_cb_func_t)(struct drm_reservation_cb *rcb,
-					  void *context);
+                      void *context);
 
 /**
  * Reservation callback structure
@@ -75,12 +75,12 @@ typedef void (*drm_reservation_cb_func_t)(struct drm_reservation_cb *rcb,
  * returning.
  */
 struct drm_reservation_cb {
-	struct work_struct work;
-	struct drm_reservation_fence_cb **fence_cbs;
-	unsigned num_fence_cbs;
-	atomic_t count;
-	void *context;
-	drm_reservation_cb_func_t func;
+    struct work_struct work;
+    struct drm_reservation_fence_cb **fence_cbs;
+    unsigned num_fence_cbs;
+    atomic_t count;
+    void *context;
+    drm_reservation_cb_func_t func;
 };
 
 /**
@@ -90,8 +90,8 @@ struct drm_reservation_cb {
  * @context: parameter to call func with
  */
 void drm_reservation_cb_init(struct drm_reservation_cb *rcb,
-			     drm_reservation_cb_func_t func,
-			     void *context);
+                 drm_reservation_cb_func_t func,
+                 void *context);
 
 /**
  * Add fences from reservation object to callback
@@ -101,8 +101,8 @@ void drm_reservation_cb_init(struct drm_reservation_cb *rcb,
  *    exclusive fence
  */
 int drm_reservation_cb_add(struct drm_reservation_cb *rcb,
-			   struct reservation_object *resv,
-			   bool exclusive);
+               struct reservation_object *resv,
+               bool exclusive);
 
 /**
  * Finish adding fences
@@ -130,9 +130,9 @@ void drm_reservation_cb_fini(struct drm_reservation_cb *rcb);
  */
 void
 drm_add_reservation(struct reservation_object *resv,
-			struct reservation_object **resvs,
-			unsigned long *excl_resvs_bitmap,
-			unsigned int *num_resvs, bool exclusive);
+            struct reservation_object **resvs,
+            unsigned long *excl_resvs_bitmap,
+            unsigned int *num_resvs, bool exclusive);
 
 /**
  * Acquire ww_mutex lock on all reservations in the array
@@ -141,7 +141,7 @@ drm_add_reservation(struct reservation_object *resv,
  * @ctx: ww mutex context
  */
 int drm_lock_reservations(struct reservation_object **resvs,
-			unsigned int num_resvs, struct ww_acquire_ctx *ctx);
+            unsigned int num_resvs, struct ww_acquire_ctx *ctx);
 
 /**
  * Release ww_mutex lock on all reservations in the array
@@ -150,7 +150,7 @@ int drm_lock_reservations(struct reservation_object **resvs,
  * @ctx: ww mutex context
  */
 void drm_unlock_reservations(struct reservation_object **resvs,
-				unsigned int num_resvs,
-				struct ww_acquire_ctx *ctx);
+                unsigned int num_resvs,
+                struct ww_acquire_ctx *ctx);
 
 #endif

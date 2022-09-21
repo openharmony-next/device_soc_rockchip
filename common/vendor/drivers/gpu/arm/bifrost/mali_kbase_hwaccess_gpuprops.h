@@ -44,16 +44,16 @@
 
 /**
  * kbase_backend_gpuprops_get() - Fill @regdump with GPU properties read from
- *				  GPU
- * @kbdev:	Device pointer
- * @regdump:	Pointer to struct kbase_gpuprops_regdump structure
+ *                  GPU
+ * @kbdev:    Device pointer
+ * @regdump:    Pointer to struct kbase_gpuprops_regdump structure
  *
  * The caller should ensure that GPU remains powered-on during this function.
  *
  * Return: Zero for succeess or a Linux error code
  */
 int kbase_backend_gpuprops_get(struct kbase_device *kbdev,
-					struct kbase_gpuprops_regdump *regdump);
+                    struct kbase_gpuprops_regdump *regdump);
 
 /**
  * kbase_backend_gpuprops_get_features - Fill @regdump with GPU properties read
@@ -67,7 +67,7 @@ int kbase_backend_gpuprops_get(struct kbase_device *kbdev,
  * Return: Zero for succeess or a Linux error code
  */
 int kbase_backend_gpuprops_get_features(struct kbase_device *kbdev,
-					struct kbase_gpuprops_regdump *regdump);
+                    struct kbase_gpuprops_regdump *regdump);
 
 /**
  * kbase_backend_gpuprops_get_l2_features - Fill @regdump with L2_FEATURES read
@@ -81,7 +81,7 @@ int kbase_backend_gpuprops_get_features(struct kbase_device *kbdev,
  * Return: Zero on success, Linux error code on failure
  */
 int kbase_backend_gpuprops_get_l2_features(struct kbase_device *kbdev,
-					struct kbase_gpuprops_regdump *regdump);
+                    struct kbase_gpuprops_regdump *regdump);
 
 
 #endif /* _KBASE_HWACCESS_GPUPROPS_H_ */

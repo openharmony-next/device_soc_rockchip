@@ -29,8 +29,8 @@
  * be provided.
  */
 
-#ifndef _KBASE_MMU_HW_H_
-#define _KBASE_MMU_HW_H_
+#ifndef KBASE_MMU_HW_H
+#define KBASE_MMU_HW_H
 
 /* Forward declarations */
 struct kbase_device;
@@ -41,11 +41,11 @@ struct kbase_context;
  * enum kbase_mmu_fault_type - MMU fault type descriptor.
  */
 enum kbase_mmu_fault_type {
-	KBASE_MMU_FAULT_TYPE_UNKNOWN = 0,
-	KBASE_MMU_FAULT_TYPE_PAGE,
-	KBASE_MMU_FAULT_TYPE_BUS,
-	KBASE_MMU_FAULT_TYPE_PAGE_UNEXPECTED,
-	KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED
+    KBASE_MMU_FAULT_TYPE_UNKNOWN = 0,
+    KBASE_MMU_FAULT_TYPE_PAGE,
+    KBASE_MMU_FAULT_TYPE_BUS,
+    KBASE_MMU_FAULT_TYPE_PAGE_UNEXPECTED,
+    KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED
 };
 
 /**
@@ -57,7 +57,7 @@ enum kbase_mmu_fault_type {
  * kbase_context structure.
  */
 void kbase_mmu_hw_configure(struct kbase_device *kbdev,
-		struct kbase_as *as);
+        struct kbase_as *as);
 
 /**
  * kbase_mmu_hw_do_operation - Issue an operation to the MMU.
@@ -75,8 +75,8 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev,
  * Return: Zero if the operation was successful, non-zero otherwise.
  */
 int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
-		u64 vpfn, u32 nr, u32 type,
-		unsigned int handling_irq);
+        u64 vpfn, u32 nr, u32 type,
+        unsigned int handling_irq);
 
 /**
  * kbase_mmu_hw_clear_fault - Clear a fault that has been previously reported by
@@ -88,7 +88,7 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
  * Clear a bus error or page fault that has been reported by the MMU.
  */
 void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
-		enum kbase_mmu_fault_type type);
+        enum kbase_mmu_fault_type type);
 
 /**
  * kbase_mmu_hw_enable_fault - Enable fault that has been previously reported by
@@ -102,6 +102,6 @@ void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
  * called to enable the page fault or bus error fault again.
  */
 void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as,
-		enum kbase_mmu_fault_type type);
+        enum kbase_mmu_fault_type type);
 
-#endif	/* _KBASE_MMU_HW_H_ */
+#endif    /* _KBASE_MMU_HW_H_ */

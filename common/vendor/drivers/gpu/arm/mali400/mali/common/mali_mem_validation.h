@@ -8,12 +8,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_MEM_VALIDATION_H__
-#define __MALI_MEM_VALIDATION_H__
+#ifndef MALI_MEM_VALIDATION_H
+#define MALI_MEM_VALIDATION_H
 
 #include "mali_osk.h"
 
-_mali_osk_errcode_t mali_mem_validation_add_range(u32 start, u32 size);
-_mali_osk_errcode_t mali_mem_validation_check(u32 phys_addr, u32 size);
+mali_osk_errcode_t mali_mem_validation_add_range(u32 start, u32 size);
+mali_osk_errcode_t mali_mem_validation_check(u32 phys_addr, u32 size);
 
 #endif /* __MALI_MEM_VALIDATION_H__ */

@@ -20,8 +20,8 @@
  *
  */
 
-#if !defined(_KBASE_TL_SERIALIZE_H)
-#define _KBASE_TL_SERIALIZE_H
+#if !defined(KBASE_TL_SERIALIZE_H)
+#define KBASE_TL_SERIALIZE_H
 
 #include <mali_kbase.h>
 
@@ -43,17 +43,17 @@
  * Return: updated position in the buffer
  */
 static inline size_t kbasep_serialize_bytes(
-		char       *buffer,
-		size_t     pos,
-		const void *bytes,
-		size_t     len)
+        char       *buffer,
+        size_t     pos,
+        const void *bytes,
+        size_t     len)
 {
-	KBASE_DEBUG_ASSERT(buffer);
-	KBASE_DEBUG_ASSERT(bytes);
+    KBASE_DEBUG_ASSERT(buffer);
+    KBASE_DEBUG_ASSERT(bytes);
 
-	memcpy(&buffer[pos], bytes, len);
+    memcpy(&buffer[pos], bytes, len);
 
-	return pos + len;
+    return pos + len;
 }
 
 /**
@@ -70,34 +70,34 @@ static inline size_t kbasep_serialize_bytes(
  * Return: updated position in the buffer
  */
 static inline size_t kbasep_serialize_string(
-		char       *buffer,
-		size_t     pos,
-		const char *string,
-		size_t     max_write_size)
+        char       *buffer,
+        size_t     pos,
+        const char *string,
+        size_t     max_write_size)
 {
-	u32 string_len;
+    u32 string_len;
 
-	KBASE_DEBUG_ASSERT(buffer);
-	KBASE_DEBUG_ASSERT(string);
-	/* Timeline string consists of at least string length and nul
-	 * terminator.
-	 */
-	KBASE_DEBUG_ASSERT(max_write_size >= sizeof(string_len) + sizeof(char));
-	max_write_size -= sizeof(string_len);
+    KBASE_DEBUG_ASSERT(buffer);
+    KBASE_DEBUG_ASSERT(string);
+    /* Timeline string consists of at least string length and nul
+     * terminator.
+     */
+    KBASE_DEBUG_ASSERT(max_write_size >= sizeof(string_len) + sizeof(char));
+    max_write_size -= sizeof(string_len);
 
-	string_len = strlcpy(
-			&buffer[pos + sizeof(string_len)],
-			string,
-			max_write_size);
-	string_len += sizeof(char);
+    string_len = strlcpy(
+            &buffer[pos + sizeof(string_len)],
+            string,
+            max_write_size);
+    string_len += sizeof(char);
 
-	/* Make sure that the source string fit into the buffer. */
-	KBASE_DEBUG_ASSERT(string_len <= max_write_size);
+    /* Make sure that the source string fit into the buffer. */
+    KBASE_DEBUG_ASSERT(string_len <= max_write_size);
 
-	/* Update string length. */
-	memcpy(&buffer[pos], &string_len, sizeof(string_len));
+    /* Update string length. */
+    memcpy(&buffer[pos], &string_len, sizeof(string_len));
 
-	return pos + sizeof(string_len) + string_len;
+    return pos + sizeof(string_len) + string_len;
 }
 
 /**
@@ -113,13 +113,13 @@ static inline size_t kbasep_serialize_string(
  */
 static inline size_t kbasep_serialize_timestamp(void *buffer, size_t pos)
 {
-	u64             timestamp;
+    u64             timestamp;
 
-	timestamp = ktime_get_raw_ns();
+    timestamp = ktime_get_raw_ns();
 
-	return kbasep_serialize_bytes(
-			buffer, pos,
-			&timestamp, sizeof(timestamp));
+    return kbasep_serialize_bytes(
+            buffer, pos,
+            &timestamp, sizeof(timestamp));
 }
 #endif /* _KBASE_TL_SERIALIZE_H */
 

@@ -22,8 +22,8 @@
 
 #include <mali_kbase.h>
 
-#ifndef _KBASE_CSF_HEAP_CONTEXT_ALLOC_H_
-#define _KBASE_CSF_HEAP_CONTEXT_ALLOC_H_
+#ifndef KBASE_CSF_HEAP_CONTEXT_ALLOC_H
+#define KBASE_CSF_HEAP_CONTEXT_ALLOC_H
 
 /**
  * kbase_csf_heap_context_allocator_init - Initialize an allocator for heap
@@ -34,8 +34,8 @@
  * Return: 0 if successful or a negative error code on failure.
  */
 int kbase_csf_heap_context_allocator_init(
-	struct kbase_csf_heap_context_allocator *const ctx_alloc,
-	struct kbase_context *const kctx);
+    struct kbase_csf_heap_context_allocator *const ctx_alloc,
+    struct kbase_context *const kctx);
 
 /**
  * kbase_csf_heap_context_allocator_term - Terminate an allocator for heap
@@ -43,7 +43,7 @@ int kbase_csf_heap_context_allocator_init(
  * @ctx_alloc: Pointer to the heap context allocator to terminate.
  */
 void kbase_csf_heap_context_allocator_term(
-	struct kbase_csf_heap_context_allocator *const ctx_alloc);
+    struct kbase_csf_heap_context_allocator *const ctx_alloc);
 
 /**
  * kbase_csf_heap_context_allocator_alloc - Allocate a heap context structure
@@ -56,7 +56,7 @@ void kbase_csf_heap_context_allocator_term(
  * Return: GPU virtual address of the allocated heap context or 0 on failure.
  */
 u64 kbase_csf_heap_context_allocator_alloc(
-	struct kbase_csf_heap_context_allocator *const ctx_alloc);
+    struct kbase_csf_heap_context_allocator *const ctx_alloc);
 
 /**
  * kbase_csf_heap_context_allocator_free - Free a heap context structure
@@ -70,7 +70,7 @@ u64 kbase_csf_heap_context_allocator_alloc(
  *               was allocated for the firmware.
  */
 void kbase_csf_heap_context_allocator_free(
-	struct kbase_csf_heap_context_allocator *const ctx_alloc,
-	u64 const heap_gpu_va);
+    struct kbase_csf_heap_context_allocator *const ctx_alloc,
+    u64 const heap_gpu_va);
 
 #endif /* _KBASE_CSF_HEAP_CONTEXT_ALLOC_H_ */

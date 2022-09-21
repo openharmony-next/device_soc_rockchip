@@ -18,9 +18,9 @@
  * Reentrant spinlock.
  */
 struct mali_spinlock_reentrant {
-	_mali_osk_spinlock_irq_t *lock;
-	u32               owner;
-	u32               counter;
+    _mali_osk_spinlock_irq_t *lock;
+    u32               owner;
+    u32               counter;
 };
 
 /**
@@ -63,8 +63,8 @@ void mali_spinlock_reentrant_signal(struct mali_spinlock_reentrant *spinlock, u3
  */
 MALI_STATIC_INLINE mali_bool mali_spinlock_reentrant_is_held(struct mali_spinlock_reentrant *spinlock, u32 tid)
 {
-	MALI_DEBUG_ASSERT_POINTER(spinlock->lock);
-	return (tid == spinlock->owner && 0 < spinlock->counter);
+    MALI_DEBUG_ASSERT_POINTER(spinlock->lock);
+    return (tid == spinlock->owner && 0 < spinlock->counter);
 }
 
 #endif /* __MALI_SPINLOCK_REENTRANT_H__ */

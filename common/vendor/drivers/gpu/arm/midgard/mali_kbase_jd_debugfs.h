@@ -20,8 +20,8 @@
  * Header file for job dispatcher-related entries in debugfs
  */
 
-#ifndef _KBASE_JD_DEBUGFS_H
-#define _KBASE_JD_DEBUGFS_H
+#ifndef H_KBASE_JD_DEBUGFS_H
+#define H_KBASE_JD_DEBUGFS_H
 
 #include <linux/debugfs.h>
 

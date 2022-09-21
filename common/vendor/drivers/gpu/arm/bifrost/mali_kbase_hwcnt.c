@@ -44,9 +44,9 @@
  *                        any enabled counters.
  */
 enum kbase_hwcnt_accum_state {
-	ACCUM_STATE_ERROR,
-	ACCUM_STATE_DISABLED,
-	ACCUM_STATE_ENABLED
+    ACCUM_STATE_ERROR,
+    ACCUM_STATE_DISABLED,
+    ACCUM_STATE_ENABLED
 };
 
 /**
@@ -89,14 +89,14 @@ enum kbase_hwcnt_accum_state {
  *                             accum_lock.
  */
 struct kbase_hwcnt_accumulator {
-	struct kbase_hwcnt_backend *backend;
-	enum kbase_hwcnt_accum_state state;
-	struct kbase_hwcnt_enable_map enable_map;
-	bool enable_map_any_enabled;
-	struct kbase_hwcnt_enable_map scratch_map;
-	struct kbase_hwcnt_dump_buffer accum_buf;
-	bool accumulated;
-	u64 ts_last_dump_ns;
+    struct kbase_hwcnt_backend *backend;
+    enum kbase_hwcnt_accum_state state;
+    struct kbase_hwcnt_enable_map enable_map;
+    bool enable_map_any_enabled;
+    struct kbase_hwcnt_enable_map scratch_map;
+    struct kbase_hwcnt_dump_buffer accum_buf;
+    bool accumulated;
+    u64 ts_last_dump_ns;
 };
 
 /**
@@ -119,47 +119,47 @@ struct kbase_hwcnt_accumulator {
  * @accum:         Hardware counter accumulator structure.
  */
 struct kbase_hwcnt_context {
-	const struct kbase_hwcnt_backend_interface *iface;
-	spinlock_t state_lock;
-	size_t disable_count;
-	struct mutex accum_lock;
-	bool accum_inited;
-	struct kbase_hwcnt_accumulator accum;
+    const struct kbase_hwcnt_backend_interface *iface;
+    spinlock_t state_lock;
+    size_t disable_count;
+    struct mutex accum_lock;
+    bool accum_inited;
+    struct kbase_hwcnt_accumulator accum;
 };
 
 int kbase_hwcnt_context_init(
-	const struct kbase_hwcnt_backend_interface *iface,
-	struct kbase_hwcnt_context **out_hctx)
+    const struct kbase_hwcnt_backend_interface *iface,
+    struct kbase_hwcnt_context **out_hctx)
 {
-	struct kbase_hwcnt_context *hctx = NULL;
+    struct kbase_hwcnt_context *hctx = NULL;
 
-	if (!iface || !out_hctx)
-		return -EINVAL;
+    if (!iface || !out_hctx)
+        return -EINVAL;
 
-	hctx = kzalloc(sizeof(*hctx), GFP_KERNEL);
-	if (!hctx)
-		return -ENOMEM;
+    hctx = kzalloc(sizeof(*hctx), GFP_KERNEL);
+    if (!hctx)
+        return -ENOMEM;
 
-	hctx->iface = iface;
-	spin_lock_init(&hctx->state_lock);
-	hctx->disable_count = 1;
-	mutex_init(&hctx->accum_lock);
-	hctx->accum_inited = false;
+    hctx->iface = iface;
+    spin_lock_init(&hctx->state_lock);
+    hctx->disable_count = 1;
+    mutex_init(&hctx->accum_lock);
+    hctx->accum_inited = false;
 
-	*out_hctx = hctx;
+    *out_hctx = hctx;
 
-	return 0;
+    return 0;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_init);
 
 void kbase_hwcnt_context_term(struct kbase_hwcnt_context *hctx)
 {
-	if (!hctx)
-		return;
+    if (!hctx)
+        return;
 
-	/* Make sure we didn't leak the accumulator */
-	WARN_ON(hctx->accum_inited);
-	kfree(hctx);
+    /* Make sure we didn't leak the accumulator */
+    WARN_ON(hctx->accum_inited);
+    kfree(hctx);
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_term);
 
@@ -169,14 +169,14 @@ KBASE_EXPORT_TEST_API(kbase_hwcnt_context_term);
  */
 static void kbasep_hwcnt_accumulator_term(struct kbase_hwcnt_context *hctx)
 {
-	WARN_ON(!hctx);
-	WARN_ON(!hctx->accum_inited);
+    WARN_ON(!hctx);
+    WARN_ON(!hctx->accum_inited);
 
-	kbase_hwcnt_enable_map_free(&hctx->accum.scratch_map);
-	kbase_hwcnt_dump_buffer_free(&hctx->accum.accum_buf);
-	kbase_hwcnt_enable_map_free(&hctx->accum.enable_map);
-	hctx->iface->term(hctx->accum.backend);
-	memset(&hctx->accum, 0, sizeof(hctx->accum));
+    kbase_hwcnt_enable_map_free(&hctx->accum.scratch_map);
+    kbase_hwcnt_dump_buffer_free(&hctx->accum.accum_buf);
+    kbase_hwcnt_enable_map_free(&hctx->accum.enable_map);
+    hctx->iface->term(hctx->accum.backend);
+    memset(&hctx->accum, 0, sizeof(hctx->accum));
 }
 
 /**
@@ -187,45 +187,45 @@ static void kbasep_hwcnt_accumulator_term(struct kbase_hwcnt_context *hctx)
  */
 static int kbasep_hwcnt_accumulator_init(struct kbase_hwcnt_context *hctx)
 {
-	int errcode;
+    int errcode;
 
-	WARN_ON(!hctx);
-	WARN_ON(!hctx->accum_inited);
+    WARN_ON(!hctx);
+    WARN_ON(!hctx->accum_inited);
 
-	errcode = hctx->iface->init(
-		hctx->iface->info, &hctx->accum.backend);
-	if (errcode)
-		goto error;
+    errcode = hctx->iface->init(
+        hctx->iface->info, &hctx->accum.backend);
+    if (errcode)
+        goto error;
 
-	hctx->accum.state = ACCUM_STATE_ERROR;
+    hctx->accum.state = ACCUM_STATE_ERROR;
 
-	errcode = kbase_hwcnt_enable_map_alloc(
-		hctx->iface->metadata, &hctx->accum.enable_map);
-	if (errcode)
-		goto error;
+    errcode = kbase_hwcnt_enable_map_alloc(
+        hctx->iface->metadata, &hctx->accum.enable_map);
+    if (errcode)
+        goto error;
 
-	hctx->accum.enable_map_any_enabled = false;
+    hctx->accum.enable_map_any_enabled = false;
 
-	errcode = kbase_hwcnt_dump_buffer_alloc(
-		hctx->iface->metadata, &hctx->accum.accum_buf);
-	if (errcode)
-		goto error;
+    errcode = kbase_hwcnt_dump_buffer_alloc(
+        hctx->iface->metadata, &hctx->accum.accum_buf);
+    if (errcode)
+        goto error;
 
-	errcode = kbase_hwcnt_enable_map_alloc(
-		hctx->iface->metadata, &hctx->accum.scratch_map);
-	if (errcode)
-		goto error;
+    errcode = kbase_hwcnt_enable_map_alloc(
+        hctx->iface->metadata, &hctx->accum.scratch_map);
+    if (errcode)
+        goto error;
 
-	hctx->accum.accumulated = false;
+    hctx->accum.accumulated = false;
 
-	hctx->accum.ts_last_dump_ns =
-		hctx->iface->timestamp_ns(hctx->accum.backend);
+    hctx->accum.ts_last_dump_ns =
+        hctx->iface->timestamp_ns(hctx->accum.backend);
 
-	return 0;
+    return 0;
 
 error:
-	kbasep_hwcnt_accumulator_term(hctx);
-	return errcode;
+    kbasep_hwcnt_accumulator_term(hctx);
+    return errcode;
 }
 
 /**
@@ -236,68 +236,68 @@ error:
  * @accumulate: True if we should accumulate before disabling, else false.
  */
 static void kbasep_hwcnt_accumulator_disable(
-	struct kbase_hwcnt_context *hctx, bool accumulate)
+    struct kbase_hwcnt_context *hctx, bool accumulate)
 {
-	int errcode = 0;
-	bool backend_enabled = false;
-	struct kbase_hwcnt_accumulator *accum;
-	unsigned long flags;
-	u64 dump_time_ns;
+    int errcode = 0;
+    bool backend_enabled = false;
+    struct kbase_hwcnt_accumulator *accum;
+    unsigned long flags;
+    u64 dump_time_ns;
 
-	WARN_ON(!hctx);
-	lockdep_assert_held(&hctx->accum_lock);
-	WARN_ON(!hctx->accum_inited);
+    WARN_ON(!hctx);
+    lockdep_assert_held(&hctx->accum_lock);
+    WARN_ON(!hctx->accum_inited);
 
-	accum = &hctx->accum;
+    accum = &hctx->accum;
 
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	WARN_ON(hctx->disable_count != 0);
-	WARN_ON(hctx->accum.state == ACCUM_STATE_DISABLED);
+    WARN_ON(hctx->disable_count != 0);
+    WARN_ON(hctx->accum.state == ACCUM_STATE_DISABLED);
 
-	if ((hctx->accum.state == ACCUM_STATE_ENABLED) &&
-	    (accum->enable_map_any_enabled))
-		backend_enabled = true;
+    if ((hctx->accum.state == ACCUM_STATE_ENABLED) &&
+        (accum->enable_map_any_enabled))
+        backend_enabled = true;
 
-	if (!backend_enabled)
-		hctx->accum.state = ACCUM_STATE_DISABLED;
+    if (!backend_enabled)
+        hctx->accum.state = ACCUM_STATE_DISABLED;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 
-	/* Early out if the backend is not already enabled */
-	if (!backend_enabled)
-		return;
+    /* Early out if the backend is not already enabled */
+    if (!backend_enabled)
+        return;
 
-	if (!accumulate)
-		goto disable;
+    if (!accumulate)
+        goto disable;
 
-	/* Try and accumulate before disabling */
-	errcode = hctx->iface->dump_request(accum->backend, &dump_time_ns);
-	if (errcode)
-		goto disable;
+    /* Try and accumulate before disabling */
+    errcode = hctx->iface->dump_request(accum->backend, &dump_time_ns);
+    if (errcode)
+        goto disable;
 
-	errcode = hctx->iface->dump_wait(accum->backend);
-	if (errcode)
-		goto disable;
+    errcode = hctx->iface->dump_wait(accum->backend);
+    if (errcode)
+        goto disable;
 
-	errcode = hctx->iface->dump_get(accum->backend,
-		&accum->accum_buf, &accum->enable_map, accum->accumulated);
-	if (errcode)
-		goto disable;
+    errcode = hctx->iface->dump_get(accum->backend,
+        &accum->accum_buf, &accum->enable_map, accum->accumulated);
+    if (errcode)
+        goto disable;
 
-	accum->accumulated = true;
+    accum->accumulated = true;
 
 disable:
-	hctx->iface->dump_disable(accum->backend);
+    hctx->iface->dump_disable(accum->backend);
 
-	/* Regardless of any errors during the accumulate, put the accumulator
-	 * in the disabled state.
-	 */
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    /* Regardless of any errors during the accumulate, put the accumulator
+     * in the disabled state.
+     */
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	hctx->accum.state = ACCUM_STATE_DISABLED;
+    hctx->accum.state = ACCUM_STATE_DISABLED;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 }
 
 /**
@@ -307,25 +307,25 @@ disable:
  */
 static void kbasep_hwcnt_accumulator_enable(struct kbase_hwcnt_context *hctx)
 {
-	int errcode = 0;
-	struct kbase_hwcnt_accumulator *accum;
+    int errcode = 0;
+    struct kbase_hwcnt_accumulator *accum;
 
-	WARN_ON(!hctx);
-	lockdep_assert_held(&hctx->state_lock);
-	WARN_ON(!hctx->accum_inited);
-	WARN_ON(hctx->accum.state != ACCUM_STATE_DISABLED);
+    WARN_ON(!hctx);
+    lockdep_assert_held(&hctx->state_lock);
+    WARN_ON(!hctx->accum_inited);
+    WARN_ON(hctx->accum.state != ACCUM_STATE_DISABLED);
 
-	accum = &hctx->accum;
+    accum = &hctx->accum;
 
-	/* The backend only needs enabling if any counters are enabled */
-	if (accum->enable_map_any_enabled)
-		errcode = hctx->iface->dump_enable_nolock(
-			accum->backend, &accum->enable_map);
+    /* The backend only needs enabling if any counters are enabled */
+    if (accum->enable_map_any_enabled)
+        errcode = hctx->iface->dump_enable_nolock(
+            accum->backend, &accum->enable_map);
 
-	if (!errcode)
-		accum->state = ACCUM_STATE_ENABLED;
-	else
-		accum->state = ACCUM_STATE_ERROR;
+    if (!errcode)
+        accum->state = ACCUM_STATE_ENABLED;
+    else
+        accum->state = ACCUM_STATE_ERROR;
 }
 
 /**
@@ -346,174 +346,174 @@ static void kbasep_hwcnt_accumulator_enable(struct kbase_hwcnt_context *hctx)
  *               enabled counters will be unchanged.
  */
 static int kbasep_hwcnt_accumulator_dump(
-	struct kbase_hwcnt_context *hctx,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf,
-	const struct kbase_hwcnt_enable_map *new_map)
+    struct kbase_hwcnt_context *hctx,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf,
+    const struct kbase_hwcnt_enable_map *new_map)
 {
-	int errcode = 0;
-	unsigned long flags;
-	enum kbase_hwcnt_accum_state state;
-	bool dump_requested = false;
-	bool dump_written = false;
-	bool cur_map_any_enabled;
-	struct kbase_hwcnt_enable_map *cur_map;
-	bool new_map_any_enabled = false;
-	u64 dump_time_ns;
-	struct kbase_hwcnt_accumulator *accum;
+    int errcode = 0;
+    unsigned long flags;
+    enum kbase_hwcnt_accum_state state;
+    bool dump_requested = false;
+    bool dump_written = false;
+    bool cur_map_any_enabled;
+    struct kbase_hwcnt_enable_map *cur_map;
+    bool new_map_any_enabled = false;
+    u64 dump_time_ns;
+    struct kbase_hwcnt_accumulator *accum;
 
-	WARN_ON(!hctx);
-	WARN_ON(!ts_start_ns);
-	WARN_ON(!ts_end_ns);
-	WARN_ON(dump_buf && (dump_buf->metadata != hctx->iface->metadata));
-	WARN_ON(new_map && (new_map->metadata != hctx->iface->metadata));
-	WARN_ON(!hctx->accum_inited);
-	lockdep_assert_held(&hctx->accum_lock);
+    WARN_ON(!hctx);
+    WARN_ON(!ts_start_ns);
+    WARN_ON(!ts_end_ns);
+    WARN_ON(dump_buf && (dump_buf->metadata != hctx->iface->metadata));
+    WARN_ON(new_map && (new_map->metadata != hctx->iface->metadata));
+    WARN_ON(!hctx->accum_inited);
+    lockdep_assert_held(&hctx->accum_lock);
 
-	accum = &hctx->accum;
-	cur_map = &accum->scratch_map;
+    accum = &hctx->accum;
+    cur_map = &accum->scratch_map;
 
-	/* Save out info about the current enable map */
-	cur_map_any_enabled = accum->enable_map_any_enabled;
-	kbase_hwcnt_enable_map_copy(cur_map, &accum->enable_map);
+    /* Save out info about the current enable map */
+    cur_map_any_enabled = accum->enable_map_any_enabled;
+    kbase_hwcnt_enable_map_copy(cur_map, &accum->enable_map);
 
-	if (new_map)
-		new_map_any_enabled =
-			kbase_hwcnt_enable_map_any_enabled(new_map);
+    if (new_map)
+        new_map_any_enabled =
+            kbase_hwcnt_enable_map_any_enabled(new_map);
 
-	/*
-	 * We're holding accum_lock, so the accumulator state might transition
-	 * from disabled to enabled during this function (as enabling is lock
-	 * free), but it will never disable (as disabling needs to hold the
-	 * accum_lock), nor will it ever transition from enabled to error (as
-	 * an enable while we're already enabled is impossible).
-	 *
-	 * If we're already disabled, we'll only look at the accumulation buffer
-	 * rather than do a real dump, so a concurrent enable does not affect
-	 * us.
-	 *
-	 * If a concurrent enable fails, we might transition to the error
-	 * state, but again, as we're only looking at the accumulation buffer,
-	 * it's not an issue.
-	 */
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    /*
+     * We're holding accum_lock, so the accumulator state might transition
+     * from disabled to enabled during this function (as enabling is lock
+     * free), but it will never disable (as disabling needs to hold the
+     * accum_lock), nor will it ever transition from enabled to error (as
+     * an enable while we're already enabled is impossible).
+     *
+     * If we're already disabled, we'll only look at the accumulation buffer
+     * rather than do a real dump, so a concurrent enable does not affect
+     * us.
+     *
+     * If a concurrent enable fails, we might transition to the error
+     * state, but again, as we're only looking at the accumulation buffer,
+     * it's not an issue.
+     */
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	state = accum->state;
+    state = accum->state;
 
-	/*
-	 * Update the new map now, such that if an enable occurs during this
-	 * dump then that enable will set the new map. If we're already enabled,
-	 * then we'll do it ourselves after the dump.
-	 */
-	if (new_map) {
-		kbase_hwcnt_enable_map_copy(
-			&accum->enable_map, new_map);
-		accum->enable_map_any_enabled = new_map_any_enabled;
-	}
+    /*
+     * Update the new map now, such that if an enable occurs during this
+     * dump then that enable will set the new map. If we're already enabled,
+     * then we'll do it ourselves after the dump.
+     */
+    if (new_map) {
+        kbase_hwcnt_enable_map_copy(
+            &accum->enable_map, new_map);
+        accum->enable_map_any_enabled = new_map_any_enabled;
+    }
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 
-	/* Error state, so early out. No need to roll back any map updates */
-	if (state == ACCUM_STATE_ERROR)
-		return -EIO;
+    /* Error state, so early out. No need to roll back any map updates */
+    if (state == ACCUM_STATE_ERROR)
+        return -EIO;
 
-	/* Initiate the dump if the backend is enabled. */
-	if ((state == ACCUM_STATE_ENABLED) && cur_map_any_enabled) {
-		if (dump_buf) {
-			errcode = hctx->iface->dump_request(
-					accum->backend, &dump_time_ns);
-			dump_requested = true;
-		} else {
-			dump_time_ns = hctx->iface->timestamp_ns(
-					accum->backend);
-			errcode = hctx->iface->dump_clear(accum->backend);
-		}
+    /* Initiate the dump if the backend is enabled. */
+    if ((state == ACCUM_STATE_ENABLED) && cur_map_any_enabled) {
+        if (dump_buf) {
+            errcode = hctx->iface->dump_request(
+                    accum->backend, &dump_time_ns);
+            dump_requested = true;
+        } else {
+            dump_time_ns = hctx->iface->timestamp_ns(
+                    accum->backend);
+            errcode = hctx->iface->dump_clear(accum->backend);
+        }
 
-		if (errcode)
-			goto error;
-	} else {
-		dump_time_ns = hctx->iface->timestamp_ns(accum->backend);
-	}
+        if (errcode)
+            goto error;
+    } else {
+        dump_time_ns = hctx->iface->timestamp_ns(accum->backend);
+    }
 
-	/* Copy any accumulation into the dest buffer */
-	if (accum->accumulated && dump_buf) {
-		kbase_hwcnt_dump_buffer_copy(
-			dump_buf, &accum->accum_buf, cur_map);
-		dump_written = true;
-	}
+    /* Copy any accumulation into the dest buffer */
+    if (accum->accumulated && dump_buf) {
+        kbase_hwcnt_dump_buffer_copy(
+            dump_buf, &accum->accum_buf, cur_map);
+        dump_written = true;
+    }
 
-	/* Wait for any requested dumps to complete */
-	if (dump_requested) {
-		WARN_ON(state != ACCUM_STATE_ENABLED);
-		errcode = hctx->iface->dump_wait(accum->backend);
-		if (errcode)
-			goto error;
-	}
+    /* Wait for any requested dumps to complete */
+    if (dump_requested) {
+        WARN_ON(state != ACCUM_STATE_ENABLED);
+        errcode = hctx->iface->dump_wait(accum->backend);
+        if (errcode)
+            goto error;
+    }
 
-	/* If we're enabled and there's a new enable map, change the enabled set
-	 * as soon after the dump has completed as possible.
-	 */
-	if ((state == ACCUM_STATE_ENABLED) && new_map) {
-		/* Backend is only enabled if there were any enabled counters */
-		if (cur_map_any_enabled)
-			hctx->iface->dump_disable(accum->backend);
+    /* If we're enabled and there's a new enable map, change the enabled set
+     * as soon after the dump has completed as possible.
+     */
+    if ((state == ACCUM_STATE_ENABLED) && new_map) {
+        /* Backend is only enabled if there were any enabled counters */
+        if (cur_map_any_enabled)
+            hctx->iface->dump_disable(accum->backend);
 
-		/* (Re-)enable the backend if the new map has enabled counters.
-		 * No need to acquire the spinlock, as concurrent enable while
-		 * we're already enabled and holding accum_lock is impossible.
-		 */
-		if (new_map_any_enabled) {
-			errcode = hctx->iface->dump_enable(
-				accum->backend, new_map);
-			if (errcode)
-				goto error;
-		}
-	}
+        /* (Re-)enable the backend if the new map has enabled counters.
+         * No need to acquire the spinlock, as concurrent enable while
+         * we're already enabled and holding accum_lock is impossible.
+         */
+        if (new_map_any_enabled) {
+            errcode = hctx->iface->dump_enable(
+                accum->backend, new_map);
+            if (errcode)
+                goto error;
+        }
+    }
 
-	/* Copy, accumulate, or zero into the dest buffer to finish */
-	if (dump_buf) {
-		/* If we dumped, copy or accumulate it into the destination */
-		if (dump_requested) {
-			WARN_ON(state != ACCUM_STATE_ENABLED);
-			errcode = hctx->iface->dump_get(
-				accum->backend,
-				dump_buf,
-				cur_map,
-				dump_written);
-			if (errcode)
-				goto error;
-			dump_written = true;
-		}
+    /* Copy, accumulate, or zero into the dest buffer to finish */
+    if (dump_buf) {
+        /* If we dumped, copy or accumulate it into the destination */
+        if (dump_requested) {
+            WARN_ON(state != ACCUM_STATE_ENABLED);
+            errcode = hctx->iface->dump_get(
+                accum->backend,
+                dump_buf,
+                cur_map,
+                dump_written);
+            if (errcode)
+                goto error;
+            dump_written = true;
+        }
 
-		/* If we've not written anything into the dump buffer so far, it
-		 * means there was nothing to write. Zero any enabled counters.
-		 */
-		if (!dump_written)
-			kbase_hwcnt_dump_buffer_zero(dump_buf, cur_map);
-	}
+        /* If we've not written anything into the dump buffer so far, it
+         * means there was nothing to write. Zero any enabled counters.
+         */
+        if (!dump_written)
+            kbase_hwcnt_dump_buffer_zero(dump_buf, cur_map);
+    }
 
-	/* Write out timestamps */
-	*ts_start_ns = accum->ts_last_dump_ns;
-	*ts_end_ns = dump_time_ns;
+    /* Write out timestamps */
+    *ts_start_ns = accum->ts_last_dump_ns;
+    *ts_end_ns = dump_time_ns;
 
-	accum->accumulated = false;
-	accum->ts_last_dump_ns = dump_time_ns;
+    accum->accumulated = false;
+    accum->ts_last_dump_ns = dump_time_ns;
 
-	return 0;
+    return 0;
 error:
-	/* An error was only physically possible if the backend was enabled */
-	WARN_ON(state != ACCUM_STATE_ENABLED);
+    /* An error was only physically possible if the backend was enabled */
+    WARN_ON(state != ACCUM_STATE_ENABLED);
 
-	/* Disable the backend, and transition to the error state */
-	hctx->iface->dump_disable(accum->backend);
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    /* Disable the backend, and transition to the error state */
+    hctx->iface->dump_disable(accum->backend);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	accum->state = ACCUM_STATE_ERROR;
+    accum->state = ACCUM_STATE_ERROR;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 
-	return errcode;
+    return errcode;
 }
 
 /**
@@ -522,273 +522,273 @@ error:
  * @accumulate: True if we should accumulate before disabling, else false.
  */
 static void kbasep_hwcnt_context_disable(
-	struct kbase_hwcnt_context *hctx, bool accumulate)
+    struct kbase_hwcnt_context *hctx, bool accumulate)
 {
-	unsigned long flags;
+    unsigned long flags;
 
-	WARN_ON(!hctx);
-	lockdep_assert_held(&hctx->accum_lock);
+    WARN_ON(!hctx);
+    lockdep_assert_held(&hctx->accum_lock);
 
-	if (!kbase_hwcnt_context_disable_atomic(hctx)) {
-		kbasep_hwcnt_accumulator_disable(hctx, accumulate);
+    if (!kbase_hwcnt_context_disable_atomic(hctx)) {
+        kbasep_hwcnt_accumulator_disable(hctx, accumulate);
 
-		spin_lock_irqsave(&hctx->state_lock, flags);
+        spin_lock_irqsave(&hctx->state_lock, flags);
 
-		/* Atomic disable failed and we're holding the mutex, so current
-		 * disable count must be 0.
-		 */
-		WARN_ON(hctx->disable_count != 0);
-		hctx->disable_count++;
+        /* Atomic disable failed and we're holding the mutex, so current
+         * disable count must be 0.
+         */
+        WARN_ON(hctx->disable_count != 0);
+        hctx->disable_count++;
 
-		spin_unlock_irqrestore(&hctx->state_lock, flags);
-	}
+        spin_unlock_irqrestore(&hctx->state_lock, flags);
+    }
 }
 
 int kbase_hwcnt_accumulator_acquire(
-	struct kbase_hwcnt_context *hctx,
-	struct kbase_hwcnt_accumulator **accum)
+    struct kbase_hwcnt_context *hctx,
+    struct kbase_hwcnt_accumulator **accum)
 {
-	int errcode = 0;
-	unsigned long flags;
+    int errcode = 0;
+    unsigned long flags;
 
-	if (!hctx || !accum)
-		return -EINVAL;
+    if (!hctx || !accum)
+        return -EINVAL;
 
-	mutex_lock(&hctx->accum_lock);
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    mutex_lock(&hctx->accum_lock);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	if (!hctx->accum_inited)
-		/* Set accum initing now to prevent concurrent init */
-		hctx->accum_inited = true;
-	else
-		/* Already have an accum, or already being inited */
-		errcode = -EBUSY;
+    if (!hctx->accum_inited)
+        /* Set accum initing now to prevent concurrent init */
+        hctx->accum_inited = true;
+    else
+        /* Already have an accum, or already being inited */
+        errcode = -EBUSY;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
-	mutex_unlock(&hctx->accum_lock);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
+    mutex_unlock(&hctx->accum_lock);
 
-	if (errcode)
-		return errcode;
+    if (errcode)
+        return errcode;
 
-	errcode = kbasep_hwcnt_accumulator_init(hctx);
+    errcode = kbasep_hwcnt_accumulator_init(hctx);
 
-	if (errcode) {
-		mutex_lock(&hctx->accum_lock);
-		spin_lock_irqsave(&hctx->state_lock, flags);
+    if (errcode) {
+        mutex_lock(&hctx->accum_lock);
+        spin_lock_irqsave(&hctx->state_lock, flags);
 
-		hctx->accum_inited = false;
+        hctx->accum_inited = false;
 
-		spin_unlock_irqrestore(&hctx->state_lock, flags);
-		mutex_unlock(&hctx->accum_lock);
+        spin_unlock_irqrestore(&hctx->state_lock, flags);
+        mutex_unlock(&hctx->accum_lock);
 
-		return errcode;
-	}
+        return errcode;
+    }
 
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	WARN_ON(hctx->disable_count == 0);
-	WARN_ON(hctx->accum.enable_map_any_enabled);
+    WARN_ON(hctx->disable_count == 0);
+    WARN_ON(hctx->accum.enable_map_any_enabled);
 
-	/* Decrement the disable count to allow the accumulator to be accessible
-	 * now that it's fully constructed.
-	 */
-	hctx->disable_count--;
+    /* Decrement the disable count to allow the accumulator to be accessible
+     * now that it's fully constructed.
+     */
+    hctx->disable_count--;
 
-	/*
-	 * Make sure the accumulator is initialised to the correct state.
-	 * Regardless of initial state, counters don't need to be enabled via
-	 * the backend, as the initial enable map has no enabled counters.
-	 */
-	hctx->accum.state = (hctx->disable_count == 0) ?
-		ACCUM_STATE_ENABLED :
-		ACCUM_STATE_DISABLED;
+    /*
+     * Make sure the accumulator is initialised to the correct state.
+     * Regardless of initial state, counters don't need to be enabled via
+     * the backend, as the initial enable map has no enabled counters.
+     */
+    hctx->accum.state = (hctx->disable_count == 0) ?
+        ACCUM_STATE_ENABLED :
+        ACCUM_STATE_DISABLED;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 
-	*accum = &hctx->accum;
+    *accum = &hctx->accum;
 
-	return 0;
+    return 0;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_accumulator_acquire);
 
 void kbase_hwcnt_accumulator_release(struct kbase_hwcnt_accumulator *accum)
 {
-	unsigned long flags;
-	struct kbase_hwcnt_context *hctx;
+    unsigned long flags;
+    struct kbase_hwcnt_context *hctx;
 
-	if (!accum)
-		return;
+    if (!accum)
+        return;
 
-	hctx = container_of(accum, struct kbase_hwcnt_context, accum);
+    hctx = container_of(accum, struct kbase_hwcnt_context, accum);
 
-	mutex_lock(&hctx->accum_lock);
+    mutex_lock(&hctx->accum_lock);
 
-	/* Double release is a programming error */
-	WARN_ON(!hctx->accum_inited);
+    /* Double release is a programming error */
+    WARN_ON(!hctx->accum_inited);
 
-	/* Disable the context to ensure the accumulator is inaccesible while
-	 * we're destroying it. This performs the corresponding disable count
-	 * increment to the decrement done during acquisition.
-	 */
-	kbasep_hwcnt_context_disable(hctx, false);
+    /* Disable the context to ensure the accumulator is inaccesible while
+     * we're destroying it. This performs the corresponding disable count
+     * increment to the decrement done during acquisition.
+     */
+    kbasep_hwcnt_context_disable(hctx, false);
 
-	mutex_unlock(&hctx->accum_lock);
+    mutex_unlock(&hctx->accum_lock);
 
-	kbasep_hwcnt_accumulator_term(hctx);
+    kbasep_hwcnt_accumulator_term(hctx);
 
-	mutex_lock(&hctx->accum_lock);
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    mutex_lock(&hctx->accum_lock);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	hctx->accum_inited = false;
+    hctx->accum_inited = false;
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
-	mutex_unlock(&hctx->accum_lock);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
+    mutex_unlock(&hctx->accum_lock);
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_accumulator_release);
 
 void kbase_hwcnt_context_disable(struct kbase_hwcnt_context *hctx)
 {
-	if (WARN_ON(!hctx))
-		return;
+    if (WARN_ON(!hctx))
+        return;
 
-	/* Try and atomically disable first, so we can avoid locking the mutex
-	 * if we don't need to.
-	 */
-	if (kbase_hwcnt_context_disable_atomic(hctx))
-		return;
+    /* Try and atomically disable first, so we can avoid locking the mutex
+     * if we don't need to.
+     */
+    if (kbase_hwcnt_context_disable_atomic(hctx))
+        return;
 
-	mutex_lock(&hctx->accum_lock);
+    mutex_lock(&hctx->accum_lock);
 
-	kbasep_hwcnt_context_disable(hctx, true);
+    kbasep_hwcnt_context_disable(hctx, true);
 
-	mutex_unlock(&hctx->accum_lock);
+    mutex_unlock(&hctx->accum_lock);
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_disable);
 
 bool kbase_hwcnt_context_disable_atomic(struct kbase_hwcnt_context *hctx)
 {
-	unsigned long flags;
-	bool atomic_disabled = false;
+    unsigned long flags;
+    bool atomic_disabled = false;
 
-	if (WARN_ON(!hctx))
-		return false;
+    if (WARN_ON(!hctx))
+        return false;
 
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	if (!WARN_ON(hctx->disable_count == SIZE_MAX)) {
-		/*
-		 * If disable count is non-zero, we can just bump the disable
-		 * count.
-		 *
-		 * Otherwise, we can't disable in an atomic context.
-		 */
-		if (hctx->disable_count != 0) {
-			hctx->disable_count++;
-			atomic_disabled = true;
-		}
-	}
+    if (!WARN_ON(hctx->disable_count == SIZE_MAX)) {
+        /*
+         * If disable count is non-zero, we can just bump the disable
+         * count.
+         *
+         * Otherwise, we can't disable in an atomic context.
+         */
+        if (hctx->disable_count != 0) {
+            hctx->disable_count++;
+            atomic_disabled = true;
+        }
+    }
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 
-	return atomic_disabled;
+    return atomic_disabled;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_disable_atomic);
 
 void kbase_hwcnt_context_enable(struct kbase_hwcnt_context *hctx)
 {
-	unsigned long flags;
+    unsigned long flags;
 
-	if (WARN_ON(!hctx))
-		return;
+    if (WARN_ON(!hctx))
+        return;
 
-	spin_lock_irqsave(&hctx->state_lock, flags);
+    spin_lock_irqsave(&hctx->state_lock, flags);
 
-	if (!WARN_ON(hctx->disable_count == 0)) {
-		if (hctx->disable_count == 1)
-			kbasep_hwcnt_accumulator_enable(hctx);
+    if (!WARN_ON(hctx->disable_count == 0)) {
+        if (hctx->disable_count == 1)
+            kbasep_hwcnt_accumulator_enable(hctx);
 
-		hctx->disable_count--;
-	}
+        hctx->disable_count--;
+    }
 
-	spin_unlock_irqrestore(&hctx->state_lock, flags);
+    spin_unlock_irqrestore(&hctx->state_lock, flags);
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_enable);
 
 const struct kbase_hwcnt_metadata *kbase_hwcnt_context_metadata(
-	struct kbase_hwcnt_context *hctx)
+    struct kbase_hwcnt_context *hctx)
 {
-	if (!hctx)
-		return NULL;
+    if (!hctx)
+        return NULL;
 
-	return hctx->iface->metadata;
+    return hctx->iface->metadata;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_context_metadata);
 
 int kbase_hwcnt_accumulator_set_counters(
-	struct kbase_hwcnt_accumulator *accum,
-	const struct kbase_hwcnt_enable_map *new_map,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf)
+    struct kbase_hwcnt_accumulator *accum,
+    const struct kbase_hwcnt_enable_map *new_map,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf)
 {
-	int errcode;
-	struct kbase_hwcnt_context *hctx;
+    int errcode;
+    struct kbase_hwcnt_context *hctx;
 
-	if (!accum || !new_map || !ts_start_ns || !ts_end_ns)
-		return -EINVAL;
+    if (!accum || !new_map || !ts_start_ns || !ts_end_ns)
+        return -EINVAL;
 
-	hctx = container_of(accum, struct kbase_hwcnt_context, accum);
+    hctx = container_of(accum, struct kbase_hwcnt_context, accum);
 
-	if ((new_map->metadata != hctx->iface->metadata) ||
-	    (dump_buf && (dump_buf->metadata != hctx->iface->metadata)))
-		return -EINVAL;
+    if ((new_map->metadata != hctx->iface->metadata) ||
+        (dump_buf && (dump_buf->metadata != hctx->iface->metadata)))
+        return -EINVAL;
 
-	mutex_lock(&hctx->accum_lock);
+    mutex_lock(&hctx->accum_lock);
 
-	errcode = kbasep_hwcnt_accumulator_dump(
-		hctx, ts_start_ns, ts_end_ns, dump_buf, new_map);
+    errcode = kbasep_hwcnt_accumulator_dump(
+        hctx, ts_start_ns, ts_end_ns, dump_buf, new_map);
 
-	mutex_unlock(&hctx->accum_lock);
+    mutex_unlock(&hctx->accum_lock);
 
-	return errcode;
+    return errcode;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_accumulator_set_counters);
 
 int kbase_hwcnt_accumulator_dump(
-	struct kbase_hwcnt_accumulator *accum,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf)
+    struct kbase_hwcnt_accumulator *accum,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf)
 {
-	int errcode;
-	struct kbase_hwcnt_context *hctx;
+    int errcode;
+    struct kbase_hwcnt_context *hctx;
 
-	if (!accum || !ts_start_ns || !ts_end_ns)
-		return -EINVAL;
+    if (!accum || !ts_start_ns || !ts_end_ns)
+        return -EINVAL;
 
-	hctx = container_of(accum, struct kbase_hwcnt_context, accum);
+    hctx = container_of(accum, struct kbase_hwcnt_context, accum);
 
-	if (dump_buf && (dump_buf->metadata != hctx->iface->metadata))
-		return -EINVAL;
+    if (dump_buf && (dump_buf->metadata != hctx->iface->metadata))
+        return -EINVAL;
 
-	mutex_lock(&hctx->accum_lock);
+    mutex_lock(&hctx->accum_lock);
 
-	errcode = kbasep_hwcnt_accumulator_dump(
-		hctx, ts_start_ns, ts_end_ns, dump_buf, NULL);
+    errcode = kbasep_hwcnt_accumulator_dump(
+        hctx, ts_start_ns, ts_end_ns, dump_buf, NULL);
 
-	mutex_unlock(&hctx->accum_lock);
+    mutex_unlock(&hctx->accum_lock);
 
-	return errcode;
+    return errcode;
 }
 KBASE_EXPORT_TEST_API(kbase_hwcnt_accumulator_dump);
 
 u64 kbase_hwcnt_accumulator_timestamp_ns(struct kbase_hwcnt_accumulator *accum)
 {
-	struct kbase_hwcnt_context *hctx;
+    struct kbase_hwcnt_context *hctx;
 
-	if (WARN_ON(!accum))
-		return 0;
+    if (WARN_ON(!accum))
+        return 0;
 
-	hctx = container_of(accum, struct kbase_hwcnt_context, accum);
-	return hctx->iface->timestamp_ns(accum->backend);
+    hctx = container_of(accum, struct kbase_hwcnt_context, accum);
+    return hctx->iface->timestamp_ns(accum->backend);
 }

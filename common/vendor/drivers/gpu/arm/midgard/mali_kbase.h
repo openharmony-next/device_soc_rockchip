@@ -124,8 +124,8 @@ void kbase_jd_exit(struct kbase_context *kctx);
  * Return: 0 on success or error code
  */
 int kbase_jd_submit(struct kbase_context *kctx,
-		void __user *user_addr, u32 nr_atoms, u32 stride,
-		bool uk6_atom);
+        void __user *user_addr, u32 nr_atoms, u32 stride,
+        bool uk6_atom);
 
 /**
  * kbase_jd_done_worker - Handle a job completion
@@ -147,15 +147,15 @@ int kbase_jd_submit(struct kbase_context *kctx,
 void kbase_jd_done_worker(struct work_struct *data);
 
 void kbase_jd_done(struct kbase_jd_atom *katom, int slot_nr, ktime_t *end_timestamp,
-		kbasep_js_atom_done_code done_code);
+        kbasep_js_atom_done_code done_code);
 void kbase_jd_cancel(struct kbase_device *kbdev, struct kbase_jd_atom *katom);
 void kbase_jd_zap_context(struct kbase_context *kctx);
 bool jd_done_nolock(struct kbase_jd_atom *katom,
-		struct list_head *completed_jobs_ctx);
+        struct list_head *completed_jobs_ctx);
 void kbase_jd_free_external_resources(struct kbase_jd_atom *katom);
 bool jd_submit_atom(struct kbase_context *kctx,
-			 const struct base_jd_atom_v2 *user_atom,
-			 struct kbase_jd_atom *katom);
+             const struct base_jd_atom_v2 *user_atom,
+             struct kbase_jd_atom *katom);
 void kbase_jd_dep_clear_locked(struct kbase_jd_atom *katom);
 
 void kbase_job_done(struct kbase_device *kbdev, u32 done);
@@ -173,18 +173,18 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done);
  * The hwaccess_lock must be held when calling this function.
  */
 void kbase_job_slot_ctx_priority_check_locked(struct kbase_context *kctx,
-				struct kbase_jd_atom *katom);
+                struct kbase_jd_atom *katom);
 
 void kbase_job_slot_softstop(struct kbase_device *kbdev, int js,
-		struct kbase_jd_atom *target_katom);
+        struct kbase_jd_atom *target_katom);
 void kbase_job_slot_softstop_swflags(struct kbase_device *kbdev, int js,
-		struct kbase_jd_atom *target_katom, u32 sw_flags);
+        struct kbase_jd_atom *target_katom, u32 sw_flags);
 void kbase_job_slot_hardstop(struct kbase_context *kctx, int js,
-		struct kbase_jd_atom *target_katom);
+        struct kbase_jd_atom *target_katom);
 void kbase_job_check_enter_disjoint(struct kbase_device *kbdev, u32 action,
-		base_jd_core_req core_reqs, struct kbase_jd_atom *target_katom);
+        base_jd_core_req core_reqs, struct kbase_jd_atom *target_katom);
 void kbase_job_check_leave_disjoint(struct kbase_device *kbdev,
-		struct kbase_jd_atom *target_katom);
+        struct kbase_jd_atom *target_katom);
 
 void kbase_event_post(struct kbase_context *ctx, struct kbase_jd_atom *event);
 int kbase_event_dequeue(struct kbase_context *ctx, struct base_jd_event_v2 *uevent);
@@ -204,8 +204,8 @@ void kbasep_remove_waiting_soft_job(struct kbase_jd_atom *katom);
 void kbase_soft_event_wait_callback(struct kbase_jd_atom *katom);
 #endif
 int kbase_soft_event_update(struct kbase_context *kctx,
-			    u64 event,
-			    unsigned char new_status);
+                u64 event,
+                unsigned char new_status);
 
 bool kbase_replay_process(struct kbase_jd_atom *katom);
 
@@ -215,7 +215,7 @@ void kbasep_complete_triggered_soft_events(struct kbase_context *kctx, u64 evt);
 /* api used internally for register access. Contains validation and tracing */
 void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_reg_access_type type, u16 reg_offset, u32 reg_value);
 int kbase_device_trace_buffer_install(
-		struct kbase_context *kctx, u32 *tb, size_t size);
+        struct kbase_context *kctx, u32 *tb, size_t size);
 void kbase_device_trace_buffer_uninstall(struct kbase_context *kctx);
 
 /* api to be ported per OS, only need to do the raw register access */
@@ -234,7 +234,7 @@ void kbasep_as_do_poke(struct work_struct *work);
  * @return name associated with the exception code
  */
 const char *kbase_exception_name(struct kbase_device *kbdev,
-		u32 exception_code);
+        u32 exception_code);
 
 /**
  * Check whether a system suspend is in progress, or has already been suspended
@@ -248,7 +248,7 @@ const char *kbase_exception_name(struct kbase_device *kbdev,
  */
 static inline bool kbase_pm_is_suspending(struct kbase_device *kbdev)
 {
-	return kbdev->pm.suspending;
+    return kbdev->pm.suspending;
 }
 
 /**
@@ -257,15 +257,15 @@ static inline bool kbase_pm_is_suspending(struct kbase_device *kbdev)
  */
 static inline int kbase_jd_atom_id(struct kbase_context *kctx, struct kbase_jd_atom *katom)
 {
-	int result;
+    int result;
 
-	KBASE_DEBUG_ASSERT(kctx);
-	KBASE_DEBUG_ASSERT(katom);
-	KBASE_DEBUG_ASSERT(katom->kctx == kctx);
+    KBASE_DEBUG_ASSERT(kctx);
+    KBASE_DEBUG_ASSERT(katom);
+    KBASE_DEBUG_ASSERT(katom->kctx == kctx);
 
-	result = katom - &kctx->jctx.atoms[0];
-	KBASE_DEBUG_ASSERT(result >= 0 && result <= BASE_JD_ATOM_COUNT);
-	return result;
+    result = katom - &kctx->jctx.atoms[0];
+    KBASE_DEBUG_ASSERT(result >= 0 && result <= BASE_JD_ATOM_COUNT);
+    return result;
 }
 
 /**
@@ -276,9 +276,9 @@ static inline int kbase_jd_atom_id(struct kbase_context *kctx, struct kbase_jd_a
  * Return: Pointer to struct kbase_jd_atom associated with the supplied ID
  */
 static inline struct kbase_jd_atom *kbase_jd_atom_from_id(
-		struct kbase_context *kctx, int id)
+        struct kbase_context *kctx, int id)
 {
-	return &kctx->jctx.atoms[id];
+    return &kctx->jctx.atoms[id];
 }
 
 /**
@@ -364,7 +364,7 @@ void kbase_disjoint_state_down(struct kbase_device *kbdev);
 #define KBASE_DISJOINT_STATE_INTERLEAVED_CONTEXT_COUNT_THRESHOLD 2
 
 #if !defined(UINT64_MAX)
-	#define UINT64_MAX ((uint64_t)0xFFFFFFFFFFFFFFFFULL)
+    #define UINT64_MAX ((uint64_t)0xFFFFFFFFFFFFFFFFULL)
 #endif
 
 #if KBASE_TRACE_ENABLE
@@ -380,8 +380,8 @@ void kbasep_trace_debugfs_init(struct kbase_device *kbdev);
  * - must just return 0 and have no other statements present in the body.
  */
 #define KBASE_TRACE_ADD_SLOT(kbdev, code, ctx, katom, gpu_addr, jobslot) \
-	kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
-			KBASE_TRACE_FLAG_JOBSLOT, 0, jobslot, 0)
+    kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
+            KBASE_TRACE_FLAG_JOBSLOT, 0, jobslot, 0)
 
 /** Add trace values about a job-slot, with info
  *
@@ -392,8 +392,8 @@ void kbasep_trace_debugfs_init(struct kbase_device *kbdev);
  * - must just return 0 and have no other statements present in the body.
  */
 #define KBASE_TRACE_ADD_SLOT_INFO(kbdev, code, ctx, katom, gpu_addr, jobslot, info_val) \
-	kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
-			KBASE_TRACE_FLAG_JOBSLOT, 0, jobslot, info_val)
+    kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
+            KBASE_TRACE_FLAG_JOBSLOT, 0, jobslot, info_val)
 
 /** Add trace values about a ctx refcount
  *
@@ -404,8 +404,8 @@ void kbasep_trace_debugfs_init(struct kbase_device *kbdev);
  * - must just return 0 and have no other statements present in the body.
  */
 #define KBASE_TRACE_ADD_REFCOUNT(kbdev, code, ctx, katom, gpu_addr, refcount) \
-	kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
-			KBASE_TRACE_FLAG_REFCOUNT, refcount, 0, 0)
+    kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
+            KBASE_TRACE_FLAG_REFCOUNT, refcount, 0, 0)
 /** Add trace values about a ctx refcount, and info
  *
  * @note Any functions called through this macro will still be evaluated in
@@ -415,8 +415,8 @@ void kbasep_trace_debugfs_init(struct kbase_device *kbdev);
  * - must just return 0 and have no other statements present in the body.
  */
 #define KBASE_TRACE_ADD_REFCOUNT_INFO(kbdev, code, ctx, katom, gpu_addr, refcount, info_val) \
-	kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
-			KBASE_TRACE_FLAG_REFCOUNT, refcount, 0, info_val)
+    kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
+            KBASE_TRACE_FLAG_REFCOUNT, refcount, 0, info_val)
 
 /** Add trace values (no slot or refcount)
  *
@@ -427,16 +427,16 @@ void kbasep_trace_debugfs_init(struct kbase_device *kbdev);
  * - must just return 0 and have no other statements present in the body.
  */
 #define KBASE_TRACE_ADD(kbdev, code, ctx, katom, gpu_addr, info_val)     \
-	kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
-			0, 0, 0, info_val)
+    kbasep_trace_add(kbdev, KBASE_TRACE_CODE(code), ctx, katom, gpu_addr, \
+            0, 0, 0, info_val)
 
 /** Clear the trace */
 #define KBASE_TRACE_CLEAR(kbdev) \
-	kbasep_trace_clear(kbdev)
+    kbasep_trace_clear(kbdev)
 
 /** Dump the slot trace */
 #define KBASE_TRACE_DUMP(kbdev) \
-	kbasep_trace_dump(kbdev)
+    kbasep_trace_dump(kbdev)
 
 /** PRIVATE - do not use directly. Use KBASE_TRACE_ADD() instead */
 void kbasep_trace_add(struct kbase_device *kbdev, enum kbase_trace_code code, void *ctx, struct kbase_jd_atom *katom, u64 gpu_addr, u8 flags, int refcount, int jobslot, unsigned long info_val);
@@ -446,98 +446,98 @@ void kbasep_trace_clear(struct kbase_device *kbdev);
 /* Dispatch kbase trace events as system trace events */
 #include <mali_linux_kbase_trace.h>
 #define KBASE_TRACE_ADD_SLOT(kbdev, code, ctx, katom, gpu_addr, jobslot)\
-	trace_mali_##code(jobslot, 0)
+    trace_mali_##code(jobslot, 0)
 
 #define KBASE_TRACE_ADD_SLOT_INFO(kbdev, code, ctx, katom, gpu_addr, jobslot, info_val)\
-	trace_mali_##code(jobslot, info_val)
+    trace_mali_##code(jobslot, info_val)
 
 #define KBASE_TRACE_ADD_REFCOUNT(kbdev, code, ctx, katom, gpu_addr, refcount)\
-	trace_mali_##code(refcount, 0)
+    trace_mali_##code(refcount, 0)
 
 #define KBASE_TRACE_ADD_REFCOUNT_INFO(kbdev, code, ctx, katom, gpu_addr, refcount, info_val)\
-	trace_mali_##code(refcount, info_val)
+    trace_mali_##code(refcount, info_val)
 
 #define KBASE_TRACE_ADD(kbdev, code, ctx, katom, gpu_addr, info_val)\
-	trace_mali_##code(gpu_addr, info_val)
+    trace_mali_##code(gpu_addr, info_val)
 
 #define KBASE_TRACE_CLEAR(kbdev)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(0);\
+    } while (0)
 #define KBASE_TRACE_DUMP(kbdev)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #endif /* #ifndef CONFIG_MALI_SYSTEM_TRACE */
 #else
 #define KBASE_TRACE_ADD_SLOT(kbdev, code, ctx, katom, gpu_addr, jobslot)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(ctx);\
-		CSTD_UNUSED(katom);\
-		CSTD_UNUSED(gpu_addr);\
-		CSTD_UNUSED(jobslot);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(ctx);\
+        CSTD_UNUSED(katom);\
+        CSTD_UNUSED(gpu_addr);\
+        CSTD_UNUSED(jobslot);\
+    } while (0)
 
 #define KBASE_TRACE_ADD_SLOT_INFO(kbdev, code, ctx, katom, gpu_addr, jobslot, info_val)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(ctx);\
-		CSTD_UNUSED(katom);\
-		CSTD_UNUSED(gpu_addr);\
-		CSTD_UNUSED(jobslot);\
-		CSTD_UNUSED(info_val);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(ctx);\
+        CSTD_UNUSED(katom);\
+        CSTD_UNUSED(gpu_addr);\
+        CSTD_UNUSED(jobslot);\
+        CSTD_UNUSED(info_val);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #define KBASE_TRACE_ADD_REFCOUNT(kbdev, code, ctx, katom, gpu_addr, refcount)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(ctx);\
-		CSTD_UNUSED(katom);\
-		CSTD_UNUSED(gpu_addr);\
-		CSTD_UNUSED(refcount);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(ctx);\
+        CSTD_UNUSED(katom);\
+        CSTD_UNUSED(gpu_addr);\
+        CSTD_UNUSED(refcount);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #define KBASE_TRACE_ADD_REFCOUNT_INFO(kbdev, code, ctx, katom, gpu_addr, refcount, info_val)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(ctx);\
-		CSTD_UNUSED(katom);\
-		CSTD_UNUSED(gpu_addr);\
-		CSTD_UNUSED(info_val);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(ctx);\
+        CSTD_UNUSED(katom);\
+        CSTD_UNUSED(gpu_addr);\
+        CSTD_UNUSED(info_val);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #define KBASE_TRACE_ADD(kbdev, code, subcode, ctx, katom, val)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(subcode);\
-		CSTD_UNUSED(ctx);\
-		CSTD_UNUSED(katom);\
-		CSTD_UNUSED(val);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(subcode);\
+        CSTD_UNUSED(ctx);\
+        CSTD_UNUSED(katom);\
+        CSTD_UNUSED(val);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #define KBASE_TRACE_CLEAR(kbdev)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(0);\
+    } while (0)
 #define KBASE_TRACE_DUMP(kbdev)\
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(0);\
+    } while (0)
 #endif /* KBASE_TRACE_ENABLE */
 /** PRIVATE - do not use directly. Use KBASE_TRACE_DUMP() instead */
 void kbasep_trace_dump(struct kbase_device *kbdev);

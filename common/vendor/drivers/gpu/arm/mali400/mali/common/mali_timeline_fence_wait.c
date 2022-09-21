@@ -20,7 +20,7 @@
  */
 static struct mali_timeline_fence_wait_tracker *mali_timeline_fence_wait_tracker_alloc(void)
 {
-	return (struct mali_timeline_fence_wait_tracker *) _mali_osk_calloc(1, sizeof(struct mali_timeline_fence_wait_tracker));
+    return (struct mali_timeline_fence_wait_tracker *) mali_osk_calloc(1, sizeof(struct mali_timeline_fence_wait_tracker));
 }
 
 /**
@@ -30,9 +30,9 @@ static struct mali_timeline_fence_wait_tracker *mali_timeline_fence_wait_tracker
  */
 static void mali_timeline_fence_wait_tracker_free(struct mali_timeline_fence_wait_tracker *wait)
 {
-	MALI_DEBUG_ASSERT_POINTER(wait);
-	_mali_osk_atomic_term(&wait->refcount);
-	_mali_osk_free(wait);
+    MALI_DEBUG_ASSERT_POINTER(wait);
+    mali_osk_atomic_term(&wait->refcount);
+    _mali_osk_free(wait);
 }
 
 /**
@@ -43,12 +43,12 @@ static void mali_timeline_fence_wait_tracker_free(struct mali_timeline_fence_wai
  */
 static mali_bool mali_timeline_fence_wait_tracker_is_activated(void *data)
 {
-	struct mali_timeline_fence_wait_tracker *wait;
+    struct mali_timeline_fence_wait_tracker *wait;
 
-	wait = (struct mali_timeline_fence_wait_tracker *) data;
-	MALI_DEBUG_ASSERT_POINTER(wait);
+    wait = (struct mali_timeline_fence_wait_tracker *) data;
+    MALI_DEBUG_ASSERT_POINTER(wait);
 
-	return wait->activated;
+    return wait->activated;
 }
 
 /**
@@ -60,159 +60,159 @@ static mali_bool mali_timeline_fence_wait_tracker_is_activated(void *data)
  */
 static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_system *system, struct mali_timeline_fence *fence)
 {
-	int i;
-	u32 tid = _mali_osk_get_tid();
-	mali_bool ret = MALI_TRUE;
+    int i;
+    u32 tid = mali_osk_get_tid();
+    mali_bool ret = MALI_TRUE;
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-	struct sync_fence *sync_fence = NULL;
+    struct sync_fence *sync_fence = NULL;
 #else
-	struct mali_internal_sync_fence *sync_fence = NULL;
+    struct mali_internal_sync_fence *sync_fence = NULL;
 #endif
 #endif
 
-	MALI_DEBUG_ASSERT_POINTER(system);
-	MALI_DEBUG_ASSERT_POINTER(fence);
+    MALI_DEBUG_ASSERT_POINTER(system);
+    MALI_DEBUG_ASSERT_POINTER(fence);
 
-	mali_spinlock_reentrant_wait(system->spinlock, tid);
+    mali_spinlock_reentrant_wait(system->spinlock, tid);
 
-	for (i = 0; i < MALI_TIMELINE_MAX; ++i) {
-		struct mali_timeline *timeline;
-		mali_timeline_point   point;
+    for (i = 0; i < MALI_TIMELINE_MAX; ++i) {
+        struct mali_timeline *timeline;
+        mali_timeline_point   point;
 
-		point = fence->points[i];
+        point = fence->points[i];
 
-		if (likely(MALI_TIMELINE_NO_POINT == point)) {
-			/* Fence contains no point on this timeline. */
-			continue;
-		}
+        if (likely(MALI_TIMELINE_NO_POINT == point)) {
+            /* Fence contains no point on this timeline. */
+            continue;
+        }
 
-		timeline = system->timelines[i];
-		MALI_DEBUG_ASSERT_POINTER(timeline);
+        timeline = system->timelines[i];
+        MALI_DEBUG_ASSERT_POINTER(timeline);
 
-		if (unlikely(!mali_timeline_is_point_valid(timeline, point))) {
-			MALI_PRINT_ERROR(("Mali Timeline: point %d is not valid (oldest=%d, next=%d)\n", point, timeline->point_oldest, timeline->point_next));
-		}
+        if (unlikely(!mali_timeline_is_point_valid(timeline, point))) {
+            MALI_PRINT_ERROR(("Mali Timeline: point %d is not valid (oldest=%d, next=%d)\n", point, timeline->point_oldest, timeline->point_next));
+        }
 
-		if (!mali_timeline_is_point_released(timeline, point)) {
-			ret = MALI_FALSE;
-			goto exit;
-		}
-	}
+        if (!mali_timeline_is_point_released(timeline, point)) {
+            ret = MALI_FALSE;
+            goto exit;
+        }
+    }
 
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
-	if (-1 != fence->sync_fd) {
+    if (-1 != fence->sync_fd) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-		sync_fence = sync_fence_fdget(fence->sync_fd);
+        sync_fence = sync_fence_fdget(fence->sync_fd);
 #else
-		sync_fence = mali_internal_sync_fence_fdget(fence->sync_fd);
+        sync_fence = mali_internal_sync_fence_fdget(fence->sync_fd);
 #endif
-		if (likely(NULL != sync_fence)) {
+        if (likely(NULL != sync_fence)) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
-			if (0 == sync_fence->status) {
+            if (0 == sync_fence->status) {
 #elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
-			if (0 < atomic_read(&sync_fence->status)) {
+            if (0 < atomic_read(&sync_fence->status)) {
 #else
-			if (0 == sync_fence->fence->ops->signaled(sync_fence->fence)) {
+            if (0 == sync_fence->fence->ops->signaled(sync_fence->fence)) {
 #endif
-				ret = MALI_FALSE;
+                ret = MALI_FALSE;
 
-			} else {
-				ret = MALI_TRUE;
-			}
-		} else {
-			MALI_PRINT_ERROR(("Mali Timeline: failed to get sync fence from fd %d\n", fence->sync_fd));
-		}
-	}
+            } else {
+                ret = MALI_TRUE;
+            }
+        } else {
+            MALI_PRINT_ERROR(("Mali Timeline: failed to get sync fence from fd %d\n", fence->sync_fd));
+        }
+    }
 #endif /* defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE) */
 
 exit:
-	mali_spinlock_reentrant_signal(system->spinlock, tid);
+    mali_spinlock_reentrant_signal(system->spinlock, tid);
 
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
-	if (NULL != sync_fence) {
+    if (NULL != sync_fence) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-		sync_fence_put(sync_fence);
+        sync_fence_put(sync_fence);
 #else
-		fput(sync_fence->file);
+        fput(sync_fence->file);
 #endif
-	}
+    }
 #endif /* defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE) */
 
-	return ret;
+    return ret;
 }
 
 mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct mali_timeline_fence *fence, u32 timeout)
 {
-	struct mali_timeline_fence_wait_tracker *wait;
-	mali_timeline_point point;
-	mali_bool ret;
+    struct mali_timeline_fence_wait_tracker *wait;
+    mali_timeline_point point;
+    mali_bool ret;
 
-	MALI_DEBUG_ASSERT_POINTER(system);
-	MALI_DEBUG_ASSERT_POINTER(fence);
+    MALI_DEBUG_ASSERT_POINTER(system);
+    MALI_DEBUG_ASSERT_POINTER(fence);
 
-	MALI_DEBUG_PRINT(4, ("Mali Timeline: wait on fence\n"));
+    MALI_DEBUG_PRINT(4, ("Mali Timeline: wait on fence\n"));
 
-	if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_IMMEDIATELY == timeout) {
-		return mali_timeline_fence_wait_check_status(system, fence);
-	}
+    if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_IMMEDIATELY == timeout) {
+        return mali_timeline_fence_wait_check_status(system, fence);
+    }
 
-	wait = mali_timeline_fence_wait_tracker_alloc();
-	if (unlikely(NULL == wait)) {
-		MALI_PRINT_ERROR(("Mali Timeline: failed to allocate data for fence wait\n"));
-		return MALI_FALSE;
-	}
+    wait = mali_timeline_fence_wait_tracker_alloc();
+    if (unlikely(NULL == wait)) {
+        MALI_PRINT_ERROR(("Mali Timeline: failed to allocate data for fence wait\n"));
+        return MALI_FALSE;
+    }
 
-	wait->activated = MALI_FALSE;
-	wait->system = system;
+    wait->activated = MALI_FALSE;
+    wait->system = system;
 
-	/* Initialize refcount to two references.  The reference first will be released by this
-	 * function after the wait is over.  The second reference will be released when the tracker
-	 * is activated. */
-	_mali_osk_atomic_init(&wait->refcount, 2);
+    /* Initialize refcount to two references.  The reference first will be released by this
+     * function after the wait is over.  The second reference will be released when the tracker
+     * is activated. */
+    mali_osk_atomic_init(&wait->refcount, 2);
 
-	/* Add tracker to timeline system, but not to a timeline. */
-	mali_timeline_tracker_init(&wait->tracker, MALI_TIMELINE_TRACKER_WAIT, fence, wait);
-	point = mali_timeline_system_add_tracker(system, &wait->tracker, MALI_TIMELINE_NONE);
-	MALI_DEBUG_ASSERT(MALI_TIMELINE_NO_POINT == point);
-	MALI_IGNORE(point);
+    /* Add tracker to timeline system, but not to a timeline. */
+    mali_timeline_tracker_init(&wait->tracker, MALI_TIMELINE_TRACKER_WAIT, fence, wait);
+    point = mali_timeline_system_add_tracker(system, &wait->tracker, MALI_TIMELINE_NONE);
+    MALI_DEBUG_ASSERT(MALI_TIMELINE_NO_POINT == point);
+    MALI_IGNORE(point);
 
-	/* Wait for the tracker to be activated or time out. */
-	if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_NEVER == timeout) {
-		_mali_osk_wait_queue_wait_event(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait);
-	} else {
-		_mali_osk_wait_queue_wait_event_timeout(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait, timeout);
-	}
+    /* Wait for the tracker to be activated or time out. */
+    if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_NEVER == timeout) {
+        _mali_osk_wait_queue_wait_event(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait);
+    } else {
+        _mali_osk_wait_queue_wait_event_timeout(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait, timeout);
+    }
 
-	ret = wait->activated;
+    ret = wait->activated;
 
-	if (0 == _mali_osk_atomic_dec_return(&wait->refcount)) {
-		mali_timeline_fence_wait_tracker_free(wait);
-	}
+    if (0 == mali_osk_atomic_dec_return(&wait->refcount)) {
+        mali_timeline_fence_wait_tracker_free(wait);
+    }
 
-	return ret;
+    return ret;
 }
 
 void mali_timeline_fence_wait_activate(struct mali_timeline_fence_wait_tracker *wait)
 {
-	mali_scheduler_mask schedule_mask = MALI_SCHEDULER_MASK_EMPTY;
+    mali_scheduler_mask schedule_mask = MALI_SCHEDULER_MASK_EMPTY;
 
-	MALI_DEBUG_ASSERT_POINTER(wait);
-	MALI_DEBUG_ASSERT_POINTER(wait->system);
+    MALI_DEBUG_ASSERT_POINTER(wait);
+    MALI_DEBUG_ASSERT_POINTER(wait->system);
 
-	MALI_DEBUG_PRINT(4, ("Mali Timeline: activation for fence wait tracker\n"));
+    MALI_DEBUG_PRINT(4, ("Mali Timeline: activation for fence wait tracker\n"));
 
-	MALI_DEBUG_ASSERT(MALI_FALSE == wait->activated);
-	wait->activated = MALI_TRUE;
+    MALI_DEBUG_ASSERT(MALI_FALSE == wait->activated);
+    wait->activated = MALI_TRUE;
 
-	_mali_osk_wait_queue_wake_up(wait->system->wait_queue);
+    _mali_osk_wait_queue_wake_up(wait->system->wait_queue);
 
-	/* Nothing can wait on this tracker, so nothing to schedule after release. */
-	schedule_mask = mali_timeline_tracker_release(&wait->tracker);
-	MALI_DEBUG_ASSERT(MALI_SCHEDULER_MASK_EMPTY == schedule_mask);
-	MALI_IGNORE(schedule_mask);
+    /* Nothing can wait on this tracker, so nothing to schedule after release. */
+    schedule_mask = mali_timeline_tracker_release(&wait->tracker);
+    MALI_DEBUG_ASSERT(MALI_SCHEDULER_MASK_EMPTY == schedule_mask);
+    MALI_IGNORE(schedule_mask);
 
-	if (0 == _mali_osk_atomic_dec_return(&wait->refcount)) {
-		mali_timeline_fence_wait_tracker_free(wait);
-	}
+    if (0 == mali_osk_atomic_dec_return(&wait->refcount)) {
+        mali_timeline_fence_wait_tracker_free(wait);
+    }
 }

@@ -56,7 +56,7 @@
  * This contains data that is private to the demand power policy.
  */
 struct kbasep_pm_policy_demand {
-	int dummy;
+    int dummy;
 };
 
 extern const struct kbase_pm_policy kbase_pm_demand_policy_ops;

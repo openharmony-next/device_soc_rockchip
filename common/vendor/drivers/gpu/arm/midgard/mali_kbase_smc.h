@@ -17,8 +17,8 @@
 
 
 
-#ifndef _KBASE_SMC_H_
-#define _KBASE_SMC_H_
+#ifndef H_KBASE_SMC_H_
+#define H_KBASE_SMC_H_
 
 #ifdef CONFIG_ARM64
 
@@ -60,7 +60,7 @@ u64 kbase_invoke_smc_fid(u32 fid, u64 arg0, u64 arg1, u64 arg2);
   * Return: the return value from the SMC call.
   */
 u64 kbase_invoke_smc(u32 oen, u16 function_number, bool smc64,
-		u64 arg0, u64 arg1, u64 arg2);
+        u64 arg0, u64 arg1, u64 arg2);
 
 #endif /* CONFIG_ARM64 */
 

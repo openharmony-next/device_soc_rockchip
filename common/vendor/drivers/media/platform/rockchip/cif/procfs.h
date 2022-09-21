@@ -13,7 +13,7 @@ void rkcif_proc_cleanup(struct rkcif_device *dev);
 
 static inline int rkcif_proc_init(struct rkisp_device *dev)
 {
-	return 0;
+    return 0;
 }
 static inline void rkcif_proc_cleanup(struct rkisp_device *dev)
 {

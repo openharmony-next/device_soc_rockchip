@@ -44,8 +44,8 @@ struct kbase_hwcnt_context;
  * Return: 0 on success, else error code.
  */
 int kbase_hwcnt_context_init(
-	const struct kbase_hwcnt_backend_interface *iface,
-	struct kbase_hwcnt_context **out_hctx);
+    const struct kbase_hwcnt_backend_interface *iface,
+    struct kbase_hwcnt_context **out_hctx);
 
 /**
  * kbase_hwcnt_context_term() - Terminate a hardware counter context.
@@ -62,7 +62,7 @@ void kbase_hwcnt_context_term(struct kbase_hwcnt_context *hctx);
  * Return: Non-NULL pointer to metadata, or NULL on error.
  */
 const struct kbase_hwcnt_metadata *kbase_hwcnt_context_metadata(
-	struct kbase_hwcnt_context *hctx);
+    struct kbase_hwcnt_context *hctx);
 
 /**
  * kbase_hwcnt_context_disable() - Increment the disable count of the context.

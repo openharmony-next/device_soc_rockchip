@@ -25,8 +25,8 @@
  * Sync fence tracker.
  */
 struct mali_timeline_sync_fence_tracker {
-	struct mali_sync_flag        *flag;    /**< Sync flag used to connect tracker and sync fence. */
-	struct mali_timeline_tracker  tracker; /**< Timeline tracker. */
+    struct mali_sync_flag        *flag;    /**< Sync flag used to connect tracker and sync fence. */
+    struct mali_timeline_tracker  tracker; /**< Timeline tracker. */
 };
 
 /**

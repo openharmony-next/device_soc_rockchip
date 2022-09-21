@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSFFW_TL_READER_H_
-#define _KBASE_CSFFW_TL_READER_H_
+#ifndef KBASE_CSFFW_TL_READER_H
+#define KBASE_CSFFW_TL_READER_H
 
 #include <linux/spinlock.h>
 #include <linux/timer.h>
@@ -43,9 +43,9 @@ struct kbase_device;
 /**
  * System timestamp to CPU timestamp converter state.
  *
- * @multiplier:	Numerator of the converter's fraction.
- * @divisor:	Denominator of the converter's fraction.
- * @offset:	Converter's offset term.
+ * @multiplier:    Numerator of the converter's fraction.
+ * @divisor:    Denominator of the converter's fraction.
+ * @offset:    Converter's offset term.
  *
  * According to Generic timer spec, system timer:
  * - Increments at a fixed frequency
@@ -66,9 +66,9 @@ struct kbase_device;
  *
  */
 struct kbase_ts_converter {
-	u64 multiplier;
-	u64 divisor;
-	s64 offset;
+    u64 multiplier;
+    u64 divisor;
+    s64 offset;
 };
 
 /**
@@ -94,40 +94,40 @@ struct kbase_ts_converter {
  *                     reading from the tracebufer.
  */
 struct kbase_csf_tl_reader {
-	struct timer_list read_timer;
-	u32 timer_interval;
-	struct kbase_tlstream *stream;
+    struct timer_list read_timer;
+    u32 timer_interval;
+    struct kbase_tlstream *stream;
 
-	struct kbase_device *kbdev;
-	struct firmware_trace_buffer *trace_buffer;
-	struct {
-		const char *data;
-		size_t size;
-		size_t btc;
-	} tl_header;
-	struct kbase_ts_converter ts_converter;
+    struct kbase_device *kbdev;
+    struct firmware_trace_buffer *trace_buffer;
+    struct {
+        const char *data;
+        size_t size;
+        size_t btc;
+    } tl_header;
+    struct kbase_ts_converter ts_converter;
 
-	bool got_first_event;
-	bool is_active;
-	u16 expected_event_id;
+    bool got_first_event;
+    bool is_active;
+    u16 expected_event_id;
 
-	u8 read_buffer[PAGE_SIZE * KBASE_CSF_TL_BUFFER_NR_PAGES];
-	spinlock_t read_lock;
+    u8 read_buffer[PAGE_SIZE * KBASE_CSF_TL_BUFFER_NR_PAGES];
+    spinlock_t read_lock;
 };
 
 /**
  * kbase_csf_tl_reader_init() - Initialize CSFFW Timelime Stream Reader.
  *
- * @self:	CSFFW TL Reader instance.
- * @stream:	Destination timeline stream.
+ * @self:    CSFFW TL Reader instance.
+ * @stream:    Destination timeline stream.
  */
 void kbase_csf_tl_reader_init(struct kbase_csf_tl_reader *self,
-	struct kbase_tlstream *stream);
+    struct kbase_tlstream *stream);
 
 /**
  * kbase_csf_tl_reader_term() - Terminate CSFFW Timelime Stream Reader.
  *
- * @self:	CSFFW TL Reader instance.
+ * @self:    CSFFW TL Reader instance.
  */
 void kbase_csf_tl_reader_term(struct kbase_csf_tl_reader *self);
 
@@ -142,39 +142,39 @@ void kbase_csf_tl_reader_flush_buffer(struct kbase_csf_tl_reader *self);
 
 /**
  * kbase_csf_tl_reader_start() -
- *	Start asynchronous copying of CSFFW timeline stream.
+ *    Start asynchronous copying of CSFFW timeline stream.
  *
- * @self:	CSFFW TL Reader instance.
- * @kbdev:	Kbase device.
+ * @self:    CSFFW TL Reader instance.
+ * @kbdev:    Kbase device.
  *
  * Return: zero on success, a negative error code otherwise.
  */
 int kbase_csf_tl_reader_start(struct kbase_csf_tl_reader *self,
-	struct kbase_device *kbdev);
+    struct kbase_device *kbdev);
 
 /**
  * kbase_csf_tl_reader_stop() -
- *	Stop asynchronous copying of CSFFW timeline stream.
+ *    Stop asynchronous copying of CSFFW timeline stream.
  *
- * @self:	CSFFW TL Reader instance.
+ * @self:    CSFFW TL Reader instance.
  */
 void kbase_csf_tl_reader_stop(struct kbase_csf_tl_reader *self);
 
 #ifdef CONFIG_DEBUG_FS
 /**
  * kbase_csf_tl_reader_debugfs_init() -
- *	Initialize debugfs for CSFFW Timelime Stream Reader.
+ *    Initialize debugfs for CSFFW Timelime Stream Reader.
  *
- * @kbdev:	Kbase device.
+ * @kbdev:    Kbase device.
  */
 void kbase_csf_tl_reader_debugfs_init(struct kbase_device *kbdev);
 #endif
 
 /**
  * kbase_csf_tl_reader_reset() -
- *	Reset CSFFW timeline reader, it should be called before reset CSFFW.
+ *    Reset CSFFW timeline reader, it should be called before reset CSFFW.
  *
- * @self:	CSFFW TL Reader instance.
+ * @self:    CSFFW TL Reader instance.
  */
 void kbase_csf_tl_reader_reset(struct kbase_csf_tl_reader *self);
 

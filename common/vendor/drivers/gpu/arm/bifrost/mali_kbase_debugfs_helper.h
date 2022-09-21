@@ -32,7 +32,7 @@
  * @value: Attribute value to be set.
  */
 typedef void (*kbase_debugfs_helper_set_attr_fn)(
-	void *array, size_t index, size_t value);
+    void *array, size_t index, size_t value);
 
 /**
  * kbase_debugfs_helper_set_attr_from_string - Parse a string to reconfigure an
@@ -55,8 +55,8 @@ typedef void (*kbase_debugfs_helper_set_attr_fn)(
  * Return: 0 if success, negative error code otherwise.
  */
 int kbase_debugfs_helper_set_attr_from_string(
-	const char *buf, void *array, size_t nelems,
-	kbase_debugfs_helper_set_attr_fn set_attr_fn);
+    const char *buf, void *array, size_t nelems,
+    kbase_debugfs_helper_set_attr_fn set_attr_fn);
 
 /**
  * typedef kbase_debugfs_helper_get_attr_fn - Type of function to get an
@@ -68,7 +68,7 @@ int kbase_debugfs_helper_set_attr_from_string(
  * Return: Value of attribute.
  */
 typedef size_t (*kbase_debugfs_helper_get_attr_fn)(
-	void *array, size_t index);
+    void *array, size_t index);
 
 /**
  * kbase_debugfs_helper_get_attr_to_string - Construct a formatted string
@@ -88,8 +88,8 @@ typedef size_t (*kbase_debugfs_helper_get_attr_fn)(
  * Return: Number of characters written excluding the nul terminator.
  */
 ssize_t kbase_debugfs_helper_get_attr_to_string(
-	char *buf, size_t size, void *array, size_t nelems,
-	kbase_debugfs_helper_get_attr_fn get_attr_fn);
+    char *buf, size_t size, void *array, size_t nelems,
+    kbase_debugfs_helper_get_attr_fn get_attr_fn);
 
 /**
  * kbase_debugfs_helper_seq_read - Implements reads from a virtual file for an
@@ -110,8 +110,8 @@ ssize_t kbase_debugfs_helper_get_attr_to_string(
  * Return: 0 if success, negative error code otherwise.
  */
 int kbase_debugfs_helper_seq_read(
-	struct seq_file *const sfile, size_t const nelems,
-	kbase_debugfs_helper_get_attr_fn const get_attr_fn);
+    struct seq_file *const sfile, size_t const nelems,
+    kbase_debugfs_helper_get_attr_fn const get_attr_fn);
 
 /**
  * kbase_debugfs_helper_seq_write - Implements writes to a virtual file for an
@@ -133,9 +133,9 @@ int kbase_debugfs_helper_seq_read(
  * Return: 0 if success, negative error code otherwise.
  */
 int kbase_debugfs_helper_seq_write(struct file *const file,
-	const char __user *const ubuf, size_t const count,
-	size_t const nelems,
-	kbase_debugfs_helper_set_attr_fn const set_attr_fn);
+    const char __user *const ubuf, size_t const count,
+    size_t const nelems,
+    kbase_debugfs_helper_set_attr_fn const set_attr_fn);
 
 #endif  /*_KBASE_DEBUGFS_HELPER_H_ */
 

@@ -31,45 +31,45 @@
 
 static int kbase_as_fault_read(struct seq_file *sfile, void *data)
 {
-	uintptr_t as_no = (uintptr_t) sfile->private;
+    uintptr_t as_no = (uintptr_t) sfile->private;
 
-	struct list_head *entry;
-	const struct list_head *kbdev_list;
-	struct kbase_device *kbdev = NULL;
+    struct list_head *entry;
+    const struct list_head *kbdev_list;
+    struct kbase_device *kbdev = NULL;
 
-	kbdev_list = kbase_device_get_list();
+    kbdev_list = kbase_device_get_list();
 
-	list_for_each(entry, kbdev_list) {
-		kbdev = list_entry(entry, struct kbase_device, entry);
+    list_for_each(entry, kbdev_list) {
+        kbdev = list_entry(entry, struct kbase_device, entry);
 
-		if (kbdev->debugfs_as_read_bitmap & (1ULL << as_no)) {
+        if (kbdev->debugfs_as_read_bitmap & (1ULL << as_no)) {
 
-			/* don't show this one again until another fault occors */
-			kbdev->debugfs_as_read_bitmap &= ~(1ULL << as_no);
+            /* don't show this one again until another fault occors */
+            kbdev->debugfs_as_read_bitmap &= ~(1ULL << as_no);
 
-			/* output the last page fault addr */
-			seq_printf(sfile, "%llu\n",
-				   (u64) kbdev->as[as_no].pf_data.addr);
-		}
+            /* output the last page fault addr */
+            seq_printf(sfile, "%llu\n",
+                   (u64) kbdev->as[as_no].pf_data.addr);
+        }
 
-	}
+    }
 
-	kbase_device_put_list(kbdev_list);
+    kbase_device_put_list(kbdev_list);
 
-	return 0;
+    return 0;
 }
 
 static int kbase_as_fault_debugfs_open(struct inode *in, struct file *file)
 {
-	return single_open(file, kbase_as_fault_read, in->i_private);
+    return single_open(file, kbase_as_fault_read, in->i_private);
 }
 
 static const struct file_operations as_fault_fops = {
-	.owner = THIS_MODULE,
-	.open = kbase_as_fault_debugfs_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
+    .owner = THIS_MODULE,
+    .open = kbase_as_fault_debugfs_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
 };
 
 #endif /* CONFIG_MALI_BIFROST_DEBUG */
@@ -82,32 +82,32 @@ void kbase_as_fault_debugfs_init(struct kbase_device *kbdev)
 {
 #ifdef CONFIG_DEBUG_FS
 #ifdef CONFIG_MALI_BIFROST_DEBUG
-	uint i;
-	char as_name[64];
-	struct dentry *debugfs_directory;
+    uint i;
+    char as_name[64];
+    struct dentry *debugfs_directory;
 
-	kbdev->debugfs_as_read_bitmap = 0ULL;
+    kbdev->debugfs_as_read_bitmap = 0ULL;
 
-	KBASE_DEBUG_ASSERT(kbdev->nr_hw_address_spaces);
-	KBASE_DEBUG_ASSERT(sizeof(kbdev->as[0].pf_data.addr) == sizeof(u64));
+    KBASE_DEBUG_ASSERT(kbdev->nr_hw_address_spaces);
+    KBASE_DEBUG_ASSERT(sizeof(kbdev->as[0].pf_data.addr) == sizeof(u64));
 
-	debugfs_directory = debugfs_create_dir("address_spaces",
-					       kbdev->mali_debugfs_directory);
+    debugfs_directory = debugfs_create_dir("address_spaces",
+                           kbdev->mali_debugfs_directory);
 
-	if (debugfs_directory) {
-		for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
-			snprintf(as_name, ARRAY_SIZE(as_name), "as%u", i);
-			debugfs_create_file(as_name, S_IRUGO,
-					    debugfs_directory,
-					    (void *)(uintptr_t)i,
-					    &as_fault_fops);
-		}
-	} else {
-		dev_warn(kbdev->dev,
-			 "unable to create address_spaces debugfs directory");
-	}
+    if (debugfs_directory) {
+        for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
+            snprintf(as_name, ARRAY_SIZE(as_name), "as%u", i);
+            debugfs_create_file(as_name, S_IRUGO,
+                        debugfs_directory,
+                        (void *)(uintptr_t)i,
+                        &as_fault_fops);
+        }
+    } else {
+        dev_warn(kbdev->dev,
+             "unable to create address_spaces debugfs directory");
+    }
 
 #endif /* CONFIG_MALI_BIFROST_DEBUG */
 #endif /* CONFIG_DEBUG_FS */
-	return;
+    return;
 }

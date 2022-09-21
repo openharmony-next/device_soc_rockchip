@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_FENCE_DEFS_H_
-#define _KBASE_FENCE_DEFS_H_
+#ifndef KBASE_FENCE_DEFS_H
+#define KBASE_FENCE_DEFS_H
 
 /*
  * There was a big rename in the 4.10 kernel (fence* -> dma_fence*)
@@ -55,8 +55,8 @@
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 11, 0))
 #define dma_fence_get_status(a) (dma_fence_is_signaled(a) ? \
-	(a)->status ?: 1 \
-	: 0)
+    (a)->status ?: 1 \
+    : 0)
 #endif
 
 #endif /* < 4.10.0 */

@@ -20,8 +20,8 @@
  *                    fail.
  */
 enum df_reason {
-	DF_NORMAL,
-	DF_UNDER_PRESSURE,
+    DF_NORMAL,
+    DF_UNDER_PRESSURE,
 };
 
 /**
@@ -35,10 +35,10 @@ enum df_reason {
  * @list: list entry for the deferred list
  */
 struct deferred_freelist_item {
-	size_t nr_pages;
-	void (*free)(struct deferred_freelist_item *i,
-		     enum df_reason reason);
-	struct list_head list;
+    size_t nr_pages;
+    void (*free)(struct deferred_freelist_item *i,
+             enum df_reason reason);
+    struct list_head list;
 };
 
 /**
@@ -49,7 +49,7 @@ struct deferred_freelist_item {
  * @nr_pages: number of pages to be freed
  */
 void deferred_free(struct deferred_freelist_item *item,
-		   void (*free)(struct deferred_freelist_item *i,
-				enum df_reason reason),
-		   size_t nr_pages);
+           void (*free)(struct deferred_freelist_item *i,
+                enum df_reason reason),
+           size_t nr_pages);
 #endif

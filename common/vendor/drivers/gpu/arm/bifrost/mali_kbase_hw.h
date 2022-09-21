@@ -27,8 +27,8 @@
  * Run-time work-arounds helpers
  */
 
-#ifndef _KBASE_HW_H_
-#define _KBASE_HW_H_
+#ifndef KBASE_HW_H
+#define KBASE_HW_H
 
 #include "mali_kbase_defs.h"
 
@@ -36,13 +36,13 @@
  * @brief Tell whether a work-around should be enabled
  */
 #define kbase_hw_has_issue(kbdev, issue)\
-	test_bit(issue, &(kbdev)->hw_issues_mask[0])
+    test_bit(issue, &(kbdev)->hw_issues_mask[0])
 
 /**
  * @brief Tell whether a feature is supported
  */
 #define kbase_hw_has_feature(kbdev, feature)\
-	test_bit(feature, &(kbdev)->hw_features_mask[0])
+    test_bit(feature, &(kbdev)->hw_features_mask[0])
 
 /**
  * kbase_hw_set_issues_mask - Set the hardware issues mask based on the GPU ID
@@ -67,4 +67,4 @@ int kbase_hw_set_issues_mask(struct kbase_device *kbdev);
  */
 void kbase_hw_set_features_mask(struct kbase_device *kbdev);
 
-#endif				/* _KBASE_HW_H_ */
+#endif                /* _KBASE_HW_H_ */

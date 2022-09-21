@@ -52,9 +52,9 @@
  * to get the information.
  */
 struct kbase_sync_fence_info {
-	void *fence;
-	char name[32];
-	int status;
+    void *fence;
+    char name[32];
+    int status;
 };
 
 /**
@@ -166,9 +166,9 @@ void kbase_sync_fence_out_remove(struct kbase_jd_atom *katom);
 static inline void kbase_sync_fence_close_fd(int fd)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
-	ksys_close(fd);
+    ksys_close(fd);
 #else
-	sys_close(fd);
+    sys_close(fd);
 #endif
 }
 
@@ -181,7 +181,7 @@ static inline void kbase_sync_fence_close_fd(int fd)
  * return: 0 on success, < 0 on error
  */
 int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
-				 struct kbase_sync_fence_info *info);
+                 struct kbase_sync_fence_info *info);
 
 /**
  * kbase_sync_fence_out_info_get() - Retrieves information about output fence
@@ -191,16 +191,16 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
  * return: 0 on success, < 0 on error
  */
 int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
-				  struct kbase_sync_fence_info *info);
+                  struct kbase_sync_fence_info *info);
 #endif /* !MALI_USE_CSF */
 
 #if defined(CONFIG_SYNC_FILE)
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
 void kbase_sync_fence_info_get(struct fence *fence,
-			       struct kbase_sync_fence_info *info);
+                   struct kbase_sync_fence_info *info);
 #else
 void kbase_sync_fence_info_get(struct dma_fence *fence,
-			       struct kbase_sync_fence_info *info);
+                   struct kbase_sync_fence_info *info);
 #endif
 #endif
 

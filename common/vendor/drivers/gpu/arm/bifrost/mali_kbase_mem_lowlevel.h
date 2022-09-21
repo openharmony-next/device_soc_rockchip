@@ -34,17 +34,17 @@
 /**
  * @brief Flags for kbase_phy_allocator_pages_alloc
  */
-#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)	/** Default allocation flag */
-#define KBASE_PHY_PAGES_FLAG_CLEAR   (1 << 0)	/** Clear the pages after allocation */
-#define KBASE_PHY_PAGES_FLAG_POISON  (1 << 1)	/** Fill the memory with a poison value */
+#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)    /** Default allocation flag */
+#define KBASE_PHY_PAGES_FLAG_CLEAR   (1 << 0)    /** Clear the pages after allocation */
+#define KBASE_PHY_PAGES_FLAG_POISON  (1 << 1)    /** Fill the memory with a poison value */
 
 #define KBASE_PHY_PAGES_SUPPORTED_FLAGS (KBASE_PHY_PAGES_FLAG_DEFAULT|KBASE_PHY_PAGES_FLAG_CLEAR|KBASE_PHY_PAGES_FLAG_POISON)
 
 #define KBASE_PHY_PAGES_POISON_VALUE  0xFD /** Value to fill the memory with when KBASE_PHY_PAGES_FLAG_POISON is set */
 
 enum kbase_sync_type {
-	KBASE_SYNC_TO_CPU,
-	KBASE_SYNC_TO_DEVICE
+    KBASE_SYNC_TO_CPU,
+    KBASE_SYNC_TO_DEVICE
 };
 
 struct tagged_addr { phys_addr_t tagged_addr; };
@@ -59,7 +59,7 @@ struct tagged_addr { phys_addr_t tagged_addr; };
  * which are reported during builds for some architectures.
  */
 #ifndef phys_to_page
-#define phys_to_page(phys)	(pfn_to_page((phys) >> PAGE_SHIFT))
+#define phys_to_page(phys)    (pfn_to_page((phys) >> PAGE_SHIFT))
 #endif
 
 /**
@@ -71,7 +71,7 @@ struct tagged_addr { phys_addr_t tagged_addr; };
  */
 static inline phys_addr_t as_phys_addr_t(struct tagged_addr t)
 {
-	return t.tagged_addr & PAGE_MASK;
+    return t.tagged_addr & PAGE_MASK;
 }
 
 /**
@@ -82,7 +82,7 @@ static inline phys_addr_t as_phys_addr_t(struct tagged_addr t)
  */
 static inline struct page *as_page(struct tagged_addr t)
 {
-	return phys_to_page(as_phys_addr_t(t));
+    return phys_to_page(as_phys_addr_t(t));
 }
 
 /**
@@ -99,10 +99,10 @@ static inline struct page *as_page(struct tagged_addr t)
  */
 static inline struct tagged_addr as_tagged(phys_addr_t phys)
 {
-	struct tagged_addr t;
+    struct tagged_addr t;
 
-	t.tagged_addr = phys & PAGE_MASK;
-	return t;
+    t.tagged_addr = phys & PAGE_MASK;
+    return t;
 }
 
 /**
@@ -117,10 +117,10 @@ static inline struct tagged_addr as_tagged(phys_addr_t phys)
  */
 static inline struct tagged_addr as_tagged_tag(phys_addr_t phys, int tag)
 {
-	struct tagged_addr t;
+    struct tagged_addr t;
 
-	t.tagged_addr = (phys & PAGE_MASK) | (tag & ~PAGE_MASK);
-	return t;
+    t.tagged_addr = (phys & PAGE_MASK) | (tag & ~PAGE_MASK);
+    return t;
 }
 
 /**
@@ -132,7 +132,7 @@ static inline struct tagged_addr as_tagged_tag(phys_addr_t phys, int tag)
  */
 static inline bool is_huge(struct tagged_addr t)
 {
-	return t.tagged_addr & HUGE_PAGE;
+    return t.tagged_addr & HUGE_PAGE;
 }
 
 /**
@@ -145,9 +145,9 @@ static inline bool is_huge(struct tagged_addr t)
  */
 static inline bool is_huge_head(struct tagged_addr t)
 {
-	int mask = HUGE_HEAD | HUGE_PAGE;
+    int mask = HUGE_HEAD | HUGE_PAGE;
 
-	return mask == (t.tagged_addr & mask);
+    return mask == (t.tagged_addr & mask);
 }
 
 /**
@@ -160,7 +160,7 @@ static inline bool is_huge_head(struct tagged_addr t)
  */
 static inline bool is_partial(struct tagged_addr t)
 {
-	return t.tagged_addr & FROM_PARTIAL;
+    return t.tagged_addr & FROM_PARTIAL;
 }
 
 #endif /* _KBASE_LOWLEVEL_H */

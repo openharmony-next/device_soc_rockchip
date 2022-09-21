@@ -27,8 +27,8 @@
  * - regs_history: return the information about last accesses to the registers.
  */
 
-#ifndef _KBASE_REGS_HISTORY_DEBUGFS_H
-#define _KBASE_REGS_HISTORY_DEBUGFS_H
+#ifndef H_KBASE_REGS_HISTORY_DEBUGFS_H
+#define H_KBASE_REGS_HISTORY_DEBUGFS_H
 
 struct kbase_device;
 

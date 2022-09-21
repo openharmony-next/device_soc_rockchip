@@ -28,19 +28,19 @@
 
 /* The timeline stream file operations functions. */
 static ssize_t kbasep_timeline_io_read(
-		struct file *filp,
-		char __user *buffer,
-		size_t      size,
-		loff_t      *f_pos);
+        struct file *filp,
+        char __user *buffer,
+        size_t      size,
+        loff_t      *f_pos);
 static unsigned int kbasep_timeline_io_poll(struct file *filp, poll_table *wait);
 static int kbasep_timeline_io_release(struct inode *inode, struct file *filp);
 
 /* The timeline stream file operations structure. */
 const struct file_operations kbasep_tlstream_fops = {
-	.owner = THIS_MODULE,
-	.release = kbasep_timeline_io_release,
-	.read    = kbasep_timeline_io_read,
-	.poll    = kbasep_timeline_io_poll,
+    .owner = THIS_MODULE,
+    .release = kbasep_timeline_io_release,
+    .read    = kbasep_timeline_io_read,
+    .poll    = kbasep_timeline_io_poll,
 };
 
 /**
@@ -57,50 +57,50 @@ const struct file_operations kbasep_tlstream_fops = {
  * Return: non-zero if any of timeline streams has at last one packet ready
  */
 static int kbasep_timeline_io_packet_pending(
-		struct kbase_timeline  *timeline,
-		struct kbase_tlstream **ready_stream,
-		unsigned int           *rb_idx_raw)
+        struct kbase_timeline  *timeline,
+        struct kbase_tlstream **ready_stream,
+        unsigned int           *rb_idx_raw)
 {
-	enum tl_stream_type i;
+    enum tl_stream_type i;
 
-	KBASE_DEBUG_ASSERT(ready_stream);
-	KBASE_DEBUG_ASSERT(rb_idx_raw);
+    KBASE_DEBUG_ASSERT(ready_stream);
+    KBASE_DEBUG_ASSERT(rb_idx_raw);
 
-	for (i = (enum tl_stream_type)0; i < TL_STREAM_TYPE_COUNT; ++i) {
-		struct kbase_tlstream *stream = &timeline->streams[i];
-		*rb_idx_raw = atomic_read(&stream->rbi);
-		/* Read buffer index may be updated by writer in case of
-		 * overflow. Read and write buffer indexes must be
-		 * loaded in correct order.
-		 */
-		smp_rmb();
-		if (atomic_read(&stream->wbi) != *rb_idx_raw) {
-			*ready_stream = stream;
-			return 1;
-		}
+    for (i = (enum tl_stream_type)0; i < TL_STREAM_TYPE_COUNT; ++i) {
+        struct kbase_tlstream *stream = &timeline->streams[i];
+        *rb_idx_raw = atomic_read(&stream->rbi);
+        /* Read buffer index may be updated by writer in case of
+         * overflow. Read and write buffer indexes must be
+         * loaded in correct order.
+         */
+        smp_rmb();
+        if (atomic_read(&stream->wbi) != *rb_idx_raw) {
+            *ready_stream = stream;
+            return 1;
+        }
 
-	}
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
  * kbasep_timeline_has_header_data() -
- *	check timeline headers for pending packets
+ *    check timeline headers for pending packets
  *
  * @timeline:      Timeline instance
  *
  * Return: non-zero if any of timeline headers has at last one packet ready.
  */
 static int kbasep_timeline_has_header_data(
-	struct kbase_timeline *timeline)
+    struct kbase_timeline *timeline)
 {
-	return timeline->obj_header_btc
-		|| timeline->aux_header_btc
+    return timeline->obj_header_btc
+        || timeline->aux_header_btc
 #if MALI_USE_CSF
-		|| timeline->csf_tl_reader.tl_header.btc
+        || timeline->csf_tl_reader.tl_header.btc
 #endif
-		;
+        ;
 }
 
 /**
@@ -117,27 +117,27 @@ static int kbasep_timeline_has_header_data(
  * Returns: 0 if success, -1 otherwise.
  */
 static inline int copy_stream_header(
-	char __user *buffer, size_t size, ssize_t *copy_len,
-	const char *hdr,
-	size_t hdr_size,
-	size_t *hdr_btc)
+    char __user *buffer, size_t size, ssize_t *copy_len,
+    const char *hdr,
+    size_t hdr_size,
+    size_t *hdr_btc)
 {
-	const size_t offset = hdr_size - *hdr_btc;
-	const size_t copy_size = MIN(size - *copy_len, *hdr_btc);
+    const size_t offset = hdr_size - *hdr_btc;
+    const size_t copy_size = MIN(size - *copy_len, *hdr_btc);
 
-	if (!*hdr_btc)
-		return 0;
+    if (!*hdr_btc)
+        return 0;
 
-	if (WARN_ON(*hdr_btc > hdr_size))
-		return -1;
+    if (WARN_ON(*hdr_btc > hdr_size))
+        return -1;
 
-	if (copy_to_user(&buffer[*copy_len], &hdr[offset], copy_size))
-		return -1;
+    if (copy_to_user(&buffer[*copy_len], &hdr[offset], copy_size))
+        return -1;
 
-	*hdr_btc -= copy_size;
-	*copy_len += copy_size;
+    *hdr_btc -= copy_size;
+    *copy_len += copy_size;
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -155,30 +155,30 @@ static inline int copy_stream_header(
  * Returns: 0 if success, -1 if copy_to_user has failed.
  */
 static inline int kbasep_timeline_copy_headers(
-	struct kbase_timeline *timeline,
-	char __user *buffer,
-	size_t size,
-	ssize_t *copy_len)
+    struct kbase_timeline *timeline,
+    char __user *buffer,
+    size_t size,
+    ssize_t *copy_len)
 {
-	if (copy_stream_header(buffer, size, copy_len,
-			obj_desc_header,
-			obj_desc_header_size,
-			&timeline->obj_header_btc))
-		return -1;
+    if (copy_stream_header(buffer, size, copy_len,
+            obj_desc_header,
+            obj_desc_header_size,
+            &timeline->obj_header_btc))
+        return -1;
 
-	if (copy_stream_header(buffer, size, copy_len,
-			aux_desc_header,
-			aux_desc_header_size,
-			&timeline->aux_header_btc))
-		return -1;
+    if (copy_stream_header(buffer, size, copy_len,
+            aux_desc_header,
+            aux_desc_header_size,
+            &timeline->aux_header_btc))
+        return -1;
 #if MALI_USE_CSF
-	if (copy_stream_header(buffer, size, copy_len,
-			timeline->csf_tl_reader.tl_header.data,
-			timeline->csf_tl_reader.tl_header.size,
-			&timeline->csf_tl_reader.tl_header.btc))
-		return -1;
+    if (copy_stream_header(buffer, size, copy_len,
+            timeline->csf_tl_reader.tl_header.data,
+            timeline->csf_tl_reader.tl_header.size,
+            &timeline->csf_tl_reader.tl_header.btc))
+        return -1;
 #endif
-	return 0;
+    return 0;
 }
 
 
@@ -192,112 +192,112 @@ static inline int kbasep_timeline_copy_headers(
  * Return: number of bytes stored in the buffer
  */
 static ssize_t kbasep_timeline_io_read(
-		struct file *filp,
-		char __user *buffer,
-		size_t      size,
-		loff_t      *f_pos)
+        struct file *filp,
+        char __user *buffer,
+        size_t      size,
+        loff_t      *f_pos)
 {
-	ssize_t copy_len = 0;
-	struct kbase_timeline *timeline;
+    ssize_t copy_len = 0;
+    struct kbase_timeline *timeline;
 
-	KBASE_DEBUG_ASSERT(filp);
-	KBASE_DEBUG_ASSERT(f_pos);
+    KBASE_DEBUG_ASSERT(filp);
+    KBASE_DEBUG_ASSERT(f_pos);
 
-	if (WARN_ON(!filp->private_data))
-		return -EFAULT;
+    if (WARN_ON(!filp->private_data))
+        return -EFAULT;
 
-	timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *) filp->private_data;
 
-	if (!buffer)
-		return -EINVAL;
+    if (!buffer)
+        return -EINVAL;
 
-	if ((*f_pos < 0) || (size < PACKET_SIZE))
-		return -EINVAL;
+    if ((*f_pos < 0) || (size < PACKET_SIZE))
+        return -EINVAL;
 
-	mutex_lock(&timeline->reader_lock);
+    mutex_lock(&timeline->reader_lock);
 
-	while (copy_len < size) {
-		struct kbase_tlstream *stream = NULL;
-		unsigned int        rb_idx_raw = 0;
-		unsigned int        wb_idx_raw;
-		unsigned int        rb_idx;
-		size_t              rb_size;
+    while (copy_len < size) {
+        struct kbase_tlstream *stream = NULL;
+        unsigned int        rb_idx_raw = 0;
+        unsigned int        wb_idx_raw;
+        unsigned int        rb_idx;
+        size_t              rb_size;
 
-		if (kbasep_timeline_copy_headers(
-			    timeline, buffer, size, &copy_len)) {
-			copy_len = -EFAULT;
-			break;
-		}
+        if (kbasep_timeline_copy_headers(
+                timeline, buffer, size, &copy_len)) {
+            copy_len = -EFAULT;
+            break;
+        }
 
-		/* If we already read some packets and there is no
-		 * packet pending then return back to user.
-		 * If we don't have any data yet, wait for packet to be
-		 * submitted.
-		 */
-		if (copy_len > 0) {
-			if (!kbasep_timeline_io_packet_pending(
-						timeline,
-						&stream,
-						&rb_idx_raw))
-				break;
-		} else {
-			if (wait_event_interruptible(
-						timeline->event_queue,
-						kbasep_timeline_io_packet_pending(
-							timeline,
-							&stream,
-							&rb_idx_raw))) {
-				copy_len = -ERESTARTSYS;
-				break;
-			}
-		}
+        /* If we already read some packets and there is no
+         * packet pending then return back to user.
+         * If we don't have any data yet, wait for packet to be
+         * submitted.
+         */
+        if (copy_len > 0) {
+            if (!kbasep_timeline_io_packet_pending(
+                        timeline,
+                        &stream,
+                        &rb_idx_raw))
+                break;
+        } else {
+            if (wait_event_interruptible(
+                        timeline->event_queue,
+                        kbasep_timeline_io_packet_pending(
+                            timeline,
+                            &stream,
+                            &rb_idx_raw))) {
+                copy_len = -ERESTARTSYS;
+                break;
+            }
+        }
 
-		if (WARN_ON(!stream)) {
-			copy_len = -EFAULT;
-			break;
-		}
+        if (WARN_ON(!stream)) {
+            copy_len = -EFAULT;
+            break;
+        }
 
-		/* Check if this packet fits into the user buffer.
-		 * If so copy its content.
-		 */
-		rb_idx = rb_idx_raw % PACKET_COUNT;
-		rb_size = atomic_read(&stream->buffer[rb_idx].size);
-		if (rb_size > size - copy_len)
-			break;
-		if (copy_to_user(
-					&buffer[copy_len],
-					stream->buffer[rb_idx].data,
-					rb_size)) {
-			copy_len = -EFAULT;
-			break;
-		}
+        /* Check if this packet fits into the user buffer.
+         * If so copy its content.
+         */
+        rb_idx = rb_idx_raw % PACKET_COUNT;
+        rb_size = atomic_read(&stream->buffer[rb_idx].size);
+        if (rb_size > size - copy_len)
+            break;
+        if (copy_to_user(
+                    &buffer[copy_len],
+                    stream->buffer[rb_idx].data,
+                    rb_size)) {
+            copy_len = -EFAULT;
+            break;
+        }
 
-		/* If the distance between read buffer index and write
-		 * buffer index became more than PACKET_COUNT, then overflow
-		 * happened and we need to ignore the last portion of bytes
-		 * that we have just sent to user.
-		 */
-		smp_rmb();
-		wb_idx_raw = atomic_read(&stream->wbi);
+        /* If the distance between read buffer index and write
+         * buffer index became more than PACKET_COUNT, then overflow
+         * happened and we need to ignore the last portion of bytes
+         * that we have just sent to user.
+         */
+        smp_rmb();
+        wb_idx_raw = atomic_read(&stream->wbi);
 
-		if (wb_idx_raw - rb_idx_raw < PACKET_COUNT) {
-			copy_len += rb_size;
-			atomic_inc(&stream->rbi);
+        if (wb_idx_raw - rb_idx_raw < PACKET_COUNT) {
+            copy_len += rb_size;
+            atomic_inc(&stream->rbi);
 #if MALI_UNIT_TEST
-			atomic_add(rb_size, &timeline->bytes_collected);
+            atomic_add(rb_size, &timeline->bytes_collected);
 #endif /* MALI_UNIT_TEST */
 
-		} else {
-			const unsigned int new_rb_idx_raw =
-				wb_idx_raw - PACKET_COUNT + 1;
-			/* Adjust read buffer index to the next valid buffer */
-			atomic_set(&stream->rbi, new_rb_idx_raw);
-		}
-	}
+        } else {
+            const unsigned int new_rb_idx_raw =
+                wb_idx_raw - PACKET_COUNT + 1;
+            /* Adjust read buffer index to the next valid buffer */
+            atomic_set(&stream->rbi, new_rb_idx_raw);
+        }
+    }
 
-	mutex_unlock(&timeline->reader_lock);
+    mutex_unlock(&timeline->reader_lock);
 
-	return copy_len;
+    return copy_len;
 }
 
 /**
@@ -308,26 +308,26 @@ static ssize_t kbasep_timeline_io_read(
  */
 static unsigned int kbasep_timeline_io_poll(struct file *filp, poll_table *wait)
 {
-	struct kbase_tlstream *stream;
-	unsigned int        rb_idx;
-	struct kbase_timeline *timeline;
+    struct kbase_tlstream *stream;
+    unsigned int        rb_idx;
+    struct kbase_timeline *timeline;
 
-	KBASE_DEBUG_ASSERT(filp);
-	KBASE_DEBUG_ASSERT(wait);
+    KBASE_DEBUG_ASSERT(filp);
+    KBASE_DEBUG_ASSERT(wait);
 
-	if (WARN_ON(!filp->private_data))
-		return -EFAULT;
+    if (WARN_ON(!filp->private_data))
+        return -EFAULT;
 
-	timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *) filp->private_data;
 
-	/* If there are header bytes to copy, read will not block */
-	if (kbasep_timeline_has_header_data(timeline))
-		return POLLIN;
+    /* If there are header bytes to copy, read will not block */
+    if (kbasep_timeline_has_header_data(timeline))
+        return POLLIN;
 
-	poll_wait(filp, &timeline->event_queue, wait);
-	if (kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx))
-		return POLLIN;
-	return 0;
+    poll_wait(filp, &timeline->event_queue, wait);
+    if (kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx))
+        return POLLIN;
+    return 0;
 }
 
 /**
@@ -339,24 +339,24 @@ static unsigned int kbasep_timeline_io_poll(struct file *filp, poll_table *wait)
  */
 static int kbasep_timeline_io_release(struct inode *inode, struct file *filp)
 {
-	struct kbase_timeline *timeline;
+    struct kbase_timeline *timeline;
 
-	KBASE_DEBUG_ASSERT(inode);
-	KBASE_DEBUG_ASSERT(filp);
-	KBASE_DEBUG_ASSERT(filp->private_data);
+    KBASE_DEBUG_ASSERT(inode);
+    KBASE_DEBUG_ASSERT(filp);
+    KBASE_DEBUG_ASSERT(filp->private_data);
 
-	CSTD_UNUSED(inode);
+    CSTD_UNUSED(inode);
 
-	timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *) filp->private_data;
 
 #if MALI_USE_CSF
-	kbase_csf_tl_reader_stop(&timeline->csf_tl_reader);
+    kbase_csf_tl_reader_stop(&timeline->csf_tl_reader);
 #endif
 
-	/* Stop autoflush timer before releasing access to streams. */
-	atomic_set(&timeline->autoflush_timer_active, 0);
-	del_timer_sync(&timeline->autoflush_timer);
+    /* Stop autoflush timer before releasing access to streams. */
+    atomic_set(&timeline->autoflush_timer_active, 0);
+    del_timer_sync(&timeline->autoflush_timer);
 
-	atomic_set(timeline->timeline_flags, 0);
-	return 0;
+    atomic_set(timeline->timeline_flags, 0);
+    return 0;
 }

@@ -8,8 +8,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_UTGARD_PROFILING_GATOR_API_H__
-#define __MALI_UTGARD_PROFILING_GATOR_API_H__
+#ifndef MALI_UTGARD_PROFILING_GATOR_API_H
+#define MALI_UTGARD_PROFILING_GATOR_API_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,172 +21,172 @@ extern "C" {
 #define MAX_NUM_FP_CORES 8
 #define MAX_NUM_VP_CORES 1
 
-#define _MALI_SPCIAL_COUNTER_DESCRIPTIONS \
-	{                                           \
-		"Filmstrip_cnt0",                 \
-		"Frequency",       \
-		"Voltage",       \
-		"vertex",     \
-		"fragment",         \
-		"Total_alloc_pages",        \
-	};
+#define MALI_SPCIAL_COUNTER_DESCRIPTIONS \
+    {                                           \
+        "Filmstrip_cnt0",                 \
+        "Frequency",       \
+        "Voltage",       \
+        "vertex",     \
+        "fragment",         \
+        "Total_alloc_pages",        \
+    };
 
-#define _MALI_MEM_COUTNER_DESCRIPTIONS \
-	{                                           \
-		"untyped_memory",                 \
-		"vertex_index_buffer",       \
-		"texture_buffer",       \
-		"varying_buffer",     \
-		"render_target",         \
-		"pbuffer_buffer",        \
-		"plbu_heap",            \
-		"pointer_array_buffer",             \
-		"slave_tilelist",          \
-		"untyped_gp_cmdlist",     \
-		"polygon_cmdlist",               \
-		"texture_descriptor",               \
-		"render_state_word",               \
-		"shader",               \
-		"stream_buffer",               \
-		"fragment_stack",               \
-		"uniform",               \
-		"untyped_frame_pool",               \
-		"untyped_surface",               \
-	};
+#define MALI_MEM_COUTNER_DESCRIPTIONS \
+    {                                           \
+        "untyped_memory",                 \
+        "vertex_index_buffer",       \
+        "texture_buffer",       \
+        "varying_buffer",     \
+        "render_target",         \
+        "pbuffer_buffer",        \
+        "plbu_heap",            \
+        "pointer_array_buffer",             \
+        "slave_tilelist",          \
+        "untyped_gp_cmdlist",     \
+        "polygon_cmdlist",               \
+        "texture_descriptor",               \
+        "render_state_word",               \
+        "shader",               \
+        "stream_buffer",               \
+        "fragment_stack",               \
+        "uniform",               \
+        "untyped_frame_pool",               \
+        "untyped_surface",               \
+    };
 
 /** The list of events supported by the Mali DDK. */
 typedef enum {
-	/* Vertex processor activity */
-	ACTIVITY_VP_0 = 0,
+    /* Vertex processor activity */
+    ACTIVITY_VP_0 = 0,
 
-	/* Fragment processor activity */
-	ACTIVITY_FP_0,
-	ACTIVITY_FP_1,
-	ACTIVITY_FP_2,
-	ACTIVITY_FP_3,
-	ACTIVITY_FP_4,
-	ACTIVITY_FP_5,
-	ACTIVITY_FP_6,
-	ACTIVITY_FP_7,
+    /* Fragment processor activity */
+    ACTIVITY_FP_0,
+    ACTIVITY_FP_1,
+    ACTIVITY_FP_2,
+    ACTIVITY_FP_3,
+    ACTIVITY_FP_4,
+    ACTIVITY_FP_5,
+    ACTIVITY_FP_6,
+    ACTIVITY_FP_7,
 
-	/* L2 cache counters */
-	COUNTER_L2_0_C0,
-	COUNTER_L2_0_C1,
-	COUNTER_L2_1_C0,
-	COUNTER_L2_1_C1,
-	COUNTER_L2_2_C0,
-	COUNTER_L2_2_C1,
+    /* L2 cache counters */
+    COUNTER_L2_0_C0,
+    COUNTER_L2_0_C1,
+    COUNTER_L2_1_C0,
+    COUNTER_L2_1_C1,
+    COUNTER_L2_2_C0,
+    COUNTER_L2_2_C1,
 
-	/* Vertex processor counters */
-	COUNTER_VP_0_C0,
-	COUNTER_VP_0_C1,
+    /* Vertex processor counters */
+    COUNTER_VP_0_C0,
+    COUNTER_VP_0_C1,
 
-	/* Fragment processor counters */
-	COUNTER_FP_0_C0,
-	COUNTER_FP_0_C1,
-	COUNTER_FP_1_C0,
-	COUNTER_FP_1_C1,
-	COUNTER_FP_2_C0,
-	COUNTER_FP_2_C1,
-	COUNTER_FP_3_C0,
-	COUNTER_FP_3_C1,
-	COUNTER_FP_4_C0,
-	COUNTER_FP_4_C1,
-	COUNTER_FP_5_C0,
-	COUNTER_FP_5_C1,
-	COUNTER_FP_6_C0,
-	COUNTER_FP_6_C1,
-	COUNTER_FP_7_C0,
-	COUNTER_FP_7_C1,
+    /* Fragment processor counters */
+    COUNTER_FP_0_C0,
+    COUNTER_FP_0_C1,
+    COUNTER_FP_1_C0,
+    COUNTER_FP_1_C1,
+    COUNTER_FP_2_C0,
+    COUNTER_FP_2_C1,
+    COUNTER_FP_3_C0,
+    COUNTER_FP_3_C1,
+    COUNTER_FP_4_C0,
+    COUNTER_FP_4_C1,
+    COUNTER_FP_5_C0,
+    COUNTER_FP_5_C1,
+    COUNTER_FP_6_C0,
+    COUNTER_FP_6_C1,
+    COUNTER_FP_7_C0,
+    COUNTER_FP_7_C1,
 
-	/*
-	 * If more hardware counters are added, the _mali_osk_hw_counter_table
-	 * below should also be updated.
-	 */
+    /*
+     * If more hardware counters are added, the _mali_osk_hw_counter_table
+     * below should also be updated.
+     */
 
-	/* EGL software counters */
-	COUNTER_EGL_BLIT_TIME,
+    /* EGL software counters */
+    COUNTER_EGL_BLIT_TIME,
 
-	/* GLES software counters */
-	COUNTER_GLES_DRAW_ELEMENTS_CALLS,
-	COUNTER_GLES_DRAW_ELEMENTS_NUM_INDICES,
-	COUNTER_GLES_DRAW_ELEMENTS_NUM_TRANSFORMED,
-	COUNTER_GLES_DRAW_ARRAYS_CALLS,
-	COUNTER_GLES_DRAW_ARRAYS_NUM_TRANSFORMED,
-	COUNTER_GLES_DRAW_POINTS,
-	COUNTER_GLES_DRAW_LINES,
-	COUNTER_GLES_DRAW_LINE_LOOP,
-	COUNTER_GLES_DRAW_LINE_STRIP,
-	COUNTER_GLES_DRAW_TRIANGLES,
-	COUNTER_GLES_DRAW_TRIANGLE_STRIP,
-	COUNTER_GLES_DRAW_TRIANGLE_FAN,
-	COUNTER_GLES_NON_VBO_DATA_COPY_TIME,
-	COUNTER_GLES_UNIFORM_BYTES_COPIED_TO_MALI,
-	COUNTER_GLES_UPLOAD_TEXTURE_TIME,
-	COUNTER_GLES_UPLOAD_VBO_TIME,
-	COUNTER_GLES_NUM_FLUSHES,
-	COUNTER_GLES_NUM_VSHADERS_GENERATED,
-	COUNTER_GLES_NUM_FSHADERS_GENERATED,
-	COUNTER_GLES_VSHADER_GEN_TIME,
-	COUNTER_GLES_FSHADER_GEN_TIME,
-	COUNTER_GLES_INPUT_TRIANGLES,
-	COUNTER_GLES_VXCACHE_HIT,
-	COUNTER_GLES_VXCACHE_MISS,
-	COUNTER_GLES_VXCACHE_COLLISION,
-	COUNTER_GLES_CULLED_TRIANGLES,
-	COUNTER_GLES_CULLED_LINES,
-	COUNTER_GLES_BACKFACE_TRIANGLES,
-	COUNTER_GLES_GBCLIP_TRIANGLES,
-	COUNTER_GLES_GBCLIP_LINES,
-	COUNTER_GLES_TRIANGLES_DRAWN,
-	COUNTER_GLES_DRAWCALL_TIME,
-	COUNTER_GLES_TRIANGLES_COUNT,
-	COUNTER_GLES_INDEPENDENT_TRIANGLES_COUNT,
-	COUNTER_GLES_STRIP_TRIANGLES_COUNT,
-	COUNTER_GLES_FAN_TRIANGLES_COUNT,
-	COUNTER_GLES_LINES_COUNT,
-	COUNTER_GLES_INDEPENDENT_LINES_COUNT,
-	COUNTER_GLES_STRIP_LINES_COUNT,
-	COUNTER_GLES_LOOP_LINES_COUNT,
+    /* GLES software counters */
+    COUNTER_GLES_DRAW_ELEMENTS_CALLS,
+    COUNTER_GLES_DRAW_ELEMENTS_NUM_INDICES,
+    COUNTER_GLES_DRAW_ELEMENTS_NUM_TRANSFORMED,
+    COUNTER_GLES_DRAW_ARRAYS_CALLS,
+    COUNTER_GLES_DRAW_ARRAYS_NUM_TRANSFORMED,
+    COUNTER_GLES_DRAW_POINTS,
+    COUNTER_GLES_DRAW_LINES,
+    COUNTER_GLES_DRAW_LINE_LOOP,
+    COUNTER_GLES_DRAW_LINE_STRIP,
+    COUNTER_GLES_DRAW_TRIANGLES,
+    COUNTER_GLES_DRAW_TRIANGLE_STRIP,
+    COUNTER_GLES_DRAW_TRIANGLE_FAN,
+    COUNTER_GLES_NON_VBO_DATA_COPY_TIME,
+    COUNTER_GLES_UNIFORM_BYTES_COPIED_TO_MALI,
+    COUNTER_GLES_UPLOAD_TEXTURE_TIME,
+    COUNTER_GLES_UPLOAD_VBO_TIME,
+    COUNTER_GLES_NUM_FLUSHES,
+    COUNTER_GLES_NUM_VSHADERS_GENERATED,
+    COUNTER_GLES_NUM_FSHADERS_GENERATED,
+    COUNTER_GLES_VSHADER_GEN_TIME,
+    COUNTER_GLES_FSHADER_GEN_TIME,
+    COUNTER_GLES_INPUT_TRIANGLES,
+    COUNTER_GLES_VXCACHE_HIT,
+    COUNTER_GLES_VXCACHE_MISS,
+    COUNTER_GLES_VXCACHE_COLLISION,
+    COUNTER_GLES_CULLED_TRIANGLES,
+    COUNTER_GLES_CULLED_LINES,
+    COUNTER_GLES_BACKFACE_TRIANGLES,
+    COUNTER_GLES_GBCLIP_TRIANGLES,
+    COUNTER_GLES_GBCLIP_LINES,
+    COUNTER_GLES_TRIANGLES_DRAWN,
+    COUNTER_GLES_DRAWCALL_TIME,
+    COUNTER_GLES_TRIANGLES_COUNT,
+    COUNTER_GLES_INDEPENDENT_TRIANGLES_COUNT,
+    COUNTER_GLES_STRIP_TRIANGLES_COUNT,
+    COUNTER_GLES_FAN_TRIANGLES_COUNT,
+    COUNTER_GLES_LINES_COUNT,
+    COUNTER_GLES_INDEPENDENT_LINES_COUNT,
+    COUNTER_GLES_STRIP_LINES_COUNT,
+    COUNTER_GLES_LOOP_LINES_COUNT,
 
-	/* Special counter */
+    /* Special counter */
 
-	/* Framebuffer capture pseudo-counter */
-	COUNTER_FILMSTRIP,
-	COUNTER_FREQUENCY,
-	COUNTER_VOLTAGE,
-	COUNTER_VP_ACTIVITY,
-	COUNTER_FP_ACTIVITY,
-	COUNTER_TOTAL_ALLOC_PAGES,
+    /* Framebuffer capture pseudo-counter */
+    COUNTER_FILMSTRIP,
+    COUNTER_FREQUENCY,
+    COUNTER_VOLTAGE,
+    COUNTER_VP_ACTIVITY,
+    COUNTER_FP_ACTIVITY,
+    COUNTER_TOTAL_ALLOC_PAGES,
 
-	/* Memory usage counter */
-	COUNTER_MEM_UNTYPED,
-	COUNTER_MEM_VB_IB,
-	COUNTER_MEM_TEXTURE,
-	COUNTER_MEM_VARYING,
-	COUNTER_MEM_RT,
-	COUNTER_MEM_PBUFFER,
-	/* memory usages for gp command */
-	COUNTER_MEM_PLBU_HEAP,
-	COUNTER_MEM_POINTER_ARRAY,
-	COUNTER_MEM_SLAVE_TILELIST,
-	COUNTER_MEM_UNTYPE_GP_CMDLIST,
-	/* memory usages for polygon list command */
-	COUNTER_MEM_POLYGON_CMDLIST,
-	/* memory usages for pp command */
-	COUNTER_MEM_TD,
-	COUNTER_MEM_RSW,
-	/* other memory usages */
-	COUNTER_MEM_SHADER,
-	COUNTER_MEM_STREAMS,
-	COUNTER_MEM_FRAGMENT_STACK,
-	COUNTER_MEM_UNIFORM,
-	/* Special mem usage, which is used for mem pool allocation */
-	COUNTER_MEM_UNTYPE_MEM_POOL,
-	COUNTER_MEM_UNTYPE_SURFACE,
+    /* Memory usage counter */
+    COUNTER_MEM_UNTYPED,
+    COUNTER_MEM_VB_IB,
+    COUNTER_MEM_TEXTURE,
+    COUNTER_MEM_VARYING,
+    COUNTER_MEM_RT,
+    COUNTER_MEM_PBUFFER,
+    /* memory usages for gp command */
+    COUNTER_MEM_PLBU_HEAP,
+    COUNTER_MEM_POINTER_ARRAY,
+    COUNTER_MEM_SLAVE_TILELIST,
+    COUNTER_MEM_UNTYPE_GP_CMDLIST,
+    /* memory usages for polygon list command */
+    COUNTER_MEM_POLYGON_CMDLIST,
+    /* memory usages for pp command */
+    COUNTER_MEM_TD,
+    COUNTER_MEM_RSW,
+    /* other memory usages */
+    COUNTER_MEM_SHADER,
+    COUNTER_MEM_STREAMS,
+    COUNTER_MEM_FRAGMENT_STACK,
+    COUNTER_MEM_UNIFORM,
+    /* Special mem usage, which is used for mem pool allocation */
+    COUNTER_MEM_UNTYPE_MEM_POOL,
+    COUNTER_MEM_UNTYPE_SURFACE,
 
-	NUMBER_OF_EVENTS
-} _mali_osk_counter_id;
+    NUMBER_OF_EVENTS
+} mali_osk_counter_id;
 
 #define FIRST_ACTIVITY_EVENT    ACTIVITY_VP_0
 #define LAST_ACTIVITY_EVENT     ACTIVITY_FP_7
@@ -231,18 +231,18 @@ typedef enum {
  * Structure to pass performance counter data of a Mali core
  */
 typedef struct _mali_profiling_core_counters {
-	u32 source0;
-	u32 value0;
-	u32 source1;
-	u32 value1;
+    u32 source0;
+    u32 value0;
+    u32 source1;
+    u32 value1;
 } _mali_profiling_core_counters;
 
 /**
  * Structure to pass performance counter data of Mali L2 cache cores
  */
-typedef struct _mali_profiling_l2_counter_values {
-	struct _mali_profiling_core_counters cores[MAX_NUM_L2_CACHE_CORES];
-} _mali_profiling_l2_counter_values;
+typedef struct mali_profiling_l2_counter_values {
+    struct _mali_profiling_core_counters cores[MAX_NUM_L2_CACHE_CORES];
+} mali_profiling_l2_counter_values;
 
 /**
  * Structure to pass data defining Mali instance in use:
@@ -254,26 +254,26 @@ typedef struct _mali_profiling_l2_counter_values {
  * num_of_fp_cores - number of fragment processor cores
  * num_of_vp_cores - number of vertex processor cores
  */
-typedef struct _mali_profiling_mali_version {
-	u32 mali_product_id;
-	u32 mali_version_major;
-	u32 mali_version_minor;
-	u32 num_of_l2_cores;
-	u32 num_of_fp_cores;
-	u32 num_of_vp_cores;
-} _mali_profiling_mali_version;
+typedef struct mali_profiling_mali_version {
+    u32 mali_product_id;
+    u32 mali_version_major;
+    u32 mali_version_minor;
+    u32 num_of_l2_cores;
+    u32 num_of_fp_cores;
+    u32 num_of_vp_cores;
+} mali_profiling_mali_version;
 
 /**
  * Structure to define the mali profiling counter struct.
  */
 typedef struct mali_profiling_counter {
-	char counter_name[40];
-	u32 counter_id;
-	u32 counter_event;
-	u32 prev_counter_value;
-	u32 current_counter_value;
-	u32 key;
-	int enabled;
+    char counter_name[40];
+    u32 counter_id;
+    u32 counter_event;
+    u32 prev_counter_value;
+    u32 current_counter_value;
+    u32 key;
+    int enabled;
 } mali_profiling_counter;
 
 /*
@@ -288,15 +288,15 @@ typedef struct mali_profiling_counter {
 #define MEM_COUNTER_ENABLE (5)
 #define ANNOTATE_PROFILING_ENABLE (6)
 
-void _mali_profiling_control(u32 action, u32 value);
+void mali_profiling_control(u32 action, u32 value);
 
-u32 _mali_profiling_get_l2_counters(_mali_profiling_l2_counter_values *values);
+u32 mali_profiling_get_l2_counters(mali_profiling_l2_counter_values *values);
 
-int _mali_profiling_set_event(u32 counter_id, s32 event_id);
+int mali_profiling_set_event(u32 counter_id, s32 event_id);
 
-u32 _mali_profiling_get_api_version(void);
+u32 mali_profiling_get_api_version(void);
 
-void _mali_profiling_get_mali_version(struct _mali_profiling_mali_version *values);
+void mali_profiling_get_mali_version(struct mali_profiling_mali_version *values);
 
 #ifdef __cplusplus
 }

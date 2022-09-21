@@ -86,10 +86,10 @@ void kbase_tlstream_reset_body_streams(void);
  * writers finish.
  */
 void kbase_tlstream_test(
-		unsigned int tpw_count,
-		unsigned int msg_delay,
-		unsigned int msg_count,
-		int          aux_msg);
+        unsigned int tpw_count,
+        unsigned int msg_delay,
+        unsigned int msg_count,
+        int          aux_msg);
 
 /**
  * kbase_tlstream_stats - read timeline stream statistics
@@ -119,7 +119,7 @@ void __kbase_tlstream_tl_del_atom(void *atom);
 void __kbase_tlstream_tl_ret_ctx_lpu(void *context, void *lpu);
 void __kbase_tlstream_tl_ret_atom_ctx(void *atom, void *context);
 void __kbase_tlstream_tl_ret_atom_lpu(
-		void *atom, void *lpu, const char *attrib_match_list);
+        void *atom, void *lpu, const char *attrib_match_list);
 void __kbase_tlstream_tl_nret_ctx_lpu(void *context, void *lpu);
 void __kbase_tlstream_tl_nret_atom_ctx(void *atom, void *context);
 void __kbase_tlstream_tl_nret_atom_lpu(void *atom, void *lpu);
@@ -131,14 +131,14 @@ void __kbase_tlstream_tl_dep_atom_atom(void *atom1, void *atom2);
 void __kbase_tlstream_tl_ndep_atom_atom(void *atom1, void *atom2);
 void __kbase_tlstream_tl_rdep_atom_atom(void *atom1, void *atom2);
 void __kbase_tlstream_tl_attrib_atom_config(
-		void *atom, u64 jd, u64 affinity, u32 config);
+        void *atom, u64 jd, u64 affinity, u32 config);
 void __kbase_tlstream_tl_attrib_atom_priority(void *atom, u32 prio);
 void __kbase_tlstream_tl_attrib_atom_state(void *atom, u32 state);
 void __kbase_tlstream_tl_attrib_atom_priority_change(void *atom);
 void __kbase_tlstream_tl_attrib_atom_jit(
-		void *atom, u64 edit_addr, u64 new_addr);
+        void *atom, u64 edit_addr, u64 new_addr);
 void __kbase_tlstream_tl_attrib_as_config(
-		void *as, u64 transtab, u64 memattr, u64 transcfg);
+        void *as, u64 transtab, u64 memattr, u64 transcfg);
 void __kbase_tlstream_tl_event_atom_softstop_ex(void *atom);
 void __kbase_tlstream_tl_event_lpu_softstop(void *lpu);
 void __kbase_tlstream_tl_event_atom_softstop_issue(void *atom);
@@ -157,25 +157,25 @@ void __kbase_tlstream_aux_protected_leave_end(void *gpu);
 extern atomic_t kbase_tlstream_enabled;
 
 #define __TRACE_IF_ENABLED(trace_name, ...)                         \
-	do {                                                        \
-		int enabled = atomic_read(&kbase_tlstream_enabled); \
-		if (enabled & TLSTREAM_ENABLED)                     \
-			__kbase_tlstream_##trace_name(__VA_ARGS__); \
-	} while (0)
+    do {                                                        \
+        int enabled = atomic_read(&kbase_tlstream_enabled); \
+        if (enabled & TLSTREAM_ENABLED)                     \
+            __kbase_tlstream_##trace_name(__VA_ARGS__); \
+    } while (0)
 
 #define __TRACE_IF_ENABLED_LATENCY(trace_name, ...)                     \
-	do {                                                            \
-		int enabled = atomic_read(&kbase_tlstream_enabled);     \
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS) \
-			__kbase_tlstream_##trace_name(__VA_ARGS__);     \
-	} while (0)
+    do {                                                            \
+        int enabled = atomic_read(&kbase_tlstream_enabled);     \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS) \
+            __kbase_tlstream_##trace_name(__VA_ARGS__);     \
+    } while (0)
 
 #define __TRACE_IF_ENABLED_JD(trace_name, ...)                      \
-	do {                                                        \
-		int enabled = atomic_read(&kbase_tlstream_enabled); \
-		if (enabled & BASE_TLSTREAM_JOB_DUMPING_ENABLED)    \
-			__kbase_tlstream_##trace_name(__VA_ARGS__); \
-	} while (0)
+    do {                                                        \
+        int enabled = atomic_read(&kbase_tlstream_enabled); \
+        if (enabled & BASE_TLSTREAM_JOB_DUMPING_ENABLED)    \
+            __kbase_tlstream_##trace_name(__VA_ARGS__); \
+    } while (0)
 
 /*****************************************************************************/
 
@@ -192,7 +192,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_NEW_CTX(context, nr, tgid) \
-	__TRACE_IF_ENABLED(tl_summary_new_ctx, context, nr, tgid)
+    __TRACE_IF_ENABLED(tl_summary_new_ctx, context, nr, tgid)
 
 /**
  * KBASE_TLSTREAM_TL_SUMMARY_NEW_GPU - create GPU object in timeline summary
@@ -205,7 +205,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_NEW_GPU(gpu, id, core_count) \
-	__TRACE_IF_ENABLED(tl_summary_new_gpu, gpu, id, core_count)
+    __TRACE_IF_ENABLED(tl_summary_new_gpu, gpu, id, core_count)
 
 /**
  * KBASE_TLSTREAM_TL_SUMMARY_NEW_LPU - create LPU object in timeline summary
@@ -219,7 +219,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_NEW_LPU(lpu, nr, fn) \
-	__TRACE_IF_ENABLED(tl_summary_new_lpu, lpu, nr, fn)
+    __TRACE_IF_ENABLED(tl_summary_new_lpu, lpu, nr, fn)
 
 /**
  * KBASE_TLSTREAM_TL_SUMMARY_LIFELINK_LPU_GPU - lifelink LPU object to GPU
@@ -231,7 +231,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_LIFELINK_LPU_GPU(lpu, gpu) \
-	__TRACE_IF_ENABLED(tl_summary_lifelink_lpu_gpu, lpu, gpu)
+    __TRACE_IF_ENABLED(tl_summary_lifelink_lpu_gpu, lpu, gpu)
 
 /**
  * KBASE_TLSTREAM_TL_SUMMARY_NEW_AS - create address space object in timeline summary
@@ -244,7 +244,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_NEW_AS(as, nr) \
-	__TRACE_IF_ENABLED(tl_summary_new_as, as, nr)
+    __TRACE_IF_ENABLED(tl_summary_new_as, as, nr)
 
 /**
  * KBASE_TLSTREAM_TL_SUMMARY_LIFELINK_AS_GPU - lifelink address space object to GPU
@@ -256,7 +256,7 @@ extern atomic_t kbase_tlstream_enabled;
  * This message is directed to timeline summary stream.
  */
 #define KBASE_TLSTREAM_TL_SUMMARY_LIFELINK_AS_GPU(as, gpu) \
-	__TRACE_IF_ENABLED(tl_summary_lifelink_as_gpu, as, gpu)
+    __TRACE_IF_ENABLED(tl_summary_lifelink_as_gpu, as, gpu)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_CTX - create context object in timeline
@@ -269,7 +269,7 @@ extern atomic_t kbase_tlstream_enabled;
  * kbase context with userspace context.
  */
 #define KBASE_TLSTREAM_TL_NEW_CTX(context, nr, tgid) \
-	__TRACE_IF_ENABLED(tl_new_ctx, context, nr, tgid)
+    __TRACE_IF_ENABLED(tl_new_ctx, context, nr, tgid)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_ATOM - create atom object in timeline
@@ -281,7 +281,7 @@ extern atomic_t kbase_tlstream_enabled;
  * bucket id understood by hardware.
  */
 #define KBASE_TLSTREAM_TL_NEW_ATOM(atom, nr) \
-	__TRACE_IF_ENABLED(tl_new_atom, atom, nr)
+    __TRACE_IF_ENABLED(tl_new_atom, atom, nr)
 
 /**
  * KBASE_TLSTREAM_TL_DEL_CTX - destroy context object in timeline
@@ -291,7 +291,7 @@ extern atomic_t kbase_tlstream_enabled;
  * exist.
  */
 #define KBASE_TLSTREAM_TL_DEL_CTX(context) \
-	__TRACE_IF_ENABLED(tl_del_ctx, context)
+    __TRACE_IF_ENABLED(tl_del_ctx, context)
 
 /**
  * KBASE_TLSTREAM_TL_DEL_ATOM - destroy atom object in timeline
@@ -301,7 +301,7 @@ extern atomic_t kbase_tlstream_enabled;
  * exist.
  */
 #define KBASE_TLSTREAM_TL_DEL_ATOM(atom) \
-	__TRACE_IF_ENABLED(tl_del_atom, atom)
+    __TRACE_IF_ENABLED(tl_del_atom, atom)
 
 /**
  * KBASE_TLSTREAM_TL_RET_CTX_LPU - retain context by LPU
@@ -312,7 +312,7 @@ extern atomic_t kbase_tlstream_enabled;
  * by LPU and must not be deleted unless it is released.
  */
 #define KBASE_TLSTREAM_TL_RET_CTX_LPU(context, lpu) \
-	__TRACE_IF_ENABLED(tl_ret_ctx_lpu, context, lpu)
+    __TRACE_IF_ENABLED(tl_ret_ctx_lpu, context, lpu)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_CTX - retain atom by context
@@ -323,7 +323,7 @@ extern atomic_t kbase_tlstream_enabled;
  * by context and must not be deleted unless it is released.
  */
 #define KBASE_TLSTREAM_TL_RET_ATOM_CTX(atom, context) \
-	__TRACE_IF_ENABLED(tl_ret_atom_ctx, atom, context)
+    __TRACE_IF_ENABLED(tl_ret_atom_ctx, atom, context)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_LPU - retain atom by LPU
@@ -335,7 +335,7 @@ extern atomic_t kbase_tlstream_enabled;
  * by LPU and must not be deleted unless it is released.
  */
 #define KBASE_TLSTREAM_TL_RET_ATOM_LPU(atom, lpu, attrib_match_list) \
-	__TRACE_IF_ENABLED(tl_ret_atom_lpu, atom, lpu, attrib_match_list)
+    __TRACE_IF_ENABLED(tl_ret_atom_lpu, atom, lpu, attrib_match_list)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_CTX_LPU - release context by LPU
@@ -346,7 +346,7 @@ extern atomic_t kbase_tlstream_enabled;
  * by LPU object.
  */
 #define KBASE_TLSTREAM_TL_NRET_CTX_LPU(context, lpu) \
-	__TRACE_IF_ENABLED(tl_nret_ctx_lpu, context, lpu)
+    __TRACE_IF_ENABLED(tl_nret_ctx_lpu, context, lpu)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_CTX - release atom by context
@@ -357,7 +357,7 @@ extern atomic_t kbase_tlstream_enabled;
  * released by context.
  */
 #define KBASE_TLSTREAM_TL_NRET_ATOM_CTX(atom, context) \
-	__TRACE_IF_ENABLED(tl_nret_atom_ctx, atom, context)
+    __TRACE_IF_ENABLED(tl_nret_atom_ctx, atom, context)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_LPU - release atom by LPU
@@ -368,7 +368,7 @@ extern atomic_t kbase_tlstream_enabled;
  * released by LPU.
  */
 #define KBASE_TLSTREAM_TL_NRET_ATOM_LPU(atom, lpu) \
-	__TRACE_IF_ENABLED(tl_nret_atom_lpu, atom, lpu)
+    __TRACE_IF_ENABLED(tl_nret_atom_lpu, atom, lpu)
 
 /**
  * KBASE_TLSTREAM_TL_RET_AS_CTX - lifelink address space object to context
@@ -379,7 +379,7 @@ extern atomic_t kbase_tlstream_enabled;
  * is being held by the context object.
  */
 #define KBASE_TLSTREAM_TL_RET_AS_CTX(as, ctx) \
-	__TRACE_IF_ENABLED(tl_ret_as_ctx, as, ctx)
+    __TRACE_IF_ENABLED(tl_ret_as_ctx, as, ctx)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_AS_CTX - release address space by context
@@ -390,7 +390,7 @@ extern atomic_t kbase_tlstream_enabled;
  * is being released by atom.
  */
 #define KBASE_TLSTREAM_TL_NRET_AS_CTX(as, ctx) \
-	__TRACE_IF_ENABLED(tl_nret_as_ctx, as, ctx)
+    __TRACE_IF_ENABLED(tl_nret_as_ctx, as, ctx)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_AS - retain atom by address space
@@ -401,7 +401,7 @@ extern atomic_t kbase_tlstream_enabled;
  * by address space and must not be deleted unless it is released.
  */
 #define KBASE_TLSTREAM_TL_RET_ATOM_AS(atom, as) \
-	__TRACE_IF_ENABLED(tl_ret_atom_as, atom, as)
+    __TRACE_IF_ENABLED(tl_ret_atom_as, atom, as)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_AS - release atom by address space
@@ -412,7 +412,7 @@ extern atomic_t kbase_tlstream_enabled;
  * released by address space.
  */
 #define KBASE_TLSTREAM_TL_NRET_ATOM_AS(atom, as) \
-	__TRACE_IF_ENABLED(tl_nret_atom_as, atom, as)
+    __TRACE_IF_ENABLED(tl_nret_atom_as, atom, as)
 
 /**
  * KBASE_TLSTREAM_TL_DEP_ATOM_ATOM - parent atom depends on child atom
@@ -423,7 +423,7 @@ extern atomic_t kbase_tlstream_enabled;
  * child atom object to be completed before start its execution.
  */
 #define KBASE_TLSTREAM_TL_DEP_ATOM_ATOM(atom1, atom2) \
-	__TRACE_IF_ENABLED(tl_dep_atom_atom, atom1, atom2)
+    __TRACE_IF_ENABLED(tl_dep_atom_atom, atom1, atom2)
 
 /**
  * KBASE_TLSTREAM_TL_NDEP_ATOM_ATOM - dependency between atoms resolved
@@ -434,7 +434,7 @@ extern atomic_t kbase_tlstream_enabled;
  * dependency on child atom has been resolved.
  */
 #define KBASE_TLSTREAM_TL_NDEP_ATOM_ATOM(atom1, atom2) \
-	__TRACE_IF_ENABLED(tl_ndep_atom_atom, atom1, atom2)
+    __TRACE_IF_ENABLED(tl_ndep_atom_atom, atom1, atom2)
 
 /**
  * KBASE_TLSTREAM_TL_RDEP_ATOM_ATOM - information about already resolved dependency between atoms
@@ -445,7 +445,7 @@ extern atomic_t kbase_tlstream_enabled;
  * dependency on child atom has been resolved.
  */
 #define KBASE_TLSTREAM_TL_RDEP_ATOM_ATOM(atom1, atom2) \
-	__TRACE_IF_ENABLED(tl_rdep_atom_atom, atom1, atom2)
+    __TRACE_IF_ENABLED(tl_rdep_atom_atom, atom1, atom2)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_CONFIG - atom job slot attributes
@@ -457,7 +457,7 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message containing atom attributes.
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_ATOM_CONFIG(atom, jd, affinity, config) \
-	__TRACE_IF_ENABLED(tl_attrib_atom_config, atom, jd, affinity, config)
+    __TRACE_IF_ENABLED(tl_attrib_atom_config, atom, jd, affinity, config)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY - atom priority
@@ -467,7 +467,7 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message containing atom priority.
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY(atom, prio) \
-	__TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_priority, atom, prio)
+    __TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_priority, atom, prio)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_STATE - atom state
@@ -477,7 +477,7 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message containing atom state.
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_ATOM_STATE(atom, state) \
-	__TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_state, atom, state)
+    __TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_state, atom, state)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY_CHANGE - atom caused priority change
@@ -486,7 +486,7 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message signalling priority change
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY_CHANGE(atom) \
-	__TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_priority_change, atom)
+    __TRACE_IF_ENABLED_LATENCY(tl_attrib_atom_priority_change, atom)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_JIT - jit happened on atom
@@ -495,7 +495,7 @@ extern atomic_t kbase_tlstream_enabled;
  * @new_addr:   address placed into the edited location
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JIT(atom, edit_addr, new_addr) \
-	__TRACE_IF_ENABLED_JD(tl_attrib_atom_jit, atom, edit_addr, new_addr)
+    __TRACE_IF_ENABLED_JD(tl_attrib_atom_jit, atom, edit_addr, new_addr)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG - address space attributes
@@ -507,28 +507,28 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message containing address space attributes.
  */
 #define KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(as, transtab, memattr, transcfg) \
-	__TRACE_IF_ENABLED(tl_attrib_as_config, as, transtab, memattr, transcfg)
+    __TRACE_IF_ENABLED(tl_attrib_as_config, as, transtab, memattr, transcfg)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_ex
  * @atom:       atom identifier
  */
 #define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_EX(atom) \
-	__TRACE_IF_ENABLED(tl_event_atom_softstop_ex, atom)
+    __TRACE_IF_ENABLED(tl_event_atom_softstop_ex, atom)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_LPU_softstop
  * @lpu:        name of the LPU object
  */
 #define KBASE_TLSTREAM_TL_EVENT_LPU_SOFTSTOP(lpu) \
-	__TRACE_IF_ENABLED(tl_event_lpu_softstop, lpu)
+    __TRACE_IF_ENABLED(tl_event_lpu_softstop, lpu)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_issue
  * @atom:       atom identifier
  */
 #define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_ISSUE(atom) \
-	__TRACE_IF_ENABLED(tl_event_atom_softstop_issue, atom)
+    __TRACE_IF_ENABLED(tl_event_atom_softstop_issue, atom)
 
 /**
  * KBASE_TLSTREAM_JD_GPU_SOFT_RESET - The GPU is being soft reset
@@ -538,7 +538,7 @@ extern atomic_t kbase_tlstream_enabled;
  * Function emits a timeline message indicating GPU soft reset.
  */
 #define KBASE_TLSTREAM_JD_GPU_SOFT_RESET(gpu) \
-	__TRACE_IF_ENABLED(jd_gpu_soft_reset, gpu)
+    __TRACE_IF_ENABLED(jd_gpu_soft_reset, gpu)
 
 
 /**
@@ -547,7 +547,7 @@ extern atomic_t kbase_tlstream_enabled;
  * @state:     64bits bitmask reporting power state of the cores (1-ON, 0-OFF)
  */
 #define KBASE_TLSTREAM_AUX_PM_STATE(core_type, state) \
-	__TRACE_IF_ENABLED(aux_pm_state, core_type, state)
+    __TRACE_IF_ENABLED(aux_pm_state, core_type, state)
 
 /**
  * KBASE_TLSTREAM_AUX_PAGEFAULT - timeline message: MMU page fault event
@@ -556,7 +556,7 @@ extern atomic_t kbase_tlstream_enabled;
  * @page_count_change: number of pages to be added
  */
 #define KBASE_TLSTREAM_AUX_PAGEFAULT(ctx_nr, page_count_change) \
-	__TRACE_IF_ENABLED(aux_pagefault, ctx_nr, page_count_change)
+    __TRACE_IF_ENABLED(aux_pagefault, ctx_nr, page_count_change)
 
 /**
  * KBASE_TLSTREAM_AUX_PAGESALLOC - timeline message: total number of allocated
@@ -565,7 +565,7 @@ extern atomic_t kbase_tlstream_enabled;
  * @page_count: number of pages used by the context
  */
 #define KBASE_TLSTREAM_AUX_PAGESALLOC(ctx_nr, page_count) \
-	__TRACE_IF_ENABLED(aux_pagesalloc, ctx_nr, page_count)
+    __TRACE_IF_ENABLED(aux_pagesalloc, ctx_nr, page_count)
 
 /**
  * KBASE_TLSTREAM_AUX_DEVFREQ_TARGET - timeline message: new target DVFS
@@ -573,7 +573,7 @@ extern atomic_t kbase_tlstream_enabled;
  * @target_freq: new target frequency
  */
 #define KBASE_TLSTREAM_AUX_DEVFREQ_TARGET(target_freq) \
-	__TRACE_IF_ENABLED(aux_devfreq_target, target_freq)
+    __TRACE_IF_ENABLED(aux_devfreq_target, target_freq)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_ENTER_START - The GPU has started transitioning
@@ -584,7 +584,7 @@ extern atomic_t kbase_tlstream_enabled;
  * transition to protected mode.
  */
 #define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_START(gpu) \
-	__TRACE_IF_ENABLED_LATENCY(aux_protected_enter_start, gpu)
+    __TRACE_IF_ENABLED_LATENCY(aux_protected_enter_start, gpu)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_ENTER_END - The GPU has finished transitioning
@@ -595,7 +595,7 @@ extern atomic_t kbase_tlstream_enabled;
  * transitioning to protected mode.
  */
 #define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_END(gpu) \
-	__TRACE_IF_ENABLED_LATENCY(aux_protected_enter_end, gpu)
+    __TRACE_IF_ENABLED_LATENCY(aux_protected_enter_end, gpu)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_START - The GPU has started transitioning
@@ -606,7 +606,7 @@ extern atomic_t kbase_tlstream_enabled;
  * transition to non-protected mode.
  */
 #define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_START(gpu) \
-	__TRACE_IF_ENABLED_LATENCY(aux_protected_leave_start, gpu)
+    __TRACE_IF_ENABLED_LATENCY(aux_protected_leave_start, gpu)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_END - The GPU has finished transitioning
@@ -617,7 +617,7 @@ extern atomic_t kbase_tlstream_enabled;
  * transitioning to non-protected mode.
  */
 #define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_END(gpu) \
-	__TRACE_IF_ENABLED_LATENCY(aux_protected_leave_end, gpu)
+    __TRACE_IF_ENABLED_LATENCY(aux_protected_leave_end, gpu)
 
 #endif /* _KBASE_TLSTREAM_H */
 

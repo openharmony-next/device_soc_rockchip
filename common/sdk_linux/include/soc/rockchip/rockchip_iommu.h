@@ -13,11 +13,11 @@ int rockchip_iommu_disable(struct device *dev);
 #else
 static inline int rockchip_iommu_enable(struct device *dev)
 {
-	return -ENODEV;
+    return -ENODEV;
 }
 static inline int rockchip_iommu_disable(struct device *dev)
 {
-	return -ENODEV;
+    return -ENODEV;
 }
 #endif
 

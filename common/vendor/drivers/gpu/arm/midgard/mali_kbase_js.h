@@ -217,8 +217,8 @@ void kbasep_js_remove_job(struct kbase_device *kbdev, struct kbase_context *kctx
  * @return false otherwise
  */
 bool kbasep_js_remove_cancelled_job(struct kbase_device *kbdev,
-						struct kbase_context *kctx,
-						struct kbase_jd_atom *katom);
+                        struct kbase_context *kctx,
+                        struct kbase_jd_atom *katom);
 
 /**
  * @brief Refcount a context as being busy, preventing it from being scheduled
@@ -371,7 +371,7 @@ void kbasep_js_runpool_release_ctx_and_katom_retained_state(struct kbase_device 
  * attempt to schedule new contexts.
  */
 void kbasep_js_runpool_release_ctx_nolock(struct kbase_device *kbdev,
-						struct kbase_context *kctx);
+                        struct kbase_context *kctx);
 
 /**
  * @brief Schedule in a privileged context
@@ -464,7 +464,7 @@ void kbasep_js_resume(struct kbase_device *kbdev);
  *
  * @return Whether the context requires to be enqueued. */
 bool kbase_js_dep_resolved_submit(struct kbase_context *kctx,
-					struct kbase_jd_atom *katom);
+                    struct kbase_jd_atom *katom);
 
 /**
   * jsctx_ll_flush_to_rb() - Pushes atoms from the linked list to ringbuffer.
@@ -523,7 +523,7 @@ void kbase_js_unpull(struct kbase_context *kctx, struct kbase_jd_atom *katom);
  *         false otherwise
  */
 bool kbase_js_complete_atom_wq(struct kbase_context *kctx,
-				struct kbase_jd_atom *katom);
+                struct kbase_jd_atom *katom);
 
 /**
  * @brief Complete an atom.
@@ -539,7 +539,7 @@ bool kbase_js_complete_atom_wq(struct kbase_context *kctx,
  * Return: Atom that has now been unblocked and can now be run, or NULL if none
  */
 struct kbase_jd_atom *kbase_js_complete_atom(struct kbase_jd_atom *katom,
-		ktime_t *end_timestamp);
+        ktime_t *end_timestamp);
 
 /**
  * @brief Submit atoms from all available contexts.
@@ -579,7 +579,7 @@ void kbase_js_zap_context(struct kbase_context *kctx);
  *                   false otherwise
  */
 bool kbase_js_is_atom_valid(struct kbase_device *kbdev,
-				struct kbase_jd_atom *katom);
+                struct kbase_jd_atom *katom);
 
 /**
  * kbase_js_set_timeouts - update all JS timeouts with user specified data
@@ -607,15 +607,15 @@ void kbase_js_set_timeouts(struct kbase_device *kbdev);
  */
 static inline bool kbasep_js_is_submit_allowed(struct kbasep_js_device_data *js_devdata, struct kbase_context *kctx)
 {
-	u16 test_bit;
+    u16 test_bit;
 
-	/* Ensure context really is scheduled in */
-	KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
-	KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
+    /* Ensure context really is scheduled in */
+    KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
+    KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-	test_bit = (u16) (1u << kctx->as_nr);
+    test_bit = (u16) (1u << kctx->as_nr);
 
-	return (bool) (js_devdata->runpool_irq.submit_allowed & test_bit);
+    return (bool) (js_devdata->runpool_irq.submit_allowed & test_bit);
 }
 
 /**
@@ -628,17 +628,17 @@ static inline bool kbasep_js_is_submit_allowed(struct kbasep_js_device_data *js_
  */
 static inline void kbasep_js_set_submit_allowed(struct kbasep_js_device_data *js_devdata, struct kbase_context *kctx)
 {
-	u16 set_bit;
+    u16 set_bit;
 
-	/* Ensure context really is scheduled in */
-	KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
-	KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
+    /* Ensure context really is scheduled in */
+    KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
+    KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-	set_bit = (u16) (1u << kctx->as_nr);
+    set_bit = (u16) (1u << kctx->as_nr);
 
-	dev_dbg(kctx->kbdev->dev, "JS: Setting Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
+    dev_dbg(kctx->kbdev->dev, "JS: Setting Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
 
-	js_devdata->runpool_irq.submit_allowed |= set_bit;
+    js_devdata->runpool_irq.submit_allowed |= set_bit;
 }
 
 /**
@@ -651,19 +651,19 @@ static inline void kbasep_js_set_submit_allowed(struct kbasep_js_device_data *js
  */
 static inline void kbasep_js_clear_submit_allowed(struct kbasep_js_device_data *js_devdata, struct kbase_context *kctx)
 {
-	u16 clear_bit;
-	u16 clear_mask;
+    u16 clear_bit;
+    u16 clear_mask;
 
-	/* Ensure context really is scheduled in */
-	KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
-	KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
+    /* Ensure context really is scheduled in */
+    KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
+    KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-	clear_bit = (u16) (1u << kctx->as_nr);
-	clear_mask = ~clear_bit;
+    clear_bit = (u16) (1u << kctx->as_nr);
+    clear_mask = ~clear_bit;
 
-	dev_dbg(kctx->kbdev->dev, "JS: Clearing Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
+    dev_dbg(kctx->kbdev->dev, "JS: Clearing Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
 
-	js_devdata->runpool_irq.submit_allowed &= clear_mask;
+    js_devdata->runpool_irq.submit_allowed &= clear_mask;
 }
 
 /**
@@ -671,7 +671,7 @@ static inline void kbasep_js_clear_submit_allowed(struct kbasep_js_device_data *
  */
 static inline void kbasep_js_clear_job_retry_submit(struct kbase_jd_atom *atom)
 {
-	atom->retry_submit_on_slot = KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID;
+    atom->retry_submit_on_slot = KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID;
 }
 
 /**
@@ -689,12 +689,12 @@ static inline void kbasep_js_clear_job_retry_submit(struct kbase_jd_atom *atom)
  */
 static inline void kbasep_js_set_job_retry_submit_slot(struct kbase_jd_atom *atom, int js)
 {
-	KBASE_DEBUG_ASSERT(0 <= js && js <= BASE_JM_MAX_NR_SLOTS);
-	KBASE_DEBUG_ASSERT((atom->retry_submit_on_slot ==
-					KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID)
-				|| (atom->retry_submit_on_slot == js));
+    KBASE_DEBUG_ASSERT(0 <= js && js <= BASE_JM_MAX_NR_SLOTS);
+    KBASE_DEBUG_ASSERT((atom->retry_submit_on_slot ==
+                    KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID)
+                || (atom->retry_submit_on_slot == js));
 
-	atom->retry_submit_on_slot = js;
+    atom->retry_submit_on_slot = js;
 }
 
 /**
@@ -704,9 +704,9 @@ static inline void kbasep_js_set_job_retry_submit_slot(struct kbase_jd_atom *ato
  */
 static inline void kbasep_js_atom_retained_state_init_invalid(struct kbasep_js_atom_retained_state *retained_state)
 {
-	retained_state->event_code = BASE_JD_EVENT_NOT_STARTED;
-	retained_state->core_req = KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID;
-	retained_state->retry_submit_on_slot = KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID;
+    retained_state->event_code = BASE_JD_EVENT_NOT_STARTED;
+    retained_state->core_req = KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID;
+    retained_state->retry_submit_on_slot = KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID;
 }
 
 /**
@@ -715,11 +715,11 @@ static inline void kbasep_js_atom_retained_state_init_invalid(struct kbasep_js_a
  */
 static inline void kbasep_js_atom_retained_state_copy(struct kbasep_js_atom_retained_state *retained_state, const struct kbase_jd_atom *katom)
 {
-	retained_state->event_code = katom->event_code;
-	retained_state->core_req = katom->core_req;
-	retained_state->retry_submit_on_slot = katom->retry_submit_on_slot;
-	retained_state->sched_priority = katom->sched_priority;
-	retained_state->device_nr = katom->device_nr;
+    retained_state->event_code = katom->event_code;
+    retained_state->core_req = katom->core_req;
+    retained_state->retry_submit_on_slot = katom->retry_submit_on_slot;
+    retained_state->sched_priority = katom->sched_priority;
+    retained_state->device_nr = katom->device_nr;
 }
 
 /**
@@ -735,7 +735,7 @@ static inline void kbasep_js_atom_retained_state_copy(struct kbasep_js_atom_reta
  */
 static inline bool kbasep_js_has_atom_finished(const struct kbasep_js_atom_retained_state *katom_retained_state)
 {
-	return (bool) (katom_retained_state->event_code != BASE_JD_EVENT_STOPPED && katom_retained_state->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT);
+    return (bool) (katom_retained_state->event_code != BASE_JD_EVENT_STOPPED && katom_retained_state->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT);
 }
 
 /**
@@ -750,15 +750,15 @@ static inline bool kbasep_js_has_atom_finished(const struct kbasep_js_atom_retai
  */
 static inline bool kbasep_js_atom_retained_state_is_valid(const struct kbasep_js_atom_retained_state *katom_retained_state)
 {
-	return (bool) (katom_retained_state->core_req != KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID);
+    return (bool) (katom_retained_state->core_req != KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID);
 }
 
 static inline bool kbasep_js_get_atom_retry_submit_slot(const struct kbasep_js_atom_retained_state *katom_retained_state, int *res)
 {
-	int js = katom_retained_state->retry_submit_on_slot;
+    int js = katom_retained_state->retry_submit_on_slot;
 
-	*res = js;
-	return (bool) (js >= 0);
+    *res = js;
+    return (bool) (js >= 0);
 }
 
 /**
@@ -778,16 +778,16 @@ static inline bool kbasep_js_get_atom_retry_submit_slot(const struct kbasep_js_a
  */
 static inline struct kbase_context *kbasep_js_runpool_lookup_ctx_noretain(struct kbase_device *kbdev, int as_nr)
 {
-	struct kbase_context *found_kctx;
+    struct kbase_context *found_kctx;
 
-	KBASE_DEBUG_ASSERT(kbdev != NULL);
-	KBASE_DEBUG_ASSERT(0 <= as_nr && as_nr < BASE_MAX_NR_AS);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(0 <= as_nr && as_nr < BASE_MAX_NR_AS);
 
-	found_kctx = kbdev->as_to_kctx[as_nr];
-	KBASE_DEBUG_ASSERT(found_kctx == NULL ||
-			atomic_read(&found_kctx->refcount) > 0);
+    found_kctx = kbdev->as_to_kctx[as_nr];
+    KBASE_DEBUG_ASSERT(found_kctx == NULL ||
+            atomic_read(&found_kctx->refcount) > 0);
 
-	return found_kctx;
+    return found_kctx;
 }
 
 /*
@@ -796,31 +796,31 @@ static inline struct kbase_context *kbasep_js_runpool_lookup_ctx_noretain(struct
  * - The caller must hold the kbasep_js_device_data::runpool_mutex
  */
 static inline void kbase_js_runpool_inc_context_count(
-						struct kbase_device *kbdev,
-						struct kbase_context *kctx)
+                        struct kbase_device *kbdev,
+                        struct kbase_context *kctx)
 {
-	struct kbasep_js_device_data *js_devdata;
-	struct kbasep_js_kctx_info *js_kctx_info;
+    struct kbasep_js_device_data *js_devdata;
+    struct kbasep_js_kctx_info *js_kctx_info;
 
-	KBASE_DEBUG_ASSERT(kbdev != NULL);
-	KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
-	js_devdata = &kbdev->js_data;
-	js_kctx_info = &kctx->jctx.sched_info;
+    js_devdata = &kbdev->js_data;
+    js_kctx_info = &kctx->jctx.sched_info;
 
-	lockdep_assert_held(&js_kctx_info->ctx.jsctx_mutex);
-	lockdep_assert_held(&js_devdata->runpool_mutex);
+    lockdep_assert_held(&js_kctx_info->ctx.jsctx_mutex);
+    lockdep_assert_held(&js_devdata->runpool_mutex);
 
-	/* Track total contexts */
-	KBASE_DEBUG_ASSERT(js_devdata->nr_all_contexts_running < S8_MAX);
-	++(js_devdata->nr_all_contexts_running);
+    /* Track total contexts */
+    KBASE_DEBUG_ASSERT(js_devdata->nr_all_contexts_running < S8_MAX);
+    ++(js_devdata->nr_all_contexts_running);
 
-	if (!kbase_ctx_flag(kctx, KCTX_SUBMIT_DISABLED)) {
-		/* Track contexts that can submit jobs */
-		KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running <
-									S8_MAX);
-		++(js_devdata->nr_user_contexts_running);
-	}
+    if (!kbase_ctx_flag(kctx, KCTX_SUBMIT_DISABLED)) {
+        /* Track contexts that can submit jobs */
+        KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running <
+                                    S8_MAX);
+        ++(js_devdata->nr_user_contexts_running);
+    }
 }
 
 /*
@@ -829,30 +829,30 @@ static inline void kbase_js_runpool_inc_context_count(
  * - The caller must hold the kbasep_js_device_data::runpool_mutex
  */
 static inline void kbase_js_runpool_dec_context_count(
-						struct kbase_device *kbdev,
-						struct kbase_context *kctx)
+                        struct kbase_device *kbdev,
+                        struct kbase_context *kctx)
 {
-	struct kbasep_js_device_data *js_devdata;
-	struct kbasep_js_kctx_info *js_kctx_info;
+    struct kbasep_js_device_data *js_devdata;
+    struct kbasep_js_kctx_info *js_kctx_info;
 
-	KBASE_DEBUG_ASSERT(kbdev != NULL);
-	KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
-	js_devdata = &kbdev->js_data;
-	js_kctx_info = &kctx->jctx.sched_info;
+    js_devdata = &kbdev->js_data;
+    js_kctx_info = &kctx->jctx.sched_info;
 
-	lockdep_assert_held(&js_kctx_info->ctx.jsctx_mutex);
-	lockdep_assert_held(&js_devdata->runpool_mutex);
+    lockdep_assert_held(&js_kctx_info->ctx.jsctx_mutex);
+    lockdep_assert_held(&js_devdata->runpool_mutex);
 
-	/* Track total contexts */
-	--(js_devdata->nr_all_contexts_running);
-	KBASE_DEBUG_ASSERT(js_devdata->nr_all_contexts_running >= 0);
+    /* Track total contexts */
+    --(js_devdata->nr_all_contexts_running);
+    KBASE_DEBUG_ASSERT(js_devdata->nr_all_contexts_running >= 0);
 
-	if (!kbase_ctx_flag(kctx, KCTX_SUBMIT_DISABLED)) {
-		/* Track contexts that can submit jobs */
-		--(js_devdata->nr_user_contexts_running);
-		KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running >= 0);
-	}
+    if (!kbase_ctx_flag(kctx, KCTX_SUBMIT_DISABLED)) {
+        /* Track contexts that can submit jobs */
+        --(js_devdata->nr_user_contexts_running);
+        KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running >= 0);
+    }
 }
 
 
@@ -866,7 +866,7 @@ static inline void kbase_js_runpool_dec_context_count(
  */
 static inline void kbase_js_sched_all(struct kbase_device *kbdev)
 {
-	kbase_js_sched(kbdev, (1 << kbdev->gpu_props.num_job_slots) - 1);
+    kbase_js_sched(kbdev, (1 << kbdev->gpu_props.num_job_slots) - 1);
 }
 
 extern const int
@@ -900,26 +900,26 @@ kbasep_js_relative_priority_to_atom[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
  */
 static inline int kbasep_js_atom_prio_to_sched_prio(base_jd_prio atom_prio)
 {
-	if (atom_prio >= BASE_JD_NR_PRIO_LEVELS)
-		return KBASE_JS_ATOM_SCHED_PRIO_INVALID;
+    if (atom_prio >= BASE_JD_NR_PRIO_LEVELS)
+        return KBASE_JS_ATOM_SCHED_PRIO_INVALID;
 
-	return kbasep_js_atom_priority_to_relative[atom_prio];
+    return kbasep_js_atom_priority_to_relative[atom_prio];
 }
 
 static inline base_jd_prio kbasep_js_sched_prio_to_atom_prio(int sched_prio)
 {
-	unsigned int prio_idx;
+    unsigned int prio_idx;
 
-	KBASE_DEBUG_ASSERT(0 <= sched_prio
-			&& sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
+    KBASE_DEBUG_ASSERT(0 <= sched_prio
+            && sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
 
-	prio_idx = (unsigned int)sched_prio;
+    prio_idx = (unsigned int)sched_prio;
 
-	return kbasep_js_relative_priority_to_atom[prio_idx];
+    return kbasep_js_relative_priority_to_atom[prio_idx];
 }
 
-	  /** @} *//* end group kbase_js */
-	  /** @} *//* end group base_kbase_api */
-	  /** @} *//* end group base_api */
+      /** @} *//* end group kbase_js */
+      /** @} *//* end group base_kbase_api */
+      /** @} *//* end group base_api */
 
-#endif				/* _KBASE_JS_H_ */
+#endif                /* _KBASE_JS_H_ */

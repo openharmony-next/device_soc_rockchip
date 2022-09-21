@@ -88,8 +88,8 @@ int kbase_ctx_sched_retain_ctx(struct kbase_context *kctx);
  *
  * The kbase_device::hwaccess_lock must be held whilst calling this function
  * @return
- *	若成功, 返回 0;
- *	若 *kctx 状态异常, 返回 -1.
+ *    若成功, 返回 0;
+ *    若 *kctx 状态异常, 返回 -1.
  */
 int kbase_ctx_sched_retain_ctx_refcount(struct kbase_context *kctx);
 

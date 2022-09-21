@@ -61,9 +61,9 @@
  * Power management configuration
  *
  * Attached value:
- *	pointer to @ref kbase_pm_callback_conf
+ *    pointer to @ref kbase_pm_callback_conf
  * Default value:
- *	See @ref kbase_pm_callback_conf
+ *    See @ref kbase_pm_callback_conf
  */
 #define POWER_MANAGEMENT_CALLBACKS (&pm_callbacks)
 extern struct kbase_pm_callback_conf pm_callbacks;
@@ -72,9 +72,9 @@ extern struct kbase_pm_callback_conf pm_callbacks;
  * Platform specific configuration functions
  *
  * Attached value:
- *	pointer to @ref kbase_platform_funcs_conf
+ *    pointer to @ref kbase_platform_funcs_conf
  * Default value:
- *	See @ref kbase_platform_funcs_conf
+ *    See @ref kbase_platform_funcs_conf
  */
 #define PLATFORM_FUNCS (&platform_funcs)
 extern struct kbase_platform_funcs_conf platform_funcs;

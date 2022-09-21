@@ -25,19 +25,19 @@ extern "C" {
 #endif
 
 
-_mali_osk_errcode_t _ump_ukk_open(void **context);
+mali_osk_errcode_t _ump_ukk_open(void **context);
 
-_mali_osk_errcode_t _ump_ukk_close(void **context);
+mali_osk_errcode_t _ump_ukk_close(void **context);
 
-_mali_osk_errcode_t _ump_ukk_allocate(_ump_uk_allocate_s *user_interaction);
+mali_osk_errcode_t _ump_ukk_allocate(_ump_uk_allocate_s *user_interaction);
 
-_mali_osk_errcode_t _ump_ukk_release(_ump_uk_release_s *release_info);
+mali_osk_errcode_t _ump_ukk_release(_ump_uk_release_s *release_info);
 
-_mali_osk_errcode_t _ump_ukk_size_get(_ump_uk_size_get_s *user_interaction);
+mali_osk_errcode_t _ump_ukk_size_get(_ump_uk_size_get_s *user_interaction);
 
-_mali_osk_errcode_t _ump_ukk_map_mem(_ump_uk_map_mem_s *args);
+mali_osk_errcode_t _ump_ukk_map_mem(_ump_uk_map_mem_s *args);
 
-_mali_osk_errcode_t _ump_uku_get_api_version(_ump_uk_api_version_s *args);
+mali_osk_errcode_t _ump_uku_get_api_version(_ump_uk_api_version_s *args);
 
 void _ump_ukk_unmap_mem(_ump_uk_unmap_mem_s *args);
 

@@ -47,9 +47,9 @@
  * to get the information.
  */
 struct kbase_sync_fence_info {
-	void *fence;
-	char name[32];
-	int status;
+    void *fence;
+    char name[32];
+    int status;
 };
 
 /**
@@ -156,7 +156,7 @@ void kbase_sync_fence_out_remove(struct kbase_jd_atom *katom);
  */
 static inline void kbase_sync_fence_close_fd(int fd)
 {
-	ksys_close(fd);
+    ksys_close(fd);
 }
 
 /**
@@ -167,7 +167,7 @@ static inline void kbase_sync_fence_close_fd(int fd)
  * return: 0 on success, < 0 on error
  */
 int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
-				 struct kbase_sync_fence_info *info);
+                 struct kbase_sync_fence_info *info);
 
 /**
  * kbase_sync_fence_out_info_get() - Retrieves information about output fence
@@ -177,7 +177,7 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
  * return: 0 on success, < 0 on error
  */
 int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
-				  struct kbase_sync_fence_info *info);
+                  struct kbase_sync_fence_info *info);
 
 /**
  * kbase_sync_status_string() - Get string matching @status

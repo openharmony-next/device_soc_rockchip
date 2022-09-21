@@ -33,8 +33,8 @@ extern "C" {
  */
 #undef _IOC
 #define _IOC(dir, type, nr, size) \
-	((int)(((dir) << _IOC_DIRSHIFT) | ((type) << _IOC_TYPESHIFT) | \
-	((nr) << _IOC_NRSHIFT) | ((size) << _IOC_SIZESHIFT)))
+    ((int)(((dir) << _IOC_DIRSHIFT) | ((type) << _IOC_TYPESHIFT) | \
+    ((nr) << _IOC_NRSHIFT) | ((size) << _IOC_SIZESHIFT)))
 #endif
 
 /**
@@ -44,12 +44,12 @@ extern "C" {
  * @minor: Minor version number
  */
 struct kbase_ioctl_version_check {
-	__u16 major;
-	__u16 minor;
+    __u16 major;
+    __u16 minor;
 };
 
 #define KBASE_IOCTL_VERSION_CHECK \
-	_IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
+    _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
 
 /**
  * struct kbase_ioctl_set_flags - Set kernel context creation flags
@@ -57,11 +57,11 @@ struct kbase_ioctl_version_check {
  * @create_flags: Flags - see base_context_create_flags
  */
 struct kbase_ioctl_set_flags {
-	__u32 create_flags;
+    __u32 create_flags;
 };
 
 #define KBASE_IOCTL_SET_FLAGS \
-	_IOW(KBASE_IOCTL_TYPE, 1, struct kbase_ioctl_set_flags)
+    _IOW(KBASE_IOCTL_TYPE, 1, struct kbase_ioctl_set_flags)
 
 /**
  * struct kbase_ioctl_job_submit - Submit jobs/atoms to the kernel
@@ -71,13 +71,13 @@ struct kbase_ioctl_set_flags {
  * @stride: sizeof(struct base_jd_atom_v2)
  */
 struct kbase_ioctl_job_submit {
-	union kbase_pointer addr;
-	__u32 nr_atoms;
-	__u32 stride;
+    union kbase_pointer addr;
+    __u32 nr_atoms;
+    __u32 stride;
 };
 
 #define KBASE_IOCTL_JOB_SUBMIT \
-	_IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
+    _IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
 
 /**
  * struct kbase_ioctl_get_gpuprops - Read GPU properties from the kernel
@@ -106,16 +106,16 @@ struct kbase_ioctl_job_submit {
  * 11 = u64
  */
 struct kbase_ioctl_get_gpuprops {
-	union kbase_pointer buffer;
-	__u32 size;
-	__u32 flags;
+    union kbase_pointer buffer;
+    __u32 size;
+    __u32 flags;
 };
 
 #define KBASE_IOCTL_GET_GPUPROPS \
-	_IOW(KBASE_IOCTL_TYPE, 3, struct kbase_ioctl_get_gpuprops)
+    _IOW(KBASE_IOCTL_TYPE, 3, struct kbase_ioctl_get_gpuprops)
 
 #define KBASE_IOCTL_POST_TERM \
-	_IO(KBASE_IOCTL_TYPE, 4)
+    _IO(KBASE_IOCTL_TYPE, 4)
 
 /**
  * union kbase_ioctl_mem_alloc - Allocate memory on the GPU
@@ -131,20 +131,20 @@ struct kbase_ioctl_get_gpuprops {
  * @out: Output parameters
  */
 union kbase_ioctl_mem_alloc {
-	struct {
-		__u64 va_pages;
-		__u64 commit_pages;
-		__u64 extent;
-		__u64 flags;
-	} in;
-	struct {
-		__u64 flags;
-		__u64 gpu_va;
-	} out;
+    struct {
+        __u64 va_pages;
+        __u64 commit_pages;
+        __u64 extent;
+        __u64 flags;
+    } in;
+    struct {
+        __u64 flags;
+        __u64 gpu_va;
+    } out;
 };
 
 #define KBASE_IOCTL_MEM_ALLOC \
-	_IOWR(KBASE_IOCTL_TYPE, 5, union kbase_ioctl_mem_alloc)
+    _IOWR(KBASE_IOCTL_TYPE, 5, union kbase_ioctl_mem_alloc)
 
 /**
  * struct kbase_ioctl_mem_query - Query properties of a GPU memory region
@@ -158,32 +158,32 @@ union kbase_ioctl_mem_alloc {
  * @out: Output parameters
  */
 union kbase_ioctl_mem_query {
-	struct {
-		__u64 gpu_addr;
-		__u64 query;
-	} in;
-	struct {
-		__u64 value;
-	} out;
+    struct {
+        __u64 gpu_addr;
+        __u64 query;
+    } in;
+    struct {
+        __u64 value;
+    } out;
 };
 
 #define KBASE_IOCTL_MEM_QUERY \
-	_IOWR(KBASE_IOCTL_TYPE, 6, union kbase_ioctl_mem_query)
+    _IOWR(KBASE_IOCTL_TYPE, 6, union kbase_ioctl_mem_query)
 
-#define KBASE_MEM_QUERY_COMMIT_SIZE	1
-#define KBASE_MEM_QUERY_VA_SIZE		2
-#define KBASE_MEM_QUERY_FLAGS		3
+#define KBASE_MEM_QUERY_COMMIT_SIZE    1
+#define KBASE_MEM_QUERY_VA_SIZE        2
+#define KBASE_MEM_QUERY_FLAGS        3
 
 /**
  * struct kbase_ioctl_mem_free - Free a memory region
  * @gpu_addr: Handle to the region to free
  */
 struct kbase_ioctl_mem_free {
-	__u64 gpu_addr;
+    __u64 gpu_addr;
 };
 
 #define KBASE_IOCTL_MEM_FREE \
-	_IOW(KBASE_IOCTL_TYPE, 7, struct kbase_ioctl_mem_free)
+    _IOW(KBASE_IOCTL_TYPE, 7, struct kbase_ioctl_mem_free)
 
 /**
  * struct kbase_ioctl_hwcnt_reader_setup - Setup HWC dumper/reader
@@ -196,15 +196,15 @@ struct kbase_ioctl_mem_free {
  * A fd is returned from the ioctl if successful, or a negative value on error
  */
 struct kbase_ioctl_hwcnt_reader_setup {
-	__u32 buffer_count;
-	__u32 jm_bm;
-	__u32 shader_bm;
-	__u32 tiler_bm;
-	__u32 mmu_l2_bm;
+    __u32 buffer_count;
+    __u32 jm_bm;
+    __u32 shader_bm;
+    __u32 tiler_bm;
+    __u32 mmu_l2_bm;
 };
 
 #define KBASE_IOCTL_HWCNT_READER_SETUP \
-	_IOW(KBASE_IOCTL_TYPE, 8, struct kbase_ioctl_hwcnt_reader_setup)
+    _IOW(KBASE_IOCTL_TYPE, 8, struct kbase_ioctl_hwcnt_reader_setup)
 
 /**
  * struct kbase_ioctl_hwcnt_enable - Enable hardware counter collection
@@ -215,32 +215,32 @@ struct kbase_ioctl_hwcnt_reader_setup {
  * @mmu_l2_bm:    counters selection bitmask (MMU_L2)
  */
 struct kbase_ioctl_hwcnt_enable {
-	__u64 dump_buffer;
-	__u32 jm_bm;
-	__u32 shader_bm;
-	__u32 tiler_bm;
-	__u32 mmu_l2_bm;
+    __u64 dump_buffer;
+    __u32 jm_bm;
+    __u32 shader_bm;
+    __u32 tiler_bm;
+    __u32 mmu_l2_bm;
 };
 
 #define KBASE_IOCTL_HWCNT_ENABLE \
-	_IOW(KBASE_IOCTL_TYPE, 9, struct kbase_ioctl_hwcnt_enable)
+    _IOW(KBASE_IOCTL_TYPE, 9, struct kbase_ioctl_hwcnt_enable)
 
 #define KBASE_IOCTL_HWCNT_DUMP \
-	_IO(KBASE_IOCTL_TYPE, 10)
+    _IO(KBASE_IOCTL_TYPE, 10)
 
 #define KBASE_IOCTL_HWCNT_CLEAR \
-	_IO(KBASE_IOCTL_TYPE, 11)
+    _IO(KBASE_IOCTL_TYPE, 11)
 
 /**
  * struct kbase_ioctl_disjoint_query - Query the disjoint counter
  * @counter:   A counter of disjoint events in the kernel
  */
 struct kbase_ioctl_disjoint_query {
-	__u32 counter;
+    __u32 counter;
 };
 
 #define KBASE_IOCTL_DISJOINT_QUERY \
-	_IOR(KBASE_IOCTL_TYPE, 12, struct kbase_ioctl_disjoint_query)
+    _IOR(KBASE_IOCTL_TYPE, 12, struct kbase_ioctl_disjoint_query)
 
 /**
  * struct kbase_ioctl_get_ddk_version - Query the kernel version
@@ -251,12 +251,12 @@ struct kbase_ioctl_disjoint_query {
  * (which includes a NULL byte) or a negative error code
  */
 struct kbase_ioctl_get_ddk_version {
-	union kbase_pointer version_buffer;
-	__u32 size;
+    union kbase_pointer version_buffer;
+    __u32 size;
 };
 
 #define KBASE_IOCTL_GET_DDK_VERSION \
-	_IOW(KBASE_IOCTL_TYPE, 13, struct kbase_ioctl_get_ddk_version)
+    _IOW(KBASE_IOCTL_TYPE, 13, struct kbase_ioctl_get_ddk_version)
 
 /**
  * struct kbase_ioctl_mem_jit_init - Initialise the JIT memory allocator
@@ -267,11 +267,11 @@ struct kbase_ioctl_get_ddk_version {
  * specified in @va_pages may be ignored.
  */
 struct kbase_ioctl_mem_jit_init {
-	__u64 va_pages;
+    __u64 va_pages;
 };
 
 #define KBASE_IOCTL_MEM_JIT_INIT \
-	_IOW(KBASE_IOCTL_TYPE, 14, struct kbase_ioctl_mem_jit_init)
+    _IOW(KBASE_IOCTL_TYPE, 14, struct kbase_ioctl_mem_jit_init)
 
 /**
  * struct kbase_ioctl_mem_sync - Perform cache maintenance on memory
@@ -284,15 +284,15 @@ struct kbase_ioctl_mem_jit_init {
  * @padding: Padding to round up to a multiple of 8 bytes, must be zero
  */
 struct kbase_ioctl_mem_sync {
-	__u64 handle;
-	__u64 user_addr;
-	__u64 size;
-	__u8 type;
-	__u8 padding[7];
+    __u64 handle;
+    __u64 user_addr;
+    __u64 size;
+    __u8 type;
+    __u8 padding[7];
 };
 
 #define KBASE_IOCTL_MEM_SYNC \
-	_IOW(KBASE_IOCTL_TYPE, 15, struct kbase_ioctl_mem_sync)
+    _IOW(KBASE_IOCTL_TYPE, 15, struct kbase_ioctl_mem_sync)
 
 /**
  * union kbase_ioctl_mem_find_cpu_offset - Find the offset of a CPU pointer
@@ -306,18 +306,18 @@ struct kbase_ioctl_mem_sync {
  * @out: Output parameters
  */
 union kbase_ioctl_mem_find_cpu_offset {
-	struct {
-		__u64 gpu_addr;
-		__u64 cpu_addr;
-		__u64 size;
-	} in;
-	struct {
-		__u64 offset;
-	} out;
+    struct {
+        __u64 gpu_addr;
+        __u64 cpu_addr;
+        __u64 size;
+    } in;
+    struct {
+        __u64 offset;
+    } out;
 };
 
 #define KBASE_IOCTL_MEM_FIND_CPU_OFFSET \
-	_IOWR(KBASE_IOCTL_TYPE, 16, union kbase_ioctl_mem_find_cpu_offset)
+    _IOWR(KBASE_IOCTL_TYPE, 16, union kbase_ioctl_mem_find_cpu_offset)
 
 /**
  * struct kbase_ioctl_get_context_id - Get the kernel context ID
@@ -325,11 +325,11 @@ union kbase_ioctl_mem_find_cpu_offset {
  * @id: The kernel context ID
  */
 struct kbase_ioctl_get_context_id {
-	int id; /* This should really be __u32, but see GPUCORE-10048 */
+    int id; /* This should really be __u32, but see GPUCORE-10048 */
 };
 
 #define KBASE_IOCTL_GET_CONTEXT_ID \
-	_IOR(KBASE_IOCTL_TYPE, 17, struct kbase_ioctl_get_context_id)
+    _IOR(KBASE_IOCTL_TYPE, 17, struct kbase_ioctl_get_context_id)
 
 /**
  * struct kbase_ioctl_tlstream_acquire - Acquire a tlstream fd
@@ -339,14 +339,14 @@ struct kbase_ioctl_get_context_id {
  * The ioctl returns a file descriptor when successful
  */
 struct kbase_ioctl_tlstream_acquire {
-	__u32 flags;
+    __u32 flags;
 };
 
 #define KBASE_IOCTL_TLSTREAM_ACQUIRE \
-	_IOW(KBASE_IOCTL_TYPE, 18, struct kbase_ioctl_tlstream_acquire)
+    _IOW(KBASE_IOCTL_TYPE, 18, struct kbase_ioctl_tlstream_acquire)
 
 #define KBASE_IOCTL_TLSTREAM_FLUSH \
-	_IO(KBASE_IOCTL_TYPE, 19)
+    _IO(KBASE_IOCTL_TYPE, 19)
 
 /**
  * struct kbase_ioctl_mem_commit - Change the amount of memory backing a region
@@ -359,12 +359,12 @@ struct kbase_ioctl_tlstream_acquire {
  *   -EINVAL: Invalid arguments
  */
 struct kbase_ioctl_mem_commit {
-	__u64 gpu_addr;
-	__u64 pages;
+    __u64 gpu_addr;
+    __u64 pages;
 };
 
 #define KBASE_IOCTL_MEM_COMMIT \
-	_IOW(KBASE_IOCTL_TYPE, 20, struct kbase_ioctl_mem_commit)
+    _IOW(KBASE_IOCTL_TYPE, 20, struct kbase_ioctl_mem_commit)
 
 /**
  * union kbase_ioctl_mem_alias - Create an alias of memory regions
@@ -379,21 +379,21 @@ struct kbase_ioctl_mem_commit {
  * @out: Output parameters
  */
 union kbase_ioctl_mem_alias {
-	struct {
-		__u64 flags;
-		__u64 stride;
-		__u64 nents;
-		union kbase_pointer aliasing_info;
-	} in;
-	struct {
-		__u64 flags;
-		__u64 gpu_va;
-		__u64 va_pages;
-	} out;
+    struct {
+        __u64 flags;
+        __u64 stride;
+        __u64 nents;
+        union kbase_pointer aliasing_info;
+    } in;
+    struct {
+        __u64 flags;
+        __u64 gpu_va;
+        __u64 va_pages;
+    } out;
 };
 
 #define KBASE_IOCTL_MEM_ALIAS \
-	_IOWR(KBASE_IOCTL_TYPE, 21, union kbase_ioctl_mem_alias)
+    _IOWR(KBASE_IOCTL_TYPE, 21, union kbase_ioctl_mem_alias)
 
 /**
  * union kbase_ioctl_mem_import - Import memory for use by the GPU
@@ -408,21 +408,21 @@ union kbase_ioctl_mem_alias {
  * @out: Output parameters
  */
 union kbase_ioctl_mem_import {
-	struct {
-		__u64 flags;
-		union kbase_pointer phandle;
-		__u32 type;
-		__u32 padding;
-	} in;
-	struct {
-		__u64 flags;
-		__u64 gpu_va;
-		__u64 va_pages;
-	} out;
+    struct {
+        __u64 flags;
+        union kbase_pointer phandle;
+        __u32 type;
+        __u32 padding;
+    } in;
+    struct {
+        __u64 flags;
+        __u64 gpu_va;
+        __u64 va_pages;
+    } out;
 };
 
 #define KBASE_IOCTL_MEM_IMPORT \
-	_IOWR(KBASE_IOCTL_TYPE, 22, union kbase_ioctl_mem_import)
+    _IOWR(KBASE_IOCTL_TYPE, 22, union kbase_ioctl_mem_import)
 
 /**
  * struct kbase_ioctl_mem_flags_change - Change the flags for a memory region
@@ -431,13 +431,13 @@ union kbase_ioctl_mem_import {
  * @mask: Mask of the flags to modify
  */
 struct kbase_ioctl_mem_flags_change {
-	__u64 gpu_va;
-	__u64 flags;
-	__u64 mask;
+    __u64 gpu_va;
+    __u64 flags;
+    __u64 mask;
 };
 
 #define KBASE_IOCTL_MEM_FLAGS_CHANGE \
-	_IOW(KBASE_IOCTL_TYPE, 23, struct kbase_ioctl_mem_flags_change)
+    _IOW(KBASE_IOCTL_TYPE, 23, struct kbase_ioctl_mem_flags_change)
 
 /**
  * struct kbase_ioctl_stream_create - Create a synchronisation stream
@@ -451,22 +451,22 @@ struct kbase_ioctl_mem_flags_change {
  * The ioctl returns a file descriptor.
  */
 struct kbase_ioctl_stream_create {
-	char name[32];
+    char name[32];
 };
 
 #define KBASE_IOCTL_STREAM_CREATE \
-	_IOW(KBASE_IOCTL_TYPE, 24, struct kbase_ioctl_stream_create)
+    _IOW(KBASE_IOCTL_TYPE, 24, struct kbase_ioctl_stream_create)
 
 /**
  * struct kbase_ioctl_fence_validate - Validate a fd refers to a fence
  * @fd: The file descriptor to validate
  */
 struct kbase_ioctl_fence_validate {
-	int fd;
+    int fd;
 };
 
 #define KBASE_IOCTL_FENCE_VALIDATE \
-	_IOW(KBASE_IOCTL_TYPE, 25, struct kbase_ioctl_fence_validate)
+    _IOW(KBASE_IOCTL_TYPE, 25, struct kbase_ioctl_fence_validate)
 
 /**
  * struct kbase_ioctl_get_profiling_controls - Get the profiling controls
@@ -474,12 +474,12 @@ struct kbase_ioctl_fence_validate {
  * @buffer: The buffer to receive the profiling controls
  */
 struct kbase_ioctl_get_profiling_controls {
-	union kbase_pointer buffer;
-	__u32 count;
+    union kbase_pointer buffer;
+    __u32 count;
 };
 
 #define KBASE_IOCTL_GET_PROFILING_CONTROLS \
-	_IOW(KBASE_IOCTL_TYPE, 26, struct kbase_ioctl_get_profiling_controls)
+    _IOW(KBASE_IOCTL_TYPE, 26, struct kbase_ioctl_get_profiling_controls)
 
 /**
  * struct kbase_ioctl_mem_profile_add - Provide profiling information to kernel
@@ -490,13 +490,13 @@ struct kbase_ioctl_get_profiling_controls {
  * The data provided is accessible through a debugfs file
  */
 struct kbase_ioctl_mem_profile_add {
-	union kbase_pointer buffer;
-	__u32 len;
-	__u32 padding;
+    union kbase_pointer buffer;
+    __u32 len;
+    __u32 padding;
 };
 
 #define KBASE_IOCTL_MEM_PROFILE_ADD \
-	_IOW(KBASE_IOCTL_TYPE, 27, struct kbase_ioctl_mem_profile_add)
+    _IOW(KBASE_IOCTL_TYPE, 27, struct kbase_ioctl_mem_profile_add)
 
 /**
  * struct kbase_ioctl_soft_event_update - Update the status of a soft-event
@@ -505,13 +505,13 @@ struct kbase_ioctl_mem_profile_add {
  * @flags: Flags for future expansion
  */
 struct kbase_ioctl_soft_event_update {
-	__u64 event;
-	__u32 new_status;
-	__u32 flags;
+    __u64 event;
+    __u32 new_status;
+    __u32 flags;
 };
 
 #define KBASE_IOCTL_SOFT_EVENT_UPDATE \
-	_IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
+    _IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
 
 /***************
  * test ioctls *
@@ -532,14 +532,14 @@ struct kbase_ioctl_soft_event_update {
  * @aux_msg:   if non-zero aux messages will be included
  */
 struct kbase_ioctl_tlstream_test {
-	__u32 tpw_count;
-	__u32 msg_delay;
-	__u32 msg_count;
-	__u32 aux_msg;
+    __u32 tpw_count;
+    __u32 msg_delay;
+    __u32 msg_count;
+    __u32 aux_msg;
 };
 
 #define KBASE_IOCTL_TLSTREAM_TEST \
-	_IOW(KBASE_IOCTL_TEST_TYPE, 1, struct kbase_ioctl_tlstream_test)
+    _IOW(KBASE_IOCTL_TEST_TYPE, 1, struct kbase_ioctl_tlstream_test)
 
 /**
  * struct kbase_ioctl_tlstream_stats - Read tlstream stats for test purposes
@@ -547,107 +547,112 @@ struct kbase_ioctl_tlstream_test {
  * @bytes_generated: number of bytes generated by tracepoints
  */
 struct kbase_ioctl_tlstream_stats {
-	__u32 bytes_collected;
-	__u32 bytes_generated;
+    __u32 bytes_collected;
+    __u32 bytes_generated;
 };
 
 #define KBASE_IOCTL_TLSTREAM_STATS \
-	_IOR(KBASE_IOCTL_TEST_TYPE, 2, struct kbase_ioctl_tlstream_stats)
+    _IOR(KBASE_IOCTL_TEST_TYPE, 2, struct kbase_ioctl_tlstream_stats)
 
 #endif
 
 /**********************************
  * Definitions for GPU properties *
  **********************************/
-#define KBASE_GPUPROP_VALUE_SIZE_U8	(0x0)
-#define KBASE_GPUPROP_VALUE_SIZE_U16	(0x1)
-#define KBASE_GPUPROP_VALUE_SIZE_U32	(0x2)
-#define KBASE_GPUPROP_VALUE_SIZE_U64	(0x3)
+#define KBASE_GPUPROP_VALUE_SIZE_U8    (0x0)
+#define KBASE_GPUPROP_VALUE_SIZE_U16    (0x1)
+#define KBASE_GPUPROP_VALUE_SIZE_U32    (0x2)
+#define KBASE_GPUPROP_VALUE_SIZE_U64    (0x3)
 
-#define KBASE_GPUPROP_PRODUCT_ID			1
-#define KBASE_GPUPROP_VERSION_STATUS			2
-#define KBASE_GPUPROP_MINOR_REVISION			3
-#define KBASE_GPUPROP_MAJOR_REVISION			4
-#define KBASE_GPUPROP_GPU_SPEED_MHZ			5
-#define KBASE_GPUPROP_GPU_FREQ_KHZ_MAX			6
-#define KBASE_GPUPROP_GPU_FREQ_KHZ_MIN			7
-#define KBASE_GPUPROP_LOG2_PROGRAM_COUNTER_SIZE		8
-#define KBASE_GPUPROP_TEXTURE_FEATURES_0		9
-#define KBASE_GPUPROP_TEXTURE_FEATURES_1		10
-#define KBASE_GPUPROP_TEXTURE_FEATURES_2		11
-#define KBASE_GPUPROP_GPU_AVAILABLE_MEMORY_SIZE		12
+#define KBASE_GPUPROP_VALUE_U8            1
+#define KBASE_GPUPROP_VALUE_U16            2
+#define KBASE_GPUPROP_VALUE_U32            4
+#define KBASE_GPUPROP_VALUE_U64            8
 
-#define KBASE_GPUPROP_L2_LOG2_LINE_SIZE			13
-#define KBASE_GPUPROP_L2_LOG2_CACHE_SIZE		14
-#define KBASE_GPUPROP_L2_NUM_L2_SLICES			15
+#define KBASE_GPUPROP_PRODUCT_ID            1
+#define KBASE_GPUPROP_VERSION_STATUS            2
+#define KBASE_GPUPROP_MINOR_REVISION            3
+#define KBASE_GPUPROP_MAJOR_REVISION            4
+#define KBASE_GPUPROP_GPU_SPEED_MHZ            5
+#define KBASE_GPUPROP_GPU_FREQ_KHZ_MAX            6
+#define KBASE_GPUPROP_GPU_FREQ_KHZ_MIN            7
+#define KBASE_GPUPROP_LOG2_PROGRAM_COUNTER_SIZE        8
+#define KBASE_GPUPROP_TEXTURE_FEATURES_0        9
+#define KBASE_GPUPROP_TEXTURE_FEATURES_1        10
+#define KBASE_GPUPROP_TEXTURE_FEATURES_2        11
+#define KBASE_GPUPROP_GPU_AVAILABLE_MEMORY_SIZE        12
 
-#define KBASE_GPUPROP_TILER_BIN_SIZE_BYTES		16
-#define KBASE_GPUPROP_TILER_MAX_ACTIVE_LEVELS		17
+#define KBASE_GPUPROP_L2_LOG2_LINE_SIZE            13
+#define KBASE_GPUPROP_L2_LOG2_CACHE_SIZE        14
+#define KBASE_GPUPROP_L2_NUM_L2_SLICES            15
 
-#define KBASE_GPUPROP_MAX_THREADS			18
-#define KBASE_GPUPROP_MAX_WORKGROUP_SIZE		19
-#define KBASE_GPUPROP_MAX_BARRIER_SIZE			20
-#define KBASE_GPUPROP_MAX_REGISTERS			21
-#define KBASE_GPUPROP_MAX_TASK_QUEUE			22
-#define KBASE_GPUPROP_MAX_THREAD_GROUP_SPLIT		23
-#define KBASE_GPUPROP_IMPL_TECH				24
+#define KBASE_GPUPROP_TILER_BIN_SIZE_BYTES        16
+#define KBASE_GPUPROP_TILER_MAX_ACTIVE_LEVELS        17
 
-#define KBASE_GPUPROP_RAW_SHADER_PRESENT		25
-#define KBASE_GPUPROP_RAW_TILER_PRESENT			26
-#define KBASE_GPUPROP_RAW_L2_PRESENT			27
-#define KBASE_GPUPROP_RAW_STACK_PRESENT			28
-#define KBASE_GPUPROP_RAW_L2_FEATURES			29
-#define KBASE_GPUPROP_RAW_SUSPEND_SIZE			30
-#define KBASE_GPUPROP_RAW_MEM_FEATURES			31
-#define KBASE_GPUPROP_RAW_MMU_FEATURES			32
-#define KBASE_GPUPROP_RAW_AS_PRESENT			33
-#define KBASE_GPUPROP_RAW_JS_PRESENT			34
-#define KBASE_GPUPROP_RAW_JS_FEATURES_0			35
-#define KBASE_GPUPROP_RAW_JS_FEATURES_1			36
-#define KBASE_GPUPROP_RAW_JS_FEATURES_2			37
-#define KBASE_GPUPROP_RAW_JS_FEATURES_3			38
-#define KBASE_GPUPROP_RAW_JS_FEATURES_4			39
-#define KBASE_GPUPROP_RAW_JS_FEATURES_5			40
-#define KBASE_GPUPROP_RAW_JS_FEATURES_6			41
-#define KBASE_GPUPROP_RAW_JS_FEATURES_7			42
-#define KBASE_GPUPROP_RAW_JS_FEATURES_8			43
-#define KBASE_GPUPROP_RAW_JS_FEATURES_9			44
-#define KBASE_GPUPROP_RAW_JS_FEATURES_10		45
-#define KBASE_GPUPROP_RAW_JS_FEATURES_11		46
-#define KBASE_GPUPROP_RAW_JS_FEATURES_12		47
-#define KBASE_GPUPROP_RAW_JS_FEATURES_13		48
-#define KBASE_GPUPROP_RAW_JS_FEATURES_14		49
-#define KBASE_GPUPROP_RAW_JS_FEATURES_15		50
-#define KBASE_GPUPROP_RAW_TILER_FEATURES		51
-#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_0		52
-#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_1		53
-#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_2		54
-#define KBASE_GPUPROP_RAW_GPU_ID			55
-#define KBASE_GPUPROP_RAW_THREAD_MAX_THREADS		56
-#define KBASE_GPUPROP_RAW_THREAD_MAX_WORKGROUP_SIZE	57
-#define KBASE_GPUPROP_RAW_THREAD_MAX_BARRIER_SIZE	58
-#define KBASE_GPUPROP_RAW_THREAD_FEATURES		59
-#define KBASE_GPUPROP_RAW_COHERENCY_MODE		60
+#define KBASE_GPUPROP_MAX_THREADS            18
+#define KBASE_GPUPROP_MAX_WORKGROUP_SIZE        19
+#define KBASE_GPUPROP_MAX_BARRIER_SIZE            20
+#define KBASE_GPUPROP_MAX_REGISTERS            21
+#define KBASE_GPUPROP_MAX_TASK_QUEUE            22
+#define KBASE_GPUPROP_MAX_THREAD_GROUP_SPLIT        23
+#define KBASE_GPUPROP_IMPL_TECH                24
 
-#define KBASE_GPUPROP_COHERENCY_NUM_GROUPS		61
-#define KBASE_GPUPROP_COHERENCY_NUM_CORE_GROUPS		62
-#define KBASE_GPUPROP_COHERENCY_COHERENCY		63
-#define KBASE_GPUPROP_COHERENCY_GROUP_0			64
-#define KBASE_GPUPROP_COHERENCY_GROUP_1			65
-#define KBASE_GPUPROP_COHERENCY_GROUP_2			66
-#define KBASE_GPUPROP_COHERENCY_GROUP_3			67
-#define KBASE_GPUPROP_COHERENCY_GROUP_4			68
-#define KBASE_GPUPROP_COHERENCY_GROUP_5			69
-#define KBASE_GPUPROP_COHERENCY_GROUP_6			70
-#define KBASE_GPUPROP_COHERENCY_GROUP_7			71
-#define KBASE_GPUPROP_COHERENCY_GROUP_8			72
-#define KBASE_GPUPROP_COHERENCY_GROUP_9			73
-#define KBASE_GPUPROP_COHERENCY_GROUP_10		74
-#define KBASE_GPUPROP_COHERENCY_GROUP_11		75
-#define KBASE_GPUPROP_COHERENCY_GROUP_12		76
-#define KBASE_GPUPROP_COHERENCY_GROUP_13		77
-#define KBASE_GPUPROP_COHERENCY_GROUP_14		78
-#define KBASE_GPUPROP_COHERENCY_GROUP_15		79
+#define KBASE_GPUPROP_RAW_SHADER_PRESENT        25
+#define KBASE_GPUPROP_RAW_TILER_PRESENT            26
+#define KBASE_GPUPROP_RAW_L2_PRESENT            27
+#define KBASE_GPUPROP_RAW_STACK_PRESENT            28
+#define KBASE_GPUPROP_RAW_L2_FEATURES            29
+#define KBASE_GPUPROP_RAW_SUSPEND_SIZE            30
+#define KBASE_GPUPROP_RAW_MEM_FEATURES            31
+#define KBASE_GPUPROP_RAW_MMU_FEATURES            32
+#define KBASE_GPUPROP_RAW_AS_PRESENT            33
+#define KBASE_GPUPROP_RAW_JS_PRESENT            34
+#define KBASE_GPUPROP_RAW_JS_FEATURES_0            35
+#define KBASE_GPUPROP_RAW_JS_FEATURES_1            36
+#define KBASE_GPUPROP_RAW_JS_FEATURES_2            37
+#define KBASE_GPUPROP_RAW_JS_FEATURES_3            38
+#define KBASE_GPUPROP_RAW_JS_FEATURES_4            39
+#define KBASE_GPUPROP_RAW_JS_FEATURES_5            40
+#define KBASE_GPUPROP_RAW_JS_FEATURES_6            41
+#define KBASE_GPUPROP_RAW_JS_FEATURES_7            42
+#define KBASE_GPUPROP_RAW_JS_FEATURES_8            43
+#define KBASE_GPUPROP_RAW_JS_FEATURES_9            44
+#define KBASE_GPUPROP_RAW_JS_FEATURES_10        45
+#define KBASE_GPUPROP_RAW_JS_FEATURES_11        46
+#define KBASE_GPUPROP_RAW_JS_FEATURES_12        47
+#define KBASE_GPUPROP_RAW_JS_FEATURES_13        48
+#define KBASE_GPUPROP_RAW_JS_FEATURES_14        49
+#define KBASE_GPUPROP_RAW_JS_FEATURES_15        50
+#define KBASE_GPUPROP_RAW_TILER_FEATURES        51
+#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_0        52
+#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_1        53
+#define KBASE_GPUPROP_RAW_TEXTURE_FEATURES_2        54
+#define KBASE_GPUPROP_RAW_GPU_ID            55
+#define KBASE_GPUPROP_RAW_THREAD_MAX_THREADS        56
+#define KBASE_GPUPROP_RAW_THREAD_MAX_WORKGROUP_SIZE    57
+#define KBASE_GPUPROP_RAW_THREAD_MAX_BARRIER_SIZE    58
+#define KBASE_GPUPROP_RAW_THREAD_FEATURES        59
+#define KBASE_GPUPROP_RAW_COHERENCY_MODE        60
+
+#define KBASE_GPUPROP_COHERENCY_NUM_GROUPS        61
+#define KBASE_GPUPROP_COHERENCY_NUM_CORE_GROUPS        62
+#define KBASE_GPUPROP_COHERENCY_COHERENCY        63
+#define KBASE_GPUPROP_COHERENCY_GROUP_0            64
+#define KBASE_GPUPROP_COHERENCY_GROUP_1            65
+#define KBASE_GPUPROP_COHERENCY_GROUP_2            66
+#define KBASE_GPUPROP_COHERENCY_GROUP_3            67
+#define KBASE_GPUPROP_COHERENCY_GROUP_4            68
+#define KBASE_GPUPROP_COHERENCY_GROUP_5            69
+#define KBASE_GPUPROP_COHERENCY_GROUP_6            70
+#define KBASE_GPUPROP_COHERENCY_GROUP_7            71
+#define KBASE_GPUPROP_COHERENCY_GROUP_8            72
+#define KBASE_GPUPROP_COHERENCY_GROUP_9            73
+#define KBASE_GPUPROP_COHERENCY_GROUP_10        74
+#define KBASE_GPUPROP_COHERENCY_GROUP_11        75
+#define KBASE_GPUPROP_COHERENCY_GROUP_12        76
+#define KBASE_GPUPROP_COHERENCY_GROUP_13        77
+#define KBASE_GPUPROP_COHERENCY_GROUP_14        78
+#define KBASE_GPUPROP_COHERENCY_GROUP_15        79
 
 #ifdef __cpluscplus
 }

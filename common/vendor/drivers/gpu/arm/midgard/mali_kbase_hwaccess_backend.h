@@ -25,7 +25,7 @@
 
 /**
  * kbase_backend_early_init - Perform any backend-specific initialization.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * Return: 0 on success, or an error code on failure.
  */
@@ -33,7 +33,7 @@ int kbase_backend_early_init(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_late_init - Perform any backend-specific initialization.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * Return: 0 on success, or an error code on failure.
  */
@@ -41,13 +41,13 @@ int kbase_backend_late_init(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_early_term - Perform any backend-specific termination.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  */
 void kbase_backend_early_term(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_late_term - Perform any backend-specific termination.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  */
 void kbase_backend_late_term(struct kbase_device *kbdev);
 

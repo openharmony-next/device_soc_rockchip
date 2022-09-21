@@ -41,8 +41,8 @@
  * Base kernel property query APIs
  */
 
-#ifndef _KBASE_GPUPROPS_H_
-#define _KBASE_GPUPROPS_H_
+#ifndef KBASE_GPUPROPS_H
+#define KBASE_GPUPROPS_H
 
 #include "mali_kbase_gpuprops_types.h"
 
@@ -61,14 +61,14 @@ struct kbase_device;
  */
 /* from mali_cdsb.h */
 #define KBASE_UBFX32(value, offset, size) \
-	(((u32)(value) >> (u32)(offset)) & (u32)((1ULL << (u32)(size)) - 1))
+    (((u32)(value) >> (u32)(offset)) & (u32)((1ULL << (u32)(size)) - 1))
 
 /**
  * @brief Set up Kbase GPU properties.
  *
  * Set up Kbase GPU properties with information from the GPU registers
  *
- * @param kbdev		The struct kbase_device structure for the device
+ * @param kbdev        The struct kbase_device structure for the device
  */
 void kbase_gpuprops_set(struct kbase_device *kbdev);
 
@@ -130,6 +130,6 @@ int kbase_device_populate_max_freq(struct kbase_device *kbdev);
  * stored in base_gpu_props::core_props.
  */
 void kbase_gpuprops_update_core_props_gpu_id(
-	struct base_gpu_props * const gpu_props);
+    struct base_gpu_props * const gpu_props);
 
-#endif				/* _KBASE_GPUPROPS_H_ */
+#endif                /* _KBASE_GPUPROPS_H_ */

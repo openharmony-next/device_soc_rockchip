@@ -21,16 +21,16 @@
  * HW access common definitions
  */
 
-#ifndef _KBASE_HWACCESS_DEFS_H_
-#define _KBASE_HWACCESS_DEFS_H_
+#ifndef KBASE_HWACCESS_DEFS_H
+#define KBASE_HWACCESS_DEFS_H
 
 #include <mali_kbase_jm_defs.h>
 
 /* The hwaccess_lock (a spinlock) must be held when accessing this structure */
 struct kbase_hwaccess_data {
-	struct kbase_context *active_kctx;
+    struct kbase_context *active_kctx;
 
-	struct kbase_backend_data backend;
+    struct kbase_backend_data backend;
 };
 
 #endif /* _KBASE_HWACCESS_DEFS_H_ */

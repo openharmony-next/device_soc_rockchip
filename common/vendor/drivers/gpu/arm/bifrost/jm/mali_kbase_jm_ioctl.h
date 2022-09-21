@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_JM_IOCTL_H_
-#define _KBASE_JM_IOCTL_H_
+#ifndef KBASE_JM_IOCTL_H
+#define KBASE_JM_IOCTL_H
 
 #include <asm-generic/ioctl.h>
 #include <linux/types.h>
@@ -126,15 +126,15 @@
  * @minor: Minor version number
  */
 struct kbase_ioctl_version_check {
-	__u16 major;
-	__u16 minor;
+    __u16 major;
+    __u16 minor;
 };
 
 #define KBASE_IOCTL_VERSION_CHECK \
-	_IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
+    _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
 
 #define KBASE_IOCTL_VERSION_CHECK_RESERVED \
-	_IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
+    _IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
 
 /**
  * struct kbase_ioctl_job_submit - Submit jobs/atoms to the kernel
@@ -144,16 +144,16 @@ struct kbase_ioctl_version_check {
  * @stride: sizeof(struct base_jd_atom_v2) or sizeof(struct base_jd_atom)
  */
 struct kbase_ioctl_job_submit {
-	__u64 addr;
-	__u32 nr_atoms;
-	__u32 stride;
+    __u64 addr;
+    __u32 nr_atoms;
+    __u32 stride;
 };
 
 #define KBASE_IOCTL_JOB_SUBMIT \
-	_IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
+    _IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
 
 #define KBASE_IOCTL_POST_TERM \
-	_IO(KBASE_IOCTL_TYPE, 4)
+    _IO(KBASE_IOCTL_TYPE, 4)
 
 /**
  * struct kbase_ioctl_soft_event_update - Update the status of a soft-event
@@ -162,13 +162,13 @@ struct kbase_ioctl_job_submit {
  * @flags: Flags for future expansion
  */
 struct kbase_ioctl_soft_event_update {
-	__u64 event;
-	__u32 new_status;
-	__u32 flags;
+    __u64 event;
+    __u32 new_status;
+    __u32 flags;
 };
 
 #define KBASE_IOCTL_SOFT_EVENT_UPDATE \
-	_IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
+    _IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
 
 /**
  * struct kbase_kinstr_jm_fd_out - Explains the compatibility information for
@@ -187,9 +187,9 @@ struct kbase_ioctl_soft_event_update {
  * The `size` can be used to cast the opaque memory returned from the kernel.
  */
 struct kbase_kinstr_jm_fd_out {
-	__u16 size;
-	__u8 version;
-	__u8 padding[5];
+    __u16 size;
+    __u8 version;
+    __u8 padding[5];
 };
 
 /**
@@ -201,16 +201,16 @@ struct kbase_kinstr_jm_fd_out {
  * https://www.kernel.org/doc/Documentation/ioctl/botching-up-ioctls.rst
  */
 struct kbase_kinstr_jm_fd_in {
-	__u16 count;
-	__u8 padding[6];
+    __u16 count;
+    __u8 padding[6];
 };
 
 union kbase_kinstr_jm_fd {
-	struct kbase_kinstr_jm_fd_in in;
-	struct kbase_kinstr_jm_fd_out out;
+    struct kbase_kinstr_jm_fd_in in;
+    struct kbase_kinstr_jm_fd_out out;
 };
 
 #define KBASE_IOCTL_KINSTR_JM_FD \
-	_IOWR(KBASE_IOCTL_TYPE, 51, union kbase_kinstr_jm_fd)
+    _IOWR(KBASE_IOCTL_TYPE, 51, union kbase_kinstr_jm_fd)
 
 #endif /* _KBASE_JM_IOCTL_H_ */

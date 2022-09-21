@@ -21,13 +21,13 @@
 
 bool kbasep_list_member_of(const struct list_head *base, struct list_head *entry)
 {
-	struct list_head *pos = base->next;
+    struct list_head *pos = base->next;
 
-	while (pos != base) {
-		if (pos == entry)
-			return true;
+    while (pos != base) {
+        if (pos == entry)
+            return true;
 
-		pos = pos->next;
-	}
-	return false;
+        pos = pos->next;
+    }
+    return false;
 }

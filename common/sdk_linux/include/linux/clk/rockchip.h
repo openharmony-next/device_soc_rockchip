@@ -11,7 +11,7 @@ int rockchip_pll_clk_compensation(struct clk *clk, int ppm);
 #else
 static inline int rockchip_pll_clk_compensation(struct clk *clk, int ppm)
 {
-	return -ENOSYS;
+    return -ENOSYS;
 }
 #endif
 

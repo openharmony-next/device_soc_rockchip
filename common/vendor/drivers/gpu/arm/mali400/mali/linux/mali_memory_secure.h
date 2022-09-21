@@ -17,9 +17,9 @@
 
 #include "mali_memory_types.h"
 
-_mali_osk_errcode_t mali_mem_secure_attach_dma_buf(mali_mem_secure *secure_mem, u32 size, int mem_fd);
+mali_osk_errcode_t mali_mem_secure_attach_dma_buf(mali_mem_secure *secure_mem, u32 size, int mem_fd);
 
-_mali_osk_errcode_t mali_mem_secure_mali_map(mali_mem_secure *secure_mem, struct mali_session_data *session, u32 vaddr, u32 props);
+mali_osk_errcode_t mali_mem_secure_mali_map(mali_mem_secure *secure_mem, struct mali_session_data *session, u32 vaddr, u32 props);
 
 void mali_mem_secure_mali_unmap(mali_mem_allocation *alloc);
 

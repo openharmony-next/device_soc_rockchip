@@ -19,7 +19,7 @@ static inline void leave_mm(int cpu) { }
  * homogeneous system. Must contain at least one active CPU.
  */
 #ifndef task_cpu_possible_mask
-# define task_cpu_possible_mask(p)	cpu_possible_mask
+# define task_cpu_possible_mask(p)    cpu_possible_mask
 #endif
 
 #endif

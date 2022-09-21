@@ -3,7 +3,7 @@
  * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
  *
  * author:
- *	Ding Wei, leo.ding@rock-chips.com
+ *    Ding Wei, leo.ding@rock-chips.com
  *
  */
 #ifndef __ROCKCHIP_MPP_HACK_PX30_H__
@@ -15,12 +15,12 @@ int px30_workaround_combo_switch_grf(struct mpp_dev *mpp);
 #else
 static inline int px30_workaround_combo_init(struct mpp_dev *mpp)
 {
-	return 0;
+    return 0;
 }
 
 static inline int px30_workaround_combo_switch_grf(struct mpp_dev *mpp)
 {
-	return 0;
+    return 0;
 }
 #endif
 

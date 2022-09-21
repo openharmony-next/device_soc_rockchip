@@ -25,6 +25,20 @@
 extern "C" {
 #endif
 
+/* mail define value begin */
+#define MAIL_DEBUG_LEVEL_TO    (2)
+#define MAIL_DEBUG_LEVEL_TH    (3)
+#define MAIL_DEBUG_LEVEL_FO    (4)
+#define MAIL_DEBUG_LEVEL_FI    (5)
+#define MAIL_EVENT_TO          (2)
+#define MAIL_EVENT_TH          (3)
+#define MAIL_EVENT_FO          (4)
+#define NEW_SESSION_SIZE       (8)
+#define MAIL_OFFSET_TH         (32)
+#define PER_PAGE_SIZE          (512)
+
+/* mail define value end */
+
 /**
  * @addtogroup uddapi Unified Device Driver (UDD) APIs
  *
@@ -43,7 +57,7 @@ extern "C" {
 #ifdef DEBUG
 /** @brief Macro for asserting that the current thread holds a given lock
  */
-#define MALI_DEBUG_ASSERT_LOCK_HELD(l) MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == _mali_osk_get_tid());
+#define MALI_DEBUG_ASSERT_LOCK_HELD(l) MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == mali_osk_get_tid());
 
 /** @brief returns a lock's owner (thread id) if debugging is enabled
  */
@@ -63,7 +77,7 @@ extern "C" {
  * This is the reverse of the operation 'offsetof'. This means that the
  * following condition is satisfied:
  *
- *   ptr == _MALI_OSK_CONTAINER_OF( &ptr->member, type, member )
+ *   ptr == MALI_OSK_CONTAINER_OF( &ptr->member, type, member )
  *
  * When ptr is of type 'type'.
  *
@@ -80,36 +94,36 @@ extern "C" {
  * @return a pointer to a \a type object which contains \a member, as pointed
  * to by \a ptr.
  */
-#define _MALI_OSK_CONTAINER_OF(ptr, type, member) \
-	((type *)( ((char *)ptr) - offsetof(type,member) ))
+#define MALI_OSK_CONTAINER_OF(ptr, type, member) \
+    ((type *)( ((char *)ptr) - offsetof(type,member) ))
 
 /** @addtogroup _mali_osk_wq
  * @{ */
 
 /** @brief Initialize work queues (for deferred work)
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_wq_init(void);
+mali_osk_errcode_t mali_osk_wq_init(void);
 
 /** @brief Terminate work queues (for deferred work)
  */
-void _mali_osk_wq_term(void);
+void mali_osk_wq_term(void);
 
 /** @brief Create work in the work queue
  *
  * Creates a work object which can be scheduled in the work queue. When
  * scheduled, \a handler will be called with \a data as the argument.
  *
- * Refer to \ref _mali_osk_wq_schedule_work() for details on how work
+ * Refer to \ref mali_osk_wq_schedule_work() for details on how work
  * is scheduled in the queue.
  *
  * The returned pointer must be freed with \ref _mali_osk_wq_delete_work()
  * when no longer needed.
  */
-_mali_osk_wq_work_t *_mali_osk_wq_create_work(_mali_osk_wq_work_handler_t handler, void *data);
+_mali_osk_wq_work_t *mali_osk_wq_create_work(_mali_osk_wq_work_handler_t handler, void *data);
 
-/** @brief A high priority version of \a _mali_osk_wq_create_work()
+/** @brief A high priority version of \a mali_osk_wq_create_work()
  *
  * Creates a work object which can be scheduled in the high priority work queue.
  *
@@ -123,7 +137,7 @@ _mali_osk_wq_work_t *_mali_osk_wq_create_work(_mali_osk_wq_work_handler_t handle
  * random things instead of starting the next GPU job when the GPU is idle.  So setting the gpu
  * scheduler to high priority does give a visually more responsive system.
  *
- * Start the high priority work with: \a _mali_osk_wq_schedule_work_high_pri()
+ * Start the high priority work with: \a mali_osk_wq_schedule_work_high_pri()
  */
 _mali_osk_wq_work_t *_mali_osk_wq_create_work_high_pri(_mali_osk_wq_work_handler_t handler, void *data);
 
@@ -143,8 +157,8 @@ void _mali_osk_wq_delete_work_nonflush(_mali_osk_wq_work_t *work);
 
 /** @brief Cause a queued, deferred call of the work handler
  *
- * _mali_osk_wq_schedule_work provides a mechanism for enqueuing deferred calls
- * to the work handler. After calling \ref _mali_osk_wq_schedule_work(), the
+ * mali_osk_wq_schedule_work provides a mechanism for enqueuing deferred calls
+ * to the work handler. After calling \ref mali_osk_wq_schedule_work(), the
  * work handler will be scheduled to run at some point in the future.
  *
  * Typically this is called by the IRQ upper-half to defer further processing of
@@ -160,30 +174,30 @@ void _mali_osk_wq_delete_work_nonflush(_mali_osk_wq_work_t *work);
  * IRQ bottom half to hold the same mutex, with a guarantee that they will not
  * deadlock just by using this mechanism.
  *
- * _mali_osk_wq_schedule_work() places deferred call requests on a queue, to
+ * mali_osk_wq_schedule_work() places deferred call requests on a queue, to
  * allow for more than one thread to make a deferred call. Therfore, if it is
  * called 'K' times, then the IRQ bottom-half will be scheduled 'K' times too.
  * 'K' is a number that is implementation-specific.
  *
- * _mali_osk_wq_schedule_work() is guaranteed to not block on:
+ * mali_osk_wq_schedule_work() is guaranteed to not block on:
  * - enqueuing a deferred call request.
  * - the completion of the work handler.
  *
- * This is to prevent deadlock. For example, if _mali_osk_wq_schedule_work()
+ * This is to prevent deadlock. For example, if mali_osk_wq_schedule_work()
  * blocked, then it would cause a deadlock when the following two conditions
  * hold:
  * - The work handler callback (of type _mali_osk_wq_work_handler_t) locks
  * a mutex
- * - And, at the same time, the caller of _mali_osk_wq_schedule_work() also
+ * - And, at the same time, the caller of mali_osk_wq_schedule_work() also
  * holds the same mutex
  *
  * @note care must be taken to not overflow the queue that
- * _mali_osk_wq_schedule_work() operates on. Code must be structured to
+ * mali_osk_wq_schedule_work() operates on. Code must be structured to
  * ensure that the number of requests made to the queue is bounded. Otherwise,
  * work will be lost.
  *
- * The queue that _mali_osk_wq_schedule_work implements is a FIFO of N-writer,
- * 1-reader type. The writers are the callers of _mali_osk_wq_schedule_work
+ * The queue that mali_osk_wq_schedule_work implements is a FIFO of N-writer,
+ * 1-reader type. The writers are the callers of mali_osk_wq_schedule_work
  * (all OSK-registered IRQ upper-half handlers in the system, watchdog timers,
  * callers from a Kernel-process context). The reader is a single thread that
  * handles all OSK-registered work.
@@ -191,11 +205,11 @@ void _mali_osk_wq_delete_work_nonflush(_mali_osk_wq_work_t *work);
  * @param work a pointer to the _mali_osk_wq_work_t object corresponding to the
  * work to begin processing.
  */
-void _mali_osk_wq_schedule_work(_mali_osk_wq_work_t *work);
+void mali_osk_wq_schedule_work(_mali_osk_wq_work_t *work);
 
 /** @brief Cause a queued, deferred call of the high priority work handler
  *
- * Function is the same as \a _mali_osk_wq_schedule_work() with the only
+ * Function is the same as \a mali_osk_wq_schedule_work() with the only
  * difference that it runs in a high (real time) priority on the system.
  *
  * Should only be used as a substitue for doing the same work in interrupts.
@@ -203,7 +217,7 @@ void _mali_osk_wq_schedule_work(_mali_osk_wq_work_t *work);
  * This is allowed to sleep, but the work should be small since it will block
  * all other applications.
 */
-void _mali_osk_wq_schedule_work_high_pri(_mali_osk_wq_work_t *work);
+void mali_osk_wq_schedule_work_high_pri(_mali_osk_wq_work_t *work);
 
 /** @brief Flush the work queue
  *
@@ -226,7 +240,7 @@ void _mali_osk_wq_flush(void);
  * Refer to \ref _mali_osk_wq_delayed_schedule_work() for details on how work
  * is scheduled in the queue.
  *
- * The returned pointer must be freed with \ref _mali_osk_wq_delayed_delete_work_nonflush()
+ * The returned pointer must be freed with \ref mali_osk_wq_delayed_delete_work_nonflush()
  * when no longer needed.
  */
 _mali_osk_wq_delayed_work_t *_mali_osk_wq_delayed_create_work(_mali_osk_wq_work_handler_t handler, void *data);
@@ -236,7 +250,7 @@ _mali_osk_wq_delayed_work_t *_mali_osk_wq_delayed_create_work(_mali_osk_wq_work_
  * This will NOT flush the work queue, so only call this if you are sure that the work handler will
  * not be called after deletion.
  */
-void _mali_osk_wq_delayed_delete_work_nonflush(_mali_osk_wq_delayed_work_t *work);
+void mali_osk_wq_delayed_delete_work_nonflush(_mali_osk_wq_delayed_work_t *work);
 
 /** @brief Cancel a delayed work without waiting for it to finish
  *
@@ -253,7 +267,7 @@ void _mali_osk_wq_delayed_cancel_work_async(_mali_osk_wq_delayed_work_t *work);
  *
  * @param work The delayed work to be cancelled
  */
-void _mali_osk_wq_delayed_cancel_work_sync(_mali_osk_wq_delayed_work_t *work);
+void mali_osk_wq_delayed_cancel_work_sync(_mali_osk_wq_delayed_work_t *work);
 
 /** @brief Put \a work task in global workqueue after delay
  *
@@ -306,7 +320,7 @@ _mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandle
  * currently executing IRQ handlers to complete.
  *
  * @note If work is deferred to an IRQ bottom-half handler through
- * \ref _mali_osk_wq_schedule_work(), be sure to flush any remaining work
+ * \ref mali_osk_wq_schedule_work(), be sure to flush any remaining work
  * with \ref _mali_osk_wq_flush() or (implicitly) with \ref _mali_osk_wq_delete_work()
  *
  * @param irq a pointer to the _mali_osk_irq_t object corresponding to the
@@ -325,25 +339,25 @@ void _mali_osk_irq_term(_mali_osk_irq_t *irq);
  * @note It is an error to decrement the counter beyond -(1<<23)
  *
  * @param atom pointer to an atomic counter */
-void _mali_osk_atomic_dec(_mali_osk_atomic_t *atom);
+void mali_osk_atomic_dec(_mali_osk_atomic_t *atom);
 
 /** @brief Decrement an atomic counter, return new value
  *
  * @param atom pointer to an atomic counter
  * @return The new value, after decrement */
-u32 _mali_osk_atomic_dec_return(_mali_osk_atomic_t *atom);
+u32 mali_osk_atomic_dec_return(_mali_osk_atomic_t *atom);
 
 /** @brief Increment an atomic counter
  *
  * @note It is an error to increment the counter beyond (1<<23)-1
  *
  * @param atom pointer to an atomic counter */
-void _mali_osk_atomic_inc(_mali_osk_atomic_t *atom);
+void mali_osk_atomic_inc(_mali_osk_atomic_t *atom);
 
 /** @brief Increment an atomic counter, return new value
  *
  * @param atom pointer to an atomic counter */
-u32 _mali_osk_atomic_inc_return(_mali_osk_atomic_t *atom);
+u32 mali_osk_atomic_inc_return(_mali_osk_atomic_t *atom);
 
 /** @brief Initialize an atomic counter
  *
@@ -353,7 +367,7 @@ u32 _mali_osk_atomic_inc_return(_mali_osk_atomic_t *atom);
  * @param atom pointer to an atomic counter
  * @param val the value to initialize the atomic counter.
  */
-void _mali_osk_atomic_init(_mali_osk_atomic_t *atom, u32 val);
+void mali_osk_atomic_init(_mali_osk_atomic_t *atom, u32 val);
 
 /** @brief Read a value from an atomic counter
  *
@@ -363,13 +377,13 @@ void _mali_osk_atomic_init(_mali_osk_atomic_t *atom, u32 val);
  *
  * @param atom pointer to an atomic counter
  */
-u32 _mali_osk_atomic_read(_mali_osk_atomic_t *atom);
+u32 mali_osk_atomic_read(_mali_osk_atomic_t *atom);
 
 /** @brief Terminate an atomic counter
  *
  * @param atom pointer to an atomic counter
  */
-void _mali_osk_atomic_term(_mali_osk_atomic_t *atom);
+void mali_osk_atomic_term(_mali_osk_atomic_t *atom);
 
 /** @brief Assign a new val to atomic counter, and return the old atomic counter
  *
@@ -377,7 +391,7 @@ void _mali_osk_atomic_term(_mali_osk_atomic_t *atom);
  * @param val the new value assign to the atomic counter
  * @return the old value of the atomic counter
  */
-u32 _mali_osk_atomic_xchg(_mali_osk_atomic_t *atom, u32 val);
+u32 mali_osk_atomic_xchg(_mali_osk_atomic_t *atom, u32 val);
 /** @} */  /* end group _mali_osk_atomic */
 
 
@@ -408,7 +422,7 @@ u32 _mali_osk_atomic_xchg(_mali_osk_atomic_t *atom, u32 val);
  * @param size Size of each element
  * @return On success, the zero-initialized buffer allocated. NULL on failure
  */
-void *_mali_osk_calloc(u32 n, u32 size);
+void *mali_osk_calloc(u32 n, u32 size);
 
 /** @brief Allocate memory.
  *
@@ -434,12 +448,12 @@ void *_mali_osk_calloc(u32 n, u32 size);
  * @param size Number of bytes to allocate
  * @return On success, the buffer allocated. NULL on failure.
  */
-void *_mali_osk_malloc(u32 size);
+void *mali_osk_malloc(u32 size);
 
 /** @brief Free memory.
  *
  * Reclaims the buffer pointed to by the parameter \a ptr for the system.
- * All memory returned from _mali_osk_malloc() and _mali_osk_calloc()
+ * All memory returned from mali_osk_malloc() and mali_osk_calloc()
  * must be freed before the application exits. Otherwise,
  * a memory leak will occur.
  *
@@ -457,7 +471,7 @@ void _mali_osk_free(void *ptr);
  * Returns a buffer capable of containing at least \a size bytes. The
  * contents of the buffer are undefined.
  *
- * This function is potentially slower than _mali_osk_malloc() and _mali_osk_calloc(),
+ * This function is potentially slower than mali_osk_malloc() and mali_osk_calloc(),
  * but do support bigger sizes.
  *
  * The buffer is suitably aligned for storage and subsequent access of every
@@ -505,7 +519,7 @@ void _mali_osk_vfree(void *ptr);
  * @param len Number of bytes to copy.
  * @return \a dst is always passed through unmodified.
  */
-void *_mali_osk_memcpy(void *dst, const void *src, u32 len);
+void *mali_osk_memcpy(void *dst, const void *src, u32 len);
 
 /** @brief Fills memory.
  *
@@ -517,7 +531,7 @@ void *_mali_osk_memcpy(void *dst, const void *src, u32 len);
  * @param n Number of bytes to be set to the value.
  * @return \a s is always passed through unmodified
  */
-void *_mali_osk_memset(void *s, u32 c, u32 n);
+void *mali_osk_memset(void *s, u32 c, u32 n);
 /** @} */ /* end group _mali_osk_memory */
 
 
@@ -657,10 +671,10 @@ void _mali_osk_mem_freeioregion(u32 phys, u32 size, mali_io_address mapping);
  * @param size the number of bytes of physically contiguous address space to
  * request.
  * @param description A textual description of the memory being requested.
- * @return _MALI_OSK_ERR_OK on success. Otherwise, a suitable
- * _mali_osk_errcode_t on failure.
+ * @return MALI_OSK_ERR_OK on success. Otherwise, a suitable
+ * mali_osk_errcode_t on failure.
  */
-_mali_osk_errcode_t _mali_osk_mem_reqregion(uintptr_t phys, u32 size, const char *description);
+mali_osk_errcode_t _mali_osk_mem_reqregion(uintptr_t phys, u32 size, const char *description);
 
 /** @brief Un-request a region of physically contiguous memory
  *
@@ -802,7 +816,7 @@ u32 _mali_osk_mem_write_safe(void *dest, const void *src, u32 size);
  * _mali_osk_notification_t::result_buffer member will be initialized to point
  * to \a size bytes of storage, and that storage will be suitably aligned for
  * storage of any structure. That is, the created buffer meets the same
- * requirements as _mali_osk_malloc().
+ * requirements as mali_osk_malloc().
  *
  * The notification object must be deleted when not in use. Use
  * _mali_osk_notification_delete() for deleting it.
@@ -830,7 +844,7 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size);
  *
  * In addition, the notification object may not be deleted while it is in a
  * queue. That is, if it has been placed on a queue with
- * _mali_osk_notification_queue_send(), then it must not be deleted until
+ * mali_osk_notification_queue_send(), then it must not be deleted until
  * it has been received by a call to _mali_osk_notification_queue_receive().
  * Otherwise, the queue may be corrupted.
  *
@@ -861,9 +875,9 @@ _mali_osk_notification_queue_t *_mali_osk_notification_queue_init(void);
  * A notification queue \b must \b not be destroyed in the following cases:
  * - while there are \ref _mali_osk_notification_t objects in the queue.
  * - while there are writers currently acting upon the queue. That is, while
- * a thread is currently calling \ref _mali_osk_notification_queue_send() on
+ * a thread is currently calling \ref mali_osk_notification_queue_send() on
  * the queue, or while a thread may call
- * \ref _mali_osk_notification_queue_send() on the queue in the future.
+ * \ref mali_osk_notification_queue_send() on the queue in the future.
  * - while there are readers currently waiting upon the queue. That is, while
  * a thread is currently calling \ref _mali_osk_notification_queue_receive() on
  * the queue, or while a thread may call
@@ -903,7 +917,7 @@ void _mali_osk_notification_queue_term(_mali_osk_notification_queue_t *queue);
  * @param queue The notification queue to add this notification to
  * @param object The entry to add
  */
-void _mali_osk_notification_queue_send(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t *object);
+void mali_osk_notification_queue_send(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t *object);
 
 /** @brief Receive a notification from a queue
  *
@@ -918,9 +932,9 @@ void _mali_osk_notification_queue_send(_mali_osk_notification_queue_t *queue, _m
  * \ref _mali_osk_notification_t*. \a result will be written to such that the
  * expression \a (*result) will evaluate to a pointer to a valid
  * \ref _mali_osk_notification_t object, or NULL if none were received.
- * @return _MALI_OSK_ERR_OK on success. _MALI_OSK_ERR_RESTARTSYSCALL if the sleep was interrupted.
+ * @return MALI_OSK_ERR_OK on success. MALI_OSK_ERR_RESTARTSYSCALL if the sleep was interrupted.
  */
-_mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
+mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
 
 /** @brief Dequeues a notification from a queue
  *
@@ -933,9 +947,9 @@ _mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_
  * \ref _mali_osk_notification_t*. \a result will be written to such that the
  * expression \a (*result) will evaluate to a pointer to a valid
  * \ref _mali_osk_notification_t object, or NULL if none were received.
- * @return _MALI_OSK_ERR_OK on success, _MALI_OSK_ERR_ITEM_NOT_FOUND if queue was empty.
+ * @return MALI_OSK_ERR_OK on success, MALI_OSK_ERR_ITEM_NOT_FOUND if queue was empty.
  */
-_mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
+mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
 
 /** @} */ /* end group _mali_osk_notification */
 
@@ -1004,7 +1018,7 @@ void _mali_osk_timer_mod(_mali_osk_timer_t *tim, unsigned long ticks_to_expire);
  *
  * @note While the callback itself is guaranteed to not be running, work
  * enqueued on the work-queue by the timer (with
- * \ref _mali_osk_wq_schedule_work()) may still run. The timer callback and
+ * \ref mali_osk_wq_schedule_work()) may still run. The timer callback and
  * work handler must take this into account.
  *
  * It is legal to stop an already stopped timer.
@@ -1238,7 +1252,7 @@ void _mali_osk_dbgmsg(const char *fmt, ...);
  * @param ... a variable-number of parameters suitable for \a fmt
  * @return The number of bytes written to \a buf
  */
-u32 _mali_osk_snprintf(char *buf, u32 size, const char *fmt, ...);
+u32 mali_osk_snprintf(char *buf, u32 size, const char *fmt, ...);
 
 /** @brief Abnormal process abort.
  *
@@ -1279,7 +1293,7 @@ char *_mali_osk_get_comm(void);
  *
  * @return Identificator for calling thread.
  */
-u32 _mali_osk_get_tid(void);
+u32 mali_osk_get_tid(void);
 
 
 /** @brief Take a reference to the power manager system for the Mali device (synchronously).
@@ -1288,7 +1302,7 @@ u32 _mali_osk_get_tid(void);
  *
  * @note Call \a _mali_osk_pm_dev_ref_put() to release this reference.
  */
-_mali_osk_errcode_t _mali_osk_pm_dev_ref_get_sync(void);
+mali_osk_errcode_t _mali_osk_pm_dev_ref_get_sync(void);
 
 /** @brief Take a reference to the external power manager system for the Mali device (asynchronously).
  *
@@ -1298,7 +1312,7 @@ _mali_osk_errcode_t _mali_osk_pm_dev_ref_get_sync(void);
  *
  * @note Call \a _mali_osk_pm_dev_ref_dec() to release this reference.
  */
-_mali_osk_errcode_t _mali_osk_pm_dev_ref_get_async(void);
+mali_osk_errcode_t _mali_osk_pm_dev_ref_get_async(void);
 
 /** @brief Release the reference to the external power manger system for the Mali device.
  *

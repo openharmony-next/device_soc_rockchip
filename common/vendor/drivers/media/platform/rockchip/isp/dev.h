@@ -32,8 +32,8 @@
  * SOFTWARE.
  */
 
-#ifndef _RKISP_DEV_H
-#define _RKISP_DEV_H
+#ifndef H_RKISP_DEV_H
+#define H_RKISP_DEV_H
 
 #include "capture.h"
 #include "csi.h"
@@ -47,59 +47,66 @@
 #include "procfs.h"
 #include "isp_external.h"
 
+#define IO_MEM   __iomem
+#define MAYBE_UNUSED __maybe_unused
 #define DRIVER_NAME "rkisp"
 #define ISP_VDEV_NAME DRIVER_NAME  "_ispdev"
 
-#define GRP_ID_SENSOR			BIT(0)
-#define GRP_ID_MIPIPHY			BIT(1)
-#define GRP_ID_ISP			BIT(2)
-#define GRP_ID_ISP_MP			BIT(3)
-#define GRP_ID_ISP_SP			BIT(4)
-#define GRP_ID_ISP_DMARX		BIT(5)
-#define GRP_ID_ISP_BRIDGE		BIT(6)
-#define GRP_ID_CSI			BIT(7)
+#define GRP_ID_SENSOR            BIT(0)
+#define GRP_ID_MIPIPHY            BIT(1)
+#define GRP_ID_ISP            BIT(2)
+#define GRP_ID_ISP_MP            BIT(3)
+#define GRP_ID_ISP_SP            BIT(4)
+#define GRP_ID_ISP_DMARX        BIT(5)
+#define GRP_ID_ISP_BRIDGE        BIT(6)
+#define GRP_ID_CSI            BIT(7)
 
-#define RKISP_MAX_SENSOR		2
-#define RKISP_MAX_PIPELINE		4
+#define RKISP_MAX_SENSOR        2
+#define RKISP_MAX_PIPELINE      4
+#define CAPTURE_VALUE_EI        8
+#define CAPTURE_VALUE_TH        16
+#define CAPTURE_VALUE_NIT       19
+#define BRIDGE_FI_HUN           500
+#define BRIDGE_V30_MSES            1000
 
-#define RKISP_MEDIA_BUS_FMT_MASK	0xF000
-#define RKISP_MEDIA_BUS_FMT_BAYER	0x3000
+#define RKISP_MEDIA_BUS_FMT_MASK    0xF000
+#define RKISP_MEDIA_BUS_FMT_BAYER    0x3000
 
-#define RKISP_CONTI_ERR_MAX		50
+#define RKISP_CONTI_ERR_MAX        50
 
 enum rkisp_isp_state {
-	ISP_FRAME_END = BIT(0),
-	ISP_FRAME_IN = BIT(1),
-	ISP_FRAME_VS = BIT(2),
-	ISP_FRAME_MP = BIT(3),
-	ISP_FRAME_SP = BIT(4),
-	ISP_FRAME_MPFBC = BIT(5),
-	ISP_FRAME_BP = BIT(6),
+    ISP_FRAME_END = BIT(0),
+    ISP_FRAME_IN = BIT(1),
+    ISP_FRAME_VS = BIT(2),
+    ISP_FRAME_MP = BIT(3),
+    ISP_FRAME_SP = BIT(4),
+    ISP_FRAME_MPFBC = BIT(5),
+    ISP_FRAME_BP = BIT(6),
 
-	ISP_STOP = BIT(8),
-	ISP_START = BIT(9),
-	ISP_ERROR = BIT(10),
-	ISP_MIPI_ERROR = BIT(11),
+    ISP_STOP = BIT(8),
+    ISP_START = BIT(9),
+    ISP_ERROR = BIT(10),
+    ISP_MIPI_ERROR = BIT(11),
 };
 
 enum rkisp_isp_inp {
-	INP_INVAL = 0,
-	INP_RAWRD0 = BIT(0),
-	INP_RAWRD1 = BIT(1),
-	INP_RAWRD2 = BIT(2),
-	INP_CSI = BIT(4),
-	INP_DVP = BIT(5),
-	INP_DMARX_ISP = BIT(6),
-	INP_LVDS = BIT(7),
-	INP_CIF = BIT(8),
+    INP_INVAL = 0,
+    INP_RAWRD0 = BIT(0),
+    INP_RAWRD1 = BIT(1),
+    INP_RAWRD2 = BIT(2),
+    INP_CSI = BIT(4),
+    INP_DVP = BIT(5),
+    INP_DMARX_ISP = BIT(6),
+    INP_LVDS = BIT(7),
+    INP_CIF = BIT(8),
 };
 
 enum rkisp_rdbk_filt {
-	RDBK_F_VS,
-	RDBK_F_RD0,
-	RDBK_F_RD1,
-	RDBK_F_RD2,
-	RDBK_F_MAX
+    RDBK_F_VS,
+    RDBK_F_RD0,
+    RDBK_F_RD1,
+    RDBK_F_RD2,
+    RDBK_F_MAX
 };
 
 /*
@@ -112,15 +119,15 @@ enum rkisp_rdbk_filt {
  * @stream_cnt: stream power count
  */
 struct rkisp_pipeline {
-	struct media_pipeline pipe;
-	int num_subdevs;
-	atomic_t power_cnt;
-	atomic_t stream_cnt;
-	struct v4l2_subdev *subdevs[RKISP_MAX_PIPELINE];
-	int (*open)(struct rkisp_pipeline *p,
-		    struct media_entity *me, bool prepare);
-	int (*close)(struct rkisp_pipeline *p);
-	int (*set_stream)(struct rkisp_pipeline *p, bool on);
+    struct media_pipeline pipe;
+    int num_subdevs;
+    atomic_t power_cnt;
+    atomic_t stream_cnt;
+    struct v4l2_subdev *subdevs[RKISP_MAX_PIPELINE];
+    int (*open)(struct rkisp_pipeline *p,
+            struct media_entity *me, bool prepare);
+    int (*close)(struct rkisp_pipeline *p);
+    int (*set_stream)(struct rkisp_pipeline *p, bool on);
 };
 
 /*
@@ -128,11 +135,11 @@ struct rkisp_pipeline {
  * @mbus: media bus configuration
  */
 struct rkisp_sensor_info {
-	struct v4l2_subdev *sd;
-	struct v4l2_mbus_config mbus;
-	struct v4l2_subdev_frame_interval fi;
-	struct v4l2_subdev_format fmt[CSI_PAD_MAX - 1];
-	struct v4l2_subdev_pad_config cfg;
+    struct v4l2_subdev *sd;
+    struct v4l2_mbus_config mbus;
+    struct v4l2_subdev_frame_interval fi;
+    struct v4l2_subdev_format fmt[CSI_PAD_MAX - 1];
+    struct v4l2_subdev_pad_config cfg;
 };
 
 /* struct rkisp_hdr - hdr configured
@@ -146,15 +153,15 @@ struct rkisp_sensor_info {
  * @dummy_buf: hdr dma internal buf
  */
 struct rkisp_hdr {
-	u8 op_mode;
-	u8 esp_mode;
-	u8 index[HDR_DMA_MAX];
-	atomic_t refcnt;
-	struct v4l2_subdev *sensor;
-	struct list_head q_tx[HDR_DMA_MAX];
-	struct list_head q_rx[HDR_DMA_MAX];
-	struct rkisp_dummy_buffer *rx_cur_buf[HDR_DMA_MAX];
-	struct rkisp_dummy_buffer dummy_buf[HDR_DMA_MAX][HDR_MAX_DUMMY_BUF];
+    u8 op_mode;
+    u8 esp_mode;
+    u8 index[HDR_DMA_MAX];
+    atomic_t refcnt;
+    struct v4l2_subdev *sensor;
+    struct list_head q_tx[HDR_DMA_MAX];
+    struct list_head q_rx[HDR_DMA_MAX];
+    struct rkisp_dummy_buffer *rx_cur_buf[HDR_DMA_MAX];
+    struct rkisp_dummy_buffer dummy_buf[HDR_DMA_MAX][HDR_MAX_DUMMY_BUF];
 };
 
 /*
@@ -170,69 +177,69 @@ struct rkisp_hdr {
  * @br_dev: bridge of isp and ispp device
  */
 struct rkisp_device {
-	struct list_head list;
-	void __iomem *base_addr;
-	struct device *dev;
-	char name[128];
-	void *sw_base_addr;
-	struct rkisp_hw_dev *hw_dev;
-	struct v4l2_device v4l2_dev;
-	struct v4l2_ctrl_handler ctrl_handler;
-	struct media_device media_dev;
-	struct v4l2_async_notifier notifier;
-	struct v4l2_subdev *subdevs[RKISP_SD_MAX];
-	struct rkisp_sensor_info *active_sensor;
-	struct rkisp_sensor_info sensors[RKISP_MAX_SENSOR];
-	int num_sensors;
-	struct rkisp_isp_subdev isp_sdev;
-	struct rkisp_capture_device cap_dev;
-	struct rkisp_isp_stats_vdev stats_vdev;
-	struct rkisp_isp_params_vdev params_vdev;
-	struct rkisp_dmarx_device dmarx_dev;
-	struct rkisp_csi_device csi_dev;
-	struct rkisp_bridge_device br_dev;
-	struct rkisp_luma_vdev luma_vdev;
-	struct proc_dir_entry *procfs;
-	struct rkisp_pipeline pipe;
-	enum rkisp_isp_ver isp_ver;
-	struct rkisp_emd_data emd_data_fifo[RKISP_EMDDATA_FIFO_MAX];
-	unsigned int emd_data_idx;
-	unsigned int emd_vc;
-	unsigned int emd_dt;
-	int vs_irq;
-	struct gpio_desc *vs_irq_gpio;
-	struct rkisp_hdr hdr;
-	unsigned int isp_state;
-	unsigned int isp_err_cnt;
-	unsigned int isp_isr_cnt;
-	unsigned int isp_inp;
-	struct mutex apilock; /* mutex to serialize the calls of stream */
-	struct mutex iqlock; /* mutex to serialize the calls of iq */
-	wait_queue_head_t sync_onoff;
-	dma_addr_t resmem_addr;
-	phys_addr_t resmem_pa;
-	size_t resmem_size;
-	int dev_id;
-	unsigned int skip_frame;
-	unsigned int irq_ends;
-	unsigned int irq_ends_mask;
-	bool send_fbcgain;
-	struct rkisp_ispp_buf *cur_fbcgain;
-	struct rkisp_buffer *cur_spbuf;
+    struct list_head list;
+    void __iomem *base_addr;
+    struct device *dev;
+    char name[128];
+    void *sw_base_addr;
+    struct rkisp_hw_dev *hw_dev;
+    struct v4l2_device v4l2_dev;
+    struct v4l2_ctrl_handler ctrl_handler;
+    struct media_device media_dev;
+    struct v4l2_async_notifier notifier;
+    struct v4l2_subdev *subdevs[RKISP_SD_MAX];
+    struct rkisp_sensor_info *active_sensor;
+    struct rkisp_sensor_info sensors[RKISP_MAX_SENSOR];
+    int num_sensors;
+    struct rkisp_isp_subdev isp_sdev;
+    struct rkisp_capture_device cap_dev;
+    struct rkisp_isp_stats_vdev stats_vdev;
+    struct rkisp_isp_params_vdev params_vdev;
+    struct rkisp_dmarx_device dmarx_dev;
+    struct rkisp_csi_device csi_dev;
+    struct rkisp_bridge_device br_dev;
+    struct rkisp_luma_vdev luma_vdev;
+    struct proc_dir_entry *procfs;
+    struct rkisp_pipeline pipe;
+    enum rkisp_isp_ver isp_ver;
+    struct rkisp_emd_data emd_data_fifo[RKISP_EMDDATA_FIFO_MAX];
+    unsigned int emd_data_idx;
+    unsigned int emd_vc;
+    unsigned int emd_dt;
+    int vs_irq;
+    struct gpio_desc *vs_irq_gpio;
+    struct rkisp_hdr hdr;
+    unsigned int isp_state;
+    unsigned int isp_err_cnt;
+    unsigned int isp_isr_cnt;
+    unsigned int isp_inp;
+    struct mutex apilock; /* mutex to serialize the calls of stream */
+    struct mutex iqlock; /* mutex to serialize the calls of iq */
+    wait_queue_head_t sync_onoff;
+    dma_addr_t resmem_addr;
+    phys_addr_t resmem_pa;
+    size_t resmem_size;
+    int dev_id;
+    unsigned int skip_frame;
+    unsigned int irq_ends;
+    unsigned int irq_ends_mask;
+    bool send_fbcgain;
+    struct rkisp_ispp_buf *cur_fbcgain;
+    struct rkisp_buffer *cur_spbuf;
 
-	struct kfifo rdbk_kfifo;
-	spinlock_t rdbk_lock;
-	int rdbk_cnt;
-	int rdbk_cnt_x1;
-	int rdbk_cnt_x2;
-	int rdbk_cnt_x3;
-	u32 rd_mode;
-	u8 filt_state[RDBK_F_MAX];
+    struct kfifo rdbk_kfifo;
+    spinlock_t rdbk_lock;
+    int rdbk_cnt;
+    int rdbk_cnt_x1;
+    int rdbk_cnt_x2;
+    int rdbk_cnt_x3;
+    u32 rd_mode;
+    u8 filt_state[RDBK_F_MAX];
 
-	struct rkisp_rx_buf_pool pv_pool[RKISP_RX_BUF_POOL_MAX];
+    struct rkisp_rx_buf_pool pv_pool[RKISP_RX_BUF_POOL_MAX];
 
-	spinlock_t cmsk_lock;
-	struct rkisp_cmsk_cfg cmsk_cfg;
-	bool is_cmsk_upd;
+    spinlock_t cmsk_lock;
+    struct rkisp_cmsk_cfg cmsk_cfg;
+    bool is_cmsk_upd;
 };
 #endif

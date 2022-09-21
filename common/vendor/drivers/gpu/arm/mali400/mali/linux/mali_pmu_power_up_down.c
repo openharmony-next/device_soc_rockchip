@@ -17,7 +17,7 @@
 
 int mali_perf_set_num_pp_cores(unsigned int num_cores)
 {
-	return mali_executor_set_perf_level(num_cores, MALI_FALSE);
+    return mali_executor_set_perf_level(num_cores, MALI_FALSE);
 }
 
 EXPORT_SYMBOL(mali_perf_set_num_pp_cores);

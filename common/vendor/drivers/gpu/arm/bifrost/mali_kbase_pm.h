@@ -106,24 +106,24 @@ void kbase_pm_context_active(struct kbase_device *kbdev);
 
 /** Handler codes for doing kbase_pm_context_active_handle_suspend() */
 enum kbase_pm_suspend_handler {
-	/** A suspend is not expected/not possible - this is the same as
-	 * kbase_pm_context_active()
-	 */
-	KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE,
-	/** If we're suspending, fail and don't increase the active count */
-	KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE,
-	/** If we're suspending, succeed and allow the active count to increase
-	 * if it didn't go from 0->1 (i.e., we didn't re-activate the GPU).
-	 *
-	 * This should only be used when there is a bounded time on the activation
-	 * (e.g. guarantee it's going to be idled very soon after)
-	 */
-	KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE,
+    /** A suspend is not expected/not possible - this is the same as
+     * kbase_pm_context_active()
+     */
+    KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE,
+    /** If we're suspending, fail and don't increase the active count */
+    KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE,
+    /** If we're suspending, succeed and allow the active count to increase
+     * if it didn't go from 0->1 (i.e., we didn't re-activate the GPU).
+     *
+     * This should only be used when there is a bounded time on the activation
+     * (e.g. guarantee it's going to be idled very soon after)
+     */
+    KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE,
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-	/** Special case when Arbiter has notified we can use GPU.
-	 * Active count should always start at 0 in this case.
-	 */
-	KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED,
+    /** Special case when Arbiter has notified we can use GPU.
+     * Active count should always start at 0 in this case.
+     */
+    KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED,
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
 };
 
@@ -233,7 +233,7 @@ void kbase_pm_driver_suspend(struct kbase_device *kbdev);
  * Despite kbase_pm_resume(), it will ignore to update Arbiter
  * status if MALI_ARBITER_SUPPORT is enabled.
  */
-void kbase_pm_driver_resume(struct kbase_device *kbdev,	bool arb_gpu_start);
+void kbase_pm_driver_resume(struct kbase_device *kbdev,    bool arb_gpu_start);
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
 /**

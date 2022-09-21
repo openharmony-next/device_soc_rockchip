@@ -11,11 +11,11 @@
 #define BUF_LIST_MAX_NUMBER 100
 
 typedef struct buf_list_s {
-	/** number of elements */
-	int nb_elt;
-	/** list node */
-	int **array_elements;
-	int maxelements;
+    /** number of elements */
+    int nb_elt;
+    /** list node */
+    int **array_elements;
+    int maxelements;
 } buf_list_t;
 
 /** @brief initializes the list struct
@@ -70,7 +70,7 @@ int buf_list_add(buf_list_t *li, int *el, int pos);
   * @param *list    - the list
   * @param *node    - node to be matched
   * @param cmp_func - compare function. compare function must return -1, 0, 1
-		for less than, equal to, and greater than
+        for less than, equal to, and greater than
   * @returns - on success, 1 on error
   */
 int *buf_list_find(buf_list_t *list, int *node, int (*cmp_func)(int *, int *));

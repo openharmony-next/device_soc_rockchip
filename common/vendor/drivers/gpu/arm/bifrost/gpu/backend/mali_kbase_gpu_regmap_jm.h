@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_REGMAP_JM_H_
-#define _KBASE_GPU_REGMAP_JM_H_
+#ifndef KBASE_GPU_REGMAP_JM_H
+#define KBASE_GPU_REGMAP_JM_H
 
 #if MALI_USE_CSF
 #error "Cannot be compiled with CSF"
@@ -62,30 +62,30 @@
 #define CORE_FEATURES           0x008   /* (RO) Shader Core Features */
 #define JS_PRESENT              0x01C   /* (RO) Job slots present */
 #define LATEST_FLUSH            0x038   /* (RO) Flush ID of latest
-					 * clean-and-invalidate operation
-					 */
+                     * clean-and-invalidate operation
+                     */
 
 #define PRFCNT_BASE_LO   0x060  /* (RW) Performance counter memory
-				 * region base address, low word
-				 */
+                 * region base address, low word
+                 */
 #define PRFCNT_BASE_HI   0x064  /* (RW) Performance counter memory
-				 * region base address, high word
-				 */
+                 * region base address, high word
+                 */
 #define PRFCNT_CONFIG    0x068  /* (RW) Performance counter
-				 * configuration
-				 */
+                 * configuration
+                 */
 #define PRFCNT_JM_EN     0x06C  /* (RW) Performance counter enable
-				 * flags for Job Manager
-				 */
+                 * flags for Job Manager
+                 */
 #define PRFCNT_SHADER_EN 0x070  /* (RW) Performance counter enable
-				 * flags for shader cores
-				 */
+                 * flags for shader cores
+                 */
 #define PRFCNT_TILER_EN  0x074  /* (RW) Performance counter enable
-				 * flags for tiler
-				 */
+                 * flags for tiler
+                 */
 #define PRFCNT_MMU_L2_EN 0x07C  /* (RW) Performance counter enable
-				 * flags for MMU/L2 cache
-				 */
+                 * flags for MMU/L2 cache
+                 */
 
 #define JS0_FEATURES            0x0C0   /* (RO) Features of job slot 0 */
 #define JS1_FEATURES            0x0C4   /* (RO) Features of job slot 1 */
@@ -132,44 +132,44 @@
 
 #define JOB_SLOT_REG(n, r)      (JOB_CONTROL_REG(JOB_SLOT0 + ((n) << 7)) + (r))
 
-#define JS_HEAD_LO             0x00	/* (RO) Job queue head pointer for job slot n, low word */
-#define JS_HEAD_HI             0x04	/* (RO) Job queue head pointer for job slot n, high word */
-#define JS_TAIL_LO             0x08	/* (RO) Job queue tail pointer for job slot n, low word */
-#define JS_TAIL_HI             0x0C	/* (RO) Job queue tail pointer for job slot n, high word */
-#define JS_AFFINITY_LO         0x10	/* (RO) Core affinity mask for job slot n, low word */
-#define JS_AFFINITY_HI         0x14	/* (RO) Core affinity mask for job slot n, high word */
-#define JS_CONFIG              0x18	/* (RO) Configuration settings for job slot n */
-#define JS_XAFFINITY           0x1C	/* (RO) Extended affinity mask for job
-					   slot n */
+#define JS_HEAD_LO             0x00    /* (RO) Job queue head pointer for job slot n, low word */
+#define JS_HEAD_HI             0x04    /* (RO) Job queue head pointer for job slot n, high word */
+#define JS_TAIL_LO             0x08    /* (RO) Job queue tail pointer for job slot n, low word */
+#define JS_TAIL_HI             0x0C    /* (RO) Job queue tail pointer for job slot n, high word */
+#define JS_AFFINITY_LO         0x10    /* (RO) Core affinity mask for job slot n, low word */
+#define JS_AFFINITY_HI         0x14    /* (RO) Core affinity mask for job slot n, high word */
+#define JS_CONFIG              0x18    /* (RO) Configuration settings for job slot n */
+#define JS_XAFFINITY           0x1C    /* (RO) Extended affinity mask for job
+                       slot n */
 
-#define JS_COMMAND             0x20	/* (WO) Command register for job slot n */
-#define JS_STATUS              0x24	/* (RO) Status register for job slot n */
+#define JS_COMMAND             0x20    /* (WO) Command register for job slot n */
+#define JS_STATUS              0x24    /* (RO) Status register for job slot n */
 
-#define JS_HEAD_NEXT_LO        0x40	/* (RW) Next job queue head pointer for job slot n, low word */
-#define JS_HEAD_NEXT_HI        0x44	/* (RW) Next job queue head pointer for job slot n, high word */
+#define JS_HEAD_NEXT_LO        0x40    /* (RW) Next job queue head pointer for job slot n, low word */
+#define JS_HEAD_NEXT_HI        0x44    /* (RW) Next job queue head pointer for job slot n, high word */
 
-#define JS_AFFINITY_NEXT_LO    0x50	/* (RW) Next core affinity mask for job slot n, low word */
-#define JS_AFFINITY_NEXT_HI    0x54	/* (RW) Next core affinity mask for job slot n, high word */
-#define JS_CONFIG_NEXT         0x58	/* (RW) Next configuration settings for job slot n */
-#define JS_XAFFINITY_NEXT      0x5C	/* (RW) Next extended affinity mask for
-					   job slot n */
+#define JS_AFFINITY_NEXT_LO    0x50    /* (RW) Next core affinity mask for job slot n, low word */
+#define JS_AFFINITY_NEXT_HI    0x54    /* (RW) Next core affinity mask for job slot n, high word */
+#define JS_CONFIG_NEXT         0x58    /* (RW) Next configuration settings for job slot n */
+#define JS_XAFFINITY_NEXT      0x5C    /* (RW) Next extended affinity mask for
+                       job slot n */
 
-#define JS_COMMAND_NEXT        0x60	/* (RW) Next command register for job slot n */
+#define JS_COMMAND_NEXT        0x60    /* (RW) Next command register for job slot n */
 
-#define JS_FLUSH_ID_NEXT       0x70	/* (RW) Next job slot n cache flush ID */
+#define JS_FLUSH_ID_NEXT       0x70    /* (RW) Next job slot n cache flush ID */
 
 /* No JM-specific MMU control registers */
 /* No JM-specific MMU address space control registers */
 
 /* JS_COMMAND register commands */
-#define JS_COMMAND_NOP         0x00	/* NOP Operation. Writing this value is ignored */
-#define JS_COMMAND_START       0x01	/* Start processing a job chain. Writing this value is ignored */
-#define JS_COMMAND_SOFT_STOP   0x02	/* Gently stop processing a job chain */
-#define JS_COMMAND_HARD_STOP   0x03	/* Rudely stop processing a job chain */
-#define JS_COMMAND_SOFT_STOP_0 0x04	/* Execute SOFT_STOP if JOB_CHAIN_FLAG is 0 */
-#define JS_COMMAND_HARD_STOP_0 0x05	/* Execute HARD_STOP if JOB_CHAIN_FLAG is 0 */
-#define JS_COMMAND_SOFT_STOP_1 0x06	/* Execute SOFT_STOP if JOB_CHAIN_FLAG is 1 */
-#define JS_COMMAND_HARD_STOP_1 0x07	/* Execute HARD_STOP if JOB_CHAIN_FLAG is 1 */
+#define JS_COMMAND_NOP         0x00    /* NOP Operation. Writing this value is ignored */
+#define JS_COMMAND_START       0x01    /* Start processing a job chain. Writing this value is ignored */
+#define JS_COMMAND_SOFT_STOP   0x02    /* Gently stop processing a job chain */
+#define JS_COMMAND_HARD_STOP   0x03    /* Rudely stop processing a job chain */
+#define JS_COMMAND_SOFT_STOP_0 0x04    /* Execute SOFT_STOP if JOB_CHAIN_FLAG is 0 */
+#define JS_COMMAND_HARD_STOP_0 0x05    /* Execute HARD_STOP if JOB_CHAIN_FLAG is 0 */
+#define JS_COMMAND_SOFT_STOP_1 0x06    /* Execute SOFT_STOP if JOB_CHAIN_FLAG is 1 */
+#define JS_COMMAND_HARD_STOP_1 0x07    /* Execute HARD_STOP if JOB_CHAIN_FLAG is 1 */
 
 #define JS_COMMAND_MASK        0x07    /* Mask of bits currently in use by the HW */
 
@@ -199,37 +199,37 @@
 
 /* Group of values representing the job status instead of a particular fault */
 #define JS_STATUS_NO_EXCEPTION_BASE   0x00
-#define JS_STATUS_INTERRUPTED         (JS_STATUS_NO_EXCEPTION_BASE + 0x02)	/* 0x02 means INTERRUPTED */
-#define JS_STATUS_STOPPED             (JS_STATUS_NO_EXCEPTION_BASE + 0x03)	/* 0x03 means STOPPED */
-#define JS_STATUS_TERMINATED          (JS_STATUS_NO_EXCEPTION_BASE + 0x04)	/* 0x04 means TERMINATED */
+#define JS_STATUS_INTERRUPTED         (JS_STATUS_NO_EXCEPTION_BASE + 0x02)    /* 0x02 means INTERRUPTED */
+#define JS_STATUS_STOPPED             (JS_STATUS_NO_EXCEPTION_BASE + 0x03)    /* 0x03 means STOPPED */
+#define JS_STATUS_TERMINATED          (JS_STATUS_NO_EXCEPTION_BASE + 0x04)    /* 0x04 means TERMINATED */
 
 /* General fault values */
 #define JS_STATUS_FAULT_BASE          0x40
-#define JS_STATUS_CONFIG_FAULT        (JS_STATUS_FAULT_BASE)	/* 0x40 means CONFIG FAULT */
-#define JS_STATUS_POWER_FAULT         (JS_STATUS_FAULT_BASE + 0x01)	/* 0x41 means POWER FAULT */
-#define JS_STATUS_READ_FAULT          (JS_STATUS_FAULT_BASE + 0x02)	/* 0x42 means READ FAULT */
-#define JS_STATUS_WRITE_FAULT         (JS_STATUS_FAULT_BASE + 0x03)	/* 0x43 means WRITE FAULT */
-#define JS_STATUS_AFFINITY_FAULT      (JS_STATUS_FAULT_BASE + 0x04)	/* 0x44 means AFFINITY FAULT */
-#define JS_STATUS_BUS_FAULT           (JS_STATUS_FAULT_BASE + 0x08)	/* 0x48 means BUS FAULT */
+#define JS_STATUS_CONFIG_FAULT        (JS_STATUS_FAULT_BASE)    /* 0x40 means CONFIG FAULT */
+#define JS_STATUS_POWER_FAULT         (JS_STATUS_FAULT_BASE + 0x01)    /* 0x41 means POWER FAULT */
+#define JS_STATUS_READ_FAULT          (JS_STATUS_FAULT_BASE + 0x02)    /* 0x42 means READ FAULT */
+#define JS_STATUS_WRITE_FAULT         (JS_STATUS_FAULT_BASE + 0x03)    /* 0x43 means WRITE FAULT */
+#define JS_STATUS_AFFINITY_FAULT      (JS_STATUS_FAULT_BASE + 0x04)    /* 0x44 means AFFINITY FAULT */
+#define JS_STATUS_BUS_FAULT           (JS_STATUS_FAULT_BASE + 0x08)    /* 0x48 means BUS FAULT */
 
 /* Instruction or data faults */
 #define JS_STATUS_INSTRUCTION_FAULT_BASE  0x50
-#define JS_STATUS_INSTR_INVALID_PC        (JS_STATUS_INSTRUCTION_FAULT_BASE)	/* 0x50 means INSTR INVALID PC */
-#define JS_STATUS_INSTR_INVALID_ENC       (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x01)	/* 0x51 means INSTR INVALID ENC */
-#define JS_STATUS_INSTR_TYPE_MISMATCH     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x02)	/* 0x52 means INSTR TYPE MISMATCH */
-#define JS_STATUS_INSTR_OPERAND_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x03)	/* 0x53 means INSTR OPERAND FAULT */
-#define JS_STATUS_INSTR_TLS_FAULT         (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x04)	/* 0x54 means INSTR TLS FAULT */
-#define JS_STATUS_INSTR_BARRIER_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x05)	/* 0x55 means INSTR BARRIER FAULT */
-#define JS_STATUS_INSTR_ALIGN_FAULT       (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x06)	/* 0x56 means INSTR ALIGN FAULT */
+#define JS_STATUS_INSTR_INVALID_PC        (JS_STATUS_INSTRUCTION_FAULT_BASE)    /* 0x50 means INSTR INVALID PC */
+#define JS_STATUS_INSTR_INVALID_ENC       (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x01)    /* 0x51 means INSTR INVALID ENC */
+#define JS_STATUS_INSTR_TYPE_MISMATCH     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x02)    /* 0x52 means INSTR TYPE MISMATCH */
+#define JS_STATUS_INSTR_OPERAND_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x03)    /* 0x53 means INSTR OPERAND FAULT */
+#define JS_STATUS_INSTR_TLS_FAULT         (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x04)    /* 0x54 means INSTR TLS FAULT */
+#define JS_STATUS_INSTR_BARRIER_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x05)    /* 0x55 means INSTR BARRIER FAULT */
+#define JS_STATUS_INSTR_ALIGN_FAULT       (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x06)    /* 0x56 means INSTR ALIGN FAULT */
 /* NOTE: No fault with 0x57 code defined in spec. */
-#define JS_STATUS_DATA_INVALID_FAULT      (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x08)	/* 0x58 means DATA INVALID FAULT */
-#define JS_STATUS_TILE_RANGE_FAULT        (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x09)	/* 0x59 means TILE RANGE FAULT */
-#define JS_STATUS_ADDRESS_RANGE_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x0A)	/* 0x5A means ADDRESS RANGE FAULT */
+#define JS_STATUS_DATA_INVALID_FAULT      (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x08)    /* 0x58 means DATA INVALID FAULT */
+#define JS_STATUS_TILE_RANGE_FAULT        (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x09)    /* 0x59 means TILE RANGE FAULT */
+#define JS_STATUS_ADDRESS_RANGE_FAULT     (JS_STATUS_INSTRUCTION_FAULT_BASE + 0x0A)    /* 0x5A means ADDRESS RANGE FAULT */
 
 /* Other faults */
 #define JS_STATUS_MEMORY_FAULT_BASE   0x60
-#define JS_STATUS_OUT_OF_MEMORY       (JS_STATUS_MEMORY_FAULT_BASE)	/* 0x60 means OUT OF MEMORY */
-#define JS_STATUS_UNKNOWN             0x7F	/* 0x7F means UNKNOWN */
+#define JS_STATUS_OUT_OF_MEMORY       (JS_STATUS_MEMORY_FAULT_BASE)    /* 0x60 means OUT OF MEMORY */
+#define JS_STATUS_UNKNOWN             0x7F    /* 0x7F means UNKNOWN */
 
 /* JS<n>_FEATURES register */
 #define JS_FEATURE_NULL_JOB              (1u << 1)
@@ -283,6 +283,6 @@
  * CLEAN_CACHES_COMPLETED - Used separately for cache operation.
  */
 #define GPU_IRQ_REG_COMMON (GPU_FAULT | MULTIPLE_GPU_FAULTS | RESET_COMPLETED \
-		| POWER_CHANGED_ALL | PRFCNT_SAMPLE_COMPLETED)
+        | POWER_CHANGED_ALL | PRFCNT_SAMPLE_COMPLETED)
 
 #endif /* _KBASE_GPU_REGMAP_JM_H_ */

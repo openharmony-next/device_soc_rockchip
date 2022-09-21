@@ -16,7 +16,7 @@
 #include "mali_kernel_common.h"
 
 typedef enum {
-	MALI_EXECUTOR_HINT_GP_BOUND = 0
+    MALI_EXECUTOR_HINT_GP_BOUND = 0
 #define MALI_EXECUTOR_HINT_MAX        1
 } mali_executor_hint;
 
@@ -31,7 +31,7 @@ extern _mali_osk_spinlock_irq_t *mali_executor_lock_obj;
 
 #define MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD() MALI_DEBUG_ASSERT_LOCK_HELD(mali_executor_lock_obj);
 
-_mali_osk_errcode_t mali_executor_initialize(void);
+mali_osk_errcode_t mali_executor_initialize(void);
 void mali_executor_terminate(void);
 
 void mali_executor_populate(void);
@@ -55,9 +55,9 @@ void mali_executor_zap_all_active(struct mali_session_data *session);
  */
 void mali_executor_schedule_from_mask(mali_scheduler_mask mask, mali_bool deferred_schedule);
 
-_mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group, mali_bool in_upper_half);
-_mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group, mali_bool in_upper_half);
-_mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group, mali_bool in_upper_half);
+mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group, mali_bool in_upper_half);
+mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group, mali_bool in_upper_half);
+mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group, mali_bool in_upper_half);
 void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups);
 void mali_executor_group_power_down(struct mali_group *groups[], u32 num_groups);
 
@@ -79,20 +79,20 @@ u32 mali_executor_dump_state(char *buf, u32 size);
 
 MALI_STATIC_INLINE void mali_executor_hint_enable(mali_executor_hint hint)
 {
-	MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
-	mali_executor_hints[hint] = MALI_TRUE;
+    MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
+    mali_executor_hints[hint] = MALI_TRUE;
 }
 
 MALI_STATIC_INLINE void mali_executor_hint_disable(mali_executor_hint hint)
 {
-	MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
-	mali_executor_hints[hint] = MALI_FALSE;
+    MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
+    mali_executor_hints[hint] = MALI_FALSE;
 }
 
 MALI_STATIC_INLINE mali_bool mali_executor_hint_is_enabled(mali_executor_hint hint)
 {
-	MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
-	return mali_executor_hints[hint];
+    MALI_DEBUG_ASSERT(hint < MALI_EXECUTOR_HINT_MAX);
+    return mali_executor_hints[hint];
 }
 
 void mali_executor_running_status_print(void);

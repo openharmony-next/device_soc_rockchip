@@ -47,137 +47,137 @@
  * Return: 0 if success, negative error code otherwise.
  */
 static int set_attr_from_string(
-	char *const buf,
-	void *const array, size_t const nelems,
-	kbase_debugfs_helper_set_attr_fn const set_attr_fn)
+    char *const buf,
+    void *const array, size_t const nelems,
+    kbase_debugfs_helper_set_attr_fn const set_attr_fn)
 {
-	size_t index, err = 0;
-	char *ptr = buf;
+    size_t index, err = 0;
+    char *ptr = buf;
 
-	for (index = 0; index < nelems && *ptr; ++index) {
-		unsigned long new_size;
-		size_t len;
-		char sep;
+    for (index = 0; index < nelems && *ptr; ++index) {
+        unsigned long new_size;
+        size_t len;
+        char sep;
 
-		/* Drop leading spaces */
-		while (*ptr == ' ')
-			ptr++;
+        /* Drop leading spaces */
+        while (*ptr == ' ')
+            ptr++;
 
-		len = strcspn(ptr, "\n ");
-		if (len == 0) {
-			/* No more values (allow this) */
-			break;
-		}
+        len = strcspn(ptr, "\n ");
+        if (len == 0) {
+            /* No more values (allow this) */
+            break;
+        }
 
-		/* Substitute a nul terminator for a space character
-		 * to make the substring valid for kstrtoul.
-		 */
-		sep = ptr[len];
-		if (sep == ' ')
-			ptr[len++] = '\0';
+        /* Substitute a nul terminator for a space character
+         * to make the substring valid for kstrtoul.
+         */
+        sep = ptr[len];
+        if (sep == ' ')
+            ptr[len++] = '\0';
 
-		err = kstrtoul(ptr, 0, &new_size);
-		if (err)
-			break;
+        err = kstrtoul(ptr, 0, &new_size);
+        if (err)
+            break;
 
-		/* Skip the substring (including any premature nul terminator)
-		 */
-		ptr += len;
+        /* Skip the substring (including any premature nul terminator)
+         */
+        ptr += len;
 
-		set_attr_fn(array, index, new_size);
-	}
+        set_attr_fn(array, index, new_size);
+    }
 
-	return err;
+    return err;
 }
 
 int kbase_debugfs_helper_set_attr_from_string(
-	const char *const buf, void *const array, size_t const nelems,
-	kbase_debugfs_helper_set_attr_fn const set_attr_fn)
+    const char *const buf, void *const array, size_t const nelems,
+    kbase_debugfs_helper_set_attr_fn const set_attr_fn)
 {
-	char *const wbuf = kstrdup(buf, GFP_KERNEL);
-	int err = 0;
+    char *const wbuf = kstrdup(buf, GFP_KERNEL);
+    int err = 0;
 
-	if (!wbuf)
-		return -ENOMEM;
+    if (!wbuf)
+        return -ENOMEM;
 
-	err = set_attr_from_string(wbuf, array, nelems,
-		set_attr_fn);
+    err = set_attr_from_string(wbuf, array, nelems,
+        set_attr_fn);
 
-	kfree(wbuf);
-	return err;
+    kfree(wbuf);
+    return err;
 }
 
 ssize_t kbase_debugfs_helper_get_attr_to_string(
-	char *const buf, size_t const size,
-	void *const array, size_t const nelems,
-	kbase_debugfs_helper_get_attr_fn const get_attr_fn)
+    char *const buf, size_t const size,
+    void *const array, size_t const nelems,
+    kbase_debugfs_helper_get_attr_fn const get_attr_fn)
 {
-	ssize_t total = 0;
-	size_t index;
+    ssize_t total = 0;
+    size_t index;
 
-	for (index = 0; index < nelems; ++index) {
-		const char *postfix = " ";
+    for (index = 0; index < nelems; ++index) {
+        const char *postfix = " ";
 
-		if (index == (nelems-1))
-			postfix = "\n";
+        if (index == (nelems-1))
+            postfix = "\n";
 
-		total += scnprintf(buf + total, size - total, "%zu%s",
-				get_attr_fn(array, index), postfix);
-	}
+        total += scnprintf(buf + total, size - total, "%zu%s",
+                get_attr_fn(array, index), postfix);
+    }
 
-	return total;
+    return total;
 }
 
 int kbase_debugfs_helper_seq_write(struct file *const file,
-	const char __user *const ubuf, size_t const count,
-	size_t const nelems,
-	kbase_debugfs_helper_set_attr_fn const set_attr_fn)
+    const char __user *const ubuf, size_t const count,
+    size_t const nelems,
+    kbase_debugfs_helper_set_attr_fn const set_attr_fn)
 {
-	const struct seq_file *const sfile = file->private_data;
-	void *const array = sfile->private;
-	int err = 0;
-	char *buf;
+    const struct seq_file *const sfile = file->private_data;
+    void *const array = sfile->private;
+    int err = 0;
+    char *buf;
 
-	if (WARN_ON(!array))
-		return -EINVAL;
+    if (WARN_ON(!array))
+        return -EINVAL;
 
-	if (WARN_ON(count > DEBUGFS_MEM_POOLS_MAX_WRITE_SIZE))
-		return -EINVAL;
+    if (WARN_ON(count > DEBUGFS_MEM_POOLS_MAX_WRITE_SIZE))
+        return -EINVAL;
 
-	buf = kmalloc(count + 1, GFP_KERNEL);
-	if (buf == NULL)
-		return -ENOMEM;
+    buf = kmalloc(count + 1, GFP_KERNEL);
+    if (buf == NULL)
+        return -ENOMEM;
 
-	if (copy_from_user(buf, ubuf, count)) {
-		kfree(buf);
-		return -EFAULT;
-	}
+    if (copy_from_user(buf, ubuf, count)) {
+        kfree(buf);
+        return -EFAULT;
+    }
 
-	buf[count] = '\0';
-	err = set_attr_from_string(buf,
-		array, nelems, set_attr_fn);
-	kfree(buf);
+    buf[count] = '\0';
+    err = set_attr_from_string(buf,
+        array, nelems, set_attr_fn);
+    kfree(buf);
 
-	return err;
+    return err;
 }
 
 int kbase_debugfs_helper_seq_read(struct seq_file *const sfile,
-	size_t const nelems,
-	kbase_debugfs_helper_get_attr_fn const get_attr_fn)
+    size_t const nelems,
+    kbase_debugfs_helper_get_attr_fn const get_attr_fn)
 {
-	void *const array = sfile->private;
-	size_t index;
+    void *const array = sfile->private;
+    size_t index;
 
-	if (WARN_ON(!array))
-		return -EINVAL;
+    if (WARN_ON(!array))
+        return -EINVAL;
 
-	for (index = 0; index < nelems; ++index) {
-		const char *postfix = " ";
+    for (index = 0; index < nelems; ++index) {
+        const char *postfix = " ";
 
-		if (index == (nelems-1))
-			postfix = "\n";
+        if (index == (nelems-1))
+            postfix = "\n";
 
-		seq_printf(sfile, "%zu%s", get_attr_fn(array, index), postfix);
-	}
-	return 0;
+        seq_printf(sfile, "%zu%s", get_attr_fn(array, index), postfix);
+    }
+    return 0;
 }

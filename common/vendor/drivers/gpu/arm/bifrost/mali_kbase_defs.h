@@ -76,7 +76,7 @@
 #include <linux/memory_group_manager.h>
 
 #if defined(CONFIG_PM_RUNTIME) || \
-	(defined(CONFIG_PM) && LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
+    (defined(CONFIG_PM) && LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
 #define KBASE_PM_RUNTIME 1
 #endif
 
@@ -129,7 +129,7 @@
  * kbase_context
  */
 #define KBASE_PERMANENTLY_MAPPED_MEM_LIMIT_PAGES ((32 * 1024ul * 1024ul) >> \
-								PAGE_SHIFT)
+                                PAGE_SHIFT)
 /* Minimum threshold period for hwcnt dumps between different hwcnt virtualizer
  * clients, to reduce undesired system load.
  * If a virtualizer client requests a dump within this threshold period after
@@ -144,7 +144,7 @@
  * kernel.
  */
 #if (KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE) || \
-			defined(LSK_OPPV2_BACKPORT)
+            defined(LSK_OPPV2_BACKPORT)
 #define BASE_MAX_NR_CLOCKS_REGULATORS (2)
 #else
 #define BASE_MAX_NR_CLOCKS_REGULATORS (1)
@@ -165,8 +165,8 @@ struct kbase_kinstr_jm;
  * @value: value written or read
  */
 struct kbase_io_access {
-	uintptr_t addr;
-	u32 value;
+    uintptr_t addr;
+    u32 value;
 };
 
 /**
@@ -180,52 +180,52 @@ struct kbase_io_access {
  */
 struct kbase_io_history {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
-	bool enabled;
+    bool enabled;
 #else
-	u32 enabled;
+    u32 enabled;
 #endif
 
-	spinlock_t lock;
-	size_t count;
-	u16 size;
-	struct kbase_io_access *buf;
+    spinlock_t lock;
+    size_t count;
+    u16 size;
+    struct kbase_io_access *buf;
 };
 
 /**
  * struct kbase_debug_copy_buffer - information about the buffer to be copied.
  *
- * @size:	size of the buffer in bytes
- * @pages:	pointer to an array of pointers to the pages which contain
- *		the buffer
+ * @size:    size of the buffer in bytes
+ * @pages:    pointer to an array of pointers to the pages which contain
+ *        the buffer
  * @is_vmalloc: true if @pages was allocated with vzalloc. false if @pages was
  *              allocated with kcalloc
- * @nr_pages:	number of pages
- * @offset:	offset into the pages
- * @gpu_alloc:	pointer to physical memory allocated by the GPU
+ * @nr_pages:    number of pages
+ * @offset:    offset into the pages
+ * @gpu_alloc:    pointer to physical memory allocated by the GPU
  * @extres_pages: array of pointers to the pages containing external resources
- *		for this buffer
+ *        for this buffer
  * @nr_extres_pages: number of pages in @extres_pages
  */
 struct kbase_debug_copy_buffer {
-	size_t size;
-	struct page **pages;
-	bool is_vmalloc;
-	int nr_pages;
-	size_t offset;
-	struct kbase_mem_phy_alloc *gpu_alloc;
+    size_t size;
+    struct page **pages;
+    bool is_vmalloc;
+    int nr_pages;
+    size_t offset;
+    struct kbase_mem_phy_alloc *gpu_alloc;
 
-	struct page **extres_pages;
-	int nr_extres_pages;
+    struct page **extres_pages;
+    int nr_extres_pages;
 };
 
 struct kbase_device_info {
-	u32 features;
+    u32 features;
 };
 
 struct kbase_mmu_setup {
-	u64	transtab;
-	u64	memattr;
-	u64	transcfg;
+    u64    transtab;
+    u64    memattr;
+    u64    transcfg;
 };
 
 /**
@@ -237,10 +237,10 @@ struct kbase_mmu_setup {
  *                  or not.
  */
 struct kbase_fault {
-	u64 addr;
-	u64 extra_addr;
-	u32 status;
-	bool protected_mode;
+    u64 addr;
+    u64 extra_addr;
+    u32 status;
+    bool protected_mode;
 };
 
 /**
@@ -262,11 +262,11 @@ struct kbase_fault {
  *                        it is NULL
  */
 struct kbase_mmu_table {
-	u64 *mmu_teardown_pages;
-	struct mutex mmu_lock;
-	phys_addr_t pgd;
-	u8 group_id;
-	struct kbase_context *kctx;
+    u64 *mmu_teardown_pages;
+    struct mutex mmu_lock;
+    phys_addr_t pgd;
+    u8 group_id;
+    struct kbase_context *kctx;
 };
 
 #if MALI_USE_CSF
@@ -276,15 +276,15 @@ struct kbase_mmu_table {
 #endif
 
 static inline int kbase_as_has_bus_fault(struct kbase_as *as,
-	struct kbase_fault *fault)
+    struct kbase_fault *fault)
 {
-	return (fault == &as->bf_data);
+    return (fault == &as->bf_data);
 }
 
 static inline int kbase_as_has_page_fault(struct kbase_as *as,
-	struct kbase_fault *fault)
+    struct kbase_fault *fault)
 {
-	return (fault == &as->pf_data);
+    return (fault == &as->pf_data);
 }
 
 /**
@@ -298,8 +298,8 @@ static inline int kbase_as_has_page_fault(struct kbase_as *as,
  *                0 means disabled.
  */
 struct kbasep_mem_device {
-	atomic_t used_pages;
-	atomic_t ir_threshold;
+    atomic_t used_pages;
+    atomic_t ir_threshold;
 };
 
 struct kbase_clk_rate_listener;
@@ -316,9 +316,9 @@ struct kbase_clk_rate_listener;
  * its lock is taken.
  */
 typedef void (*kbase_clk_rate_listener_on_change_t)(
-	struct kbase_clk_rate_listener *listener,
-	u32 clk_index,
-	u32 clk_rate_hz);
+    struct kbase_clk_rate_listener *listener,
+    u32 clk_index,
+    u32 clk_rate_hz);
 
 /**
  * struct kbase_clk_rate_listener - Clock frequency listener
@@ -327,8 +327,8 @@ typedef void (*kbase_clk_rate_listener_on_change_t)(
  * @notify:    Callback to be called when GPU frequency changes.
  */
 struct kbase_clk_rate_listener {
-	struct list_head node;
-	kbase_clk_rate_listener_on_change_t notify;
+    struct list_head node;
+    kbase_clk_rate_listener_on_change_t notify;
 };
 
 /**
@@ -347,11 +347,11 @@ struct kbase_clk_rate_listener {
  *                      manager.
  */
 struct kbase_clk_rate_trace_manager {
-	bool gpu_idle;
-	struct kbase_clk_data *clks[BASE_MAX_NR_CLOCKS_REGULATORS];
-	struct kbase_clk_rate_trace_op_conf *clk_rate_trace_ops;
-	struct list_head listeners;
-	spinlock_t lock;
+    bool gpu_idle;
+    struct kbase_clk_data *clks[BASE_MAX_NR_CLOCKS_REGULATORS];
+    struct kbase_clk_rate_trace_op_conf *clk_rate_trace_ops;
+    struct list_head listeners;
+    spinlock_t lock;
 };
 
 /**
@@ -361,69 +361,69 @@ struct kbase_clk_rate_trace_manager {
  * instance of this structure per device in the system.
  */
 struct kbase_pm_device_data {
-	/**
-	 * The lock protecting Power Management structures accessed outside of
-	 * IRQ.
-	 *
-	 * This lock must also be held whenever the GPU is being powered on or
-	 * off.
-	 */
-	struct mutex lock;
+    /**
+     * The lock protecting Power Management structures accessed outside of
+     * IRQ.
+     *
+     * This lock must also be held whenever the GPU is being powered on or
+     * off.
+     */
+    struct mutex lock;
 
-	/**
-	 * The reference count of active contexts on this device. Note that
-	 * some code paths keep shaders/the tiler powered whilst this is 0. Use
-	 * kbase_pm_is_active() instead to check for such cases.
-	 */
-	int active_count;
-	/** Flag indicating suspending/suspended */
-	bool suspending;
+    /**
+     * The reference count of active contexts on this device. Note that
+     * some code paths keep shaders/the tiler powered whilst this is 0. Use
+     * kbase_pm_is_active() instead to check for such cases.
+     */
+    int active_count;
+    /** Flag indicating suspending/suspended */
+    bool suspending;
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-	/* Flag indicating gpu lost */
-	atomic_t gpu_lost;
+    /* Flag indicating gpu lost */
+    atomic_t gpu_lost;
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
-	/* Wait queue set when active_count == 0 */
-	wait_queue_head_t zero_active_count_wait;
+    /* Wait queue set when active_count == 0 */
+    wait_queue_head_t zero_active_count_wait;
 
-	/**
-	 * Bit masks identifying the available shader cores that are specified
-	 * via sysfs. One mask per job slot.
-	 */
-	u64 debug_core_mask[BASE_JM_MAX_NR_SLOTS];
-	u64 debug_core_mask_all;
+    /**
+     * Bit masks identifying the available shader cores that are specified
+     * via sysfs. One mask per job slot.
+     */
+    u64 debug_core_mask[BASE_JM_MAX_NR_SLOTS];
+    u64 debug_core_mask_all;
 
-	/**
-	 * Callback for initializing the runtime power management.
-	 *
-	 * @param kbdev The kbase device
-	 *
-	 * @return 0 on success, else error code
-	 */
-	 int (*callback_power_runtime_init)(struct kbase_device *kbdev);
+    /**
+     * Callback for initializing the runtime power management.
+     *
+     * @param kbdev The kbase device
+     *
+     * @return 0 on success, else error code
+     */
+     int (*callback_power_runtime_init)(struct kbase_device *kbdev);
 
-	/**
-	 * Callback for terminating the runtime power management.
-	 *
-	 * @param kbdev The kbase device
-	 */
-	void (*callback_power_runtime_term)(struct kbase_device *kbdev);
+    /**
+     * Callback for terminating the runtime power management.
+     *
+     * @param kbdev The kbase device
+     */
+    void (*callback_power_runtime_term)(struct kbase_device *kbdev);
 
-	/* Time in milliseconds between each dvfs sample */
-	u32 dvfs_period;
+    /* Time in milliseconds between each dvfs sample */
+    u32 dvfs_period;
 
-	struct kbase_pm_backend_data backend;
+    struct kbase_pm_backend_data backend;
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-	/**
-	 * The state of the arbiter VM machine
-	 */
-	struct kbase_arbiter_vm_state *arb_vm_state;
+    /**
+     * The state of the arbiter VM machine
+     */
+    struct kbase_arbiter_vm_state *arb_vm_state;
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
 
-	/**
-	 * The state of the GPU clock rate trace manager
-	 */
-	struct kbase_clk_rate_trace_manager clk_rtm;
+    /**
+     * The state of the GPU clock rate trace manager
+     */
+    struct kbase_clk_rate_trace_manager clk_rtm;
 };
 
 /**
@@ -450,19 +450,19 @@ struct kbase_pm_device_data {
  *                this pool, eg during a grow operation
  */
 struct kbase_mem_pool {
-	struct kbase_device *kbdev;
-	size_t              cur_size;
-	size_t              max_size;
-	u8                  order;
-	u8                  group_id;
-	spinlock_t          pool_lock;
-	struct list_head    page_list;
-	struct shrinker     reclaim;
+    struct kbase_device *kbdev;
+    size_t              cur_size;
+    size_t              max_size;
+    u8                  order;
+    u8                  group_id;
+    spinlock_t          pool_lock;
+    struct list_head    page_list;
+    struct shrinker     reclaim;
 
-	struct kbase_mem_pool *next_pool;
+    struct kbase_mem_pool *next_pool;
 
-	bool dying;
-	bool dont_reclaim;
+    bool dying;
+    bool dont_reclaim;
 };
 
 /**
@@ -480,8 +480,8 @@ struct kbase_mem_pool {
  *         physical pages.
  */
 struct kbase_mem_pool_group {
-	struct kbase_mem_pool small[MEMORY_GROUP_MANAGER_NR_GROUPS];
-	struct kbase_mem_pool large[MEMORY_GROUP_MANAGER_NR_GROUPS];
+    struct kbase_mem_pool small[MEMORY_GROUP_MANAGER_NR_GROUPS];
+    struct kbase_mem_pool large[MEMORY_GROUP_MANAGER_NR_GROUPS];
 };
 
 /**
@@ -491,7 +491,7 @@ struct kbase_mem_pool_group {
  * @max_size: Maximum number of free pages that the pool can hold.
  */
 struct kbase_mem_pool_config {
-	size_t max_size;
+    size_t max_size;
 };
 
 /**
@@ -505,8 +505,8 @@ struct kbase_mem_pool_config {
  * @large: Array of initial configuration for pools of 2 MiB pages.
  */
 struct kbase_mem_pool_group_config {
-	struct kbase_mem_pool_config small[MEMORY_GROUP_MANAGER_NR_GROUPS];
-	struct kbase_mem_pool_config large[MEMORY_GROUP_MANAGER_NR_GROUPS];
+    struct kbase_mem_pool_config small[MEMORY_GROUP_MANAGER_NR_GROUPS];
+    struct kbase_mem_pool_config large[MEMORY_GROUP_MANAGER_NR_GROUPS];
 };
 
 /**
@@ -518,10 +518,10 @@ struct kbase_mem_pool_group_config {
  * @core_mask: Shader core mask
  */
 struct kbase_devfreq_opp {
-	u64 opp_freq;
-	u64 core_mask;
-	u64 real_freqs[BASE_MAX_NR_CLOCKS_REGULATORS];
-	u32 opp_volts[BASE_MAX_NR_CLOCKS_REGULATORS];
+    u64 opp_freq;
+    u64 core_mask;
+    u64 real_freqs[BASE_MAX_NR_CLOCKS_REGULATORS];
+    u32 opp_volts[BASE_MAX_NR_CLOCKS_REGULATORS];
 };
 
 /* MMU mode flags */
@@ -547,26 +547,26 @@ struct kbase_devfreq_opp {
  * @flags:            bitmask of MMU mode flags. Refer to KBASE_MMU_MODE_ constants.
  */
 struct kbase_mmu_mode {
-	void (*update)(struct kbase_device *kbdev,
-			struct kbase_mmu_table *mmut,
-			int as_nr);
-	void (*get_as_setup)(struct kbase_mmu_table *mmut,
-			struct kbase_mmu_setup * const setup);
-	void (*disable_as)(struct kbase_device *kbdev, int as_nr);
-	phys_addr_t (*pte_to_phy_addr)(u64 entry);
-	int (*ate_is_valid)(u64 ate, int level);
-	int (*pte_is_valid)(u64 pte, int level);
-	void (*entry_set_ate)(u64 *entry, struct tagged_addr phy,
-			unsigned long flags, int level);
-	void (*entry_set_pte)(u64 *entry, phys_addr_t phy);
-	void (*entry_invalidate)(u64 *entry);
-	unsigned long flags;
+    void (*update)(struct kbase_device *kbdev,
+            struct kbase_mmu_table *mmut,
+            int as_nr);
+    void (*get_as_setup)(struct kbase_mmu_table *mmut,
+            struct kbase_mmu_setup * const setup);
+    void (*disable_as)(struct kbase_device *kbdev, int as_nr);
+    phys_addr_t (*pte_to_phy_addr)(u64 entry);
+    int (*ate_is_valid)(u64 ate, int level);
+    int (*pte_is_valid)(u64 pte, int level);
+    void (*entry_set_ate)(u64 *entry, struct tagged_addr phy,
+            unsigned long flags, int level);
+    void (*entry_set_pte)(u64 *entry, phys_addr_t phy);
+    void (*entry_invalidate)(u64 *entry);
+    unsigned long flags;
 };
 
 struct kbase_mmu_mode const *kbase_mmu_mode_get_lpae(void);
 struct kbase_mmu_mode const *kbase_mmu_mode_get_aarch64(void);
 
-#define DEVNAME_SIZE	16
+#define DEVNAME_SIZE    16
 
 /**
  * enum kbase_devfreq_work_type - The type of work to perform in the devfreq
@@ -576,9 +576,9 @@ struct kbase_mmu_mode const *kbase_mmu_mode_get_aarch64(void);
  * @DEVFREQ_WORK_RESUME:  Call devfreq_resume_device().
  */
 enum kbase_devfreq_work_type {
-	DEVFREQ_WORK_NONE,
-	DEVFREQ_WORK_SUSPEND,
-	DEVFREQ_WORK_RESUME
+    DEVFREQ_WORK_NONE,
+    DEVFREQ_WORK_SUSPEND,
+    DEVFREQ_WORK_RESUME
 };
 
 /**
@@ -592,10 +592,10 @@ enum kbase_devfreq_work_type {
  *                         internal recorded state of the suspend/resume
  */
 struct kbase_devfreq_queue_info {
-	struct workqueue_struct *workq;
-	struct work_struct work;
-	enum kbase_devfreq_work_type req_type;
-	enum kbase_devfreq_work_type acted_type;
+    struct workqueue_struct *workq;
+    struct work_struct work;
+    enum kbase_devfreq_work_type req_type;
+    enum kbase_devfreq_work_type acted_type;
 };
 
 /**
@@ -616,12 +616,12 @@ struct kbase_devfreq_queue_info {
  *                      imported multiple times for the process.
  */
 struct kbase_process {
-	pid_t tgid;
-	size_t total_gpu_pages;
-	struct list_head kctx_list;
+    pid_t tgid;
+    size_t total_gpu_pages;
+    struct list_head kctx_list;
 
-	struct rb_node kprcs_node;
-	struct rb_root dma_buf_root;
+    struct rb_node kprcs_node;
+    struct rb_root dma_buf_root;
 };
 
 /**
@@ -887,265 +887,265 @@ struct kbase_process {
  *                          allocations.
  */
 struct kbase_device {
-	u32 hw_quirks_sc;
-	u32 hw_quirks_tiler;
-	u32 hw_quirks_mmu;
-	u32 hw_quirks_jm;
+    u32 hw_quirks_sc;
+    u32 hw_quirks_tiler;
+    u32 hw_quirks_mmu;
+    u32 hw_quirks_jm;
 
-	struct list_head entry;
-	struct device *dev;
-	struct miscdevice mdev;
-	u64 reg_start;
-	size_t reg_size;
-	void __iomem *reg;
+    struct list_head entry;
+    struct device *dev;
+    struct miscdevice mdev;
+    u64 reg_start;
+    size_t reg_size;
+    void __iomem *reg;
 
-	struct {
-		int irq;
-		int flags;
-	} irqs[3];
+    struct {
+        int irq;
+        int flags;
+    } irqs[3];
 
-	struct clk *clocks[BASE_MAX_NR_CLOCKS_REGULATORS];
-	unsigned int nr_clocks;
+    struct clk *clocks[BASE_MAX_NR_CLOCKS_REGULATORS];
+    unsigned int nr_clocks;
 #ifdef CONFIG_REGULATOR
-	struct regulator *regulators[BASE_MAX_NR_CLOCKS_REGULATORS];
-	unsigned int nr_regulators;
+    struct regulator *regulators[BASE_MAX_NR_CLOCKS_REGULATORS];
+    unsigned int nr_regulators;
 #if (KERNEL_VERSION(4, 10, 0) <= LINUX_VERSION_CODE)
-	struct opp_table *opp_table;
+    struct opp_table *opp_table;
 #endif /* (KERNEL_VERSION(4, 10, 0) <= LINUX_VERSION_CODE */
 #endif /* CONFIG_REGULATOR */
-	char devname[DEVNAME_SIZE];
-	u32  id;
+    char devname[DEVNAME_SIZE];
+    u32  id;
 
 #ifdef CONFIG_MALI_BIFROST_NO_MALI
-	void *model;
-	struct kmem_cache *irq_slab;
-	struct workqueue_struct *irq_workq;
-	atomic_t serving_job_irq;
-	atomic_t serving_gpu_irq;
-	atomic_t serving_mmu_irq;
-	spinlock_t reg_op_lock;
-#endif	/* CONFIG_MALI_BIFROST_NO_MALI */
+    void *model;
+    struct kmem_cache *irq_slab;
+    struct workqueue_struct *irq_workq;
+    atomic_t serving_job_irq;
+    atomic_t serving_gpu_irq;
+    atomic_t serving_mmu_irq;
+    spinlock_t reg_op_lock;
+#endif    /* CONFIG_MALI_BIFROST_NO_MALI */
 
-	struct kbase_pm_device_data pm;
+    struct kbase_pm_device_data pm;
 
-	struct kbase_mem_pool_group mem_pools;
-	struct kbasep_mem_device memdev;
-	struct kbase_mmu_mode const *mmu_mode;
+    struct kbase_mem_pool_group mem_pools;
+    struct kbasep_mem_device memdev;
+    struct kbase_mmu_mode const *mmu_mode;
 
-	struct memory_group_manager_device *mgm_dev;
+    struct memory_group_manager_device *mgm_dev;
 
-	struct kbase_as as[BASE_MAX_NR_AS];
-	u16 as_free; /* Bitpattern of free Address Spaces */
-	struct kbase_context *as_to_kctx[BASE_MAX_NR_AS];
+    struct kbase_as as[BASE_MAX_NR_AS];
+    u16 as_free; /* Bitpattern of free Address Spaces */
+    struct kbase_context *as_to_kctx[BASE_MAX_NR_AS];
 
-	spinlock_t mmu_mask_change;
+    spinlock_t mmu_mask_change;
 
-	struct kbase_gpu_props gpu_props;
+    struct kbase_gpu_props gpu_props;
 
-	unsigned long hw_issues_mask[(BASE_HW_ISSUE_END + BITS_PER_LONG - 1) / BITS_PER_LONG];
-	unsigned long hw_features_mask[(BASE_HW_FEATURE_END + BITS_PER_LONG - 1) / BITS_PER_LONG];
+    unsigned long hw_issues_mask[(BASE_HW_ISSUE_END + BITS_PER_LONG - 1) / BITS_PER_LONG];
+    unsigned long hw_features_mask[(BASE_HW_FEATURE_END + BITS_PER_LONG - 1) / BITS_PER_LONG];
 
-	struct {
-		atomic_t count;
-		atomic_t state;
-	} disjoint_event;
+    struct {
+        atomic_t count;
+        atomic_t state;
+    } disjoint_event;
 
-	s8 nr_hw_address_spaces;
-	s8 nr_user_address_spaces;
+    s8 nr_hw_address_spaces;
+    s8 nr_user_address_spaces;
 
-	struct kbase_hwcnt {
-		/* The lock should be used when accessing any of the following members */
-		spinlock_t lock;
+    struct kbase_hwcnt {
+        /* The lock should be used when accessing any of the following members */
+        spinlock_t lock;
 
-		struct kbase_context *kctx;
-		u64 addr;
-		u64 addr_bytes;
+        struct kbase_context *kctx;
+        u64 addr;
+        u64 addr_bytes;
 
-		struct kbase_instr_backend backend;
-	} hwcnt;
+        struct kbase_instr_backend backend;
+    } hwcnt;
 
-	struct kbase_hwcnt_backend_interface hwcnt_gpu_iface;
-	struct kbase_hwcnt_context *hwcnt_gpu_ctx;
-	struct kbase_hwcnt_virtualizer *hwcnt_gpu_virt;
-	struct kbase_vinstr_context *vinstr_ctx;
+    struct kbase_hwcnt_backend_interface hwcnt_gpu_iface;
+    struct kbase_hwcnt_context *hwcnt_gpu_ctx;
+    struct kbase_hwcnt_virtualizer *hwcnt_gpu_virt;
+    struct kbase_vinstr_context *vinstr_ctx;
 
-	atomic_t               timeline_flags;
-	struct kbase_timeline *timeline;
+    atomic_t               timeline_flags;
+    struct kbase_timeline *timeline;
 
 #if KBASE_KTRACE_TARGET_RBUF
-	struct kbase_ktrace ktrace;
+    struct kbase_ktrace ktrace;
 #endif
-	u32 reset_timeout_ms;
+    u32 reset_timeout_ms;
 
-	bool cache_clean_in_progress;
-	bool cache_clean_queued;
-	wait_queue_head_t cache_clean_wait;
+    bool cache_clean_in_progress;
+    bool cache_clean_queued;
+    wait_queue_head_t cache_clean_wait;
 
-	void *platform_context;
+    void *platform_context;
 
-	struct list_head        kctx_list;
-	struct mutex            kctx_list_lock;
+    struct list_head        kctx_list;
+    struct mutex            kctx_list_lock;
 
 #ifdef CONFIG_MALI_BIFROST_DEVFREQ
-	struct devfreq_dev_profile devfreq_profile;
-	struct devfreq *devfreq;
-	unsigned long current_freqs[BASE_MAX_NR_CLOCKS_REGULATORS];
-	unsigned long current_nominal_freq;
-	unsigned long current_voltages[BASE_MAX_NR_CLOCKS_REGULATORS];
-	u64 current_core_mask;
-	struct kbase_devfreq_opp *devfreq_table;
-	int num_opps;
-	struct kbasep_pm_metrics last_devfreq_metrics;
-	struct monitor_dev_info *mdev_info;
-	struct ipa_power_model_data *model_data;
+    struct devfreq_dev_profile devfreq_profile;
+    struct devfreq *devfreq;
+    unsigned long current_freqs[BASE_MAX_NR_CLOCKS_REGULATORS];
+    unsigned long current_nominal_freq;
+    unsigned long current_voltages[BASE_MAX_NR_CLOCKS_REGULATORS];
+    u64 current_core_mask;
+    struct kbase_devfreq_opp *devfreq_table;
+    int num_opps;
+    struct kbasep_pm_metrics last_devfreq_metrics;
+    struct monitor_dev_info *mdev_info;
+    struct ipa_power_model_data *model_data;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
-	struct kbase_devfreq_queue_info devfreq_queue;
+    struct kbase_devfreq_queue_info devfreq_queue;
 #endif
 
 #ifdef CONFIG_DEVFREQ_THERMAL
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
-	struct devfreq_cooling_device *devfreq_cooling;
+    struct devfreq_cooling_device *devfreq_cooling;
 #else
-	struct thermal_cooling_device *devfreq_cooling;
+    struct thermal_cooling_device *devfreq_cooling;
 #endif
-	bool ipa_protection_mode_switched;
-	struct {
-		/* Access to this struct must be with ipa.lock held */
-		struct mutex lock;
-		struct kbase_ipa_model *configured_model;
-		struct kbase_ipa_model *fallback_model;
+    bool ipa_protection_mode_switched;
+    struct {
+        /* Access to this struct must be with ipa.lock held */
+        struct mutex lock;
+        struct kbase_ipa_model *configured_model;
+        struct kbase_ipa_model *fallback_model;
 
-		/* Values of the PM utilization metrics from last time the
-		 * power model was invoked. The utilization is calculated as
-		 * the difference between last_metrics and the current values.
-		 */
-		struct kbasep_pm_metrics last_metrics;
-		/* Model data to pass to ipa_gpu_active/idle() */
-		struct kbase_ipa_model_vinstr_data *model_data;
+        /* Values of the PM utilization metrics from last time the
+         * power model was invoked. The utilization is calculated as
+         * the difference between last_metrics and the current values.
+         */
+        struct kbasep_pm_metrics last_metrics;
+        /* Model data to pass to ipa_gpu_active/idle() */
+        struct kbase_ipa_model_vinstr_data *model_data;
 
-		/* true if use of fallback model has been forced by the User */
-		bool force_fallback_model;
-	} ipa;
+        /* true if use of fallback model has been forced by the User */
+        bool force_fallback_model;
+    } ipa;
 #endif /* CONFIG_DEVFREQ_THERMAL */
 #endif /* CONFIG_MALI_BIFROST_DEVFREQ */
-	unsigned long previous_frequency;
+    unsigned long previous_frequency;
 
-	atomic_t job_fault_debug;
+    atomic_t job_fault_debug;
 
 #ifdef CONFIG_DEBUG_FS
-	struct dentry *mali_debugfs_directory;
-	struct dentry *debugfs_ctx_directory;
-	struct dentry *debugfs_instr_directory;
+    struct dentry *mali_debugfs_directory;
+    struct dentry *debugfs_ctx_directory;
+    struct dentry *debugfs_instr_directory;
 
 #ifdef CONFIG_MALI_BIFROST_DEBUG
-	u64 debugfs_as_read_bitmap;
+    u64 debugfs_as_read_bitmap;
 #endif /* CONFIG_MALI_BIFROST_DEBUG */
 
-	wait_queue_head_t job_fault_wq;
-	wait_queue_head_t job_fault_resume_wq;
-	struct workqueue_struct *job_fault_resume_workq;
-	struct list_head job_fault_event_list;
-	spinlock_t job_fault_event_lock;
+    wait_queue_head_t job_fault_wq;
+    wait_queue_head_t job_fault_resume_wq;
+    struct workqueue_struct *job_fault_resume_workq;
+    struct list_head job_fault_event_list;
+    spinlock_t job_fault_event_lock;
 
 #if !MALI_CUSTOMER_RELEASE
-	struct {
-		u16 reg_offset;
-	} regs_dump_debugfs_data;
+    struct {
+        u16 reg_offset;
+    } regs_dump_debugfs_data;
 #endif /* !MALI_CUSTOMER_RELEASE */
 #endif /* CONFIG_DEBUG_FS */
 
-	atomic_t ctx_num;
+    atomic_t ctx_num;
 
 #ifdef CONFIG_DEBUG_FS
-	struct kbase_io_history io_history;
+    struct kbase_io_history io_history;
 #endif /* CONFIG_DEBUG_FS */
 
-	struct kbase_hwaccess_data hwaccess;
+    struct kbase_hwaccess_data hwaccess;
 
-	atomic_t faults_pending;
+    atomic_t faults_pending;
 
-	bool poweroff_pending;
+    bool poweroff_pending;
 
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
-	bool infinite_cache_active_default;
+    bool infinite_cache_active_default;
 #else
-	u32 infinite_cache_active_default;
+    u32 infinite_cache_active_default;
 #endif
-	struct kbase_mem_pool_group_config mem_pool_defaults;
+    struct kbase_mem_pool_group_config mem_pool_defaults;
 
-	u32 current_gpu_coherency_mode;
-	u32 system_coherency;
+    u32 current_gpu_coherency_mode;
+    u32 system_coherency;
 
-	bool cci_snoop_enabled;
+    bool cci_snoop_enabled;
 
-	u32 snoop_enable_smc;
-	u32 snoop_disable_smc;
+    u32 snoop_enable_smc;
+    u32 snoop_disable_smc;
 
-	const struct protected_mode_ops *protected_ops;
+    const struct protected_mode_ops *protected_ops;
 
-	struct protected_mode_device *protected_dev;
+    struct protected_mode_device *protected_dev;
 
-	bool protected_mode;
+    bool protected_mode;
 
-	bool protected_mode_transition;
+    bool protected_mode_transition;
 
-	bool protected_mode_hwcnt_desired;
+    bool protected_mode_hwcnt_desired;
 
-	bool protected_mode_hwcnt_disabled;
+    bool protected_mode_hwcnt_disabled;
 
-	struct work_struct protected_mode_hwcnt_disable_work;
+    struct work_struct protected_mode_hwcnt_disable_work;
 
 #ifdef CONFIG_MALI_BUSLOG
-	struct bus_logger_client *buslogger;
+    struct bus_logger_client *buslogger;
 #endif
 
-	bool irq_reset_flush;
+    bool irq_reset_flush;
 
-	u32 inited_subsys;
+    u32 inited_subsys;
 
-	spinlock_t hwaccess_lock;
+    spinlock_t hwaccess_lock;
 
-	struct mutex mmu_hw_mutex;
+    struct mutex mmu_hw_mutex;
 
-	u8 l2_size_override;
-	u8 l2_hash_override;
+    u8 l2_size_override;
+    u8 l2_hash_override;
 
 #if MALI_USE_CSF
-	/* Command-stream front-end for the device. */
-	struct kbase_csf_device csf;
+    /* Command-stream front-end for the device. */
+    struct kbase_csf_device csf;
 #else
-	struct kbasep_js_device_data js_data;
+    struct kbasep_js_device_data js_data;
 
-	/* See KBASE_JS_*_PRIORITY_MODE for details. */
-	u32 js_ctx_scheduling_mode;
+    /* See KBASE_JS_*_PRIORITY_MODE for details. */
+    u32 js_ctx_scheduling_mode;
 
-	/* See KBASE_SERIALIZE_* for details */
-	u8 serialize_jobs;
+    /* See KBASE_SERIALIZE_* for details */
+    u8 serialize_jobs;
 
 #ifdef CONFIG_MALI_CINSTR_GWT
-	u8 backup_serialize_jobs;
+    u8 backup_serialize_jobs;
 #endif /* CONFIG_MALI_CINSTR_GWT */
 
 #endif /* MALI_USE_CSF */
 
-	struct rb_root process_root;
-	struct rb_root dma_buf_root;
+    struct rb_root process_root;
+    struct rb_root dma_buf_root;
 
-	size_t total_gpu_pages;
-	struct mutex dma_buf_lock;
-	spinlock_t gpu_mem_usage_lock;
+    size_t total_gpu_pages;
+    struct mutex dma_buf_lock;
+    spinlock_t gpu_mem_usage_lock;
 
-	struct {
-		struct kbase_context *ctx;
-		u64 jc;
-		int slot;
-		u64 flags;
-	} dummy_job_wa;
+    struct {
+        struct kbase_context *ctx;
+        u64 jc;
+        int slot;
+        u64 flags;
+    } dummy_job_wa;
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-		/* Pointer to the arbiter device */
-		struct kbase_arbiter_device arb;
+        /* Pointer to the arbiter device */
+        struct kbase_arbiter_device arb;
 #endif
 };
 
@@ -1168,11 +1168,11 @@ struct kbase_device {
  * is complete.
  */
 enum kbase_file_state {
-	KBASE_FILE_NEED_VSN,
-	KBASE_FILE_VSN_IN_PROGRESS,
-	KBASE_FILE_NEED_CTX,
-	KBASE_FILE_CTX_IN_PROGRESS,
-	KBASE_FILE_COMPLETE
+    KBASE_FILE_NEED_VSN,
+    KBASE_FILE_VSN_IN_PROGRESS,
+    KBASE_FILE_NEED_CTX,
+    KBASE_FILE_CTX_IN_PROGRESS,
+    KBASE_FILE_COMPLETE
 };
 
 /**
@@ -1192,11 +1192,11 @@ enum kbase_file_state {
  *                       the kbase_file_state enumeration.
  */
 struct kbase_file {
-	struct kbase_device  *kbdev;
-	struct file          *filp;
-	struct kbase_context *kctx;
-	unsigned long         api_version;
-	atomic_t              setup_state;
+    struct kbase_device  *kbdev;
+    struct file          *filp;
+    struct kbase_context *kctx;
+    unsigned long         api_version;
+    atomic_t              setup_state;
 };
 
 /**
@@ -1262,35 +1262,35 @@ struct kbase_file {
  * bitmask where multiple values get OR-ed together.
  */
 enum kbase_context_flags {
-	KCTX_COMPAT = 1U << 0,
-	KCTX_RUNNABLE_REF = 1U << 1,
-	KCTX_ACTIVE = 1U << 2,
-	KCTX_PULLED = 1U << 3,
-	KCTX_MEM_PROFILE_INITIALIZED = 1U << 4,
-	KCTX_INFINITE_CACHE = 1U << 5,
-	KCTX_SUBMIT_DISABLED = 1U << 6,
-	KCTX_PRIVILEGED = 1U << 7,
-	KCTX_SCHEDULED = 1U << 8,
-	KCTX_DYING = 1U << 9,
-	KCTX_NO_IMPLICIT_SYNC = 1U << 10,
-	KCTX_FORCE_SAME_VA = 1U << 11,
-	KCTX_PULLED_SINCE_ACTIVE_JS0 = 1U << 12,
-	KCTX_PULLED_SINCE_ACTIVE_JS1 = 1U << 13,
-	KCTX_PULLED_SINCE_ACTIVE_JS2 = 1U << 14,
-	KCTX_AS_DISABLED_ON_FAULT = 1U << 15,
+    KCTX_COMPAT = 1U << 0,
+    KCTX_RUNNABLE_REF = 1U << 1,
+    KCTX_ACTIVE = 1U << 2,
+    KCTX_PULLED = 1U << 3,
+    KCTX_MEM_PROFILE_INITIALIZED = 1U << 4,
+    KCTX_INFINITE_CACHE = 1U << 5,
+    KCTX_SUBMIT_DISABLED = 1U << 6,
+    KCTX_PRIVILEGED = 1U << 7,
+    KCTX_SCHEDULED = 1U << 8,
+    KCTX_DYING = 1U << 9,
+    KCTX_NO_IMPLICIT_SYNC = 1U << 10,
+    KCTX_FORCE_SAME_VA = 1U << 11,
+    KCTX_PULLED_SINCE_ACTIVE_JS0 = 1U << 12,
+    KCTX_PULLED_SINCE_ACTIVE_JS1 = 1U << 13,
+    KCTX_PULLED_SINCE_ACTIVE_JS2 = 1U << 14,
+    KCTX_AS_DISABLED_ON_FAULT = 1U << 15,
 #if MALI_JIT_PRESSURE_LIMIT_BASE
-	/*
-	 * Set when JIT physical page limit is less than JIT virtual address
-	 * page limit, so we must take care to not exceed the physical limit
-	 */
-	KCTX_JPL_ENABLED = 1U << 16,
+    /*
+     * Set when JIT physical page limit is less than JIT virtual address
+     * page limit, so we must take care to not exceed the physical limit
+     */
+    KCTX_JPL_ENABLED = 1U << 16,
 #endif /* !MALI_JIT_PRESSURE_LIMIT_BASE */
 };
 
 struct kbase_sub_alloc {
-	struct list_head link;
-	struct page *page;
-	DECLARE_BITMAP(sub_pages, SZ_2M / SZ_4K);
+    struct list_head link;
+    struct page *page;
+    DECLARE_BITMAP(sub_pages, SZ_2M / SZ_4K);
 };
 
 /**
@@ -1555,143 +1555,143 @@ struct kbase_sub_alloc {
  * is made on the device file.
  */
 struct kbase_context {
-	struct file *filp;
-	struct kbase_device *kbdev;
-	struct list_head kctx_list_link;
-	struct kbase_mmu_table mmu;
+    struct file *filp;
+    struct kbase_device *kbdev;
+    struct list_head kctx_list_link;
+    struct kbase_mmu_table mmu;
 
-	u32 id;
-	unsigned long api_version;
-	struct list_head event_list;
-	struct list_head event_coalesce_list;
-	struct mutex event_mutex;
+    u32 id;
+    unsigned long api_version;
+    struct list_head event_list;
+    struct list_head event_coalesce_list;
+    struct mutex event_mutex;
 #if !MALI_USE_CSF
-	atomic_t event_closed;
+    atomic_t event_closed;
 #endif
-	struct workqueue_struct *event_workq;
-	atomic_t event_count;
-	int event_coalesce_count;
+    struct workqueue_struct *event_workq;
+    atomic_t event_count;
+    int event_coalesce_count;
 
-	atomic_t flags;
+    atomic_t flags;
 
-	struct tagged_addr aliasing_sink_page;
+    struct tagged_addr aliasing_sink_page;
 
-	spinlock_t              mem_partials_lock;
-	struct list_head        mem_partials;
+    spinlock_t              mem_partials_lock;
+    struct list_head        mem_partials;
 
-	struct mutex            reg_lock;
+    struct mutex            reg_lock;
 
-	struct rb_root reg_rbtree_same;
-	struct rb_root reg_rbtree_custom;
-	struct rb_root reg_rbtree_exec;
+    struct rb_root reg_rbtree_same;
+    struct rb_root reg_rbtree_custom;
+    struct rb_root reg_rbtree_exec;
 
 #if MALI_USE_CSF
-	struct kbase_csf_context csf;
+    struct kbase_csf_context csf;
 #else
-	struct kbase_jd_context jctx;
-	struct jsctx_queue jsctx_queue
-		[KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
+    struct kbase_jd_context jctx;
+    struct jsctx_queue jsctx_queue
+        [KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
 
-	struct list_head completed_jobs;
-	atomic_t work_count;
-	struct timer_list soft_job_timeout;
+    struct list_head completed_jobs;
+    atomic_t work_count;
+    struct timer_list soft_job_timeout;
 
-	atomic_t atoms_pulled;
-	atomic_t atoms_pulled_slot[BASE_JM_MAX_NR_SLOTS];
-	int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][
-			KBASE_JS_ATOM_SCHED_PRIO_COUNT];
-	int priority;
-	bool blocked_js[BASE_JM_MAX_NR_SLOTS][KBASE_JS_ATOM_SCHED_PRIO_COUNT];
-	s16 atoms_count[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
-	u32 slots_pullable;
-	u32 age_count;
+    atomic_t atoms_pulled;
+    atomic_t atoms_pulled_slot[BASE_JM_MAX_NR_SLOTS];
+    int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][
+            KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+    int priority;
+    bool blocked_js[BASE_JM_MAX_NR_SLOTS][KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+    s16 atoms_count[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+    u32 slots_pullable;
+    u32 age_count;
 #endif /* MALI_USE_CSF */
 
-	DECLARE_BITMAP(cookies, BITS_PER_LONG);
-	struct kbase_va_region *pending_regions[BITS_PER_LONG];
+    DECLARE_BITMAP(cookies, BITS_PER_LONG);
+    struct kbase_va_region *pending_regions[BITS_PER_LONG];
 
-	wait_queue_head_t event_queue;
-	pid_t tgid;
-	pid_t pid;
-	atomic_t used_pages;
-	atomic_t nonmapped_pages;
-	atomic_t permanent_mapped_pages;
+    wait_queue_head_t event_queue;
+    pid_t tgid;
+    pid_t pid;
+    atomic_t used_pages;
+    atomic_t nonmapped_pages;
+    atomic_t permanent_mapped_pages;
 
-	struct kbase_mem_pool_group mem_pools;
+    struct kbase_mem_pool_group mem_pools;
 
-	struct shrinker         reclaim;
-	struct list_head        evict_list;
+    struct shrinker         reclaim;
+    struct list_head        evict_list;
 
-	struct list_head waiting_soft_jobs;
-	spinlock_t waiting_soft_jobs_lock;
+    struct list_head waiting_soft_jobs;
+    spinlock_t waiting_soft_jobs_lock;
 #ifdef CONFIG_MALI_BIFROST_DMA_FENCE
-	struct {
-		struct list_head waiting_resource;
-		struct workqueue_struct *wq;
-	} dma_fence;
+    struct {
+        struct list_head waiting_resource;
+        struct workqueue_struct *wq;
+    } dma_fence;
 #endif /* CONFIG_MALI_BIFROST_DMA_FENCE */
 
-	int as_nr;
+    int as_nr;
 
-	atomic_t refcount;
+    atomic_t refcount;
 
-	spinlock_t         mm_update_lock;
-	struct mm_struct __rcu *process_mm;
-	u64 same_va_end;
-	u64 exec_va_start;
-	u64 gpu_va_end;
-	bool jit_va;
+    spinlock_t         mm_update_lock;
+    struct mm_struct __rcu *process_mm;
+    u64 same_va_end;
+    u64 exec_va_start;
+    u64 gpu_va_end;
+    bool jit_va;
 
 #ifdef CONFIG_DEBUG_FS
-	char *mem_profile_data;
-	size_t mem_profile_size;
-	struct mutex mem_profile_lock;
-	struct dentry *kctx_dentry;
+    char *mem_profile_data;
+    size_t mem_profile_size;
+    struct mutex mem_profile_lock;
+    struct dentry *kctx_dentry;
 
-	unsigned int *reg_dump;
-	atomic_t job_fault_count;
-	struct list_head job_fault_resume_event_list;
+    unsigned int *reg_dump;
+    atomic_t job_fault_count;
+    struct list_head job_fault_resume_event_list;
 
 #endif /* CONFIG_DEBUG_FS */
 
-	struct kbase_hwcnt_legacy_client *legacy_hwcnt_cli;
-	struct mutex legacy_hwcnt_lock;
+    struct kbase_hwcnt_legacy_client *legacy_hwcnt_cli;
+    struct mutex legacy_hwcnt_lock;
 
-	struct kbase_va_region *jit_alloc[1 + BASE_JIT_ALLOC_COUNT];
-	u8 jit_max_allocations;
-	u8 jit_current_allocations;
-	u8 jit_current_allocations_per_bin[256];
-	u8 jit_version;
-	u8 jit_group_id;
+    struct kbase_va_region *jit_alloc[1 + BASE_JIT_ALLOC_COUNT];
+    u8 jit_max_allocations;
+    u8 jit_current_allocations;
+    u8 jit_current_allocations_per_bin[256];
+    u8 jit_version;
+    u8 jit_group_id;
 #if MALI_JIT_PRESSURE_LIMIT_BASE
-	u64 jit_phys_pages_limit;
-	u64 jit_current_phys_pressure;
-	u64 jit_phys_pages_to_be_allocated;
+    u64 jit_phys_pages_limit;
+    u64 jit_current_phys_pressure;
+    u64 jit_phys_pages_to_be_allocated;
 #endif /* MALI_JIT_PRESSURE_LIMIT_BASE */
-	struct list_head jit_active_head;
-	struct list_head jit_pool_head;
-	struct list_head jit_destroy_head;
-	struct mutex jit_evict_lock;
-	struct work_struct jit_work;
+    struct list_head jit_active_head;
+    struct list_head jit_pool_head;
+    struct list_head jit_destroy_head;
+    struct mutex jit_evict_lock;
+    struct work_struct jit_work;
 
-	struct list_head ext_res_meta_head;
+    struct list_head ext_res_meta_head;
 
-	u8 trim_level;
+    u8 trim_level;
 
-	struct kbase_process *kprcs;
-	struct list_head kprcs_link;
+    struct kbase_process *kprcs;
+    struct list_head kprcs_link;
 
 #ifdef CONFIG_MALI_CINSTR_GWT
-	bool gwt_enabled;
-	bool gwt_was_enabled;
-	struct list_head gwt_current_list;
-	struct list_head gwt_snapshot_list;
+    bool gwt_enabled;
+    bool gwt_was_enabled;
+    struct list_head gwt_current_list;
+    struct list_head gwt_snapshot_list;
 #endif
 
-	base_context_create_flags create_flags;
+    base_context_create_flags create_flags;
 
 #if !MALI_USE_CSF
-	struct kbase_kinstr_jm *kinstr_jm;
+    struct kbase_kinstr_jm *kinstr_jm;
 #endif
 };
 
@@ -1708,10 +1708,10 @@ struct kbase_context {
  * Using this structure all GPU write faults are stored in a list.
  */
 struct kbasep_gwt_list_element {
-	struct list_head link;
-	struct kbase_va_region *region;
-	u64 page_addr;
-	u64 num_pages;
+    struct list_head link;
+    struct kbase_va_region *region;
+    u64 page_addr;
+    u64 num_pages;
 };
 
 #endif
@@ -1738,21 +1738,21 @@ struct kbasep_gwt_list_element {
  * multiple times) don't effect the refcount of the physical allocation.
  */
 struct kbase_ctx_ext_res_meta {
-	struct list_head ext_res_node;
-	struct kbase_mem_phy_alloc *alloc;
-	u64 gpu_addr;
-	u32 ref;
+    struct list_head ext_res_node;
+    struct kbase_mem_phy_alloc *alloc;
+    u64 gpu_addr;
+    u32 ref;
 };
 
 enum kbase_reg_access_type {
-	REG_READ,
-	REG_WRITE
+    REG_READ,
+    REG_WRITE
 };
 
 enum kbase_share_attr_bits {
-	/* (1ULL << 8) bit is reserved */
-	SHARE_BOTH_BITS = (2ULL << 8),	/* inner and outer shareable coherency */
-	SHARE_INNER_BITS = (3ULL << 8)	/* inner shareable coherency */
+    /* (1ULL << 8) bit is reserved */
+    SHARE_BOTH_BITS = (2ULL << 8),    /* inner and outer shareable coherency */
+    SHARE_INNER_BITS = (3ULL << 8)    /* inner shareable coherency */
 };
 
 /**
@@ -1763,11 +1763,11 @@ enum kbase_share_attr_bits {
  */
 static inline bool kbase_device_is_cpu_coherent(struct kbase_device *kbdev)
 {
-	if ((kbdev->system_coherency == COHERENCY_ACE_LITE) ||
-			(kbdev->system_coherency == COHERENCY_ACE))
-		return true;
+    if ((kbdev->system_coherency == COHERENCY_ACE_LITE) ||
+            (kbdev->system_coherency == COHERENCY_ACE))
+        return true;
 
-	return false;
+    return false;
 }
 
 /* Conversion helpers for setting up high resolution timers */
@@ -1782,26 +1782,26 @@ static inline bool kbase_device_is_cpu_coherent(struct kbase_device *kbdev)
 /* JobDescriptorHeader - taken from the architecture specifications, the layout
  * is currently identical for all GPU archs. */
 struct job_descriptor_header {
-	u32 exception_status;
-	u32 first_incomplete_task;
-	u64 fault_pointer;
-	u8 job_descriptor_size : 1;
-	u8 job_type : 7;
-	u8 job_barrier : 1;
-	u8 _reserved_01 : 1;
-	u8 _reserved_1 : 1;
-	u8 _reserved_02 : 1;
-	u8 _reserved_03 : 1;
-	u8 _reserved_2 : 1;
-	u8 _reserved_04 : 1;
-	u8 _reserved_05 : 1;
-	u16 job_index;
-	u16 job_dependency_index_1;
-	u16 job_dependency_index_2;
-	union {
-		u64 _64;
-		u32 _32;
-	} next_job;
+    u32 exception_status;
+    u32 first_incomplete_task;
+    u64 fault_pointer;
+    u8 job_descriptor_size : 1;
+    u8 job_type : 7;
+    u8 job_barrier : 1;
+    u8 _reserved_01 : 1;
+    u8 _reserved_1 : 1;
+    u8 _reserved_02 : 1;
+    u8 _reserved_03 : 1;
+    u8 _reserved_2 : 1;
+    u8 _reserved_04 : 1;
+    u8 _reserved_05 : 1;
+    u16 job_index;
+    u16 job_dependency_index_1;
+    u16 job_dependency_index_2;
+    union {
+        u64 _64;
+        u32 _32;
+    } next_job;
 };
 
-#endif				/* _KBASE_DEFS_H_ */
+#endif                /* _KBASE_DEFS_H_ */

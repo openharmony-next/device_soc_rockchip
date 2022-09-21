@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CLK_RATE_TRACE_MGR_
-#define _KBASE_CLK_RATE_TRACE_MGR_
+#ifndef KBASE_CLK_RATE_TRACE_MGR_H
+#define KBASE_CLK_RATE_TRACE_MGR_H
 
 /** The index of top clock domain in kbase_clk_rate_trace_manager:clks. */
 #define KBASE_CLOCK_DOMAIN_TOP (0)
@@ -44,12 +44,12 @@
  * @index:              Index at which the GPU clock was enumerated.
  */
 struct kbase_clk_data {
-	struct kbase_clk_rate_trace_manager *clk_rtm;
-	void *gpu_clk_handle;
-	void *plat_private;
-	struct notifier_block clk_rate_change_nb;
-	unsigned long clock_val;
-	u8 index;
+    struct kbase_clk_rate_trace_manager *clk_rtm;
+    void *gpu_clk_handle;
+    void *plat_private;
+    struct notifier_block clk_rate_change_nb;
+    unsigned long clock_val;
+    u8 index;
 };
 
 /**
@@ -92,11 +92,11 @@ void kbase_clk_rate_trace_manager_gpu_idle(struct kbase_device *kbdev);
  * kbase_clk_rate_trace_manager:lock must be held by the caller.
  */
 static inline void kbase_clk_rate_trace_manager_subscribe_no_lock(
-	struct kbase_clk_rate_trace_manager *clk_rtm,
-	struct kbase_clk_rate_listener *listener)
+    struct kbase_clk_rate_trace_manager *clk_rtm,
+    struct kbase_clk_rate_listener *listener)
 {
-	lockdep_assert_held(&clk_rtm->lock);
-	list_add(&listener->node, &clk_rtm->listeners);
+    lockdep_assert_held(&clk_rtm->lock);
+    list_add(&listener->node, &clk_rtm->listeners);
 }
 
 /**
@@ -106,15 +106,15 @@ static inline void kbase_clk_rate_trace_manager_subscribe_no_lock(
  * @listener:   Listener handle
  */
 static inline void kbase_clk_rate_trace_manager_subscribe(
-	struct kbase_clk_rate_trace_manager *clk_rtm,
-	struct kbase_clk_rate_listener *listener)
+    struct kbase_clk_rate_trace_manager *clk_rtm,
+    struct kbase_clk_rate_listener *listener)
 {
-	unsigned long flags;
+    unsigned long flags;
 
-	spin_lock_irqsave(&clk_rtm->lock, flags);
-	kbase_clk_rate_trace_manager_subscribe_no_lock(
-		clk_rtm, listener);
-	spin_unlock_irqrestore(&clk_rtm->lock, flags);
+    spin_lock_irqsave(&clk_rtm->lock, flags);
+    kbase_clk_rate_trace_manager_subscribe_no_lock(
+        clk_rtm, listener);
+    spin_unlock_irqrestore(&clk_rtm->lock, flags);
 }
 
 /**
@@ -124,14 +124,14 @@ static inline void kbase_clk_rate_trace_manager_subscribe(
  * @listener:   Listener handle
  */
 static inline void kbase_clk_rate_trace_manager_unsubscribe(
-	struct kbase_clk_rate_trace_manager *clk_rtm,
-	struct kbase_clk_rate_listener *listener)
+    struct kbase_clk_rate_trace_manager *clk_rtm,
+    struct kbase_clk_rate_listener *listener)
 {
-	unsigned long flags;
+    unsigned long flags;
 
-	spin_lock_irqsave(&clk_rtm->lock, flags);
-	list_del(&listener->node);
-	spin_unlock_irqrestore(&clk_rtm->lock, flags);
+    spin_lock_irqsave(&clk_rtm->lock, flags);
+    list_del(&listener->node);
+    spin_unlock_irqrestore(&clk_rtm->lock, flags);
 }
 
 /**
@@ -147,9 +147,9 @@ static inline void kbase_clk_rate_trace_manager_unsubscribe(
  * portal.
  */
 void kbase_clk_rate_trace_manager_notify_all(
-	struct kbase_clk_rate_trace_manager *clk_rtm,
-	u32 clock_index,
-	unsigned long new_rate);
+    struct kbase_clk_rate_trace_manager *clk_rtm,
+    u32 clock_index,
+    unsigned long new_rate);
 
 #endif /* _KBASE_CLK_RATE_TRACE_MGR_ */
 

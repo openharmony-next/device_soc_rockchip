@@ -34,4 +34,4 @@
  */
 bool kbasep_list_member_of(const struct list_head *base, struct list_head *entry);
 
-#endif				/* _KBASE_UTILITY_H */
+#endif                /* _KBASE_UTILITY_H */

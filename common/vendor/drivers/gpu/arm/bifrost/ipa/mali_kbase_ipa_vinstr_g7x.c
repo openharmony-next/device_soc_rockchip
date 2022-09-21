@@ -63,9 +63,9 @@
  * Return: Block offset in bytes of the required performance counter.
  */
 static u32 kbase_g7x_power_model_get_jm_counter(struct kbase_ipa_model_vinstr_data *model_data,
-						u32 counter_block_offset)
+                        u32 counter_block_offset)
 {
-	return JM_BASE + counter_block_offset;
+    return JM_BASE + counter_block_offset;
 }
 
 /**
@@ -76,12 +76,12 @@ static u32 kbase_g7x_power_model_get_jm_counter(struct kbase_ipa_model_vinstr_da
  * Return: Block offset in bytes of the required performance counter.
  */
 static u32 kbase_g7x_power_model_get_memsys_counter(struct kbase_ipa_model_vinstr_data *model_data,
-						    u32 counter_block_offset)
+                            u32 counter_block_offset)
 {
-	/* The base address of Memory System performance counters is always the same, although their number
-	 * may vary based on the number of cores. For the moment it's ok to return a constant.
-	 */
-	return MEMSYS_BASE + counter_block_offset;
+    /* The base address of Memory System performance counters is always the same, although their number
+     * may vary based on the number of cores. For the moment it's ok to return a constant.
+     */
+    return MEMSYS_BASE + counter_block_offset;
 }
 
 /**
@@ -92,13 +92,13 @@ static u32 kbase_g7x_power_model_get_memsys_counter(struct kbase_ipa_model_vinst
  * Return: Block offset in bytes of the required performance counter.
  */
 static u32 kbase_g7x_power_model_get_sc_counter(struct kbase_ipa_model_vinstr_data *model_data,
-						u32 counter_block_offset)
+                        u32 counter_block_offset)
 {
-	const u32 sc_base = MEMSYS_BASE +
-		(model_data->kbdev->gpu_props.props.l2_props.num_l2_slices *
-		 KBASE_IPA_NR_BYTES_PER_BLOCK);
+    const u32 sc_base = MEMSYS_BASE +
+        (model_data->kbdev->gpu_props.props.l2_props.num_l2_slices *
+         KBASE_IPA_NR_BYTES_PER_BLOCK);
 
-	return sc_base + counter_block_offset;
+    return sc_base + counter_block_offset;
 }
 
 /**
@@ -110,14 +110,14 @@ static u32 kbase_g7x_power_model_get_sc_counter(struct kbase_ipa_model_vinstr_da
  * Return: Energy estimation for a single Memory System performance counter.
  */
 static s64 kbase_g7x_sum_all_memsys_blocks(
-		struct kbase_ipa_model_vinstr_data *model_data,
-		s32 coeff,
-		u32 offset)
+        struct kbase_ipa_model_vinstr_data *model_data,
+        s32 coeff,
+        u32 offset)
 {
-	u32 counter;
+    u32 counter;
 
-	counter = kbase_g7x_power_model_get_memsys_counter(model_data, offset);
-	return kbase_ipa_sum_all_memsys_blocks(model_data, coeff, counter);
+    counter = kbase_g7x_power_model_get_memsys_counter(model_data, offset);
+    return kbase_ipa_sum_all_memsys_blocks(model_data, coeff, counter);
 }
 
 /**
@@ -129,15 +129,15 @@ static s64 kbase_g7x_sum_all_memsys_blocks(
  * Return: Energy estimation for a Shader Cores performance counter for all cores.
  */
 static s64 kbase_g7x_sum_all_shader_cores(
-	struct kbase_ipa_model_vinstr_data *model_data,
-	s32 coeff,
-	u32 counter_block_offset)
+    struct kbase_ipa_model_vinstr_data *model_data,
+    s32 coeff,
+    u32 counter_block_offset)
 {
-	u32 counter;
+    u32 counter;
 
-	counter = kbase_g7x_power_model_get_sc_counter(model_data,
-						       counter_block_offset);
-	return kbase_ipa_sum_all_shader_cores(model_data, coeff, counter);
+    counter = kbase_g7x_power_model_get_sc_counter(model_data,
+                               counter_block_offset);
+    return kbase_ipa_sum_all_shader_cores(model_data, coeff, counter);
 }
 
 /**
@@ -149,15 +149,15 @@ static s64 kbase_g7x_sum_all_shader_cores(
  * Return: Energy estimation for a single Job Manager performance counter.
  */
 static s64 kbase_g7x_jm_single_counter(
-	struct kbase_ipa_model_vinstr_data *model_data,
-	s32 coeff,
-	u32 counter_block_offset)
+    struct kbase_ipa_model_vinstr_data *model_data,
+    s32 coeff,
+    u32 counter_block_offset)
 {
-	u32 counter;
+    u32 counter;
 
-	counter = kbase_g7x_power_model_get_jm_counter(model_data,
-						     counter_block_offset);
-	return kbase_ipa_single_counter(model_data, coeff, counter);
+    counter = kbase_g7x_power_model_get_jm_counter(model_data,
+                             counter_block_offset);
+    return kbase_ipa_single_counter(model_data, coeff, counter);
 }
 
 /**
@@ -168,14 +168,14 @@ static s64 kbase_g7x_jm_single_counter(
  * period.
  */
 static u32 kbase_g7x_get_active_cycles(
-	struct kbase_ipa_model_vinstr_data *model_data)
+    struct kbase_ipa_model_vinstr_data *model_data)
 {
-	u32 counter = kbase_g7x_power_model_get_jm_counter(model_data, JM_GPU_ACTIVE);
+    u32 counter = kbase_g7x_power_model_get_jm_counter(model_data, JM_GPU_ACTIVE);
 
-	/* Counters are only 32-bit, so we can safely multiply by 1 then cast
-	 * the 64-bit result back to a u32.
-	 */
-	return kbase_ipa_single_counter(model_data, 1, counter);
+    /* Counters are only 32-bit, so we can safely multiply by 1 then cast
+     * the 64-bit result back to a u32.
+     */
+    return kbase_ipa_single_counter(model_data, 1, counter);
 }
 
 /** Table of IPA group definitions.
@@ -185,295 +185,295 @@ static u32 kbase_g7x_get_active_cycles(
  */
 
 static const struct kbase_ipa_group ipa_groups_def_g71[] = {
-	{
-		.name = "l2_access",
-		.default_value = 526300,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
-	{
-		.name = "exec_instr_count",
-		.default_value = 301100,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_COUNT,
-	},
-	{
-		.name = "tex_issue",
-		.default_value = 197400,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_COORD_ISSUE,
-	},
-	{
-		.name = "tile_wb",
-		.default_value = -156400,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_BEATS_WR_TIB,
-	},
-	{
-		.name = "gpu_active",
-		.default_value = 115800,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
+    {
+        .name = "l2_access",
+        .default_value = 526300,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
+    {
+        .name = "exec_instr_count",
+        .default_value = 301100,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_COUNT,
+    },
+    {
+        .name = "tex_issue",
+        .default_value = 197400,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_COORD_ISSUE,
+    },
+    {
+        .name = "tile_wb",
+        .default_value = -156400,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_BEATS_WR_TIB,
+    },
+    {
+        .name = "gpu_active",
+        .default_value = 115800,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_g72[] = {
-	{
-		.name = "l2_access",
-		.default_value = 393000,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
-	{
-		.name = "exec_instr_count",
-		.default_value = 227000,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_COUNT,
-	},
-	{
-		.name = "tex_issue",
-		.default_value = 181900,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_COORD_ISSUE,
-	},
-	{
-		.name = "tile_wb",
-		.default_value = -120200,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_BEATS_WR_TIB,
-	},
-	{
-		.name = "gpu_active",
-		.default_value = 133100,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
+    {
+        .name = "l2_access",
+        .default_value = 393000,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
+    {
+        .name = "exec_instr_count",
+        .default_value = 227000,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_COUNT,
+    },
+    {
+        .name = "tex_issue",
+        .default_value = 181900,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_COORD_ISSUE,
+    },
+    {
+        .name = "tile_wb",
+        .default_value = -120200,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_BEATS_WR_TIB,
+    },
+    {
+        .name = "gpu_active",
+        .default_value = 133100,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_g76[] = {
-	{
-		.name = "gpu_active",
-		.default_value = 122000,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
-	{
-		.name = "exec_instr_count",
-		.default_value = 488900,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_COUNT,
-	},
-	{
-		.name = "vary_instr",
-		.default_value = 212100,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_VARY_INSTR,
-	},
-	{
-		.name = "tex_tfch_num_operations",
-		.default_value = 288000,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
-	},
-	{
-		.name = "l2_access",
-		.default_value = 378100,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
+    {
+        .name = "gpu_active",
+        .default_value = 122000,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
+    {
+        .name = "exec_instr_count",
+        .default_value = 488900,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_COUNT,
+    },
+    {
+        .name = "vary_instr",
+        .default_value = 212100,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_VARY_INSTR,
+    },
+    {
+        .name = "tex_tfch_num_operations",
+        .default_value = 288000,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
+    },
+    {
+        .name = "l2_access",
+        .default_value = 378100,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_g52_r1[] = {
-	{
-		.name = "gpu_active",
-		.default_value = 224200,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
-	{
-		.name = "exec_instr_count",
-		.default_value = 384700,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_COUNT,
-	},
-	{
-		.name = "vary_instr",
-		.default_value = 271900,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_VARY_INSTR,
-	},
-	{
-		.name = "tex_tfch_num_operations",
-		.default_value = 477700,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
-	},
-	{
-		.name = "l2_access",
-		.default_value = 551400,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
+    {
+        .name = "gpu_active",
+        .default_value = 224200,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
+    {
+        .name = "exec_instr_count",
+        .default_value = 384700,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_COUNT,
+    },
+    {
+        .name = "vary_instr",
+        .default_value = 271900,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_VARY_INSTR,
+    },
+    {
+        .name = "tex_tfch_num_operations",
+        .default_value = 477700,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
+    },
+    {
+        .name = "l2_access",
+        .default_value = 551400,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_g51[] = {
-	{
-		.name = "gpu_active",
-		.default_value = 201400,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
-	{
-		.name = "exec_instr_count",
-		.default_value = 392700,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_COUNT,
-	},
-	{
-		.name = "vary_instr",
-		.default_value = 274000,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_VARY_INSTR,
-	},
-	{
-		.name = "tex_tfch_num_operations",
-		.default_value = 528000,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
-	},
-	{
-		.name = "l2_access",
-		.default_value = 506400,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
+    {
+        .name = "gpu_active",
+        .default_value = 201400,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
+    {
+        .name = "exec_instr_count",
+        .default_value = 392700,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_COUNT,
+    },
+    {
+        .name = "vary_instr",
+        .default_value = 274000,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_VARY_INSTR,
+    },
+    {
+        .name = "tex_tfch_num_operations",
+        .default_value = 528000,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_TFCH_NUM_OPERATIONS,
+    },
+    {
+        .name = "l2_access",
+        .default_value = 506400,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_g77[] = {
-	{
-		.name = "l2_access",
-		.default_value = 710800,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
-	{
-		.name = "exec_instr_msg",
-		.default_value = 2375300,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_MSG,
-	},
-	{
-		.name = "exec_instr_fma",
-		.default_value = 656100,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_FMA,
-	},
-	{
-		.name = "tex_filt_num_operations",
-		.default_value = 318800,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
-	},
-	{
-		.name = "gpu_active",
-		.default_value = 172800,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
+    {
+        .name = "l2_access",
+        .default_value = 710800,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
+    {
+        .name = "exec_instr_msg",
+        .default_value = 2375300,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_MSG,
+    },
+    {
+        .name = "exec_instr_fma",
+        .default_value = 656100,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_FMA,
+    },
+    {
+        .name = "tex_filt_num_operations",
+        .default_value = 318800,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
+    },
+    {
+        .name = "gpu_active",
+        .default_value = 172800,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_tbex[] = {
-	{
-		.name = "l2_access",
-		.default_value = 599800,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
-	{
-		.name = "exec_instr_msg",
-		.default_value = 1830200,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_MSG,
-	},
-	{
-		.name = "exec_instr_fma",
-		.default_value = 407300,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_FMA,
-	},
-	{
-		.name = "tex_filt_num_operations",
-		.default_value = 224500,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
-	},
-	{
-		.name = "gpu_active",
-		.default_value = 153800,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
+    {
+        .name = "l2_access",
+        .default_value = 599800,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
+    {
+        .name = "exec_instr_msg",
+        .default_value = 1830200,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_MSG,
+    },
+    {
+        .name = "exec_instr_fma",
+        .default_value = 407300,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_FMA,
+    },
+    {
+        .name = "tex_filt_num_operations",
+        .default_value = 224500,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
+    },
+    {
+        .name = "gpu_active",
+        .default_value = 153800,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
 };
 
 static const struct kbase_ipa_group ipa_groups_def_tbax[] = {
-	{
-		.name = "l2_access",
-		.default_value = 599800,
-		.op = kbase_g7x_sum_all_memsys_blocks,
-		.counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
-	},
-	{
-		.name = "exec_instr_msg",
-		.default_value = 1830200,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_MSG,
-	},
-	{
-		.name = "exec_instr_fma",
-		.default_value = 407300,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_EXEC_INSTR_FMA,
-	},
-	{
-		.name = "tex_filt_num_operations",
-		.default_value = 224500,
-		.op = kbase_g7x_sum_all_shader_cores,
-		.counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
-	},
-	{
-		.name = "gpu_active",
-		.default_value = 153800,
-		.op = kbase_g7x_jm_single_counter,
-		.counter_block_offset = JM_GPU_ACTIVE,
-	},
+    {
+        .name = "l2_access",
+        .default_value = 599800,
+        .op = kbase_g7x_sum_all_memsys_blocks,
+        .counter_block_offset = MEMSYS_L2_ANY_LOOKUP,
+    },
+    {
+        .name = "exec_instr_msg",
+        .default_value = 1830200,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_MSG,
+    },
+    {
+        .name = "exec_instr_fma",
+        .default_value = 407300,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_EXEC_INSTR_FMA,
+    },
+    {
+        .name = "tex_filt_num_operations",
+        .default_value = 224500,
+        .op = kbase_g7x_sum_all_shader_cores,
+        .counter_block_offset = SC_TEX_FILT_NUM_OPERATIONS,
+    },
+    {
+        .name = "gpu_active",
+        .default_value = 153800,
+        .op = kbase_g7x_jm_single_counter,
+        .counter_block_offset = JM_GPU_ACTIVE,
+    },
 };
 
 
 #define IPA_POWER_MODEL_OPS(gpu, init_token) \
-	const struct kbase_ipa_model_ops kbase_ ## gpu ## _ipa_model_ops = { \
-		.name = "mali-" #gpu "-power-model", \
-		.init = kbase_ ## init_token ## _power_model_init, \
-		.term = kbase_ipa_vinstr_common_model_term, \
-		.get_dynamic_coeff = kbase_ipa_vinstr_dynamic_coeff, \
-	}; \
-	KBASE_EXPORT_TEST_API(kbase_ ## gpu ## _ipa_model_ops)
+    const struct kbase_ipa_model_ops kbase_ ## gpu ## _ipa_model_ops = { \
+        .name = "mali-" #gpu "-power-model", \
+        .init = kbase_ ## init_token ## _power_model_init, \
+        .term = kbase_ipa_vinstr_common_model_term, \
+        .get_dynamic_coeff = kbase_ipa_vinstr_dynamic_coeff, \
+    }; \
+    KBASE_EXPORT_TEST_API(kbase_ ## gpu ## _ipa_model_ops)
 
 #define STANDARD_POWER_MODEL(gpu, reference_voltage) \
-	static int kbase_ ## gpu ## _power_model_init(\
-			struct kbase_ipa_model *model) \
-	{ \
-		BUILD_BUG_ON(ARRAY_SIZE(ipa_groups_def_ ## gpu) > \
-				KBASE_IPA_MAX_GROUP_DEF_NUM); \
-		return kbase_ipa_vinstr_common_model_init(model, \
-				ipa_groups_def_ ## gpu, \
-				ARRAY_SIZE(ipa_groups_def_ ## gpu), \
-				kbase_g7x_get_active_cycles, \
-				(reference_voltage)); \
-	} \
-	IPA_POWER_MODEL_OPS(gpu, gpu)
+    static int kbase_ ## gpu ## _power_model_init(\
+            struct kbase_ipa_model *model) \
+    { \
+        BUILD_BUG_ON(ARRAY_SIZE(ipa_groups_def_ ## gpu) > \
+                KBASE_IPA_MAX_GROUP_DEF_NUM); \
+        return kbase_ipa_vinstr_common_model_init(model, \
+                ipa_groups_def_ ## gpu, \
+                ARRAY_SIZE(ipa_groups_def_ ## gpu), \
+                kbase_g7x_get_active_cycles, \
+                (reference_voltage)); \
+    } \
+    IPA_POWER_MODEL_OPS(gpu, gpu)
 
 #define ALIAS_POWER_MODEL(gpu, as_gpu) \
-	IPA_POWER_MODEL_OPS(gpu, as_gpu)
+    IPA_POWER_MODEL_OPS(gpu, as_gpu)
 
 STANDARD_POWER_MODEL(g71, 800);
 STANDARD_POWER_MODEL(g72, 800);

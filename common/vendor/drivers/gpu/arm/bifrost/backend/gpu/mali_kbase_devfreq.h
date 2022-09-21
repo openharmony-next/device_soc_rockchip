@@ -42,6 +42,6 @@ void kbase_devfreq_force_freq(struct kbase_device *kbdev, unsigned long freq);
  * @work_type:  The type of the devfreq work item, i.e. suspend or resume
  */
 void kbase_devfreq_enqueue_work(struct kbase_device *kbdev,
-				enum kbase_devfreq_work_type work_type);
+                enum kbase_devfreq_work_type work_type);
 
 #endif /* _BASE_DEVFREQ_H_ */

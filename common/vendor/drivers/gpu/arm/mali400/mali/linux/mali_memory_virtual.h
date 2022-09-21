@@ -7,8 +7,8 @@
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef __MALI_GPU_VMEM_H__
-#define __MALI_GPU_VMEM_H__
+#ifndef MALI_GPU_VMEM_H
+#define MALI_GPU_VMEM_H
 
 #include "mali_osk.h"
 #include "mali_session.h"
@@ -24,12 +24,12 @@
 
 
 int mali_vma_offset_add(struct mali_allocation_manager *mgr,
-			struct mali_vma_node *node);
+            struct mali_vma_node *node);
 
 void mali_vma_offset_remove(struct mali_allocation_manager *mgr,
-			    struct mali_vma_node *node);
+                struct mali_vma_node *node);
 
 struct mali_vma_node *mali_vma_offset_search(struct mali_allocation_manager *mgr,
-		unsigned long start,    unsigned long pages);
+        unsigned long start,    unsigned long pages);
 
 #endif

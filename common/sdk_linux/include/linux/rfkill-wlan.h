@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-#ifndef __PLAT_BOARD_H
-#define __PLAT_BOARD_H
+#ifndef H_PLAT_BOARD_RFKILL_WLAN_H
+#define H_PLAT_BOARD_RFKILL_WLAN_H
 
 #include <linux/types.h>
 #include <linux/init.h>
@@ -43,7 +43,7 @@ struct rksdmmc_gpio_wifi_moudle {
     struct rksdmmc_gpio   ANTSEL3;  //pin6--ANTSEL3 
     struct rksdmmc_gpio   GPS_LAN;  //pin33--GPS_LAN
     struct regmap *grf;
-	struct clk *ext_clk;
+    struct clk *ext_clk;
 };
 
 int rfkill_get_wifi_power_state(int *power);

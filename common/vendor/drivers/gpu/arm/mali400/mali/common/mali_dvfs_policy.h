@@ -17,7 +17,7 @@ extern "C" {
 
 void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_period);
 
-_mali_osk_errcode_t mali_dvfs_policy_init(void);
+mali_osk_errcode_t mali_dvfs_policy_init(void);
 
 void mali_dvfs_policy_new_period(void);
 

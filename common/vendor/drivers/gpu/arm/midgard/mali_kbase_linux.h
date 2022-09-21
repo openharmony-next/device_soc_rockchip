@@ -33,9 +33,9 @@
 #include <linux/atomic.h>
 
 #if (defined(MALI_KERNEL_TEST_API) && (1 == MALI_KERNEL_TEST_API))
-	#define KBASE_EXPORT_TEST_API(func) EXPORT_SYMBOL(func)
+    #define KBASE_EXPORT_TEST_API(func) EXPORT_SYMBOL(func)
 #else
-	#define KBASE_EXPORT_TEST_API(func)
+    #define KBASE_EXPORT_TEST_API(func)
 #endif
 
 #define KBASE_EXPORT_SYMBOL(func) EXPORT_SYMBOL(func)

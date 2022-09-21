@@ -20,7 +20,7 @@
 #include "mali_memory_types.h"
 #include "mali_memory_os_alloc.h"
 
-_mali_osk_errcode_t mali_memory_initialize(void);
+mali_osk_errcode_t mali_memory_initialize(void);
 void mali_memory_terminate(void);
 
 /** @brief Allocate a page table page
@@ -28,14 +28,14 @@ void mali_memory_terminate(void);
  * Allocate a page for use as a page directory or page table. The page is
  * mapped into kernel space.
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise an error code
+ * @return MALI_OSK_ERR_OK on success, otherwise an error code
  * @param table_page GPU pointer to the allocated page
  * @param mapping CPU pointer to the mapping of the allocated page
  */
-MALI_STATIC_INLINE _mali_osk_errcode_t
+MALI_STATIC_INLINE mali_osk_errcode_t
 mali_mmu_get_table_page(mali_dma_addr *table_page, mali_io_address *mapping)
 {
-	return mali_mem_os_get_table_page(table_page, mapping);
+    return mali_mem_os_get_table_page(table_page, mapping);
 }
 
 /** @brief Release a page table page
@@ -47,7 +47,7 @@ mali_mmu_get_table_page(mali_dma_addr *table_page, mali_io_address *mapping)
 MALI_STATIC_INLINE void
 mali_mmu_release_table_page(mali_dma_addr phys, void *virt)
 {
-	mali_mem_os_release_table_page(phys, virt);
+    mali_mem_os_release_table_page(phys, virt);
 }
 
 /** @brief mmap function
@@ -64,7 +64,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma);
  *
  * @param session Pointer to session to initialize
  */
-_mali_osk_errcode_t mali_memory_session_begin(struct mali_session_data *session);
+mali_osk_errcode_t mali_memory_session_begin(struct mali_session_data *session);
 
 /** @brief Close a memory session
  *
@@ -85,7 +85,7 @@ void mali_memory_session_end(struct mali_session_data *session);
  *
  * @param descriptor Pointer to the memory descriptor to the mapping
  */
-_mali_osk_errcode_t mali_mem_mali_map_prepare(mali_mem_allocation *descriptor);
+mali_osk_errcode_t mali_mem_mali_map_prepare(mali_mem_allocation *descriptor);
 
 /** @brief Resize Mali page tables for mapping
  *
@@ -97,7 +97,7 @@ _mali_osk_errcode_t mali_mem_mali_map_prepare(mali_mem_allocation *descriptor);
  * @param descriptor Pointer to the memory descriptor to the mapping
  * @param new_size The new size of descriptor
  */
-_mali_osk_errcode_t mali_mem_mali_map_resize(mali_mem_allocation *descriptor, u32 new_size);
+mali_osk_errcode_t mali_mem_mali_map_resize(mali_mem_allocation *descriptor, u32 new_size);
 
 /** @brief Free Mali page tables for mapping
  *
@@ -113,17 +113,17 @@ void mali_mem_mali_map_free(struct mali_session_data *session, u32 size, mali_ad
 /** @brief Parse resource and prepare the OS memory allocator
  *
  * @param size Maximum size to allocate for Mali GPU.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t mali_memory_core_resource_os_memory(u32 size);
+mali_osk_errcode_t mali_memory_core_resource_os_memory(u32 size);
 
 /** @brief Parse resource and prepare the dedicated memory allocator
  *
  * @param start Physical start address of dedicated Mali GPU memory.
  * @param size Size of dedicated Mali GPU memory.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t mali_memory_core_resource_dedicated_memory(u32 start, u32 size);
+mali_osk_errcode_t mali_memory_core_resource_dedicated_memory(u32 start, u32 size);
 
 
 struct mali_page_node *_mali_page_node_allocate(mali_page_node_type type);
@@ -136,7 +136,7 @@ void _mali_page_node_add_block_item(struct mali_page_node *node, mali_block_item
 
 void _mali_page_node_add_swap_item(struct mali_page_node *node, struct mali_swap_item *item);
 
-int _mali_page_node_get_ref_count(struct mali_page_node *node);
+int mali_page_node_get_ref_count(struct mali_page_node *node);
 dma_addr_t _mali_page_node_get_dma_addr(struct mali_page_node *node);
 unsigned long _mali_page_node_get_pfn(struct mali_page_node *node);
 

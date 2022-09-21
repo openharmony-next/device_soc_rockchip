@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_MMU_H_
-#define _KBASE_MMU_H_
+#ifndef KBASE_MMU_H
+#define KBASE_MMU_H
 
 /**
  * kbase_mmu_as_init() - Initialising GPU address space object.
@@ -62,7 +62,7 @@ void kbase_mmu_as_term(struct kbase_device *kbdev, int i);
  * Return:    0 if successful, otherwise a negative error code.
  */
 int kbase_mmu_init(struct kbase_device *kbdev, struct kbase_mmu_table *mmut,
-		struct kbase_context *kctx, int group_id);
+        struct kbase_context *kctx, int group_id);
 
 /**
  * kbase_mmu_interrupt - Process an MMU interrupt.
@@ -102,27 +102,27 @@ void kbase_mmu_term(struct kbase_device *kbdev, struct kbase_mmu_table *mmut);
  *         (depending on the driver's configuration).
  */
 u64 kbase_mmu_create_ate(struct kbase_device *kbdev,
-	struct tagged_addr phy, unsigned long flags, int level, int group_id);
+    struct tagged_addr phy, unsigned long flags, int level, int group_id);
 
 int kbase_mmu_insert_pages_no_flush(struct kbase_device *kbdev,
-				    struct kbase_mmu_table *mmut,
-				    const u64 start_vpfn,
-				    struct tagged_addr *phys, size_t nr,
-				    unsigned long flags, int group_id);
+                    struct kbase_mmu_table *mmut,
+                    const u64 start_vpfn,
+                    struct tagged_addr *phys, size_t nr,
+                    unsigned long flags, int group_id);
 int kbase_mmu_insert_pages(struct kbase_device *kbdev,
-			   struct kbase_mmu_table *mmut, u64 vpfn,
-			   struct tagged_addr *phys, size_t nr,
-			   unsigned long flags, int as_nr, int group_id);
+               struct kbase_mmu_table *mmut, u64 vpfn,
+               struct tagged_addr *phys, size_t nr,
+               unsigned long flags, int as_nr, int group_id);
 int kbase_mmu_insert_single_page(struct kbase_context *kctx, u64 vpfn,
-					struct tagged_addr phys, size_t nr,
-					unsigned long flags, int group_id);
+                    struct tagged_addr phys, size_t nr,
+                    unsigned long flags, int group_id);
 
 int kbase_mmu_teardown_pages(struct kbase_device *kbdev,
-			     struct kbase_mmu_table *mmut, u64 vpfn,
-			     size_t nr, int as_nr);
+                 struct kbase_mmu_table *mmut, u64 vpfn,
+                 size_t nr, int as_nr);
 int kbase_mmu_update_pages(struct kbase_context *kctx, u64 vpfn,
-			   struct tagged_addr *phys, size_t nr,
-			   unsigned long flags, int const group_id);
+               struct tagged_addr *phys, size_t nr,
+               unsigned long flags, int const group_id);
 
 /**
  * kbase_mmu_bus_fault_interrupt - Process a bus fault interrupt.
@@ -137,7 +137,7 @@ int kbase_mmu_update_pages(struct kbase_context *kctx, u64 vpfn,
  * Return: zero if the operation was successful, non-zero otherwise.
  */
 int kbase_mmu_bus_fault_interrupt(struct kbase_device *kbdev, u32 status,
-		u32 as_nr);
+        u32 as_nr);
 
 /**
  * kbase_mmu_gpu_fault_interrupt() - Report a GPU fault.
@@ -151,6 +151,6 @@ int kbase_mmu_bus_fault_interrupt(struct kbase_device *kbdev, u32 status,
  * for reporting the details of the fault.
  */
 void kbase_mmu_gpu_fault_interrupt(struct kbase_device *kbdev, u32 status,
-		u32 as_nr, u64 address, bool as_valid);
+        u32 as_nr, u64 address, bool as_valid);
 
 #endif /* _KBASE_MMU_H_ */

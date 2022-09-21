@@ -13,7 +13,7 @@ int panel_simple_loader_protect(struct drm_panel *panel);
 #else
 static inline int panel_simple_loader_protect(struct drm_panel *panel)
 {
-	return 0;
+    return 0;
 }
 #endif
 #endif

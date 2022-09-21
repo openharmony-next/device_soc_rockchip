@@ -49,9 +49,9 @@
 #define BASE_LEGACY_UK10_4_SUPPORT 1
 
 typedef struct base_mem_handle {
-	struct {
-		u64 handle;
-	} basep;
+    struct {
+        u64 handle;
+    } basep;
 } base_mem_handle;
 
 #include "mali_base_mem_priv.h"
@@ -102,9 +102,9 @@ typedef struct base_mem_handle {
 
 /** 32/64-bit neutral way to represent pointers */
 typedef union kbase_pointer {
-	void __user *value;	  /**< client should store their pointers here */
-	u32 compat_value; /**< 64-bit kernels should fetch value here when handling 32-bit clients */
-	u64 sizer;	  /**< Force 64-bit storage for all clients regardless */
+    void __user *value;      /**< client should store their pointers here */
+    u32 compat_value; /**< 64-bit kernels should fetch value here when handling 32-bit clients */
+    u64 sizer;      /**< Force 64-bit storage for all clients regardless */
 } kbase_pointer;
 
 /**
@@ -157,16 +157,16 @@ typedef u32 base_mem_alloc_flags;
  */
 #define BASE_MEM_PROT_GPU_EX ((base_mem_alloc_flags)1 << 4)
 
-	/* BASE_MEM_HINT flags have been removed, but their values are reserved
-	 * for backwards compatibility with older user-space drivers. The values
-	 * can be re-used once support for r5p0 user-space drivers is removed,
-	 * presumably in r7p0.
-	 *
-	 * RESERVED: (1U << 5)
-	 * RESERVED: (1U << 6)
-	 * RESERVED: (1U << 7)
-	 * RESERVED: (1U << 8)
-	 */
+    /* BASE_MEM_HINT flags have been removed, but their values are reserved
+     * for backwards compatibility with older user-space drivers. The values
+     * can be re-used once support for r5p0 user-space drivers is removed,
+     * presumably in r7p0.
+     *
+     * RESERVED: (1U << 5)
+     * RESERVED: (1U << 6)
+     * RESERVED: (1U << 7)
+     * RESERVED: (1U << 8)
+     */
 
 /* Grow backing store on GPU Page Fault
  */
@@ -225,14 +225,14 @@ typedef u32 base_mem_alloc_flags;
 /* A mask for all input bits, including IN/OUT bits.
  */
 #define BASE_MEM_FLAGS_INPUT_MASK \
-	(((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
+    (((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
 
 /* A mask for all the flags which are modifiable via the base_mem_set_flags
  * interface.
  */
 #define BASE_MEM_FLAGS_MODIFIABLE \
-	(BASE_MEM_DONT_NEED | BASE_MEM_COHERENT_SYSTEM | \
-	 BASE_MEM_COHERENT_LOCAL)
+    (BASE_MEM_DONT_NEED | BASE_MEM_COHERENT_SYSTEM | \
+     BASE_MEM_COHERENT_LOCAL)
 
 /**
  * enum base_mem_import_type - Memory types supported by @a base_mem_import
@@ -252,24 +252,24 @@ typedef u32 base_mem_alloc_flags;
  * which could clash with your custom types.
  */
 typedef enum base_mem_import_type {
-	BASE_MEM_IMPORT_TYPE_INVALID = 0,
-	BASE_MEM_IMPORT_TYPE_UMP = 1,
-	BASE_MEM_IMPORT_TYPE_UMM = 2,
-	BASE_MEM_IMPORT_TYPE_USER_BUFFER = 3
+    BASE_MEM_IMPORT_TYPE_INVALID = 0,
+    BASE_MEM_IMPORT_TYPE_UMP = 1,
+    BASE_MEM_IMPORT_TYPE_UMM = 2,
+    BASE_MEM_IMPORT_TYPE_USER_BUFFER = 3
 } base_mem_import_type;
 
 /**
  * struct base_mem_import_user_buffer - Handle of an imported user buffer
  *
- * @ptr:	kbase_pointer to imported user buffer
- * @length:	length of imported user buffer in bytes
+ * @ptr:    kbase_pointer to imported user buffer
+ * @length:    length of imported user buffer in bytes
  *
  * This structure is used to represent a handle of an imported user buffer.
  */
 
 struct base_mem_import_user_buffer {
-	kbase_pointer ptr;
-	u64 length;
+    kbase_pointer ptr;
+    u64 length;
 };
 
 /**
@@ -302,7 +302,7 @@ struct base_mem_import_user_buffer {
 /* reserved handles ..-64<<PAGE_SHIFT> for future special handles */
 #define BASE_MEM_COOKIE_BASE                   (64ul  << 12)
 #define BASE_MEM_FIRST_FREE_ADDRESS            ((BITS_PER_LONG << 12) + \
-						BASE_MEM_COOKIE_BASE)
+                        BASE_MEM_COOKIE_BASE)
 
 /* Mask to detect 4GB boundary alignment */
 #define BASE_MEM_MASK_4GB  0xfffff000UL
@@ -316,9 +316,9 @@ struct base_mem_import_user_buffer {
  * @brief Result codes of changing the size of the backing store allocated to a tmem region
  */
 typedef enum base_backing_threshold_status {
-	BASE_BACKING_THRESHOLD_OK = 0,			    /**< Resize successful */
-	BASE_BACKING_THRESHOLD_ERROR_OOM = -2,		    /**< Increase failed due to an out-of-memory condition */
-	BASE_BACKING_THRESHOLD_ERROR_INVALID_ARGUMENTS = -4 /**< Invalid arguments (not tmem, illegal size request, etc.) */
+    BASE_BACKING_THRESHOLD_OK = 0,                /**< Resize successful */
+    BASE_BACKING_THRESHOLD_ERROR_OOM = -2,            /**< Increase failed due to an out-of-memory condition */
+    BASE_BACKING_THRESHOLD_ERROR_INVALID_ARGUMENTS = -4 /**< Invalid arguments (not tmem, illegal size request, etc.) */
 } base_backing_threshold_status;
 
 /**
@@ -333,7 +333,7 @@ typedef enum base_backing_threshold_status {
  * by the accessors.
  */
 typedef struct base_syncset {
-	struct basep_syncset basep_sset;
+    struct basep_syncset basep_sset;
 } base_syncset;
 
 /** @} end group base_user_api_memory_defered */
@@ -344,9 +344,9 @@ typedef struct base_syncset {
  * with anything but base_external_resource_init to bind to an atom.
  */
 typedef struct base_import_handle {
-	struct {
-		u64 handle;
-	} basep;
+    struct {
+        u64 handle;
+    } basep;
 } base_import_handle;
 
 /** @} end group base_user_api_memory */
@@ -356,8 +356,7 @@ typedef struct base_import_handle {
  * @{
  */
 
-typedef int platform_fence_type;
-#define INVALID_PLATFORM_FENCE ((platform_fence_type)-1)
+#define INVALID_PLATFORM_FENCE ((int)-1)
 
 /**
  * Base stream handle.
@@ -365,9 +364,9 @@ typedef int platform_fence_type;
  * References an underlying base stream object.
  */
 typedef struct base_stream {
-	struct {
-		int fd;
-	} basep;
+    struct {
+        int fd;
+    } basep;
 } base_stream;
 
 /**
@@ -376,10 +375,10 @@ typedef struct base_stream {
  * References an underlying base fence object.
  */
 typedef struct base_fence {
-	struct {
-		int fd;
-		int stream_fd;
-	} basep;
+    struct {
+        int fd;
+        int stream_fd;
+    } basep;
 } base_fence;
 
 /**
@@ -391,7 +390,7 @@ typedef struct base_fence {
  * untouched by the Base driver.
  */
 typedef struct base_jd_udata {
-	u64 blob[2];	 /**< per-job data array */
+    u64 blob[2];     /**< per-job data array */
 } base_jd_udata;
 
 /**
@@ -416,9 +415,9 @@ typedef struct base_jd_udata {
  *         specifies the number of times the special page is needed.
  */
 struct base_mem_aliasing_info {
-	base_mem_handle handle;
-	u64 offset;
-	u64 length;
+    base_mem_handle handle;
+    u64 offset;
+    u64 length;
 };
 
 /**
@@ -436,11 +435,11 @@ struct base_mem_aliasing_info {
  *                              Zero is not a valid value.
  */
 struct base_jit_alloc_info {
-	u64 gpu_alloc_addr;
-	u64 va_pages;
-	u64 commit_pages;
-	u64 extent;
-	u8 id;
+    u64 gpu_alloc_addr;
+    u64 va_pages;
+    u64 commit_pages;
+    u64 extent;
+    u8 id;
 };
 
 /**
@@ -707,12 +706,12 @@ typedef u32 base_jd_core_req;
  * These requirement bits are currently unused in base_jd_core_req
  */
 #define BASEP_JD_REQ_RESERVED \
-	(~(BASE_JD_REQ_ATOM_TYPE | BASE_JD_REQ_EXTERNAL_RESOURCES | \
-	BASE_JD_REQ_EVENT_ONLY_ON_FAILURE | BASEP_JD_REQ_EVENT_NEVER | \
-	BASE_JD_REQ_EVENT_COALESCE | \
-	BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP | \
-	BASE_JD_REQ_FS_AFBC | BASE_JD_REQ_PERMON | \
-	BASE_JD_REQ_SKIP_CACHE_START | BASE_JD_REQ_SKIP_CACHE_END))
+    (~(BASE_JD_REQ_ATOM_TYPE | BASE_JD_REQ_EXTERNAL_RESOURCES | \
+    BASE_JD_REQ_EVENT_ONLY_ON_FAILURE | BASEP_JD_REQ_EVENT_NEVER | \
+    BASE_JD_REQ_EVENT_COALESCE | \
+    BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP | \
+    BASE_JD_REQ_FS_AFBC | BASE_JD_REQ_PERMON | \
+    BASE_JD_REQ_SKIP_CACHE_START | BASE_JD_REQ_SKIP_CACHE_END))
 
 /**
  * Mask of all bits in base_jd_core_req that control the type of the atom.
@@ -720,8 +719,8 @@ typedef u32 base_jd_core_req;
  * This allows dependency only atoms to have flags set
  */
 #define BASE_JD_REQ_ATOM_TYPE \
-	(BASE_JD_REQ_FS | BASE_JD_REQ_CS | BASE_JD_REQ_T | BASE_JD_REQ_CF | \
-	BASE_JD_REQ_V | BASE_JD_REQ_SOFT_JOB | BASE_JD_REQ_ONLY_COMPUTE)
+    (BASE_JD_REQ_FS | BASE_JD_REQ_CS | BASE_JD_REQ_T | BASE_JD_REQ_CF | \
+    BASE_JD_REQ_V | BASE_JD_REQ_SOFT_JOB | BASE_JD_REQ_ONLY_COMPUTE)
 
 /**
  * Mask of all bits in base_jd_core_req that control the type of a soft job.
@@ -733,8 +732,8 @@ typedef u32 base_jd_core_req;
  * a dependency only job.
  */
 #define BASE_JD_REQ_SOFT_JOB_OR_DEP(core_req) \
-	((core_req & BASE_JD_REQ_SOFT_JOB) || \
-	(core_req & BASE_JD_REQ_ATOM_TYPE) == BASE_JD_REQ_DEP)
+    ((core_req & BASE_JD_REQ_SOFT_JOB) || \
+    (core_req & BASE_JD_REQ_ATOM_TYPE) == BASE_JD_REQ_DEP)
 
 /**
  * @brief States to model state machine processed by kbasep_js_job_check_ref_cores(), which
@@ -763,16 +762,16 @@ typedef u32 base_jd_core_req;
  * the Job Scheduling Policy has a timer).
  */
 enum kbase_atom_coreref_state {
-	/** Starting state: No affinity chosen, and cores must be requested. kbase_jd_atom::affinity==0 */
-	KBASE_ATOM_COREREF_STATE_NO_CORES_REQUESTED,
-	/** Cores requested, but waiting for them to be powered. Requested cores given by kbase_jd_atom::affinity */
-	KBASE_ATOM_COREREF_STATE_WAITING_FOR_REQUESTED_CORES,
-	/** Cores given by kbase_jd_atom::affinity are powered, but affinity might be out-of-date, so must recheck */
-	KBASE_ATOM_COREREF_STATE_RECHECK_AFFINITY,
-	/** Cores given by kbase_jd_atom::affinity are powered, and affinity is up-to-date, but must check for violations */
-	KBASE_ATOM_COREREF_STATE_CHECK_AFFINITY_VIOLATIONS,
-	/** Cores are powered, kbase_jd_atom::affinity up-to-date, no affinity violations: atom can be submitted to HW */
-	KBASE_ATOM_COREREF_STATE_READY
+    /** Starting state: No affinity chosen, and cores must be requested. kbase_jd_atom::affinity==0 */
+    KBASE_ATOM_COREREF_STATE_NO_CORES_REQUESTED,
+    /** Cores requested, but waiting for them to be powered. Requested cores given by kbase_jd_atom::affinity */
+    KBASE_ATOM_COREREF_STATE_WAITING_FOR_REQUESTED_CORES,
+    /** Cores given by kbase_jd_atom::affinity are powered, but affinity might be out-of-date, so must recheck */
+    KBASE_ATOM_COREREF_STATE_RECHECK_AFFINITY,
+    /** Cores given by kbase_jd_atom::affinity are powered, and affinity is up-to-date, but must check for violations */
+    KBASE_ATOM_COREREF_STATE_CHECK_AFFINITY_VIOLATIONS,
+    /** Cores are powered, kbase_jd_atom::affinity up-to-date, no affinity violations: atom can be submitted to HW */
+    KBASE_ATOM_COREREF_STATE_READY
 };
 
 /*
@@ -818,24 +817,24 @@ typedef u8 base_jd_prio;
 #define BASE_JD_NR_PRIO_LEVELS 3
 
 enum kbase_jd_atom_state {
-	/** Atom is not used */
-	KBASE_JD_ATOM_STATE_UNUSED,
-	/** Atom is queued in JD */
-	KBASE_JD_ATOM_STATE_QUEUED,
-	/** Atom has been given to JS (is runnable/running) */
-	KBASE_JD_ATOM_STATE_IN_JS,
-	/** Atom has been completed, but not yet handed back to job dispatcher
-	 *  for dependency resolution */
-	KBASE_JD_ATOM_STATE_HW_COMPLETED,
-	/** Atom has been completed, but not yet handed back to userspace */
-	KBASE_JD_ATOM_STATE_COMPLETED
+    /** Atom is not used */
+    KBASE_JD_ATOM_STATE_UNUSED,
+    /** Atom is queued in JD */
+    KBASE_JD_ATOM_STATE_QUEUED,
+    /** Atom has been given to JS (is runnable/running) */
+    KBASE_JD_ATOM_STATE_IN_JS,
+    /** Atom has been completed, but not yet handed back to job dispatcher
+     *  for dependency resolution */
+    KBASE_JD_ATOM_STATE_HW_COMPLETED,
+    /** Atom has been completed, but not yet handed back to userspace */
+    KBASE_JD_ATOM_STATE_COMPLETED
 };
 
 typedef u16 base_atom_id; /**< Type big enough to store an atom number in */
 
 struct base_dependency {
-	base_atom_id  atom_id;               /**< An atom number */
-	base_jd_dep_type dependency_type;    /**< Dependency type */
+    base_atom_id  atom_id;               /**< An atom number */
+    base_jd_dep_type dependency_type;    /**< Dependency type */
 };
 
 /* This structure has changed since UK 10.2 for which base_jd_core_req was a u16 value.
@@ -846,42 +845,42 @@ struct base_dependency {
  * as long as UK 10.2 legacy is supported. Once when this support ends, this field can be left
  * for possible future use. */
 typedef struct base_jd_atom_v2 {
-	u64 jc;			    /**< job-chain GPU address */
-	struct base_jd_udata udata;		    /**< user data */
-	kbase_pointer extres_list;	    /**< list of external resources */
-	u16 nr_extres;			    /**< nr of external resources */
-	u16 compat_core_req;	            /**< core requirements which correspond to the legacy support for UK 10.2 */
-	struct base_dependency pre_dep[2];  /**< pre-dependencies, one need to use SETTER function to assign this field,
-	this is done in order to reduce possibility of improper assigment of a dependency field */
-	base_atom_id atom_number;	    /**< unique number to identify the atom */
-	base_jd_prio prio;                  /**< Atom priority. Refer to @ref base_jd_prio for more details */
-	u8 device_nr;			    /**< coregroup when BASE_JD_REQ_SPECIFIC_COHERENT_GROUP specified */
-	u8 padding[1];
-	base_jd_core_req core_req;          /**< core requirements */
+    u64 jc;                /**< job-chain GPU address */
+    struct base_jd_udata udata;            /**< user data */
+    kbase_pointer extres_list;        /**< list of external resources */
+    u16 nr_extres;                /**< nr of external resources */
+    u16 compat_core_req;                /**< core requirements which correspond to the legacy support for UK 10.2 */
+    struct base_dependency pre_dep[2];  /**< pre-dependencies, one need to use SETTER function to assign this field,
+    this is done in order to reduce possibility of improper assigment of a dependency field */
+    base_atom_id atom_number;        /**< unique number to identify the atom */
+    base_jd_prio prio;                  /**< Atom priority. Refer to @ref base_jd_prio for more details */
+    u8 device_nr;                /**< coregroup when BASE_JD_REQ_SPECIFIC_COHERENT_GROUP specified */
+    u8 padding[1];
+    base_jd_core_req core_req;          /**< core requirements */
 } base_jd_atom_v2;
 
 #ifdef BASE_LEGACY_UK6_SUPPORT
 struct base_jd_atom_v2_uk6 {
-	u64 jc;			    /**< job-chain GPU address */
-	struct base_jd_udata udata;		    /**< user data */
-	kbase_pointer extres_list;	    /**< list of external resources */
-	u16 nr_extres;			    /**< nr of external resources */
-	u16 core_req;                       /**< core requirements */
-	base_atom_id pre_dep[2]; /**< pre-dependencies */
-	base_atom_id atom_number;	    /**< unique number to identify the atom */
-	base_jd_prio prio;		    /**< priority - smaller is higher priority */
-	u8 device_nr;			    /**< coregroup when BASE_JD_REQ_SPECIFIC_COHERENT_GROUP specified */
-	u8 padding[7];
+    u64 jc;                /**< job-chain GPU address */
+    struct base_jd_udata udata;            /**< user data */
+    kbase_pointer extres_list;        /**< list of external resources */
+    u16 nr_extres;                /**< nr of external resources */
+    u16 core_req;                       /**< core requirements */
+    base_atom_id pre_dep[2]; /**< pre-dependencies */
+    base_atom_id atom_number;        /**< unique number to identify the atom */
+    base_jd_prio prio;            /**< priority - smaller is higher priority */
+    u8 device_nr;                /**< coregroup when BASE_JD_REQ_SPECIFIC_COHERENT_GROUP specified */
+    u8 padding[7];
 };
 #endif /* BASE_LEGACY_UK6_SUPPORT */
 
 typedef enum base_external_resource_access {
-	BASE_EXT_RES_ACCESS_SHARED,
-	BASE_EXT_RES_ACCESS_EXCLUSIVE
+    BASE_EXT_RES_ACCESS_SHARED,
+    BASE_EXT_RES_ACCESS_EXCLUSIVE
 } base_external_resource_access;
 
 typedef struct base_external_resource {
-	u64 ext_resource;
+    u64 ext_resource;
 } base_external_resource;
 
 
@@ -899,14 +898,14 @@ typedef struct base_external_resource {
  *                                      sized at allocation time.
  */
 struct base_external_resource_list {
-	u64 count;
-	struct base_external_resource ext_res[1];
+    u64 count;
+    struct base_external_resource ext_res[1];
 };
 
 struct base_jd_debug_copy_buffer {
-	u64 address;
-	u64 size;
-	struct base_external_resource extres;
+    u64 address;
+    u64 size;
+    struct base_external_resource extres;
 };
 
 /**
@@ -918,19 +917,19 @@ struct base_jd_debug_copy_buffer {
  *
  */
 static inline void base_jd_atom_dep_set(struct base_dependency *dep,
-		base_atom_id id, base_jd_dep_type dep_type)
+        base_atom_id id, base_jd_dep_type dep_type)
 {
-	LOCAL_ASSERT(dep != NULL);
+    LOCAL_ASSERT(dep != NULL);
 
-	/*
-	 * make sure we don't set not allowed combinations
-	 * of atom_id/dependency_type.
-	 */
-	LOCAL_ASSERT((id == 0 && dep_type == BASE_JD_DEP_TYPE_INVALID) ||
-			(id > 0 && dep_type != BASE_JD_DEP_TYPE_INVALID));
+    /*
+     * make sure we don't set not allowed combinations
+     * of atom_id/dependency_type.
+     */
+    LOCAL_ASSERT((id == 0 && dep_type == BASE_JD_DEP_TYPE_INVALID) ||
+            (id > 0 && dep_type != BASE_JD_DEP_TYPE_INVALID));
 
-	dep->atom_id = id;
-	dep->dependency_type = dep_type;
+    dep->atom_id = id;
+    dep->dependency_type = dep_type;
 }
 
 /**
@@ -941,11 +940,11 @@ static inline void base_jd_atom_dep_set(struct base_dependency *dep,
  *
  */
 static inline void base_jd_atom_dep_copy(struct base_dependency *dep,
-		const struct base_dependency *from)
+        const struct base_dependency *from)
 {
-	LOCAL_ASSERT(dep != NULL);
+    LOCAL_ASSERT(dep != NULL);
 
-	base_jd_atom_dep_set(dep, from->atom_id, from->dependency_type);
+    base_jd_atom_dep_set(dep, from->atom_id, from->dependency_type);
 }
 
 /**
@@ -968,12 +967,12 @@ static inline void base_jd_atom_dep_copy(struct base_dependency *dep,
  */
 static inline void base_jd_fence_trigger_setup_v2(struct base_jd_atom_v2 *atom, struct base_fence *fence)
 {
-	LOCAL_ASSERT(atom);
-	LOCAL_ASSERT(fence);
-	LOCAL_ASSERT(fence->basep.fd == INVALID_PLATFORM_FENCE);
-	LOCAL_ASSERT(fence->basep.stream_fd >= 0);
-	atom->jc = (uintptr_t) fence;
-	atom->core_req = BASE_JD_REQ_SOFT_FENCE_TRIGGER;
+    LOCAL_ASSERT(atom);
+    LOCAL_ASSERT(fence);
+    LOCAL_ASSERT(fence->basep.fd == INVALID_PLATFORM_FENCE);
+    LOCAL_ASSERT(fence->basep.stream_fd >= 0);
+    atom->jc = (uintptr_t) fence;
+    atom->core_req = BASE_JD_REQ_SOFT_FENCE_TRIGGER;
 }
 
 /**
@@ -997,11 +996,11 @@ static inline void base_jd_fence_trigger_setup_v2(struct base_jd_atom_v2 *atom, 
  */
 static inline void base_jd_fence_wait_setup_v2(struct base_jd_atom_v2 *atom, struct base_fence *fence)
 {
-	LOCAL_ASSERT(atom);
-	LOCAL_ASSERT(fence);
-	LOCAL_ASSERT(fence->basep.fd >= 0);
-	atom->jc = (uintptr_t) fence;
-	atom->core_req = BASE_JD_REQ_SOFT_FENCE_WAIT;
+    LOCAL_ASSERT(atom);
+    LOCAL_ASSERT(fence);
+    LOCAL_ASSERT(fence->basep.fd >= 0);
+    atom->jc = (uintptr_t) fence;
+    atom->core_req = BASE_JD_REQ_SOFT_FENCE_WAIT;
 }
 
 /**
@@ -1017,15 +1016,15 @@ static inline void base_jd_fence_wait_setup_v2(struct base_jd_atom_v2 *atom, str
  */
 static inline void base_external_resource_init(struct base_external_resource *res, struct base_import_handle handle, base_external_resource_access access)
 {
-	u64 address;
+    u64 address;
 
-	address = handle.basep.handle;
+    address = handle.basep.handle;
 
-	LOCAL_ASSERT(res != NULL);
-	LOCAL_ASSERT(0 == (address & LOCAL_PAGE_LSB));
-	LOCAL_ASSERT(access == BASE_EXT_RES_ACCESS_SHARED || access == BASE_EXT_RES_ACCESS_EXCLUSIVE);
+    LOCAL_ASSERT(res != NULL);
+    LOCAL_ASSERT(0 == (address & LOCAL_PAGE_LSB));
+    LOCAL_ASSERT(access == BASE_EXT_RES_ACCESS_SHARED || access == BASE_EXT_RES_ACCESS_EXCLUSIVE);
 
-	res->ext_resource = address | (access & LOCAL_PAGE_LSB);
+    res->ext_resource = address | (access & LOCAL_PAGE_LSB);
 }
 
 /**
@@ -1033,14 +1032,14 @@ static inline void base_external_resource_init(struct base_external_resource *re
  * Defines the bits used to create ::base_jd_event_code
  */
 enum {
-	BASE_JD_SW_EVENT_KERNEL = (1u << 15), /**< Kernel side event */
-	BASE_JD_SW_EVENT = (1u << 14), /**< SW defined event */
-	BASE_JD_SW_EVENT_SUCCESS = (1u << 13), /**< Event idicates success (SW events only) */
-	BASE_JD_SW_EVENT_JOB = (0u << 11), /**< Job related event */
-	BASE_JD_SW_EVENT_BAG = (1u << 11), /**< Bag related event */
-	BASE_JD_SW_EVENT_INFO = (2u << 11), /**< Misc/info event */
-	BASE_JD_SW_EVENT_RESERVED = (3u << 11),	/**< Reserved event type */
-	BASE_JD_SW_EVENT_TYPE_MASK = (3u << 11)	    /**< Mask to extract the type from an event code */
+    BASE_JD_SW_EVENT_KERNEL = (1u << 15), /**< Kernel side event */
+    BASE_JD_SW_EVENT = (1u << 14), /**< SW defined event */
+    BASE_JD_SW_EVENT_SUCCESS = (1u << 13), /**< Event idicates success (SW events only) */
+    BASE_JD_SW_EVENT_JOB = (0u << 11), /**< Job related event */
+    BASE_JD_SW_EVENT_BAG = (1u << 11), /**< Bag related event */
+    BASE_JD_SW_EVENT_INFO = (2u << 11), /**< Misc/info event */
+    BASE_JD_SW_EVENT_RESERVED = (3u << 11),    /**< Reserved event type */
+    BASE_JD_SW_EVENT_TYPE_MASK = (3u << 11)        /**< Mask to extract the type from an event code */
 };
 
 /**
@@ -1075,97 +1074,97 @@ enum {
  * handled that enum value.
  */
 typedef enum base_jd_event_code {
-	/* HW defined exceptions */
+    /* HW defined exceptions */
 
-	/** Start of HW Non-fault status codes
-	 *
-	 * @note Obscurely, BASE_JD_EVENT_TERMINATED indicates a real fault,
-	 * because the job was hard-stopped
-	 */
-	BASE_JD_EVENT_RANGE_HW_NONFAULT_START = 0,
+    /** Start of HW Non-fault status codes
+     *
+     * @note Obscurely, BASE_JD_EVENT_TERMINATED indicates a real fault,
+     * because the job was hard-stopped
+     */
+    BASE_JD_EVENT_RANGE_HW_NONFAULT_START = 0,
 
-	/* non-fatal exceptions */
-	BASE_JD_EVENT_NOT_STARTED = 0x00, /**< Can't be seen by userspace, treated as 'previous job done' */
-	BASE_JD_EVENT_DONE = 0x01,
-	BASE_JD_EVENT_STOPPED = 0x03,	  /**< Can't be seen by userspace, becomes TERMINATED, DONE or JOB_CANCELLED */
-	BASE_JD_EVENT_TERMINATED = 0x04,  /**< This is actually a fault status code - the job was hard stopped */
-	BASE_JD_EVENT_ACTIVE = 0x08,	  /**< Can't be seen by userspace, jobs only returned on complete/fail/cancel */
+    /* non-fatal exceptions */
+    BASE_JD_EVENT_NOT_STARTED = 0x00, /**< Can't be seen by userspace, treated as 'previous job done' */
+    BASE_JD_EVENT_DONE = 0x01,
+    BASE_JD_EVENT_STOPPED = 0x03,      /**< Can't be seen by userspace, becomes TERMINATED, DONE or JOB_CANCELLED */
+    BASE_JD_EVENT_TERMINATED = 0x04,  /**< This is actually a fault status code - the job was hard stopped */
+    BASE_JD_EVENT_ACTIVE = 0x08,      /**< Can't be seen by userspace, jobs only returned on complete/fail/cancel */
 
-	/** End of HW Non-fault status codes
-	 *
-	 * @note Obscurely, BASE_JD_EVENT_TERMINATED indicates a real fault,
-	 * because the job was hard-stopped
-	 */
-	BASE_JD_EVENT_RANGE_HW_NONFAULT_END = 0x40,
+    /** End of HW Non-fault status codes
+     *
+     * @note Obscurely, BASE_JD_EVENT_TERMINATED indicates a real fault,
+     * because the job was hard-stopped
+     */
+    BASE_JD_EVENT_RANGE_HW_NONFAULT_END = 0x40,
 
-	/** Start of HW fault and SW Error status codes */
-	BASE_JD_EVENT_RANGE_HW_FAULT_OR_SW_ERROR_START = 0x40,
+    /** Start of HW fault and SW Error status codes */
+    BASE_JD_EVENT_RANGE_HW_FAULT_OR_SW_ERROR_START = 0x40,
 
-	/* job exceptions */
-	BASE_JD_EVENT_JOB_CONFIG_FAULT = 0x40,
-	BASE_JD_EVENT_JOB_POWER_FAULT = 0x41,
-	BASE_JD_EVENT_JOB_READ_FAULT = 0x42,
-	BASE_JD_EVENT_JOB_WRITE_FAULT = 0x43,
-	BASE_JD_EVENT_JOB_AFFINITY_FAULT = 0x44,
-	BASE_JD_EVENT_JOB_BUS_FAULT = 0x48,
-	BASE_JD_EVENT_INSTR_INVALID_PC = 0x50,
-	BASE_JD_EVENT_INSTR_INVALID_ENC = 0x51,
-	BASE_JD_EVENT_INSTR_TYPE_MISMATCH = 0x52,
-	BASE_JD_EVENT_INSTR_OPERAND_FAULT = 0x53,
-	BASE_JD_EVENT_INSTR_TLS_FAULT = 0x54,
-	BASE_JD_EVENT_INSTR_BARRIER_FAULT = 0x55,
-	BASE_JD_EVENT_INSTR_ALIGN_FAULT = 0x56,
-	BASE_JD_EVENT_DATA_INVALID_FAULT = 0x58,
-	BASE_JD_EVENT_TILE_RANGE_FAULT = 0x59,
-	BASE_JD_EVENT_STATE_FAULT = 0x5A,
-	BASE_JD_EVENT_OUT_OF_MEMORY = 0x60,
-	BASE_JD_EVENT_UNKNOWN = 0x7F,
+    /* job exceptions */
+    BASE_JD_EVENT_JOB_CONFIG_FAULT = 0x40,
+    BASE_JD_EVENT_JOB_POWER_FAULT = 0x41,
+    BASE_JD_EVENT_JOB_READ_FAULT = 0x42,
+    BASE_JD_EVENT_JOB_WRITE_FAULT = 0x43,
+    BASE_JD_EVENT_JOB_AFFINITY_FAULT = 0x44,
+    BASE_JD_EVENT_JOB_BUS_FAULT = 0x48,
+    BASE_JD_EVENT_INSTR_INVALID_PC = 0x50,
+    BASE_JD_EVENT_INSTR_INVALID_ENC = 0x51,
+    BASE_JD_EVENT_INSTR_TYPE_MISMATCH = 0x52,
+    BASE_JD_EVENT_INSTR_OPERAND_FAULT = 0x53,
+    BASE_JD_EVENT_INSTR_TLS_FAULT = 0x54,
+    BASE_JD_EVENT_INSTR_BARRIER_FAULT = 0x55,
+    BASE_JD_EVENT_INSTR_ALIGN_FAULT = 0x56,
+    BASE_JD_EVENT_DATA_INVALID_FAULT = 0x58,
+    BASE_JD_EVENT_TILE_RANGE_FAULT = 0x59,
+    BASE_JD_EVENT_STATE_FAULT = 0x5A,
+    BASE_JD_EVENT_OUT_OF_MEMORY = 0x60,
+    BASE_JD_EVENT_UNKNOWN = 0x7F,
 
-	/* GPU exceptions */
-	BASE_JD_EVENT_DELAYED_BUS_FAULT = 0x80,
-	BASE_JD_EVENT_SHAREABILITY_FAULT = 0x88,
+    /* GPU exceptions */
+    BASE_JD_EVENT_DELAYED_BUS_FAULT = 0x80,
+    BASE_JD_EVENT_SHAREABILITY_FAULT = 0x88,
 
-	/* MMU exceptions */
-	BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL1 = 0xC1,
-	BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL2 = 0xC2,
-	BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL3 = 0xC3,
-	BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL4 = 0xC4,
-	BASE_JD_EVENT_PERMISSION_FAULT = 0xC8,
-	BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL1 = 0xD1,
-	BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL2 = 0xD2,
-	BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL3 = 0xD3,
-	BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL4 = 0xD4,
-	BASE_JD_EVENT_ACCESS_FLAG = 0xD8,
+    /* MMU exceptions */
+    BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL1 = 0xC1,
+    BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL2 = 0xC2,
+    BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL3 = 0xC3,
+    BASE_JD_EVENT_TRANSLATION_FAULT_LEVEL4 = 0xC4,
+    BASE_JD_EVENT_PERMISSION_FAULT = 0xC8,
+    BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL1 = 0xD1,
+    BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL2 = 0xD2,
+    BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL3 = 0xD3,
+    BASE_JD_EVENT_TRANSTAB_BUS_FAULT_LEVEL4 = 0xD4,
+    BASE_JD_EVENT_ACCESS_FLAG = 0xD8,
 
-	/* SW defined exceptions */
-	BASE_JD_EVENT_MEM_GROWTH_FAILED	= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x000,
-	BASE_JD_EVENT_TIMED_OUT		= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x001,
-	BASE_JD_EVENT_JOB_CANCELLED	= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x002,
-	BASE_JD_EVENT_JOB_INVALID	= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x003,
-	BASE_JD_EVENT_PM_EVENT		= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x004,
-	BASE_JD_EVENT_FORCE_REPLAY	= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x005,
+    /* SW defined exceptions */
+    BASE_JD_EVENT_MEM_GROWTH_FAILED    = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x000,
+    BASE_JD_EVENT_TIMED_OUT        = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x001,
+    BASE_JD_EVENT_JOB_CANCELLED    = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x002,
+    BASE_JD_EVENT_JOB_INVALID    = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x003,
+    BASE_JD_EVENT_PM_EVENT        = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x004,
+    BASE_JD_EVENT_FORCE_REPLAY    = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_JOB | 0x005,
 
-	BASE_JD_EVENT_BAG_INVALID	= BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_BAG | 0x003,
+    BASE_JD_EVENT_BAG_INVALID    = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_BAG | 0x003,
 
-	/** End of HW fault and SW Error status codes */
-	BASE_JD_EVENT_RANGE_HW_FAULT_OR_SW_ERROR_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_RESERVED | 0x3FF,
+    /** End of HW fault and SW Error status codes */
+    BASE_JD_EVENT_RANGE_HW_FAULT_OR_SW_ERROR_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_RESERVED | 0x3FF,
 
-	/** Start of SW Success status codes */
-	BASE_JD_EVENT_RANGE_SW_SUCCESS_START = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | 0x000,
+    /** Start of SW Success status codes */
+    BASE_JD_EVENT_RANGE_SW_SUCCESS_START = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | 0x000,
 
-	BASE_JD_EVENT_PROGRESS_REPORT = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_JOB | 0x000,
-	BASE_JD_EVENT_BAG_DONE = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_BAG | 0x000,
-	BASE_JD_EVENT_DRV_TERMINATED = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_INFO | 0x000,
+    BASE_JD_EVENT_PROGRESS_REPORT = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_JOB | 0x000,
+    BASE_JD_EVENT_BAG_DONE = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_BAG | 0x000,
+    BASE_JD_EVENT_DRV_TERMINATED = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_INFO | 0x000,
 
-	/** End of SW Success status codes */
-	BASE_JD_EVENT_RANGE_SW_SUCCESS_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_RESERVED | 0x3FF,
+    /** End of SW Success status codes */
+    BASE_JD_EVENT_RANGE_SW_SUCCESS_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_SUCCESS | BASE_JD_SW_EVENT_RESERVED | 0x3FF,
 
-	/** Start of Kernel-only status codes. Such codes are never returned to user-space */
-	BASE_JD_EVENT_RANGE_KERNEL_ONLY_START = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | 0x000,
-	BASE_JD_EVENT_REMOVED_FROM_NEXT = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | BASE_JD_SW_EVENT_JOB | 0x000,
+    /** Start of Kernel-only status codes. Such codes are never returned to user-space */
+    BASE_JD_EVENT_RANGE_KERNEL_ONLY_START = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | 0x000,
+    BASE_JD_EVENT_REMOVED_FROM_NEXT = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | BASE_JD_SW_EVENT_JOB | 0x000,
 
-	/** End of Kernel-only status codes. */
-	BASE_JD_EVENT_RANGE_KERNEL_ONLY_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | BASE_JD_SW_EVENT_RESERVED | 0x3FF
+    /** End of Kernel-only status codes. */
+    BASE_JD_EVENT_RANGE_KERNEL_ONLY_END = BASE_JD_SW_EVENT | BASE_JD_SW_EVENT_KERNEL | BASE_JD_SW_EVENT_RESERVED | 0x3FF
 } base_jd_event_code;
 
 /**
@@ -1186,9 +1185,9 @@ typedef enum base_jd_event_code {
  * @li ::BASE_JD_SW_EVENT_INFO : base_jd_event::data not used
  */
 typedef struct base_jd_event_v2 {
-	base_jd_event_code event_code;  /**< event code */
-	base_atom_id atom_number;       /**< the atom number that has completed */
-	struct base_jd_udata udata;     /**< user data */
+    base_jd_event_code event_code;  /**< event code */
+    base_atom_id atom_number;       /**< the atom number that has completed */
+    struct base_jd_udata udata;     /**< user data */
 } base_jd_event_v2;
 
 /**
@@ -1211,11 +1210,11 @@ typedef struct base_jd_event_v2 {
  */
 
 typedef struct base_dump_cpu_gpu_counters {
-	u64 system_time;
-	u64 cycle_counter;
-	u64 sec;
-	u32 usec;
-	u8 padding[BASE_CPU_GPU_CACHE_LINE_PADDING];
+    u64 system_time;
+    u64 cycle_counter;
+    u64 sec;
+    u32 usec;
+    u8 padding[BASE_CPU_GPU_CACHE_LINE_PADDING];
 } base_dump_cpu_gpu_counters;
 
 
@@ -1363,40 +1362,40 @@ typedef struct base_dump_cpu_gpu_counters {
  *
  * @dot
    digraph plat_config_mechanism {
-	   rankdir=BT
-	   size="6,6"
+       rankdir=BT
+       size="6,6"
 
        "mali_base.h";
-	   "gpu/mali_gpu.h";
+       "gpu/mali_gpu.h";
 
-	   node [ shape=box ];
-	   {
-	       rank = same; ordering = out;
+       node [ shape=box ];
+       {
+           rank = same; ordering = out;
 
-		   "gpu/mali_gpu_props.h";
-		   "base/midg_gpus/mali_t600.h";
-		   "base/midg_gpus/other_midg_gpu.h";
-	   }
-	   { rank = same; "plat/plat_config.h"; }
-	   {
-	       rank = same;
-		   "gpu/mali_gpu.h" [ shape=box ];
-		   gpu_chooser [ label="" style="invisible" width=0 height=0 fixedsize=true ];
-		   select_gpu [ label="Mali-T600 | Other\n(select_gpu.h)" shape=polygon,sides=4,distortion=0.25 width=3.3 height=0.99 fixedsize=true ] ;
-	   }
-	   node [ shape=box ];
-	   { rank = same; "plat/plat_config.h"; }
-	   { rank = same; "mali_base.h"; }
+           "gpu/mali_gpu_props.h";
+           "base/midg_gpus/mali_t600.h";
+           "base/midg_gpus/other_midg_gpu.h";
+       }
+       { rank = same; "plat/plat_config.h"; }
+       {
+           rank = same;
+           "gpu/mali_gpu.h" [ shape=box ];
+           gpu_chooser [ label="" style="invisible" width=0 height=0 fixedsize=true ];
+           select_gpu [ label="Mali-T600 | Other\n(select_gpu.h)" shape=polygon,sides=4,distortion=0.25 width=3.3 height=0.99 fixedsize=true ] ;
+       }
+       node [ shape=box ];
+       { rank = same; "plat/plat_config.h"; }
+       { rank = same; "mali_base.h"; }
 
-	   "mali_base.h" -> "gpu/mali_gpu.h" -> "gpu/mali_gpu_props.h";
-	   "mali_base.h" -> "plat/plat_config.h" ;
-	   "mali_base.h" -> select_gpu ;
+       "mali_base.h" -> "gpu/mali_gpu.h" -> "gpu/mali_gpu_props.h";
+       "mali_base.h" -> "plat/plat_config.h" ;
+       "mali_base.h" -> select_gpu ;
 
-	   "plat/plat_config.h" -> gpu_chooser [style="dotted,bold" dir=none weight=4] ;
-	   gpu_chooser -> select_gpu [style="dotted,bold"] ;
+       "plat/plat_config.h" -> gpu_chooser [style="dotted,bold" dir=none weight=4] ;
+       gpu_chooser -> select_gpu [style="dotted,bold"] ;
 
-	   select_gpu -> "base/midg_gpus/mali_t600.h" ;
-	   select_gpu -> "base/midg_gpus/other_midg_gpu.h" ;
+       select_gpu -> "base/midg_gpus/mali_t600.h" ;
+       select_gpu -> "base/midg_gpus/other_midg_gpu.h" ;
    }
    @enddot
  *
@@ -1444,76 +1443,76 @@ typedef struct base_dump_cpu_gpu_counters {
 #define BASE_MAX_COHERENT_GROUPS 16
 
 struct mali_base_gpu_core_props {
-	/**
-	 * Product specific value.
-	 */
-	u32 product_id;
+    /**
+     * Product specific value.
+     */
+    u32 product_id;
 
-	/**
-	 * Status of the GPU release.
-	 * No defined values, but starts at 0 and increases by one for each
-	 * release status (alpha, beta, EAC, etc.).
-	 * 4 bit values (0-15).
-	 */
-	u16 version_status;
-
-	/**
-	 * Minor release number of the GPU. "P" part of an "RnPn" release number.
-     * 8 bit values (0-255).
-	 */
-	u16 minor_revision;
-
-	/**
-	 * Major release number of the GPU. "R" part of an "RnPn" release number.
+    /**
+     * Status of the GPU release.
+     * No defined values, but starts at 0 and increases by one for each
+     * release status (alpha, beta, EAC, etc.).
      * 4 bit values (0-15).
-	 */
-	u16 major_revision;
+     */
+    u16 version_status;
 
-	u16 padding;
+    /**
+     * Minor release number of the GPU. "P" part of an "RnPn" release number.
+     * 8 bit values (0-255).
+     */
+    u16 minor_revision;
 
-	/**
-	 * This property is deprecated since it has not contained the real current
-	 * value of GPU clock speed. It is kept here only for backwards compatibility.
-	 * For the new ioctl interface, it is ignored and is treated as a padding
-	 * to keep the structure of the same size and retain the placement of its
-	 * members.
-	 */
-	u32 gpu_speed_mhz;
+    /**
+     * Major release number of the GPU. "R" part of an "RnPn" release number.
+     * 4 bit values (0-15).
+     */
+    u16 major_revision;
 
-	/**
-	 * @usecase GPU clock max/min speed is required for computing best/worst case
-	 * in tasks as job scheduling ant irq_throttling. (It is not specified in the
-	 *  Midgard Architecture).
-	 * Also, GPU clock max speed is used for OpenCL's clGetDeviceInfo() function.
-	 */
-	u32 gpu_freq_khz_max;
-	u32 gpu_freq_khz_min;
+    u16 padding;
 
-	/**
-	 * Size of the shader program counter, in bits.
-	 */
-	u32 log2_program_counter_size;
+    /**
+     * This property is deprecated since it has not contained the real current
+     * value of GPU clock speed. It is kept here only for backwards compatibility.
+     * For the new ioctl interface, it is ignored and is treated as a padding
+     * to keep the structure of the same size and retain the placement of its
+     * members.
+     */
+    u32 gpu_speed_mhz;
 
-	/**
-	 * TEXTURE_FEATURES_x registers, as exposed by the GPU. This is a
-	 * bitpattern where a set bit indicates that the format is supported.
-	 *
-	 * Before using a texture format, it is recommended that the corresponding
-	 * bit be checked.
-	 */
-	u32 texture_features[BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS];
+    /**
+     * @usecase GPU clock max/min speed is required for computing best/worst case
+     * in tasks as job scheduling ant irq_throttling. (It is not specified in the
+     *  Midgard Architecture).
+     * Also, GPU clock max speed is used for OpenCL's clGetDeviceInfo() function.
+     */
+    u32 gpu_freq_khz_max;
+    u32 gpu_freq_khz_min;
 
-	/**
-	 * Theoretical maximum memory available to the GPU. It is unlikely that a
-	 * client will be able to allocate all of this memory for their own
-	 * purposes, but this at least provides an upper bound on the memory
-	 * available to the GPU.
-	 *
-	 * This is required for OpenCL's clGetDeviceInfo() call when
-	 * CL_DEVICE_GLOBAL_MEM_SIZE is requested, for OpenCL GPU devices. The
-	 * client will not be expecting to allocate anywhere near this value.
-	 */
-	u64 gpu_available_memory_size;
+    /**
+     * Size of the shader program counter, in bits.
+     */
+    u32 log2_program_counter_size;
+
+    /**
+     * TEXTURE_FEATURES_x registers, as exposed by the GPU. This is a
+     * bitpattern where a set bit indicates that the format is supported.
+     *
+     * Before using a texture format, it is recommended that the corresponding
+     * bit be checked.
+     */
+    u32 texture_features[BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS];
+
+    /**
+     * Theoretical maximum memory available to the GPU. It is unlikely that a
+     * client will be able to allocate all of this memory for their own
+     * purposes, but this at least provides an upper bound on the memory
+     * available to the GPU.
+     *
+     * This is required for OpenCL's clGetDeviceInfo() call when
+     * CL_DEVICE_GLOBAL_MEM_SIZE is requested, for OpenCL GPU devices. The
+     * client will not be expecting to allocate anywhere near this value.
+     */
+    u64 gpu_available_memory_size;
 };
 
 /**
@@ -1522,29 +1521,29 @@ struct mali_base_gpu_core_props {
  * required by upper-level apis.
  */
 struct mali_base_gpu_l2_cache_props {
-	u8 log2_line_size;
-	u8 log2_cache_size;
-	u8 num_l2_slices; /* Number of L2C slices. 1 or higher */
-	u8 padding[5];
+    u8 log2_line_size;
+    u8 log2_cache_size;
+    u8 num_l2_slices; /* Number of L2C slices. 1 or higher */
+    u8 padding[5];
 };
 
 struct mali_base_gpu_tiler_props {
-	u32 bin_size_bytes;	/* Max is 4*2^15 */
-	u32 max_active_levels;	/* Max is 2^15 */
+    u32 bin_size_bytes;    /* Max is 4*2^15 */
+    u32 max_active_levels;    /* Max is 2^15 */
 };
 
 /**
  * GPU threading system details.
  */
 struct mali_base_gpu_thread_props {
-	u32 max_threads;            /* Max. number of threads per core */
-	u32 max_workgroup_size;     /* Max. number of threads per workgroup */
-	u32 max_barrier_size;       /* Max. number of threads that can synchronize on a simple barrier */
-	u16 max_registers;          /* Total size [1..65535] of the register file available per core. */
-	u8  max_task_queue;         /* Max. tasks [1..255] which may be sent to a core before it becomes blocked. */
-	u8  max_thread_group_split; /* Max. allowed value [1..15] of the Thread Group Split field. */
-	u8  impl_tech;              /* 0 = Not specified, 1 = Silicon, 2 = FPGA, 3 = SW Model/Emulation */
-	u8  padding[7];
+    u32 max_threads;            /* Max. number of threads per core */
+    u32 max_workgroup_size;     /* Max. number of threads per workgroup */
+    u32 max_barrier_size;       /* Max. number of threads that can synchronize on a simple barrier */
+    u16 max_registers;          /* Total size [1..65535] of the register file available per core. */
+    u8  max_task_queue;         /* Max. tasks [1..255] which may be sent to a core before it becomes blocked. */
+    u8  max_thread_group_split; /* Max. allowed value [1..15] of the Thread Group Split field. */
+    u8  impl_tech;              /* 0 = Not specified, 1 = Silicon, 2 = FPGA, 3 = SW Model/Emulation */
+    u8  padding[7];
 };
 
 /**
@@ -1559,9 +1558,9 @@ struct mali_base_gpu_thread_props {
  * @note if u64s must be 8-byte aligned, then this structure has 32-bits of wastage.
  */
 struct mali_base_gpu_coherent_group {
-	u64 core_mask;	       /**< Core restriction mask required for the group */
-	u16 num_cores;	       /**< Number of cores in the group */
-	u16 padding[3];
+    u64 core_mask;           /**< Core restriction mask required for the group */
+    u16 num_cores;           /**< Number of cores in the group */
+    u16 padding[3];
 };
 
 /**
@@ -1575,32 +1574,32 @@ struct mali_base_gpu_coherent_group {
  * not intersect.
  */
 struct mali_base_gpu_coherent_group_info {
-	u32 num_groups;
+    u32 num_groups;
 
-	/**
-	 * Number of core groups (coherent or not) in the GPU. Equivalent to the number of L2 Caches.
-	 *
-	 * The GPU Counter dumping writes 2048 bytes per core group, regardless of
-	 * whether the core groups are coherent or not. Hence this member is needed
-	 * to calculate how much memory is required for dumping.
-	 *
-	 * @note Do not use it to work out how many valid elements are in the
-	 * group[] member. Use num_groups instead.
-	 */
-	u32 num_core_groups;
+    /**
+     * Number of core groups (coherent or not) in the GPU. Equivalent to the number of L2 Caches.
+     *
+     * The GPU Counter dumping writes 2048 bytes per core group, regardless of
+     * whether the core groups are coherent or not. Hence this member is needed
+     * to calculate how much memory is required for dumping.
+     *
+     * @note Do not use it to work out how many valid elements are in the
+     * group[] member. Use num_groups instead.
+     */
+    u32 num_core_groups;
 
-	/**
-	 * Coherency features of the memory, accessed by @ref gpu_mem_features
-	 * methods
-	 */
-	u32 coherency;
+    /**
+     * Coherency features of the memory, accessed by @ref gpu_mem_features
+     * methods
+     */
+    u32 coherency;
 
-	u32 padding;
+    u32 padding;
 
-	/**
-	 * Descriptors of coherent groups
-	 */
-	struct mali_base_gpu_coherent_group group[BASE_MAX_COHERENT_GROUPS];
+    /**
+     * Descriptors of coherent groups
+     */
+    struct mali_base_gpu_coherent_group group[BASE_MAX_COHERENT_GROUPS];
 };
 
 /**
@@ -1620,35 +1619,35 @@ struct mali_base_gpu_coherent_group_info {
  *
  */
 struct gpu_raw_gpu_props {
-	u64 shader_present;
-	u64 tiler_present;
-	u64 l2_present;
-	u64 stack_present;
+    u64 shader_present;
+    u64 tiler_present;
+    u64 l2_present;
+    u64 stack_present;
 
-	u32 l2_features;
-	u32 suspend_size; /* API 8.2+ */
-	u32 mem_features;
-	u32 mmu_features;
+    u32 l2_features;
+    u32 suspend_size; /* API 8.2+ */
+    u32 mem_features;
+    u32 mmu_features;
 
-	u32 as_present;
+    u32 as_present;
 
-	u32 js_present;
-	u32 js_features[GPU_MAX_JOB_SLOTS];
-	u32 tiler_features;
-	u32 texture_features[3];
+    u32 js_present;
+    u32 js_features[GPU_MAX_JOB_SLOTS];
+    u32 tiler_features;
+    u32 texture_features[3];
 
-	u32 gpu_id;
+    u32 gpu_id;
 
-	u32 thread_max_threads;
-	u32 thread_max_workgroup_size;
-	u32 thread_max_barrier_size;
-	u32 thread_features;
+    u32 thread_max_threads;
+    u32 thread_max_workgroup_size;
+    u32 thread_max_barrier_size;
+    u32 thread_features;
 
-	/*
-	 * Note: This is the _selected_ coherency mode rather than the
-	 * available modes as exposed in the coherency_features register.
-	 */
-	u32 coherency_mode;
+    /*
+     * Note: This is the _selected_ coherency mode rather than the
+     * available modes as exposed in the coherency_features register.
+     */
+    u32 coherency_mode;
 };
 
 /**
@@ -1661,17 +1660,17 @@ struct gpu_raw_gpu_props {
  *
  */
 typedef struct mali_base_gpu_props {
-	struct mali_base_gpu_core_props core_props;
-	struct mali_base_gpu_l2_cache_props l2_props;
-	u64 unused_1; /* keep for backwards compatibility */
-	struct mali_base_gpu_tiler_props tiler_props;
-	struct mali_base_gpu_thread_props thread_props;
+    struct mali_base_gpu_core_props core_props;
+    struct mali_base_gpu_l2_cache_props l2_props;
+    u64 unused_1; /* keep for backwards compatibility */
+    struct mali_base_gpu_tiler_props tiler_props;
+    struct mali_base_gpu_thread_props thread_props;
 
-	/** This member is large, likely to be 128 bytes */
-	struct gpu_raw_gpu_props raw_props;
+    /** This member is large, likely to be 128 bytes */
+    struct gpu_raw_gpu_props raw_props;
 
-	/** This must be last member of the structure */
-	struct mali_base_gpu_coherent_group_info coherency_info;
+    /** This must be last member of the structure */
+    struct mali_base_gpu_coherent_group_info coherency_info;
 } base_gpu_props;
 
 /** @} end group base_user_api_gpuprops_dyn */
@@ -1693,30 +1692,30 @@ typedef struct mali_base_gpu_props {
  * not collide with them.
  */
 enum base_context_create_flags {
-	/** No flags set */
-	BASE_CONTEXT_CREATE_FLAG_NONE = 0,
+    /** No flags set */
+    BASE_CONTEXT_CREATE_FLAG_NONE = 0,
 
-	/** Base context is embedded in a cctx object (flag used for CINSTR software counter macros) */
-	BASE_CONTEXT_CCTX_EMBEDDED = (1u << 0),
+    /** Base context is embedded in a cctx object (flag used for CINSTR software counter macros) */
+    BASE_CONTEXT_CCTX_EMBEDDED = (1u << 0),
 
-	/** Base context is a 'System Monitor' context for Hardware counters.
-	 *
-	 * One important side effect of this is that job submission is disabled. */
-	BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED = (1u << 1)
+    /** Base context is a 'System Monitor' context for Hardware counters.
+     *
+     * One important side effect of this is that job submission is disabled. */
+    BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED = (1u << 1)
 };
 
 /**
  * Bitpattern describing the ::base_context_create_flags that can be passed to base_context_init()
  */
 #define BASE_CONTEXT_CREATE_ALLOWED_FLAGS \
-	(((u32)BASE_CONTEXT_CCTX_EMBEDDED) | \
-	  ((u32)BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED))
+    (((u32)BASE_CONTEXT_CCTX_EMBEDDED) | \
+      ((u32)BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED))
 
 /**
  * Bitpattern describing the ::base_context_create_flags that can be passed to the kernel
  */
 #define BASE_CONTEXT_CREATE_KERNEL_FLAGS \
-	((u32)BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED)
+    ((u32)BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED)
 
 /*
  * Private flags used on the base context
@@ -1758,61 +1757,61 @@ enum base_context_create_flags {
  * @brief The payload for a replay job. This must be in GPU memory.
  */
 typedef struct base_jd_replay_payload {
-	/**
-	 * Pointer to the first entry in the base_jd_replay_jc list.  These
-	 * will be replayed in @b reverse order (so that extra ones can be added
-	 * to the head in future soft jobs without affecting this soft job)
-	 */
-	u64 tiler_jc_list;
+    /**
+     * Pointer to the first entry in the base_jd_replay_jc list.  These
+     * will be replayed in @b reverse order (so that extra ones can be added
+     * to the head in future soft jobs without affecting this soft job)
+     */
+    u64 tiler_jc_list;
 
-	/**
-	 * Pointer to the fragment job chain.
-	 */
-	u64 fragment_jc;
+    /**
+     * Pointer to the fragment job chain.
+     */
+    u64 fragment_jc;
 
-	/**
-	 * Pointer to the tiler heap free FBD field to be modified.
-	 */
-	u64 tiler_heap_free;
+    /**
+     * Pointer to the tiler heap free FBD field to be modified.
+     */
+    u64 tiler_heap_free;
 
-	/**
-	 * Hierarchy mask for the replayed fragment jobs. May be zero.
-	 */
-	u16 fragment_hierarchy_mask;
+    /**
+     * Hierarchy mask for the replayed fragment jobs. May be zero.
+     */
+    u16 fragment_hierarchy_mask;
 
-	/**
-	 * Hierarchy mask for the replayed tiler jobs. May be zero.
-	 */
-	u16 tiler_hierarchy_mask;
+    /**
+     * Hierarchy mask for the replayed tiler jobs. May be zero.
+     */
+    u16 tiler_hierarchy_mask;
 
-	/**
-	 * Default weight to be used for hierarchy levels not in the original
-	 * mask.
-	 */
-	u32 hierarchy_default_weight;
+    /**
+     * Default weight to be used for hierarchy levels not in the original
+     * mask.
+     */
+    u32 hierarchy_default_weight;
 
-	/**
-	 * Core requirements for the tiler job chain
-	 */
-	base_jd_core_req tiler_core_req;
+    /**
+     * Core requirements for the tiler job chain
+     */
+    base_jd_core_req tiler_core_req;
 
-	/**
-	 * Core requirements for the fragment job chain
-	 */
-	base_jd_core_req fragment_core_req;
+    /**
+     * Core requirements for the fragment job chain
+     */
+    base_jd_core_req fragment_core_req;
 } base_jd_replay_payload;
 
 #ifdef BASE_LEGACY_UK10_2_SUPPORT
 typedef struct base_jd_replay_payload_uk10_2 {
-	u64 tiler_jc_list;
-	u64 fragment_jc;
-	u64 tiler_heap_free;
-	u16 fragment_hierarchy_mask;
-	u16 tiler_hierarchy_mask;
-	u32 hierarchy_default_weight;
-	u16 tiler_core_req;
-	u16 fragment_core_req;
-	u8 padding[4];
+    u64 tiler_jc_list;
+    u64 fragment_jc;
+    u64 tiler_heap_free;
+    u16 fragment_hierarchy_mask;
+    u16 tiler_hierarchy_mask;
+    u32 hierarchy_default_weight;
+    u16 tiler_core_req;
+    u16 fragment_core_req;
+    u8 padding[4];
 } base_jd_replay_payload_uk10_2;
 #endif /* BASE_LEGACY_UK10_2_SUPPORT */
 
@@ -1821,16 +1820,16 @@ typedef struct base_jd_replay_payload_uk10_2 {
  *        be in GPU memory.
  */
 typedef struct base_jd_replay_jc {
-	/**
-	 * Pointer to next entry in the list. A setting of NULL indicates the
-	 * end of the list.
-	 */
-	u64 next;
+    /**
+     * Pointer to next entry in the list. A setting of NULL indicates the
+     * end of the list.
+     */
+    u64 next;
 
-	/**
-	 * Pointer to the job chain.
-	 */
-	u64 jc;
+    /**
+     * Pointer to the job chain.
+     */
+    u64 jc;
 
 } base_jd_replay_jc;
 
@@ -1841,7 +1840,7 @@ typedef struct base_jd_replay_jc {
 /** @} end group base_api */
 
 typedef struct base_profiling_controls {
-	u32 profiling_controls[FBDUMP_CONTROL_MAX];
+    u32 profiling_controls[FBDUMP_CONTROL_MAX];
 } base_profiling_controls;
 
 /* Enable additional tracepoints for latency measurements (TL_ATOM_READY,
@@ -1853,6 +1852,6 @@ typedef struct base_profiling_controls {
 #define BASE_TLSTREAM_JOB_DUMPING_ENABLED (1 << 1)
 
 #define BASE_TLSTREAM_FLAGS_MASK (BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS | \
-		BASE_TLSTREAM_JOB_DUMPING_ENABLED)
+        BASE_TLSTREAM_JOB_DUMPING_ENABLED)
 
-#endif				/* _BASE_KERNEL_H_ */
+#endif                /* _BASE_KERNEL_H_ */

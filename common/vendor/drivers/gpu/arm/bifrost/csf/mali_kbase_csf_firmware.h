@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_FIRMWARE_H_
-#define _KBASE_CSF_FIRMWARE_H_
+#ifndef KBASE_CSF_FIRMWARE_H
+#define KBASE_CSF_FIRMWARE_H
 
 #include "device/mali_kbase_device.h"
 #include "mali_gpu_csf_registers.h"
@@ -90,10 +90,10 @@ struct kbase_device;
  * @num_pages: Size of the mapping, in memory pages.
  */
 struct kbase_csf_mapping {
-	struct tagged_addr *phys;
-	void *cpu_addr;
-	struct kbase_va_region *va_reg;
-	unsigned int num_pages;
+    struct tagged_addr *phys;
+    void *cpu_addr;
+    struct kbase_va_region *va_reg;
+    unsigned int num_pages;
 };
 
 /**
@@ -105,9 +105,9 @@ struct kbase_csf_mapping {
  *              GPU-writable/CPU-readable variables.
  */
 struct kbase_csf_trace_buffers {
-	struct list_head list;
-	struct kbase_csf_mapping mcu_rw;
-	struct kbase_csf_mapping mcu_write;
+    struct list_head list;
+    struct kbase_csf_mapping mcu_rw;
+    struct kbase_csf_mapping mcu_write;
 };
 
 /**
@@ -123,10 +123,10 @@ struct kbase_csf_trace_buffers {
  * @output: Address of command stream interface output page.
  */
 struct kbase_csf_cmd_stream_info {
-	struct kbase_device *kbdev;
-	u32 features;
-	void *input;
-	void *output;
+    struct kbase_device *kbdev;
+    u32 features;
+    void *input;
+    void *output;
 };
 
 /**
@@ -137,7 +137,7 @@ struct kbase_csf_cmd_stream_info {
  * @value: Value to be written.
  */
 void kbase_csf_firmware_cs_input(
-	const struct kbase_csf_cmd_stream_info *info, u32 offset, u32 value);
+    const struct kbase_csf_cmd_stream_info *info, u32 offset, u32 value);
 
 /**
  * kbase_csf_firmware_cs_input_read() - Read a word in a command stream's input
@@ -149,7 +149,7 @@ void kbase_csf_firmware_cs_input(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_cs_input_read(
-	const struct kbase_csf_cmd_stream_info *const info, const u32 offset);
+    const struct kbase_csf_cmd_stream_info *const info, const u32 offset);
 
 /**
  * kbase_csf_firmware_cs_input_mask() - Set part of a word in a command stream's
@@ -161,8 +161,8 @@ u32 kbase_csf_firmware_cs_input_read(
  * @mask: Bitmask with the bits to be modified set.
  */
 void kbase_csf_firmware_cs_input_mask(
-	const struct kbase_csf_cmd_stream_info *info, u32 offset,
-	u32 value, u32 mask);
+    const struct kbase_csf_cmd_stream_info *info, u32 offset,
+    u32 value, u32 mask);
 
 /**
  * kbase_csf_firmware_cs_output() - Read a word in a command stream's output
@@ -174,7 +174,7 @@ void kbase_csf_firmware_cs_input_mask(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_cs_output(
-	const struct kbase_csf_cmd_stream_info *info, u32 offset);
+    const struct kbase_csf_cmd_stream_info *info, u32 offset);
 /**
  * struct kbase_csf_cmd_stream_group_info - Command stream group interface
  *                                          provided by the firmware.
@@ -195,15 +195,15 @@ u32 kbase_csf_firmware_cs_output(
  * @streams: Address of an array of command stream capability structures.
  */
 struct kbase_csf_cmd_stream_group_info {
-	struct kbase_device *kbdev;
-	u32 features;
-	void *input;
-	void *output;
-	u32 suspend_size;
-	u32 protm_suspend_size;
-	u32 stream_num;
-	u32 stream_stride;
-	struct kbase_csf_cmd_stream_info *streams;
+    struct kbase_device *kbdev;
+    u32 features;
+    void *input;
+    void *output;
+    u32 suspend_size;
+    u32 protm_suspend_size;
+    u32 stream_num;
+    u32 stream_stride;
+    struct kbase_csf_cmd_stream_info *streams;
 };
 
 /**
@@ -215,8 +215,8 @@ struct kbase_csf_cmd_stream_group_info {
  * @value: Value to be written.
  */
 void kbase_csf_firmware_csg_input(
-	const struct kbase_csf_cmd_stream_group_info *info, u32 offset,
-	u32 value);
+    const struct kbase_csf_cmd_stream_group_info *info, u32 offset,
+    u32 value);
 
 /**
  * kbase_csf_firmware_csg_input_read() - Read a word in a command stream group's
@@ -228,7 +228,7 @@ void kbase_csf_firmware_csg_input(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_csg_input_read(
-	const struct kbase_csf_cmd_stream_group_info *info, u32 offset);
+    const struct kbase_csf_cmd_stream_group_info *info, u32 offset);
 
 /**
  * kbase_csf_firmware_csg_input_mask() - Set part of a word in a command stream
@@ -240,8 +240,8 @@ u32 kbase_csf_firmware_csg_input_read(
  * @mask: Bitmask with the bits to be modified set.
  */
 void kbase_csf_firmware_csg_input_mask(
-	const struct kbase_csf_cmd_stream_group_info *info, u32 offset,
-	u32 value, u32 mask);
+    const struct kbase_csf_cmd_stream_group_info *info, u32 offset,
+    u32 value, u32 mask);
 
 /**
  * kbase_csf_firmware_csg_output()- Read a word in a command stream group's
@@ -253,7 +253,7 @@ void kbase_csf_firmware_csg_input_mask(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_csg_output(
-	const struct kbase_csf_cmd_stream_group_info *info, u32 offset);
+    const struct kbase_csf_cmd_stream_group_info *info, u32 offset);
 
 /**
  * struct kbase_csf_global_iface - Global command stream front-end interface
@@ -275,15 +275,15 @@ u32 kbase_csf_firmware_csg_output(
  * @groups: Address of an array of command stream group capability structures.
  */
 struct kbase_csf_global_iface {
-	struct kbase_device *kbdev;
-	u32 version;
-	u32 features;
-	void *input;
-	void *output;
-	u32 group_num;
-	u32 group_stride;
-	u32 prfcnt_size;
-	struct kbase_csf_cmd_stream_group_info *groups;
+    struct kbase_device *kbdev;
+    u32 version;
+    u32 features;
+    void *input;
+    void *output;
+    u32 group_num;
+    u32 group_stride;
+    u32 prfcnt_size;
+    struct kbase_csf_cmd_stream_group_info *groups;
 };
 
 /**
@@ -294,7 +294,7 @@ struct kbase_csf_global_iface {
  * @value: Value to be written.
  */
 void kbase_csf_firmware_global_input(
-	const struct kbase_csf_global_iface *iface, u32 offset, u32 value);
+    const struct kbase_csf_global_iface *iface, u32 offset, u32 value);
 
 /**
  * kbase_csf_firmware_global_input_mask() - Set part of a word in the global
@@ -306,8 +306,8 @@ void kbase_csf_firmware_global_input(
  * @mask: Bitmask with the bits to be modified set.
  */
 void kbase_csf_firmware_global_input_mask(
-	const struct kbase_csf_global_iface *iface, u32 offset,
-	u32 value, u32 mask);
+    const struct kbase_csf_global_iface *iface, u32 offset,
+    u32 value, u32 mask);
 
 /**
  * kbase_csf_firmware_global_input_read() - Read a word in a global input page
@@ -318,7 +318,7 @@ void kbase_csf_firmware_global_input_mask(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_global_input_read(
-	const struct kbase_csf_global_iface *info, u32 offset);
+    const struct kbase_csf_global_iface *info, u32 offset);
 
 /**
  * kbase_csf_firmware_global_output() - Read a word in the global output page
@@ -329,25 +329,25 @@ u32 kbase_csf_firmware_global_input_read(
  * @offset: Offset of the word to be read, in bytes.
  */
 u32 kbase_csf_firmware_global_output(
-	const struct kbase_csf_global_iface *iface, u32 offset);
+    const struct kbase_csf_global_iface *iface, u32 offset);
 
 /* Calculate the offset to the Hw doorbell page corresponding to the
  * doorbell number.
  */
 static u32 csf_doorbell_offset(int doorbell_nr)
 {
-	WARN_ON(doorbell_nr >= CSF_NUM_DOORBELL);
+    WARN_ON(doorbell_nr >= CSF_NUM_DOORBELL);
 
-	return CSF_HW_DOORBELL_PAGE_OFFSET +
-		(doorbell_nr * CSF_HW_DOORBELL_PAGE_SIZE);
+    return CSF_HW_DOORBELL_PAGE_OFFSET +
+        (doorbell_nr * CSF_HW_DOORBELL_PAGE_SIZE);
 }
 
 static inline void kbase_csf_ring_doorbell(struct kbase_device *kbdev,
-					   int doorbell_nr)
+                       int doorbell_nr)
 {
-	WARN_ON(doorbell_nr >= CSF_NUM_DOORBELL);
+    WARN_ON(doorbell_nr >= CSF_NUM_DOORBELL);
 
-	kbase_reg_write(kbdev, csf_doorbell_offset(doorbell_nr), (u32)1);
+    kbase_reg_write(kbdev, csf_doorbell_offset(doorbell_nr), (u32)1);
 }
 
 /**
@@ -363,7 +363,7 @@ static inline void kbase_csf_ring_doorbell(struct kbase_device *kbdev,
  * @value:     output pointer to which the read value will be written.
  */
 void kbase_csf_read_firmware_memory(struct kbase_device *kbdev,
-	u32 gpu_addr, u32 *value);
+    u32 gpu_addr, u32 *value);
 
 /**
  * kbase_csf_update_firmware_memory - Write a value in a GPU address
@@ -378,7 +378,7 @@ void kbase_csf_read_firmware_memory(struct kbase_device *kbdev,
  * @value:     Value to write
  */
 void kbase_csf_update_firmware_memory(struct kbase_device *kbdev,
-	u32 gpu_addr, u32 value);
+    u32 gpu_addr, u32 value);
 
 /**
  * kbase_csf_firmware_init() - Load the firmware for the CSF MCU
@@ -441,10 +441,10 @@ void kbase_csf_enter_protected_mode(struct kbase_device *kbdev);
 static inline bool kbase_csf_firmware_mcu_halted(struct kbase_device *kbdev)
 {
 #ifndef CONFIG_MALI_BIFROST_NO_MALI
-	return (kbase_reg_read(kbdev, GPU_CONTROL_REG(MCU_STATUS)) ==
-		MCU_STATUS_HALTED);
+    return (kbase_reg_read(kbdev, GPU_CONTROL_REG(MCU_STATUS)) ==
+        MCU_STATUS_HALTED);
 #else
-	return true;
+    return true;
 #endif
 }
 
@@ -467,11 +467,11 @@ void kbase_csf_firmware_trigger_mcu_halt(struct kbase_device *kbdev);
  */
 static inline void kbase_csf_firmware_enable_mcu(struct kbase_device *kbdev)
 {
-	/* Trigger the boot of MCU firmware, Use the AUTO mode as
-	 * otherwise on fast reset, to exit protected mode, MCU will
-	 * not reboot by itself to enter normal mode.
-	 */
-	kbase_reg_write(kbdev, GPU_CONTROL_REG(MCU_CONTROL), MCU_CNTRL_AUTO);
+    /* Trigger the boot of MCU firmware, Use the AUTO mode as
+     * otherwise on fast reset, to exit protected mode, MCU will
+     * not reboot by itself to enter normal mode.
+     */
+    kbase_reg_write(kbdev, GPU_CONTROL_REG(MCU_CONTROL), MCU_CNTRL_AUTO);
 }
 
 /**
@@ -482,7 +482,7 @@ static inline void kbase_csf_firmware_enable_mcu(struct kbase_device *kbdev)
  */
 static inline void kbase_csf_firmware_disable_mcu(struct kbase_device *kbdev)
 {
-	kbase_reg_write(kbdev, GPU_CONTROL_REG(MCU_CONTROL), MCU_CNTRL_DISABLE);
+    kbase_reg_write(kbdev, GPU_CONTROL_REG(MCU_CONTROL), MCU_CNTRL_DISABLE);
 }
 
 /**
@@ -564,9 +564,9 @@ bool kbase_csf_firmware_global_reinit_complete(struct kbase_device *kbdev);
  *                         hardware performance counter data.
  */
 u32 kbase_csf_firmware_get_glb_iface(struct kbase_device *kbdev,
-	struct basep_cs_group_control *group_data, u32 max_group_num,
-	struct basep_cs_stream_control *stream_data, u32 max_total_stream_num,
-	u32 *glb_version, u32 *features, u32 *group_num, u32 *prfcnt_size);
+    struct basep_cs_group_control *group_data, u32 max_group_num,
+    struct basep_cs_stream_control *stream_data, u32 max_total_stream_num,
+    u32 *glb_version, u32 *features, u32 *group_num, u32 *prfcnt_size);
 
 
 /**
@@ -579,7 +579,7 @@ u32 kbase_csf_firmware_get_glb_iface(struct kbase_device *kbdev,
  * @size:         Metadata size if specified metadata found.
  */
 const char *kbase_csf_firmware_get_timeline_metadata(struct kbase_device *kbdev,
-	const char *name, size_t *size);
+    const char *name, size_t *size);
 
 /**
  * kbase_csf_firmware_mcu_shared_mapping_init -
@@ -603,11 +603,11 @@ const char *kbase_csf_firmware_get_timeline_metadata(struct kbase_device *kbdev,
  * @csf_mapping:        Object where to write metadata for the memory mapping.
  */
 int kbase_csf_firmware_mcu_shared_mapping_init(
-		struct kbase_device *kbdev,
-		unsigned int num_pages,
-		unsigned long cpu_map_properties,
-		unsigned long gpu_map_properties,
-		struct kbase_csf_mapping *csf_mapping);
+        struct kbase_device *kbdev,
+        unsigned int num_pages,
+        unsigned long cpu_map_properties,
+        unsigned long gpu_map_properties,
+        struct kbase_csf_mapping *csf_mapping);
 
 /**
  * kbase_csf_firmware_mcu_shared_mapping_term - Unmap and free MCU shared memory.
@@ -616,7 +616,7 @@ int kbase_csf_firmware_mcu_shared_mapping_init(
  * @csf_mapping: Metadata of the memory mapping to terminate.
  */
 void kbase_csf_firmware_mcu_shared_mapping_term(
-		struct kbase_device *kbdev, struct kbase_csf_mapping *csf_mapping);
+        struct kbase_device *kbdev, struct kbase_csf_mapping *csf_mapping);
 
 #ifndef MALI_KBASE_BUILD
 /**
@@ -634,7 +634,7 @@ void kbase_csf_firmware_mcu_shared_mapping_term(
  * @entry: Pointer to the start of the section
  */
 int mali_kutf_process_fw_utf_entry(struct kbase_device *kbdev,
-	const void *fw_data, size_t fw_size, const u32 *entry);
+    const void *fw_data, size_t fw_size, const u32 *entry);
 
 /**
  * mali_kutf_fw_utf_entry_cleanup() - Remove the Fw UTF tests debugfs entries
@@ -654,9 +654,9 @@ extern bool fw_debug;
 static inline long kbase_csf_timeout_in_jiffies(const unsigned int msecs)
 {
 #ifdef CONFIG_MALI_BIFROST_DEBUG
-	return (fw_debug ? MAX_SCHEDULE_TIMEOUT : msecs_to_jiffies(msecs));
+    return (fw_debug ? MAX_SCHEDULE_TIMEOUT : msecs_to_jiffies(msecs));
 #else
-	return msecs_to_jiffies(msecs);
+    return msecs_to_jiffies(msecs);
 #endif
 }
 

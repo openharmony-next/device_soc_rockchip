@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_IPA_SIMPLE_H_
-#define _KBASE_IPA_SIMPLE_H_
+#ifndef KBASE_IPA_SIMPLE_H
+#define KBASE_IPA_SIMPLE_H
 
 #if defined(CONFIG_MALI_BIFROST_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)
 

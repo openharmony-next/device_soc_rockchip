@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_DEBUG_KTRACE_DEFS_CSF_H_
-#define _KBASE_DEBUG_KTRACE_DEFS_CSF_H_
+#ifndef KBASE_DEBUG_KTRACE_DEFS_CSF_H
+#define KBASE_DEBUG_KTRACE_DEFS_CSF_H
 
 #if KBASE_KTRACE_TARGET_RBUF
 /**
@@ -50,7 +50,7 @@
 
 /* Collect all the flags together for debug checking */
 #define KBASE_KTRACE_FLAG_BACKEND_ALL \
-		(KBASE_KTRACE_FLAG_CSF_GROUP | KBASE_KTRACE_FLAG_CSF_QUEUE)
+        (KBASE_KTRACE_FLAG_CSF_GROUP | KBASE_KTRACE_FLAG_CSF_QUEUE)
 
 
 /**
@@ -71,14 +71,14 @@
  *                Only valid when @flags contains KBASE_KTRACE_FLAG_CSF_QUEUE.
  */
 struct kbase_ktrace_backend {
-	/* Place 64 and 32-bit members together */
-	/* Pack smaller members together */
-	kbase_ktrace_code_t code;
-	kbase_ktrace_flag_t flags;
-	u8 group_handle;
-	s8 csg_nr;
-	u8 slot_prio;
-	s8 csi_index;
+    /* Place 64 and 32-bit members together */
+    /* Pack smaller members together */
+    kbase_ktrace_code_t code;
+    kbase_ktrace_flag_t flags;
+    u8 group_handle;
+    s8 csg_nr;
+    u8 slot_prio;
+    s8 csi_index;
 };
 
 #endif /* KBASE_KTRACE_TARGET_RBUF */

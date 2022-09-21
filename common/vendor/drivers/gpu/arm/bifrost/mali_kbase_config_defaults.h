@@ -27,64 +27,64 @@
  *
  */
 
-#ifndef _KBASE_CONFIG_DEFAULTS_H_
-#define _KBASE_CONFIG_DEFAULTS_H_
+#ifndef KBASE_CONFIG_DEFAULTS_H
+#define KBASE_CONFIG_DEFAULTS_H
 
 /* Include mandatory definitions per platform */
 #include <mali_kbase_config_platform.h>
 
 enum {
-	/**
-	 * Use unrestricted Address ID width on the AXI bus.
-	 */
-	KBASE_AID_32 = 0x0,
+    /**
+     * Use unrestricted Address ID width on the AXI bus.
+     */
+    KBASE_AID_32 = 0x0,
 
-	/**
-	 * Restrict GPU to a half of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_16 = 0x3,
+    /**
+     * Restrict GPU to a half of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_16 = 0x3,
 
-	/**
-	 * Restrict GPU to a quarter of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_8  = 0x2,
+    /**
+     * Restrict GPU to a quarter of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_8  = 0x2,
 
-	/**
-	 * Restrict GPU to an eighth of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_4  = 0x1
+    /**
+     * Restrict GPU to an eighth of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_4  = 0x1
 };
 
 enum {
-	/**
-	 * Use unrestricted Address ID width on the AXI bus.
-	 * Restricting ID width will reduce performance & bus load due to GPU.
-	 */
-	KBASE_3BIT_AID_32 = 0x0,
+    /**
+     * Use unrestricted Address ID width on the AXI bus.
+     * Restricting ID width will reduce performance & bus load due to GPU.
+     */
+    KBASE_3BIT_AID_32 = 0x0,
 
-	/* Restrict GPU to 7/8 of maximum Address ID count. */
-	KBASE_3BIT_AID_28 = 0x1,
+    /* Restrict GPU to 7/8 of maximum Address ID count. */
+    KBASE_3BIT_AID_28 = 0x1,
 
-	/* Restrict GPU to 3/4 of maximum Address ID count. */
-	KBASE_3BIT_AID_24 = 0x2,
+    /* Restrict GPU to 3/4 of maximum Address ID count. */
+    KBASE_3BIT_AID_24 = 0x2,
 
-	/* Restrict GPU to 5/8 of maximum Address ID count. */
-	KBASE_3BIT_AID_20 = 0x3,
+    /* Restrict GPU to 5/8 of maximum Address ID count. */
+    KBASE_3BIT_AID_20 = 0x3,
 
-	/* Restrict GPU to 1/2 of maximum Address ID count.  */
-	KBASE_3BIT_AID_16 = 0x4,
+    /* Restrict GPU to 1/2 of maximum Address ID count.  */
+    KBASE_3BIT_AID_16 = 0x4,
 
-	/* Restrict GPU to 3/8 of maximum Address ID count. */
-	KBASE_3BIT_AID_12 = 0x5,
+    /* Restrict GPU to 3/8 of maximum Address ID count. */
+    KBASE_3BIT_AID_12 = 0x5,
 
-	/* Restrict GPU to 1/4 of maximum Address ID count. */
-	KBASE_3BIT_AID_8  = 0x6,
+    /* Restrict GPU to 1/4 of maximum Address ID count. */
+    KBASE_3BIT_AID_8  = 0x6,
 
-	/* Restrict GPU to 1/8 of maximum Address ID count. */
-	KBASE_3BIT_AID_4  = 0x7
+    /* Restrict GPU to 1/8 of maximum Address ID count. */
+    KBASE_3BIT_AID_4  = 0x7
 };
 
 /**

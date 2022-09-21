@@ -28,7 +28,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif				/* __cplusplus */
+#endif                /* __cplusplus */
 
 /**
  * @addtogroup base_api
@@ -60,13 +60,13 @@ extern "C" {
  *
  */
 enum uk_client_id {
-	/**
-	 * Value used to identify the Base driver UK client.
-	 */
-	UK_CLIENT_MALI_T600_BASE,
+    /**
+     * Value used to identify the Base driver UK client.
+     */
+    UK_CLIENT_MALI_T600_BASE,
 
-	/** The number of uk clients supported. This must be the last member of the enum */
-	UK_CLIENT_COUNT
+    /** The number of uk clients supported. This must be the last member of the enum */
+    UK_CLIENT_COUNT
 };
 
 /**
@@ -75,14 +75,14 @@ enum uk_client_id {
  * Numbers below UK_FUNC_ID are used for internal UK functions.
  */
 enum uk_func {
-	UKP_FUNC_ID_CHECK_VERSION,   /**< UKK Core internal function */
-	/**
-	 * Each UK client numbers the functions they provide starting from
-	 * number UK_FUNC_ID. This number is then eventually assigned to the
-	 * id field of the union uk_header structure when preparing to make a
-	 * UK call. See your UK client for a list of their function numbers.
-	 */
-	UK_FUNC_ID = 512
+    UKP_FUNC_ID_CHECK_VERSION,   /**< UKK Core internal function */
+    /**
+     * Each UK client numbers the functions they provide starting from
+     * number UK_FUNC_ID. This number is then eventually assigned to the
+     * id field of the union uk_header structure when preparing to make a
+     * UK call. See your UK client for a list of their function numbers.
+     */
+    UK_FUNC_ID = 512
 };
 
 /**
@@ -98,23 +98,23 @@ enum uk_func {
  * accordingly in the OS specific mali_uk_os.h header file.
  */
 union uk_header {
-	/**
-	 * 32-bit number identifying the UK function to be called.
-	 * Also see uk_func.
-	 */
-	u32 id;
-	/**
-	 * The int return code returned by the called UK function.
-	 * See the specification of the particular UK function you are
-	 * calling for the meaning of the error codes returned. All
-	 * UK functions return 0 on success.
-	 */
-	u32 ret;
-	/*
-	 * Used to ensure 64-bit alignment of this union. Do not remove.
-	 * This field is used for padding and does not need to be initialized.
-	 */
-	u64 sizer;
+    /**
+     * 32-bit number identifying the UK function to be called.
+     * Also see uk_func.
+     */
+    u32 id;
+    /**
+     * The int return code returned by the called UK function.
+     * See the specification of the particular UK function you are
+     * calling for the meaning of the error codes returned. All
+     * UK functions return 0 on success.
+     */
+    u32 ret;
+    /*
+     * Used to ensure 64-bit alignment of this union. Do not remove.
+     * This field is used for padding and does not need to be initialized.
+     */
+    u64 sizer;
 };
 
 /**
@@ -122,13 +122,13 @@ union uk_header {
  * used during uku_open to identify the versions of the UK module in use by the user-side and kernel-side.
  */
 struct uku_version_check_args {
-	union uk_header header;
-		  /**< UK call header */
-	u16 major;
-	   /**< This field carries the user-side major version on input and the kernel-side major version on output */
-	u16 minor;
-	   /**< This field carries the user-side minor version on input and the kernel-side minor version on output. */
-	u8 padding[4];
+    union uk_header header;
+          /**< UK call header */
+    u16 major;
+       /**< This field carries the user-side major version on input and the kernel-side major version on output */
+    u16 minor;
+       /**< This field carries the user-side minor version on input and the kernel-side minor version on output. */
+    u8 padding[4];
 };
 
 /** @} end group uk_api */
@@ -137,5 +137,5 @@ struct uku_version_check_args {
 
 #ifdef __cplusplus
 }
-#endif				/* __cplusplus */
-#endif				/* _UK_H_ */
+#endif                /* __cplusplus */
+#endif                /* _UK_H_ */

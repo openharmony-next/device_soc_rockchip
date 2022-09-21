@@ -10,7 +10,7 @@ void rkispp_proc_cleanup(struct rkispp_device *dev);
 #else
 static inline int rkispp_proc_init(struct rkispp_device *dev)
 {
-	return 0;
+    return 0;
 }
 static inline void rkispp_proc_cleanup(struct rkispp_device *dev)
 {

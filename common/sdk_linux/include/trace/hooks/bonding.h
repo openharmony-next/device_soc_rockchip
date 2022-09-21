@@ -5,6 +5,9 @@
  * Copyright (c) 2022, Huawei Tech. Co., Ltd.
  */
 
+#ifndef TRACE_HOOKS_BONDING_H
+#define TRACE_HOOKS_BONDING_H
+
 #ifdef CONFIG_VENDOR_BOND_HOOKS
 
 #undef TRACE_SYSTEM
@@ -19,11 +22,13 @@
 //struct bonding;
 //struct slave;
 DECLARE_HOOK(vendor_bond_check_dev_link,
-	TP_PROTO(uint16_t intGpioNum, void *data),
-	TP_ARGS(intGpioNum, data)); 
+    TP_PROTO(uint16_t intGpioNum, void *data),
+    TP_ARGS(intGpioNum, data)); 
 
 #endif
 /* This part must be outside protection */
 #include <trace/define_trace.h>
 
 #endif
+
+#endif /* TRACE_HOOKS_BONDING_H */

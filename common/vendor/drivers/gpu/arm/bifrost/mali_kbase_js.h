@@ -37,4 +37,4 @@
 #include "jm/mali_kbase_jm_js.h"
 #include "jm/mali_kbase_js_defs.h"
 
-#endif	/* _KBASE_JS_H_ */
+#endif    /* _KBASE_JS_H_ */

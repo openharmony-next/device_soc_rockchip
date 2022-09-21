@@ -55,7 +55,7 @@ void kbasep_ktrace_backend_format_header(char *buffer, int sz, s32 *written);
  * appropriately.
  */
 void kbasep_ktrace_backend_format_msg(struct kbase_ktrace_msg *trace_msg,
-		char *buffer, int sz, s32 *written);
+        char *buffer, int sz, s32 *written);
 
 
 /**
@@ -80,9 +80,9 @@ struct kbase_ktrace_msg *kbasep_ktrace_reserve(struct kbase_ktrace *ktrace);
  * The common part includes the mandatory parts of the backend part
  */
 void kbasep_ktrace_msg_init(struct kbase_ktrace *ktrace,
-		struct kbase_ktrace_msg *trace_msg, enum kbase_ktrace_code code,
-		struct kbase_context *kctx, kbase_ktrace_flag_t flags,
-		u64 info_val);
+        struct kbase_ktrace_msg *trace_msg, enum kbase_ktrace_code code,
+        struct kbase_context *kctx, kbase_ktrace_flag_t flags,
+        u64 info_val);
 
 #endif /* KBASE_KTRACE_TARGET_RBUF */
 

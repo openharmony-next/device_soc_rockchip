@@ -42,14 +42,14 @@ struct drm_hw_lock;
  * DO NOT USE.
  */
 struct drm_lock_data {
-	struct drm_hw_lock *hw_lock;
-	struct drm_file *file_priv;
-	wait_queue_head_t lock_queue;
-	unsigned long lock_time;
-	spinlock_t spinlock;
-	uint32_t kernel_waiters;
-	uint32_t user_waiters;
-	int idle_has_lock;
+    struct drm_hw_lock *hw_lock;
+    struct drm_file *file_priv;
+    wait_queue_head_t lock_queue;
+    unsigned long lock_time;
+    spinlock_t spinlock;
+    uint32_t kernel_waiters;
+    uint32_t user_waiters;
+    int idle_has_lock;
 };
 
 /**
@@ -69,40 +69,40 @@ struct drm_lock_data {
  * nodes, hence there can only be one per device, not one per drm_minor.
  */
 struct drm_master {
-	struct kref refcount;
-	struct drm_device *dev;
-	/**
-	 * @unique: Unique identifier: e.g. busid. Protected by
-	 * &drm_device.master_mutex.
-	 */
-	char *unique;
-	/**
-	 * @unique_len: Length of unique field. Protected by
-	 * &drm_device.master_mutex.
-	 */
-	int unique_len;
-	/**
-	 * @magic_map: Map of used authentication tokens. Protected by
-	 * &drm_device.master_mutex.
-	 */
-	struct idr magic_map;
-	void *driver_priv;
+    struct kref refcount;
+    struct drm_device *dev;
+    /**
+     * @unique: Unique identifier: e.g. busid. Protected by
+     * &drm_device.master_mutex.
+     */
+    char *unique;
+    /**
+     * @unique_len: Length of unique field. Protected by
+     * &drm_device.master_mutex.
+     */
+    int unique_len;
+    /**
+     * @magic_map: Map of used authentication tokens. Protected by
+     * &drm_device.master_mutex.
+     */
+    struct idr magic_map;
+    void *driver_priv;
 
-	/* Tree of display resource leases, each of which is a drm_master struct
-	 * All of these get activated simultaneously, so drm_device master points
-	 * at the top of the tree (for which lessor is NULL). Protected by
-	 * &drm_device.mode_config.idr_mutex.
-	 */
+    /* Tree of display resource leases, each of which is a drm_master struct
+     * All of these get activated simultaneously, so drm_device master points
+     * at the top of the tree (for which lessor is NULL). Protected by
+     * &drm_device.mode_config.idr_mutex.
+     */
 
-	struct drm_master *lessor;
-	int	lessee_id;
-	struct list_head lessee_list;
-	struct list_head lessees;
-	struct idr leases;
-	struct idr lessee_idr;
-	/* private: */
+    struct drm_master *lessor;
+    int    lessee_id;
+    struct list_head lessee_list;
+    struct list_head lessees;
+    struct idr leases;
+    struct idr lessee_idr;
+    /* private: */
 #if IS_ENABLED(CONFIG_DRM_LEGACY)
-	struct drm_lock_data lock;
+    struct drm_lock_data lock;
 #endif
 };
 

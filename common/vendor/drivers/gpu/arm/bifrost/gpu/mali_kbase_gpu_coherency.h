@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_COHERENCY_H_
-#define _KBASE_GPU_COHERENCY_H_
+#ifndef KBASE_GPU_COHERENCY_H
+#define KBASE_GPU_COHERENCY_H
 
 #define COHERENCY_ACE_LITE 0
 #define COHERENCY_ACE      1

@@ -7,9 +7,9 @@
 #include <linux/rkisp1-config.h>
 
 enum rkisp_tb_state {
-	RKISP_TB_RUN = 0,
-	RKISP_TB_OK,
-	RKISP_TB_NG
+    RKISP_TB_RUN = 0,
+    RKISP_TB_OK,
+    RKISP_TB_NG
 };
 
 #ifdef CONFIG_VIDEO_ROCKCHIP_THUNDER_BOOT_ISP
@@ -22,11 +22,11 @@ static inline void rkisp_tb_unprotect_clk(void) {}
 static inline void rkisp_tb_set_state(enum rkisp_tb_state result) {}
 static inline enum rkisp_tb_state rkisp_tb_get_state(void)
 {
-	return RKISP_TB_OK;
+    return RKISP_TB_OK;
 }
 static inline long rkisp_tb_shm_ioctl(struct rkisp_thunderboot_shmem *shmem)
 {
-	return 0;
+    return 0;
 }
 #endif
 

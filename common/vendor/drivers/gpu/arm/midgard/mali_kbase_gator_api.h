@@ -18,6 +18,10 @@
 #ifndef _KBASE_GATOR_API_H_
 #define _KBASE_GATOR_API_H_
 
+#include "mali_kbase_gator_hwcnt_names_tmix.h"
+#include "mali_kbase_gator_hwcnt_names_thex.h"
+#include "mali_kbase_gator_hwcnt_names_tsix.h"
+
 /**
  * @brief This file describes the API used by Gator to fetch hardware counters.
  */
@@ -113,41 +117,41 @@
 #define MALI_DDK_GATOR_API_VERSION 3
 
 enum hwc_type {
-	JM_BLOCK = 0,
-	TILER_BLOCK,
-	SHADER_BLOCK,
-	MMU_L2_BLOCK,
-	RESERVED_BLOCK
+    JM_BLOCK = 0,
+    TILER_BLOCK,
+    SHADER_BLOCK,
+    MMU_L2_BLOCK,
+    RESERVED_BLOCK
 };
 
 struct kbase_gator_hwcnt_info {
-	/* Passed from Gator to kbase */
+    /* Passed from Gator to kbase */
 
-	/* the bitmask of enabled hardware counters for each counter block */
-	uint16_t bitmask[4];
+    /* the bitmask of enabled hardware counters for each counter block */
+    uint16_t bitmask[4];
 
-	/* Passed from kbase to Gator */
+    /* Passed from kbase to Gator */
 
-	/* ptr to counter dump memory */
-	void *kernel_dump_buffer;
+    /* ptr to counter dump memory */
+    void *kernel_dump_buffer;
 
-	/* size of counter dump memory */
-	uint32_t size;
+    /* size of counter dump memory */
+    uint32_t size;
 
-	/* the ID of the Mali device */
-	uint32_t gpu_id;
+    /* the ID of the Mali device */
+    uint32_t gpu_id;
 
-	/* the number of shader cores in the GPU */
-	uint32_t nr_cores;
+    /* the number of shader cores in the GPU */
+    uint32_t nr_cores;
 
-	/* the number of core groups */
-	uint32_t nr_core_groups;
+    /* the number of core groups */
+    uint32_t nr_core_groups;
 
-	/* the memory layout of the performance counters */
-	enum hwc_type *hwc_layout;
+    /* the memory layout of the performance counters */
+    enum hwc_type *hwc_layout;
 
-	/* the total number of hardware couter blocks */
-	uint32_t nr_hwc_blocks;
+    /* the total number of hardware couter blocks */
+    uint32_t nr_hwc_blocks;
 };
 
 /**

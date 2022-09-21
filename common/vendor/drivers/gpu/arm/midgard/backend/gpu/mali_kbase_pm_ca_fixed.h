@@ -31,7 +31,7 @@
  * active.
  */
 struct kbasep_pm_ca_policy_fixed {
-	int dummy;
+    int dummy;
 };
 
 extern const struct kbase_pm_ca_policy kbase_pm_ca_fixed_policy_ops;

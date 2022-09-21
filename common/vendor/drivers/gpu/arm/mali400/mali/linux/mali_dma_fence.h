@@ -33,22 +33,22 @@ typedef void (*mali_dma_fence_context_callback_func_t)(void *pp_job_ptr);
 
 struct mali_dma_fence_waiter {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-	struct dma_fence *fence;
-	struct dma_fence_cb base;
+    struct dma_fence *fence;
+    struct dma_fence_cb base;
 #else
-	struct fence_cb base;
-	struct fence *fence;
+    struct fence_cb base;
+    struct fence *fence;
 #endif
-	struct mali_dma_fence_context *parent;
+    struct mali_dma_fence_context *parent;
 };
 
 struct mali_dma_fence_context {
-	struct work_struct work_handle;
-	struct mali_dma_fence_waiter **mali_dma_fence_waiters;
-	u32 num_dma_fence_waiter;
-	atomic_t count;
-	void *pp_job_ptr; /* the mali pp job pointer */;
-	mali_dma_fence_context_callback_func_t cb_func;
+    struct work_struct work_handle;
+    struct mali_dma_fence_waiter **mali_dma_fence_waiters;
+    u32 num_dma_fence_waiter;
+    atomic_t count;
+    void *pp_job_ptr; /* the mali pp job pointer */;
+    mali_dma_fence_context_callback_func_t cb_func;
 };
 
 /* Create a dma fence
@@ -76,17 +76,17 @@ void mali_dma_fence_signal_and_put(struct fence **fence);
  * @param pp_job_ptr The pp_job to call function with.
  */
 void mali_dma_fence_context_init(struct mali_dma_fence_context *dma_fence_context,
-				 mali_dma_fence_context_callback_func_t  cb_func,
-				 void *pp_job_ptr);
+                 mali_dma_fence_context_callback_func_t  cb_func,
+                 void *pp_job_ptr);
 
 /**
  * Add new mali dma fence waiter into mali dma fence context
  * @param dma_fence_context The mali dma fence context
  * @param dma_reservation_object the reservation object to create new mali dma fence waiters
- * @return _MALI_OSK_ERR_OK if success, or not.
+ * @return MALI_OSK_ERR_OK if success, or not.
  */
-_mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_context *dma_fence_context,
-		struct reservation_object *dma_reservation_object);
+mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_context *dma_fence_context,
+        struct reservation_object *dma_reservation_object);
 
 /**
  * Release the dma fence context
@@ -107,18 +107,18 @@ void mali_dma_fence_context_dec_count(struct mali_dma_fence_context *dma_fence_c
  * @param num_dma_reservation_object The number of all reservation object
  */
 void mali_dma_fence_add_reservation_object_list(struct reservation_object *dma_reservation_object,
-		struct reservation_object **dma_reservation_object_list,
-		u32 *num_dma_reservation_object);
+        struct reservation_object **dma_reservation_object_list,
+        u32 *num_dma_reservation_object);
 
 /**
  * Wait/wound mutex lock to lock all reservation object.
  */
 int mali_dma_fence_lock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-		u32  num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
+        u32  num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
 
 /**
  * Wait/wound mutex lock to unlock all reservation object.
  */
 void mali_dma_fence_unlock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-		u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
+        u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
 #endif

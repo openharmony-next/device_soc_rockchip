@@ -32,20 +32,20 @@
 #define KBASE_HWCNT_READER_DUMP            _IOW(KBASE_HWCNT_READER, 0x10, u32)
 #define KBASE_HWCNT_READER_CLEAR           _IOW(KBASE_HWCNT_READER, 0x11, u32)
 #define KBASE_HWCNT_READER_GET_BUFFER      _IOC(_IOC_READ, KBASE_HWCNT_READER, 0x20,\
-		offsetof(struct kbase_hwcnt_reader_metadata, cycles))
+        offsetof(struct kbase_hwcnt_reader_metadata, cycles))
 #define KBASE_HWCNT_READER_GET_BUFFER_WITH_CYCLES      _IOR(KBASE_HWCNT_READER, 0x20,\
-		struct kbase_hwcnt_reader_metadata)
+        struct kbase_hwcnt_reader_metadata)
 #define KBASE_HWCNT_READER_PUT_BUFFER      _IOC(_IOC_WRITE, KBASE_HWCNT_READER, 0x21,\
-		offsetof(struct kbase_hwcnt_reader_metadata, cycles))
+        offsetof(struct kbase_hwcnt_reader_metadata, cycles))
 #define KBASE_HWCNT_READER_PUT_BUFFER_WITH_CYCLES      _IOW(KBASE_HWCNT_READER, 0x21,\
-		struct kbase_hwcnt_reader_metadata)
+        struct kbase_hwcnt_reader_metadata)
 #define KBASE_HWCNT_READER_SET_INTERVAL    _IOW(KBASE_HWCNT_READER, 0x30, u32)
 #define KBASE_HWCNT_READER_ENABLE_EVENT    _IOW(KBASE_HWCNT_READER, 0x40, u32)
 #define KBASE_HWCNT_READER_DISABLE_EVENT   _IOW(KBASE_HWCNT_READER, 0x41, u32)
 #define KBASE_HWCNT_READER_GET_API_VERSION _IOW(KBASE_HWCNT_READER, 0xFF, u32)
 #define KBASE_HWCNT_READER_GET_API_VERSION_WITH_FEATURES \
-		_IOW(KBASE_HWCNT_READER, 0xFF, \
-		     struct kbase_hwcnt_reader_api_version)
+        _IOW(KBASE_HWCNT_READER, 0xFF, \
+             struct kbase_hwcnt_reader_api_version)
 
 /**
  * struct kbase_hwcnt_reader_metadata_cycles - GPU clock cycles
@@ -54,8 +54,8 @@
  * @shader_cores:  the cycles that have elapsed on the GPU shader cores
  */
 struct kbase_hwcnt_reader_metadata_cycles {
-	u64 top;
-	u64 shader_cores;
+    u64 top;
+    u64 shader_cores;
 };
 
 /**
@@ -66,10 +66,10 @@ struct kbase_hwcnt_reader_metadata_cycles {
  * @cycles:     the GPU cycles that occurred since the last sample
  */
 struct kbase_hwcnt_reader_metadata {
-	u64 timestamp;
-	u32 event_id;
-	u32 buffer_idx;
-	struct kbase_hwcnt_reader_metadata_cycles cycles;
+    u64 timestamp;
+    u32 event_id;
+    u32 buffer_idx;
+    struct kbase_hwcnt_reader_metadata_cycles cycles;
 };
 
 /**
@@ -81,12 +81,12 @@ struct kbase_hwcnt_reader_metadata {
  * @BASE_HWCNT_READER_EVENT_COUNT:    number of supported events
  */
 enum base_hwcnt_reader_event {
-	BASE_HWCNT_READER_EVENT_MANUAL,
-	BASE_HWCNT_READER_EVENT_PERIODIC,
-	BASE_HWCNT_READER_EVENT_PREJOB,
-	BASE_HWCNT_READER_EVENT_POSTJOB,
+    BASE_HWCNT_READER_EVENT_MANUAL,
+    BASE_HWCNT_READER_EVENT_PERIODIC,
+    BASE_HWCNT_READER_EVENT_PREJOB,
+    BASE_HWCNT_READER_EVENT_POSTJOB,
 
-	BASE_HWCNT_READER_EVENT_COUNT
+    BASE_HWCNT_READER_EVENT_COUNT
 };
 
 /**
@@ -98,8 +98,8 @@ enum base_hwcnt_reader_event {
 #define KBASE_HWCNT_READER_API_VERSION_FEATURE_CYCLES_TOP          (1 << 0)
 #define KBASE_HWCNT_READER_API_VERSION_FEATURE_CYCLES_SHADER_CORES (1 << 1)
 struct kbase_hwcnt_reader_api_version {
-	u32 version;
-	u32 features;
+    u32 version;
+    u32 features;
 };
 
 #endif /* _KBASE_HWCNT_READER_H_ */

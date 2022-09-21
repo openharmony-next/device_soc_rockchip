@@ -52,16 +52,16 @@ struct kbase_hwcnt_dump_buffer;
  * Return: 0 on success, else error code.
  */
 int kbase_hwcnt_virtualizer_init(
-	struct kbase_hwcnt_context *hctx,
-	u64 dump_threshold_ns,
-	struct kbase_hwcnt_virtualizer **out_hvirt);
+    struct kbase_hwcnt_context *hctx,
+    u64 dump_threshold_ns,
+    struct kbase_hwcnt_virtualizer **out_hvirt);
 
 /**
  * kbase_hwcnt_virtualizer_term - Terminate a hardware counter virtualizer.
  * @hvirt: Pointer to virtualizer to be terminated.
  */
 void kbase_hwcnt_virtualizer_term(
-	struct kbase_hwcnt_virtualizer *hvirt);
+    struct kbase_hwcnt_virtualizer *hvirt);
 
 /**
  * kbase_hwcnt_virtualizer_metadata - Get the hardware counter metadata used by
@@ -72,7 +72,7 @@ void kbase_hwcnt_virtualizer_term(
  * Return: Non-NULL pointer to metadata, or NULL on error.
  */
 const struct kbase_hwcnt_metadata *kbase_hwcnt_virtualizer_metadata(
-	struct kbase_hwcnt_virtualizer *hvirt);
+    struct kbase_hwcnt_virtualizer *hvirt);
 
 /**
  * kbase_hwcnt_virtualizer_client_create - Create a new virtualizer client.
@@ -85,16 +85,16 @@ const struct kbase_hwcnt_metadata *kbase_hwcnt_virtualizer_metadata(
  * Return: 0 on success, else error code.
  */
 int kbase_hwcnt_virtualizer_client_create(
-	struct kbase_hwcnt_virtualizer *hvirt,
-	const struct kbase_hwcnt_enable_map *enable_map,
-	struct kbase_hwcnt_virtualizer_client **out_hvcli);
+    struct kbase_hwcnt_virtualizer *hvirt,
+    const struct kbase_hwcnt_enable_map *enable_map,
+    struct kbase_hwcnt_virtualizer_client **out_hvcli);
 
 /**
  * kbase_hwcnt_virtualizer_client_destroy() - Destroy a virtualizer client.
  * @hvcli: Pointer to the hardware counter client.
  */
 void kbase_hwcnt_virtualizer_client_destroy(
-	struct kbase_hwcnt_virtualizer_client *hvcli);
+    struct kbase_hwcnt_virtualizer_client *hvcli);
 
 /**
  * kbase_hwcnt_virtualizer_client_set_counters - Perform a dump of the client's
@@ -116,11 +116,11 @@ void kbase_hwcnt_virtualizer_client_destroy(
  * Return: 0 on success or error code.
  */
 int kbase_hwcnt_virtualizer_client_set_counters(
-	struct kbase_hwcnt_virtualizer_client *hvcli,
-	const struct kbase_hwcnt_enable_map *enable_map,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf);
+    struct kbase_hwcnt_virtualizer_client *hvcli,
+    const struct kbase_hwcnt_enable_map *enable_map,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf);
 
 /**
  * kbase_hwcnt_virtualizer_client_dump - Perform a dump of the client's
@@ -137,9 +137,9 @@ int kbase_hwcnt_virtualizer_client_set_counters(
  * Return: 0 on success or error code.
  */
 int kbase_hwcnt_virtualizer_client_dump(
-	struct kbase_hwcnt_virtualizer_client *hvcli,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf);
+    struct kbase_hwcnt_virtualizer_client *hvcli,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf);
 
 #endif /* _KBASE_HWCNT_VIRTUALIZER_H_ */

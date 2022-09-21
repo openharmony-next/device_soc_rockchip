@@ -67,8 +67,8 @@
 #if KBASE_KTRACE_TARGET_RBUF
 /* Collect all the flags together for debug checking */
 #define KBASE_KTRACE_FLAG_BACKEND_ALL \
-		(KBASE_KTRACE_FLAG_JM_REFCOUNT | KBASE_KTRACE_FLAG_JM_JOBSLOT \
-		| KBASE_KTRACE_FLAG_JM_ATOM)
+        (KBASE_KTRACE_FLAG_JM_REFCOUNT | KBASE_KTRACE_FLAG_JM_JOBSLOT \
+        | KBASE_KTRACE_FLAG_JM_ATOM)
 
 /**
  * struct kbase_ktrace_backend - backend specific part of a trace message
@@ -87,15 +87,15 @@
  *               related to scheduler core and policy.
  */
 struct kbase_ktrace_backend {
-	/* Place 64 and 32-bit members together */
-	u64 atom_udata[2]; /* Only valid for KBASE_KTRACE_FLAG_JM_ATOM */
-	u64 gpu_addr;
-	int atom_number; /* Only valid for KBASE_KTRACE_FLAG_JM_ATOM */
-	/* Pack smaller members together */
-	kbase_ktrace_code_t code;
-	kbase_ktrace_flag_t flags;
-	u8 jobslot;
-	u8 refcount;
+    /* Place 64 and 32-bit members together */
+    u64 atom_udata[2]; /* Only valid for KBASE_KTRACE_FLAG_JM_ATOM */
+    u64 gpu_addr;
+    int atom_number; /* Only valid for KBASE_KTRACE_FLAG_JM_ATOM */
+    /* Pack smaller members together */
+    kbase_ktrace_code_t code;
+    kbase_ktrace_flag_t flags;
+    u8 jobslot;
+    u8 refcount;
 };
 #endif /* KBASE_KTRACE_TARGET_RBUF */
 

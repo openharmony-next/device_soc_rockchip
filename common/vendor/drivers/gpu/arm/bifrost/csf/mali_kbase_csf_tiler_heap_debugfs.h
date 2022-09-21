@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_TILER_HEAP_DEBUGFS_H_
-#define _KBASE_CSF_TILER_HEAP_DEBUGFS_H_
+#ifndef KBASE_CSF_TILER_HEAP_DEBUGFS_H
+#define KBASE_CSF_TILER_HEAP_DEBUGFS_H
 
 /* Forward declaration */
 struct kbase_context;

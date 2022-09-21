@@ -56,7 +56,7 @@
  * @dummy: Dummy member - no state needed
  */
 struct kbasep_pm_policy_coarse_demand {
-	int dummy;
+    int dummy;
 };
 
 extern const struct kbase_pm_policy kbase_pm_coarse_demand_policy_ops;

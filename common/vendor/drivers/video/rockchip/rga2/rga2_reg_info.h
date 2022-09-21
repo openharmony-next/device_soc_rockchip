@@ -21,7 +21,7 @@
 #endif
 
 #ifndef CLIP
-#define CLIP(x, a,  b)				((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x))
+#define CLIP(x, a,  b)                ((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x))
 #endif
 
 #define rRGA_SYS_CTRL             (*(volatile u32 *)(RGA2_BASE + RGA2_SYS_CTRL_OFFSET    ))

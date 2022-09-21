@@ -8,8 +8,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_MEMORY_SWAP_ALLOC_H__
-#define __MALI_MEMORY_SWAP_ALLOC_H__
+#ifndef MALI_MEMORY_SWAP_ALLOC_H
+#define MALI_MEMORY_SWAP_ALLOC_H
 
 #include "mali_osk.h"
 #include "mali_session.h"
@@ -17,10 +17,12 @@
 #include "mali_memory_types.h"
 #include "mali_pp_job.h"
 
+#define PAGE_SIZE_RANGE               12
+#define MALI_MEM_SWAP_THRESHOLD_SHFIT 2
 /**
  * Initialize memory swapping module.
  */
-_mali_osk_errcode_t mali_mem_swap_init(void);
+mali_osk_errcode_t mali_mem_swap_init(void);
 
 void mali_mem_swap_term(void);
 
@@ -69,9 +71,9 @@ struct mali_page_node *_mali_mem_swap_page_node_allocate(void);
 /**
  * Reduce the reference count of given page node and if return 0, just free this page node.
  */
-_mali_osk_errcode_t _mali_mem_swap_put_page_node(struct mali_page_node *m_page);
+mali_osk_errcode_t mali_mem_swap_put_page_node(struct mali_page_node *m_page);
 
-void _mali_mem_swap_page_node_free(struct mali_page_node *m_page);
+void mali_mem_swap_page_node_free(struct mali_page_node *m_page);
 
 /**
  * Free a swappable memory backend.
@@ -90,7 +92,7 @@ mali_bool mali_mem_swap_in_page_node(struct mali_page_node *page_node);
 
 int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx);
 
-_mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_session_data *session, u32 vaddr, u32 props);
+mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_session_data *session, u32 vaddr, u32 props);
 
 void mali_mem_swap_mali_unmap(mali_mem_allocation *alloc);
 

@@ -2402,10 +2402,10 @@ static int cdc_ncm_rx_fixup(struct hw_cdc_net *dev, struct sk_buff *skb)
         skb_trim(skb2, curr_dgram_len);
         #else
         /* create a fresh copy to reduce truesize */
-		skb2 = netdev_alloc_skb_ip_align(dev->net, curr_dgram_len);
-		if (!skb2)
-			goto error;
-		skb_put_data(skb2, skb->data + curr_dgram_idx, curr_dgram_len);
+        skb2 = netdev_alloc_skb_ip_align(dev->net, curr_dgram_len);
+        if (!skb2)
+            goto error;
+        skb_put_data(skb2, skb->data + curr_dgram_idx, curr_dgram_len);
         #endif
 
         rep_len += skb2->len;
@@ -2764,12 +2764,12 @@ static void ncm_tx_timer_cb(unsigned long param)
 {
     struct ncm_ctx *ctx = (void *)param;
 
-#else	
+#else    
 static void ncm_tx_timer_cb(struct timer_list *t)
 {
     struct ncm_ctx *ctx = from_timer(ctx, t, tx_timer);
 
-#endif	
+#endif    
     if (!netif_queue_stopped(ctx->ndev->net)){
         hw_start_xmit(NULL, ctx->ndev->net);
     }
@@ -2853,9 +2853,9 @@ hw_cdc_probe (struct usb_interface *udev, const struct usb_device_id *prod)
     dev->delay.function = hw_bh;
     dev->delay.data = (unsigned long) dev;
     init_timer (&dev->delay);
-#else	
+#else    
     timer_setup(&dev->delay, hw_bh_timer_call, 0);
-#endif	
+#endif    
     mutex_init (&dev->phy_mutex);
 
     dev->net = net;
@@ -2922,8 +2922,8 @@ hw_cdc_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 
     /*activate the download tlp feature*/
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-	dev->hw_tlp_download_is_actived = 0;//activated failed
-	devdbg(dev, "kernel-4.14.x later default not active tlp");
+    dev->hw_tlp_download_is_actived = 0;//activated failed
+    devdbg(dev, "kernel-4.14.x later default not active tlp");
 #else
     if (0 < hw_send_tlp_download_request(udev)){
         devdbg(dev, "%s: The tlp is activated", __FUNCTION__);
@@ -3077,7 +3077,7 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
         init_timer(&ctx->tx_timer);
 #else
         timer_setup(&ctx->tx_timer, ncm_tx_timer_cb, 0);
-#endif		
+#endif        
 
 
     if(ncm_tx_timeout){
@@ -3152,14 +3152,14 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
                 }
             }
         
-		    
+            
             /*For Jungo solution, the NDIS device has no data interface, so needn't detect data interface*/
             if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice 
              && BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass
-        	 && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
-	         || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0)))
+             && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
+             || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0)))
            {
-			            printk("L[%d]",__LINE__);
+                        printk("L[%d]",__LINE__);
                 /* a data interface altsetting does the real i/o */
                 d = &info->data->cur_altsetting->desc;
             //if (d->bInterfaceClass != USB_CLASS_CDC_DATA) { /*delete the standard CDC slave class detect*/
@@ -3252,8 +3252,8 @@ next_desc:
     /*if the NDIS device is not Jungo solution, then assume that it has the data interface, and claim for it*/
     if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice 
      && BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass
-	 && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
-	 || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0)))
+     && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
+     || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0)))
 
     {
         /* claim data interface and set it up ... with side effects.
@@ -3284,9 +3284,9 @@ next_desc:
 
     if (HW_JUNGO_BCDDEVICE_VALUE == dev->udev->descriptor.bcdDevice 
      || BINTERFACESUBCLASS == intf->cur_altsetting->desc.bInterfaceSubClass 
-	 || BINTERFACESUBCLASS_HW == intf->cur_altsetting->desc.bInterfaceSubClass 
+     || BINTERFACESUBCLASS_HW == intf->cur_altsetting->desc.bInterfaceSubClass 
      || info->control->cur_altsetting->desc.bNumEndpoints == 1
-	 || ((NULL != info->u)&&(info->u->bMasterInterface0 == info->u->bSlaveInterface0)))
+     || ((NULL != info->u)&&(info->u->bMasterInterface0 == info->u->bSlaveInterface0)))
     {
         struct usb_endpoint_descriptor    *desc;
         dev->status = &info->control->cur_altsetting->endpoint [0];
@@ -3300,21 +3300,21 @@ next_desc:
             dev->status = NULL;
         }
     }
-	
-	 
+    
+     
      if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice 
      && BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass
-	 && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
-	 || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
-	     printk(KERN_ERR"Qualcomm device bcdDevice=%x,InterfaceSubClass=%x\n",
-		        dev->udev->descriptor.bcdDevice,intf->cur_altsetting->desc.bInterfaceSubClass);
-	     deviceisBalong = false;
-	 }else{
-	     deviceisBalong = true;
-	     printk(KERN_ERR"Balong device bcdDevice=%x,InterfaceSubClass=%x\n",
-	     dev->udev->descriptor.bcdDevice,intf->cur_altsetting->desc.bInterfaceSubClass);
-	 }
-	 
+     && BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass)
+     || ((NULL != info->u)&&(info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
+         printk(KERN_ERR"Qualcomm device bcdDevice=%x,InterfaceSubClass=%x\n",
+                dev->udev->descriptor.bcdDevice,intf->cur_altsetting->desc.bInterfaceSubClass);
+         deviceisBalong = false;
+     }else{
+         deviceisBalong = true;
+         printk(KERN_ERR"Balong device bcdDevice=%x,InterfaceSubClass=%x\n",
+         dev->udev->descriptor.bcdDevice,intf->cur_altsetting->desc.bInterfaceSubClass);
+     }
+     
 
     return hw_get_ethernet_addr(dev);
     
@@ -3904,7 +3904,7 @@ static const struct usb_device_id    hw_products [] = {
               | USB_DEVICE_ID_MATCH_VENDOR,
         .idVendor        = 0x2dee,
         HUAWEI_NDIS_SINGLE_INTERFACE_VDF_JUNGO_HW
-    }, 	
+    },     
     {
         .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
               | USB_DEVICE_ID_MATCH_VENDOR,
@@ -3928,7 +3928,7 @@ static const struct usb_device_id    hw_products [] = {
               | USB_DEVICE_ID_MATCH_VENDOR,
         .idVendor        = 0x2dee,
         HUAWEI_INTERFACE_NDIS_HW_JUNGO_HW
-    }, 	
+    },     
     {
         .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
               | USB_DEVICE_ID_MATCH_VENDOR,
@@ -3940,7 +3940,7 @@ static const struct usb_device_id    hw_products [] = {
               | USB_DEVICE_ID_MATCH_VENDOR,
         .idVendor        = 0x2dee,
         HUAWEI_INTERFACE_NDIS_NCM_JUNGO_HW
-    }, 	
+    },     
     { },        // END
 };
 MODULE_DEVICE_TABLE(usb, hw_products);

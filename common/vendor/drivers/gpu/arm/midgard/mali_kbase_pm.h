@@ -92,17 +92,17 @@ void kbase_pm_context_active(struct kbase_device *kbdev);
 
 /** Handler codes for doing kbase_pm_context_active_handle_suspend() */
 enum kbase_pm_suspend_handler {
-	/** A suspend is not expected/not possible - this is the same as
-	 * kbase_pm_context_active() */
-	KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE,
-	/** If we're suspending, fail and don't increase the active count */
-	KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE,
-	/** If we're suspending, succeed and allow the active count to increase iff
-	 * it didn't go from 0->1 (i.e., we didn't re-activate the GPU).
-	 *
-	 * This should only be used when there is a bounded time on the activation
-	 * (e.g. guarantee it's going to be idled very soon after) */
-	KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE
+    /** A suspend is not expected/not possible - this is the same as
+     * kbase_pm_context_active() */
+    KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE,
+    /** If we're suspending, fail and don't increase the active count */
+    KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE,
+    /** If we're suspending, succeed and allow the active count to increase iff
+     * it didn't go from 0->1 (i.e., we didn't re-activate the GPU).
+     *
+     * This should only be used when there is a bounded time on the activation
+     * (e.g. guarantee it's going to be idled very soon after) */
+    KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE
 };
 
 /** Suspend 'safe' variant of kbase_pm_context_active()
@@ -168,4 +168,4 @@ void kbase_pm_resume(struct kbase_device *kbdev);
  */
 void kbase_pm_vsync_callback(int buffer_updated, void *data);
 
-#endif				/* _KBASE_PM_H_ */
+#endif                /* _KBASE_PM_H_ */

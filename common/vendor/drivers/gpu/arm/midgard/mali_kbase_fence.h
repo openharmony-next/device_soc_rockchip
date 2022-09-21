@@ -45,14 +45,14 @@ extern const struct dma_fence_ops kbase_fence_ops;
 */
 struct kbase_fence_cb {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-	struct fence_cb fence_cb;
-	struct fence *fence;
+    struct fence_cb fence_cb;
+    struct fence *fence;
 #else
-	struct dma_fence_cb fence_cb;
-	struct dma_fence *fence;
+    struct dma_fence_cb fence_cb;
+    struct dma_fence *fence;
 #endif
-	struct kbase_jd_atom *katom;
-	struct list_head node;
+    struct kbase_jd_atom *katom;
+    struct list_head node;
 };
 
 /**
@@ -76,10 +76,10 @@ struct dma_fence *kbase_fence_out_new(struct kbase_jd_atom *katom);
  * This function will take ownership of one fence reference!
  */
 #define kbase_fence_fence_in_set(katom, fence) \
-	do { \
-		WARN_ON((katom)->dma_fence.fence_in); \
-		(katom)->dma_fence.fence_in = fence; \
-	} while (0)
+    do { \
+        WARN_ON((katom)->dma_fence.fence_in); \
+        (katom)->dma_fence.fence_in = fence; \
+    } while (0)
 #endif
 
 /**
@@ -90,10 +90,10 @@ struct dma_fence *kbase_fence_out_new(struct kbase_jd_atom *katom);
  */
 static inline void kbase_fence_out_remove(struct kbase_jd_atom *katom)
 {
-	if (katom->dma_fence.fence) {
-		dma_fence_put(katom->dma_fence.fence);
-		katom->dma_fence.fence = NULL;
-	}
+    if (katom->dma_fence.fence) {
+        dma_fence_put(katom->dma_fence.fence);
+        katom->dma_fence.fence = NULL;
+    }
 }
 
 #if defined(CONFIG_SYNC_FILE)
@@ -105,10 +105,10 @@ static inline void kbase_fence_out_remove(struct kbase_jd_atom *katom)
  */
 static inline void kbase_fence_in_remove(struct kbase_jd_atom *katom)
 {
-	if (katom->dma_fence.fence_in) {
-		dma_fence_put(katom->dma_fence.fence_in);
-		katom->dma_fence.fence_in = NULL;
-	}
+    if (katom->dma_fence.fence_in) {
+        dma_fence_put(katom->dma_fence.fence_in);
+        katom->dma_fence.fence_in = NULL;
+    }
 }
 #endif
 
@@ -120,8 +120,8 @@ static inline void kbase_fence_in_remove(struct kbase_jd_atom *katom)
  */
 static inline bool kbase_fence_out_is_ours(struct kbase_jd_atom *katom)
 {
-	return katom->dma_fence.fence &&
-				katom->dma_fence.fence->ops == &kbase_fence_ops;
+    return katom->dma_fence.fence &&
+                katom->dma_fence.fence->ops == &kbase_fence_ops;
 }
 
 /**
@@ -132,19 +132,19 @@ static inline bool kbase_fence_out_is_ours(struct kbase_jd_atom *katom)
  * Return: 0 on success, < 0 on error
  */
 static inline int kbase_fence_out_signal(struct kbase_jd_atom *katom,
-					 int status)
+                     int status)
 {
-	if (status) {
+    if (status) {
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE && \
-	  KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE)
-		fence_set_error(katom->dma_fence.fence, status);
+      KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE)
+        fence_set_error(katom->dma_fence.fence, status);
 #elif (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE)
-		dma_fence_set_error(katom->dma_fence.fence, status);
+        dma_fence_set_error(katom->dma_fence.fence, status);
 #else
-		katom->dma_fence.fence->status = status;
+        katom->dma_fence.fence->status = status;
 #endif
-	}
-	return dma_fence_signal(katom->dma_fence.fence);
+    }
+    return dma_fence_signal(katom->dma_fence.fence);
 }
 
 /**
@@ -164,12 +164,12 @@ static inline int kbase_fence_out_signal(struct kbase_jd_atom *katom,
  */
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
 int kbase_fence_add_callback(struct kbase_jd_atom *katom,
-			     struct fence *fence,
-			     fence_func_t callback);
+                 struct fence *fence,
+                 fence_func_t callback);
 #else
 int kbase_fence_add_callback(struct kbase_jd_atom *katom,
-			     struct dma_fence *fence,
-			     dma_fence_func_t callback);
+                 struct dma_fence *fence,
+                 dma_fence_func_t callback);
 #endif
 
 /**
@@ -197,7 +197,7 @@ int kbase_fence_add_callback(struct kbase_jd_atom *katom,
 static inline void
 kbase_fence_dep_count_set(struct kbase_jd_atom *katom, int val)
 {
-	atomic_set(&katom->dma_fence.dep_count, val);
+    atomic_set(&katom->dma_fence.dep_count, val);
 }
 
 /**
@@ -211,7 +211,7 @@ kbase_fence_dep_count_set(struct kbase_jd_atom *katom, int val)
 static inline bool
 kbase_fence_dep_count_dec_and_test(struct kbase_jd_atom *katom)
 {
-	return atomic_dec_and_test(&katom->dma_fence.dep_count);
+    return atomic_dec_and_test(&katom->dma_fence.dep_count);
 }
 
 /**
@@ -224,7 +224,7 @@ kbase_fence_dep_count_dec_and_test(struct kbase_jd_atom *katom)
  */
 static inline int kbase_fence_dep_count_read(struct kbase_jd_atom *katom)
 {
-	return atomic_read(&katom->dma_fence.dep_count);
+    return atomic_read(&katom->dma_fence.dep_count);
 }
 
 /**

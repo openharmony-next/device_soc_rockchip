@@ -21,8 +21,8 @@
  * Cache Policy API.
  */
 
-#ifndef _KBASE_CACHE_POLICY_H_
-#define _KBASE_CACHE_POLICY_H_
+#ifndef H_KBASE_CACHE_POLICY_H_
+#define H_KBASE_CACHE_POLICY_H_
 
 #include "mali_kbase.h"
 #include "mali_base_kernel.h"
@@ -42,4 +42,4 @@
  */
 u32 kbase_cache_enabled(u32 flags, u32 nr_pages);
 
-#endif				/* _KBASE_CACHE_POLICY_H_ */
+#endif                /* _KBASE_CACHE_POLICY_H_ */

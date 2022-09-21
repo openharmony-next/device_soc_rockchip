@@ -24,8 +24,8 @@
  * Base kernel core availability APIs
  */
 
-#ifndef _KBASE_PM_CA_H_
-#define _KBASE_PM_CA_H_
+#ifndef KBASE_PM_CA_H
+#define KBASE_PM_CA_H
 
 /**
  * kbase_pm_ca_init - Initialize core availability framework
@@ -72,7 +72,7 @@ u64 kbase_pm_ca_get_core_mask(struct kbase_device *kbdev);
  * Calls into the core availability policy
  */
 void kbase_pm_ca_update_core_status(struct kbase_device *kbdev, u64 cores_ready,
-						u64 cores_transitioning);
+                        u64 cores_transitioning);
 
 /**
  * kbase_pm_ca_get_instr_core_mask - Get the PM state sync-ed shaders core mask

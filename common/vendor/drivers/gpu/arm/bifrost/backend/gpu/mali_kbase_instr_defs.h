@@ -31,31 +31,31 @@
  * Instrumentation State Machine States
  */
 enum kbase_instr_state {
-	/* State where instrumentation is not active */
-	KBASE_INSTR_STATE_DISABLED = 0,
-	/* State machine is active and ready for a command. */
-	KBASE_INSTR_STATE_IDLE,
-	/* Hardware is currently dumping a frame. */
-	KBASE_INSTR_STATE_DUMPING,
-	/* We've requested a clean to occur on a workqueue */
-	KBASE_INSTR_STATE_REQUEST_CLEAN,
-	/* An error has occured during DUMPING (page fault). */
-	KBASE_INSTR_STATE_FAULT
+    /* State where instrumentation is not active */
+    KBASE_INSTR_STATE_DISABLED = 0,
+    /* State machine is active and ready for a command. */
+    KBASE_INSTR_STATE_IDLE,
+    /* Hardware is currently dumping a frame. */
+    KBASE_INSTR_STATE_DUMPING,
+    /* We've requested a clean to occur on a workqueue */
+    KBASE_INSTR_STATE_REQUEST_CLEAN,
+    /* An error has occured during DUMPING (page fault). */
+    KBASE_INSTR_STATE_FAULT
 };
 
 /* Structure used for instrumentation and HW counters dumping */
 struct kbase_instr_backend {
-	wait_queue_head_t wait;
-	int triggered;
+    wait_queue_head_t wait;
+    int triggered;
 #ifdef CONFIG_MALI_PRFCNT_SET_SECONDARY_VIA_DEBUG_FS
-	bool use_secondary_override;
+    bool use_secondary_override;
 #endif
 
-	enum kbase_instr_state state;
-	struct workqueue_struct *cache_clean_wq;
-	struct work_struct  cache_clean_work;
+    enum kbase_instr_state state;
+    struct workqueue_struct *cache_clean_wq;
+    struct work_struct  cache_clean_work;
 #if MALI_USE_CSF
-	struct tasklet_struct csf_hwc_irq_poll_tasklet;
+    struct tasklet_struct csf_hwc_irq_poll_tasklet;
 #endif
 };
 

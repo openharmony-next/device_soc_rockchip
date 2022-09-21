@@ -20,12 +20,12 @@
  * Register-based HW access backend specific job scheduler APIs
  */
 
-#ifndef _KBASE_JS_BACKEND_H_
-#define _KBASE_JS_BACKEND_H_
+#ifndef H_KBASE_JS_BACKEND_H_
+#define H_KBASE_JS_BACKEND_H_
 
 /**
  * kbase_backend_timer_init() - Initialise the JS scheduling timer
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * This function should be called at driver initialisation
  *
@@ -35,7 +35,7 @@ int kbase_backend_timer_init(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_timer_term() - Terminate the JS scheduling timer
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * This function should be called at driver termination
  */

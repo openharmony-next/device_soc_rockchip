@@ -22,36 +22,36 @@
 
 
 
-#ifndef _BASE_MEM_PRIV_H_
-#define _BASE_MEM_PRIV_H_
+#ifndef BASE_MEM_PRIV_H
+#define BASE_MEM_PRIV_H
 
-#define BASE_SYNCSET_OP_MSYNC	(1U << 0)
-#define BASE_SYNCSET_OP_CSYNC	(1U << 1)
+#define BASE_SYNCSET_OP_MSYNC    (1U << 0)
+#define BASE_SYNCSET_OP_CSYNC    (1U << 1)
 
 /*
  * This structure describe a basic memory coherency operation.
  * It can either be:
  * @li a sync from CPU to Memory:
- *	- type = ::BASE_SYNCSET_OP_MSYNC
- *	- mem_handle = a handle to the memory object on which the operation
- *	  is taking place
- *	- user_addr = the address of the range to be synced
- *	- size = the amount of data to be synced, in bytes
- *	- offset is ignored.
+ *    - type = ::BASE_SYNCSET_OP_MSYNC
+ *    - mem_handle = a handle to the memory object on which the operation
+ *      is taking place
+ *    - user_addr = the address of the range to be synced
+ *    - size = the amount of data to be synced, in bytes
+ *    - offset is ignored.
  * @li a sync from Memory to CPU:
- *	- type = ::BASE_SYNCSET_OP_CSYNC
- *	- mem_handle = a handle to the memory object on which the operation
- *	  is taking place
- *	- user_addr = the address of the range to be synced
- *	- size = the amount of data to be synced, in bytes.
- *	- offset is ignored.
+ *    - type = ::BASE_SYNCSET_OP_CSYNC
+ *    - mem_handle = a handle to the memory object on which the operation
+ *      is taking place
+ *    - user_addr = the address of the range to be synced
+ *    - size = the amount of data to be synced, in bytes.
+ *    - offset is ignored.
  */
 struct basep_syncset {
-	struct base_mem_handle mem_handle;
-	u64 user_addr;
-	u64 size;
-	u8 type;
-	u8 padding[7];
+    struct base_mem_handle mem_handle;
+    u64 user_addr;
+    u64 size;
+    u8 type;
+    u8 padding[7];
 };
 
 #endif

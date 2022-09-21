@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_MEMORY_DEBUGFS_H
-#define _KBASE_GPU_MEMORY_DEBUGFS_H
+#ifndef KBASE_GPU_MEMORY_DEBUGFS_H
+#define KBASE_GPU_MEMORY_DEBUGFS_H
 
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
@@ -42,7 +42,7 @@
  * @write: 1 if it's a register write, 0 if it's a read
  */
 void kbase_io_history_add(struct kbase_io_history *h, void __iomem const *addr,
-		u32 value, u8 write);
+        u32 value, u8 write);
 
 /**
  * kbasep_gpu_memory_debugfs_init - Initialize gpu_memory debugfs entry

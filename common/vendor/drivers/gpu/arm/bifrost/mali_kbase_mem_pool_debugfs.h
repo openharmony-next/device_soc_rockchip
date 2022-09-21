@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_MEM_POOL_DEBUGFS_H_
-#define _KBASE_MEM_POOL_DEBUGFS_H_
+#ifndef KBASE_MEM_POOL_DEBUGFS_H
+#define KBASE_MEM_POOL_DEBUGFS_H
 
 #include <mali_kbase.h>
 
@@ -37,7 +37,7 @@
  * - lp_mem_pool_max_size: get/set the max sizes of @kctx:lp_mem_pool
  */
 void kbase_mem_pool_debugfs_init(struct dentry *parent,
-		struct kbase_context *kctx);
+        struct kbase_context *kctx);
 
 /**
  * kbase_mem_pool_debugfs_trim - Grow or shrink a memory pool to a new size
@@ -66,7 +66,7 @@ void kbase_mem_pool_debugfs_trim(void *array, size_t index, size_t value);
  * new limit. For details see kbase_mem_pool_shrink().
  */
 void kbase_mem_pool_debugfs_set_max_size(void *array, size_t index,
-	size_t value);
+    size_t value);
 
 /**
  * kbase_mem_pool_debugfs_size - Get number of free pages in a memory pool
@@ -104,7 +104,7 @@ size_t kbase_mem_pool_debugfs_max_size(void *array, size_t index);
  *          selected configuration can hold.
  */
 void kbase_mem_pool_config_debugfs_set_max_size(void *array, size_t index,
-	size_t value);
+    size_t value);
 
 /**
  * kbase_mem_pool_config_debugfs_max_size - Get maximum number of free pages

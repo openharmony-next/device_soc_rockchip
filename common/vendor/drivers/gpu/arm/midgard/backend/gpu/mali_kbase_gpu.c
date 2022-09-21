@@ -28,75 +28,75 @@
 
 int kbase_backend_early_init(struct kbase_device *kbdev)
 {
-	int err;
+    int err;
 
-	err = kbasep_platform_device_init(kbdev);
-	if (err)
-		return err;
+    err = kbasep_platform_device_init(kbdev);
+    if (err)
+        return err;
 
-	/* Ensure we can access the GPU registers */
-	kbase_pm_register_access_enable(kbdev);
+    /* Ensure we can access the GPU registers */
+    kbase_pm_register_access_enable(kbdev);
 
-	/* Find out GPU properties based on the GPU feature registers */
-	kbase_gpuprops_set(kbdev);
+    /* Find out GPU properties based on the GPU feature registers */
+    kbase_gpuprops_set(kbdev);
 
-	/* We're done accessing the GPU registers for now. */
-	kbase_pm_register_access_disable(kbdev);
+    /* We're done accessing the GPU registers for now. */
+    kbase_pm_register_access_disable(kbdev);
 
-	err = kbase_hwaccess_pm_init(kbdev);
-	if (err)
-		goto fail_pm;
+    err = kbase_hwaccess_pm_init(kbdev);
+    if (err)
+        goto fail_pm;
 
-	err = kbase_install_interrupts(kbdev);
-	if (err)
-		goto fail_interrupts;
+    err = kbase_install_interrupts(kbdev);
+    if (err)
+        goto fail_interrupts;
 
-	return 0;
+    return 0;
 
 fail_interrupts:
-	kbase_hwaccess_pm_term(kbdev);
+    kbase_hwaccess_pm_term(kbdev);
 fail_pm:
-	kbasep_platform_device_term(kbdev);
+    kbasep_platform_device_term(kbdev);
 
-	return err;
+    return err;
 }
 
 void kbase_backend_early_term(struct kbase_device *kbdev)
 {
-	kbase_release_interrupts(kbdev);
-	kbase_hwaccess_pm_term(kbdev);
-	kbasep_platform_device_term(kbdev);
+    kbase_release_interrupts(kbdev);
+    kbase_hwaccess_pm_term(kbdev);
+    kbasep_platform_device_term(kbdev);
 }
 
 int kbase_backend_late_init(struct kbase_device *kbdev)
 {
-	int err;
+    int err;
 
-	err = kbase_hwaccess_pm_powerup(kbdev, PM_HW_ISSUES_DETECT);
-	if (err)
-		return err;
+    err = kbase_hwaccess_pm_powerup(kbdev, PM_HW_ISSUES_DETECT);
+    if (err)
+        return err;
 
-	err = kbase_backend_timer_init(kbdev);
-	if (err)
-		goto fail_timer;
+    err = kbase_backend_timer_init(kbdev);
+    if (err)
+        goto fail_timer;
 
 #ifdef CONFIG_MALI_DEBUG
 #ifndef CONFIG_MALI_NO_MALI
-	if (kbasep_common_test_interrupt_handlers(kbdev) != 0) {
-		dev_err(kbdev->dev, "Interrupt assigment check failed.\n");
-		err = -EINVAL;
-		goto fail_interrupt_test;
-	}
+    if (kbasep_common_test_interrupt_handlers(kbdev) != 0) {
+        dev_err(kbdev->dev, "Interrupt assigment check failed.\n");
+        err = -EINVAL;
+        goto fail_interrupt_test;
+    }
 #endif /* !CONFIG_MALI_NO_MALI */
 #endif /* CONFIG_MALI_DEBUG */
 
-	err = kbase_job_slot_init(kbdev);
-	if (err)
-		goto fail_job_slot;
+    err = kbase_job_slot_init(kbdev);
+    if (err)
+        goto fail_job_slot;
 
-	init_waitqueue_head(&kbdev->hwaccess.backend.reset_wait);
+    init_waitqueue_head(&kbdev->hwaccess.backend.reset_wait);
 
-	return 0;
+    return 0;
 
 fail_job_slot:
 
@@ -106,18 +106,18 @@ fail_interrupt_test:
 #endif /* !CONFIG_MALI_NO_MALI */
 #endif /* CONFIG_MALI_DEBUG */
 
-	kbase_backend_timer_term(kbdev);
+    kbase_backend_timer_term(kbdev);
 fail_timer:
-	kbase_hwaccess_pm_halt(kbdev);
+    kbase_hwaccess_pm_halt(kbdev);
 
-	return err;
+    return err;
 }
 
 void kbase_backend_late_term(struct kbase_device *kbdev)
 {
-	kbase_job_slot_halt(kbdev);
-	kbase_job_slot_term(kbdev);
-	kbase_backend_timer_term(kbdev);
-	kbase_hwaccess_pm_halt(kbdev);
+    kbase_job_slot_halt(kbdev);
+    kbase_job_slot_term(kbdev);
+    kbase_backend_timer_term(kbdev);
+    kbase_hwaccess_pm_halt(kbdev);
 }
 

@@ -7,18 +7,18 @@
 #include <linux/dma-buf.h>
 
 
-#define RGA_BLIT_SYNC	0x5017
+#define RGA_BLIT_SYNC    0x5017
 #define RGA_BLIT_ASYNC  0x5018
 #define RGA_FLUSH       0x5019
 #define RGA_GET_RESULT  0x501a
-#define RGA_GET_VERSION 0x501b
+#define RGAGET_VERSION 0x501b
 #define RGA_CACHE_FLUSH 0x501c
 
-#define RGA2_BLIT_SYNC	 0x6017
+#define RGA2_BLIT_SYNC     0x6017
 #define RGA2_BLIT_ASYNC  0x6018
 #define RGA2_FLUSH       0x6019
 #define RGA2_GET_RESULT  0x601a
-#define RGA2_GET_VERSION 0x601b
+#define RGA2GET_VERSION 0x601b
 
 
 #define RGA2_REG_CTRL_LEN    0x8    /* 8  */
@@ -30,15 +30,34 @@
 
 #define SCALE_DOWN_LARGE 1
 
-#define rgaIS_ERROR(status)			(status < 0)
-#define rgaNO_ERROR(status)			(status >= 0)
-#define rgaIS_SUCCESS(status)		(status == 0)
+#define rgaIS_ERROR(status)            (status < 0)
+#define rgaNO_ERROR(status)            (status >= 0)
+#define rgaIS_SUCCESS(status)        (status == 0)
 
 #define RGA_BUF_GEM_TYPE_MASK      0xC0
 #define RGA_BUF_GEM_TYPE_DMA       0x80
 #define RGA2_MAJOR_VERSION_MASK     (0xFF000000)
 #define RGA2_MINOR_VERSION_MASK     (0x00F00000)
 #define RGA2_SVN_VERSION_MASK       (0x000FFFFF)
+
+#define RGA2_INDEX_TW      2
+#define RGA2_INDEX_TH      3
+#define RGA2_INDEX_FO      4
+#define RGA2_INDEX_FI      5
+#define RGA2_INDEX_SI      6
+#define RGA2_INDEX_SE      7
+#define RGA2_INDEX_EI      8
+#define RGA2_INDEX_NI      9
+#define RGA2_INDEX_TE      10
+#define RGA2_INDEX_EIE     11
+#define RGA2_INDEX_TWE     12
+#define RGA2_INDEX_FIF     15
+#define RGA2_INDEX_SIX     16
+#define RGA2_INDEX_TWEN    20
+#define RGA2_INDEX_TWEF    24
+#define RGA2_INDEX_THIO    31
+#define RGA2_INDEX_BLOCK   2048
+#define RGA2_INDEX_SIZE    65536
 
 /* RGA2 process mode enum */
 enum
@@ -82,7 +101,7 @@ enum
 */
 enum
 {
-	RGA2_FORMAT_RGBA_8888    = 0x0,
+    RGA2_FORMAT_RGBA_8888    = 0x0,
     RGA2_FORMAT_RGBX_8888    = 0x1,
     RGA2_FORMAT_RGB_888      = 0x2,
     RGA2_FORMAT_BGRA_8888    = 0x3,
@@ -107,33 +126,33 @@ enum
     RGA2_FORMAT_YCrCb_420_SP = 0x16,
     RGA2_FORMAT_YCrCb_420_P  = 0x17,
 
-	RGA2_FORMAT_YVYU_422 = 0x18,
-	RGA2_FORMAT_YVYU_420 = 0x19,
-	RGA2_FORMAT_VYUY_422 = 0x1a,
-	RGA2_FORMAT_VYUY_420 = 0x1b,
-	RGA2_FORMAT_YUYV_422 = 0x1c,
-	RGA2_FORMAT_YUYV_420 = 0x1d,
-	RGA2_FORMAT_UYVY_422 = 0x1e,
-	RGA2_FORMAT_UYVY_420 = 0x1f,
+    RGA2_FORMAT_YVYU_422 = 0x18,
+    RGA2_FORMAT_YVYU_420 = 0x19,
+    RGA2_FORMAT_VYUY_422 = 0x1a,
+    RGA2_FORMAT_VYUY_420 = 0x1b,
+    RGA2_FORMAT_YUYV_422 = 0x1c,
+    RGA2_FORMAT_YUYV_420 = 0x1d,
+    RGA2_FORMAT_UYVY_422 = 0x1e,
+    RGA2_FORMAT_UYVY_420 = 0x1f,
 
     RGA2_FORMAT_YCbCr_420_SP_10B = 0x20,
     RGA2_FORMAT_YCrCb_420_SP_10B = 0x21,
     RGA2_FORMAT_YCbCr_422_SP_10B = 0x22,
     RGA2_FORMAT_YCrCb_422_SP_10B = 0x23,
 
-	RGA2_FORMAT_BPP_1            = 0x24,
-	RGA2_FORMAT_BPP_2            = 0x25,
-	RGA2_FORMAT_BPP_4            = 0x26,
-	RGA2_FORMAT_BPP_8            = 0x27,
+    RGA2_FORMAT_BPP_1            = 0x24,
+    RGA2_FORMAT_BPP_2            = 0x25,
+    RGA2_FORMAT_BPP_4            = 0x26,
+    RGA2_FORMAT_BPP_8            = 0x27,
 
-	RGA2_FORMAT_ARGB_8888    = 0x28,
-	RGA2_FORMAT_XRGB_8888    = 0x29,
-	RGA2_FORMAT_ARGB_5551    = 0x2a,
-	RGA2_FORMAT_ARGB_4444    = 0x2b,
-	RGA2_FORMAT_ABGR_8888    = 0x2c,
-	RGA2_FORMAT_XBGR_8888    = 0x2d,
-	RGA2_FORMAT_ABGR_5551    = 0x2e,
-	RGA2_FORMAT_ABGR_4444    = 0x2f,
+    RGA2_FORMAT_ARGB_8888    = 0x28,
+    RGA2_FORMAT_XRGB_8888    = 0x29,
+    RGA2_FORMAT_ARGB_5551    = 0x2a,
+    RGA2_FORMAT_ARGB_4444    = 0x2b,
+    RGA2_FORMAT_ABGR_8888    = 0x2c,
+    RGA2_FORMAT_XBGR_8888    = 0x2d,
+    RGA2_FORMAT_ABGR_5551    = 0x2e,
+    RGA2_FORMAT_ABGR_4444    = 0x2f,
 };
 
 typedef struct mdp_img
@@ -184,23 +203,23 @@ typedef struct MMU_INFO
 
 enum
 {
-	MMU_DIS = 0x0,
-	MMU_EN  = 0x1
+    MMU_DIS = 0x0,
+    MMU_EN  = 0x1
 };
 enum
 {
-	MMU_FLUSH_DIS = 0x0,
-	MMU_FLUSH_EN  = 0x2
+    MMU_FLUSH_DIS = 0x0,
+    MMU_FLUSH_EN  = 0x2
 };
 enum
 {
-	MMU_PRE_DIS = 0x0,
-	MMU_PRE_EN  = 0x4
+    MMU_PRE_DIS = 0x0,
+    MMU_PRE_EN  = 0x4
 };
 enum
 {
-	MMU_PRE_DIR_FORW  = 0x0,
-	MMU_PRE_DIR_BACK  = 0x8
+    MMU_PRE_DIR_FORW  = 0x0,
+    MMU_PRE_DIR_BACK  = 0x8
 };
 typedef struct COLOR_FILL
 {
@@ -217,28 +236,28 @@ COLOR_FILL;
 
 enum
 {
-	ALPHA_ORIGINAL = 0x0,
-	ALPHA_NO_128   = 0x1
+    ALPHA_ORIGINAL = 0x0,
+    ALPHA_NO_128   = 0x1
 };
 
 enum
 {
-	R2_BLACK       = 0x00,
-	R2_COPYPEN     = 0xf0,
-	R2_MASKNOTPEN  = 0x0a,
-	R2_MASKPEN     = 0xa0,
-	R2_MASKPENNOT  = 0x50,
-	R2_MERGENOTPEN = 0xaf,
-	R2_MERGEPEN    = 0xfa,
-	R2_MERGEPENNOT = 0xf5,
-	R2_NOP         = 0xaa,
-	R2_NOT         = 0x55,
-	R2_NOTCOPYPEN  = 0x0f,
-	R2_NOTMASKPEN  = 0x5f,
-	R2_NOTMERGEPEN = 0x05,
-	R2_NOTXORPEN   = 0xa5,
-	R2_WHITE       = 0xff,
-	R2_XORPEN      = 0x5a
+    R2_BLACK       = 0x00,
+    R2_COPYPEN     = 0xf0,
+    R2_MASKNOTPEN  = 0x0a,
+    R2_MASKPEN     = 0xa0,
+    R2_MASKPENNOT  = 0x50,
+    R2_MERGENOTPEN = 0xaf,
+    R2_MERGEPEN    = 0xfa,
+    R2_MERGEPENNOT = 0xf5,
+    R2_NOP         = 0xaa,
+    R2_NOT         = 0x55,
+    R2_NOTCOPYPEN  = 0x0f,
+    R2_NOTMASKPEN  = 0x5f,
+    R2_NOTMERGEPEN = 0x05,
+    R2_NOTXORPEN   = 0xa5,
+    R2_WHITE       = 0xff,
+    R2_XORPEN      = 0x5a
 };
 
 
@@ -347,15 +366,15 @@ typedef struct rga_img_info_32_t
 rga_img_info_32_t;
 
 struct rga_dma_buffer_t {
-	/* DMABUF information */
-	struct dma_buf *dma_buf;
-	struct dma_buf_attachment *attach;
-	struct sg_table *sgt;
+    /* DMABUF information */
+    struct dma_buf *dma_buf;
+    struct dma_buf_attachment *attach;
+    struct sg_table *sgt;
 
-	dma_addr_t iova;
-	unsigned long size;
-	void *vaddr;
-	enum dma_data_direction dir;
+    dma_addr_t iova;
+    unsigned long size;
+    void *vaddr;
+    enum dma_data_direction dir;
 };
 
 struct rga_req {
@@ -571,7 +590,7 @@ struct rga2_req
     u8 src_a_global_val;    /* src global alpha value        */
     u8 dst_a_global_val;    /* dst global alpha value        */
 
-    u8  rop_mode;	    /* rop mode select 0 : rop2 1 : rop3 2 : rop4 */
+    u8  rop_mode;        /* rop mode select 0 : rop2 1 : rop3 2 : rop4 */
     u16 rop_code;           /* rop2/3/4 code */
 
     u8 palette_mode;        /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp*/
@@ -598,7 +617,7 @@ struct rga2_req
 
     u8 rgb2yuv_mode;
 
-	u8 buf_type;
+    u8 buf_type;
 };
 
 struct rga2_mmu_buf_t {
@@ -638,7 +657,7 @@ enum
 
 enum
 {
-	//BYPASS        = 0x0,
+    //BYPASS        = 0x0,
     BT_601_RANGE0   = 0x1,
     BT_601_RANGE1   = 0x2,
     BT_709_RANGE0   = 0x3,
@@ -654,14 +673,14 @@ enum
 
 enum
 {
-	SOLID_COLOR   = 0x0, //color fill mode; ROP4: SOLID_rop4_mask_addr COLOR
-	PATTERN_COLOR = 0x1  //pattern_fill_mode;ROP4:PATTERN_COLOR
+    SOLID_COLOR   = 0x0, //color fill mode; ROP4: SOLID_rop4_mask_addr COLOR
+    PATTERN_COLOR = 0x1  //pattern_fill_mode;ROP4:PATTERN_COLOR
 };  /*color fill mode*/
 
 enum
 {
-	COLOR_FILL_CLIP     = 0x0,
-	COLOR_FILL_NOT_CLIP = 0x1
+    COLOR_FILL_CLIP     = 0x0,
+    COLOR_FILL_NOT_CLIP = 0x1
 };
 
 enum
@@ -674,21 +693,21 @@ enum
 
 enum
 {
-	ROP2 = 0x0,
-	ROP3 = 0x1,
-	ROP4 = 0x2
+    ROP2 = 0x0,
+    ROP3 = 0x1,
+    ROP4 = 0x2
 };  /*ROP mode*/
 
 enum
 {
-	BIG_ENDIAN    = 0x0,
-	LITTLE_ENDIAN = 0x1
+    BIG_ENDIAN    = 0x0,
+    LITTLE_ENDIAN = 0x1
 };  /*endian mode*/
 
 enum
 {
-	MMU_TABLE_4KB  = 0x0,
-	MMU_TABLE_64KB = 0x1,
+    MMU_TABLE_4KB  = 0x0,
+    MMU_TABLE_64KB = 0x1,
 };  /*MMU table size*/
 
 enum
@@ -707,52 +726,52 @@ enum
  * @author ZhangShengqin (2012-2-15)
  */
 typedef struct rga2_session {
-	/* a linked list of data so we can access them for debugging */
-	struct list_head    list_session;
-	/* a linked list of register data waiting for process */
-	struct list_head    waiting;
-	/* a linked list of register data in processing */
-	struct list_head    running;
-	/* all coommand this thread done */
+    /* a linked list of data so we can access them for debugging */
+    struct list_head    list_session;
+    /* a linked list of register data waiting for process */
+    struct list_head    waiting;
+    /* a linked list of register data in processing */
+    struct list_head    running;
+    /* all coommand this thread done */
     atomic_t            done;
-	wait_queue_head_t   wait;
-	pid_t           pid;
-	atomic_t        task_running;
+    wait_queue_head_t   wait;
+    pid_t           pid;
+    atomic_t        task_running;
     atomic_t        num_done;
 } rga2_session;
 
 struct rga2_reg {
-	rga2_session		*session;
-	struct list_head	session_link;
-	struct list_head	status_link;
-	uint32_t  sys_reg[8];
-	uint32_t  csc_reg[12];
-	uint32_t  cmd_reg[32];
+    rga2_session        *session;
+    struct list_head    session_link;
+    struct list_head    status_link;
+    uint32_t  sys_reg[8];
+    uint32_t  csc_reg[12];
+    uint32_t  cmd_reg[32];
 
-	uint32_t *MMU_src0_base;
-	uint32_t *MMU_src1_base;
-	uint32_t *MMU_dst_base;
-	uint32_t MMU_src0_count;
-	uint32_t MMU_src1_count;
-	uint32_t MMU_dst_count;
+    uint32_t *MMU_src0_base;
+    uint32_t *MMU_src1_base;
+    uint32_t *MMU_dst_base;
+    uint32_t MMU_src0_count;
+    uint32_t MMU_src1_count;
+    uint32_t MMU_dst_count;
 
-	uint32_t MMU_len;
-	bool MMU_map;
+    uint32_t MMU_len;
+    bool MMU_map;
 
-	struct rga_dma_buffer_t dma_buffer_src0;
-	struct rga_dma_buffer_t dma_buffer_src1;
-	struct rga_dma_buffer_t dma_buffer_dst;
-	struct rga_dma_buffer_t dma_buffer_els;
+    struct rga_dma_buffer_t dma_buffer_src0;
+    struct rga_dma_buffer_t dma_buffer_src1;
+    struct rga_dma_buffer_t dma_buffer_dst;
+    struct rga_dma_buffer_t dma_buffer_els;
 };
 
 struct rga2_service_info {
-    struct mutex	lock;
-    struct timer_list	timer;			/* timer for power off */
-    struct list_head	waiting;		/* link to link_reg in struct vpu_reg */
-    struct list_head	running;		/* link to link_reg in struct vpu_reg */
-    struct list_head	done;			/* link to link_reg in struct vpu_reg */
-    struct list_head	session;		/* link to list_session in struct vpu_session */
-    atomic_t		total_running;
+    struct mutex    lock;
+    struct timer_list    timer;            /* timer for power off */
+    struct list_head    waiting;        /* link to link_reg in struct vpu_reg */
+    struct list_head    running;        /* link to link_reg in struct vpu_reg */
+    struct list_head    done;            /* link to link_reg in struct vpu_reg */
+    struct list_head    session;        /* link to list_session in struct vpu_session */
+    atomic_t        total_running;
 
     struct rga2_reg        *reg;
 
@@ -768,7 +787,7 @@ struct rga2_service_info {
 
     //struct rga_req      req[10];
 
-    struct mutex	mutex;	// mutex
+    struct mutex    mutex;    // mutex
 };
 
 #define RGA2_TEST_CASE 0

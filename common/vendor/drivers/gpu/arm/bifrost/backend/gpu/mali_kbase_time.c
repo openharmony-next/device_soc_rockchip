@@ -26,56 +26,56 @@
 #include <backend/gpu/mali_kbase_pm_internal.h>
 
 void kbase_backend_get_gpu_time_norequest(struct kbase_device *kbdev,
-					  u64 *cycle_counter,
-					  u64 *system_time,
-					  struct timespec64 *ts)
+                      u64 *cycle_counter,
+                      u64 *system_time,
+                      struct timespec64 *ts)
 {
-	u32 hi1, hi2;
+    u32 hi1, hi2;
 
-	if (cycle_counter) {
-		/* Read hi, lo, hi to ensure a coherent u64 */
-		do {
-			hi1 = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(CYCLE_COUNT_HI));
-			*cycle_counter = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(CYCLE_COUNT_LO));
-			hi2 = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(CYCLE_COUNT_HI));
-		} while (hi1 != hi2);
-		*cycle_counter |= (((u64) hi1) << 32);
-	}
+    if (cycle_counter) {
+        /* Read hi, lo, hi to ensure a coherent u64 */
+        do {
+            hi1 = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(CYCLE_COUNT_HI));
+            *cycle_counter = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(CYCLE_COUNT_LO));
+            hi2 = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(CYCLE_COUNT_HI));
+        } while (hi1 != hi2);
+        *cycle_counter |= (((u64) hi1) << BASE_MEM_FLAGS_NR_HI_BITS);
+    }
 
-	if (system_time) {
-		/* Read hi, lo, hi to ensure a coherent u64 */
-		do {
-			hi1 = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(TIMESTAMP_HI));
-			*system_time = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(TIMESTAMP_LO));
-			hi2 = kbase_reg_read(kbdev,
-					     GPU_CONTROL_REG(TIMESTAMP_HI));
-		} while (hi1 != hi2);
-		*system_time |= (((u64) hi1) << 32);
-	}
+    if (system_time) {
+        /* Read hi, lo, hi to ensure a coherent u64 */
+        do {
+            hi1 = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(TIMESTAMP_HI));
+            *system_time = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(TIMESTAMP_LO));
+            hi2 = kbase_reg_read(kbdev,
+                         GPU_CONTROL_REG(TIMESTAMP_HI));
+        } while (hi1 != hi2);
+        *system_time |= (((u64) hi1) << BASE_MEM_FLAGS_NR_HI_BITS);
+    }
 
-	/* Record the CPU's idea of current time */
-	if (ts != NULL)
+    /* Record the CPU's idea of current time */
+    if (ts != NULL)
 #if (KERNEL_VERSION(4, 17, 0) > LINUX_VERSION_CODE)
-		*ts = ktime_to_timespec64(ktime_get_raw());
+        *ts = ktime_to_timespec64(ktime_get_raw());
 #else
-		ktime_get_raw_ts64(ts);
+        ktime_get_raw_ts64(ts);
 #endif
 }
 
 void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
-				u64 *system_time, struct timespec64 *ts)
+                u64 *system_time, struct timespec64 *ts)
 {
 #if !MALI_USE_CSF
-	kbase_pm_request_gpu_cycle_counter(kbdev);
+    kbase_pm_request_gpu_cycle_counter(kbdev);
 #endif
-	kbase_backend_get_gpu_time_norequest(
-		kbdev, cycle_counter, system_time, ts);
+    kbase_backend_get_gpu_time_norequest(
+        kbdev, cycle_counter, system_time, ts);
 #if !MALI_USE_CSF
-	kbase_pm_release_gpu_cycle_counter(kbdev);
+    kbase_pm_release_gpu_cycle_counter(kbdev);
 #endif
 }

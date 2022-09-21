@@ -38,7 +38,7 @@
  * @max_size: Maximum number of free 4 KiB pages each pool can hold
  */
 void kbase_mem_pool_group_config_set_max_size(
-	struct kbase_mem_pool_group_config *configs, size_t max_size);
+    struct kbase_mem_pool_group_config *configs, size_t max_size);
 
 /**
  * kbase_mem_pool_group_init - Initialize a set of memory pools
@@ -64,9 +64,9 @@ void kbase_mem_pool_group_config_set_max_size(
  * Return: 0 on success, otherwise a negative error code
  */
 int kbase_mem_pool_group_init(struct kbase_mem_pool_group *mem_pools,
-	struct kbase_device *kbdev,
-	const struct kbase_mem_pool_group_config *configs,
-	struct kbase_mem_pool_group *next_pools);
+    struct kbase_device *kbdev,
+    const struct kbase_mem_pool_group_config *configs,
+    struct kbase_mem_pool_group *next_pools);
 
 /**
  * kbase_mem_pool_group_term - Mark a set of memory pools as dying

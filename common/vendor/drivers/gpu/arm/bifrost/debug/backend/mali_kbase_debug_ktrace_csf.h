@@ -41,26 +41,26 @@
  */
 
 void kbasep_ktrace_add_csf(struct kbase_device *kbdev,
-		enum kbase_ktrace_code code, struct kbase_queue_group *group,
-		struct kbase_queue *queue, kbase_ktrace_flag_t flags,
-		u64 info_val);
+        enum kbase_ktrace_code code, struct kbase_queue_group *group,
+        struct kbase_queue *queue, kbase_ktrace_flag_t flags,
+        u64 info_val);
 
 #define KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, group, queue, flags, info_val) \
-	kbasep_ktrace_add_csf(kbdev, KBASE_KTRACE_CODE(code), group, queue, \
-			flags, info_val)
+    kbasep_ktrace_add_csf(kbdev, KBASE_KTRACE_CODE(code), group, queue, \
+            flags, info_val)
 
 #else /* KBASE_KTRACE_TARGET_RBUF */
 
 #define KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, group, queue, flags, info_val) \
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(group);\
-		CSTD_UNUSED(queue);		\
-		CSTD_UNUSED(flags);\
-		CSTD_UNUSED(info_val);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(group);\
+        CSTD_UNUSED(queue);        \
+        CSTD_UNUSED(flags);\
+        CSTD_UNUSED(info_val);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #endif /* KBASE_KTRACE_TARGET_RBUF */
 
@@ -73,19 +73,19 @@ void kbasep_ktrace_add_csf(struct kbase_device *kbdev,
 #if KBASE_KTRACE_TARGET_FTRACE
 
 #define KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, group, queue, info_val) \
-	trace_mali_##code(kbdev, group, queue, info_val)
+    trace_mali_##code(kbdev, group, queue, info_val)
 
 #else /* KBASE_KTRACE_TARGET_FTRACE */
 
 #define KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, group, queue, info_val) \
-	do {\
-		CSTD_UNUSED(kbdev);\
-		CSTD_NOP(code);\
-		CSTD_UNUSED(group);\
-		CSTD_UNUSED(queue);\
-		CSTD_UNUSED(info_val);\
-		CSTD_NOP(0);\
-	} while (0)
+    do {\
+        CSTD_UNUSED(kbdev);\
+        CSTD_NOP(code);\
+        CSTD_UNUSED(group);\
+        CSTD_UNUSED(queue);\
+        CSTD_UNUSED(info_val);\
+        CSTD_NOP(0);\
+    } while (0)
 
 #endif /* KBASE_KTRACE_TARGET_FTRACE */
 
@@ -108,15 +108,15 @@ void kbasep_ktrace_add_csf(struct kbase_device *kbdev,
  * b) just return 0 and have no other statements present in the body.
  */
 #define KBASE_KTRACE_ADD_CSF_GRP(kbdev, code, group, info_val) \
-	do { \
-		/* capture values that could come from non-pure function calls */ \
-		struct kbase_queue_group *__group = group; \
-		u64 __info_val = info_val; \
-		KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, __group, NULL, 0u, \
-				__info_val); \
-		KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, __group, NULL, \
-				__info_val); \
-	} while (0)
+    do { \
+        /* capture values that could come from non-pure function calls */ \
+        struct kbase_queue_group *__group = group; \
+        u64 __info_val = info_val; \
+        KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, __group, NULL, 0u, \
+                __info_val); \
+        KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, __group, NULL, \
+                __info_val); \
+    } while (0)
 
 /**
  * KBASE_KTRACE_ADD_CSF_GRP_Q - Add trace values about a group, queue, with info
@@ -134,15 +134,15 @@ void kbasep_ktrace_add_csf(struct kbase_device *kbdev,
  * b) just return 0 and have no other statements present in the body.
  */
 #define KBASE_KTRACE_ADD_CSF_GRP_Q(kbdev, code, group, queue, info_val) \
-	do { \
-		/* capture values that could come from non-pure function calls */ \
-		struct kbase_queue_group *__group = group; \
-		struct kbase_queue *__queue = queue; \
-		u64 __info_val = info_val; \
-		KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, __group, __queue, 0u, \
-				__info_val); \
-		KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, __group, \
-				__queue, __info_val); \
-	} while (0)
+    do { \
+        /* capture values that could come from non-pure function calls */ \
+        struct kbase_queue_group *__group = group; \
+        struct kbase_queue *__queue = queue; \
+        u64 __info_val = info_val; \
+        KBASE_KTRACE_RBUF_ADD_CSF(kbdev, code, __group, __queue, 0u, \
+                __info_val); \
+        KBASE_KTRACE_FTRACE_ADD_CSF(kbdev, code, __group, \
+                __queue, __info_val); \
+    } while (0)
 
 #endif /* _KBASE_DEBUG_KTRACE_CSF_H_ */

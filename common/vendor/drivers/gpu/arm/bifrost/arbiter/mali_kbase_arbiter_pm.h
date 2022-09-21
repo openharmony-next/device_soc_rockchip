@@ -79,18 +79,18 @@
  *                                  KBase has work to do.
  */
 enum kbase_vm_state {
-	KBASE_VM_STATE_INITIALIZING,
-	KBASE_VM_STATE_INITIALIZING_WITH_GPU,
-	KBASE_VM_STATE_SUSPENDED,
-	KBASE_VM_STATE_STOPPED,
-	KBASE_VM_STATE_STOPPED_GPU_REQUESTED,
-	KBASE_VM_STATE_STARTING,
-	KBASE_VM_STATE_IDLE,
-	KBASE_VM_STATE_ACTIVE,
-	KBASE_VM_STATE_SUSPEND_PENDING,
-	KBASE_VM_STATE_SUSPEND_WAIT_FOR_GRANT,
-	KBASE_VM_STATE_STOPPING_IDLE,
-	KBASE_VM_STATE_STOPPING_ACTIVE
+    KBASE_VM_STATE_INITIALIZING,
+    KBASE_VM_STATE_INITIALIZING_WITH_GPU,
+    KBASE_VM_STATE_SUSPENDED,
+    KBASE_VM_STATE_STOPPED,
+    KBASE_VM_STATE_STOPPED_GPU_REQUESTED,
+    KBASE_VM_STATE_STARTING,
+    KBASE_VM_STATE_IDLE,
+    KBASE_VM_STATE_ACTIVE,
+    KBASE_VM_STATE_SUSPEND_PENDING,
+    KBASE_VM_STATE_SUSPEND_WAIT_FOR_GRANT,
+    KBASE_VM_STATE_STOPPING_IDLE,
+    KBASE_VM_STATE_STOPPING_ACTIVE
 };
 
 /**
@@ -128,7 +128,7 @@ void kbase_arbiter_pm_release_interrupts(struct kbase_device *kbdev);
  * according the event received and the current state
  */
 void kbase_arbiter_pm_vm_event(struct kbase_device *kbdev,
-	enum kbase_arbif_evt event);
+    enum kbase_arbif_evt event);
 
 /**
  * kbase_arbiter_pm_ctx_active_handle_suspend() - Handle suspend operation for
@@ -144,7 +144,7 @@ void kbase_arbiter_pm_vm_event(struct kbase_device *kbdev,
  * Return: 0 if success, 1 if failure due to system suspending/suspended
  */
 int kbase_arbiter_pm_ctx_active_handle_suspend(struct kbase_device *kbdev,
-	enum kbase_pm_suspend_handler suspend_handler);
+    enum kbase_pm_suspend_handler suspend_handler);
 
 
 /**

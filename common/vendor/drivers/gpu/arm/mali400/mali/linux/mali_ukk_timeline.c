@@ -20,69 +20,69 @@
 #include "mali_timeline_fence_wait.h"
 #include "mali_timeline_sync_fence.h"
 
-int timeline_get_latest_point_wrapper(struct mali_session_data *session, _mali_uk_timeline_get_latest_point_s __user *uargs)
+int timeline_get_latest_point_wrapper(struct mali_session_data *session, mali_uk_timeline_get_latest_point_s __user *uargs)
 {
-	u32 val;
-	mali_timeline_id timeline;
-	mali_timeline_point point;
+    u32 val;
+    mali_timeline_id timeline;
+    mali_timeline_point point;
 
-	MALI_DEBUG_ASSERT_POINTER(session);
+    MALI_DEBUG_ASSERT_POINTER(session);
 
-	if (0 != get_user(val, &uargs->timeline)) return -EFAULT;
+    if (0 != get_user(val, &uargs->timeline)) return -EFAULT;
 
-	if (MALI_UK_TIMELINE_MAX <= val) {
-		return -EINVAL;
-	}
+    if (MALI_UK_TIMELINE_MAX <= val) {
+        return -EINVAL;
+    }
 
-	timeline = (mali_timeline_id)val;
+    timeline = (mali_timeline_id)val;
 
-	point = mali_timeline_system_get_latest_point(session->timeline_system, timeline);
+    point = mali_timeline_system_get_latest_point(session->timeline_system, timeline);
 
-	if (0 != put_user(point, &uargs->point)) return -EFAULT;
+    if (0 != put_user(point, &uargs->point)) return -EFAULT;
 
-	return 0;
+    return 0;
 }
 
-int timeline_wait_wrapper(struct mali_session_data *session, _mali_uk_timeline_wait_s __user *uargs)
+int timeline_wait_wrapper(struct mali_session_data *session, mali_uk_timeline_wait_s __user *uargs)
 {
-	u32 timeout, status;
-	mali_bool ret;
-	_mali_uk_fence_t uk_fence;
-	struct mali_timeline_fence fence;
+    u32 timeout, status;
+    mali_bool ret;
+    mali_uk_fence_t uk_fence;
+    struct mali_timeline_fence fence;
 
-	MALI_DEBUG_ASSERT_POINTER(session);
+    MALI_DEBUG_ASSERT_POINTER(session);
 
-	if (0 != copy_from_user(&uk_fence, &uargs->fence, sizeof(_mali_uk_fence_t))) return -EFAULT;
-	if (0 != get_user(timeout, &uargs->timeout)) return -EFAULT;
+    if (0 != copy_from_user(&uk_fence, &uargs->fence, sizeof(mali_uk_fence_t))) return -EFAULT;
+    if (0 != get_user(timeout, &uargs->timeout)) return -EFAULT;
 
-	mali_timeline_fence_copy_uk_fence(&fence, &uk_fence);
+    mali_timeline_fence_copy_uk_fence(&fence, &uk_fence);
 
-	ret = mali_timeline_fence_wait(session->timeline_system, &fence, timeout);
-	status = (MALI_TRUE == ret ? 1 : 0);
+    ret = mali_timeline_fence_wait(session->timeline_system, &fence, timeout);
+    status = (MALI_TRUE == ret ? 1 : 0);
 
-	if (0 != put_user(status, &uargs->status)) return -EFAULT;
+    if (0 != put_user(status, &uargs->status)) return -EFAULT;
 
-	return 0;
+    return 0;
 }
 
-int timeline_create_sync_fence_wrapper(struct mali_session_data *session, _mali_uk_timeline_create_sync_fence_s __user *uargs)
+int timeline_create_sync_fence_wrapper(struct mali_session_data *session, mali_uk_timeline_create_sync_fence_s __user *uargs)
 {
-	s32 sync_fd = -1;
-	_mali_uk_fence_t uk_fence;
-	struct mali_timeline_fence fence;
+    s32 sync_fd = -1;
+    mali_uk_fence_t uk_fence;
+    struct mali_timeline_fence fence;
 
-	MALI_DEBUG_ASSERT_POINTER(session);
+    MALI_DEBUG_ASSERT_POINTER(session);
 
-	if (0 != copy_from_user(&uk_fence, &uargs->fence, sizeof(_mali_uk_fence_t))) return -EFAULT;
-	mali_timeline_fence_copy_uk_fence(&fence, &uk_fence);
+    if (0 != copy_from_user(&uk_fence, &uargs->fence, sizeof(mali_uk_fence_t))) return -EFAULT;
+    mali_timeline_fence_copy_uk_fence(&fence, &uk_fence);
 
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
-	sync_fd = mali_timeline_sync_fence_create(session->timeline_system, &fence);
+    sync_fd = mali_timeline_sync_fence_create(session->timeline_system, &fence);
 #else
-	sync_fd = -1;
+    sync_fd = -1;
 #endif /* defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE) */
 
-	if (0 != put_user(sync_fd, &uargs->sync_fd)) return -EFAULT;
+    if (0 != put_user(sync_fd, &uargs->sync_fd)) return -EFAULT;
 
-	return 0;
+    return 0;
 }

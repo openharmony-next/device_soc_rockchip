@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_H_
-#define _KBASE_GPU_H_
+#ifndef KBASE_GPU_H
+#define KBASE_GPU_H
 
 #include "mali_kbase_gpu_regmap.h"
 #include "mali_kbase_gpu_fault.h"

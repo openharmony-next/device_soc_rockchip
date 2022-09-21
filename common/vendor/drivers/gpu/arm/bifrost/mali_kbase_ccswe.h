@@ -38,11 +38,11 @@
  *                  change.
  */
 struct kbase_ccswe {
-	spinlock_t access;
-	u64 timestamp_ns;
-	u64 cycles_elapsed;
-	u32 gpu_freq;
-	u32 prev_gpu_freq;
+    spinlock_t access;
+    u64 timestamp_ns;
+    u64 cycles_elapsed;
+    u32 gpu_freq;
+    u32 prev_gpu_freq;
 };
 
 /**
@@ -85,7 +85,7 @@ u64 kbase_ccswe_cycle_at(struct kbase_ccswe *self, u64 timestamp_ns);
  * change moment (not later).
  */
 void kbase_ccswe_freq_change(
-	struct kbase_ccswe *self, u64 timestamp_ns, u32 gpu_freq);
+    struct kbase_ccswe *self, u64 timestamp_ns, u32 gpu_freq);
 
 /**
  * kbase_ccswe_reset() - reset estimator state

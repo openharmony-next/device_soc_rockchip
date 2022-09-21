@@ -8,18 +8,18 @@
 #include <linux/dma-buf.h>
 
 extern void dma_buf_cache_detach(struct dma_buf *dmabuf,
-				 struct dma_buf_attachment *attach);
+                 struct dma_buf_attachment *attach);
 
 extern void dma_buf_cache_unmap_attachment(struct dma_buf_attachment *attach,
-					   struct sg_table *sg_table,
-					   enum dma_data_direction direction);
+                       struct sg_table *sg_table,
+                       enum dma_data_direction direction);
 
 extern struct dma_buf_attachment *
 dma_buf_cache_attach(struct dma_buf *dmabuf, struct device *dev);
 
 extern struct sg_table *
 dma_buf_cache_map_attachment(struct dma_buf_attachment *attach,
-			     enum dma_data_direction direction);
+                 enum dma_data_direction direction);
 
 #ifdef CONFIG_DMABUF_CACHE
 /* Replace dma-buf apis to cached apis */

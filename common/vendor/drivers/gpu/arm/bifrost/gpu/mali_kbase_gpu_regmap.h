@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_REGMAP_H_
-#define _KBASE_GPU_REGMAP_H_
+#ifndef KBASE_GPU_REGMAP_H
+#define KBASE_GPU_REGMAP_H
 
 #include "mali_kbase_gpu_coherency.h"
 #include "mali_kbase_gpu_id.h"
@@ -60,8 +60,8 @@
 
 #define GROUPS_L2_COHERENT      (1 << 0) /* Cores groups are l2 coherent */
 #define SUPER_L2_COHERENT       (1 << 1) /* Shader cores within a core
-					  * supergroup are l2 coherent
-					  */
+                      * supergroup are l2 coherent
+                      */
 
 #define PWR_KEY                 0x050   /* (WO) Power manager key register */
 #define PWR_OVERRIDE0           0x054   /* (RW) Power manager override settings */
@@ -203,17 +203,17 @@
 
 #define MMU_AS_REG(n, r)        (MMU_REG(MMU_AS0 + ((n) << 6)) + (r))
 
-#define AS_TRANSTAB_LO         0x00	/* (RW) Translation Table Base Address for address space n, low word */
-#define AS_TRANSTAB_HI         0x04	/* (RW) Translation Table Base Address for address space n, high word */
-#define AS_MEMATTR_LO          0x08	/* (RW) Memory attributes for address space n, low word. */
-#define AS_MEMATTR_HI          0x0C	/* (RW) Memory attributes for address space n, high word. */
-#define AS_LOCKADDR_LO         0x10	/* (RW) Lock region address for address space n, low word */
-#define AS_LOCKADDR_HI         0x14	/* (RW) Lock region address for address space n, high word */
-#define AS_COMMAND             0x18	/* (WO) MMU command register for address space n */
-#define AS_FAULTSTATUS         0x1C	/* (RO) MMU fault status register for address space n */
-#define AS_FAULTADDRESS_LO     0x20	/* (RO) Fault Address for address space n, low word */
-#define AS_FAULTADDRESS_HI     0x24	/* (RO) Fault Address for address space n, high word */
-#define AS_STATUS              0x28	/* (RO) Status flags for address space n */
+#define AS_TRANSTAB_LO         0x00    /* (RW) Translation Table Base Address for address space n, low word */
+#define AS_TRANSTAB_HI         0x04    /* (RW) Translation Table Base Address for address space n, high word */
+#define AS_MEMATTR_LO          0x08    /* (RW) Memory attributes for address space n, low word. */
+#define AS_MEMATTR_HI          0x0C    /* (RW) Memory attributes for address space n, high word. */
+#define AS_LOCKADDR_LO         0x10    /* (RW) Lock region address for address space n, low word */
+#define AS_LOCKADDR_HI         0x14    /* (RW) Lock region address for address space n, high word */
+#define AS_COMMAND             0x18    /* (WO) MMU command register for address space n */
+#define AS_FAULTSTATUS         0x1C    /* (RO) MMU fault status register for address space n */
+#define AS_FAULTADDRESS_LO     0x20    /* (RO) Fault Address for address space n, low word */
+#define AS_FAULTADDRESS_HI     0x24    /* (RO) Fault Address for address space n, high word */
+#define AS_STATUS              0x28    /* (RO) Status flags for address space n */
 
 /* (RW) Translation table configuration for address space n, low word */
 #define AS_TRANSCFG_LO         0x30
@@ -279,13 +279,13 @@
 #define AS_FAULTSTATUS_EXCEPTION_TYPE_SHIFT 0
 #define AS_FAULTSTATUS_EXCEPTION_TYPE_MASK (0xFF << AS_FAULTSTATUS_EXCEPTION_TYPE_SHIFT)
 #define AS_FAULTSTATUS_EXCEPTION_TYPE_GET(reg_val) \
-	(((reg_val)&AS_FAULTSTATUS_EXCEPTION_TYPE_MASK) >> AS_FAULTSTATUS_EXCEPTION_TYPE_SHIFT)
+    (((reg_val)&AS_FAULTSTATUS_EXCEPTION_TYPE_MASK) >> AS_FAULTSTATUS_EXCEPTION_TYPE_SHIFT)
 #define AS_FAULTSTATUS_EXCEPTION_TYPE_TRANSLATION_FAULT_0 0xC0
 
 #define AS_FAULTSTATUS_ACCESS_TYPE_SHIFT 8
 #define AS_FAULTSTATUS_ACCESS_TYPE_MASK (0x3 << AS_FAULTSTATUS_ACCESS_TYPE_SHIFT)
 #define AS_FAULTSTATUS_ACCESS_TYPE_GET(reg_val) \
-	(((reg_val)&AS_FAULTSTATUS_ACCESS_TYPE_MASK) >> AS_FAULTSTATUS_ACCESS_TYPE_SHIFT)
+    (((reg_val)&AS_FAULTSTATUS_ACCESS_TYPE_MASK) >> AS_FAULTSTATUS_ACCESS_TYPE_SHIFT)
 
 #define AS_FAULTSTATUS_ACCESS_TYPE_ATOMIC       (0x0)
 #define AS_FAULTSTATUS_ACCESS_TYPE_EX           (0x1)
@@ -295,7 +295,7 @@
 #define AS_FAULTSTATUS_SOURCE_ID_SHIFT 16
 #define AS_FAULTSTATUS_SOURCE_ID_MASK (0xFFFF << AS_FAULTSTATUS_SOURCE_ID_SHIFT)
 #define AS_FAULTSTATUS_SOURCE_ID_GET(reg_val) \
-	(((reg_val)&AS_FAULTSTATUS_SOURCE_ID_MASK) >> AS_FAULTSTATUS_SOURCE_ID_SHIFT)
+    (((reg_val)&AS_FAULTSTATUS_SOURCE_ID_MASK) >> AS_FAULTSTATUS_SOURCE_ID_SHIFT)
 
 /*
  * Begin MMU TRANSCFG register values
@@ -325,15 +325,15 @@
  */
 
 /* AS_COMMAND register commands */
-#define AS_COMMAND_NOP         0x00	/* NOP Operation */
-#define AS_COMMAND_UPDATE      0x01	/* Broadcasts the values in AS_TRANSTAB and ASn_MEMATTR to all MMUs */
-#define AS_COMMAND_LOCK        0x02	/* Issue a lock region command to all MMUs */
-#define AS_COMMAND_UNLOCK      0x03	/* Issue a flush region command to all MMUs */
-#define AS_COMMAND_FLUSH       0x04	/* Flush all L2 caches then issue a flush region command to all MMUs
-					   (deprecated - only for use with T60x) */
-#define AS_COMMAND_FLUSH_PT    0x04	/* Flush all L2 caches then issue a flush region command to all MMUs */
-#define AS_COMMAND_FLUSH_MEM   0x05	/* Wait for memory accesses to complete, flush all the L1s cache then
-					   flush all L2 caches then issue a flush region command to all MMUs */
+#define AS_COMMAND_NOP         0x00    /* NOP Operation */
+#define AS_COMMAND_UPDATE      0x01    /* Broadcasts the values in AS_TRANSTAB and ASn_MEMATTR to all MMUs */
+#define AS_COMMAND_LOCK        0x02    /* Issue a lock region command to all MMUs */
+#define AS_COMMAND_UNLOCK      0x03    /* Issue a flush region command to all MMUs */
+#define AS_COMMAND_FLUSH       0x04    /* Flush all L2 caches then issue a flush region command to all MMUs
+                       (deprecated - only for use with T60x) */
+#define AS_COMMAND_FLUSH_PT    0x04    /* Flush all L2 caches then issue a flush region command to all MMUs */
+#define AS_COMMAND_FLUSH_MEM   0x05    /* Wait for memory accesses to complete, flush all the L1s cache then
+                       flush all L2 caches then issue a flush region command to all MMUs */
 
 /* GPU_STATUS values */
 #define GPU_STATUS_PRFCNT_ACTIVE            (1 << 2)    /* Set if the performance counters are active. */

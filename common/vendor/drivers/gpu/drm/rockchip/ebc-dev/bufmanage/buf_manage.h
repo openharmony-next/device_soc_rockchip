@@ -8,28 +8,28 @@
 #ifndef _BUF_MANAGE_H_
 #define _BUF_MANAGE_H_
 
-#define BUF_ERROR	(-1)
-#define BUF_SUCCESS	(0)
+#define BUF_ERROR    (-1)
+#define BUF_SUCCESS    (0)
 
 enum ebc_buf_status {
-	buf_idle = 0,		//empty buf can be used
-	buf_user = 1,		//buf get by user
-	buf_dsp = 2,		//buf on dsp list
-	buf_osd = 3,		//buf is osd buf
-	buf_error = 4,
+    buf_idle = 0,        //empty buf can be used
+    buf_user = 1,        //buf get by user
+    buf_dsp = 2,        //buf on dsp list
+    buf_osd = 3,        //buf is osd buf
+    buf_error = 4,
 };
 
 struct ebc_buf_s {
-	enum ebc_buf_status status; //buffer status.
-	unsigned long phy_addr; //buffer physical address.
-	char *virt_addr; //buffer virtual address.
-	char tid_name[TASK_COMM_LEN];
-	int buf_mode;
-	int len; //buffer length
-	int win_x1;
-	int win_y1;
-	int win_x2;
-	int win_y2;
+    enum ebc_buf_status status; //buffer status.
+    unsigned long phy_addr; //buffer physical address.
+    char *virt_addr; //buffer virtual address.
+    char tid_name[TASK_COMM_LEN];
+    int buf_mode;
+    int len; //buffer length
+    int win_x1;
+    int win_y1;
+    int win_x2;
+    int win_y2;
 };
 
 struct ebc_buf_s *ebc_osd_buf_get(void);

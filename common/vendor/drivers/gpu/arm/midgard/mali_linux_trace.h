@@ -31,23 +31,23 @@
  * @event_id: ORed together bitfields representing a type of event, made with the GATOR_MAKE_EVENT() macro.
  */
 TRACE_EVENT(mali_job_slots_event,
-	TP_PROTO(unsigned int event_id, unsigned int tgid, unsigned int pid,
-			unsigned char job_id),
-	TP_ARGS(event_id, tgid, pid, job_id),
-	TP_STRUCT__entry(
-		__field(unsigned int, event_id)
-		__field(unsigned int, tgid)
-		__field(unsigned int, pid)
-		__field(unsigned char, job_id)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-		__entry->tgid = tgid;
-		__entry->pid = pid;
-		__entry->job_id = job_id;
-	),
-	TP_printk("event=%u tgid=%u pid=%u job_id=%u",
-		__entry->event_id, __entry->tgid, __entry->pid, __entry->job_id)
+    TP_PROTO(unsigned int event_id, unsigned int tgid, unsigned int pid,
+            unsigned char job_id),
+    TP_ARGS(event_id, tgid, pid, job_id),
+    TP_STRUCT__entry(
+        __field(unsigned int, event_id)
+        __field(unsigned int, tgid)
+        __field(unsigned int, pid)
+        __field(unsigned char, job_id)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+        __entry->tgid = tgid;
+        __entry->pid = pid;
+        __entry->job_id = job_id;
+    ),
+    TP_printk("event=%u tgid=%u pid=%u job_id=%u",
+        __entry->event_id, __entry->tgid, __entry->pid, __entry->job_id)
 );
 
 /**
@@ -56,17 +56,17 @@ TRACE_EVENT(mali_job_slots_event,
  * @value: 64bits bitmask reporting either power status of the cores (1-ON, 0-OFF)
  */
 TRACE_EVENT(mali_pm_status,
-	TP_PROTO(unsigned int event_id, unsigned long long value),
-	TP_ARGS(event_id, value),
-	TP_STRUCT__entry(
-		__field(unsigned int, event_id)
-		__field(unsigned long long, value)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-		__entry->value = value;
-	),
-	TP_printk("event %u = %llu", __entry->event_id, __entry->value)
+    TP_PROTO(unsigned int event_id, unsigned long long value),
+    TP_ARGS(event_id, value),
+    TP_STRUCT__entry(
+        __field(unsigned int, event_id)
+        __field(unsigned long long, value)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+        __entry->value = value;
+    ),
+    TP_printk("event %u = %llu", __entry->event_id, __entry->value)
 );
 
 /**
@@ -75,17 +75,17 @@ TRACE_EVENT(mali_pm_status,
  * @value: 64bits bitmask reporting the cores to power up
  */
 TRACE_EVENT(mali_pm_power_on,
-	TP_PROTO(unsigned int event_id, unsigned long long value),
-	TP_ARGS(event_id, value),
-	TP_STRUCT__entry(
-		__field(unsigned int, event_id)
-		__field(unsigned long long, value)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-		__entry->value = value;
-	),
-	TP_printk("event %u = %llu", __entry->event_id, __entry->value)
+    TP_PROTO(unsigned int event_id, unsigned long long value),
+    TP_ARGS(event_id, value),
+    TP_STRUCT__entry(
+        __field(unsigned int, event_id)
+        __field(unsigned long long, value)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+        __entry->value = value;
+    ),
+    TP_printk("event %u = %llu", __entry->event_id, __entry->value)
 );
 
 /**
@@ -94,17 +94,17 @@ TRACE_EVENT(mali_pm_power_on,
  * @value: 64bits bitmask reporting the cores to power down
  */
 TRACE_EVENT(mali_pm_power_off,
-	TP_PROTO(unsigned int event_id, unsigned long long value),
-	TP_ARGS(event_id, value),
-	TP_STRUCT__entry(
-		__field(unsigned int, event_id)
-		__field(unsigned long long, value)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-		__entry->value = value;
-	),
-	TP_printk("event %u = %llu", __entry->event_id, __entry->value)
+    TP_PROTO(unsigned int event_id, unsigned long long value),
+    TP_ARGS(event_id, value),
+    TP_STRUCT__entry(
+        __field(unsigned int, event_id)
+        __field(unsigned long long, value)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+        __entry->value = value;
+    ),
+    TP_printk("event %u = %llu", __entry->event_id, __entry->value)
 );
 
 /**
@@ -114,17 +114,17 @@ TRACE_EVENT(mali_pm_power_off,
  * @value: number of newly allocated pages
  */
 TRACE_EVENT(mali_page_fault_insert_pages,
-	TP_PROTO(int event_id, unsigned long value),
-	TP_ARGS(event_id, value),
-	TP_STRUCT__entry(
-		__field(int, event_id)
-		__field(unsigned long, value)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-		__entry->value = value;
-	),
-	TP_printk("event %d = %lu", __entry->event_id, __entry->value)
+    TP_PROTO(int event_id, unsigned long value),
+    TP_ARGS(event_id, value),
+    TP_STRUCT__entry(
+        __field(int, event_id)
+        __field(unsigned long, value)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+        __entry->value = value;
+    ),
+    TP_printk("event %d = %lu", __entry->event_id, __entry->value)
 );
 
 /**
@@ -133,15 +133,15 @@ TRACE_EVENT(mali_page_fault_insert_pages,
  * @event_id: MMU address space number.
  */
 TRACE_EVENT(mali_mmu_as_in_use,
-	TP_PROTO(int event_id),
-	TP_ARGS(event_id),
-	TP_STRUCT__entry(
-		__field(int, event_id)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-	),
-	TP_printk("event=%d", __entry->event_id)
+    TP_PROTO(int event_id),
+    TP_ARGS(event_id),
+    TP_STRUCT__entry(
+        __field(int, event_id)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+    ),
+    TP_printk("event=%d", __entry->event_id)
 );
 
 /**
@@ -150,15 +150,15 @@ TRACE_EVENT(mali_mmu_as_in_use,
  * @event_id: MMU address space number.
  */
 TRACE_EVENT(mali_mmu_as_released,
-	TP_PROTO(int event_id),
-	TP_ARGS(event_id),
-	TP_STRUCT__entry(
-		__field(int, event_id)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-	),
-	TP_printk("event=%d", __entry->event_id)
+    TP_PROTO(int event_id),
+    TP_ARGS(event_id),
+    TP_STRUCT__entry(
+        __field(int, event_id)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+    ),
+    TP_printk("event=%d", __entry->event_id)
 );
 
 /**
@@ -168,18 +168,18 @@ TRACE_EVENT(mali_mmu_as_released,
  * @event_id: number of pages to be added or subtracted (according to the sign).
  */
 TRACE_EVENT(mali_total_alloc_pages_change,
-	TP_PROTO(long long int event_id),
-	TP_ARGS(event_id),
-	TP_STRUCT__entry(
-		__field(long long int, event_id)
-	),
-	TP_fast_assign(
-		__entry->event_id = event_id;
-	),
-	TP_printk("event=%lld", __entry->event_id)
+    TP_PROTO(long long int event_id),
+    TP_ARGS(event_id),
+    TP_STRUCT__entry(
+        __field(long long int, event_id)
+    ),
+    TP_fast_assign(
+        __entry->event_id = event_id;
+    ),
+    TP_printk("event=%lld", __entry->event_id)
 );
 
-#endif				/*  _TRACE_MALI_H */
+#endif                /*  _TRACE_MALI_H */
 
 #undef TRACE_INCLUDE_PATH
 #undef linux

@@ -24,7 +24,7 @@
 #define _KBASE_MMU_INTERNAL_H_
 
 void kbase_mmu_get_as_setup(struct kbase_mmu_table *mmut,
-		struct kbase_mmu_setup * const setup);
+        struct kbase_mmu_setup * const setup);
 
 /**
  * kbase_mmu_report_mcu_as_fault_and_reset - Report page fault for all
@@ -33,20 +33,20 @@ void kbase_mmu_get_as_setup(struct kbase_mmu_table *mmut,
  * @fault:   Data relating to the fault
  */
 void kbase_mmu_report_mcu_as_fault_and_reset(struct kbase_device *kbdev,
-		struct kbase_fault *fault);
+        struct kbase_fault *fault);
 
 void kbase_gpu_report_bus_fault_and_kill(struct kbase_context *kctx,
-		struct kbase_as *as, struct kbase_fault *fault);
+        struct kbase_as *as, struct kbase_fault *fault);
 
 void kbase_mmu_report_fault_and_kill(struct kbase_context *kctx,
-		struct kbase_as *as, const char *reason_str,
-		struct kbase_fault *fault);
+        struct kbase_as *as, const char *reason_str,
+        struct kbase_fault *fault);
 
 /**
  * kbase_mmu_switch_to_ir() - Switch to incremental rendering if possible
- * @kctx:	kbase_context for the faulting address space.
- * @reg:	of a growable GPU memory region in the same context.
- *		Takes ownership of the reference if successful.
+ * @kctx:    kbase_context for the faulting address space.
+ * @reg:    of a growable GPU memory region in the same context.
+ *        Takes ownership of the reference if successful.
  *
  * Used to switch to incremental rendering if we have nearly run out of
  * virtual address space in a growable memory region.
@@ -54,7 +54,7 @@ void kbase_mmu_report_fault_and_kill(struct kbase_context *kctx,
  * Return 0 if successful, otherwise a negative error code.
  */
 int kbase_mmu_switch_to_ir(struct kbase_context *kctx,
-	struct kbase_va_region *reg);
+    struct kbase_va_region *reg);
 
 /**
  * kbase_mmu_page_fault_worker() - Process a page fault.

@@ -38,7 +38,7 @@
  *
  * PM module covers Mali PM core, PM domains and Mali PMU
  */
-_mali_osk_errcode_t mali_pm_initialize(void);
+mali_osk_errcode_t mali_pm_initialize(void);
 
 /**
  * Terminate the Mali PM module
@@ -50,15 +50,15 @@ void mali_pm_exec_unlock(void);
 
 
 struct mali_pm_domain *mali_pm_register_l2_cache(u32 domain_index,
-		struct mali_l2_cache_core *l2_cache);
+        struct mali_l2_cache_core *l2_cache);
 struct mali_pm_domain *mali_pm_register_group(u32 domain_index,
-		struct mali_group *group);
+        struct mali_group *group);
 
 mali_bool mali_pm_get_domain_refs(struct mali_pm_domain **domains,
-				  struct mali_group **groups,
-				  u32 num_domains);
+                  struct mali_group **groups,
+                  u32 num_domains);
 mali_bool mali_pm_put_domain_refs(struct mali_pm_domain **domains,
-				  u32 num_domains);
+                  u32 num_domains);
 
 void mali_pm_init_begin(void);
 void mali_pm_init_end(void);
@@ -75,7 +75,7 @@ void mali_pm_runtime_resume(void);
 
 #if MALI_STATE_TRACKING
 u32 mali_pm_dump_state_domain(struct mali_pm_domain *domain,
-			      char *buf, u32 size);
+                  char *buf, u32 size);
 #endif
 
 void mali_pm_power_cost_setup(void);

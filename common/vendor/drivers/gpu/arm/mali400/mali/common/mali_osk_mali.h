@@ -25,24 +25,24 @@ extern "C" {
 
 #ifdef CONFIG_MALI_DEVFREQ
 struct mali_device {
-	struct device *dev;
+    struct device *dev;
 #ifdef CONFIG_HAVE_CLK
-	struct clk *clock;
+    struct clk *clock;
 #endif
 #ifdef CONFIG_REGULATOR
-	struct regulator *regulator;
+    struct regulator *regulator;
 #endif
 #ifdef CONFIG_PM_DEVFREQ
-	struct devfreq_dev_profile devfreq_profile;
-	struct devfreq *devfreq;
-	unsigned long current_freq;
-	unsigned long current_voltage;
-	struct monitor_dev_info *mdev_info;
+    struct devfreq_dev_profile devfreq_profile;
+    struct devfreq *devfreq;
+    unsigned long current_freq;
+    unsigned long current_voltage;
+    struct monitor_dev_info *mdev_info;
 #ifdef CONFIG_DEVFREQ_THERMAL
-	struct thermal_cooling_device *devfreq_cooling;
+    struct thermal_cooling_device *devfreq_cooling;
 #endif
 #endif
-	struct mali_pm_metrics_data mali_metrics;
+    struct mali_pm_metrics_data mali_metrics;
 };
 #endif
 
@@ -51,30 +51,30 @@ struct mali_device {
 
 /** @brief Struct with device specific configuration data
  */
-typedef struct mali_gpu_device_data _mali_osk_device_data;
+typedef struct mali_gpu_device_data mali_osk_device_data;
 
 #ifdef CONFIG_MALI_DT
 /** @brief Initialize those device resources when we use device tree
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_resource_initialize(void);
+mali_osk_errcode_t mali_osk_resource_initialize(void);
 #endif
 
 /** @brief Find Mali GPU HW resource
  *
  * @param addr Address of Mali GPU resource to find
  * @param res Storage for resource information if resource is found.
- * @return _MALI_OSK_ERR_OK on success, _MALI_OSK_ERR_ITEM_NOT_FOUND if resource is not found
+ * @return MALI_OSK_ERR_OK on success, MALI_OSK_ERR_ITEM_NOT_FOUND if resource is not found
  */
-_mali_osk_errcode_t _mali_osk_resource_find(u32 addr, _mali_osk_resource_t *res);
+mali_osk_errcode_t mali_osk_resource_find(u32 addr, _mali_osk_resource_t *res);
 
 
 /** @brief Find Mali GPU HW base address
  *
  * @return 0 if resources are found, otherwise the Mali GPU component with lowest address.
  */
-uintptr_t _mali_osk_resource_base_address(void);
+uintptr_t mali_osk_resource_base_address(void);
 
 /** @brief Find the specific GPU resource.
  *
@@ -84,63 +84,63 @@ uintptr_t _mali_osk_resource_base_address(void);
  * 0x470 if Mali 470 specific GPU resource identified
  *
  */
-u32 _mali_osk_identify_gpu_resource(void);
+u32 mali_osk_identify_gpu_resource(void);
 
 /** @brief Retrieve the Mali GPU specific data
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_device_data_get(_mali_osk_device_data *data);
+mali_osk_errcode_t mali_osk_device_data_get(mali_osk_device_data *data);
 
 /** @brief Find the pmu domain config from device data.
  *
  * @param domain_config_array used to store pmu domain config found in device data.
  * @param array_size is the size of array domain_config_array.
  */
-void _mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_size);
+void mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_size);
 
 /** @brief Get Mali PMU switch delay
  *
  *@return pmu switch delay if it is configured
  */
-u32 _mali_osk_get_pmu_switch_delay(void);
+u32 mali_osk_get_pmu_switch_delay(void);
 
 /** @brief Determines if Mali GPU has been configured with shared interrupts.
  *
  * @return MALI_TRUE if shared interrupts, MALI_FALSE if not.
  */
-mali_bool _mali_osk_shared_interrupts(void);
+mali_bool mali_osk_shared_interrupts(void);
 
 /** @brief Initialize the gpu secure mode.
  * The gpu secure mode will initially be in a disabled state.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_gpu_secure_mode_init(void);
+mali_osk_errcode_t mali_osk_gpu_secure_mode_init(void);
 
 /** @brief Deinitialize the gpu secure mode.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_gpu_secure_mode_deinit(void);
+mali_osk_errcode_t mali_osk_gpu_secure_mode_deinit(void);
 
 /** @brief Reset GPU and enable the gpu secure mode.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_gpu_reset_and_secure_mode_enable(void);
+mali_osk_errcode_t mali_osk_gpu_reset_and_secure_mode_enable(void);
 
 /** @brief Reset GPU and disable the gpu secure mode.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_gpu_reset_and_secure_mode_disable(void);
+mali_osk_errcode_t mali_osk_gpu_reset_and_secure_mode_disable(void);
 
 /** @brief Check if the gpu secure mode has been enabled.
  * @return MALI_TRUE if enabled, otherwise MALI_FALSE.
  */
-mali_bool _mali_osk_gpu_secure_mode_is_enabled(void);
+mali_bool mali_osk_gpu_secure_mode_is_enabled(void);
 
 /** @brief Check if the gpu secure mode is supported.
  * @return MALI_TRUE if supported, otherwise MALI_FALSE.
  */
-mali_bool _mali_osk_gpu_secure_mode_is_supported(void);
+mali_bool mali_osk_gpu_secure_mode_is_supported(void);
 
 
 /** @} */ /* end group _mali_osk_miscellaneous */

@@ -24,99 +24,99 @@
  * Contains information about the mapping of the registers
  */
 struct mali_l2_cache_core {
-	/* Common HW core functionality */
-	struct mali_hw_core hw_core;
+    /* Common HW core functionality */
+    struct mali_hw_core hw_core;
 
-	/* Synchronize L2 cache access */
-	_mali_osk_spinlock_irq_t *lock;
+    /* Synchronize L2 cache access */
+    _mali_osk_spinlock_irq_t *lock;
 
-	/* Unique core ID */
-	u32 core_id;
+    /* Unique core ID */
+    u32 core_id;
 
-	/* The power domain this L2 cache belongs to */
-	struct mali_pm_domain *pm_domain;
+    /* The power domain this L2 cache belongs to */
+    struct mali_pm_domain *pm_domain;
 
-	/* MALI_TRUE if power is on for this L2 cache */
-	mali_bool power_is_on;
+    /* MALI_TRUE if power is on for this L2 cache */
+    mali_bool power_is_on;
 
-	/* A "timestamp" to avoid unnecessary flushes */
-	u32 last_invalidated_id;
+    /* A "timestamp" to avoid unnecessary flushes */
+    u32 last_invalidated_id;
 
-	/* Performance counter 0, MALI_HW_CORE_NO_COUNTER for disabled */
-	u32 counter_src0;
+    /* Performance counter 0, MALI_HW_CORE_NO_COUNTER for disabled */
+    u32 counter_src0;
 
-	/* Performance counter 1, MALI_HW_CORE_NO_COUNTER for disabled */
-	u32 counter_src1;
+    /* Performance counter 1, MALI_HW_CORE_NO_COUNTER for disabled */
+    u32 counter_src1;
 
-	/*
-	 * Performance counter 0 value base/offset
-	 * (allows accumulative reporting even after power off)
-	 */
-	u32 counter_value0_base;
+    /*
+     * Performance counter 0 value base/offset
+     * (allows accumulative reporting even after power off)
+     */
+    u32 counter_value0_base;
 
-	/*
-	 * Performance counter 0 value base/offset
-	 * (allows accumulative reporting even after power off)
-	 */
-	u32 counter_value1_base;
+    /*
+     * Performance counter 0 value base/offset
+     * (allows accumulative reporting even after power off)
+     */
+    u32 counter_value1_base;
 
-	/* Used by PM domains to link L2 caches of same domain */
-	_mali_osk_list_t pm_domain_list;
+    /* Used by PM domains to link L2 caches of same domain */
+    _mali_osk_list_t pm_domain_list;
 };
 
-_mali_osk_errcode_t mali_l2_cache_initialize(void);
+mali_osk_errcode_t mali_l2_cache_initialize(void);
 void mali_l2_cache_terminate(void);
 
 struct mali_l2_cache_core *mali_l2_cache_create(
-	_mali_osk_resource_t *resource, u32 domain_index);
+    _mali_osk_resource_t *resource, u32 domain_index);
 void mali_l2_cache_delete(struct mali_l2_cache_core *cache);
 
 MALI_STATIC_INLINE u32 mali_l2_cache_get_id(struct mali_l2_cache_core *cache)
 {
-	MALI_DEBUG_ASSERT_POINTER(cache);
-	return cache->core_id;
+    MALI_DEBUG_ASSERT_POINTER(cache);
+    return cache->core_id;
 }
 
 MALI_STATIC_INLINE struct mali_pm_domain *mali_l2_cache_get_pm_domain(
-	struct mali_l2_cache_core *cache)
+    struct mali_l2_cache_core *cache)
 {
-	MALI_DEBUG_ASSERT_POINTER(cache);
-	return cache->pm_domain;
+    MALI_DEBUG_ASSERT_POINTER(cache);
+    return cache->pm_domain;
 }
 
 void mali_l2_cache_power_up(struct mali_l2_cache_core *cache);
 void mali_l2_cache_power_down(struct mali_l2_cache_core *cache);
 
 void mali_l2_cache_core_set_counter_src(
-	struct mali_l2_cache_core *cache, u32 source_id, u32 counter);
+    struct mali_l2_cache_core *cache, u32 source_id, u32 counter);
 
 MALI_STATIC_INLINE u32 mali_l2_cache_core_get_counter_src0(
-	struct mali_l2_cache_core *cache)
+    struct mali_l2_cache_core *cache)
 {
-	MALI_DEBUG_ASSERT_POINTER(cache);
-	return cache->counter_src0;
+    MALI_DEBUG_ASSERT_POINTER(cache);
+    return cache->counter_src0;
 }
 
 MALI_STATIC_INLINE u32 mali_l2_cache_core_get_counter_src1(
-	struct mali_l2_cache_core *cache)
+    struct mali_l2_cache_core *cache)
 {
-	MALI_DEBUG_ASSERT_POINTER(cache);
-	return cache->counter_src1;
+    MALI_DEBUG_ASSERT_POINTER(cache);
+    return cache->counter_src1;
 }
 
 void mali_l2_cache_core_get_counter_values(
-	struct mali_l2_cache_core *cache,
-	u32 *src0, u32 *value0, u32 *src1, u32 *value1);
+    struct mali_l2_cache_core *cache,
+    u32 *src0, u32 *value0, u32 *src1, u32 *value1);
 
 struct mali_l2_cache_core *mali_l2_cache_core_get_glob_l2_core(u32 index);
 u32 mali_l2_cache_core_get_glob_num_l2_cores(void);
 
 struct mali_group *mali_l2_cache_get_group(
-	struct mali_l2_cache_core *cache, u32 index);
+    struct mali_l2_cache_core *cache, u32 index);
 
 void mali_l2_cache_invalidate(struct mali_l2_cache_core *cache);
 void mali_l2_cache_invalidate_conditional(
-	struct mali_l2_cache_core *cache, u32 id);
+    struct mali_l2_cache_core *cache, u32 id);
 
 void mali_l2_cache_invalidate_all(void);
 void mali_l2_cache_invalidate_all_pages(u32 *pages, u32 num_pages);

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_TRACE_BUFFER_H_
-#define _KBASE_CSF_TRACE_BUFFER_H_
+#ifndef KBASE_CSF_TRACE_BUFFER_H
+#define KBASE_CSF_TRACE_BUFFER_H
 
 #include <linux/types.h>
 
@@ -81,7 +81,7 @@ void kbase_csf_firmware_trace_buffers_term(struct kbase_device *kbdev);
  * @size:  Size (in bytes) of the section
  */
 int kbase_csf_firmware_parse_trace_buffer_entry(struct kbase_device *kbdev,
-		const u32 *entry, unsigned int size);
+        const u32 *entry, unsigned int size);
 
 /**
  * kbase_csf_firmware_reload_trace_buffers_data -
@@ -112,7 +112,7 @@ void kbase_csf_firmware_reload_trace_buffers_data(struct kbase_device *kbdev);
  * @name:  Name of the trace buffer to find
  */
 struct firmware_trace_buffer *kbase_csf_firmware_get_trace_buffer(
-	struct kbase_device *kbdev, const char *name);
+    struct kbase_device *kbdev, const char *name);
 
 /**
  * kbase_csf_firmware_trace_buffer_get_trace_enable_bits_count -
@@ -123,7 +123,7 @@ struct firmware_trace_buffer *kbase_csf_firmware_get_trace_buffer(
  * @trace_buffer: Trace buffer handle
  */
 unsigned int kbase_csf_firmware_trace_buffer_get_trace_enable_bits_count(
-	const struct firmware_trace_buffer *trace_buffer);
+    const struct firmware_trace_buffer *trace_buffer);
 
 /**
  * kbase_csf_firmware_trace_buffer_update_trace_enable_bit -
@@ -136,7 +136,7 @@ unsigned int kbase_csf_firmware_trace_buffer_get_trace_enable_bits_count(
  * @value:        New value for the given bit
  */
 void kbase_csf_firmware_trace_buffer_update_trace_enable_bit(
-	struct firmware_trace_buffer *trace_buffer, unsigned int bit, bool value);
+    struct firmware_trace_buffer *trace_buffer, unsigned int bit, bool value);
 
 /**
  * kbase_csf_firmware_trace_buffer_is_empty - Empty trace buffer predicate
@@ -146,7 +146,7 @@ void kbase_csf_firmware_trace_buffer_update_trace_enable_bit(
  * @trace_buffer: Trace buffer handle
  */
 bool kbase_csf_firmware_trace_buffer_is_empty(
-	const struct firmware_trace_buffer *trace_buffer);
+    const struct firmware_trace_buffer *trace_buffer);
 
 /**
  * kbase_csf_firmware_trace_buffer_read_data - Read data from a trace buffer
@@ -161,7 +161,7 @@ bool kbase_csf_firmware_trace_buffer_is_empty(
  * @num_bytes:    Maximum number of bytes to read from the trace buffer.
  */
 unsigned int kbase_csf_firmware_trace_buffer_read_data(
-	struct firmware_trace_buffer *trace_buffer, u8 *data, unsigned int num_bytes);
+    struct firmware_trace_buffer *trace_buffer, u8 *data, unsigned int num_bytes);
 
 #ifdef CONFIG_DEBUG_FS
 /**

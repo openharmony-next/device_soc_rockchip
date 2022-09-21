@@ -40,9 +40,9 @@ typedef void kbase_context_term_method(struct kbase_context *kctx);
  * @err_mes: Error message to be printed when init method fails.
  */
 struct kbase_context_init {
-	kbase_context_init_method *init;
-	kbase_context_term_method *term;
-	char *err_mes;
+    kbase_context_init_method *init;
+    kbase_context_term_method *term;
+    char *err_mes;
 };
 
 int kbase_context_common_init(struct kbase_context *kctx);

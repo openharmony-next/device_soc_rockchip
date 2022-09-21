@@ -6,13 +6,13 @@
 #include <linux/compiler.h>
 
 struct swsusp_info {
-	struct new_utsname	uts;
-	u32			version_code;
-	unsigned long		num_physpages;
-	int			cpus;
-	unsigned long		image_pages;
-	unsigned long		pages;
-	unsigned long		size;
+    struct new_utsname    uts;
+    u32            version_code;
+    unsigned long        num_physpages;
+    int            cpus;
+    unsigned long        image_pages;
+    unsigned long        pages;
+    unsigned long        size;
 } __aligned(PAGE_SIZE);
 
 #ifdef CONFIG_HIBERNATION
@@ -22,20 +22,20 @@ extern void __init hibernate_image_size_init(void);
 
 #ifdef CONFIG_ARCH_HIBERNATION_HEADER
 /* Maximum size of architecture specific data in a hibernation header */
-#define MAX_ARCH_HEADER_SIZE	(sizeof(struct new_utsname) + 4)
+#define MAX_ARCH_HEADER_SIZE    (sizeof(struct new_utsname) + 4)
 
 extern int arch_hibernation_header_save(void *addr, unsigned int max_size);
 extern int arch_hibernation_header_restore(void *addr);
 
 static inline int init_header_complete(struct swsusp_info *info)
 {
-	return arch_hibernation_header_save(info, MAX_ARCH_HEADER_SIZE);
+    return arch_hibernation_header_save(info, MAX_ARCH_HEADER_SIZE);
 }
 
 static inline const char *check_image_kernel(struct swsusp_info *info)
 {
-	return arch_hibernation_header_restore(info) ?
-			"architecture specific data" : NULL;
+    return arch_hibernation_header_restore(info) ?
+            "architecture specific data" : NULL;
 }
 #endif /* CONFIG_ARCH_HIBERNATION_HEADER */
 
@@ -45,13 +45,13 @@ extern int hibernate_resume_nonboot_cpu_disable(void);
  * Keep some memory free so that I/O operations can succeed without paging
  * [Might this be more than 4 MB?]
  */
-#define PAGES_FOR_IO	((4096 * 1024) >> PAGE_SHIFT)
+#define PAGES_FOR_IO    ((4096 * 1024) >> PAGE_SHIFT)
 
 /*
  * Keep 1 MB of memory free so that device drivers can allocate some pages in
  * their .suspend() routines without breaking the suspend to disk.
  */
-#define SPARE_PAGES	((1024 * 1024) >> PAGE_SHIFT)
+#define SPARE_PAGES    ((1024 * 1024) >> PAGE_SHIFT)
 
 asmlinkage int swsusp_save(void);
 
@@ -76,22 +76,22 @@ static inline void hibernate_image_size_init(void) {}
 #endif /* !CONFIG_HIBERNATION */
 
 #define power_attr(_name) \
-static struct kobj_attribute _name##_attr = {	\
-	.attr	= {				\
-		.name = __stringify(_name),	\
-		.mode = 0644,			\
-	},					\
-	.show	= _name##_show,			\
-	.store	= _name##_store,		\
+static struct kobj_attribute _name##_attr = {    \
+    .attr    = {                \
+        .name = __stringify(_name),    \
+        .mode = 0644,            \
+    },                    \
+    .show    = _name##_show,            \
+    .store    = _name##_store,        \
 }
 
 #define power_attr_ro(_name) \
-static struct kobj_attribute _name##_attr = {	\
-	.attr	= {				\
-		.name = __stringify(_name),	\
-		.mode = S_IRUGO,		\
-	},					\
-	.show	= _name##_show,			\
+static struct kobj_attribute _name##_attr = {    \
+    .attr    = {                \
+        .name = __stringify(_name),    \
+        .mode = S_IRUGO,        \
+    },                    \
+    .show    = _name##_show,            \
 }
 
 /* Preferred image size in bytes (default 500 MB) */
@@ -109,43 +109,43 @@ extern int hibernate_preallocate_memory(void);
 extern void clear_or_poison_free_pages(void);
 
 /**
- *	Auxiliary structure used for reading the snapshot image data and
- *	metadata from and writing them to the list of page backup entries
- *	(PBEs) which is the main data structure of swsusp.
+ *    Auxiliary structure used for reading the snapshot image data and
+ *    metadata from and writing them to the list of page backup entries
+ *    (PBEs) which is the main data structure of swsusp.
  *
- *	Using struct snapshot_handle we can transfer the image, including its
- *	metadata, as a continuous sequence of bytes with the help of
- *	snapshot_read_next() and snapshot_write_next().
+ *    Using struct snapshot_handle we can transfer the image, including its
+ *    metadata, as a continuous sequence of bytes with the help of
+ *    snapshot_read_next() and snapshot_write_next().
  *
- *	The code that writes the image to a storage or transfers it to
- *	the user land is required to use snapshot_read_next() for this
- *	purpose and it should not make any assumptions regarding the internal
- *	structure of the image.  Similarly, the code that reads the image from
- *	a storage or transfers it from the user land is required to use
- *	snapshot_write_next().
+ *    The code that writes the image to a storage or transfers it to
+ *    the user land is required to use snapshot_read_next() for this
+ *    purpose and it should not make any assumptions regarding the internal
+ *    structure of the image.  Similarly, the code that reads the image from
+ *    a storage or transfers it from the user land is required to use
+ *    snapshot_write_next().
  *
- *	This may allow us to change the internal structure of the image
- *	in the future with considerably less effort.
+ *    This may allow us to change the internal structure of the image
+ *    in the future with considerably less effort.
  */
 
 struct snapshot_handle {
-	unsigned int	cur;	/* number of the block of PAGE_SIZE bytes the
-				 * next operation will refer to (ie. current)
-				 */
-	void		*buffer;	/* address of the block to read from
-					 * or write to
-					 */
-	int		sync_read;	/* Set to one to notify the caller of
-					 * snapshot_write_next() that it may
-					 * need to call wait_on_bio_chain()
-					 */
+    unsigned int    cur;    /* number of the block of PAGE_SIZE bytes the
+                 * next operation will refer to (ie. current)
+                 */
+    void        *buffer;    /* address of the block to read from
+                     * or write to
+                     */
+    int        sync_read;    /* Set to one to notify the caller of
+                     * snapshot_write_next() that it may
+                     * need to call wait_on_bio_chain()
+                     */
 };
 
 /* This macro returns the address from/to which the caller of
  * snapshot_read_next()/snapshot_write_next() is allowed to
  * read/write data after the function returns
  */
-#define data_of(handle)	((handle).buffer)
+#define data_of(handle)    ((handle).buffer)
 
 extern unsigned int snapshot_additional_pages(struct zone *zone);
 extern unsigned long snapshot_get_image_size(void);
@@ -165,9 +165,9 @@ extern int swsusp_swap_in_use(void);
  * Flags that can be passed from the hibernatig hernel to the "boot" kernel in
  * the image header.
  */
-#define SF_PLATFORM_MODE	1
-#define SF_NOCOMPRESS_MODE	2
-#define SF_CRC32_MODE	        4
+#define SF_PLATFORM_MODE    1
+#define SF_NOCOMPRESS_MODE    2
+#define SF_CRC32_MODE            4
 
 /* kernel/power/hibernate.c */
 extern int swsusp_check(void);
@@ -191,11 +191,11 @@ extern const char *mem_sleep_states[];
 
 extern int suspend_devices_and_enter(suspend_state_t state);
 #else /* !CONFIG_SUSPEND */
-#define mem_sleep_current	PM_SUSPEND_ON
+#define mem_sleep_current    PM_SUSPEND_ON
 
 static inline int suspend_devices_and_enter(suspend_state_t state)
 {
-	return -ENOSYS;
+    return -ENOSYS;
 }
 #endif /* !CONFIG_SUSPEND */
 
@@ -225,58 +225,58 @@ static inline int restore_highmem(void) { return 0; }
  * Suspend test levels
  */
 enum {
-	/* keep first */
-	TEST_NONE,
-	TEST_CORE,
-	TEST_CPUS,
-	TEST_PLATFORM,
-	TEST_DEVICES,
-	TEST_FREEZER,
-	/* keep last */
-	__TEST_AFTER_LAST
+    /* keep first */
+    TEST_NONE,
+    TEST_CORE,
+    TEST_CPUS,
+    TEST_PLATFORM,
+    TEST_DEVICES,
+    TEST_FREEZER,
+    /* keep last */
+    __TEST_AFTER_LAST
 };
 
-#define TEST_FIRST	TEST_NONE
-#define TEST_MAX	(__TEST_AFTER_LAST - 1)
+#define TEST_FIRST    TEST_NONE
+#define TEST_MAX    (__TEST_AFTER_LAST - 1)
 
 #ifdef CONFIG_PM_SLEEP_DEBUG
 extern int pm_test_level;
 #else
-#define pm_test_level	(TEST_NONE)
+#define pm_test_level    (TEST_NONE)
 #endif
 
 #ifdef CONFIG_SUSPEND_FREEZER
 static inline int suspend_freeze_processes(void)
 {
-	int error;
+    int error;
 
-	error = freeze_processes();
-	/*
-	 * freeze_processes() automatically thaws every task if freezing
-	 * fails. So we need not do anything extra upon error.
-	 */
-	if (error)
-		return error;
+    error = freeze_processes();
+    /*
+     * freeze_processes() automatically thaws every task if freezing
+     * fails. So we need not do anything extra upon error.
+     */
+    if (error)
+        return error;
 
-	error = freeze_kernel_threads();
-	/*
-	 * freeze_kernel_threads() thaws only kernel threads upon freezing
-	 * failure. So we have to thaw the userspace tasks ourselves.
-	 */
-	if (error)
-		thaw_processes();
+    error = freeze_kernel_threads();
+    /*
+     * freeze_kernel_threads() thaws only kernel threads upon freezing
+     * failure. So we have to thaw the userspace tasks ourselves.
+     */
+    if (error)
+        thaw_processes();
 
-	return error;
+    return error;
 }
 
 static inline void suspend_thaw_processes(void)
 {
-	thaw_processes();
+    thaw_processes();
 }
 #else
 static inline int suspend_freeze_processes(void)
 {
-	return 0;
+    return 0;
 }
 
 static inline void suspend_thaw_processes(void)

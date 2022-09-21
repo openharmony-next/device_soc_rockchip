@@ -38,82 +38,82 @@
  * drm_crtc_enable_color_mgmt().
  *
  * "DEGAMMA_LUT”:
- *	Blob property to set the degamma lookup table (LUT) mapping pixel data
- *	from the framebuffer before it is given to the transformation matrix.
- *	The data is interpreted as an array of &struct drm_color_lut elements.
- *	Hardware might choose not to use the full precision of the LUT elements
- *	nor use all the elements of the LUT (for example the hardware might
- *	choose to interpolate between LUT[0] and LUT[4]).
+ *    Blob property to set the degamma lookup table (LUT) mapping pixel data
+ *    from the framebuffer before it is given to the transformation matrix.
+ *    The data is interpreted as an array of &struct drm_color_lut elements.
+ *    Hardware might choose not to use the full precision of the LUT elements
+ *    nor use all the elements of the LUT (for example the hardware might
+ *    choose to interpolate between LUT[0] and LUT[4]).
  *
- *	Setting this to NULL (blob property value set to 0) means a
- *	linear/pass-thru gamma table should be used. This is generally the
- *	driver boot-up state too. Drivers can access this blob through
- *	&drm_crtc_state.degamma_lut.
+ *    Setting this to NULL (blob property value set to 0) means a
+ *    linear/pass-thru gamma table should be used. This is generally the
+ *    driver boot-up state too. Drivers can access this blob through
+ *    &drm_crtc_state.degamma_lut.
  *
  * “DEGAMMA_LUT_SIZE”:
- *	Unsinged range property to give the size of the lookup table to be set
- *	on the DEGAMMA_LUT property (the size depends on the underlying
- *	hardware). If drivers support multiple LUT sizes then they should
- *	publish the largest size, and sub-sample smaller sized LUTs (e.g. for
- *	split-gamma modes) appropriately.
+ *    Unsinged range property to give the size of the lookup table to be set
+ *    on the DEGAMMA_LUT property (the size depends on the underlying
+ *    hardware). If drivers support multiple LUT sizes then they should
+ *    publish the largest size, and sub-sample smaller sized LUTs (e.g. for
+ *    split-gamma modes) appropriately.
  *
  * “CTM”:
- *	Blob property to set the current transformation matrix (CTM) apply to
- *	pixel data after the lookup through the degamma LUT and before the
- *	lookup through the cubic LUT. The data is interpreted as a struct
- *	&drm_color_ctm.
+ *    Blob property to set the current transformation matrix (CTM) apply to
+ *    pixel data after the lookup through the degamma LUT and before the
+ *    lookup through the cubic LUT. The data is interpreted as a struct
+ *    &drm_color_ctm.
  *
- *	Setting this to NULL (blob property value set to 0) means a
- *	unit/pass-thru matrix should be used. This is generally the driver
- *	boot-up state too. Drivers can access the blob for the color conversion
- *	matrix through &drm_crtc_state.ctm.
+ *    Setting this to NULL (blob property value set to 0) means a
+ *    unit/pass-thru matrix should be used. This is generally the driver
+ *    boot-up state too. Drivers can access the blob for the color conversion
+ *    matrix through &drm_crtc_state.ctm.
  *
  * ”CUBIC_LUT”:
- *	Blob property to set the cubic (3D) lookup table performing color
- *	mapping after the transformation matrix and before the lookup through
- *	the gamma LUT. Unlike the degamma and gamma LUTs that map color
- *	components independently, the 3D LUT converts an input color to an
- *	output color by indexing into the 3D table using the color components
- *	as a 3D coordinate. The LUT is subsampled as 8-bit (or more) precision
- *	would require too much storage space in the hardware, so the precision
- *	of the color components is reduced before the look up, and the low
- *	order bits may be used to interpolate between the nearest points in 3D
- *	space.
+ *    Blob property to set the cubic (3D) lookup table performing color
+ *    mapping after the transformation matrix and before the lookup through
+ *    the gamma LUT. Unlike the degamma and gamma LUTs that map color
+ *    components independently, the 3D LUT converts an input color to an
+ *    output color by indexing into the 3D table using the color components
+ *    as a 3D coordinate. The LUT is subsampled as 8-bit (or more) precision
+ *    would require too much storage space in the hardware, so the precision
+ *    of the color components is reduced before the look up, and the low
+ *    order bits may be used to interpolate between the nearest points in 3D
+ *    space.
  *
- *	The data is interpreted as an array of &struct drm_color_lut elements.
- *	Hardware might choose not to use the full precision of the LUT
- *	elements.
+ *    The data is interpreted as an array of &struct drm_color_lut elements.
+ *    Hardware might choose not to use the full precision of the LUT
+ *    elements.
  *
- *	Setting this to NULL (blob property value set to 0) means the output
- *	color is identical to the input color. This is generally the driver
- *	boot-up state too. Drivers can access this blob through
- *	&drm_crtc_state.cubic_lut.
+ *    Setting this to NULL (blob property value set to 0) means the output
+ *    color is identical to the input color. This is generally the driver
+ *    boot-up state too. Drivers can access this blob through
+ *    &drm_crtc_state.cubic_lut.
  *
  * ”CUBIC_LUT_SIZE”:
- *	Unsigned range property to give the size of the lookup table to be set
- *	on the CUBIC_LUT property (the size depends on the underlying hardware).
- *	If drivers support multiple LUT sizes then they should publish the
- *	largest size, and sub-sample smaller sized LUTs appropriately.
+ *    Unsigned range property to give the size of the lookup table to be set
+ *    on the CUBIC_LUT property (the size depends on the underlying hardware).
+ *    If drivers support multiple LUT sizes then they should publish the
+ *    largest size, and sub-sample smaller sized LUTs appropriately.
  *
  * “GAMMA_LUT”:
- *	Blob property to set the gamma lookup table (LUT) mapping pixel data
- *	after the cubic LUT to data sent to the connector. The data is
- *	interpreted as an array of &struct drm_color_lut elements. Hardware
- *	might choose not to use the full precision of the LUT elements nor use
- *	all the elements of the LUT (for example the hardware might choose to
- *	interpolate between LUT[0] and LUT[4]).
+ *    Blob property to set the gamma lookup table (LUT) mapping pixel data
+ *    after the cubic LUT to data sent to the connector. The data is
+ *    interpreted as an array of &struct drm_color_lut elements. Hardware
+ *    might choose not to use the full precision of the LUT elements nor use
+ *    all the elements of the LUT (for example the hardware might choose to
+ *    interpolate between LUT[0] and LUT[4]).
  *
- *	Setting this to NULL (blob property value set to 0) means a
- *	linear/pass-thru gamma table should be used. This is generally the
- *	driver boot-up state too. Drivers can access this blob through
- *	&drm_crtc_state.gamma_lut.
+ *    Setting this to NULL (blob property value set to 0) means a
+ *    linear/pass-thru gamma table should be used. This is generally the
+ *    driver boot-up state too. Drivers can access this blob through
+ *    &drm_crtc_state.gamma_lut.
  *
  * “GAMMA_LUT_SIZE”:
- *	Unsigned range property to give the size of the lookup table to be set
- *	on the GAMMA_LUT property (the size depends on the underlying hardware).
- *	If drivers support multiple LUT sizes then they should publish the
- *	largest size, and sub-sample smaller sized LUTs (e.g. for split-gamma
- *	modes) appropriately.
+ *    Unsigned range property to give the size of the lookup table to be set
+ *    on the GAMMA_LUT property (the size depends on the underlying hardware).
+ *    If drivers support multiple LUT sizes then they should publish the
+ *    largest size, and sub-sample smaller sized LUTs (e.g. for split-gamma
+ *    modes) appropriately.
  *
  * There is also support for a legacy gamma table, which is set up by calling
  * drm_mode_crtc_set_gamma_size(). Drivers which support both should use
@@ -125,14 +125,14 @@
  * are set up by calling drm_plane_create_color_properties().
  *
  * "COLOR_ENCODING"
- * 	Optional plane enum property to support different non RGB
- * 	color encodings. The driver can provide a subset of standard
- * 	enum values supported by the DRM plane.
+ *     Optional plane enum property to support different non RGB
+ *     color encodings. The driver can provide a subset of standard
+ *     enum values supported by the DRM plane.
  *
  * "COLOR_RANGE"
- * 	Optional plane enum property to support different non RGB
- * 	color parameter ranges. The driver can provide a subset of
- * 	standard enum values supported by the DRM plane.
+ *     Optional plane enum property to support different non RGB
+ *     color parameter ranges. The driver can provide a subset of
+ *     standard enum values supported by the DRM plane.
  */
 
 /**
@@ -156,16 +156,16 @@
  */
 u64 drm_color_ctm_s31_32_to_qm_n(u64 user_input, u32 m, u32 n)
 {
-	u64 mag = (user_input & ~BIT_ULL(63)) >> (32 - n);
-	bool negative = !!(user_input & BIT_ULL(63));
-	s64 val;
+    u64 mag = (user_input & ~BIT_ULL(63)) >> (32 - n);
+    bool negative = !!(user_input & BIT_ULL(63));
+    s64 val;
 
-	WARN_ON(m > 32 || n > 32);
+    WARN_ON(m > 32 || n > 32);
 
-	val = clamp_val(mag, 0, negative ?
-				BIT_ULL(n + m - 1) : BIT_ULL(n + m - 1) - 1);
+    val = clamp_val(mag, 0, negative ?
+                BIT_ULL(n + m - 1) : BIT_ULL(n + m - 1) - 1);
 
-	return negative ? -val : val;
+    return negative ? -val : val;
 }
 EXPORT_SYMBOL(drm_color_ctm_s31_32_to_qm_n);
 
@@ -188,32 +188,32 @@ EXPORT_SYMBOL(drm_color_ctm_s31_32_to_qm_n);
  * legacy &drm_crtc_funcs.gamma_set callback.
  */
 void drm_crtc_enable_color_mgmt(struct drm_crtc *crtc,
-				uint degamma_lut_size,
-				bool has_ctm,
-				uint gamma_lut_size)
+                uint degamma_lut_size,
+                bool has_ctm,
+                uint gamma_lut_size)
 {
-	struct drm_device *dev = crtc->dev;
-	struct drm_mode_config *config = &dev->mode_config;
+    struct drm_device *dev = crtc->dev;
+    struct drm_mode_config *config = &dev->mode_config;
 
-	if (degamma_lut_size) {
-		drm_object_attach_property(&crtc->base,
-					   config->degamma_lut_property, 0);
-		drm_object_attach_property(&crtc->base,
-					   config->degamma_lut_size_property,
-					   degamma_lut_size);
-	}
+    if (degamma_lut_size) {
+        drm_object_attach_property(&crtc->base,
+                       config->degamma_lut_property, 0);
+        drm_object_attach_property(&crtc->base,
+                       config->degamma_lut_size_property,
+                       degamma_lut_size);
+    }
 
-	if (has_ctm)
-		drm_object_attach_property(&crtc->base,
-					   config->ctm_property, 0);
+    if (has_ctm)
+        drm_object_attach_property(&crtc->base,
+                       config->ctm_property, 0);
 
-	if (gamma_lut_size) {
-		drm_object_attach_property(&crtc->base,
-					   config->gamma_lut_property, 0);
-		drm_object_attach_property(&crtc->base,
-					   config->gamma_lut_size_property,
-					   gamma_lut_size);
-	}
+    if (gamma_lut_size) {
+        drm_object_attach_property(&crtc->base,
+                       config->gamma_lut_property, 0);
+        drm_object_attach_property(&crtc->base,
+                       config->gamma_lut_size_property,
+                       gamma_lut_size);
+    }
 }
 EXPORT_SYMBOL(drm_crtc_enable_color_mgmt);
 
@@ -230,31 +230,31 @@ EXPORT_SYMBOL(drm_crtc_enable_color_mgmt);
  * Zero on success, negative errno on failure.
  */
 int drm_mode_crtc_set_gamma_size(struct drm_crtc *crtc,
-				 int gamma_size)
+                 int gamma_size)
 {
-	uint16_t *r_base, *g_base, *b_base;
-	int i;
+    uint16_t *r_base, *g_base, *b_base;
+    int i;
 
-	crtc->gamma_size = gamma_size;
+    crtc->gamma_size = gamma_size;
 
-	crtc->gamma_store = kcalloc(gamma_size, sizeof(uint16_t) * 3,
-				    GFP_KERNEL);
-	if (!crtc->gamma_store) {
-		crtc->gamma_size = 0;
-		return -ENOMEM;
-	}
+    crtc->gamma_store = kcalloc(gamma_size, sizeof(uint16_t) * 3,
+                    GFP_KERNEL);
+    if (!crtc->gamma_store) {
+        crtc->gamma_size = 0;
+        return -ENOMEM;
+    }
 
-	r_base = crtc->gamma_store;
-	g_base = r_base + gamma_size;
-	b_base = g_base + gamma_size;
-	for (i = 0; i < gamma_size; i++) {
-		r_base[i] = i << 8;
-		g_base[i] = i << 8;
-		b_base[i] = i << 8;
-	}
+    r_base = crtc->gamma_store;
+    g_base = r_base + gamma_size;
+    b_base = g_base + gamma_size;
+    for (i = 0; i < gamma_size; i++) {
+        r_base[i] = i << 8;
+        g_base[i] = i << 8;
+        b_base[i] = i << 8;
+    }
 
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_mode_crtc_set_gamma_size);
 
@@ -273,56 +273,56 @@ EXPORT_SYMBOL(drm_mode_crtc_set_gamma_size);
  * Zero on success, negative errno on failure.
  */
 int drm_mode_gamma_set_ioctl(struct drm_device *dev,
-			     void *data, struct drm_file *file_priv)
+                 void *data, struct drm_file *file_priv)
 {
-	struct drm_mode_crtc_lut *crtc_lut = data;
-	struct drm_crtc *crtc;
-	void *r_base, *g_base, *b_base;
-	int size;
-	struct drm_modeset_acquire_ctx ctx;
-	int ret = 0;
+    struct drm_mode_crtc_lut *crtc_lut = data;
+    struct drm_crtc *crtc;
+    void *r_base, *g_base, *b_base;
+    int size;
+    struct drm_modeset_acquire_ctx ctx;
+    int ret = 0;
 
-	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EOPNOTSUPP;
+    if (!drm_core_check_feature(dev, DRIVER_MODESET))
+        return -EOPNOTSUPP;
 
-	crtc = drm_crtc_find(dev, file_priv, crtc_lut->crtc_id);
-	if (!crtc)
-		return -ENOENT;
+    crtc = drm_crtc_find(dev, file_priv, crtc_lut->crtc_id);
+    if (!crtc)
+        return -ENOENT;
 
-	if (crtc->funcs->gamma_set == NULL)
-		return -ENOSYS;
+    if (crtc->funcs->gamma_set == NULL)
+        return -ENOSYS;
 
-	/* memcpy into gamma store */
-	if (crtc_lut->gamma_size != crtc->gamma_size)
-		return -EINVAL;
+    /* memcpy into gamma store */
+    if (crtc_lut->gamma_size != crtc->gamma_size)
+        return -EINVAL;
 
-	DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, ret);
+    DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, ret);
 
-	size = crtc_lut->gamma_size * (sizeof(uint16_t));
-	r_base = crtc->gamma_store;
-	if (copy_from_user(r_base, (void __user *)(unsigned long)crtc_lut->red, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    size = crtc_lut->gamma_size * (sizeof(uint16_t));
+    r_base = crtc->gamma_store;
+    if (copy_from_user(r_base, (void __user *)(unsigned long)crtc_lut->red, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 
-	g_base = r_base + size;
-	if (copy_from_user(g_base, (void __user *)(unsigned long)crtc_lut->green, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    g_base = r_base + size;
+    if (copy_from_user(g_base, (void __user *)(unsigned long)crtc_lut->green, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 
-	b_base = g_base + size;
-	if (copy_from_user(b_base, (void __user *)(unsigned long)crtc_lut->blue, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    b_base = g_base + size;
+    if (copy_from_user(b_base, (void __user *)(unsigned long)crtc_lut->blue, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 
-	ret = crtc->funcs->gamma_set(crtc, r_base, g_base, b_base,
-				     crtc->gamma_size, &ctx);
+    ret = crtc->funcs->gamma_set(crtc, r_base, g_base, b_base,
+                     crtc->gamma_size, &ctx);
 
 out:
-	DRM_MODESET_LOCK_ALL_END(dev, ctx, ret);
-	return ret;
+    DRM_MODESET_LOCK_ALL_END(dev, ctx, ret);
+    return ret;
 
 }
 
@@ -342,58 +342,58 @@ out:
  * Zero on success, negative errno on failure.
  */
 int drm_mode_gamma_get_ioctl(struct drm_device *dev,
-			     void *data, struct drm_file *file_priv)
+                 void *data, struct drm_file *file_priv)
 {
-	struct drm_mode_crtc_lut *crtc_lut = data;
-	struct drm_crtc *crtc;
-	void *r_base, *g_base, *b_base;
-	int size;
-	int ret = 0;
+    struct drm_mode_crtc_lut *crtc_lut = data;
+    struct drm_crtc *crtc;
+    void *r_base, *g_base, *b_base;
+    int size;
+    int ret = 0;
 
-	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EOPNOTSUPP;
+    if (!drm_core_check_feature(dev, DRIVER_MODESET))
+        return -EOPNOTSUPP;
 
-	crtc = drm_crtc_find(dev, file_priv, crtc_lut->crtc_id);
-	if (!crtc)
-		return -ENOENT;
+    crtc = drm_crtc_find(dev, file_priv, crtc_lut->crtc_id);
+    if (!crtc)
+        return -ENOENT;
 
-	/* memcpy into gamma store */
-	if (crtc_lut->gamma_size != crtc->gamma_size)
-		return -EINVAL;
+    /* memcpy into gamma store */
+    if (crtc_lut->gamma_size != crtc->gamma_size)
+        return -EINVAL;
 
-	drm_modeset_lock(&crtc->mutex, NULL);
-	size = crtc_lut->gamma_size * (sizeof(uint16_t));
-	r_base = crtc->gamma_store;
-	if (copy_to_user((void __user *)(unsigned long)crtc_lut->red, r_base, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    drm_modeset_lock(&crtc->mutex, NULL);
+    size = crtc_lut->gamma_size * (sizeof(uint16_t));
+    r_base = crtc->gamma_store;
+    if (copy_to_user((void __user *)(unsigned long)crtc_lut->red, r_base, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 
-	g_base = r_base + size;
-	if (copy_to_user((void __user *)(unsigned long)crtc_lut->green, g_base, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    g_base = r_base + size;
+    if (copy_to_user((void __user *)(unsigned long)crtc_lut->green, g_base, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 
-	b_base = g_base + size;
-	if (copy_to_user((void __user *)(unsigned long)crtc_lut->blue, b_base, size)) {
-		ret = -EFAULT;
-		goto out;
-	}
+    b_base = g_base + size;
+    if (copy_to_user((void __user *)(unsigned long)crtc_lut->blue, b_base, size)) {
+        ret = -EFAULT;
+        goto out;
+    }
 out:
-	drm_modeset_unlock(&crtc->mutex);
-	return ret;
+    drm_modeset_unlock(&crtc->mutex);
+    return ret;
 }
 
 static const char * const color_encoding_name[] = {
-	[DRM_COLOR_YCBCR_BT601] = "ITU-R BT.601 YCbCr",
-	[DRM_COLOR_YCBCR_BT709] = "ITU-R BT.709 YCbCr",
-	[DRM_COLOR_YCBCR_BT2020] = "ITU-R BT.2020 YCbCr",
+    [DRM_COLOR_YCBCR_BT601] = "ITU-R BT.601 YCbCr",
+    [DRM_COLOR_YCBCR_BT709] = "ITU-R BT.709 YCbCr",
+    [DRM_COLOR_YCBCR_BT2020] = "ITU-R BT.2020 YCbCr",
 };
 
 static const char * const color_range_name[] = {
-	[DRM_COLOR_YCBCR_FULL_RANGE] = "YCbCr full range",
-	[DRM_COLOR_YCBCR_LIMITED_RANGE] = "YCbCr limited range",
+    [DRM_COLOR_YCBCR_FULL_RANGE] = "YCbCr full range",
+    [DRM_COLOR_YCBCR_LIMITED_RANGE] = "YCbCr limited range",
 };
 
 /**
@@ -405,10 +405,10 @@ static const char * const color_range_name[] = {
  */
 const char *drm_get_color_encoding_name(enum drm_color_encoding encoding)
 {
-	if (WARN_ON(encoding >= ARRAY_SIZE(color_encoding_name)))
-		return "unknown";
+    if (WARN_ON(encoding >= ARRAY_SIZE(color_encoding_name)))
+        return "unknown";
 
-	return color_encoding_name[encoding];
+    return color_encoding_name[encoding];
 }
 
 /**
@@ -420,10 +420,10 @@ const char *drm_get_color_encoding_name(enum drm_color_encoding encoding)
  */
 const char *drm_get_color_range_name(enum drm_color_range range)
 {
-	if (WARN_ON(range >= ARRAY_SIZE(color_range_name)))
-		return "unknown";
+    if (WARN_ON(range >= ARRAY_SIZE(color_range_name)))
+        return "unknown";
 
-	return color_range_name[range];
+    return color_range_name[range];
 }
 
 /**
@@ -441,66 +441,66 @@ const char *drm_get_color_range_name(enum drm_color_range range)
  * value is supported.
  */
 int drm_plane_create_color_properties(struct drm_plane *plane,
-				      u32 supported_encodings,
-				      u32 supported_ranges,
-				      enum drm_color_encoding default_encoding,
-				      enum drm_color_range default_range)
+                      u32 supported_encodings,
+                      u32 supported_ranges,
+                      enum drm_color_encoding default_encoding,
+                      enum drm_color_range default_range)
 {
-	struct drm_device *dev = plane->dev;
-	struct drm_property *prop;
-	struct drm_prop_enum_list enum_list[max_t(int, DRM_COLOR_ENCODING_MAX,
-						       DRM_COLOR_RANGE_MAX)];
-	int i, len;
+    struct drm_device *dev = plane->dev;
+    struct drm_property *prop;
+    struct drm_prop_enum_list enum_list[max_t(int, DRM_COLOR_ENCODING_MAX,
+                               DRM_COLOR_RANGE_MAX)];
+    int i, len;
 
-	if (WARN_ON(supported_encodings == 0 ||
-		    (supported_encodings & -BIT(DRM_COLOR_ENCODING_MAX)) != 0 ||
-		    (supported_encodings & BIT(default_encoding)) == 0))
-		return -EINVAL;
+    if (WARN_ON(supported_encodings == 0 ||
+            (supported_encodings & -BIT(DRM_COLOR_ENCODING_MAX)) != 0 ||
+            (supported_encodings & BIT(default_encoding)) == 0))
+        return -EINVAL;
 
-	if (WARN_ON(supported_ranges == 0 ||
-		    (supported_ranges & -BIT(DRM_COLOR_RANGE_MAX)) != 0 ||
-		    (supported_ranges & BIT(default_range)) == 0))
-		return -EINVAL;
+    if (WARN_ON(supported_ranges == 0 ||
+            (supported_ranges & -BIT(DRM_COLOR_RANGE_MAX)) != 0 ||
+            (supported_ranges & BIT(default_range)) == 0))
+        return -EINVAL;
 
-	len = 0;
-	for (i = 0; i < DRM_COLOR_ENCODING_MAX; i++) {
-		if ((supported_encodings & BIT(i)) == 0)
-			continue;
+    len = 0;
+    for (i = 0; i < DRM_COLOR_ENCODING_MAX; i++) {
+        if ((supported_encodings & BIT(i)) == 0)
+            continue;
 
-		enum_list[len].type = i;
-		enum_list[len].name = color_encoding_name[i];
-		len++;
-	}
+        enum_list[len].type = i;
+        enum_list[len].name = color_encoding_name[i];
+        len++;
+    }
 
-	prop = drm_property_create_enum(dev, 0, "COLOR_ENCODING",
-					enum_list, len);
-	if (!prop)
-		return -ENOMEM;
-	plane->color_encoding_property = prop;
-	drm_object_attach_property(&plane->base, prop, default_encoding);
-	if (plane->state)
-		plane->state->color_encoding = default_encoding;
+    prop = drm_property_create_enum(dev, 0, "COLOR_ENCODING",
+                    enum_list, len);
+    if (!prop)
+        return -ENOMEM;
+    plane->color_encoding_property = prop;
+    drm_object_attach_property(&plane->base, prop, default_encoding);
+    if (plane->state)
+        plane->state->color_encoding = default_encoding;
 
-	len = 0;
-	for (i = 0; i < DRM_COLOR_RANGE_MAX; i++) {
-		if ((supported_ranges & BIT(i)) == 0)
-			continue;
+    len = 0;
+    for (i = 0; i < DRM_COLOR_RANGE_MAX; i++) {
+        if ((supported_ranges & BIT(i)) == 0)
+            continue;
 
-		enum_list[len].type = i;
-		enum_list[len].name = color_range_name[i];
-		len++;
-	}
+        enum_list[len].type = i;
+        enum_list[len].name = color_range_name[i];
+        len++;
+    }
 
-	prop = drm_property_create_enum(dev, 0,	"COLOR_RANGE",
-					enum_list, len);
-	if (!prop)
-		return -ENOMEM;
-	plane->color_range_property = prop;
-	drm_object_attach_property(&plane->base, prop, default_range);
-	if (plane->state)
-		plane->state->color_range = default_range;
+    prop = drm_property_create_enum(dev, 0,    "COLOR_RANGE",
+                    enum_list, len);
+    if (!prop)
+        return -ENOMEM;
+    plane->color_range_property = prop;
+    drm_object_attach_property(&plane->base, prop, default_range);
+    if (plane->state)
+        plane->state->color_range = default_range;
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_plane_create_color_properties);
 
@@ -517,32 +517,32 @@ EXPORT_SYMBOL(drm_plane_create_color_properties);
  */
 int drm_color_lut_check(const struct drm_property_blob *lut, u32 tests)
 {
-	const struct drm_color_lut *entry;
-	int i;
+    const struct drm_color_lut *entry;
+    int i;
 
-	if (!lut || !tests)
-		return 0;
+    if (!lut || !tests)
+        return 0;
 
-	entry = lut->data;
-	for (i = 0; i < drm_color_lut_size(lut); i++) {
-		if (tests & DRM_COLOR_LUT_EQUAL_CHANNELS) {
-			if (entry[i].red != entry[i].blue ||
-			    entry[i].red != entry[i].green) {
-				DRM_DEBUG_KMS("All LUT entries must have equal r/g/b\n");
-				return -EINVAL;
-			}
-		}
+    entry = lut->data;
+    for (i = 0; i < drm_color_lut_size(lut); i++) {
+        if (tests & DRM_COLOR_LUT_EQUAL_CHANNELS) {
+            if (entry[i].red != entry[i].blue ||
+                entry[i].red != entry[i].green) {
+                DRM_DEBUG_KMS("All LUT entries must have equal r/g/b\n");
+                return -EINVAL;
+            }
+        }
 
-		if (i > 0 && tests & DRM_COLOR_LUT_NON_DECREASING) {
-			if (entry[i].red < entry[i - 1].red ||
-			    entry[i].green < entry[i - 1].green ||
-			    entry[i].blue < entry[i - 1].blue) {
-				DRM_DEBUG_KMS("LUT entries must never decrease.\n");
-				return -EINVAL;
-			}
-		}
-	}
+        if (i > 0 && tests & DRM_COLOR_LUT_NON_DECREASING) {
+            if (entry[i].red < entry[i - 1].red ||
+                entry[i].green < entry[i - 1].green ||
+                entry[i].blue < entry[i - 1].blue) {
+                DRM_DEBUG_KMS("LUT entries must never decrease.\n");
+                return -EINVAL;
+            }
+        }
+    }
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(drm_color_lut_check);

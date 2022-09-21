@@ -32,9 +32,9 @@ typedef void kbase_device_term_method(struct kbase_device *kbdev);
  * @err_mes: Error message to be printed when init method fails.
  */
 struct kbase_device_init {
-	kbase_device_init_method *init;
-	kbase_device_term_method *term;
-	char *err_mes;
+    kbase_device_init_method *init;
+    kbase_device_term_method *term;
+    char *err_mes;
 };
 
 int kbase_device_vinstr_init(struct kbase_device *kbdev);
@@ -65,7 +65,7 @@ void kbase_device_id_init(struct kbase_device *kbdev);
 
 /**
  * kbase_device_early_init - Perform any device-specific initialization.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * Return: 0 on success, or an error code on failure.
  */
@@ -73,6 +73,6 @@ int kbase_device_early_init(struct kbase_device *kbdev);
 
 /**
  * kbase_device_early_term - Perform any device-specific termination.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  */
 void kbase_device_early_term(struct kbase_device *kbdev);

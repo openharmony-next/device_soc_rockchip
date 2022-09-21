@@ -47,88 +47,88 @@
 #include <media/videobuf2-v4l2.h>
 #include <media/v4l2-mc.h>
 
-#define RKISP_DEFAULT_WIDTH		800
-#define RKISP_DEFAULT_HEIGHT		600
+#define RKISP_DEFAULT_WIDTH        800
+#define RKISP_DEFAULT_HEIGHT        600
 
-#define RKISP_PLANE_Y			0
-#define RKISP_PLANE_CB			1
-#define RKISP_PLANE_CR			2
+#define RKISP_PLANE_Y            0
+#define RKISP_PLANE_CB            1
+#define RKISP_PLANE_CR            2
 
-#define RKISP_EMDDATA_FIFO_MAX		4
+#define RKISP_EMDDATA_FIFO_MAX        4
 #define RKISP_DMATX_CHECK              0xA5A5A5A5
 
-#define RKISP_MOTION_DECT_TS_SIZE	16
+#define RKISP_MOTION_DECT_TS_SIZE    16
 
 struct rkisp_device;
 
 /* ISP_V10_1 for only support MP */
 enum rkisp_isp_ver {
-	ISP_V10 = 0x00,
-	ISP_V10_1 = 0x01,
-	ISP_V11 = 0x10,
-	ISP_V12 = 0x20,
-	ISP_V13 = 0x30,
-	ISP_V20 = 0x40,
-	ISP_V21 = 0x50,
-	ISP_V30 = 0x60,
+    ISP_V10 = 0x00,
+    ISP_V10_1 = 0x01,
+    ISP_V11 = 0x10,
+    ISP_V12 = 0x20,
+    ISP_V13 = 0x30,
+    ISP_V20 = 0x40,
+    ISP_V21 = 0x50,
+    ISP_V30 = 0x60,
 };
 
 enum rkisp_sd_type {
-	RKISP_SD_SENSOR,
-	RKISP_SD_PHY_CSI,
-	RKISP_SD_VCM,
-	RKISP_SD_FLASH,
-	RKISP_SD_MAX,
+    RKISP_SD_SENSOR,
+    RKISP_SD_PHY_CSI,
+    RKISP_SD_VCM,
+    RKISP_SD_FLASH,
+    RKISP_SD_MAX,
 };
 
 /* One structure per video node */
 struct rkisp_vdev_node {
-	struct vb2_queue buf_queue;
-	struct video_device vdev;
-	struct media_pad pad;
+    struct vb2_queue buf_queue;
+    struct video_device vdev;
+    struct media_pad pad;
 };
 
 enum rkisp_fmt_pix_type {
-	FMT_YUV,
-	FMT_RGB,
-	FMT_BAYER,
-	FMT_JPEG,
-	FMT_FBCGAIN,
-	FMT_EBD,
-	FMT_SPD,
-	FMT_FBC,
-	FMT_MAX
+    FMT_YUV,
+    FMT_RGB,
+    FMT_BAYER,
+    FMT_JPEG,
+    FMT_FBCGAIN,
+    FMT_EBD,
+    FMT_SPD,
+    FMT_FBC,
+    FMT_MAX
 };
 
 enum rkisp_fmt_raw_pat_type {
-	RAW_RGGB = 0,
-	RAW_GRBG,
-	RAW_GBRG,
-	RAW_BGGR,
+    RAW_RGGB = 0,
+    RAW_GRBG,
+    RAW_GBRG,
+    RAW_BGGR,
 };
 
 struct rkisp_buffer {
-	struct vb2_v4l2_buffer vb;
-	struct list_head queue;
-	int dev_id;
-	union {
-		u32 buff_addr[VIDEO_MAX_PLANES];
-		void *vaddr[VIDEO_MAX_PLANES];
-	};
+    struct vb2_v4l2_buffer vb;
+    struct list_head queue;
+    int dev_id;
+    union {
+        u32 buff_addr[VIDEO_MAX_PLANES];
+        void *vaddr[VIDEO_MAX_PLANES];
+    };
 };
 
 struct rkisp_dummy_buffer {
-	struct list_head queue;
-	struct dma_buf *dbuf;
-	dma_addr_t dma_addr;
-	struct page **pages;
-	void *mem_priv;
-	void *vaddr;
-	u32 size;
-	int dma_fd;
-	bool is_need_vaddr;
-	bool is_need_dbuf;
-	bool is_need_dmafd;
+    struct list_head queue;
+    struct dma_buf *dbuf;
+    dma_addr_t dma_addr;
+    struct page **pages;
+    void *mem_priv;
+    void *vaddr;
+    u32 size;
+    int dma_fd;
+    bool is_need_vaddr;
+    bool is_need_dbuf;
+    bool is_need_dmafd;
 };
 
 extern int rkisp_debug;
@@ -139,24 +139,24 @@ extern struct platform_driver rkisp_plat_drv;
 static inline
 struct rkisp_vdev_node *vdev_to_node(struct video_device *vdev)
 {
-	return container_of(vdev, struct rkisp_vdev_node, vdev);
+    return container_of(vdev, struct rkisp_vdev_node, vdev);
 }
 
 static inline struct rkisp_vdev_node *queue_to_node(struct vb2_queue *q)
 {
-	return container_of(q, struct rkisp_vdev_node, buf_queue);
+    return container_of(q, struct rkisp_vdev_node, buf_queue);
 }
 
 static inline struct rkisp_buffer *to_rkisp_buffer(struct vb2_v4l2_buffer *vb)
 {
-	return container_of(vb, struct rkisp_buffer, vb);
+    return container_of(vb, struct rkisp_buffer, vb);
 }
 
 static inline struct vb2_queue *to_vb2_queue(struct file *file)
 {
-	struct rkisp_vdev_node *vnode = video_drvdata(file);
+    struct rkisp_vdev_node *vnode = video_drvdata(file);
 
-	return &vnode->buf_queue;
+    return &vnode->buf_queue;
 }
 
 void rkisp_write(struct rkisp_device *dev, u32 reg, u32 val, bool is_direct);
@@ -174,27 +174,27 @@ void rkisp_next_clear_bits(struct rkisp_device *dev, u32 reg, u32 mask, bool is_
 static inline void
 rkisp_unite_write(struct rkisp_device *dev, u32 reg, u32 val, bool is_direct, bool is_unite)
 {
-	rkisp_write(dev, reg, val, is_direct);
-	if (is_unite)
-		rkisp_next_write(dev, reg, val, is_direct);
+    rkisp_write(dev, reg, val, is_direct);
+    if (is_unite)
+        rkisp_next_write(dev, reg, val, is_direct);
 }
 
 static inline void
 rkisp_unite_set_bits(struct rkisp_device *dev, u32 reg, u32 mask,
-		     u32 val, bool is_direct, bool is_unite)
+             u32 val, bool is_direct, bool is_unite)
 {
-	rkisp_set_bits(dev, reg, mask, val, is_direct);
-	if (is_unite)
-		rkisp_next_set_bits(dev, reg, mask, val, is_direct);
+    rkisp_set_bits(dev, reg, mask, val, is_direct);
+    if (is_unite)
+        rkisp_next_set_bits(dev, reg, mask, val, is_direct);
 }
 
 static inline void
 rkisp_unite_clear_bits(struct rkisp_device *dev, u32 reg, u32 mask,
-		       bool is_direct, bool is_unite)
+               bool is_direct, bool is_unite)
 {
-	rkisp_clear_bits(dev, reg, mask, is_direct);
-	if (is_unite)
-		rkisp_next_clear_bits(dev, reg, mask, is_direct);
+    rkisp_clear_bits(dev, reg, mask, is_direct);
+    if (is_unite)
+        rkisp_next_clear_bits(dev, reg, mask, is_direct);
 }
 
 void rkisp_update_regs(struct rkisp_device *dev, u32 start, u32 end);

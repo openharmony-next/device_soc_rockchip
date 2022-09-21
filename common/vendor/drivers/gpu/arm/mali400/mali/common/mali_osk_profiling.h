@@ -26,9 +26,9 @@
 
 /**
  * Initialize the profiling module.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_profiling_init(mali_bool auto_start);
+mali_osk_errcode_t _mali_osk_profiling_init(mali_bool auto_start);
 
 /*
  * Terminate the profiling module.
@@ -47,9 +47,9 @@ void _mali_osk_profiling_stop_sampling(u32 pid);
  * MALI_PROFILING_MAX_BUFFER_ENTRIES determines the maximum size allowed by the device driver.
  *
  * @param limit The desired maximum number of events to record on input, the actual maximum on output.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_profiling_start(u32 *limit);
+mali_osk_errcode_t _mali_osk_profiling_start(u32 *limit);
 
 /**
  * Add an profiling event
@@ -86,9 +86,9 @@ void _mali_osk_profiling_record_global_counters(int counter_id, u32 value);
  * Stop recording profiling data
  *
  * @param count Returns the number of recorded events.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_profiling_stop(u32 *count);
+mali_osk_errcode_t _mali_osk_profiling_stop(u32 *count);
 
 /**
  * Retrieves the number of events that can be retrieved
@@ -104,18 +104,18 @@ u32 _mali_osk_profiling_get_count(void);
  * @param timestamp The timestamp for the retrieved event will be stored here.
  * @param event_id The event ID for the retrieved event will be stored here.
  * @param data The 5 data values for the retrieved event will be stored here.
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_profiling_get_event(u32 index, u64 *timestamp, u32 *event_id, u32 data[5]);
+mali_osk_errcode_t _mali_osk_profiling_get_event(u32 index, u64 *timestamp, u32 *event_id, u32 data[5]);
 
 /**
  * Clear the recorded buffer.
  *
  * This is needed in order to start another recording.
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t _mali_osk_profiling_clear(void);
+mali_osk_errcode_t _mali_osk_profiling_clear(void);
 
 /**
  * Checks if a recording of profiling data is in progress

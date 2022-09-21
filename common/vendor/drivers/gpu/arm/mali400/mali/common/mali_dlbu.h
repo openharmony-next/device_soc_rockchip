@@ -21,13 +21,13 @@ struct mali_dlbu_core;
 
 extern mali_dma_addr mali_dlbu_phys_addr;
 
-_mali_osk_errcode_t mali_dlbu_initialize(void);
+mali_osk_errcode_t mali_dlbu_initialize(void);
 void mali_dlbu_terminate(void);
 
 struct mali_dlbu_core *mali_dlbu_create(const _mali_osk_resource_t *resource);
 void mali_dlbu_delete(struct mali_dlbu_core *dlbu);
 
-_mali_osk_errcode_t mali_dlbu_reset(struct mali_dlbu_core *dlbu);
+mali_osk_errcode_t mali_dlbu_reset(struct mali_dlbu_core *dlbu);
 
 void mali_dlbu_add_group(struct mali_dlbu_core *dlbu, struct mali_group *group);
 void mali_dlbu_remove_group(struct mali_dlbu_core *dlbu, struct mali_group *group);

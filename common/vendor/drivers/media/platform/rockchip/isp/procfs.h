@@ -10,7 +10,7 @@ void rkisp_proc_cleanup(struct rkisp_device *dev);
 #else
 static inline int rkisp_proc_init(struct rkisp_device *dev)
 {
-	return 0;
+    return 0;
 }
 static inline void rkisp_proc_cleanup(struct rkisp_device *dev)
 {

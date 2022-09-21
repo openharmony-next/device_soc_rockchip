@@ -16,19 +16,19 @@
 
 
 
-#ifndef _KBASE_CACHE_POLICY_BACKEND_H_
-#define _KBASE_CACHE_POLICY_BACKEND_H_
+#ifndef H_KBASE_CACHE_POLICY_BACKEND_H_
+#define H_KBASE_CACHE_POLICY_BACKEND_H_
 
 #include "mali_kbase.h"
 #include "mali_base_kernel.h"
 
 /**
   * kbase_cache_set_coherency_mode() - Sets the system coherency mode
-  *			in the GPU.
-  * @kbdev:	Device pointer
-  * @mode:	Coherency mode. COHERENCY_ACE/ACE_LITE
+  *            in the GPU.
+  * @kbdev:    Device pointer
+  * @mode:    Coherency mode. COHERENCY_ACE/ACE_LITE
   */
 void kbase_cache_set_coherency_mode(struct kbase_device *kbdev,
-		u32 mode);
+        u32 mode);
 
-#endif				/* _KBASE_CACHE_POLICY_H_ */
+#endif                /* _KBASE_CACHE_POLICY_H_ */

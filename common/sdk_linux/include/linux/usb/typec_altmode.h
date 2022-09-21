@@ -7,7 +7,7 @@
 #include <linux/usb/typec.h>
 #include <linux/device.h>
 
-#define MODE_DISCOVERY_MAX	6
+#define MODE_DISCOVERY_MAX    6
 
 struct typec_altmode_ops;
 
@@ -22,27 +22,27 @@ struct typec_altmode_ops;
  * @ops: Operations vector from the driver
  */
 struct typec_altmode {
-	struct device			dev;
-	u16				svid;
-	int				mode;
-	u32				vdo;
-	unsigned int			active:1;
+    struct device            dev;
+    u16                svid;
+    int                mode;
+    u32                vdo;
+    unsigned int            active:1;
 
-	char				*desc;
-	const struct typec_altmode_ops	*ops;
+    char                *desc;
+    const struct typec_altmode_ops    *ops;
 };
 
 #define to_typec_altmode(d) container_of(d, struct typec_altmode, dev)
 
 static inline void typec_altmode_set_drvdata(struct typec_altmode *altmode,
-					     void *data)
+                         void *data)
 {
-	dev_set_drvdata(&altmode->dev, data);
+    dev_set_drvdata(&altmode->dev, data);
 }
 
 static inline void *typec_altmode_get_drvdata(struct typec_altmode *altmode)
 {
-	return dev_get_drvdata(&altmode->dev);
+    return dev_get_drvdata(&altmode->dev);
 }
 
 /**
@@ -55,23 +55,23 @@ static inline void *typec_altmode_get_drvdata(struct typec_altmode *altmode)
  * @activate: User callback for Enter/Exit Mode
  */
 struct typec_altmode_ops {
-	int (*enter)(struct typec_altmode *altmode, u32 *vdo);
-	int (*exit)(struct typec_altmode *altmode);
-	void (*attention)(struct typec_altmode *altmode, u32 vdo);
-	int (*vdm)(struct typec_altmode *altmode, const u32 hdr,
-		   const u32 *vdo, int cnt);
-	int (*notify)(struct typec_altmode *altmode, unsigned long conf,
-		      void *data);
-	int (*activate)(struct typec_altmode *altmode, int activate);
+    int (*enter)(struct typec_altmode *altmode, u32 *vdo);
+    int (*exit)(struct typec_altmode *altmode);
+    void (*attention)(struct typec_altmode *altmode, u32 vdo);
+    int (*vdm)(struct typec_altmode *altmode, const u32 hdr,
+           const u32 *vdo, int cnt);
+    int (*notify)(struct typec_altmode *altmode, unsigned long conf,
+              void *data);
+    int (*activate)(struct typec_altmode *altmode, int activate);
 };
 
 int typec_altmode_enter(struct typec_altmode *altmode, u32 *vdo);
 int typec_altmode_exit(struct typec_altmode *altmode);
 void typec_altmode_attention(struct typec_altmode *altmode, u32 vdo);
 int typec_altmode_vdm(struct typec_altmode *altmode,
-		      const u32 header, const u32 *vdo, int count);
+              const u32 header, const u32 *vdo, int count);
 int typec_altmode_notify(struct typec_altmode *altmode, unsigned long conf,
-			 void *data);
+             void *data);
 const struct typec_altmode *
 typec_altmode_get_partner(struct typec_altmode *altmode);
 
@@ -81,9 +81,9 @@ typec_altmode_get_partner(struct typec_altmode *altmode);
  * start from the value TYPEC_STATE_MODAL.
  */
 enum {
-	TYPEC_STATE_SAFE,	/* USB Safe State */
-	TYPEC_STATE_USB,	/* USB Operation */
-	TYPEC_STATE_MODAL,	/* Alternate Modes */
+    TYPEC_STATE_SAFE,    /* USB Safe State */
+    TYPEC_STATE_USB,    /* USB Operation */
+    TYPEC_STATE_MODAL,    /* Alternate Modes */
 };
 
 /*
@@ -106,21 +106,21 @@ enum {
  * state values, just like the Accessory Modes.
  */
 enum {
-	TYPEC_MODE_USB2 = TYPEC_STATE_MODAL,	/* USB 2.0 mode */
-	TYPEC_MODE_USB3,			/* USB 3.2 mode */
-	TYPEC_MODE_USB4,			/* USB4 mode */
-	TYPEC_MODE_AUDIO,			/* Audio Accessory */
-	TYPEC_MODE_DEBUG,			/* Debug Accessory */
+    TYPEC_MODE_USB2 = TYPEC_STATE_MODAL,    /* USB 2.0 mode */
+    TYPEC_MODE_USB3,            /* USB 3.2 mode */
+    TYPEC_MODE_USB4,            /* USB4 mode */
+    TYPEC_MODE_AUDIO,            /* Audio Accessory */
+    TYPEC_MODE_DEBUG,            /* Debug Accessory */
 };
 
-#define TYPEC_MODAL_STATE(_state_)	((_state_) + TYPEC_STATE_MODAL)
+#define TYPEC_MODAL_STATE(_state_)    ((_state_) + TYPEC_STATE_MODAL)
 
 struct typec_altmode *typec_altmode_get_plug(struct typec_altmode *altmode,
-					     enum typec_plug_index index);
+                         enum typec_plug_index index);
 void typec_altmode_put_plug(struct typec_altmode *plug);
 
 struct typec_altmode *typec_match_altmode(struct typec_altmode **altmodes,
-					  size_t n, u16 svid, u8 mode);
+                      size_t n, u16 svid, u8 mode);
 
 /**
  * typec_altmode_get_orientation - Get cable plug orientation
@@ -129,7 +129,7 @@ struct typec_altmode *typec_match_altmode(struct typec_altmode **altmodes,
 static inline enum typec_orientation
 typec_altmode_get_orientation(struct typec_altmode *altmode)
 {
-	return typec_get_orientation(typec_altmode2port(altmode));
+    return typec_get_orientation(typec_altmode2port(altmode));
 }
 
 /**
@@ -139,7 +139,7 @@ typec_altmode_get_orientation(struct typec_altmode *altmode)
 static inline int
 typec_altmode_get_svdm_version(struct typec_altmode *altmode)
 {
-	return typec_get_negotiated_svdm_version(typec_altmode2port(altmode));
+    return typec_get_negotiated_svdm_version(typec_altmode2port(altmode));
 }
 
 /**
@@ -153,30 +153,30 @@ typec_altmode_get_svdm_version(struct typec_altmode *altmode)
  * handle all SVID specific communication.
  */
 struct typec_altmode_driver {
-	const struct typec_device_id *id_table;
-	int (*probe)(struct typec_altmode *altmode);
-	void (*remove)(struct typec_altmode *altmode);
-	struct device_driver driver;
+    const struct typec_device_id *id_table;
+    int (*probe)(struct typec_altmode *altmode);
+    void (*remove)(struct typec_altmode *altmode);
+    struct device_driver driver;
 };
 
 #define to_altmode_driver(d) container_of(d, struct typec_altmode_driver, \
-					  driver)
+                      driver)
 
 /**
  * typec_altmode_register_driver - registers a USB Type-C alternate mode
- * 				   device driver
+ *                    device driver
  * @drv: pointer to struct typec_altmode_driver
  *
  * These drivers will be bind to the partner alternate mode devices. They will
  * handle all SVID specific communication.
  */
 #define typec_altmode_register_driver(drv) \
-		__typec_altmode_register_driver(drv, THIS_MODULE)
+        __typec_altmode_register_driver(drv, THIS_MODULE)
 int __typec_altmode_register_driver(struct typec_altmode_driver *drv,
-				    struct module *module);
+                    struct module *module);
 /**
  * typec_altmode_unregister_driver - unregisters a USB Type-C alternate mode
- * 				     device driver
+ *                      device driver
  * @drv: pointer to struct typec_altmode_driver
  *
  * These drivers will be bind to the partner alternate mode devices. They will
@@ -185,7 +185,7 @@ int __typec_altmode_register_driver(struct typec_altmode_driver *drv,
 void typec_altmode_unregister_driver(struct typec_altmode_driver *drv);
 
 #define module_typec_altmode_driver(__typec_altmode_driver) \
-	module_driver(__typec_altmode_driver, typec_altmode_register_driver, \
-		      typec_altmode_unregister_driver)
+    module_driver(__typec_altmode_driver, typec_altmode_register_driver, \
+              typec_altmode_unregister_driver)
 
 #endif /* __USB_TYPEC_ALTMODE_H */

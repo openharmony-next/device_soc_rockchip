@@ -11,146 +11,146 @@
 #include <linux/v4l2-controls.h>
 #include "rkisp21-config.h"
 
-#define CIFISP_MODULE_DPCC			(1 << 0)
-#define CIFISP_MODULE_BLS			(1 << 1)
-#define CIFISP_MODULE_SDG			(1 << 2)
-#define CIFISP_MODULE_HST			(1 << 3)
-#define CIFISP_MODULE_LSC			(1 << 4)
-#define CIFISP_MODULE_AWB_GAIN			(1 << 5)
-#define CIFISP_MODULE_FLT			(1 << 6)
-#define CIFISP_MODULE_BDM			(1 << 7)
-#define CIFISP_MODULE_CTK			(1 << 8)
-#define CIFISP_MODULE_GOC			(1 << 9)
-#define CIFISP_MODULE_CPROC			(1 << 10)
-#define CIFISP_MODULE_AFC			(1 << 11)
-#define CIFISP_MODULE_AWB			(1 << 12)
-#define CIFISP_MODULE_IE			(1 << 13)
-#define CIFISP_MODULE_AEC			(1 << 14)
-#define CIFISP_MODULE_WDR			(1 << 15)
-#define CIFISP_MODULE_DPF			(1 << 16)
-#define CIFISP_MODULE_DPF_STRENGTH		(1 << 17)
-#define CIFISP_MODULE_DEMOSAICLP		(1 << 18)
-#define CIFISP_MODULE_RK_IESHARP		(1 << 19)
+#define CIFISP_MODULE_DPCC            (1 << 0)
+#define CIFISP_MODULE_BLS            (1 << 1)
+#define CIFISP_MODULE_SDG            (1 << 2)
+#define CIFISP_MODULE_HST            (1 << 3)
+#define CIFISP_MODULE_LSC            (1 << 4)
+#define CIFISP_MODULE_AWB_GAIN            (1 << 5)
+#define CIFISP_MODULE_FLT            (1 << 6)
+#define CIFISP_MODULE_BDM            (1 << 7)
+#define CIFISP_MODULE_CTK            (1 << 8)
+#define CIFISP_MODULE_GOC            (1 << 9)
+#define CIFISP_MODULE_CPROC            (1 << 10)
+#define CIFISP_MODULE_AFC            (1 << 11)
+#define CIFISP_MODULE_AWB            (1 << 12)
+#define CIFISP_MODULE_IE            (1 << 13)
+#define CIFISP_MODULE_AEC            (1 << 14)
+#define CIFISP_MODULE_WDR            (1 << 15)
+#define CIFISP_MODULE_DPF            (1 << 16)
+#define CIFISP_MODULE_DPF_STRENGTH        (1 << 17)
+#define CIFISP_MODULE_DEMOSAICLP        (1 << 18)
+#define CIFISP_MODULE_RK_IESHARP        (1 << 19)
 
-#define CIFISP_CTK_COEFF_MAX			0x100
-#define CIFISP_CTK_OFFSET_MAX			0x800
+#define CIFISP_CTK_COEFF_MAX            0x100
+#define CIFISP_CTK_OFFSET_MAX            0x800
 
-#define CIFISP_AE_MEAN_MAX			81
-#define CIFISP_HIST_BIN_N_MAX			32
-#define CIFISP_AFM_MAX_WINDOWS			3
-#define CIFISP_DEGAMMA_CURVE_SIZE		17
+#define CIFISP_AE_MEAN_MAX            81
+#define CIFISP_HIST_BIN_N_MAX            32
+#define CIFISP_AFM_MAX_WINDOWS            3
+#define CIFISP_DEGAMMA_CURVE_SIZE        17
 
-#define CIFISP_BDM_MAX_TH			0xFF
+#define CIFISP_BDM_MAX_TH            0xFF
 
 /*
  * Black level compensation
  */
 /* maximum value for horizontal start address */
-#define CIFISP_BLS_START_H_MAX			0x00000FFF
+#define CIFISP_BLS_START_H_MAX            0x00000FFF
 /* maximum value for horizontal stop address */
-#define CIFISP_BLS_STOP_H_MAX			0x00000FFF
+#define CIFISP_BLS_STOP_H_MAX            0x00000FFF
 /* maximum value for vertical start address */
-#define CIFISP_BLS_START_V_MAX			0x00000FFF
+#define CIFISP_BLS_START_V_MAX            0x00000FFF
 /* maximum value for vertical stop address */
-#define CIFISP_BLS_STOP_V_MAX			0x00000FFF
+#define CIFISP_BLS_STOP_V_MAX            0x00000FFF
 /* maximum is 2^18 = 262144*/
-#define CIFISP_BLS_SAMPLES_MAX			0x00000012
+#define CIFISP_BLS_SAMPLES_MAX            0x00000012
 /* maximum value for fixed black level */
-#define CIFISP_BLS_FIX_SUB_MAX			0x00000FFF
+#define CIFISP_BLS_FIX_SUB_MAX            0x00000FFF
 /* minimum value for fixed black level */
-#define CIFISP_BLS_FIX_SUB_MIN			0xFFFFF000
+#define CIFISP_BLS_FIX_SUB_MIN            0xFFFFF000
 /* 13 bit range (signed)*/
-#define CIFISP_BLS_FIX_MASK			0x00001FFF
+#define CIFISP_BLS_FIX_MASK            0x00001FFF
 
 /*
  * Automatic white balance measurments
  */
-#define CIFISP_AWB_MAX_GRID			1
-#define CIFISP_AWB_MAX_FRAMES			7
+#define CIFISP_AWB_MAX_GRID            1
+#define CIFISP_AWB_MAX_FRAMES            7
 
 /*
  * Gamma out
  */
 /* Maximum number of color samples supported */
-#define CIFISP_GAMMA_OUT_MAX_SAMPLES		34
+#define CIFISP_GAMMA_OUT_MAX_SAMPLES        34
 
 /*
  * Lens shade correction
  */
-#define CIFISP_LSC_GRAD_TBL_SIZE		8
-#define CIFISP_LSC_SIZE_TBL_SIZE		8
+#define CIFISP_LSC_GRAD_TBL_SIZE        8
+#define CIFISP_LSC_SIZE_TBL_SIZE        8
 /*
  * The following matches the tuning process,
  * not the max capabilities of the chip.
  * Last value unused.
  */
-#define	CIFISP_LSC_DATA_TBL_SIZE		290
+#define    CIFISP_LSC_DATA_TBL_SIZE        290
 
 /*
  * Histogram calculation
  */
 /* Last 3 values unused. */
-#define CIFISP_HISTOGRAM_WEIGHT_GRIDS_SIZE	81
+#define CIFISP_HISTOGRAM_WEIGHT_GRIDS_SIZE    81
 
 /*
  * Defect Pixel Cluster Correction
  */
-#define CIFISP_DPCC_METHODS_MAX			3
+#define CIFISP_DPCC_METHODS_MAX            3
 
 /*
  * Denoising pre filter
  */
-#define CIFISP_DPF_MAX_NLF_COEFFS		17
-#define CIFISP_DPF_MAX_SPATIAL_COEFFS		6
+#define CIFISP_DPF_MAX_NLF_COEFFS        17
+#define CIFISP_DPF_MAX_SPATIAL_COEFFS        6
 
 /* WDR */
-#define CIFISP_WDR_SIZE				48
+#define CIFISP_WDR_SIZE                48
 
 /*
  * Measurement types
  */
-#define CIFISP_STAT_AWB				(1 << 0)
-#define CIFISP_STAT_AUTOEXP			(1 << 1)
-#define CIFISP_STAT_AFM_FIN			(1 << 2)
-#define CIFISP_STAT_HIST			(1 << 3)
-#define CIFISP_STAT_EMB_DATA			(1 << 4)
+#define CIFISP_STAT_AWB                (1 << 0)
+#define CIFISP_STAT_AUTOEXP            (1 << 1)
+#define CIFISP_STAT_AFM_FIN            (1 << 2)
+#define CIFISP_STAT_HIST            (1 << 3)
+#define CIFISP_STAT_EMB_DATA            (1 << 4)
 
 /* ADD DATA */
-#define CIFISP_ADD_DATA_FIFO_SIZE		(2048 * 4)
+#define CIFISP_ADD_DATA_FIFO_SIZE        (2048 * 4)
 
 /* Private v4l2 event */
-#define CIFISP_V4L2_EVENT_STREAM_START	\
-				(V4L2_EVENT_PRIVATE_START + 1)
-#define CIFISP_V4L2_EVENT_STREAM_STOP	\
-				(V4L2_EVENT_PRIVATE_START + 2)
+#define CIFISP_V4L2_EVENT_STREAM_START    \
+                (V4L2_EVENT_PRIVATE_START + 1)
+#define CIFISP_V4L2_EVENT_STREAM_STOP    \
+                (V4L2_EVENT_PRIVATE_START + 2)
 
 /*
  * private control id
  */
 enum cifisp_ctrl_id {
-	CIFISP_CID_EMB_VC = (V4L2_CTRL_CLASS_CAMERA | 0x1001),
-	CIFISP_CID_EMB_DT,
-	CIFISP_CID_LAST
+    CIFISP_CID_EMB_VC = (V4L2_CTRL_CLASS_CAMERA | 0x1001),
+    CIFISP_CID_EMB_DT,
+    CIFISP_CID_LAST
 };
 
 enum cifisp_histogram_mode {
-	CIFISP_HISTOGRAM_MODE_DISABLE,
-	CIFISP_HISTOGRAM_MODE_RGB_COMBINED,
-	CIFISP_HISTOGRAM_MODE_R_HISTOGRAM,
-	CIFISP_HISTOGRAM_MODE_G_HISTOGRAM,
-	CIFISP_HISTOGRAM_MODE_B_HISTOGRAM,
-	CIFISP_HISTOGRAM_MODE_Y_HISTOGRAM
+    CIFISP_HISTOGRAM_MODE_DISABLE,
+    CIFISP_HISTOGRAM_MODE_RGB_COMBINED,
+    CIFISP_HISTOGRAM_MODE_R_HISTOGRAM,
+    CIFISP_HISTOGRAM_MODE_G_HISTOGRAM,
+    CIFISP_HISTOGRAM_MODE_B_HISTOGRAM,
+    CIFISP_HISTOGRAM_MODE_Y_HISTOGRAM
 };
 
 enum cifisp_awb_mode_type {
-	CIFISP_AWB_MODE_MANUAL,
-	CIFISP_AWB_MODE_RGB,
-	CIFISP_AWB_MODE_YCBCR
+    CIFISP_AWB_MODE_MANUAL,
+    CIFISP_AWB_MODE_RGB,
+    CIFISP_AWB_MODE_YCBCR
 };
 
 enum cifisp_flt_mode {
-	CIFISP_FLT_STATIC_MODE,
-	CIFISP_FLT_DYNAMIC_MODE
+    CIFISP_FLT_STATIC_MODE,
+    CIFISP_FLT_DYNAMIC_MODE
 };
 
 /**
@@ -159,8 +159,8 @@ enum cifisp_flt_mode {
  * @CIFISP_EXP_CTRL_AUTOSTOP_1: stop measuring after a complete frame
  */
 enum cifisp_exp_ctrl_auotostop {
-	CIFISP_EXP_CTRL_AUTOSTOP_0 = 0,
-	CIFISP_EXP_CTRL_AUTOSTOP_1 = 1,
+    CIFISP_EXP_CTRL_AUTOSTOP_0 = 0,
+    CIFISP_EXP_CTRL_AUTOSTOP_1 = 1,
 };
 
 /**
@@ -169,17 +169,17 @@ enum cifisp_exp_ctrl_auotostop {
  * @CIFISP_EXP_MEASURING_MODE_1: Y = (R + G + B) x (85/256)
  */
 enum cifisp_exp_meas_mode {
-	CIFISP_EXP_MEASURING_MODE_0,
-	CIFISP_EXP_MEASURING_MODE_1,
+    CIFISP_EXP_MEASURING_MODE_0,
+    CIFISP_EXP_MEASURING_MODE_1,
 };
 
 /*---------- PART1: Input Parameters ------------*/
 
 struct cifisp_window {
-	unsigned short h_offs;
-	unsigned short v_offs;
-	unsigned short h_size;
-	unsigned short v_size;
+    unsigned short h_offs;
+    unsigned short v_offs;
+    unsigned short h_size;
+    unsigned short v_size;
 } __attribute__ ((packed));
 
 /**
@@ -194,10 +194,10 @@ struct cifisp_window {
  * @b: Fixed (signed!) subtraction value for Bayer pattern B
  */
 struct cifisp_bls_fixed_val {
-	signed short r;
-	signed short gr;
-	signed short gb;
-	signed short b;
+    signed short r;
+    signed short gr;
+    signed short gb;
+    signed short b;
 } __attribute__ ((packed));
 
 /**
@@ -214,12 +214,12 @@ struct cifisp_bls_fixed_val {
  * @cifisp_bls_fixed_val: Fixed subtraction values
  */
 struct cifisp_bls_config {
-	unsigned char enable_auto;
-	unsigned char en_windows;
-	struct cifisp_window bls_window1;
-	struct cifisp_window bls_window2;
-	unsigned char bls_samples;
-	struct cifisp_bls_fixed_val fixed_val;
+    unsigned char enable_auto;
+    unsigned char en_windows;
+    struct cifisp_window bls_window1;
+    struct cifisp_window bls_window2;
+    unsigned char bls_samples;
+    struct cifisp_bls_fixed_val fixed_val;
 } __attribute__ ((packed));
 
 /**
@@ -233,12 +233,12 @@ struct cifisp_bls_config {
  * @rg_fac:
  */
 struct cifisp_dpcc_methods_config {
-	unsigned int method;
-	unsigned int line_thresh;
-	unsigned int line_mad_fac;
-	unsigned int pg_fac;
-	unsigned int rnd_thresh;
-	unsigned int rg_fac;
+    unsigned int method;
+    unsigned int line_thresh;
+    unsigned int line_mad_fac;
+    unsigned int pg_fac;
+    unsigned int rnd_thresh;
+    unsigned int rg_fac;
 } __attribute__ ((packed));
 
 /**
@@ -252,21 +252,21 @@ struct cifisp_dpcc_methods_config {
  * @rnd_offs: differential rank offsets for rank neighbor difference
  */
 struct cifisp_dpcc_config {
-	unsigned int mode;
-	unsigned int output_mode;
-	unsigned int set_use;
-	struct cifisp_dpcc_methods_config methods[CIFISP_DPCC_METHODS_MAX];
-	unsigned int ro_limits;
-	unsigned int rnd_offs;
+    unsigned int mode;
+    unsigned int output_mode;
+    unsigned int set_use;
+    struct cifisp_dpcc_methods_config methods[CIFISP_DPCC_METHODS_MAX];
+    unsigned int ro_limits;
+    unsigned int rnd_offs;
 } __attribute__ ((packed));
 
 struct cifisp_gamma_corr_curve {
-	unsigned short gamma_y[CIFISP_DEGAMMA_CURVE_SIZE];
+    unsigned short gamma_y[CIFISP_DEGAMMA_CURVE_SIZE];
 } __attribute__ ((packed));
 
 struct cifisp_gamma_curve_x_axis_pnts {
-	unsigned int gamma_dx0;
-	unsigned int gamma_dx1;
+    unsigned int gamma_dx0;
+    unsigned int gamma_dx1;
 } __attribute__ ((packed));
 
 /**
@@ -276,10 +276,10 @@ struct cifisp_gamma_curve_x_axis_pnts {
  * @xa_pnts: x increments
  */
 struct cifisp_sdg_config {
-	struct cifisp_gamma_corr_curve curve_r;
-	struct cifisp_gamma_corr_curve curve_g;
-	struct cifisp_gamma_corr_curve curve_b;
-	struct cifisp_gamma_curve_x_axis_pnts xa_pnts;
+    struct cifisp_gamma_corr_curve curve_r;
+    struct cifisp_gamma_corr_curve curve_g;
+    struct cifisp_gamma_corr_curve curve_b;
+    struct cifisp_gamma_curve_x_axis_pnts xa_pnts;
 } __attribute__ ((packed));
 
 /**
@@ -288,18 +288,18 @@ struct cifisp_sdg_config {
  * refer to datasheet for details
  */
 struct cifisp_lsc_config {
-	unsigned int r_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
-	unsigned int gr_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
-	unsigned int gb_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
-	unsigned int b_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
+    unsigned int r_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
+    unsigned int gr_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
+    unsigned int gb_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
+    unsigned int b_data_tbl[CIFISP_LSC_DATA_TBL_SIZE];
 
-	unsigned int x_grad_tbl[CIFISP_LSC_GRAD_TBL_SIZE];
-	unsigned int y_grad_tbl[CIFISP_LSC_GRAD_TBL_SIZE];
+    unsigned int x_grad_tbl[CIFISP_LSC_GRAD_TBL_SIZE];
+    unsigned int y_grad_tbl[CIFISP_LSC_GRAD_TBL_SIZE];
 
-	unsigned int x_size_tbl[CIFISP_LSC_SIZE_TBL_SIZE];
-	unsigned int y_size_tbl[CIFISP_LSC_SIZE_TBL_SIZE];
-	unsigned short config_width;
-	unsigned short config_height;
+    unsigned int x_size_tbl[CIFISP_LSC_SIZE_TBL_SIZE];
+    unsigned int y_size_tbl[CIFISP_LSC_SIZE_TBL_SIZE];
+    unsigned short config_width;
+    unsigned short config_height;
 } __attribute__ ((packed));
 
 /**
@@ -313,14 +313,14 @@ struct cifisp_lsc_config {
  * @eff_tint: Chrominance increment values of tint (used for sepia effect)
  */
 struct cifisp_ie_config {
-	unsigned short effect;
-	unsigned short color_sel;
-	unsigned short eff_mat_1;
-	unsigned short eff_mat_2;
-	unsigned short eff_mat_3;
-	unsigned short eff_mat_4;
-	unsigned short eff_mat_5;
-	unsigned short eff_tint;
+    unsigned short effect;
+    unsigned short color_sel;
+    unsigned short eff_mat_1;
+    unsigned short eff_mat_2;
+    unsigned short eff_mat_3;
+    unsigned short eff_mat_4;
+    unsigned short eff_mat_5;
+    unsigned short eff_tint;
 } __attribute__ ((packed));
 
 /**
@@ -335,13 +335,13 @@ struct cifisp_ie_config {
  * @hue: 80~7F, -90~+87.188
  */
 struct cifisp_cproc_config {
-	unsigned char c_out_range;
-	unsigned char y_in_range;
-	unsigned char y_out_range;
-	unsigned char contrast;
-	unsigned char brightness;
-	unsigned char sat;
-	unsigned char hue;
+    unsigned char c_out_range;
+    unsigned char y_in_range;
+    unsigned char y_out_range;
+    unsigned char contrast;
+    unsigned char brightness;
+    unsigned char sat;
+    unsigned char hue;
 } __attribute__ ((packed));
 
 /**
@@ -357,19 +357,19 @@ struct cifisp_cproc_config {
  * @awb_ref_cb: reference Cb value for AWB regulation, target for AWB
  */
 struct cifisp_awb_meas_config {
-	/*
-	 * Note: currently the h and v offsets are mapped to grid offsets
-	 */
-	struct cifisp_window awb_wnd;
-	enum cifisp_awb_mode_type awb_mode;
-	unsigned char max_y;
-	unsigned char min_y;
-	unsigned char max_csum;
-	unsigned char min_c;
-	unsigned char frames;
-	unsigned char awb_ref_cr;
-	unsigned char awb_ref_cb;
-	bool enable_ymax_cmp;
+    /*
+     * Note: currently the h and v offsets are mapped to grid offsets
+     */
+    struct cifisp_window awb_wnd;
+    enum cifisp_awb_mode_type awb_mode;
+    unsigned char max_y;
+    unsigned char min_y;
+    unsigned char max_csum;
+    unsigned char min_c;
+    unsigned char frames;
+    unsigned char awb_ref_cr;
+    unsigned char awb_ref_cb;
+    bool enable_ymax_cmp;
 } __attribute__ ((packed));
 
 /**
@@ -378,10 +378,10 @@ struct cifisp_awb_meas_config {
  * out_data_x = ( AWB_GEAIN_X * in_data + 128) >> 8
  */
 struct cifisp_awb_gain_config {
-	unsigned short gain_red;
-	unsigned short gain_green_r;
-	unsigned short gain_blue;
-	unsigned short gain_green_b;
+    unsigned short gain_red;
+    unsigned short gain_green_r;
+    unsigned short gain_blue;
+    unsigned short gain_green_b;
 } __attribute__ ((packed));
 
 /**
@@ -395,20 +395,20 @@ struct cifisp_awb_gain_config {
  * refer to datasheet for details.
  */
 struct cifisp_flt_config {
-	enum cifisp_flt_mode mode;
-	unsigned char grn_stage1;
-	unsigned char chr_h_mode;
-	unsigned char chr_v_mode;
-	unsigned int thresh_bl0;
-	unsigned int thresh_bl1;
-	unsigned int thresh_sh0;
-	unsigned int thresh_sh1;
-	unsigned int lum_weight;
-	unsigned int fac_sh1;
-	unsigned int fac_sh0;
-	unsigned int fac_mid;
-	unsigned int fac_bl0;
-	unsigned int fac_bl1;
+    enum cifisp_flt_mode mode;
+    unsigned char grn_stage1;
+    unsigned char chr_h_mode;
+    unsigned char chr_v_mode;
+    unsigned int thresh_bl0;
+    unsigned int thresh_bl1;
+    unsigned int thresh_sh0;
+    unsigned int thresh_sh1;
+    unsigned int lum_weight;
+    unsigned int fac_sh1;
+    unsigned int fac_sh0;
+    unsigned int fac_mid;
+    unsigned int fac_bl0;
+    unsigned int fac_bl1;
 } __attribute__ ((packed));
 
 /**
@@ -417,7 +417,7 @@ struct cifisp_flt_config {
  * @demosaic_th: threshod for bayer demosaicing texture detection
  */
 struct cifisp_bdm_config {
-	unsigned char demosaic_th;
+    unsigned char demosaic_th;
 } __attribute__ ((packed));
 
 /**
@@ -427,23 +427,23 @@ struct cifisp_bdm_config {
  * @ct_offset_b: offset for the crosstalk correction matrix
  */
 struct cifisp_ctk_config {
-	unsigned short coeff0;
-	unsigned short coeff1;
-	unsigned short coeff2;
-	unsigned short coeff3;
-	unsigned short coeff4;
-	unsigned short coeff5;
-	unsigned short coeff6;
-	unsigned short coeff7;
-	unsigned short coeff8;
-	unsigned short ct_offset_r;
-	unsigned short ct_offset_g;
-	unsigned short ct_offset_b;
+    unsigned short coeff0;
+    unsigned short coeff1;
+    unsigned short coeff2;
+    unsigned short coeff3;
+    unsigned short coeff4;
+    unsigned short coeff5;
+    unsigned short coeff6;
+    unsigned short coeff7;
+    unsigned short coeff8;
+    unsigned short ct_offset_r;
+    unsigned short ct_offset_g;
+    unsigned short ct_offset_b;
 } __attribute__ ((packed));
 
 enum cifisp_goc_mode {
-	CIFISP_GOC_MODE_LOGARITHMIC,
-	CIFISP_GOC_MODE_EQUIDISTANT
+    CIFISP_GOC_MODE_LOGARITHMIC,
+    CIFISP_GOC_MODE_EQUIDISTANT
 };
 
 /**
@@ -453,8 +453,8 @@ enum cifisp_goc_mode {
  * @gamma_y: gamma out curve y-axis for all color components
  */
 struct cifisp_goc_config {
-	enum cifisp_goc_mode mode;
-	unsigned short gamma_y[CIFISP_GAMMA_OUT_MAX_SAMPLES];
+    enum cifisp_goc_mode mode;
+    unsigned short gamma_y[CIFISP_GAMMA_OUT_MAX_SAMPLES];
 } __attribute__ ((packed));
 
 /**
@@ -466,10 +466,10 @@ struct cifisp_goc_config {
  * @hist_weight: weighting factor for sub-windows
  */
 struct cifisp_hst_config {
-	enum cifisp_histogram_mode mode;
-	unsigned char histogram_predivider;
-	struct cifisp_window meas_window;
-	unsigned char hist_weight[CIFISP_HISTOGRAM_WEIGHT_GRIDS_SIZE];
+    enum cifisp_histogram_mode mode;
+    unsigned char histogram_predivider;
+    struct cifisp_window meas_window;
+    unsigned char hist_weight[CIFISP_HISTOGRAM_WEIGHT_GRIDS_SIZE];
 } __attribute__ ((packed));
 
 /**
@@ -480,9 +480,9 @@ struct cifisp_hst_config {
  * @meas_window: coordinates of the meas window
  */
 struct cifisp_aec_config {
-	enum cifisp_exp_meas_mode mode;
-	__u32 autostop;
-	struct cifisp_window meas_window;
+    enum cifisp_exp_meas_mode mode;
+    __u32 autostop;
+    struct cifisp_window meas_window;
 } __attribute__ ((packed));
 
 /**
@@ -494,10 +494,10 @@ struct cifisp_aec_config {
  * @var_shift: the number of bits for the shift operation at the end of the calculation chain.
  */
 struct cifisp_afc_config {
-	unsigned char num_afm_win;
-	struct cifisp_window afm_win[CIFISP_AFM_MAX_WINDOWS];
-	unsigned int thres;
-	unsigned int var_shift;
+    unsigned char num_afm_win;
+    struct cifisp_window afm_win[CIFISP_AFM_MAX_WINDOWS];
+    unsigned int thres;
+    unsigned int var_shift;
 } __attribute__ ((packed));
 
 /**
@@ -511,13 +511,13 @@ struct cifisp_afc_config {
  * @CIFISP_DPF_GAIN_USAGE_MAX: upper border (only for an internal evaluation)
  */
 enum cifisp_dpf_gain_usage {
-	CIFISP_DPF_GAIN_USAGE_DISABLED,
-	CIFISP_DPF_GAIN_USAGE_NF_GAINS,
-	CIFISP_DPF_GAIN_USAGE_LSC_GAINS,
-	CIFISP_DPF_GAIN_USAGE_NF_LSC_GAINS,
-	CIFISP_DPF_GAIN_USAGE_AWB_GAINS,
-	CIFISP_DPF_GAIN_USAGE_AWB_LSC_GAINS,
-	CIFISP_DPF_GAIN_USAGE_MAX
+    CIFISP_DPF_GAIN_USAGE_DISABLED,
+    CIFISP_DPF_GAIN_USAGE_NF_GAINS,
+    CIFISP_DPF_GAIN_USAGE_LSC_GAINS,
+    CIFISP_DPF_GAIN_USAGE_NF_LSC_GAINS,
+    CIFISP_DPF_GAIN_USAGE_AWB_GAINS,
+    CIFISP_DPF_GAIN_USAGE_AWB_LSC_GAINS,
+    CIFISP_DPF_GAIN_USAGE_MAX
 };
 
 /**
@@ -526,8 +526,8 @@ enum cifisp_dpf_gain_usage {
  * @CIFISP_DPF_RB_FILTERSIZE_9x9: red and blue filter kernel size 9x9 (means 5x5 active pixel)
  */
 enum cifisp_dpf_rb_filtersize {
-	CIFISP_DPF_RB_FILTERSIZE_13x9,
-	CIFISP_DPF_RB_FILTERSIZE_9x9,
+    CIFISP_DPF_RB_FILTERSIZE_13x9,
+    CIFISP_DPF_RB_FILTERSIZE_9x9,
 };
 
 /**
@@ -536,34 +536,34 @@ enum cifisp_dpf_rb_filtersize {
  * @CIFISP_NLL_SCALE_LOGARITHMIC: use a logarithmic scaling
  */
 enum cifisp_dpf_nll_scale_mode {
-	CIFISP_NLL_SCALE_LINEAR,
-	CIFISP_NLL_SCALE_LOGARITHMIC,
+    CIFISP_NLL_SCALE_LINEAR,
+    CIFISP_NLL_SCALE_LOGARITHMIC,
 };
 
 struct cifisp_dpf_nll {
-	unsigned short coeff[CIFISP_DPF_MAX_NLF_COEFFS];
-	enum cifisp_dpf_nll_scale_mode scale_mode;
+    unsigned short coeff[CIFISP_DPF_MAX_NLF_COEFFS];
+    enum cifisp_dpf_nll_scale_mode scale_mode;
 } __attribute__ ((packed));
 
 struct cifisp_dpf_rb_flt {
-	enum cifisp_dpf_rb_filtersize fltsize;
-	unsigned char spatial_coeff[CIFISP_DPF_MAX_SPATIAL_COEFFS];
-	bool r_enable;
-	bool b_enable;
+    enum cifisp_dpf_rb_filtersize fltsize;
+    unsigned char spatial_coeff[CIFISP_DPF_MAX_SPATIAL_COEFFS];
+    bool r_enable;
+    bool b_enable;
 } __attribute__ ((packed));
 
 struct cifisp_dpf_g_flt {
-	unsigned char spatial_coeff[CIFISP_DPF_MAX_SPATIAL_COEFFS];
-	bool gr_enable;
-	bool gb_enable;
+    unsigned char spatial_coeff[CIFISP_DPF_MAX_SPATIAL_COEFFS];
+    bool gr_enable;
+    bool gb_enable;
 } __attribute__ ((packed));
 
 struct cifisp_dpf_gain {
-	enum cifisp_dpf_gain_usage mode;
-	unsigned short nf_r_gain;
-	unsigned short nf_b_gain;
-	unsigned short nf_gr_gain;
-	unsigned short nf_gb_gain;
+    enum cifisp_dpf_gain_usage mode;
+    unsigned short nf_r_gain;
+    unsigned short nf_b_gain;
+    unsigned short nf_gr_gain;
+    unsigned short nf_gb_gain;
 } __attribute__ ((packed));
 
 /**
@@ -575,10 +575,10 @@ struct cifisp_dpf_gain {
  * @nll: noise level lookup
  */
 struct cifisp_dpf_config {
-	struct cifisp_dpf_gain gain;
-	struct cifisp_dpf_g_flt g_flt;
-	struct cifisp_dpf_rb_flt rb_flt;
-	struct cifisp_dpf_nll nll;
+    struct cifisp_dpf_gain gain;
+    struct cifisp_dpf_g_flt g_flt;
+    struct cifisp_dpf_rb_flt rb_flt;
+    struct cifisp_dpf_nll nll;
 } __attribute__ ((packed));
 
 /**
@@ -589,9 +589,9 @@ struct cifisp_dpf_config {
  * @b: filter strength of the BLUE filter
  */
 struct cifisp_dpf_strength_config {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
 } __attribute__ ((packed));
 
 /**
@@ -600,74 +600,74 @@ struct cifisp_dpf_strength_config {
  * @CIFISP_WDR_MODE_GLOBAL: use a logarithmic scaling
  */
 enum cifisp_wdr_mode {
-	CIFISP_WDR_MODE_BLOCK,
-	CIFISP_WDR_MODE_GLOBAL
+    CIFISP_WDR_MODE_BLOCK,
+    CIFISP_WDR_MODE_GLOBAL
 };
 
 /**
  * struct cifisp_wdr_config - Gamma Out correction
  */
 struct cifisp_wdr_config {
-	enum cifisp_wdr_mode mode;
-	unsigned int c_wdr[CIFISP_WDR_SIZE];
+    enum cifisp_wdr_mode mode;
+    unsigned int c_wdr[CIFISP_WDR_SIZE];
 } __attribute__ ((packed));
 
 /**
  * struct cifisp_demosaiclp_config - rk demosiac low pass
  */
 struct cifisp_demosaiclp_config {
-	unsigned char rb_filter_en;
-	unsigned char hp_filter_en;
-	unsigned char lu_divided[4];
-	unsigned char thgrad_divided[5];
-	unsigned char thdiff_divided[5];
-	unsigned char thcsc_divided[5];
-	unsigned short thvar_divided[5];
-	unsigned char th_grad;
-	unsigned char th_diff;
-	unsigned char th_csc;
-	unsigned short th_var;
-	unsigned char th_var_en;
-	unsigned char th_csc_en;
-	unsigned char th_diff_en;
-	unsigned char th_grad_en;
-	unsigned char use_old_lp;
-	unsigned char similarity_th;
-	unsigned char flat_level_sel;
-	unsigned char pattern_level_sel;
-	unsigned char edge_level_sel;
-	unsigned char thgrad_r_fct;
-	unsigned char thdiff_r_fct;
-	unsigned char thvar_r_fct;
-	unsigned char thgrad_b_fct;
-	unsigned char thdiff_b_fct;
-	unsigned char thvar_b_fct;
+    unsigned char rb_filter_en;
+    unsigned char hp_filter_en;
+    unsigned char lu_divided[4];
+    unsigned char thgrad_divided[5];
+    unsigned char thdiff_divided[5];
+    unsigned char thcsc_divided[5];
+    unsigned short thvar_divided[5];
+    unsigned char th_grad;
+    unsigned char th_diff;
+    unsigned char th_csc;
+    unsigned short th_var;
+    unsigned char th_var_en;
+    unsigned char th_csc_en;
+    unsigned char th_diff_en;
+    unsigned char th_grad_en;
+    unsigned char use_old_lp;
+    unsigned char similarity_th;
+    unsigned char flat_level_sel;
+    unsigned char pattern_level_sel;
+    unsigned char edge_level_sel;
+    unsigned char thgrad_r_fct;
+    unsigned char thdiff_r_fct;
+    unsigned char thvar_r_fct;
+    unsigned char thgrad_b_fct;
+    unsigned char thdiff_b_fct;
+    unsigned char thvar_b_fct;
 } __attribute__ ((packed));
 
 /**
  * struct cifisp_rkiesharp_config - rk ie sharp
  */
 struct cifisp_rkiesharp_config {
-	unsigned char coring_thr;
-	unsigned char full_range;
-	unsigned char switch_avg;
-	unsigned char yavg_thr[4];
-	unsigned char delta1[5];
-	unsigned char delta2[5];
-	unsigned char maxnumber[5];
-	unsigned char minnumber[5];
-	unsigned char gauss_flat_coe[9];
-	unsigned char gauss_noise_coe[9];
-	unsigned char gauss_other_coe[9];
-	unsigned char line1_filter_coe[6];
-	unsigned char line2_filter_coe[9];
-	unsigned char line3_filter_coe[6];
-	unsigned short grad_seq[4];
-	unsigned char sharp_factor[5];
-	unsigned char uv_gauss_flat_coe[15];
-	unsigned char uv_gauss_noise_coe[15];
-	unsigned char uv_gauss_other_coe[15];
-	unsigned char lap_mat_coe[9];
+    unsigned char coring_thr;
+    unsigned char full_range;
+    unsigned char switch_avg;
+    unsigned char yavg_thr[4];
+    unsigned char delta1[5];
+    unsigned char delta2[5];
+    unsigned char maxnumber[5];
+    unsigned char minnumber[5];
+    unsigned char gauss_flat_coe[9];
+    unsigned char gauss_noise_coe[9];
+    unsigned char gauss_other_coe[9];
+    unsigned char line1_filter_coe[6];
+    unsigned char line2_filter_coe[9];
+    unsigned char line3_filter_coe[6];
+    unsigned short grad_seq[4];
+    unsigned char sharp_factor[5];
+    unsigned char uv_gauss_flat_coe[15];
+    unsigned char uv_gauss_noise_coe[15];
+    unsigned char uv_gauss_other_coe[15];
+    unsigned char lap_mat_coe[9];
 } __attribute__ ((packed));
 
 /**
@@ -689,22 +689,22 @@ struct cifisp_rkiesharp_config {
  * @ie_config: image effects config
  */
 struct cifisp_isp_other_cfg {
-	struct cifisp_dpcc_config dpcc_config;
-	struct cifisp_bls_config bls_config;
-	struct cifisp_sdg_config sdg_config;
-	struct cifisp_lsc_config lsc_config;
-	struct cifisp_awb_gain_config awb_gain_config;
-	struct cifisp_flt_config flt_config;
-	struct cifisp_bdm_config bdm_config;
-	struct cifisp_ctk_config ctk_config;
-	struct cifisp_goc_config goc_config;
-	struct cifisp_dpf_config dpf_config;
-	struct cifisp_dpf_strength_config dpf_strength_config;
-	struct cifisp_cproc_config cproc_config;
-	struct cifisp_ie_config ie_config;
-	struct cifisp_wdr_config wdr_config;
-	struct cifisp_demosaiclp_config demosaiclp_config;
-	struct cifisp_rkiesharp_config rkiesharp_config;
+    struct cifisp_dpcc_config dpcc_config;
+    struct cifisp_bls_config bls_config;
+    struct cifisp_sdg_config sdg_config;
+    struct cifisp_lsc_config lsc_config;
+    struct cifisp_awb_gain_config awb_gain_config;
+    struct cifisp_flt_config flt_config;
+    struct cifisp_bdm_config bdm_config;
+    struct cifisp_ctk_config ctk_config;
+    struct cifisp_goc_config goc_config;
+    struct cifisp_dpf_config dpf_config;
+    struct cifisp_dpf_strength_config dpf_strength_config;
+    struct cifisp_cproc_config cproc_config;
+    struct cifisp_ie_config ie_config;
+    struct cifisp_wdr_config wdr_config;
+    struct cifisp_demosaiclp_config demosaiclp_config;
+    struct cifisp_rkiesharp_config rkiesharp_config;
 } __attribute__ ((packed));
 
 /**
@@ -716,10 +716,10 @@ struct cifisp_isp_other_cfg {
  * @afc_config: auto focus config
  */
 struct cifisp_isp_meas_cfg {
-	struct cifisp_awb_meas_config awb_meas_config;
-	struct cifisp_hst_config hst_config;
-	struct cifisp_aec_config aec_config;
-	struct cifisp_afc_config afc_config;
+    struct cifisp_awb_meas_config awb_meas_config;
+    struct cifisp_hst_config hst_config;
+    struct cifisp_aec_config aec_config;
+    struct cifisp_afc_config afc_config;
 } __attribute__ ((packed));
 
 /**
@@ -733,12 +733,12 @@ struct cifisp_isp_meas_cfg {
  * @others: other config
  */
 struct rkisp1_isp_params_cfg {
-	unsigned int module_en_update;
-	unsigned int module_ens;
-	unsigned int module_cfg_update;
+    unsigned int module_en_update;
+    unsigned int module_ens;
+    unsigned int module_cfg_update;
 
-	struct cifisp_isp_meas_cfg meas;
-	struct cifisp_isp_other_cfg others;
+    struct cifisp_isp_meas_cfg meas;
+    struct cifisp_isp_other_cfg others;
 } __attribute__ ((packed));
 
 /*---------- PART2: Measurement Statistics ------------*/
@@ -752,10 +752,10 @@ struct rkisp1_isp_params_cfg {
  * @mean_cr_or_r: Mean value of Cr within window and frames, Red if RGB is selected.
  */
 struct cifisp_awb_meas {
-	unsigned int cnt;
-	unsigned char mean_y_or_g;
-	unsigned char mean_cb_or_b;
-	unsigned char mean_cr_or_r;
+    unsigned int cnt;
+    unsigned char mean_y_or_g;
+    unsigned char mean_cb_or_b;
+    unsigned char mean_cr_or_r;
 } __attribute__ ((packed));
 
 /**
@@ -764,7 +764,7 @@ struct cifisp_awb_meas {
  * @awb_mean: Mean measured data
  */
 struct cifisp_awb_stat {
-	struct cifisp_awb_meas awb_mean[CIFISP_AWB_MAX_GRID];
+    struct cifisp_awb_meas awb_mean[CIFISP_AWB_MAX_GRID];
 } __attribute__ ((packed));
 
 /**
@@ -776,10 +776,10 @@ struct cifisp_awb_stat {
  * @meas_b: Mean measured value for Bayer pattern B
  */
 struct cifisp_bls_meas_val {
-	unsigned short meas_r;
-	unsigned short meas_gr;
-	unsigned short meas_gb;
-	unsigned short meas_b;
+    unsigned short meas_r;
+    unsigned short meas_gr;
+    unsigned short meas_gb;
+    unsigned short meas_b;
 } __attribute__ ((packed));
 
 /**
@@ -791,8 +791,8 @@ struct cifisp_bls_meas_val {
  * Image is divided into 5x5 blocks.
  */
 struct cifisp_ae_stat {
-	unsigned char exp_mean[CIFISP_AE_MEAN_MAX];
-	struct cifisp_bls_meas_val bls_val;
+    unsigned char exp_mean[CIFISP_AE_MEAN_MAX];
+    struct cifisp_bls_meas_val bls_val;
 } __attribute__ ((packed));
 
 /**
@@ -802,8 +802,8 @@ struct cifisp_ae_stat {
  * @lum: luminance, refer to datasheet for definition
  */
 struct cifisp_af_meas_val {
-	unsigned int sum;
-	unsigned int lum;
+    unsigned int sum;
+    unsigned int lum;
 } __attribute__ ((packed));
 
 /**
@@ -815,7 +815,7 @@ struct cifisp_af_meas_val {
  * register settings(ISP_AFM_*_A/B/C)
  */
 struct cifisp_af_stat {
-	struct cifisp_af_meas_val window[CIFISP_AFM_MAX_WINDOWS];
+    struct cifisp_af_meas_val window[CIFISP_AFM_MAX_WINDOWS];
 } __attribute__ ((packed));
 
 /**
@@ -827,7 +827,7 @@ struct cifisp_af_stat {
  * with ISP_HIST_XXX
  */
 struct cifisp_hist_stat {
-	unsigned int hist_bins[CIFISP_HIST_BIN_N_MAX];
+    unsigned int hist_bins[CIFISP_HIST_BIN_N_MAX];
 } __attribute__ ((packed));
 
 /**
@@ -837,7 +837,7 @@ struct cifisp_hist_stat {
  *
  */
 struct cifisp_embedded_data {
-	unsigned char data[CIFISP_ADD_DATA_FIFO_SIZE];
+    unsigned char data[CIFISP_ADD_DATA_FIFO_SIZE];
 } __attribute__ ((packed));
 
 /**
@@ -849,11 +849,11 @@ struct cifisp_embedded_data {
  * @cifisp_hist_stat: statistics histogram data
  */
 struct cifisp_stat {
-	struct cifisp_awb_stat awb;
-	struct cifisp_ae_stat ae;
-	struct cifisp_af_stat af;
-	struct cifisp_hist_stat hist;
-	struct cifisp_embedded_data emd;
+    struct cifisp_awb_stat awb;
+    struct cifisp_ae_stat ae;
+    struct cifisp_af_stat af;
+    struct cifisp_hist_stat hist;
+    struct cifisp_embedded_data emd;
 } __attribute__ ((packed));
 
 /**
@@ -864,9 +864,9 @@ struct cifisp_stat {
  * @params: statistics data
  */
 struct rkisp1_stat_buffer {
-	unsigned int meas_type;
-	unsigned int frame_id;
-	struct cifisp_stat params;
+    unsigned int meas_type;
+    unsigned int frame_id;
+    struct cifisp_stat params;
 } __attribute__ ((packed));
 
 #endif /* _UAPI_RKISP1_CONFIG_H */

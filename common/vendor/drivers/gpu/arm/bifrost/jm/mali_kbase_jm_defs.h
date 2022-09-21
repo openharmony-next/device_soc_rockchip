@@ -27,8 +27,8 @@
  * They are placed here to allow the hierarchy of header files to work.
  */
 
-#ifndef _KBASE_JM_DEFS_H_
-#define _KBASE_JM_DEFS_H_
+#ifndef KBASE_JM_DEFS_H
+#define KBASE_JM_DEFS_H
 
 #include "mali_kbase_js_defs.h"
 
@@ -111,14 +111,14 @@
 
 #if (JS_COMMAND_SW_BITS & JS_COMMAND_MASK)
 #error "JS_COMMAND_SW_BITS not masked off by JS_COMMAND_MASK." \
-	"Must update JS_COMMAND_SW_<..> bitmasks"
+    "Must update JS_COMMAND_SW_<..> bitmasks"
 #endif
 
 /* Soft-stop command that causes a Disjoint event. This of course isn't
  * entirely masked off by JS_COMMAND_MASK
  */
 #define JS_COMMAND_SOFT_STOP_WITH_SW_DISJOINT \
-		(JS_COMMAND_SW_CAUSES_DISJOINT | JS_COMMAND_SOFT_STOP)
+        (JS_COMMAND_SW_CAUSES_DISJOINT | JS_COMMAND_SOFT_STOP)
 
 #define KBASEP_ATOM_ID_INVALID BASE_JD_ATOM_COUNT
 
@@ -150,11 +150,11 @@
  */
 struct base_job_fault_event {
 
-	u32 event_code;
-	struct kbase_jd_atom *katom;
-	struct work_struct job_fault_work;
-	struct list_head head;
-	int reg_offset;
+    u32 event_code;
+    struct kbase_jd_atom *katom;
+    struct work_struct job_fault_work;
+    struct list_head head;
+    int reg_offset;
 };
 #endif
 
@@ -165,8 +165,8 @@ struct base_job_fault_event {
  *                 dependency. BASE_JD_DEP_TYPE_INVALID indicates no dependency.
  */
 struct kbase_jd_atom_dependency {
-	struct kbase_jd_atom *atom;
-	u8 dep_type;
+    struct kbase_jd_atom *atom;
+    u8 dep_type;
 };
 
 /**
@@ -179,9 +179,9 @@ struct kbase_jd_atom_dependency {
 static inline const struct kbase_jd_atom *
 kbase_jd_katom_dep_atom(const struct kbase_jd_atom_dependency *dep)
 {
-	LOCAL_ASSERT(dep != NULL);
+    LOCAL_ASSERT(dep != NULL);
 
-	return (const struct kbase_jd_atom *)(dep->atom);
+    return (const struct kbase_jd_atom *)(dep->atom);
 }
 
 /**
@@ -192,11 +192,11 @@ kbase_jd_katom_dep_atom(const struct kbase_jd_atom_dependency *dep)
  * Return: the type of dependency there is on the dependee atom.
  */
 static inline u8 kbase_jd_katom_dep_type(
-		const struct kbase_jd_atom_dependency *dep)
+        const struct kbase_jd_atom_dependency *dep)
 {
-	LOCAL_ASSERT(dep != NULL);
+    LOCAL_ASSERT(dep != NULL);
 
-	return dep->dep_type;
+    return dep->dep_type;
 }
 
 /**
@@ -207,17 +207,17 @@ static inline u8 kbase_jd_katom_dep_type(
  * @type:         type of dependency there is on the dependee atom.
  */
 static inline void kbase_jd_katom_dep_set(
-		const struct kbase_jd_atom_dependency *const_dep,
-		struct kbase_jd_atom *a, u8 type)
+        const struct kbase_jd_atom_dependency *const_dep,
+        struct kbase_jd_atom *a, u8 type)
 {
-	struct kbase_jd_atom_dependency *dep;
+    struct kbase_jd_atom_dependency *dep;
 
-	LOCAL_ASSERT(const_dep != NULL);
+    LOCAL_ASSERT(const_dep != NULL);
 
-	dep = (struct kbase_jd_atom_dependency *)const_dep;
+    dep = (struct kbase_jd_atom_dependency *)const_dep;
 
-	dep->atom = a;
-	dep->dep_type = type;
+    dep->atom = a;
+    dep->dep_type = type;
 }
 
 /**
@@ -226,16 +226,16 @@ static inline void kbase_jd_katom_dep_set(
  * @const_dep:    pointer to the dependency info structure to be setup.
  */
 static inline void kbase_jd_katom_dep_clear(
-		const struct kbase_jd_atom_dependency *const_dep)
+        const struct kbase_jd_atom_dependency *const_dep)
 {
-	struct kbase_jd_atom_dependency *dep;
+    struct kbase_jd_atom_dependency *dep;
 
-	LOCAL_ASSERT(const_dep != NULL);
+    LOCAL_ASSERT(const_dep != NULL);
 
-	dep = (struct kbase_jd_atom_dependency *)const_dep;
+    dep = (struct kbase_jd_atom_dependency *)const_dep;
 
-	dep->atom = NULL;
-	dep->dep_type = BASE_JD_DEP_TYPE_INVALID;
+    dep->atom = NULL;
+    dep->dep_type = BASE_JD_DEP_TYPE_INVALID;
 }
 
 /**
@@ -272,14 +272,14 @@ static inline void kbase_jd_katom_dep_clear(
  *                                been returned to JS.
  */
 enum kbase_atom_gpu_rb_state {
-	KBASE_ATOM_GPU_RB_NOT_IN_SLOT_RB,
-	KBASE_ATOM_GPU_RB_WAITING_BLOCKED,
-	KBASE_ATOM_GPU_RB_WAITING_PROTECTED_MODE_PREV,
-	KBASE_ATOM_GPU_RB_WAITING_PROTECTED_MODE_TRANSITION,
-	KBASE_ATOM_GPU_RB_WAITING_FOR_CORE_AVAILABLE,
-	KBASE_ATOM_GPU_RB_READY,
-	KBASE_ATOM_GPU_RB_SUBMITTED,
-	KBASE_ATOM_GPU_RB_RETURN_TO_JS = -1
+    KBASE_ATOM_GPU_RB_NOT_IN_SLOT_RB,
+    KBASE_ATOM_GPU_RB_WAITING_BLOCKED,
+    KBASE_ATOM_GPU_RB_WAITING_PROTECTED_MODE_PREV,
+    KBASE_ATOM_GPU_RB_WAITING_PROTECTED_MODE_TRANSITION,
+    KBASE_ATOM_GPU_RB_WAITING_FOR_CORE_AVAILABLE,
+    KBASE_ATOM_GPU_RB_READY,
+    KBASE_ATOM_GPU_RB_SUBMITTED,
+    KBASE_ATOM_GPU_RB_RETURN_TO_JS = -1
 };
 
 /**
@@ -306,15 +306,15 @@ enum kbase_atom_gpu_rb_state {
  *                      that L2 is powered up and switch GPU to protected mode.
  */
 enum kbase_atom_enter_protected_state {
-	/*
-	 * NOTE: The integer value of this must match
-	 * KBASE_ATOM_EXIT_PROTECTED_CHECK.
-	 */
-	KBASE_ATOM_ENTER_PROTECTED_CHECK = 0,
-	KBASE_ATOM_ENTER_PROTECTED_HWCNT,
-	KBASE_ATOM_ENTER_PROTECTED_IDLE_L2,
-	KBASE_ATOM_ENTER_PROTECTED_SET_COHERENCY,
-	KBASE_ATOM_ENTER_PROTECTED_FINISHED,
+    /*
+     * NOTE: The integer value of this must match
+     * KBASE_ATOM_EXIT_PROTECTED_CHECK.
+     */
+    KBASE_ATOM_ENTER_PROTECTED_CHECK = 0,
+    KBASE_ATOM_ENTER_PROTECTED_HWCNT,
+    KBASE_ATOM_ENTER_PROTECTED_IDLE_L2,
+    KBASE_ATOM_ENTER_PROTECTED_SET_COHERENCY,
+    KBASE_ATOM_ENTER_PROTECTED_FINISHED,
 };
 
 /**
@@ -335,14 +335,14 @@ enum kbase_atom_enter_protected_state {
  *                      complete
  */
 enum kbase_atom_exit_protected_state {
-	/*
-	 * NOTE: The integer value of this must match
-	 * KBASE_ATOM_ENTER_PROTECTED_CHECK.
-	 */
-	KBASE_ATOM_EXIT_PROTECTED_CHECK = 0,
-	KBASE_ATOM_EXIT_PROTECTED_IDLE_L2,
-	KBASE_ATOM_EXIT_PROTECTED_RESET,
-	KBASE_ATOM_EXIT_PROTECTED_RESET_WAIT,
+    /*
+     * NOTE: The integer value of this must match
+     * KBASE_ATOM_ENTER_PROTECTED_CHECK.
+     */
+    KBASE_ATOM_EXIT_PROTECTED_CHECK = 0,
+    KBASE_ATOM_EXIT_PROTECTED_IDLE_L2,
+    KBASE_ATOM_EXIT_PROTECTED_RESET,
+    KBASE_ATOM_EXIT_PROTECTED_RESET_WAIT,
 };
 
 /**
@@ -354,8 +354,8 @@ enum kbase_atom_exit_protected_state {
  *                        mapping the external resource on GPU side.
  */
 struct kbase_ext_res {
-	u64 gpu_address;
-	struct kbase_mem_phy_alloc *alloc;
+    u64 gpu_address;
+    struct kbase_mem_phy_alloc *alloc;
 };
 
 /**
@@ -484,165 +484,165 @@ struct kbase_ext_res {
  *                         context.
  */
 struct kbase_jd_atom {
-	struct work_struct work;
-	ktime_t start_timestamp;
+    struct work_struct work;
+    ktime_t start_timestamp;
 
-	struct base_jd_udata udata;
-	struct kbase_context *kctx;
+    struct base_jd_udata udata;
+    struct kbase_context *kctx;
 
-	struct list_head dep_head[2];
-	struct list_head dep_item[2];
-	const struct kbase_jd_atom_dependency dep[2];
-	struct list_head jd_item;
-	bool in_jd_list;
+    struct list_head dep_head[2];
+    struct list_head dep_item[2];
+    const struct kbase_jd_atom_dependency dep[2];
+    struct list_head jd_item;
+    bool in_jd_list;
 
 #if MALI_JIT_PRESSURE_LIMIT_BASE
-	u8 jit_ids[2];
+    u8 jit_ids[2];
 #endif /* MALI_JIT_PRESSURE_LIMIT_BASE */
 
-	u16 nr_extres;
-	struct kbase_ext_res *extres;
+    u16 nr_extres;
+    struct kbase_ext_res *extres;
 
-	u32 device_nr;
-	u64 jc;
-	void *softjob_data;
+    u32 device_nr;
+    u64 jc;
+    void *softjob_data;
 #if defined(CONFIG_SYNC)
-	struct sync_fence *fence;
-	struct sync_fence_waiter sync_waiter;
-#endif				/* CONFIG_SYNC */
+    struct sync_fence *fence;
+    struct sync_fence_waiter sync_waiter;
+#endif                /* CONFIG_SYNC */
 #if defined(CONFIG_MALI_BIFROST_DMA_FENCE) || defined(CONFIG_SYNC_FILE)
-	struct {
-		/* Use the functions/API defined in mali_kbase_fence.h to
-		 * when working with this sub struct
-		 */
+    struct {
+        /* Use the functions/API defined in mali_kbase_fence.h to
+         * when working with this sub struct
+         */
 #if defined(CONFIG_SYNC_FILE)
-		/* Input fence */
+        /* Input fence */
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
-		struct fence *fence_in;
+        struct fence *fence_in;
 #else
-		struct dma_fence *fence_in;
+        struct dma_fence *fence_in;
 #endif
 #endif
-		/* This points to the dma-buf output fence for this atom. If
-		 * this is NULL then there is no fence for this atom and the
-		 * following fields related to dma_fence may have invalid data.
-		 *
-		 * The context and seqno fields contain the details for this
-		 * fence.
-		 *
-		 * This fence is signaled when the katom is completed,
-		 * regardless of the event_code of the katom (signal also on
-		 * failure).
-		 */
+        /* This points to the dma-buf output fence for this atom. If
+         * this is NULL then there is no fence for this atom and the
+         * following fields related to dma_fence may have invalid data.
+         *
+         * The context and seqno fields contain the details for this
+         * fence.
+         *
+         * This fence is signaled when the katom is completed,
+         * regardless of the event_code of the katom (signal also on
+         * failure).
+         */
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
-		struct fence *fence;
+        struct fence *fence;
 #else
-		struct dma_fence *fence;
+        struct dma_fence *fence;
 #endif
-		/* The dma-buf fence context number for this atom. A unique
-		 * context number is allocated to each katom in the context on
-		 * context creation.
-		 */
-		unsigned int context;
-		/* The dma-buf fence sequence number for this atom. This is
-		 * increased every time this katom uses dma-buf fence.
-		 */
-		atomic_t seqno;
-		/* This contains a list of all callbacks set up to wait on
-		 * other fences.  This atom must be held back from JS until all
-		 * these callbacks have been called and dep_count have reached
-		 * 0. The initial value of dep_count must be equal to the
-		 * number of callbacks on this list.
-		 *
-		 * This list is protected by jctx.lock. Callbacks are added to
-		 * this list when the atom is built and the wait are set up.
-		 * All the callbacks then stay on the list until all callbacks
-		 * have been called and the atom is queued, or cancelled, and
-		 * then all callbacks are taken off the list and freed.
-		 */
-		struct list_head callbacks;
-		/* Atomic counter of number of outstandind dma-buf fence
-		 * dependencies for this atom. When dep_count reaches 0 the
-		 * atom may be queued.
-		 *
-		 * The special value "-1" may only be set after the count
-		 * reaches 0, while holding jctx.lock. This indicates that the
-		 * atom has been handled, either queued in JS or cancelled.
-		 *
-		 * If anyone but the dma-fence worker sets this to -1 they must
-		 * ensure that any potentially queued worker must have
-		 * completed before allowing the atom to be marked as unused.
-		 * This can be done by flushing the fence work queue:
-		 * kctx->dma_fence.wq.
-		 */
-		atomic_t dep_count;
-	} dma_fence;
+        /* The dma-buf fence context number for this atom. A unique
+         * context number is allocated to each katom in the context on
+         * context creation.
+         */
+        unsigned int context;
+        /* The dma-buf fence sequence number for this atom. This is
+         * increased every time this katom uses dma-buf fence.
+         */
+        atomic_t seqno;
+        /* This contains a list of all callbacks set up to wait on
+         * other fences.  This atom must be held back from JS until all
+         * these callbacks have been called and dep_count have reached
+         * 0. The initial value of dep_count must be equal to the
+         * number of callbacks on this list.
+         *
+         * This list is protected by jctx.lock. Callbacks are added to
+         * this list when the atom is built and the wait are set up.
+         * All the callbacks then stay on the list until all callbacks
+         * have been called and the atom is queued, or cancelled, and
+         * then all callbacks are taken off the list and freed.
+         */
+        struct list_head callbacks;
+        /* Atomic counter of number of outstandind dma-buf fence
+         * dependencies for this atom. When dep_count reaches 0 the
+         * atom may be queued.
+         *
+         * The special value "-1" may only be set after the count
+         * reaches 0, while holding jctx.lock. This indicates that the
+         * atom has been handled, either queued in JS or cancelled.
+         *
+         * If anyone but the dma-fence worker sets this to -1 they must
+         * ensure that any potentially queued worker must have
+         * completed before allowing the atom to be marked as unused.
+         * This can be done by flushing the fence work queue:
+         * kctx->dma_fence.wq.
+         */
+        atomic_t dep_count;
+    } dma_fence;
 #endif /* CONFIG_MALI_BIFROST_DMA_FENCE || CONFIG_SYNC_FILE */
 
-	/* Note: refer to kbasep_js_atom_retained_state, which will take a copy
-	 * of some of the following members
-	 */
-	enum base_jd_event_code event_code;
-	base_jd_core_req core_req;
-	u8 jobslot;
-	u8 renderpass_id;
-	struct base_jd_fragment jc_fragment;
+    /* Note: refer to kbasep_js_atom_retained_state, which will take a copy
+     * of some of the following members
+     */
+    enum base_jd_event_code event_code;
+    base_jd_core_req core_req;
+    u8 jobslot;
+    u8 renderpass_id;
+    struct base_jd_fragment jc_fragment;
 
-	u32 ticks;
-	int sched_priority;
+    u32 ticks;
+    int sched_priority;
 
-	wait_queue_head_t completed;
-	enum kbase_jd_atom_state status;
+    wait_queue_head_t completed;
+    enum kbase_jd_atom_state status;
 #ifdef CONFIG_GPU_TRACEPOINTS
-	int work_id;
+    int work_id;
 #endif
-	int slot_nr;
+    int slot_nr;
 
-	u32 atom_flags;
+    u32 atom_flags;
 
-	int retry_count;
+    int retry_count;
 
-	enum kbase_atom_gpu_rb_state gpu_rb_state;
+    enum kbase_atom_gpu_rb_state gpu_rb_state;
 
-	bool need_cache_flush_cores_retained;
+    bool need_cache_flush_cores_retained;
 
-	atomic_t blocked;
+    atomic_t blocked;
 
-	/* user-space sequence number, to order atoms in some temporal order */
-	u64 seq_nr;
+    /* user-space sequence number, to order atoms in some temporal order */
+    u64 seq_nr;
 
-	struct kbase_jd_atom *pre_dep;
-	struct kbase_jd_atom *post_dep;
+    struct kbase_jd_atom *pre_dep;
+    struct kbase_jd_atom *post_dep;
 
-	struct kbase_jd_atom *x_pre_dep;
-	struct kbase_jd_atom *x_post_dep;
+    struct kbase_jd_atom *x_pre_dep;
+    struct kbase_jd_atom *x_post_dep;
 
-	u32 flush_id;
+    u32 flush_id;
 
 #ifdef CONFIG_DEBUG_FS
-	struct base_job_fault_event fault_event;
+    struct base_job_fault_event fault_event;
 #endif
-	struct list_head queue;
+    struct list_head queue;
 
-	struct list_head jit_node;
-	bool jit_blocked;
+    struct list_head jit_node;
+    bool jit_blocked;
 
-	enum base_jd_event_code will_fail_event_code;
+    enum base_jd_event_code will_fail_event_code;
 
-	union {
-		enum kbase_atom_enter_protected_state enter;
-		enum kbase_atom_exit_protected_state exit;
-	} protected_state;
+    union {
+        enum kbase_atom_enter_protected_state enter;
+        enum kbase_atom_exit_protected_state exit;
+    } protected_state;
 
-	struct rb_node runnable_tree_node;
+    struct rb_node runnable_tree_node;
 
-	u32 age;
+    u32 age;
 };
 
 static inline bool kbase_jd_katom_is_protected(
-		const struct kbase_jd_atom *katom)
+        const struct kbase_jd_atom *katom)
 {
-	return (bool)(katom->atom_flags & KBASE_KATOM_FLAG_PROTECTED);
+    return (bool)(katom->atom_flags & KBASE_KATOM_FLAG_PROTECTED);
 }
 
 /*
@@ -682,17 +682,17 @@ static inline bool kbase_jd_katom_is_protected(
  * A state machine is used to control incremental rendering.
  */
 enum kbase_jd_renderpass_state {
-	KBASE_JD_RP_COMPLETE,       /* COMPLETE => START */
-	KBASE_JD_RP_START,          /* START => PEND_OOM or COMPLETE */
-	KBASE_JD_RP_PEND_OOM,       /* PEND_OOM => OOM or COMPLETE */
-	KBASE_JD_RP_OOM,            /* OOM => RETRY */
-	KBASE_JD_RP_RETRY,          /* RETRY => RETRY_PEND_OOM or
-				     *          COMPLETE
-				     */
-	KBASE_JD_RP_RETRY_PEND_OOM, /* RETRY_PEND_OOM => RETRY_OOM or
-				     *                   COMPLETE
-				     */
-	KBASE_JD_RP_RETRY_OOM,      /* RETRY_OOM => RETRY */
+    KBASE_JD_RP_COMPLETE,       /* COMPLETE => START */
+    KBASE_JD_RP_START,          /* START => PEND_OOM or COMPLETE */
+    KBASE_JD_RP_PEND_OOM,       /* PEND_OOM => OOM or COMPLETE */
+    KBASE_JD_RP_OOM,            /* OOM => RETRY */
+    KBASE_JD_RP_RETRY,          /* RETRY => RETRY_PEND_OOM or
+                     *          COMPLETE
+                     */
+    KBASE_JD_RP_RETRY_PEND_OOM, /* RETRY_PEND_OOM => RETRY_OOM or
+                     *                   COMPLETE
+                     */
+    KBASE_JD_RP_RETRY_OOM,      /* RETRY_OOM => RETRY */
 };
 
 /**
@@ -719,10 +719,10 @@ enum kbase_jd_renderpass_state {
  * by kbase to keep track of each renderpass.
  */
 struct kbase_jd_renderpass {
-	enum kbase_jd_renderpass_state state;
-	struct kbase_jd_atom *start_katom;
-	struct kbase_jd_atom *end_katom;
-	struct list_head oom_reg_list;
+    enum kbase_jd_renderpass_state state;
+    struct kbase_jd_atom *start_katom;
+    struct kbase_jd_atom *end_katom;
+    struct list_head oom_reg_list;
 };
 
 /**
@@ -783,24 +783,24 @@ struct kbase_jd_renderpass {
  *                            impending free of other active allocations.
  */
 struct kbase_jd_context {
-	struct mutex lock;
-	struct kbasep_js_kctx_info sched_info;
-	struct kbase_jd_atom atoms[BASE_JD_ATOM_COUNT];
-	struct kbase_jd_renderpass renderpasses[BASE_JD_RP_COUNT];
-	struct workqueue_struct *job_done_wq;
+    struct mutex lock;
+    struct kbasep_js_kctx_info sched_info;
+    struct kbase_jd_atom atoms[BASE_JD_ATOM_COUNT];
+    struct kbase_jd_renderpass renderpasses[BASE_JD_RP_COUNT];
+    struct workqueue_struct *job_done_wq;
 
-	wait_queue_head_t zero_jobs_wait;
-	spinlock_t tb_lock;
-	u32 *tb;
-	u32 job_nr;
-	size_t tb_wrap_offset;
+    wait_queue_head_t zero_jobs_wait;
+    spinlock_t tb_lock;
+    u32 *tb;
+    u32 job_nr;
+    size_t tb_wrap_offset;
 
 #ifdef CONFIG_GPU_TRACEPOINTS
-	atomic_t work_id;
+    atomic_t work_id;
 #endif
 
-	struct list_head jit_atoms_head;
-	struct list_head jit_pending_alloc;
+    struct list_head jit_atoms_head;
+    struct list_head jit_pending_alloc;
 };
 
 /**
@@ -814,8 +814,8 @@ struct kbase_jd_context {
  * hwaccess_lock must be held when accessing this structure.
  */
 struct jsctx_queue {
-	struct rb_root runnable_tree;
-	struct list_head x_dep_head;
+    struct rb_root runnable_tree;
+    struct list_head x_dep_head;
 };
 
 /**
@@ -832,13 +832,13 @@ struct jsctx_queue {
  * @current_setup:     Stores the MMU configuration for this address space.
  */
 struct kbase_as {
-	int number;
-	struct workqueue_struct *pf_wq;
-	struct work_struct work_pagefault;
-	struct work_struct work_busfault;
-	struct kbase_fault pf_data;
-	struct kbase_fault bf_data;
-	struct kbase_mmu_setup current_setup;
+    int number;
+    struct workqueue_struct *pf_wq;
+    struct work_struct work_pagefault;
+    struct work_struct work_busfault;
+    struct kbase_fault pf_data;
+    struct kbase_fault bf_data;
+    struct kbase_mmu_setup current_setup;
 };
 
 #endif /* _KBASE_JM_DEFS_H_ */

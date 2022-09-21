@@ -33,19 +33,19 @@
 #if !MALI_USE_CSF
 void kbase_sync_fence_wait_worker(struct work_struct *data)
 {
-	struct kbase_jd_atom *katom;
+    struct kbase_jd_atom *katom;
 
-	katom = container_of(data, struct kbase_jd_atom, work);
-	kbase_soft_event_wait_callback(katom);
+    katom = container_of(data, struct kbase_jd_atom, work);
+    kbase_soft_event_wait_callback(katom);
 }
 #endif /* !MALI_USE_CSF */
 
 const char *kbase_sync_status_string(int status)
 {
-	if (status == 0)
-		return "active";
-	else if (status > 0)
-		return "signaled";
-	else
-		return "error";
+    if (status == 0)
+        return "active";
+    else if (status > 0)
+        return "signaled";
+    else
+        return "error";
 }

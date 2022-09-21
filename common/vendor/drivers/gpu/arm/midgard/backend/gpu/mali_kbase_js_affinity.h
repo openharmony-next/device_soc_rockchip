@@ -21,8 +21,8 @@
  * Affinity Manager internal APIs.
  */
 
-#ifndef _KBASE_JS_AFFINITY_H_
-#define _KBASE_JS_AFFINITY_H_
+#ifndef H_KBASE_JS_AFFINITY_H_
+#define H_KBASE_JS_AFFINITY_H_
 
 /**
  * kbase_js_can_run_job_on_slot_no_lock - Decide whether it is possible to
@@ -57,9 +57,9 @@ bool kbase_js_can_run_job_on_slot_no_lock(struct kbase_device *kbdev, int js);
  * no cores were available.
  */
 bool kbase_js_choose_affinity(u64 * const affinity,
-					struct kbase_device *kbdev,
-					struct kbase_jd_atom *katom,
-					int js);
+                    struct kbase_device *kbdev,
+                    struct kbase_jd_atom *katom,
+                    int js);
 
 /**
  * kbase_js_affinity_would_violate - Determine whether a proposed affinity on
@@ -75,7 +75,7 @@ bool kbase_js_choose_affinity(u64 * const affinity,
  * Return: true if the affinity would violate the restrictions
  */
 bool kbase_js_affinity_would_violate(struct kbase_device *kbdev, int js,
-								u64 affinity);
+                                u64 affinity);
 
 /**
  * kbase_js_affinity_retain_slot_cores - Affinity tracking: retain cores used by
@@ -89,7 +89,7 @@ bool kbase_js_affinity_would_violate(struct kbase_device *kbdev, int js,
  * - hwaccess_lock
  */
 void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js,
-								u64 affinity);
+                                u64 affinity);
 
 /**
  * kbase_js_affinity_release_slot_cores - Affinity tracking: release cores used
@@ -108,7 +108,7 @@ void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js,
  * - hwaccess_lock
  */
 void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js,
-								u64 affinity);
+                                u64 affinity);
 
 /**
  * kbase_js_debug_log_current_affinities - log the current affinities
@@ -119,11 +119,11 @@ void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js,
  */
 #if KBASE_TRACE_ENABLE
 void kbase_js_debug_log_current_affinities(struct kbase_device *kbdev);
-#else				/*  KBASE_TRACE_ENABLE  */
+#else                /*  KBASE_TRACE_ENABLE  */
 static inline void
 kbase_js_debug_log_current_affinities(struct kbase_device *kbdev)
 {
 }
-#endif				/*  KBASE_TRACE_ENABLE  */
+#endif                /*  KBASE_TRACE_ENABLE  */
 
-#endif				/* _KBASE_JS_AFFINITY_H_ */
+#endif                /* _KBASE_JS_AFFINITY_H_ */

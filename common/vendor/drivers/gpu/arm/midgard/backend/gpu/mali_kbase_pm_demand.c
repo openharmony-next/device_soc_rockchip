@@ -26,32 +26,32 @@
 
 static u64 demand_get_core_mask(struct kbase_device *kbdev)
 {
-	u64 desired = kbdev->shader_needed_bitmap | kbdev->shader_inuse_bitmap;
+    u64 desired = kbdev->shader_needed_bitmap | kbdev->shader_inuse_bitmap;
 
-	if (0 == kbdev->pm.active_count)
-		return 0;
+    if (0 == kbdev->pm.active_count)
+        return 0;
 
-	return desired;
+    return desired;
 }
 
 static bool demand_get_core_active(struct kbase_device *kbdev)
 {
-	if (0 == kbdev->pm.active_count && !(kbdev->shader_needed_bitmap |
-			kbdev->shader_inuse_bitmap) && !kbdev->tiler_needed_cnt
-			&& !kbdev->tiler_inuse_cnt)
-		return false;
+    if (0 == kbdev->pm.active_count && !(kbdev->shader_needed_bitmap |
+            kbdev->shader_inuse_bitmap) && !kbdev->tiler_needed_cnt
+            && !kbdev->tiler_inuse_cnt)
+        return false;
 
-	return true;
+    return true;
 }
 
 static void demand_init(struct kbase_device *kbdev)
 {
-	CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(kbdev);
 }
 
 static void demand_term(struct kbase_device *kbdev)
 {
-	CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(kbdev);
 }
 
 /*
@@ -61,13 +61,13 @@ static void demand_term(struct kbase_device *kbdev)
  * and name.
  */
 const struct kbase_pm_policy kbase_pm_demand_policy_ops = {
-	"demand",			/* name */
-	demand_init,			/* init */
-	demand_term,			/* term */
-	demand_get_core_mask,		/* get_core_mask */
-	demand_get_core_active,		/* get_core_active */
-	0u,				/* flags */
-	KBASE_PM_POLICY_ID_DEMAND,	/* id */
+    "demand",            /* name */
+    demand_init,            /* init */
+    demand_term,            /* term */
+    demand_get_core_mask,        /* get_core_mask */
+    demand_get_core_active,        /* get_core_active */
+    0u,                /* flags */
+    KBASE_PM_POLICY_ID_DEMAND,    /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_demand_policy_ops);

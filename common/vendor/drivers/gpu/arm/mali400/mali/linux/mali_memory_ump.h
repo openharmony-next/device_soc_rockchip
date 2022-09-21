@@ -8,16 +8,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_MEMORY_UMP_BUF_H__
-#define __MALI_MEMORY_UMP_BUF_H__
+#ifndef H__MALI_MEMORY_UMP_BUF_H__
+#define H__MALI_MEMORY_UMP_BUF_H__
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "mali_uk_types.h"
 #include "mali_osk.h"
 #include "mali_memory.h"
+extern "C" {
+#endif
 
 int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_backend, u32  secure_id, u32 flags);
 void mali_mem_unbind_ump_buf(mali_mem_backend *mem_backend);

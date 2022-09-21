@@ -62,10 +62,10 @@
  * It doesn't correspond to any action or type of event callback.
  */
 enum kbase_csf_event_callback_action {
-	KBASE_CSF_EVENT_CALLBACK_FIRST = 0,
-	KBASE_CSF_EVENT_CALLBACK_KEEP,
-	KBASE_CSF_EVENT_CALLBACK_REMOVE,
-	KBASE_CSF_EVENT_CALLBACK_LAST,
+    KBASE_CSF_EVENT_CALLBACK_FIRST = 0,
+    KBASE_CSF_EVENT_CALLBACK_KEEP,
+    KBASE_CSF_EVENT_CALLBACK_REMOVE,
+    KBASE_CSF_EVENT_CALLBACK_LAST,
 };
 
 /**
@@ -97,7 +97,7 @@ typedef enum kbase_csf_event_callback_action kbase_csf_event_callback(void *para
  * Return: 0 on success, or negative on failure.
  */
 int kbase_csf_event_wait_add(struct kbase_context *kctx,
-		kbase_csf_event_callback *callback, void *param);
+        kbase_csf_event_callback *callback, void *param);
 
 /**
  * kbase_csf_event_wait_remove - Remove a CSF event callback
@@ -111,7 +111,7 @@ int kbase_csf_event_wait_add(struct kbase_context *kctx,
  *             function.
  */
 void kbase_csf_event_wait_remove(struct kbase_context *kctx,
-		kbase_csf_event_callback *callback, void *param);
+        kbase_csf_event_callback *callback, void *param);
 
 /**
  * kbase_csf_event_wait_remove_all - Removes all CSF event callbacks
@@ -135,7 +135,7 @@ void kbase_csf_event_wait_remove_all(struct kbase_context *kctx);
  * Return: true if fatal error is read successfully.
  */
 bool kbase_csf_read_error(struct kbase_context *kctx,
-		struct base_csf_notification *event_data);
+        struct base_csf_notification *event_data);
 
 /**
  * kbase_csf_error_pending - Check whether fatal error is pending
@@ -162,19 +162,19 @@ void kbase_csf_event_signal(struct kbase_context *kctx, bool notify_gpu);
 
 static inline void kbase_csf_event_signal_notify_gpu(struct kbase_context *kctx)
 {
-	kbase_csf_event_signal(kctx, true);
+    kbase_csf_event_signal(kctx, true);
 }
 
 static inline void kbase_csf_event_signal_cpu_only(struct kbase_context *kctx)
 {
-	kbase_csf_event_signal(kctx, false);
+    kbase_csf_event_signal(kctx, false);
 }
 
 /**
  * kbase_csf_ctx_init - Initialize the command-stream front-end for a GPU
  *                      address space.
  *
- * @kctx:	Pointer to the kbase context which is being initialized.
+ * @kctx:    Pointer to the kbase context which is being initialized.
  *
  * Return: 0 if successful or a negative error code on failure.
  */
@@ -191,7 +191,7 @@ int kbase_csf_ctx_init(struct kbase_context *kctx);
  * @fault:      Pointer to the fault.
  */
 void kbase_csf_ctx_handle_fault(struct kbase_context *kctx,
-		struct kbase_fault *fault);
+        struct kbase_fault *fault);
 
 /**
  * kbase_csf_ctx_term - Terminate the command-stream front-end for a GPU
@@ -200,34 +200,34 @@ void kbase_csf_ctx_handle_fault(struct kbase_context *kctx,
  * This function terminates any remaining CSGs and CSs which weren't destroyed
  * before context termination.
  *
- * @kctx:	Pointer to the kbase context which is being terminated.
+ * @kctx:    Pointer to the kbase context which is being terminated.
  */
 void kbase_csf_ctx_term(struct kbase_context *kctx);
 
 /**
  * kbase_csf_queue_register - Register a GPU command queue.
  *
- * @kctx:	Pointer to the kbase context within which the
- *		queue is to be registered.
- * @reg:	Pointer to the structure which contains details of the
- *		queue to be registered within the provided
- *		context.
+ * @kctx:    Pointer to the kbase context within which the
+ *        queue is to be registered.
+ * @reg:    Pointer to the structure which contains details of the
+ *        queue to be registered within the provided
+ *        context.
  *
- * Return:	0 on success, or negative on failure.
+ * Return:    0 on success, or negative on failure.
  */
 int kbase_csf_queue_register(struct kbase_context *kctx,
-			     struct kbase_ioctl_cs_queue_register *reg);
+                 struct kbase_ioctl_cs_queue_register *reg);
 
 /**
  * kbase_csf_queue_terminate - Terminate a GPU command queue.
  *
- * @kctx:	Pointer to the kbase context within which the
- *		queue is to be terminated.
- * @term:	Pointer to the structure which identifies which
- *		queue is to be terminated.
+ * @kctx:    Pointer to the kbase context within which the
+ *        queue is to be terminated.
+ * @term:    Pointer to the structure which identifies which
+ *        queue is to be terminated.
  */
 void kbase_csf_queue_terminate(struct kbase_context *kctx,
-			      struct kbase_ioctl_cs_queue_terminate *term);
+                  struct kbase_ioctl_cs_queue_terminate *term);
 
 /**
  * kbase_csf_alloc_command_stream_user_pages - Allocate resources for a
@@ -237,97 +237,97 @@ void kbase_csf_queue_terminate(struct kbase_context *kctx,
  * GPU command queue and maps them in the shared interface segment of MCU
  * firmware address space. Also reserves a hardware doorbell page for the queue.
  *
- * @kctx:	Pointer to the kbase context within which the resources
- *		for the queue are being allocated.
- * @queue:	Pointer to the queue for which to allocate resources.
+ * @kctx:    Pointer to the kbase context within which the resources
+ *        for the queue are being allocated.
+ * @queue:    Pointer to the queue for which to allocate resources.
  *
- * Return:	0 on success, or negative on failure.
+ * Return:    0 on success, or negative on failure.
  */
 int kbase_csf_alloc_command_stream_user_pages(struct kbase_context *kctx,
-			struct kbase_queue *queue);
+            struct kbase_queue *queue);
 
 /**
  * kbase_csf_queue_bind - Bind a GPU command queue to a queue group.
  *
- * @kctx:	The kbase context.
- * @bind:	Pointer to the union which specifies a queue group and a
- *		queue to be bound to that group.
+ * @kctx:    The kbase context.
+ * @bind:    Pointer to the union which specifies a queue group and a
+ *        queue to be bound to that group.
  *
- * Return:	0 on success, or negative on failure.
+ * Return:    0 on success, or negative on failure.
  */
 int kbase_csf_queue_bind(struct kbase_context *kctx,
-			 union kbase_ioctl_cs_queue_bind *bind);
+             union kbase_ioctl_cs_queue_bind *bind);
 
 /**
  * kbase_csf_queue_unbind - Unbind a GPU command queue from a queue group
- *			    to which it has been bound and free
- *			    resources allocated for this queue if there
- *			    are any.
+ *                to which it has been bound and free
+ *                resources allocated for this queue if there
+ *                are any.
  *
- * @queue:	Pointer to queue to be unbound.
+ * @queue:    Pointer to queue to be unbound.
  */
 void kbase_csf_queue_unbind(struct kbase_queue *queue);
 
 /**
  * kbase_csf_queue_kick - Schedule a GPU command queue on the firmware
  *
- * @kctx:	The kbase context.
- * @kick:	Pointer to the struct which specifies the queue
- *		that needs to be scheduled.
+ * @kctx:    The kbase context.
+ * @kick:    Pointer to the struct which specifies the queue
+ *        that needs to be scheduled.
  *
- * Return:	0 on success, or negative on failure.
+ * Return:    0 on success, or negative on failure.
  */
 int kbase_csf_queue_kick(struct kbase_context *kctx,
-			 struct kbase_ioctl_cs_queue_kick *kick);
+             struct kbase_ioctl_cs_queue_kick *kick);
 
 /** Find if given the queue group handle is valid.
  *
  * This function is used to determine if the queue group handle is valid.
  *
- * @kctx:		The kbase context under which the queue group exists.
- * @group_handle:	Handle for the group which uniquely identifies it within
- *			the context with which it was created.
+ * @kctx:        The kbase context under which the queue group exists.
+ * @group_handle:    Handle for the group which uniquely identifies it within
+ *            the context with which it was created.
  *
- * Return:		0 on success, or negative on failure.
+ * Return:        0 on success, or negative on failure.
  */
 int kbase_csf_queue_group_handle_is_valid(struct kbase_context *kctx,
-	u8 group_handle);
+    u8 group_handle);
 
 /**
  * kbase_csf_queue_group_create - Create a GPU command queue group.
  *
- * @kctx:	Pointer to the kbase context within which the
- *		queue group is to be created.
- * @create:	Pointer to the structure which contains details of the
- *		queue group which is to be created within the
- *		provided kbase context.
+ * @kctx:    Pointer to the kbase context within which the
+ *        queue group is to be created.
+ * @create:    Pointer to the structure which contains details of the
+ *        queue group which is to be created within the
+ *        provided kbase context.
  *
- * Return:	0 on success, or negative on failure.
+ * Return:    0 on success, or negative on failure.
  */
 int kbase_csf_queue_group_create(struct kbase_context *kctx,
-	union kbase_ioctl_cs_queue_group_create *create);
+    union kbase_ioctl_cs_queue_group_create *create);
 
 /**
  * kbase_csf_queue_group_terminate - Terminate a GPU command queue group.
  *
- * @kctx:		Pointer to the kbase context within which the
- *			queue group is to be terminated.
- * @group_handle:	Pointer to the structure which identifies the queue
- *			group which is to be terminated.
+ * @kctx:        Pointer to the kbase context within which the
+ *            queue group is to be terminated.
+ * @group_handle:    Pointer to the structure which identifies the queue
+ *            group which is to be terminated.
  */
 void kbase_csf_queue_group_terminate(struct kbase_context *kctx,
-	u8 group_handle);
+    u8 group_handle);
 
 /**
  * kbase_csf_term_descheduled_queue_group - Terminate a GPU command queue
  *                                          group that is not operational
  *                                          inside the scheduler.
  *
- * @group:	Pointer to the structure which identifies the queue
- *		group to be terminated. The function assumes that the caller
- *		is sure that the given group is not operational inside the
- *		scheduler. If in doubt, use its alternative:
- *		@ref kbase_csf_queue_group_terminate().
+ * @group:    Pointer to the structure which identifies the queue
+ *        group to be terminated. The function assumes that the caller
+ *        is sure that the given group is not operational inside the
+ *        scheduler. If in doubt, use its alternative:
+ *        @ref kbase_csf_queue_group_terminate().
  */
 void kbase_csf_term_descheduled_queue_group(struct kbase_queue_group *group);
 
@@ -336,19 +336,19 @@ void kbase_csf_term_descheduled_queue_group(struct kbase_queue_group *group);
  *
  * This function is used to suspend a queue group and copy the suspend buffer.
  *
- * @kctx:		The kbase context for which the queue group is to be
- *			suspended.
- * @sus_buf:		Pointer to the structure which contains details of the
- *			user buffer and its kernel pinned pages.
- * @size:		The size in bytes for the user provided buffer.
- * @group_handle:	Handle for the group which uniquely identifies it within
- *			the context within which it was created.
+ * @kctx:        The kbase context for which the queue group is to be
+ *            suspended.
+ * @sus_buf:        Pointer to the structure which contains details of the
+ *            user buffer and its kernel pinned pages.
+ * @size:        The size in bytes for the user provided buffer.
+ * @group_handle:    Handle for the group which uniquely identifies it within
+ *            the context within which it was created.
  *
- * Return:		0 on success or negative value if failed to suspend
- *			queue group and copy suspend buffer contents.
+ * Return:        0 on success or negative value if failed to suspend
+ *            queue group and copy suspend buffer contents.
  */
 int kbase_csf_queue_group_suspend(struct kbase_context *kctx,
-	struct kbase_suspend_copy_buffer *sus_buf, u8 group_handle);
+    struct kbase_suspend_copy_buffer *sus_buf, u8 group_handle);
 
 /**
  * kbase_csf_interrupt - Handle interrupts issued by CSF firmware.
@@ -394,7 +394,7 @@ void kbase_csf_ring_csg_doorbell(struct kbase_device *kbdev, int slot);
  * @slot_bitmap: bitmap for the given slots, slot-0 on bit-0, etc.
  */
 void kbase_csf_ring_csg_slots_doorbell(struct kbase_device *kbdev,
-				       u32 slot_bitmap);
+                       u32 slot_bitmap);
 
 /**
  * kbase_csf_ring_cs_kernel_doorbell - ring the kernel doorbell for a queue
@@ -407,7 +407,7 @@ void kbase_csf_ring_csg_slots_doorbell(struct kbase_device *kbdev,
  * @queue: Pointer to the queue for ringing the door-bell.
  */
 void kbase_csf_ring_cs_kernel_doorbell(struct kbase_device *kbdev,
-			struct kbase_queue *queue);
+            struct kbase_queue *queue);
 
 /**
  * kbase_csf_ring_cs_user_doorbell - ring the user doorbell allocated for a
@@ -421,7 +421,7 @@ void kbase_csf_ring_cs_kernel_doorbell(struct kbase_device *kbdev,
  * @queue: Pointer to the queue for ringing the door-bell.
  */
 void kbase_csf_ring_cs_user_doorbell(struct kbase_device *kbdev,
-			struct kbase_queue *queue);
+            struct kbase_queue *queue);
 
 /**
  * kbase_csf_active_queue_groups_reset - Reset the state of all active GPU
@@ -439,6 +439,6 @@ void kbase_csf_ring_cs_user_doorbell(struct kbase_device *kbdev,
  * This is similar to the action taken in response to an unexpected OoM event.
  */
 void kbase_csf_active_queue_groups_reset(struct kbase_device *kbdev,
-			struct kbase_context *kctx);
+            struct kbase_context *kctx);
 
 #endif /* _KBASE_CSF_H_ */

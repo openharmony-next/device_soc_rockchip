@@ -39,6 +39,6 @@ void kbase_release_interrupts(struct kbase_device *kbdev);
 void kbase_synchronize_irqs(struct kbase_device *kbdev);
 
 int kbasep_common_test_interrupt_handlers(
-					struct kbase_device * const kbdev);
+                    struct kbase_device * const kbdev);
 
 #endif /* _KBASE_IRQ_INTERNAL_H_ */

@@ -52,7 +52,7 @@
  * As a macro it may evaluate its arguments more than once.
  * Refer to MAX macro for more details
  */
-#define MIN(x, y)	((x) < (y) ? (x) : (y))
+#define MIN(x, y)    ((x) < (y) ? (x) : (y))
 
 /**
  * MAX -  Return the greater of two values.
@@ -64,7 +64,7 @@
  * to retrieve the min and max of two values, consider using a conditional swap
  * instead.
  */
-#define MAX(x, y)	((x) < (y) ? (y) : (x))
+#define MAX(x, y)    ((x) < (y) ? (y) : (x))
 
 /**
  * @hideinitializer
@@ -72,7 +72,7 @@
  * such variables should be removed; this macro is present for cases where we
  * much support API backwards compatibility.
  */
-#define CSTD_UNUSED(x)	((void)(x))
+#define CSTD_UNUSED(x)    ((void)(x))
 
 /**
  * @hideinitializer
@@ -80,7 +80,7 @@
  * when compile time macros turn a function-like macro in to a no-op, but
  * where having no statement is otherwise invalid.
  */
-#define CSTD_NOP(...)	((void)#__VA_ARGS__)
+#define CSTD_NOP(...)    ((void)#__VA_ARGS__)
 
 /**
  * @hideinitializer
@@ -91,7 +91,7 @@
  * > "MY_MACRO"
  * @endcode
  */
-#define CSTD_STR1(x)	#x
+#define CSTD_STR1(x)    #x
 
 /**
  * @hideinitializer
@@ -104,6 +104,6 @@
  * > "32"
  * @endcode
  */
-#define CSTD_STR2(x)	CSTD_STR1(x)
+#define CSTD_STR2(x)    CSTD_STR1(x)
 
 #endif /* _MALISW_H_ */

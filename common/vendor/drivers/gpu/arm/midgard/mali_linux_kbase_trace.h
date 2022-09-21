@@ -25,23 +25,23 @@
 #include <linux/tracepoint.h>
 
 DECLARE_EVENT_CLASS(mali_slot_template,
-	TP_PROTO(int jobslot, unsigned int info_val),
-	TP_ARGS(jobslot, info_val),
-	TP_STRUCT__entry(
-		__field(unsigned int, jobslot)
-		__field(unsigned int, info_val)
-	),
-	TP_fast_assign(
-		__entry->jobslot = jobslot;
-		__entry->info_val = info_val;
-	),
-	TP_printk("jobslot=%u info=%u", __entry->jobslot, __entry->info_val)
+    TP_PROTO(int jobslot, unsigned int info_val),
+    TP_ARGS(jobslot, info_val),
+    TP_STRUCT__entry(
+        __field(unsigned int, jobslot)
+        __field(unsigned int, info_val)
+    ),
+    TP_fast_assign(
+        __entry->jobslot = jobslot;
+        __entry->info_val = info_val;
+    ),
+    TP_printk("jobslot=%u info=%u", __entry->jobslot, __entry->info_val)
 );
 
 #define DEFINE_MALI_SLOT_EVENT(name) \
 DEFINE_EVENT(mali_slot_template, mali_##name, \
-	TP_PROTO(int jobslot, unsigned int info_val), \
-	TP_ARGS(jobslot, info_val))
+    TP_PROTO(int jobslot, unsigned int info_val), \
+    TP_ARGS(jobslot, info_val))
 DEFINE_MALI_SLOT_EVENT(JM_SUBMIT);
 DEFINE_MALI_SLOT_EVENT(JM_JOB_DONE);
 DEFINE_MALI_SLOT_EVENT(JM_UPDATE_HEAD);
@@ -71,23 +71,23 @@ DEFINE_MALI_SLOT_EVENT(JS_POLICY_DEQUEUE_JOB_IRQ);
 #undef DEFINE_MALI_SLOT_EVENT
 
 DECLARE_EVENT_CLASS(mali_refcount_template,
-	TP_PROTO(int refcount, unsigned int info_val),
-	TP_ARGS(refcount, info_val),
-	TP_STRUCT__entry(
-		__field(unsigned int, refcount)
-		__field(unsigned int, info_val)
-	),
-	TP_fast_assign(
-		__entry->refcount = refcount;
-		__entry->info_val = info_val;
-	),
-	TP_printk("refcount=%u info=%u", __entry->refcount, __entry->info_val)
+    TP_PROTO(int refcount, unsigned int info_val),
+    TP_ARGS(refcount, info_val),
+    TP_STRUCT__entry(
+        __field(unsigned int, refcount)
+        __field(unsigned int, info_val)
+    ),
+    TP_fast_assign(
+        __entry->refcount = refcount;
+        __entry->info_val = info_val;
+    ),
+    TP_printk("refcount=%u info=%u", __entry->refcount, __entry->info_val)
 );
 
 #define DEFINE_MALI_REFCOUNT_EVENT(name) \
 DEFINE_EVENT(mali_refcount_template, mali_##name, \
-	TP_PROTO(int refcount, unsigned int info_val), \
-	TP_ARGS(refcount, info_val))
+    TP_PROTO(int refcount, unsigned int info_val), \
+    TP_ARGS(refcount, info_val))
 DEFINE_MALI_REFCOUNT_EVENT(JS_RETAIN_CTX_NOLOCK);
 DEFINE_MALI_REFCOUNT_EVENT(JS_ADD_JOB);
 DEFINE_MALI_REFCOUNT_EVENT(JS_REMOVE_JOB);
@@ -107,23 +107,23 @@ DEFINE_MALI_REFCOUNT_EVENT(PM_CONTEXT_IDLE);
 #undef DEFINE_MALI_REFCOUNT_EVENT
 
 DECLARE_EVENT_CLASS(mali_add_template,
-	TP_PROTO(int gpu_addr, unsigned int info_val),
-	TP_ARGS(gpu_addr, info_val),
-	TP_STRUCT__entry(
-		__field(unsigned int, gpu_addr)
-		__field(unsigned int, info_val)
-	),
-	TP_fast_assign(
-		__entry->gpu_addr = gpu_addr;
-		__entry->info_val = info_val;
-	),
-	TP_printk("gpu_addr=%u info=%u", __entry->gpu_addr, __entry->info_val)
+    TP_PROTO(int gpu_addr, unsigned int info_val),
+    TP_ARGS(gpu_addr, info_val),
+    TP_STRUCT__entry(
+        __field(unsigned int, gpu_addr)
+        __field(unsigned int, info_val)
+    ),
+    TP_fast_assign(
+        __entry->gpu_addr = gpu_addr;
+        __entry->info_val = info_val;
+    ),
+    TP_printk("gpu_addr=%u info=%u", __entry->gpu_addr, __entry->info_val)
 );
 
 #define DEFINE_MALI_ADD_EVENT(name) \
 DEFINE_EVENT(mali_add_template, mali_##name, \
-	TP_PROTO(int gpu_addr, unsigned int info_val), \
-	TP_ARGS(gpu_addr, info_val))
+    TP_PROTO(int gpu_addr, unsigned int info_val), \
+    TP_ARGS(gpu_addr, info_val))
 DEFINE_MALI_ADD_EVENT(CORE_CTX_DESTROY);
 DEFINE_MALI_ADD_EVENT(CORE_CTX_HWINSTR_TERM);
 DEFINE_MALI_ADD_EVENT(CORE_GPU_IRQ);

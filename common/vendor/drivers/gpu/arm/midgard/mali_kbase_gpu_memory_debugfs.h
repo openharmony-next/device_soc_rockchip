@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_MEMORY_DEBUGFS_H
-#define _KBASE_GPU_MEMORY_DEBUGFS_H
+#ifndef KBASE_GPU_MEMORY_DEBUGFS_H
+#define KBASE_GPU_MEMORY_DEBUGFS_H
 
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>

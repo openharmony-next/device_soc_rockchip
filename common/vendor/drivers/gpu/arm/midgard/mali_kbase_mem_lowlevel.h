@@ -29,17 +29,17 @@
 /**
  * @brief Flags for kbase_phy_allocator_pages_alloc
  */
-#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)	/** Default allocation flag */
-#define KBASE_PHY_PAGES_FLAG_CLEAR   (1 << 0)	/** Clear the pages after allocation */
-#define KBASE_PHY_PAGES_FLAG_POISON  (1 << 1)	/** Fill the memory with a poison value */
+#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)    /** Default allocation flag */
+#define KBASE_PHY_PAGES_FLAG_CLEAR   (1 << 0)    /** Clear the pages after allocation */
+#define KBASE_PHY_PAGES_FLAG_POISON  (1 << 1)    /** Fill the memory with a poison value */
 
 #define KBASE_PHY_PAGES_SUPPORTED_FLAGS (KBASE_PHY_PAGES_FLAG_DEFAULT|KBASE_PHY_PAGES_FLAG_CLEAR|KBASE_PHY_PAGES_FLAG_POISON)
 
 #define KBASE_PHY_PAGES_POISON_VALUE  0xFD /** Value to fill the memory with when KBASE_PHY_PAGES_FLAG_POISON is set */
 
 enum kbase_sync_type {
-	KBASE_SYNC_TO_CPU,
-	KBASE_SYNC_TO_DEVICE
+    KBASE_SYNC_TO_CPU,
+    KBASE_SYNC_TO_DEVICE
 };
 
-#endif				/* _KBASE_LOWLEVEL_H */
+#endif                /* _KBASE_LOWLEVEL_H */

@@ -25,8 +25,8 @@
  * DO NOT EDIT.
  */
 
-#if !defined(_KBASE_TRACEPOINTS_H)
-#define _KBASE_TRACEPOINTS_H
+#if !defined(KBASE_TRACEPOINTS_H)
+#define KBASE_TRACEPOINTS_H
 
 /* Tracepoints are abstract callbacks notifying that some important
  * software or hardware event has happened.
@@ -56,9 +56,9 @@ extern const size_t __aux_stream_offset;
  * relies on offset variables:
  * __obj_stream_offset and __aux_stream_offset.
  */
-#define __TL_DISPATCH_STREAM(kbdev, stype)	\
-	((struct kbase_tlstream *)	\
-	 ((u8 *)kbdev->timeline + __ ## stype ## _stream_offset))
+#define MALI_KBASE_TL_DISPATCH_STREAM(kbdev, stype)    \
+    ((struct kbase_tlstream *)    \
+     ((u8 *)kbdev->timeline + __ ## stype ## _stream_offset))
 
 struct tp_desc;
 
@@ -80,379 +80,379 @@ extern const size_t  aux_desc_header_size;
 
 #define TLSTREAM_ENABLED (1 << 31)
 
-void __kbase_tlstream_tl_new_ctx(
-	struct kbase_tlstream *stream,
-	const void *ctx,
-	u32 ctx_nr,
-	u32 tgid);
-void __kbase_tlstream_tl_new_gpu(
-	struct kbase_tlstream *stream,
-	const void *gpu,
-	u32 gpu_id,
-	u32 core_count);
-void __kbase_tlstream_tl_new_lpu(
-	struct kbase_tlstream *stream,
-	const void *lpu,
-	u32 lpu_nr,
-	u32 lpu_fn);
-void __kbase_tlstream_tl_new_atom(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u32 atom_nr);
-void __kbase_tlstream_tl_new_as(
-	struct kbase_tlstream *stream,
-	const void *address_space,
-	u32 as_nr);
-void __kbase_tlstream_tl_del_ctx(
-	struct kbase_tlstream *stream,
-	const void *ctx);
-void __kbase_tlstream_tl_del_atom(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_lifelink_lpu_gpu(
-	struct kbase_tlstream *stream,
-	const void *lpu,
-	const void *gpu);
-void __kbase_tlstream_tl_lifelink_as_gpu(
-	struct kbase_tlstream *stream,
-	const void *address_space,
-	const void *gpu);
-void __kbase_tlstream_tl_ret_ctx_lpu(
-	struct kbase_tlstream *stream,
-	const void *ctx,
-	const void *lpu);
-void __kbase_tlstream_tl_ret_atom_ctx(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *ctx);
-void __kbase_tlstream_tl_ret_atom_lpu(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *lpu,
-	const char *attrib_match_list);
-void __kbase_tlstream_tl_nret_ctx_lpu(
-	struct kbase_tlstream *stream,
-	const void *ctx,
-	const void *lpu);
-void __kbase_tlstream_tl_nret_atom_ctx(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *ctx);
-void __kbase_tlstream_tl_nret_atom_lpu(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *lpu);
-void __kbase_tlstream_tl_ret_as_ctx(
-	struct kbase_tlstream *stream,
-	const void *address_space,
-	const void *ctx);
-void __kbase_tlstream_tl_nret_as_ctx(
-	struct kbase_tlstream *stream,
-	const void *address_space,
-	const void *ctx);
-void __kbase_tlstream_tl_ret_atom_as(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *address_space);
-void __kbase_tlstream_tl_nret_atom_as(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	const void *address_space);
-void __kbase_tlstream_tl_attrib_atom_config(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u64 descriptor,
-	u64 affinity,
-	u32 config);
-void __kbase_tlstream_tl_attrib_atom_priority(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u32 prio);
-void __kbase_tlstream_tl_attrib_atom_state(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u32 state);
-void __kbase_tlstream_tl_attrib_atom_prioritized(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_attrib_atom_jit(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u64 edit_addr,
-	u64 new_addr,
-	u32 jit_flags,
-	u64 mem_flags,
-	u32 j_id,
-	u64 com_pgs,
-	u64 extent,
-	u64 va_pgs);
-void __kbase_tlstream_tl_jit_usedpages(
-	struct kbase_tlstream *stream,
-	u64 used_pages,
-	u32 j_id);
-void __kbase_tlstream_tl_attrib_atom_jitallocinfo(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u64 va_pgs,
-	u64 com_pgs,
-	u64 extent,
-	u32 j_id,
-	u32 bin_id,
-	u32 max_allocs,
-	u32 jit_flags,
-	u32 usg_id);
-void __kbase_tlstream_tl_attrib_atom_jitfreeinfo(
-	struct kbase_tlstream *stream,
-	const void *atom,
-	u32 j_id);
-void __kbase_tlstream_tl_attrib_as_config(
-	struct kbase_tlstream *stream,
-	const void *address_space,
-	u64 transtab,
-	u64 memattr,
-	u64 transcfg);
-void __kbase_tlstream_tl_event_lpu_softstop(
-	struct kbase_tlstream *stream,
-	const void *lpu);
-void __kbase_tlstream_tl_event_atom_softstop_ex(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_event_atom_softstop_issue(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_event_atom_softjob_start(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_event_atom_softjob_end(
-	struct kbase_tlstream *stream,
-	const void *atom);
-void __kbase_tlstream_tl_arbiter_granted(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_tl_arbiter_started(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_tl_arbiter_stop_requested(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_tl_arbiter_stopped(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_jd_gpu_soft_reset(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_aux_pm_state(
-	struct kbase_tlstream *stream,
-	u32 core_type,
-	u64 core_state_bitset);
-void __kbase_tlstream_aux_pagefault(
-	struct kbase_tlstream *stream,
-	u32 ctx_nr,
-	u32 as_nr,
-	u64 page_cnt_change);
-void __kbase_tlstream_aux_pagesalloc(
-	struct kbase_tlstream *stream,
-	u32 ctx_nr,
-	u64 page_cnt);
-void __kbase_tlstream_aux_devfreq_target(
-	struct kbase_tlstream *stream,
-	u64 target_freq);
-void __kbase_tlstream_aux_protected_enter_start(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_aux_protected_enter_end(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_aux_protected_leave_start(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_aux_protected_leave_end(
-	struct kbase_tlstream *stream,
-	const void *gpu);
-void __kbase_tlstream_aux_jit_stats(
-	struct kbase_tlstream *stream,
-	u32 ctx_nr,
-	u32 bid,
-	u32 max_allocs,
-	u32 allocs,
-	u32 va_pages,
-	u32 ph_pages);
-void __kbase_tlstream_aux_event_job_slot(
-	struct kbase_tlstream *stream,
-	const void *ctx,
-	u32 slot_nr,
-	u32 atom_nr,
-	u32 event);
-void __kbase_tlstream_tl_kbase_new_device(
-	struct kbase_tlstream *stream,
-	u32 kbase_device_id,
-	u32 kbase_device_gpu_core_count,
-	u32 kbase_device_max_num_csgs,
-	u32 kbase_device_as_count);
-void __kbase_tlstream_tl_kbase_device_program_csg(
-	struct kbase_tlstream *stream,
-	u32 kbase_device_id,
-	u32 gpu_cmdq_grp_handle,
-	u32 kbase_device_csg_slot_index);
-void __kbase_tlstream_tl_kbase_device_deprogram_csg(
-	struct kbase_tlstream *stream,
-	u32 kbase_device_id,
-	u32 kbase_device_csg_slot_index);
-void __kbase_tlstream_tl_kbase_new_ctx(
-	struct kbase_tlstream *stream,
-	u32 kernel_ctx_id,
-	u32 kbase_device_id);
-void __kbase_tlstream_tl_kbase_del_ctx(
-	struct kbase_tlstream *stream,
-	u32 kernel_ctx_id);
-void __kbase_tlstream_tl_kbase_ctx_assign_as(
-	struct kbase_tlstream *stream,
-	u32 kernel_ctx_id,
-	u32 kbase_device_as_index);
-void __kbase_tlstream_tl_kbase_ctx_unassign_as(
-	struct kbase_tlstream *stream,
-	u32 kernel_ctx_id);
-void __kbase_tlstream_tl_kbase_new_kcpuqueue(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u32 kernel_ctx_id,
-	u32 kcpuq_num_pending_cmds);
-void __kbase_tlstream_tl_kbase_del_kcpuqueue(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_signal(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	const void *fence);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_wait(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	const void *fence);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_wait(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 cqs_obj_gpu_addr,
-	u32 cqs_obj_compare_value);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_set(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 cqs_obj_gpu_addr);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_map_import(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 map_import_buf_gpu_addr);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 map_import_buf_gpu_addr);
-void __kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import_force(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 map_import_buf_gpu_addr);
-void __kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_alloc(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_alloc(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 jit_alloc_gpu_alloc_addr_dest,
-	u64 jit_alloc_va_pages,
-	u64 jit_alloc_commit_pages,
-	u64 jit_alloc_extent,
-	u32 jit_alloc_jit_id,
-	u32 jit_alloc_bin_id,
-	u32 jit_alloc_max_allocations,
-	u32 jit_alloc_flags,
-	u32 jit_alloc_usage_id);
-void __kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_alloc(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_free(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_free(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u32 jit_alloc_jit_id);
-void __kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_free(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_set(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_alloc_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_alloc_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_alloc_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 jit_alloc_gpu_alloc_addr,
-	u64 jit_alloc_mmu_flags);
-void __kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_alloc_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_free_start(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_free_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_free_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue,
-	u64 jit_free_pages_used);
-void __kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_free_end(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_kcpuqueue_execute_errorbarrier(
-	struct kbase_tlstream *stream,
-	const void *kcpu_queue);
-void __kbase_tlstream_tl_kbase_csffw_tlstream_overflow(
-	struct kbase_tlstream *stream,
-	u64 csffw_timestamp,
-	u64 csffw_cycle);
-void __kbase_tlstream_tl_kbase_csffw_reset(
-	struct kbase_tlstream *stream,
-	u64 csffw_cycle);
+void mali_kbase_kbase_tlstream_tl_new_ctx(
+    struct kbase_tlstream *stream,
+    const void *ctx,
+    u32 ctx_nr,
+    u32 tgid);
+void mali_kbase_kbase_tlstream_tl_new_gpu(
+    struct kbase_tlstream *stream,
+    const void *gpu,
+    u32 gpu_id,
+    u32 core_count);
+void mali_kbase_kbase_tlstream_tl_new_lpu(
+    struct kbase_tlstream *stream,
+    const void *lpu,
+    u32 lpu_nr,
+    u32 lpu_fn);
+void mali_kbase_kbase_tlstream_tl_new_atom(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u32 atom_nr);
+void mali_kbase_kbase_tlstream_tl_new_as(
+    struct kbase_tlstream *stream,
+    const void *address_space,
+    u32 as_nr);
+void mali_kbase_kbase_tlstream_tl_del_ctx(
+    struct kbase_tlstream *stream,
+    const void *ctx);
+void mali_kbase_kbase_tlstream_tl_del_atom(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_lifelink_lpu_gpu(
+    struct kbase_tlstream *stream,
+    const void *lpu,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_tl_lifelink_as_gpu(
+    struct kbase_tlstream *stream,
+    const void *address_space,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_tl_ret_ctx_lpu(
+    struct kbase_tlstream *stream,
+    const void *ctx,
+    const void *lpu);
+void mali_kbase_kbase_tlstream_tl_ret_atom_ctx(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *ctx);
+void mali_kbase_kbase_tlstream_tl_ret_atom_lpu(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *lpu,
+    const char *attrib_match_list);
+void mali_kbase_kbase_tlstream_tl_nret_ctx_lpu(
+    struct kbase_tlstream *stream,
+    const void *ctx,
+    const void *lpu);
+void mali_kbase_kbase_tlstream_tl_nret_atom_ctx(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *ctx);
+void mali_kbase_kbase_tlstream_tl_nret_atom_lpu(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *lpu);
+void mali_kbase_kbase_tlstream_tl_ret_as_ctx(
+    struct kbase_tlstream *stream,
+    const void *address_space,
+    const void *ctx);
+void mali_kbase_kbase_tlstream_tl_nret_as_ctx(
+    struct kbase_tlstream *stream,
+    const void *address_space,
+    const void *ctx);
+void mali_kbase_kbase_tlstream_tl_ret_atom_as(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *address_space);
+void mali_kbase_kbase_tlstream_tl_nret_atom_as(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    const void *address_space);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_config(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u64 descriptor,
+    u64 affinity,
+    u32 config);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_priority(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u32 prio);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_state(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u32 state);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_prioritized(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_jit(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u64 edit_addr,
+    u64 new_addr,
+    u32 jit_flags,
+    u64 mem_flags,
+    u32 j_id,
+    u64 com_pgs,
+    u64 extent,
+    u64 va_pgs);
+void mali_kbase_kbase_tlstream_tl_jit_usedpages(
+    struct kbase_tlstream *stream,
+    u64 used_pages,
+    u32 j_id);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_jitallocinfo(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u64 va_pgs,
+    u64 com_pgs,
+    u64 extent,
+    u32 j_id,
+    u32 bin_id,
+    u32 max_allocs,
+    u32 jit_flags,
+    u32 usg_id);
+void mali_kbase_kbase_tlstream_tl_attrib_atom_jitfreeinfo(
+    struct kbase_tlstream *stream,
+    const void *atom,
+    u32 j_id);
+void mali_kbase_kbase_tlstream_tl_attrib_as_config(
+    struct kbase_tlstream *stream,
+    const void *address_space,
+    u64 transtab,
+    u64 memattr,
+    u64 transcfg);
+void mali_kbase_kbase_tlstream_tl_event_lpu_softstop(
+    struct kbase_tlstream *stream,
+    const void *lpu);
+void mali_kbase_kbase_tlstream_tl_event_atom_softstop_ex(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_event_atom_softstop_issue(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_event_atom_softjob_start(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_event_atom_softjob_end(
+    struct kbase_tlstream *stream,
+    const void *atom);
+void mali_kbase_kbase_tlstream_tl_arbiter_granted(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_tl_arbiter_started(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_tl_arbiter_stop_requested(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_tl_arbiter_stopped(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_jd_gpu_soft_reset(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_aux_pm_state(
+    struct kbase_tlstream *stream,
+    u32 core_type,
+    u64 core_state_bitset);
+void mali_kbase_kbase_tlstream_aux_pagefault(
+    struct kbase_tlstream *stream,
+    u32 ctx_nr,
+    u32 as_nr,
+    u64 page_cnt_change);
+void mali_kbase_kbase_tlstream_aux_pagesalloc(
+    struct kbase_tlstream *stream,
+    u32 ctx_nr,
+    u64 page_cnt);
+void mali_kbase_kbase_tlstream_aux_devfreq_target(
+    struct kbase_tlstream *stream,
+    u64 target_freq);
+void mali_kbase_kbase_tlstream_aux_protected_enter_start(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_aux_protected_enter_end(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_aux_protected_leave_start(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_aux_protected_leave_end(
+    struct kbase_tlstream *stream,
+    const void *gpu);
+void mali_kbase_kbase_tlstream_aux_jit_stats(
+    struct kbase_tlstream *stream,
+    u32 ctx_nr,
+    u32 bid,
+    u32 max_allocs,
+    u32 allocs,
+    u32 va_pages,
+    u32 ph_pages);
+void mali_kbase_kbase_tlstream_aux_event_job_slot(
+    struct kbase_tlstream *stream,
+    const void *ctx,
+    u32 slot_nr,
+    u32 atom_nr,
+    u32 event);
+void mali_kbase_kbase_tlstream_tl_kbase_new_device(
+    struct kbase_tlstream *stream,
+    u32 kbase_device_id,
+    u32 kbase_device_gpu_core_count,
+    u32 kbase_device_max_num_csgs,
+    u32 kbase_device_as_count);
+void mali_kbase_kbase_tlstream_tl_kbase_device_program_csg(
+    struct kbase_tlstream *stream,
+    u32 kbase_device_id,
+    u32 gpu_cmdq_grp_handle,
+    u32 kbase_device_csg_slot_index);
+void mali_kbase_kbase_tlstream_tl_kbase_device_deprogram_csg(
+    struct kbase_tlstream *stream,
+    u32 kbase_device_id,
+    u32 kbase_device_csg_slot_index);
+void mali_kbase_kbase_tlstream_tl_kbase_new_ctx(
+    struct kbase_tlstream *stream,
+    u32 kernel_ctx_id,
+    u32 kbase_device_id);
+void mali_kbase_kbase_tlstream_tl_kbase_del_ctx(
+    struct kbase_tlstream *stream,
+    u32 kernel_ctx_id);
+void mali_kbase_kbase_tlstream_tl_kbase_ctx_assign_as(
+    struct kbase_tlstream *stream,
+    u32 kernel_ctx_id,
+    u32 kbase_device_as_index);
+void mali_kbase_kbase_tlstream_tl_kbase_ctx_unassign_as(
+    struct kbase_tlstream *stream,
+    u32 kernel_ctx_id);
+void mali_kbase_kbase_tlstream_tl_kbase_new_kcpuqueue(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u32 kernel_ctx_id,
+    u32 kcpuq_num_pending_cmds);
+void mali_kbase_kbase_tlstream_tl_kbase_del_kcpuqueue(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_signal(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    const void *fence);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_wait(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    const void *fence);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_wait(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 cqs_obj_gpu_addr,
+    u32 cqs_obj_compare_value);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_set(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 cqs_obj_gpu_addr);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_map_import(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 map_import_buf_gpu_addr);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 map_import_buf_gpu_addr);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import_force(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 map_import_buf_gpu_addr);
+void mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_alloc(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_alloc(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 jit_alloc_gpu_alloc_addr_dest,
+    u64 jit_alloc_va_pages,
+    u64 jit_alloc_commit_pages,
+    u64 jit_alloc_extent,
+    u32 jit_alloc_jit_id,
+    u32 jit_alloc_bin_id,
+    u32 jit_alloc_max_allocations,
+    u32 jit_alloc_flags,
+    u32 jit_alloc_usage_id);
+void mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_alloc(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_free(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_free(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u32 jit_alloc_jit_id);
+void mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_free(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_set(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_alloc_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_alloc_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_alloc_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 jit_alloc_gpu_alloc_addr,
+    u64 jit_alloc_mmu_flags);
+void mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_alloc_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_free_start(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_free_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_free_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue,
+    u64 jit_free_pages_used);
+void mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_free_end(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_errorbarrier(
+    struct kbase_tlstream *stream,
+    const void *kcpu_queue);
+void mali_kbase_kbase_tlstream_tl_kbase_csffw_tlstream_overflow(
+    struct kbase_tlstream *stream,
+    u64 csffw_timestamp,
+    u64 csffw_cycle);
+void mali_kbase_kbase_tlstream_tl_kbase_csffw_reset(
+    struct kbase_tlstream *stream,
+    u64 csffw_cycle);
 
 struct kbase_tlstream;
 
@@ -465,19 +465,19 @@ struct kbase_tlstream;
  * @ctx_nr: Kernel context number
  * @tgid: Thread Group Id
  */
-#define KBASE_TLSTREAM_TL_NEW_CTX(	\
-	kbdev,	\
-	ctx,	\
-	ctx_nr,	\
-	tgid	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_new_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				ctx, ctx_nr, tgid);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NEW_CTX(    \
+    kbdev,    \
+    ctx,    \
+    ctx_nr,    \
+    tgid    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_new_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                ctx, ctx_nr, tgid);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_GPU -
@@ -488,19 +488,19 @@ struct kbase_tlstream;
  * @gpu_id: Name of the GPU object
  * @core_count: Number of cores this GPU hosts
  */
-#define KBASE_TLSTREAM_TL_NEW_GPU(	\
-	kbdev,	\
-	gpu,	\
-	gpu_id,	\
-	core_count	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_new_gpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu, gpu_id, core_count);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NEW_GPU(    \
+    kbdev,    \
+    gpu,    \
+    gpu_id,    \
+    core_count    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_new_gpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu, gpu_id, core_count);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_LPU -
@@ -511,19 +511,19 @@ struct kbase_tlstream;
  * @lpu_nr: Sequential number assigned to the newly created LPU
  * @lpu_fn: Property describing functional abilities of this LPU
  */
-#define KBASE_TLSTREAM_TL_NEW_LPU(	\
-	kbdev,	\
-	lpu,	\
-	lpu_nr,	\
-	lpu_fn	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_new_lpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				lpu, lpu_nr, lpu_fn);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NEW_LPU(    \
+    kbdev,    \
+    lpu,    \
+    lpu_nr,    \
+    lpu_fn    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_new_lpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                lpu, lpu_nr, lpu_fn);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_ATOM -
@@ -533,18 +533,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @atom_nr: Sequential number of an atom
  */
-#define KBASE_TLSTREAM_TL_NEW_ATOM(	\
-	kbdev,	\
-	atom,	\
-	atom_nr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_new_atom(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, atom_nr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NEW_ATOM(    \
+    kbdev,    \
+    atom,    \
+    atom_nr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_new_atom(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, atom_nr);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NEW_AS -
@@ -554,18 +554,18 @@ struct kbase_tlstream;
  * @address_space: Name of the address space object
  * @as_nr: Address space number
  */
-#define KBASE_TLSTREAM_TL_NEW_AS(	\
-	kbdev,	\
-	address_space,	\
-	as_nr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_new_as(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				address_space, as_nr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NEW_AS(    \
+    kbdev,    \
+    address_space,    \
+    as_nr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_new_as(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                address_space, as_nr);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_DEL_CTX -
@@ -574,17 +574,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @ctx: Name of the context object
  */
-#define KBASE_TLSTREAM_TL_DEL_CTX(	\
-	kbdev,	\
-	ctx	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_del_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				ctx);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_DEL_CTX(    \
+    kbdev,    \
+    ctx    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_del_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                ctx);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_DEL_ATOM -
@@ -593,17 +593,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_DEL_ATOM(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_del_atom(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_DEL_ATOM(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_del_atom(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_LIFELINK_LPU_GPU -
@@ -613,18 +613,18 @@ struct kbase_tlstream;
  * @lpu: Name of the Logical Processing Unit object
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_LIFELINK_LPU_GPU(	\
-	kbdev,	\
-	lpu,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_lifelink_lpu_gpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				lpu, gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_LIFELINK_LPU_GPU(    \
+    kbdev,    \
+    lpu,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_lifelink_lpu_gpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                lpu, gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_LIFELINK_AS_GPU -
@@ -634,18 +634,18 @@ struct kbase_tlstream;
  * @address_space: Name of the address space object
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_LIFELINK_AS_GPU(	\
-	kbdev,	\
-	address_space,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_lifelink_as_gpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				address_space, gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_LIFELINK_AS_GPU(    \
+    kbdev,    \
+    address_space,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_lifelink_as_gpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                address_space, gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_RET_CTX_LPU -
@@ -655,18 +655,18 @@ struct kbase_tlstream;
  * @ctx: Name of the context object
  * @lpu: Name of the Logical Processing Unit object
  */
-#define KBASE_TLSTREAM_TL_RET_CTX_LPU(	\
-	kbdev,	\
-	ctx,	\
-	lpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_ret_ctx_lpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				ctx, lpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_RET_CTX_LPU(    \
+    kbdev,    \
+    ctx,    \
+    lpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_ret_ctx_lpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                ctx, lpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_CTX -
@@ -676,18 +676,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @ctx: Name of the context object
  */
-#define KBASE_TLSTREAM_TL_RET_ATOM_CTX(	\
-	kbdev,	\
-	atom,	\
-	ctx	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_ret_atom_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, ctx);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_RET_ATOM_CTX(    \
+    kbdev,    \
+    atom,    \
+    ctx    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_ret_atom_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, ctx);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_LPU -
@@ -698,19 +698,19 @@ struct kbase_tlstream;
  * @lpu: Name of the Logical Processing Unit object
  * @attrib_match_list: List containing match operator attributes
  */
-#define KBASE_TLSTREAM_TL_RET_ATOM_LPU(	\
-	kbdev,	\
-	atom,	\
-	lpu,	\
-	attrib_match_list	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_ret_atom_lpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, lpu, attrib_match_list);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_RET_ATOM_LPU(    \
+    kbdev,    \
+    atom,    \
+    lpu,    \
+    attrib_match_list    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_ret_atom_lpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, lpu, attrib_match_list);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_CTX_LPU -
@@ -720,18 +720,18 @@ struct kbase_tlstream;
  * @ctx: Name of the context object
  * @lpu: Name of the Logical Processing Unit object
  */
-#define KBASE_TLSTREAM_TL_NRET_CTX_LPU(	\
-	kbdev,	\
-	ctx,	\
-	lpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_nret_ctx_lpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				ctx, lpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NRET_CTX_LPU(    \
+    kbdev,    \
+    ctx,    \
+    lpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_nret_ctx_lpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                ctx, lpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_CTX -
@@ -741,18 +741,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @ctx: Name of the context object
  */
-#define KBASE_TLSTREAM_TL_NRET_ATOM_CTX(	\
-	kbdev,	\
-	atom,	\
-	ctx	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_nret_atom_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, ctx);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NRET_ATOM_CTX(    \
+    kbdev,    \
+    atom,    \
+    ctx    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_nret_atom_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, ctx);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_LPU -
@@ -762,18 +762,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @lpu: Name of the Logical Processing Unit object
  */
-#define KBASE_TLSTREAM_TL_NRET_ATOM_LPU(	\
-	kbdev,	\
-	atom,	\
-	lpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_nret_atom_lpu(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, lpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NRET_ATOM_LPU(    \
+    kbdev,    \
+    atom,    \
+    lpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_nret_atom_lpu(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, lpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_RET_AS_CTX -
@@ -783,18 +783,18 @@ struct kbase_tlstream;
  * @address_space: Name of the address space object
  * @ctx: Name of the context object
  */
-#define KBASE_TLSTREAM_TL_RET_AS_CTX(	\
-	kbdev,	\
-	address_space,	\
-	ctx	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_ret_as_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				address_space, ctx);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_RET_AS_CTX(    \
+    kbdev,    \
+    address_space,    \
+    ctx    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_ret_as_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                address_space, ctx);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_AS_CTX -
@@ -804,18 +804,18 @@ struct kbase_tlstream;
  * @address_space: Name of the address space object
  * @ctx: Name of the context object
  */
-#define KBASE_TLSTREAM_TL_NRET_AS_CTX(	\
-	kbdev,	\
-	address_space,	\
-	ctx	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_nret_as_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				address_space, ctx);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NRET_AS_CTX(    \
+    kbdev,    \
+    address_space,    \
+    ctx    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_nret_as_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                address_space, ctx);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_RET_ATOM_AS -
@@ -825,18 +825,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @address_space: Name of the address space object
  */
-#define KBASE_TLSTREAM_TL_RET_ATOM_AS(	\
-	kbdev,	\
-	atom,	\
-	address_space	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_ret_atom_as(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, address_space);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_RET_ATOM_AS(    \
+    kbdev,    \
+    atom,    \
+    address_space    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_ret_atom_as(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, address_space);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_NRET_ATOM_AS -
@@ -846,18 +846,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @address_space: Name of the address space object
  */
-#define KBASE_TLSTREAM_TL_NRET_ATOM_AS(	\
-	kbdev,	\
-	atom,	\
-	address_space	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_nret_atom_as(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, address_space);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_NRET_ATOM_AS(    \
+    kbdev,    \
+    atom,    \
+    address_space    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_nret_atom_as(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, address_space);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_CONFIG -
@@ -869,20 +869,20 @@ struct kbase_tlstream;
  * @affinity: Job affinity
  * @config: Job config
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_CONFIG(	\
-	kbdev,	\
-	atom,	\
-	descriptor,	\
-	affinity,	\
-	config	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_attrib_atom_config(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, descriptor, affinity, config);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_CONFIG(    \
+    kbdev,    \
+    atom,    \
+    descriptor,    \
+    affinity,    \
+    config    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_config(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, descriptor, affinity, config);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY -
@@ -892,18 +892,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @prio: Atom priority
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY(	\
-	kbdev,	\
-	atom,	\
-	prio	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_tl_attrib_atom_priority(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, prio);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITY(    \
+    kbdev,    \
+    atom,    \
+    prio    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_priority(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, prio);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_STATE -
@@ -913,18 +913,18 @@ struct kbase_tlstream;
  * @atom: Atom identifier
  * @state: Atom state
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_STATE(	\
-	kbdev,	\
-	atom,	\
-	state	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_tl_attrib_atom_state(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, state);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_STATE(    \
+    kbdev,    \
+    atom,    \
+    state    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_state(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, state);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITIZED -
@@ -933,17 +933,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITIZED(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_tl_attrib_atom_prioritized(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_PRIORITIZED(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_prioritized(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_JIT -
@@ -964,25 +964,25 @@ struct kbase_tlstream;
  * allocation by during a fault.
  * @va_pgs: The minimum number of virtual pages required
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JIT(	\
-	kbdev,	\
-	atom,	\
-	edit_addr,	\
-	new_addr,	\
-	jit_flags,	\
-	mem_flags,	\
-	j_id,	\
-	com_pgs,	\
-	extent,	\
-	va_pgs	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_JOB_DUMPING_ENABLED)	\
-			__kbase_tlstream_tl_attrib_atom_jit(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, edit_addr, new_addr, jit_flags, mem_flags, j_id, com_pgs, extent, va_pgs);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JIT(    \
+    kbdev,    \
+    atom,    \
+    edit_addr,    \
+    new_addr,    \
+    jit_flags,    \
+    mem_flags,    \
+    j_id,    \
+    com_pgs,    \
+    extent,    \
+    va_pgs    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_JOB_DUMPING_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_jit(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, edit_addr, new_addr, jit_flags, mem_flags, j_id, com_pgs, extent, va_pgs);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_JIT_USEDPAGES -
@@ -993,18 +993,18 @@ struct kbase_tlstream;
  * @j_id: Unique ID provided by the caller, this is used
  * to pair allocation and free requests.
  */
-#define KBASE_TLSTREAM_TL_JIT_USEDPAGES(	\
-	kbdev,	\
-	used_pages,	\
-	j_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_jit_usedpages(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				used_pages, j_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_JIT_USEDPAGES(    \
+    kbdev,    \
+    used_pages,    \
+    j_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_jit_usedpages(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                used_pages, j_id);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITALLOCINFO -
@@ -1027,25 +1027,25 @@ struct kbase_tlstream;
  * the JIT allocation.
  * @usg_id: A hint about which allocation should be reused.
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITALLOCINFO(	\
-	kbdev,	\
-	atom,	\
-	va_pgs,	\
-	com_pgs,	\
-	extent,	\
-	j_id,	\
-	bin_id,	\
-	max_allocs,	\
-	jit_flags,	\
-	usg_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_attrib_atom_jitallocinfo(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, va_pgs, com_pgs, extent, j_id, bin_id, max_allocs, jit_flags, usg_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITALLOCINFO(    \
+    kbdev,    \
+    atom,    \
+    va_pgs,    \
+    com_pgs,    \
+    extent,    \
+    j_id,    \
+    bin_id,    \
+    max_allocs,    \
+    jit_flags,    \
+    usg_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_jitallocinfo(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, va_pgs, com_pgs, extent, j_id, bin_id, max_allocs, jit_flags, usg_id);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITFREEINFO -
@@ -1056,18 +1056,18 @@ struct kbase_tlstream;
  * @j_id: Unique ID provided by the caller, this is used
  * to pair allocation and free requests.
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITFREEINFO(	\
-	kbdev,	\
-	atom,	\
-	j_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_attrib_atom_jitfreeinfo(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom, j_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_ATOM_JITFREEINFO(    \
+    kbdev,    \
+    atom,    \
+    j_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_attrib_atom_jitfreeinfo(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom, j_id);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG -
@@ -1079,20 +1079,20 @@ struct kbase_tlstream;
  * @memattr: Configuration of the MEMATTR register
  * @transcfg: Configuration of the TRANSCFG register (or zero if not present)
  */
-#define KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(	\
-	kbdev,	\
-	address_space,	\
-	transtab,	\
-	memattr,	\
-	transcfg	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_attrib_as_config(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				address_space, transtab, memattr, transcfg);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(    \
+    kbdev,    \
+    address_space,    \
+    transtab,    \
+    memattr,    \
+    transcfg    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_attrib_as_config(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                address_space, transtab, memattr, transcfg);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_LPU_SOFTSTOP -
@@ -1101,17 +1101,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @lpu: Name of the Logical Processing Unit object
  */
-#define KBASE_TLSTREAM_TL_EVENT_LPU_SOFTSTOP(	\
-	kbdev,	\
-	lpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_event_lpu_softstop(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				lpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_EVENT_LPU_SOFTSTOP(    \
+    kbdev,    \
+    lpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_event_lpu_softstop(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                lpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_EX -
@@ -1120,17 +1120,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_EX(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_event_atom_softstop_ex(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_EX(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_event_atom_softstop_ex(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_ISSUE -
@@ -1139,17 +1139,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_ISSUE(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_event_atom_softstop_issue(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTSTOP_ISSUE(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_event_atom_softstop_issue(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_START -
@@ -1158,17 +1158,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_START(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_event_atom_softjob_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_START(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_event_atom_softjob_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_END -
@@ -1177,17 +1177,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @atom: Atom identifier
  */
-#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_END(	\
-	kbdev,	\
-	atom	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_event_atom_softjob_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				atom);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_EVENT_ATOM_SOFTJOB_END(    \
+    kbdev,    \
+    atom    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_event_atom_softjob_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                atom);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ARBITER_GRANTED -
@@ -1196,17 +1196,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_ARBITER_GRANTED(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_arbiter_granted(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ARBITER_GRANTED(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_arbiter_granted(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ARBITER_STARTED -
@@ -1215,17 +1215,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_ARBITER_STARTED(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_arbiter_started(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ARBITER_STARTED(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_arbiter_started(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ARBITER_STOP_REQUESTED -
@@ -1234,17 +1234,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_ARBITER_STOP_REQUESTED(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_arbiter_stop_requested(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ARBITER_STOP_REQUESTED(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_arbiter_stop_requested(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_ARBITER_STOPPED -
@@ -1253,17 +1253,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_TL_ARBITER_STOPPED(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_tl_arbiter_stopped(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_ARBITER_STOPPED(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_tl_arbiter_stopped(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_JD_GPU_SOFT_RESET -
@@ -1272,17 +1272,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_JD_GPU_SOFT_RESET(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_jd_gpu_soft_reset(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_JD_GPU_SOFT_RESET(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_jd_gpu_soft_reset(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PM_STATE -
@@ -1293,18 +1293,18 @@ struct kbase_tlstream;
  * @core_state_bitset: 64bits bitmask reporting power state of the cores
  * (1-ON, 0-OFF)
  */
-#define KBASE_TLSTREAM_AUX_PM_STATE(	\
-	kbdev,	\
-	core_type,	\
-	core_state_bitset	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pm_state(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				core_type, core_state_bitset);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PM_STATE(    \
+    kbdev,    \
+    core_type,    \
+    core_state_bitset    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pm_state(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                core_type, core_state_bitset);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PAGEFAULT -
@@ -1315,19 +1315,19 @@ struct kbase_tlstream;
  * @as_nr: Address space number
  * @page_cnt_change: Number of pages to be added
  */
-#define KBASE_TLSTREAM_AUX_PAGEFAULT(	\
-	kbdev,	\
-	ctx_nr,	\
-	as_nr,	\
-	page_cnt_change	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pagefault(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx_nr, as_nr, page_cnt_change);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PAGEFAULT(    \
+    kbdev,    \
+    ctx_nr,    \
+    as_nr,    \
+    page_cnt_change    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pagefault(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx_nr, as_nr, page_cnt_change);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PAGESALLOC -
@@ -1337,18 +1337,18 @@ struct kbase_tlstream;
  * @ctx_nr: Kernel context number
  * @page_cnt: Number of pages used by the context
  */
-#define KBASE_TLSTREAM_AUX_PAGESALLOC(	\
-	kbdev,	\
-	ctx_nr,	\
-	page_cnt	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pagesalloc(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx_nr, page_cnt);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PAGESALLOC(    \
+    kbdev,    \
+    ctx_nr,    \
+    page_cnt    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pagesalloc(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx_nr, page_cnt);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_DEVFREQ_TARGET -
@@ -1357,17 +1357,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @target_freq: New target frequency
  */
-#define KBASE_TLSTREAM_AUX_DEVFREQ_TARGET(	\
-	kbdev,	\
-	target_freq	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_devfreq_target(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				target_freq);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_DEVFREQ_TARGET(    \
+    kbdev,    \
+    target_freq    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_devfreq_target(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                target_freq);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_ENTER_START -
@@ -1376,17 +1376,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_START(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_aux_protected_enter_start(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_START(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_aux_protected_enter_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_ENTER_END -
@@ -1395,17 +1395,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_END(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_aux_protected_enter_end(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PROTECTED_ENTER_END(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_aux_protected_enter_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_START -
@@ -1414,17 +1414,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_START(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_aux_protected_leave_start(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_START(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_aux_protected_leave_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_END -
@@ -1433,17 +1433,17 @@ struct kbase_tlstream;
  * @kbdev: Kbase device
  * @gpu: Name of the GPU object
  */
-#define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_END(	\
-	kbdev,	\
-	gpu	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)	\
-			__kbase_tlstream_aux_protected_leave_end(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				gpu);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PROTECTED_LEAVE_END(    \
+    kbdev,    \
+    gpu    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_aux_protected_leave_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                gpu);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_JIT_STATS -
@@ -1457,22 +1457,22 @@ struct kbase_tlstream;
  * @va_pages: Number of virtual pages allocated in this bin
  * @ph_pages: Number of physical pages allocated in this bin
  */
-#define KBASE_TLSTREAM_AUX_JIT_STATS(	\
-	kbdev,	\
-	ctx_nr,	\
-	bid,	\
-	max_allocs,	\
-	allocs,	\
-	va_pages,	\
-	ph_pages	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_jit_stats(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx_nr, bid, max_allocs, allocs, va_pages, ph_pages);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_JIT_STATS(    \
+    kbdev,    \
+    ctx_nr,    \
+    bid,    \
+    max_allocs,    \
+    allocs,    \
+    va_pages,    \
+    ph_pages    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_jit_stats(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx_nr, bid, max_allocs, allocs, va_pages, ph_pages);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT -
@@ -1484,20 +1484,20 @@ struct kbase_tlstream;
  * @atom_nr: Sequential number of an atom
  * @event: Event type. One of TL_JS_EVENT values
  */
-#define KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT(	\
-	kbdev,	\
-	ctx,	\
-	slot_nr,	\
-	atom_nr,	\
-	event	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_event_job_slot(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx, slot_nr, atom_nr, event);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT(    \
+    kbdev,    \
+    ctx,    \
+    slot_nr,    \
+    atom_nr,    \
+    event    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_event_job_slot(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx, slot_nr, atom_nr, event);    \
+    } while (0)
 
 /**
  * KBASE_TLSTREAM_TL_KBASE_NEW_DEVICE -
@@ -1510,29 +1510,29 @@ struct kbase_tlstream;
  * @kbase_device_as_count: The number of address spaces the physical hardware has available
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_NEW_DEVICE(	\
-	kbdev,	\
-	kbase_device_id,	\
-	kbase_device_gpu_core_count,	\
-	kbase_device_max_num_csgs,	\
-	kbase_device_as_count	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_new_device(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kbase_device_id, kbase_device_gpu_core_count, kbase_device_max_num_csgs, kbase_device_as_count);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_DEVICE(    \
+    kbdev,    \
+    kbase_device_id,    \
+    kbase_device_gpu_core_count,    \
+    kbase_device_max_num_csgs,    \
+    kbase_device_as_count    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_new_device(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kbase_device_id, kbase_device_gpu_core_count, kbase_device_max_num_csgs, kbase_device_as_count);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_NEW_DEVICE(	\
-	kbdev,	\
-	kbase_device_id,	\
-	kbase_device_gpu_core_count,	\
-	kbase_device_max_num_csgs,	\
-	kbase_device_as_count	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_DEVICE(    \
+    kbdev,    \
+    kbase_device_id,    \
+    kbase_device_gpu_core_count,    \
+    kbase_device_max_num_csgs,    \
+    kbase_device_as_count    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1545,27 +1545,27 @@ struct kbase_tlstream;
  * @kbase_device_csg_slot_index: The index of the slot in the scheduler being programmed
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_DEVICE_PROGRAM_CSG(	\
-	kbdev,	\
-	kbase_device_id,	\
-	gpu_cmdq_grp_handle,	\
-	kbase_device_csg_slot_index	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_device_program_csg(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kbase_device_id, gpu_cmdq_grp_handle, kbase_device_csg_slot_index);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEVICE_PROGRAM_CSG(    \
+    kbdev,    \
+    kbase_device_id,    \
+    gpu_cmdq_grp_handle,    \
+    kbase_device_csg_slot_index    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_device_program_csg(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kbase_device_id, gpu_cmdq_grp_handle, kbase_device_csg_slot_index);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_DEVICE_PROGRAM_CSG(	\
-	kbdev,	\
-	kbase_device_id,	\
-	gpu_cmdq_grp_handle,	\
-	kbase_device_csg_slot_index	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEVICE_PROGRAM_CSG(    \
+    kbdev,    \
+    kbase_device_id,    \
+    gpu_cmdq_grp_handle,    \
+    kbase_device_csg_slot_index    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1577,25 +1577,25 @@ struct kbase_tlstream;
  * @kbase_device_csg_slot_index: The index of the slot in the scheduler being programmed
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_DEVICE_DEPROGRAM_CSG(	\
-	kbdev,	\
-	kbase_device_id,	\
-	kbase_device_csg_slot_index	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_device_deprogram_csg(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kbase_device_id, kbase_device_csg_slot_index);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEVICE_DEPROGRAM_CSG(    \
+    kbdev,    \
+    kbase_device_id,    \
+    kbase_device_csg_slot_index    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_device_deprogram_csg(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kbase_device_id, kbase_device_csg_slot_index);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_DEVICE_DEPROGRAM_CSG(	\
-	kbdev,	\
-	kbase_device_id,	\
-	kbase_device_csg_slot_index	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEVICE_DEPROGRAM_CSG(    \
+    kbdev,    \
+    kbase_device_id,    \
+    kbase_device_csg_slot_index    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1607,25 +1607,25 @@ struct kbase_tlstream;
  * @kbase_device_id: The id of the physical hardware
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_NEW_CTX(	\
-	kbdev,	\
-	kernel_ctx_id,	\
-	kbase_device_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_new_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kernel_ctx_id, kbase_device_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_CTX(    \
+    kbdev,    \
+    kernel_ctx_id,    \
+    kbase_device_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_new_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kernel_ctx_id, kbase_device_id);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_NEW_CTX(	\
-	kbdev,	\
-	kernel_ctx_id,	\
-	kbase_device_id	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_CTX(    \
+    kbdev,    \
+    kernel_ctx_id,    \
+    kbase_device_id    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1636,23 +1636,23 @@ struct kbase_tlstream;
  * @kernel_ctx_id: Unique ID for the KBase Context
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_DEL_CTX(	\
-	kbdev,	\
-	kernel_ctx_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_del_ctx(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kernel_ctx_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEL_CTX(    \
+    kbdev,    \
+    kernel_ctx_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_del_ctx(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kernel_ctx_id);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_DEL_CTX(	\
-	kbdev,	\
-	kernel_ctx_id	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEL_CTX(    \
+    kbdev,    \
+    kernel_ctx_id    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1664,25 +1664,25 @@ struct kbase_tlstream;
  * @kbase_device_as_index: The index of the device address space being assigned
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(	\
-	kbdev,	\
-	kernel_ctx_id,	\
-	kbase_device_as_index	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_ctx_assign_as(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kernel_ctx_id, kbase_device_as_index);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(    \
+    kbdev,    \
+    kernel_ctx_id,    \
+    kbase_device_as_index    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_ctx_assign_as(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kernel_ctx_id, kbase_device_as_index);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(	\
-	kbdev,	\
-	kernel_ctx_id,	\
-	kbase_device_as_index	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(    \
+    kbdev,    \
+    kernel_ctx_id,    \
+    kbase_device_as_index    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1693,23 +1693,23 @@ struct kbase_tlstream;
  * @kernel_ctx_id: Unique ID for the KBase Context
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(	\
-	kbdev,	\
-	kernel_ctx_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_ctx_unassign_as(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kernel_ctx_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(    \
+    kbdev,    \
+    kernel_ctx_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_ctx_unassign_as(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kernel_ctx_id);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(	\
-	kbdev,	\
-	kernel_ctx_id	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(    \
+    kbdev,    \
+    kernel_ctx_id    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1723,27 +1723,27 @@ struct kbase_tlstream;
  * in the KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_NEW_KCPUQUEUE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	kernel_ctx_id,	\
-	kcpuq_num_pending_cmds	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_new_kcpuqueue(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, kernel_ctx_id, kcpuq_num_pending_cmds);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_KCPUQUEUE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    kernel_ctx_id,    \
+    kcpuq_num_pending_cmds    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_new_kcpuqueue(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, kernel_ctx_id, kcpuq_num_pending_cmds);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_NEW_KCPUQUEUE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	kernel_ctx_id,	\
-	kcpuq_num_pending_cmds	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_NEW_KCPUQUEUE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    kernel_ctx_id,    \
+    kcpuq_num_pending_cmds    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1754,23 +1754,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_DEL_KCPUQUEUE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_del_kcpuqueue(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEL_KCPUQUEUE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_del_kcpuqueue(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_DEL_KCPUQUEUE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_DEL_KCPUQUEUE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1782,25 +1782,25 @@ struct kbase_tlstream;
  * @fence: Fence object handle
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_SIGNAL(	\
-	kbdev,	\
-	kcpu_queue,	\
-	fence	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_signal(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, fence);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_SIGNAL(    \
+    kbdev,    \
+    kcpu_queue,    \
+    fence    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_signal(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, fence);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_SIGNAL(	\
-	kbdev,	\
-	kcpu_queue,	\
-	fence	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_SIGNAL(    \
+    kbdev,    \
+    kcpu_queue,    \
+    fence    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1812,25 +1812,25 @@ struct kbase_tlstream;
  * @fence: Fence object handle
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_WAIT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	fence	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_wait(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, fence);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_WAIT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    fence    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_fence_wait(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, fence);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_WAIT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	fence	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_FENCE_WAIT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    fence    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1844,27 +1844,27 @@ struct kbase_tlstream;
  * for the WAIT to pass
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_WAIT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	cqs_obj_gpu_addr,	\
-	cqs_obj_compare_value	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_wait(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, cqs_obj_gpu_addr, cqs_obj_compare_value);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_WAIT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    cqs_obj_gpu_addr,    \
+    cqs_obj_compare_value    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_wait(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, cqs_obj_gpu_addr, cqs_obj_compare_value);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_WAIT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	cqs_obj_gpu_addr,	\
-	cqs_obj_compare_value	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_WAIT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    cqs_obj_gpu_addr,    \
+    cqs_obj_compare_value    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1876,25 +1876,25 @@ struct kbase_tlstream;
  * @cqs_obj_gpu_addr: CQS Object GPU ptr
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_SET(	\
-	kbdev,	\
-	kcpu_queue,	\
-	cqs_obj_gpu_addr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_set(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, cqs_obj_gpu_addr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_SET(    \
+    kbdev,    \
+    kcpu_queue,    \
+    cqs_obj_gpu_addr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_cqs_set(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, cqs_obj_gpu_addr);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_SET(	\
-	kbdev,	\
-	kcpu_queue,	\
-	cqs_obj_gpu_addr	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_CQS_SET(    \
+    kbdev,    \
+    kcpu_queue,    \
+    cqs_obj_gpu_addr    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1906,25 +1906,25 @@ struct kbase_tlstream;
  * @map_import_buf_gpu_addr: Map import buffer GPU ptr
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_MAP_IMPORT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_map_import(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, map_import_buf_gpu_addr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_MAP_IMPORT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_map_import(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, map_import_buf_gpu_addr);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_MAP_IMPORT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_MAP_IMPORT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1936,25 +1936,25 @@ struct kbase_tlstream;
  * @map_import_buf_gpu_addr: Map import buffer GPU ptr
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, map_import_buf_gpu_addr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, map_import_buf_gpu_addr);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1966,25 +1966,25 @@ struct kbase_tlstream;
  * @map_import_buf_gpu_addr: Map import buffer GPU ptr
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT_FORCE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import_force(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, map_import_buf_gpu_addr);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT_FORCE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_enqueue_unmap_import_force(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, map_import_buf_gpu_addr);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT_FORCE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	map_import_buf_gpu_addr	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_ENQUEUE_UNMAP_IMPORT_FORCE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    map_import_buf_gpu_addr    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -1995,23 +1995,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_alloc(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_alloc(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2041,41 +2041,41 @@ struct kbase_tlstream;
  * usage_id
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_gpu_alloc_addr_dest,	\
-	jit_alloc_va_pages,	\
-	jit_alloc_commit_pages,	\
-	jit_alloc_extent,	\
-	jit_alloc_jit_id,	\
-	jit_alloc_bin_id,	\
-	jit_alloc_max_allocations,	\
-	jit_alloc_flags,	\
-	jit_alloc_usage_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_alloc(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, jit_alloc_gpu_alloc_addr_dest, jit_alloc_va_pages, jit_alloc_commit_pages, jit_alloc_extent, jit_alloc_jit_id, jit_alloc_bin_id, jit_alloc_max_allocations, jit_alloc_flags, jit_alloc_usage_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_gpu_alloc_addr_dest,    \
+    jit_alloc_va_pages,    \
+    jit_alloc_commit_pages,    \
+    jit_alloc_extent,    \
+    jit_alloc_jit_id,    \
+    jit_alloc_bin_id,    \
+    jit_alloc_max_allocations,    \
+    jit_alloc_flags,    \
+    jit_alloc_usage_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_alloc(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, jit_alloc_gpu_alloc_addr_dest, jit_alloc_va_pages, jit_alloc_commit_pages, jit_alloc_extent, jit_alloc_jit_id, jit_alloc_bin_id, jit_alloc_max_allocations, jit_alloc_flags, jit_alloc_usage_id);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_gpu_alloc_addr_dest,	\
-	jit_alloc_va_pages,	\
-	jit_alloc_commit_pages,	\
-	jit_alloc_extent,	\
-	jit_alloc_jit_id,	\
-	jit_alloc_bin_id,	\
-	jit_alloc_max_allocations,	\
-	jit_alloc_flags,	\
-	jit_alloc_usage_id	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_gpu_alloc_addr_dest,    \
+    jit_alloc_va_pages,    \
+    jit_alloc_commit_pages,    \
+    jit_alloc_extent,    \
+    jit_alloc_jit_id,    \
+    jit_alloc_bin_id,    \
+    jit_alloc_max_allocations,    \
+    jit_alloc_flags,    \
+    jit_alloc_usage_id    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2086,23 +2086,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_alloc(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_alloc(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_ALLOC(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2113,23 +2113,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_free(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_enqueue_jit_free(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2142,25 +2142,25 @@ struct kbase_tlstream;
  * to pair allocation and free requests. Zero is not a valid value
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_jit_id	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_free(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, jit_alloc_jit_id);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_jit_id    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_free(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, jit_alloc_jit_id);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_jit_id	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_jit_id    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2171,23 +2171,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_free(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_enqueue_jit_free(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_FREE(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_FREE(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2198,23 +2198,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2225,23 +2225,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_signal_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_SIGNAL_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2252,23 +2252,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2279,23 +2279,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_fence_wait_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_FENCE_WAIT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2306,23 +2306,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2333,23 +2333,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_wait_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_WAIT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2360,23 +2360,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_SET(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_set(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_SET(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_cqs_set(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_SET(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_CQS_SET(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2387,23 +2387,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2414,23 +2414,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_map_import_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_MAP_IMPORT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2441,23 +2441,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2468,23 +2468,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2495,23 +2495,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2522,23 +2522,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_unmap_import_force_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_UNMAP_IMPORT_FORCE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2549,23 +2549,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_ALLOC_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_alloc_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_ALLOC_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_alloc_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_ALLOC_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_ALLOC_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2576,23 +2576,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_alloc_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_alloc_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2605,27 +2605,27 @@ struct kbase_tlstream;
  * @jit_alloc_mmu_flags: The MMU flags for the JIT allocation
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_gpu_alloc_addr,	\
-	jit_alloc_mmu_flags	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_alloc_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, jit_alloc_gpu_alloc_addr, jit_alloc_mmu_flags);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_gpu_alloc_addr,    \
+    jit_alloc_mmu_flags    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_alloc_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, jit_alloc_gpu_alloc_addr, jit_alloc_mmu_flags);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_alloc_gpu_alloc_addr,	\
-	jit_alloc_mmu_flags	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_alloc_gpu_alloc_addr,    \
+    jit_alloc_mmu_flags    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2636,23 +2636,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_alloc_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_alloc_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_ALLOC_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2663,23 +2663,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_FREE_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_free_start(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_FREE_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_jit_free_start(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_FREE_START(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_JIT_FREE_START(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2690,23 +2690,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_free_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_begin_kcpuqueue_execute_jit_free_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_BEGIN_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2719,25 +2719,25 @@ struct kbase_tlstream;
  * allocation
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_free_pages_used	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_free_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue, jit_free_pages_used);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_free_pages_used    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_execute_jit_free_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue, jit_free_pages_used);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue,	\
-	jit_free_pages_used	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue,    \
+    jit_free_pages_used    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2748,23 +2748,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_free_end(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_array_end_kcpuqueue_execute_jit_free_end(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_FREE_END(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_ARRAY_END_KCPUQUEUE_EXECUTE_JIT_FREE_END(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2775,23 +2775,23 @@ struct kbase_tlstream;
  * @kcpu_queue: KCPU queue
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_ERRORBARRIER(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_kcpuqueue_execute_errorbarrier(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				kcpu_queue);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_ERRORBARRIER(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_kcpuqueue_execute_errorbarrier(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                kcpu_queue);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_ERRORBARRIER(	\
-	kbdev,	\
-	kcpu_queue	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_KCPUQUEUE_EXECUTE_ERRORBARRIER(    \
+    kbdev,    \
+    kcpu_queue    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2803,25 +2803,25 @@ struct kbase_tlstream;
  * @csffw_cycle: Cycle number of a CSFFW event
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_CSFFW_TLSTREAM_OVERFLOW(	\
-	kbdev,	\
-	csffw_timestamp,	\
-	csffw_cycle	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_csffw_tlstream_overflow(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				csffw_timestamp, csffw_cycle);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CSFFW_TLSTREAM_OVERFLOW(    \
+    kbdev,    \
+    csffw_timestamp,    \
+    csffw_cycle    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_csffw_tlstream_overflow(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                csffw_timestamp, csffw_cycle);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_CSFFW_TLSTREAM_OVERFLOW(	\
-	kbdev,	\
-	csffw_timestamp,	\
-	csffw_cycle	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CSFFW_TLSTREAM_OVERFLOW(    \
+    kbdev,    \
+    csffw_timestamp,    \
+    csffw_cycle    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 /**
@@ -2832,23 +2832,23 @@ struct kbase_tlstream;
  * @csffw_cycle: Cycle number of a CSFFW event
  */
 #if MALI_USE_CSF
-#define KBASE_TLSTREAM_TL_KBASE_CSFFW_RESET(	\
-	kbdev,	\
-	csffw_cycle	\
-	)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		if (enabled & BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)	\
-			__kbase_tlstream_tl_kbase_csffw_reset(	\
-				__TL_DISPATCH_STREAM(kbdev, obj),	\
-				csffw_cycle);	\
-	} while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CSFFW_RESET(    \
+    kbdev,    \
+    csffw_cycle    \
+    )    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        if (enabled & BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)    \
+            mali_kbase_kbase_tlstream_tl_kbase_csffw_reset(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
+                csffw_cycle);    \
+    } while (0)
 #else
-#define KBASE_TLSTREAM_TL_KBASE_CSFFW_RESET(	\
-	kbdev,	\
-	csffw_cycle	\
-	)	\
-	do { } while (0)
+#define KBASE_TLSTREAM_TL_KBASE_CSFFW_RESET(    \
+    kbdev,    \
+    csffw_cycle    \
+    )    \
+    do { } while (0)
 #endif /* MALI_USE_CSF */
 
 
@@ -2863,63 +2863,63 @@ struct kbase_tlstream;
  * with corresponding GATOR_JOB_SLOT values.
  */
 #undef KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT
-#define KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT(kbdev,	\
-	context, slot_nr, atom_nr, event)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		kbase_trace_mali_job_slots_event(kbdev->id,	\
-			GATOR_MAKE_EVENT(event, slot_nr),	\
-			context, (u8) atom_nr);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_event_job_slot(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				context, slot_nr, atom_nr, event);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT(kbdev,    \
+    context, slot_nr, atom_nr, event)    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        kbase_trace_mali_job_slots_event(kbdev->id,    \
+            GATOR_MAKE_EVENT(event, slot_nr),    \
+            context, (u8) atom_nr);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_event_job_slot(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                context, slot_nr, atom_nr, event);    \
+    } while (0)
 
 #undef KBASE_TLSTREAM_AUX_PM_STATE
-#define KBASE_TLSTREAM_AUX_PM_STATE(kbdev, core_type, state)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		kbase_trace_mali_pm_status(kbdev->id,	\
-			core_type, state);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pm_state(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				core_type, state);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PM_STATE(kbdev, core_type, state)    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        kbase_trace_mali_pm_status(kbdev->id,    \
+            core_type, state);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pm_state(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                core_type, state);    \
+    } while (0)
 
 #undef KBASE_TLSTREAM_AUX_PAGEFAULT
-#define KBASE_TLSTREAM_AUX_PAGEFAULT(kbdev,	\
-	ctx_nr, as_nr, page_cnt_change)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		kbase_trace_mali_page_fault_insert_pages(kbdev->id,	\
-			as_nr,	\
-			page_cnt_change);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pagefault(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx_nr, as_nr, page_cnt_change);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PAGEFAULT(kbdev,    \
+    ctx_nr, as_nr, page_cnt_change)    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        kbase_trace_mali_page_fault_insert_pages(kbdev->id,    \
+            as_nr,    \
+            page_cnt_change);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pagefault(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx_nr, as_nr, page_cnt_change);    \
+    } while (0)
 
 /* kbase_trace_mali_total_alloc_pages_change is handled differently here.
  * We stream the total amount of pages allocated for `kbdev` rather
  * than `page_count`, which is per-context.
  */
 #undef KBASE_TLSTREAM_AUX_PAGESALLOC
-#define KBASE_TLSTREAM_AUX_PAGESALLOC(kbdev, ctx_nr, page_cnt)	\
-	do {	\
-		int enabled = atomic_read(&kbdev->timeline_flags);	\
-		u32 global_pages_count =	\
-			atomic_read(&kbdev->memdev.used_pages);	\
-			\
-		kbase_trace_mali_total_alloc_pages_change(kbdev->id,	\
-			global_pages_count);	\
-		if (enabled & TLSTREAM_ENABLED)	\
-			__kbase_tlstream_aux_pagesalloc(	\
-				__TL_DISPATCH_STREAM(kbdev, aux),	\
-				ctx_nr, page_cnt);	\
-	} while (0)
+#define KBASE_TLSTREAM_AUX_PAGESALLOC(kbdev, ctx_nr, page_cnt)    \
+    do {    \
+        int enabled = atomic_read(&kbdev->timeline_flags);    \
+        u32 global_pages_count =    \
+            atomic_read(&kbdev->memdev.used_pages);    \
+            \
+        kbase_trace_mali_total_alloc_pages_change(kbdev->id,    \
+            global_pages_count);    \
+        if (enabled & TLSTREAM_ENABLED)    \
+            mali_kbase_kbase_tlstream_aux_pagesalloc(    \
+                MALI_KBASE_TL_DISPATCH_STREAM(kbdev, aux),    \
+                ctx_nr, page_cnt);    \
+    } while (0)
 #endif /* CONFIG_MALI_BIFROST_GATOR_SUPPORT */
 
 /* clang-format on */

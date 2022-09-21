@@ -7,11 +7,11 @@
 #include "hw.h"
 
 struct rkispp_fec_dev {
-	struct rkispp_hw_dev *hw;
-	struct v4l2_device v4l2_dev;
-	struct video_device vfd;
-	struct mutex apilock;
-	struct completion cmpl;
+    struct rkispp_hw_dev *hw;
+    struct v4l2_device v4l2_dev;
+    struct video_device vfd;
+    struct mutex apilock;
+    struct completion cmpl;
 };
 
 #if IS_ENABLED(CONFIG_VIDEO_ROCKCHIP_ISPP_FEC)

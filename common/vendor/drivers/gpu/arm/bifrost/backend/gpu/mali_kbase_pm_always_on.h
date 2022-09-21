@@ -72,7 +72,7 @@
  * active.
  */
 struct kbasep_pm_policy_always_on {
-	int dummy;
+    int dummy;
 };
 
 extern const struct kbase_pm_policy kbase_pm_always_on_policy_ops;

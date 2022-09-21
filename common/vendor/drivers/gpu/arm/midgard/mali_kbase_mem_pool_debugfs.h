@@ -15,8 +15,8 @@
 
 
 
-#ifndef _KBASE_MEM_POOL_DEBUGFS_H
-#define _KBASE_MEM_POOL_DEBUGFS_H
+#ifndef KBASE_MEM_POOL_DEBUGFS_H
+#define KBASE_MEM_POOL_DEBUGFS_H
 
 #include <mali_kbase.h>
 
@@ -30,7 +30,7 @@
  * - mem_pool_max_size: get/set the max size of @pool
  */
 void kbase_mem_pool_debugfs_init(struct dentry *parent,
-		struct kbase_mem_pool *pool);
+        struct kbase_mem_pool *pool);
 
 #endif  /*_KBASE_MEM_POOL_DEBUGFS_H*/
 

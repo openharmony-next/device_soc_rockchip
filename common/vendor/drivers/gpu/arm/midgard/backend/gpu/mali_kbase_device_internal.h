@@ -36,7 +36,7 @@
  * != KBASEP_AS_NR_INVALID).
  */
 void kbase_reg_write(struct kbase_device *kbdev, u16 offset, u32 value,
-						struct kbase_context *kctx);
+                        struct kbase_context *kctx);
 
 /**
  * kbase_reg_read - read from GPU register
@@ -51,7 +51,7 @@ void kbase_reg_write(struct kbase_device *kbdev, u16 offset, u32 value,
  * Return: Value in desired register
  */
 u32 kbase_reg_read(struct kbase_device *kbdev, u16 offset,
-						struct kbase_context *kctx);
+                        struct kbase_context *kctx);
 
 
 /**

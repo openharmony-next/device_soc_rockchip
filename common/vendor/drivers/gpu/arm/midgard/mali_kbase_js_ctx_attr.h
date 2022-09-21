@@ -116,13 +116,13 @@ bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbas
  */
 static inline s8 kbasep_js_ctx_attr_count_on_runpool(struct kbase_device *kbdev, enum kbasep_js_ctx_attr attribute)
 {
-	struct kbasep_js_device_data *js_devdata;
+    struct kbasep_js_device_data *js_devdata;
 
-	KBASE_DEBUG_ASSERT(kbdev != NULL);
-	KBASE_DEBUG_ASSERT(attribute < KBASEP_JS_CTX_ATTR_COUNT);
-	js_devdata = &kbdev->js_data;
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(attribute < KBASEP_JS_CTX_ATTR_COUNT);
+    js_devdata = &kbdev->js_data;
 
-	return js_devdata->runpool_irq.ctx_attr_ref_count[attribute];
+    return js_devdata->runpool_irq.ctx_attr_ref_count[attribute];
 }
 
 /**
@@ -131,8 +131,8 @@ static inline s8 kbasep_js_ctx_attr_count_on_runpool(struct kbase_device *kbdev,
  */
 static inline bool kbasep_js_ctx_attr_is_attr_on_runpool(struct kbase_device *kbdev, enum kbasep_js_ctx_attr attribute)
 {
-	/* In general, attributes are 'on' when they have a non-zero refcount (note: the refcount will never be < 0) */
-	return (bool) kbasep_js_ctx_attr_count_on_runpool(kbdev, attribute);
+    /* In general, attributes are 'on' when they have a non-zero refcount (note: the refcount will never be < 0) */
+    return (bool) kbasep_js_ctx_attr_count_on_runpool(kbdev, attribute);
 }
 
 /**
@@ -141,18 +141,18 @@ static inline bool kbasep_js_ctx_attr_is_attr_on_runpool(struct kbase_device *kb
  */
 static inline bool kbasep_js_ctx_attr_is_attr_on_ctx(struct kbase_context *kctx, enum kbasep_js_ctx_attr attribute)
 {
-	struct kbasep_js_kctx_info *js_kctx_info;
+    struct kbasep_js_kctx_info *js_kctx_info;
 
-	KBASE_DEBUG_ASSERT(kctx != NULL);
-	KBASE_DEBUG_ASSERT(attribute < KBASEP_JS_CTX_ATTR_COUNT);
-	js_kctx_info = &kctx->jctx.sched_info;
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(attribute < KBASEP_JS_CTX_ATTR_COUNT);
+    js_kctx_info = &kctx->jctx.sched_info;
 
-	/* In general, attributes are 'on' when they have a refcount (which should never be < 0) */
-	return (bool) (js_kctx_info->ctx.ctx_attr_ref_count[attribute]);
+    /* In general, attributes are 'on' when they have a refcount (which should never be < 0) */
+    return (bool) (js_kctx_info->ctx.ctx_attr_ref_count[attribute]);
 }
 
-	  /** @} *//* end group kbase_js */
-	  /** @} *//* end group base_kbase_api */
-	  /** @} *//* end group base_api */
+      /** @} *//* end group kbase_js */
+      /** @} *//* end group base_kbase_api */
+      /** @} *//* end group base_api */
 
-#endif				/* _KBASE_JS_DEFS_H_ */
+#endif                /* _KBASE_JS_DEFS_H_ */

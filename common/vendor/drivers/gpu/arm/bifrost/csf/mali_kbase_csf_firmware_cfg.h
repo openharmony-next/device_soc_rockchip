@@ -67,6 +67,6 @@ void kbase_csf_firmware_cfg_term(struct kbase_device *kbdev);
  * @size:  Size (in bytes) of the section
  */
 int kbase_csf_firmware_cfg_option_entry_parse(struct kbase_device *kbdev,
-		const struct firmware *fw,
-		const u32 *entry, unsigned int size);
+        const struct firmware *fw,
+        const u32 *entry, unsigned int size);
 #endif /* _KBASE_CSF_FIRMWARE_CFG_H_ */

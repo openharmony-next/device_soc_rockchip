@@ -15,8 +15,8 @@
 
 
 
-#ifndef _KBASE_FENCE_DEFS_H_
-#define _KBASE_FENCE_DEFS_H_
+#ifndef KBASE_FENCE_DEFS_H
+#define KBASE_FENCE_DEFS_H
 
 /*
  * There was a big rename in the 4.10 kernel (fence* -> dma_fence*)

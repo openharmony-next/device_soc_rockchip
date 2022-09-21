@@ -30,7 +30,7 @@
 
 /**
  * kbase_backend_timer_init() - Initialise the JS scheduling timer
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * This function should be called at driver initialisation
  *
@@ -40,7 +40,7 @@ int kbase_backend_timer_init(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_timer_term() - Terminate the JS scheduling timer
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  *
  * This function should be called at driver termination
  */

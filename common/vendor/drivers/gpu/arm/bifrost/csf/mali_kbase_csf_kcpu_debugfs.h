@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_KCPU_DEBUGFS_H_
-#define _KBASE_CSF_KCPU_DEBUGFS_H_
+#ifndef KBASE_CSF_KCPU_DEBUGFS_H
+#define KBASE_CSF_KCPU_DEBUGFS_H
 
 /* Forward declaration */
 struct kbase_context;

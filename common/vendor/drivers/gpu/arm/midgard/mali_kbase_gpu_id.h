@@ -40,8 +40,8 @@
 /* New GPU ID format when PRODUCT_ID is >= 0x1000 (and not 0x6956) */
 #define GPU_ID_PI_NEW_FORMAT_START        0x1000
 #define GPU_ID_IS_NEW_FORMAT(product_id)  ((product_id) != GPU_ID_PI_T60X && \
-						(product_id) >= \
-						GPU_ID_PI_NEW_FORMAT_START)
+                        (product_id) >= \
+                        GPU_ID_PI_NEW_FORMAT_START)
 
 #define GPU_ID2_VERSION_STATUS_SHIFT      0
 #define GPU_ID2_VERSION_MINOR_SHIFT       4
@@ -59,44 +59,44 @@
 #define GPU_ID2_ARCH_MAJOR                (0xF << GPU_ID2_ARCH_MAJOR_SHIFT)
 #define GPU_ID2_PRODUCT_MODEL  (GPU_ID2_ARCH_MAJOR | GPU_ID2_PRODUCT_MAJOR)
 #define GPU_ID2_VERSION        (GPU_ID2_VERSION_MAJOR | \
-								GPU_ID2_VERSION_MINOR | \
-								GPU_ID2_VERSION_STATUS)
+                                GPU_ID2_VERSION_MINOR | \
+                                GPU_ID2_VERSION_STATUS)
 
 /* Helper macro to create a partial GPU_ID (new format) that defines
    a product ignoring its version. */
 #define GPU_ID2_PRODUCT_MAKE(arch_major, arch_minor, arch_rev, product_major) \
-		(((arch_major) << GPU_ID2_ARCH_MAJOR_SHIFT)  | \
-		 ((arch_minor) << GPU_ID2_ARCH_MINOR_SHIFT)  | \
-		 ((arch_rev) << GPU_ID2_ARCH_REV_SHIFT)      | \
-		 ((product_major) << GPU_ID2_PRODUCT_MAJOR_SHIFT))
+        (((arch_major) << GPU_ID2_ARCH_MAJOR_SHIFT)  | \
+         ((arch_minor) << GPU_ID2_ARCH_MINOR_SHIFT)  | \
+         ((arch_rev) << GPU_ID2_ARCH_REV_SHIFT)      | \
+         ((product_major) << GPU_ID2_PRODUCT_MAJOR_SHIFT))
 
 /* Helper macro to create a partial GPU_ID (new format) that specifies the
    revision (major, minor, status) of a product */
 #define GPU_ID2_VERSION_MAKE(version_major, version_minor, version_status) \
-		(((version_major) << GPU_ID2_VERSION_MAJOR_SHIFT)  | \
-		 ((version_minor) << GPU_ID2_VERSION_MINOR_SHIFT)  | \
-		 ((version_status) << GPU_ID2_VERSION_STATUS_SHIFT))
+        (((version_major) << GPU_ID2_VERSION_MAJOR_SHIFT)  | \
+         ((version_minor) << GPU_ID2_VERSION_MINOR_SHIFT)  | \
+         ((version_status) << GPU_ID2_VERSION_STATUS_SHIFT))
 
 /* Helper macro to create a complete GPU_ID (new format) */
 #define GPU_ID2_MAKE(arch_major, arch_minor, arch_rev, product_major, \
-	version_major, version_minor, version_status) \
-		(GPU_ID2_PRODUCT_MAKE(arch_major, arch_minor, arch_rev, \
-			product_major) | \
-		 GPU_ID2_VERSION_MAKE(version_major, version_minor,     \
-			version_status))
+    version_major, version_minor, version_status) \
+        (GPU_ID2_PRODUCT_MAKE(arch_major, arch_minor, arch_rev, \
+            product_major) | \
+         GPU_ID2_VERSION_MAKE(version_major, version_minor,     \
+            version_status))
 
 /* Helper macro to create a partial GPU_ID (new format) that identifies
    a particular GPU model by its arch_major and product_major. */
 #define GPU_ID2_MODEL_MAKE(arch_major, product_major) \
-		(((arch_major) << GPU_ID2_ARCH_MAJOR_SHIFT)  | \
-		((product_major) << GPU_ID2_PRODUCT_MAJOR_SHIFT))
+        (((arch_major) << GPU_ID2_ARCH_MAJOR_SHIFT)  | \
+        ((product_major) << GPU_ID2_PRODUCT_MAJOR_SHIFT))
 
 /* Strip off the non-relevant bits from a product_id value and make it suitable
    for comparison against the GPU_ID2_PRODUCT_xxx values which identify a GPU
    model. */
 #define GPU_ID2_MODEL_MATCH_VALUE(product_id) \
-		(((product_id) << GPU_ID2_PRODUCT_MAJOR_SHIFT) & \
-		    GPU_ID2_PRODUCT_MODEL)
+        (((product_id) << GPU_ID2_PRODUCT_MAJOR_SHIFT) & \
+            GPU_ID2_PRODUCT_MODEL)
 
 #define GPU_ID2_PRODUCT_TMIX              GPU_ID2_MODEL_MAKE(6u, 0)
 #define GPU_ID2_PRODUCT_THEX              GPU_ID2_MODEL_MAKE(6u, 1)
@@ -111,13 +111,16 @@
 /* Values for GPU_ID_VERSION_STATUS field for PRODUCT_ID GPU_ID_PI_T60X */
 #define GPU_ID_S_15DEV0                   0x1
 #define GPU_ID_S_EAC                      0x2
+#define GPU_ID_S_TH                       0x3
+#define GPU_ID_S_NI                       0x9
+#define GPU_ID_S_EI                       0x8
 
 /* Helper macro to create a GPU_ID assuming valid values for id, major,
    minor, status */
 #define GPU_ID_MAKE(id, major, minor, status) \
-		(((id) << GPU_ID_VERSION_PRODUCT_ID_SHIFT) | \
-		((major) << GPU_ID_VERSION_MAJOR_SHIFT) |   \
-		((minor) << GPU_ID_VERSION_MINOR_SHIFT) |   \
-		((status) << GPU_ID_VERSION_STATUS_SHIFT))
+        (((id) << GPU_ID_VERSION_PRODUCT_ID_SHIFT) | \
+        ((major) << GPU_ID_VERSION_MAJOR_SHIFT) |   \
+        ((minor) << GPU_ID_VERSION_MINOR_SHIFT) |   \
+        ((status) << GPU_ID_VERSION_STATUS_SHIFT))
 
 #endif /* _KBASE_GPU_ID_H_ */

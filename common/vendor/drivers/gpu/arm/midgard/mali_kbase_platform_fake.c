@@ -33,6 +33,9 @@
 
 #define PLATFORM_CONFIG_RESOURCE_COUNT 4
 #define PLATFORM_CONFIG_IRQ_RES_COUNT  3
+#define PLATFORM_CONFIG_IRQ_NUMBER_COUNT  2
+#define PLATFORM_CONFIG_IRQ_ACTION_COUNT  1
+#define PLATFORM_CONFIG_IRQ_START_COUNT   0
 
 static struct platform_device *mali_device;
 
@@ -49,74 +52,74 @@ static struct platform_device *mali_device;
  */
 static void kbasep_config_parse_io_resources(const struct kbase_io_resources *io_resources, struct resource *const linux_resources)
 {
-	if (!io_resources || !linux_resources) {
-		pr_err("%s: couldn't find proper resources\n", __func__);
-		return;
-	}
+    if (!io_resources || !linux_resources) {
+        pr_err("%s: couldn't find proper resources\n", __func__);
+        return;
+    }
 
-	memset(linux_resources, 0, PLATFORM_CONFIG_RESOURCE_COUNT * sizeof(struct resource));
+    memset(linux_resources, 0, PLATFORM_CONFIG_RESOURCE_COUNT * sizeof(struct resource));
 
-	linux_resources[0].start = io_resources->io_memory_region.start;
-	linux_resources[0].end   = io_resources->io_memory_region.end;
-	linux_resources[0].flags = IORESOURCE_MEM;
+    linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].start = io_resources->io_memory_region.start;
+    linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].end   = io_resources->io_memory_region.end;
+    linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].flags = IORESOURCE_MEM;
 
-	linux_resources[1].start = io_resources->job_irq_number;
-	linux_resources[1].end   = io_resources->job_irq_number;
-	linux_resources[1].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
+    linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].start = io_resources->job_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].end   = io_resources->job_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 
-	linux_resources[2].start = io_resources->mmu_irq_number;
-	linux_resources[2].end   = io_resources->mmu_irq_number;
-	linux_resources[2].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
+    linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].start = io_resources->mmu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].end   = io_resources->mmu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 
-	linux_resources[3].start = io_resources->gpu_irq_number;
-	linux_resources[3].end   = io_resources->gpu_irq_number;
-	linux_resources[3].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
+    linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].start = io_resources->gpu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].end   = io_resources->gpu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 }
 #endif /* CONFIG_OF */
 
 int kbase_platform_fake_register(void)
 {
-	struct kbase_platform_config *config;
+    struct kbase_platform_config *config;
 #ifndef CONFIG_OF
-	struct resource resources[PLATFORM_CONFIG_RESOURCE_COUNT];
+    struct resource resources[PLATFORM_CONFIG_RESOURCE_COUNT];
 #endif
-	int err;
+    int err;
 
-	config = kbase_get_platform_config(); /* declared in midgard/mali_kbase_config.h but defined in platform folder */
-	if (config == NULL) {
-		pr_err("%s: couldn't get platform config\n", __func__);
-		return -ENODEV;
-	}
+    config = kbase_get_platform_config(); /* declared in midgard/mali_kbase_config.h but defined in platform folder */
+    if (config == NULL) {
+        pr_err("%s: couldn't get platform config\n", __func__);
+        return -ENODEV;
+    }
 
-	mali_device = platform_device_alloc("mali", 0);
-	if (mali_device == NULL)
-		return -ENOMEM;
+    mali_device = platform_device_alloc("mali", 0);
+    if (mali_device == NULL)
+        return -ENOMEM;
 
 #ifndef CONFIG_OF
-	kbasep_config_parse_io_resources(config->io_resources, resources);
-	err = platform_device_add_resources(mali_device, resources, PLATFORM_CONFIG_RESOURCE_COUNT);
-	if (err) {
-		platform_device_put(mali_device);
-		mali_device = NULL;
-		return err;
-	}
+    kbasep_config_parse_io_resources(config->io_resources, resources);
+    err = platform_device_add_resources(mali_device, resources, PLATFORM_CONFIG_RESOURCE_COUNT);
+    if (err) {
+        platform_device_put(mali_device);
+        mali_device = NULL;
+        return err;
+    }
 #endif /* CONFIG_OF */
 
-	err = platform_device_add(mali_device);
-	if (err) {
-		platform_device_unregister(mali_device);
-		mali_device = NULL;
-		return err;
-	}
+    err = platform_device_add(mali_device);
+    if (err) {
+        platform_device_unregister(mali_device);
+        mali_device = NULL;
+        return err;
+    }
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(kbase_platform_fake_register);
 
 void kbase_platform_fake_unregister(void)
 {
-	if (mali_device)
-		platform_device_unregister(mali_device);
+    if (mali_device)
+        platform_device_unregister(mali_device);
 }
 EXPORT_SYMBOL(kbase_platform_fake_unregister);
 

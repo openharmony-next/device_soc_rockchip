@@ -49,9 +49,9 @@ struct kbase_hwcnt_virtualizer;
  * Return: 0 on success, else error code.
  */
 int kbase_hwcnt_legacy_client_create(
-	struct kbase_hwcnt_virtualizer *hvirt,
-	struct kbase_ioctl_hwcnt_enable *enable,
-	struct kbase_hwcnt_legacy_client **out_hlcli);
+    struct kbase_hwcnt_virtualizer *hvirt,
+    struct kbase_ioctl_hwcnt_enable *enable,
+    struct kbase_hwcnt_legacy_client **out_hlcli);
 
 /**
  * kbase_hwcnt_legacy_client_destroy() - Destroy a legacy hardware counter

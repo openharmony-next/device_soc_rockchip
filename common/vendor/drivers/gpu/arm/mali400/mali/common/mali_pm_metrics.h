@@ -21,29 +21,29 @@ struct mali_device;
  * Metrics data collected for use by the power management framework.
  */
 struct mali_pm_metrics_data {
-	ktime_t time_period_start;
-	u64 time_busy;
-	u64 time_idle;
-	u64 prev_busy;
-	u64 prev_idle;
-	u32 num_running_gp_cores;
-	u32 num_running_pp_cores;
-	ktime_t time_period_start_gp;
-	u64 time_busy_gp;
-	u64 time_idle_gp;
-	ktime_t time_period_start_pp;
-	u64 time_busy_pp[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS];
-	u64 time_idle_pp[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS];
-	mali_bool gpu_active;
-	_mali_osk_spinlock_irq_t *lock;
+    ktime_t time_period_start;
+    u64 time_busy;
+    u64 time_idle;
+    u64 prev_busy;
+    u64 prev_idle;
+    u32 num_running_gp_cores;
+    u32 num_running_pp_cores;
+    ktime_t time_period_start_gp;
+    u64 time_busy_gp;
+    u64 time_idle_gp;
+    ktime_t time_period_start_pp;
+    u64 time_busy_pp[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS];
+    u64 time_idle_pp[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS];
+    mali_bool gpu_active;
+    _mali_osk_spinlock_irq_t *lock;
 };
 
 /**
  * Initialize/start the Mali GPU pm_metrics metrics reporting.
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t mali_pm_metrics_init(struct mali_device *mdev);
+mali_osk_errcode_t mali_pm_metrics_init(struct mali_device *mdev);
 
 /**
  * Terminate the Mali GPU pm_metrics metrics reporting

@@ -27,7 +27,7 @@
 /**
  * kbase_csf_protected_memory_init - Initilaise protected memory allocator.
  *
- * @kbdev:	Device pointer.
+ * @kbdev:    Device pointer.
  *
  * Return: 0 if success, or an error code on failure.
  */
@@ -36,37 +36,37 @@ int kbase_csf_protected_memory_init(struct kbase_device *const kbdev);
 /**
  * kbase_csf_protected_memory_term - Terminate prtotected memory allocator.
  *
- * @kbdev:	Device pointer.
+ * @kbdev:    Device pointer.
  */
 void kbase_csf_protected_memory_term(struct kbase_device *const kbdev);
 
 /**
  * kbase_csf_protected_memory_alloc - Allocate protected memory pages.
  *
- * @kbdev:	Device pointer.
- * @phys:	Array of physical addresses to be filled in by the protected
- *		memory allocator.
- * @num_pages:	Number of pages requested to be allocated.
+ * @kbdev:    Device pointer.
+ * @phys:    Array of physical addresses to be filled in by the protected
+ *        memory allocator.
+ * @num_pages:    Number of pages requested to be allocated.
  *
  * Return: Pointer to an array of protected memory allocations on success,
- *		or NULL on failure.
+ *        or NULL on failure.
  */
 struct protected_memory_allocation **
-	kbase_csf_protected_memory_alloc(
-		struct kbase_device *const kbdev,
-		struct tagged_addr *phys,
-		size_t num_pages);
+    kbase_csf_protected_memory_alloc(
+        struct kbase_device *const kbdev,
+        struct tagged_addr *phys,
+        size_t num_pages);
 
 /**
  * kbase_csf_protected_memory_free - Free the allocated
- *					protected memory pages
+ *                    protected memory pages
  *
- * @kbdev:	Device pointer.
- * @pma:	Array of pointer to protected memory allocations.
- * @num_pages:	Number of pages to be freed.
+ * @kbdev:    Device pointer.
+ * @pma:    Array of pointer to protected memory allocations.
+ * @num_pages:    Number of pages to be freed.
  */
 void kbase_csf_protected_memory_free(
-		struct kbase_device *const kbdev,
-		struct protected_memory_allocation **pma,
-		size_t num_pages);
+        struct kbase_device *const kbdev,
+        struct protected_memory_allocation **pma,
+        size_t num_pages);
 #endif

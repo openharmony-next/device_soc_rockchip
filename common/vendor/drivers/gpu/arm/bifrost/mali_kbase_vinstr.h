@@ -43,8 +43,8 @@ struct kbase_ioctl_hwcnt_reader_setup;
  * Return: 0 on success, else error code.
  */
 int kbase_vinstr_init(
-	struct kbase_hwcnt_virtualizer *hvirt,
-	struct kbase_vinstr_context **out_vctx);
+    struct kbase_hwcnt_virtualizer *hvirt,
+    struct kbase_vinstr_context **out_vctx);
 
 /**
  * kbase_vinstr_term() - Terminate a vinstr context.
@@ -85,7 +85,7 @@ void kbase_vinstr_resume(struct kbase_vinstr_context *vctx);
  * Return: file descriptor on success, else a (negative) error code.
  */
 int kbase_vinstr_hwcnt_reader_setup(
-	struct kbase_vinstr_context *vinstr_ctx,
-	struct kbase_ioctl_hwcnt_reader_setup *setup);
+    struct kbase_vinstr_context *vinstr_ctx,
+    struct kbase_ioctl_hwcnt_reader_setup *setup);
 
 #endif /* _KBASE_VINSTR_H_ */

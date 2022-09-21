@@ -22,23 +22,28 @@
  * Base kernel memory APIs, Linux implementation.
  */
 
-#ifndef _KBASE_MEM_LINUX_H_
-#define _KBASE_MEM_LINUX_H_
+#ifndef H_KBASE_MEM_LINUX_H_
+#define H_KBASE_MEM_LINUX_H_
+
+#define KBASE_CPU_PAGE       (2)
+#define KBASE_MMAP_BIT       (4)
+#define CPU_VA_BIT           (32)
+#define KBASE_FIRST_VERSION  (10)
 
 /** A HWC dump mapping */
 struct kbase_hwc_dma_mapping {
-	void       *cpu_va;
-	dma_addr_t  dma_pa;
-	size_t      size;
+    void       *cpu_va;
+    dma_addr_t  dma_pa;
+    size_t      size;
 };
 
 struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx,
-		u64 va_pages, u64 commit_pages, u64 extent, u64 *flags,
-		u64 *gpu_va);
+        u64 va_pages, u64 commit_pages, u64 extent, u64 *flags,
+        u64 *gpu_va);
 int kbase_mem_query(struct kbase_context *kctx, u64 gpu_addr, int query, u64 *const pages);
 int kbase_mem_import(struct kbase_context *kctx, enum base_mem_import_type type,
-		void __user *phandle, u32 padding, u64 *gpu_va, u64 *va_pages,
-		u64 *flags);
+        void __user *phandle, u32 padding, u64 *gpu_va, u64 *va_pages,
+        u64 *flags);
 u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride, u64 nents, struct base_mem_aliasing_info *ai, u64 *num_pages);
 int kbase_mem_flags_change(struct kbase_context *kctx, u64 gpu_addr, unsigned int flags, unsigned int mask);
 
@@ -86,8 +91,8 @@ void kbase_mem_evictable_deinit(struct kbase_context *kctx);
  * Note: Caller must be holding the region lock.
  */
 int kbase_mem_grow_gpu_mapping(struct kbase_context *kctx,
-		struct kbase_va_region *reg,
-		u64 new_pages, u64 old_pages);
+        struct kbase_va_region *reg,
+        u64 new_pages, u64 old_pages);
 
 /**
  * kbase_mem_evictable_make - Make a physical allocation eligible for eviction
@@ -122,14 +127,14 @@ int kbase_mem_evictable_make(struct kbase_mem_phy_alloc *gpu_alloc);
 bool kbase_mem_evictable_unmake(struct kbase_mem_phy_alloc *alloc);
 
 struct kbase_vmap_struct {
-	u64 gpu_addr;
-	struct kbase_mem_phy_alloc *cpu_alloc;
-	struct kbase_mem_phy_alloc *gpu_alloc;
-	phys_addr_t *cpu_pages;
-	phys_addr_t *gpu_pages;
-	void *addr;
-	size_t size;
-	bool is_cached;
+    u64 gpu_addr;
+    struct kbase_mem_phy_alloc *cpu_alloc;
+    struct kbase_mem_phy_alloc *gpu_alloc;
+    phys_addr_t *cpu_pages;
+    phys_addr_t *gpu_pages;
+    void *addr;
+    size_t size;
+    bool is_cached;
 };
 
 
@@ -171,7 +176,7 @@ struct kbase_vmap_struct {
  *
  */
 void *kbase_vmap_prot(struct kbase_context *kctx, u64 gpu_addr, size_t size,
-		      unsigned long prot_request, struct kbase_vmap_struct *map);
+              unsigned long prot_request, struct kbase_vmap_struct *map);
 
 /**
  * kbase_vmap - Map a GPU VA range into the kernel safely
@@ -194,7 +199,7 @@ void *kbase_vmap_prot(struct kbase_context *kctx, u64 gpu_addr, size_t size,
  * checks to ensure the security of e.g. imported user bufs from RO SHM.
  */
 void *kbase_vmap(struct kbase_context *kctx, u64 gpu_addr, size_t size,
-		struct kbase_vmap_struct *map);
+        struct kbase_vmap_struct *map);
 
 /**
  * kbase_vunmap - Unmap a GPU VA range from the kernel
@@ -228,4 +233,4 @@ void kbase_va_free(struct kbase_context *kctx, struct kbase_hwc_dma_mapping *han
 
 extern const struct vm_operations_struct kbase_vm_ops;
 
-#endif				/* _KBASE_MEM_LINUX_H_ */
+#endif                /* _KBASE_MEM_LINUX_H_ */

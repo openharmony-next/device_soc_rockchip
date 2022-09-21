@@ -27,39 +27,39 @@
  * Driver Capability Queries.
  */
 
-#ifndef _KBASE_CAPS_H_
-#define _KBASE_CAPS_H_
+#ifndef KBASE_CAPS_H
+#define KBASE_CAPS_H
 
 #include <linux/types.h>
 
 typedef enum mali_kbase_cap {
-	MALI_KBASE_CAP_SYSTEM_MONITOR = 0,
-	MALI_KBASE_CAP_JIT_PRESSURE_LIMIT,
-	MALI_KBASE_CAP_MEM_GROW_ON_GPF,
-	MALI_KBASE_CAP_MEM_PROTECTED,
-	MALI_KBASE_NUM_CAPS
+    MALI_KBASE_CAP_SYSTEM_MONITOR = 0,
+    MALI_KBASE_CAP_JIT_PRESSURE_LIMIT,
+    MALI_KBASE_CAP_MEM_GROW_ON_GPF,
+    MALI_KBASE_CAP_MEM_PROTECTED,
+    MALI_KBASE_NUM_CAPS
 } mali_kbase_cap;
 
 extern bool mali_kbase_supports_cap(unsigned long api_version, mali_kbase_cap cap);
 
 static inline bool mali_kbase_supports_system_monitor(unsigned long api_version)
 {
-	return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_SYSTEM_MONITOR);
+    return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_SYSTEM_MONITOR);
 }
 
 static inline bool mali_kbase_supports_jit_pressure_limit(unsigned long api_version)
 {
-	return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_JIT_PRESSURE_LIMIT);
+    return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_JIT_PRESSURE_LIMIT);
 }
 
 static inline bool mali_kbase_supports_mem_grow_on_gpf(unsigned long api_version)
 {
-	return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_MEM_GROW_ON_GPF);
+    return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_MEM_GROW_ON_GPF);
 }
 
 static inline bool mali_kbase_supports_mem_protected(unsigned long api_version)
 {
-	return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_MEM_PROTECTED);
+    return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_MEM_PROTECTED);
 }
 
-#endif	/* __KBASE_CAPS_H_ */
+#endif    /* __KBASE_CAPS_H_ */

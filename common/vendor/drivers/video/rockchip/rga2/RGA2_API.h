@@ -10,9 +10,9 @@
 #include "rga2.h"
 
 /* Driver information */
-#define DRIVER_DESC			"RGA2 Device Driver"
-#define DRIVER_NAME			"rga2"
-#define DRIVER_VERSION		"2.1.0"
+#define DRIVER_DESC            "RGA2 Device Driver"
+#define DRIVER_NAME            "rga2"
+#define DRIVER_VERSION        "2.1.0"
 
 /* Logging */
 #define RGA_DEBUG 1
@@ -29,25 +29,25 @@
 #endif
 
 struct rga2_drvdata_t {
-	struct miscdevice miscdev;
-	struct device *dev;
-	void *rga_base;
-	int irq;
+    struct miscdevice miscdev;
+    struct device *dev;
+    void *rga_base;
+    int irq;
 
-	struct delayed_work power_off_work;
-	struct wake_lock wake_lock;
-	void (*rga_irq_callback)(int rga_retval);
+    struct delayed_work power_off_work;
+    struct wake_lock wake_lock;
+    void (*rga_irq_callback)(int rga_retval);
 
-	struct clk *aclk_rga2;
-	struct clk *hclk_rga2;
-	struct clk *pd_rga2;
-	struct clk *clk_rga2;
+    struct clk *aclk_rga2;
+    struct clk *hclk_rga2;
+    struct clk *pd_rga2;
+    struct clk *clk_rga2;
 
-	struct ion_client *ion_client;
-	char version[16];
+    struct ion_client *ion_client;
+    char version[16];
 
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
-	struct rga_debugger *debugger;
+    struct rga_debugger *debugger;
 #endif
 };
 

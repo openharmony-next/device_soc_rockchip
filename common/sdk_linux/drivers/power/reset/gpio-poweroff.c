@@ -27,77 +27,77 @@ static u32 inactive_delay = 100;
 
 static void gpio_poweroff_do_poweroff(void)
 {
-	BUG_ON(!reset_gpio);
+    BUG_ON(!reset_gpio);
 
-	/* drive it active, also inactive->active edge */
-	gpiod_direction_output(reset_gpio, 1);
-	mdelay(active_delay);
+    /* drive it active, also inactive->active edge */
+    gpiod_direction_output(reset_gpio, 1);
+    mdelay(active_delay);
 
-	/* drive inactive, also active->inactive edge */
-	gpiod_set_value_cansleep(reset_gpio, 0);
-	mdelay(inactive_delay);
+    /* drive inactive, also active->inactive edge */
+    gpiod_set_value_cansleep(reset_gpio, 0);
+    mdelay(inactive_delay);
 
-	/* drive it active, also inactive->active edge */
-	gpiod_set_value_cansleep(reset_gpio, 1);
+    /* drive it active, also inactive->active edge */
+    gpiod_set_value_cansleep(reset_gpio, 1);
 
-	/* give it some time */
-	mdelay(timeout);
+    /* give it some time */
+    mdelay(timeout);
 
-	WARN_ON(1);
+    WARN_ON(1);
 }
 
 static int gpio_poweroff_probe(struct platform_device *pdev)
 {
-	bool input = false;
-	enum gpiod_flags flags;
+    bool input = false;
+    enum gpiod_flags flags;
 
-	/* If a pm_power_off function has already been added, leave it alone */
-	if (pm_power_off != NULL) {
-		dev_err(&pdev->dev,
-			"%s: pm_power_off function already registered\n",
-		       __func__);
-		return -EBUSY;
-	}
+    /* If a pm_power_off function has already been added, leave it alone */
+    if (pm_power_off != NULL) {
+        dev_err(&pdev->dev,
+            "%s: pm_power_off function already registered\n",
+               __func__);
+        return -EBUSY;
+    }
 
-	input = device_property_read_bool(&pdev->dev, "input");
-	if (input)
-		flags = GPIOD_IN;
-	else
-		flags = GPIOD_OUT_LOW;
+    input = device_property_read_bool(&pdev->dev, "input");
+    if (input)
+        flags = GPIOD_IN;
+    else
+        flags = GPIOD_OUT_LOW;
 
-	device_property_read_u32(&pdev->dev, "active-delay-ms", &active_delay);
-	device_property_read_u32(&pdev->dev, "inactive-delay-ms",
-				 &inactive_delay);
-	device_property_read_u32(&pdev->dev, "timeout-ms", &timeout);
+    device_property_read_u32(&pdev->dev, "active-delay-ms", &active_delay);
+    device_property_read_u32(&pdev->dev, "inactive-delay-ms",
+                 &inactive_delay);
+    device_property_read_u32(&pdev->dev, "timeout-ms", &timeout);
 
-	reset_gpio = devm_gpiod_get(&pdev->dev, NULL, flags);
-	if (IS_ERR(reset_gpio))
-		return PTR_ERR(reset_gpio);
+    reset_gpio = devm_gpiod_get(&pdev->dev, NULL, flags);
+    if (IS_ERR(reset_gpio))
+        return PTR_ERR(reset_gpio);
 
-	pm_power_off = &gpio_poweroff_do_poweroff;
-	return 0;
+    pm_power_off = &gpio_poweroff_do_poweroff;
+    return 0;
 }
 
 static int gpio_poweroff_remove(struct platform_device *pdev)
 {
-	if (pm_power_off == &gpio_poweroff_do_poweroff)
-		pm_power_off = NULL;
+    if (pm_power_off == &gpio_poweroff_do_poweroff)
+        pm_power_off = NULL;
 
-	return 0;
+    return 0;
 }
 
 static const struct of_device_id of_gpio_poweroff_match[] = {
-	{ .compatible = "gpio-poweroff", },
-	{},
+    { .compatible = "gpio-poweroff", },
+    {},
 };
 
 static struct platform_driver gpio_poweroff_driver = {
-	.probe = gpio_poweroff_probe,
-	.remove = gpio_poweroff_remove,
-	.driver = {
-		.name = "poweroff-gpio",
-		.of_match_table = of_gpio_poweroff_match,
-	},
+    .probe = gpio_poweroff_probe,
+    .remove = gpio_poweroff_remove,
+    .driver = {
+        .name = "poweroff-gpio",
+        .of_match_table = of_gpio_poweroff_match,
+    },
 };
 
 module_platform_driver(gpio_poweroff_driver);

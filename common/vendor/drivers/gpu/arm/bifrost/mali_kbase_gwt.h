@@ -44,12 +44,12 @@ int kbase_gpu_gwt_stop(struct kbase_context *kctx);
 
 /**
  * kbase_gpu_gwt_dump - Pass page address of faulting addresses to user space.
- * @kctx:	Pointer to kernel context
- * @gwt_dump:	User space data to be passed.
+ * @kctx:    Pointer to kernel context
+ * @gwt_dump:    User space data to be passed.
  *
  * @return 0 on success, error on failure.
  */
 int kbase_gpu_gwt_dump(struct kbase_context *kctx,
-			union kbase_ioctl_cinstr_gwt_dump *gwt_dump);
+            union kbase_ioctl_cinstr_gwt_dump *gwt_dump);
 
 #endif /* _KBASE_GWT_H */

@@ -33,7 +33,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif				/* __cplusplus */
+#endif                /* __cplusplus */
 
 /**
  * @addtogroup base_api
@@ -65,13 +65,13 @@ extern "C" {
  *
  */
 enum uk_client_id {
-	/**
-	 * Value used to identify the Base driver UK client.
-	 */
-	UK_CLIENT_MALI_T600_BASE,
+    /**
+     * Value used to identify the Base driver UK client.
+     */
+    UK_CLIENT_MALI_T600_BASE,
 
-	/** The number of uk clients supported. This must be the last member of the enum */
-	UK_CLIENT_COUNT
+    /** The number of uk clients supported. This must be the last member of the enum */
+    UK_CLIENT_COUNT
 };
 
 /** @} end group uk_api */
@@ -80,5 +80,5 @@ enum uk_client_id {
 
 #ifdef __cplusplus
 }
-#endif				/* __cplusplus */
-#endif				/* _UK_H_ */
+#endif                /* __cplusplus */
+#endif                /* _UK_H_ */

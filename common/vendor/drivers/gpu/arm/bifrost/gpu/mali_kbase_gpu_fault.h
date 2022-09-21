@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_GPU_FAULT_H_
-#define _KBASE_GPU_FAULT_H_
+#ifndef KBASE_GPU_FAULT_H
+#define KBASE_GPU_FAULT_H
 
 /** Returns the name associated with a Mali exception code
  *

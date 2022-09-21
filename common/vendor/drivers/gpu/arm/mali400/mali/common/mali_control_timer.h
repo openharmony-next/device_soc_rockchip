@@ -8,12 +8,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_CONTROL_TIMER_H__
-#define __MALI_CONTROL_TIMER_H__
+#ifndef MALI_CONTROL_TIMER_H
+#define MALI_CONTROL_TIMER_H
 
 #include "mali_osk.h"
 
-_mali_osk_errcode_t mali_control_timer_init(void);
+mali_osk_errcode_t mali_control_timer_init(void);
 
 void mali_control_timer_term(void);
 

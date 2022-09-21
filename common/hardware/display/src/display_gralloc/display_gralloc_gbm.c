@@ -182,7 +182,7 @@ static int32_t InitGbmDevice(const char *drmFile, GrallocManager *grallocManager
 {
     DISPLAY_DEBUGLOG();
     if (grallocManager->gbmDevice == NULL) {
-	    char path[PATH_MAX] = {0};
+        char path[PATH_MAX] = {0};
         if (realpath(drmFile, path) == NULL) {
             DISPLAY_LOGE(" drm File : %{public}s is not a realpath, errno: %{public}s", drmFile, strerror(errno));
             return DISPLAY_PARAM_ERR;

@@ -22,37 +22,37 @@
 
 int kbase_ctx_sched_init(struct kbase_device *kbdev)
 {
-	int as_present = (1U << kbdev->nr_hw_address_spaces) - 1;
+    int as_present = (1U << kbdev->nr_hw_address_spaces) - 1;
 
-	/* These two must be recalculated if nr_hw_address_spaces changes
-	 * (e.g. for HW workarounds) */
-	kbdev->nr_user_address_spaces = kbdev->nr_hw_address_spaces;
-	if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8987)) {
-		bool use_workaround;
+    /* These two must be recalculated if nr_hw_address_spaces changes
+     * (e.g. for HW workarounds) */
+    kbdev->nr_user_address_spaces = kbdev->nr_hw_address_spaces;
+    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8987)) {
+        bool use_workaround;
 
-		use_workaround = DEFAULT_SECURE_BUT_LOSS_OF_PERFORMANCE;
-		if (use_workaround) {
-			dev_dbg(kbdev->dev, "GPU has HW ISSUE 8987, and driver configured for security workaround: 1 address space only");
-			kbdev->nr_user_address_spaces = 1;
-		}
-	}
+        use_workaround = DEFAULT_SECURE_BUT_LOSS_OF_PERFORMANCE;
+        if (use_workaround) {
+            dev_dbg(kbdev->dev, "GPU has HW ISSUE 8987, and driver configured for security workaround: 1 address space only");
+            kbdev->nr_user_address_spaces = 1;
+        }
+    }
 
-	kbdev->as_free = as_present; /* All ASs initially free */
+    kbdev->as_free = as_present; /* All ASs initially free */
 
-	memset(kbdev->as_to_kctx, 0, sizeof(kbdev->as_to_kctx));
+    memset(kbdev->as_to_kctx, 0, sizeof(kbdev->as_to_kctx));
 
-	return 0;
+    return 0;
 }
 
 void kbase_ctx_sched_term(struct kbase_device *kbdev)
 {
-	s8 i;
+    s8 i;
 
-	/* Sanity checks */
-	for (i = 0; i != kbdev->nr_hw_address_spaces; ++i) {
-		WARN_ON(kbdev->as_to_kctx[i] != NULL);
-		WARN_ON(!(kbdev->as_free & (1u << i)));
-	}
+    /* Sanity checks */
+    for (i = 0; i != kbdev->nr_hw_address_spaces; ++i) {
+        WARN_ON(kbdev->as_to_kctx[i] != NULL);
+        WARN_ON(!(kbdev->as_free & (1u << i)));
+    }
 }
 
 /* kbasep_ctx_sched_find_as_for_ctx - Find a free address space
@@ -67,142 +67,142 @@ void kbase_ctx_sched_term(struct kbase_device *kbdev)
  */
 static int kbasep_ctx_sched_find_as_for_ctx(struct kbase_context *kctx)
 {
-	struct kbase_device *const kbdev = kctx->kbdev;
-	int free_as;
+    struct kbase_device *const kbdev = kctx->kbdev;
+    int free_as;
 
-	lockdep_assert_held(&kbdev->hwaccess_lock);
+    lockdep_assert_held(&kbdev->hwaccess_lock);
 
-	/* First check if the previously assigned AS is available */
-	if ((kctx->as_nr != KBASEP_AS_NR_INVALID) &&
-			(kbdev->as_free & (1u << kctx->as_nr)))
-		return kctx->as_nr;
+    /* First check if the previously assigned AS is available */
+    if ((kctx->as_nr != KBASEP_AS_NR_INVALID) &&
+            (kbdev->as_free & (1u << kctx->as_nr)))
+        return kctx->as_nr;
 
-	/* The previously assigned AS was taken, we'll be returning any free
-	 * AS at this point.
-	 */
-	free_as = ffs(kbdev->as_free) - 1;
-	if (free_as >= 0 && free_as < kbdev->nr_hw_address_spaces)
-		return free_as;
+    /* The previously assigned AS was taken, we'll be returning any free
+     * AS at this point.
+     */
+    free_as = ffs(kbdev->as_free) - 1;
+    if (free_as >= 0 && free_as < kbdev->nr_hw_address_spaces)
+        return free_as;
 
-	return KBASEP_AS_NR_INVALID;
+    return KBASEP_AS_NR_INVALID;
 }
 
 int kbase_ctx_sched_retain_ctx(struct kbase_context *kctx)
 {
-	struct kbase_device *const kbdev = kctx->kbdev;
+    struct kbase_device *const kbdev = kctx->kbdev;
 
-	lockdep_assert_held(&kbdev->mmu_hw_mutex);
-	lockdep_assert_held(&kbdev->hwaccess_lock);
+    lockdep_assert_held(&kbdev->mmu_hw_mutex);
+    lockdep_assert_held(&kbdev->hwaccess_lock);
 
-	WARN_ON(!kbdev->pm.backend.gpu_powered);
+    WARN_ON(!kbdev->pm.backend.gpu_powered);
 
-	if (atomic_inc_return(&kctx->refcount) == 1) {
-		int const free_as = kbasep_ctx_sched_find_as_for_ctx(kctx);
+    if (atomic_inc_return(&kctx->refcount) == 1) {
+        int const free_as = kbasep_ctx_sched_find_as_for_ctx(kctx);
 
-		if (free_as != KBASEP_AS_NR_INVALID) {
-			kbdev->as_free &= ~(1u << free_as);
-			/* Only program the MMU if the context has not been
-			 * assigned the same address space before.
-			 */
-			if (free_as != kctx->as_nr) {
-				struct kbase_context *const prev_kctx =
-					kbdev->as_to_kctx[free_as];
+        if (free_as != KBASEP_AS_NR_INVALID) {
+            kbdev->as_free &= ~(1u << free_as);
+            /* Only program the MMU if the context has not been
+             * assigned the same address space before.
+             */
+            if (free_as != kctx->as_nr) {
+                struct kbase_context *const prev_kctx =
+                    kbdev->as_to_kctx[free_as];
 
-				if (prev_kctx) {
-					WARN_ON(atomic_read(&prev_kctx->refcount) != 0);
-					kbase_mmu_disable(prev_kctx);
-					prev_kctx->as_nr = KBASEP_AS_NR_INVALID;
-				}
+                if (prev_kctx) {
+                    WARN_ON(atomic_read(&prev_kctx->refcount) != 0);
+                    kbase_mmu_disable(prev_kctx);
+                    prev_kctx->as_nr = KBASEP_AS_NR_INVALID;
+                }
 
-				kctx->as_nr = free_as;
-				kbdev->as_to_kctx[free_as] = kctx;
-				kbase_mmu_update(kctx);
-			}
-		} else {
-			atomic_dec(&kctx->refcount);
+                kctx->as_nr = free_as;
+                kbdev->as_to_kctx[free_as] = kctx;
+                kbase_mmu_update(kctx);
+            }
+        } else {
+            atomic_dec(&kctx->refcount);
 
-			/* Failed to find an available address space, we must
-			 * be returning an error at this point.
-			 */
-			WARN_ON(kctx->as_nr != KBASEP_AS_NR_INVALID);
-		}
-	}
+            /* Failed to find an available address space, we must
+             * be returning an error at this point.
+             */
+            WARN_ON(kctx->as_nr != KBASEP_AS_NR_INVALID);
+        }
+    }
 
-	return kctx->as_nr;
+    return kctx->as_nr;
 }
 
 int kbase_ctx_sched_retain_ctx_refcount(struct kbase_context *kctx)
 {
-	struct kbase_device *const kbdev = kctx->kbdev;
+    struct kbase_device *const kbdev = kctx->kbdev;
 
-	lockdep_assert_held(&kbdev->hwaccess_lock);
-	WARN_ON(atomic_read(&kctx->refcount) == 0);
-	if (atomic_read(&kctx->refcount) == 0)
-		return -1;
+    lockdep_assert_held(&kbdev->hwaccess_lock);
+    WARN_ON(atomic_read(&kctx->refcount) == 0);
+    if (atomic_read(&kctx->refcount) == 0)
+        return -1;
 
-	WARN_ON(kctx->as_nr == KBASEP_AS_NR_INVALID);
-	WARN_ON(kbdev->as_to_kctx[kctx->as_nr] != kctx);
+    WARN_ON(kctx->as_nr == KBASEP_AS_NR_INVALID);
+    WARN_ON(kbdev->as_to_kctx[kctx->as_nr] != kctx);
 
-	atomic_inc(&kctx->refcount);
+    atomic_inc(&kctx->refcount);
 
-	return 0;
+    return 0;
 }
 
 void kbase_ctx_sched_release_ctx(struct kbase_context *kctx)
 {
-	struct kbase_device *const kbdev = kctx->kbdev;
+    struct kbase_device *const kbdev = kctx->kbdev;
 
-	lockdep_assert_held(&kbdev->hwaccess_lock);
+    lockdep_assert_held(&kbdev->hwaccess_lock);
 
-	if (atomic_dec_return(&kctx->refcount) == 0)
-		kbdev->as_free |= (1u << kctx->as_nr);
+    if (atomic_dec_return(&kctx->refcount) == 0)
+        kbdev->as_free |= (1u << kctx->as_nr);
 }
 
 void kbase_ctx_sched_remove_ctx(struct kbase_context *kctx)
 {
-	struct kbase_device *const kbdev = kctx->kbdev;
+    struct kbase_device *const kbdev = kctx->kbdev;
 
-	lockdep_assert_held(&kbdev->mmu_hw_mutex);
-	lockdep_assert_held(&kbdev->hwaccess_lock);
+    lockdep_assert_held(&kbdev->mmu_hw_mutex);
+    lockdep_assert_held(&kbdev->hwaccess_lock);
 
-	WARN_ON(atomic_read(&kctx->refcount) != 0);
+    WARN_ON(atomic_read(&kctx->refcount) != 0);
 
-	if (kctx->as_nr != KBASEP_AS_NR_INVALID) {
-		if (kbdev->pm.backend.gpu_powered)
-			kbase_mmu_disable(kctx);
+    if (kctx->as_nr != KBASEP_AS_NR_INVALID) {
+        if (kbdev->pm.backend.gpu_powered)
+            kbase_mmu_disable(kctx);
 
-		kbdev->as_to_kctx[kctx->as_nr] = NULL;
-		kctx->as_nr = KBASEP_AS_NR_INVALID;
-	}
+        kbdev->as_to_kctx[kctx->as_nr] = NULL;
+        kctx->as_nr = KBASEP_AS_NR_INVALID;
+    }
 }
 
 void kbase_ctx_sched_restore_all_as(struct kbase_device *kbdev)
 {
-	s8 i;
+    s8 i;
 
-	lockdep_assert_held(&kbdev->mmu_hw_mutex);
-	lockdep_assert_held(&kbdev->hwaccess_lock);
+    lockdep_assert_held(&kbdev->mmu_hw_mutex);
+    lockdep_assert_held(&kbdev->hwaccess_lock);
 
-	WARN_ON(!kbdev->pm.backend.gpu_powered);
+    WARN_ON(!kbdev->pm.backend.gpu_powered);
 
-	for (i = 0; i != kbdev->nr_hw_address_spaces; ++i) {
-		struct kbase_context *kctx;
+    for (i = 0; i != kbdev->nr_hw_address_spaces; ++i) {
+        struct kbase_context *kctx;
 
-		kctx = kbdev->as_to_kctx[i];
-		if (kctx) {
-			if (atomic_read(&kctx->refcount)) {
-				WARN_ON(kctx->as_nr != i);
+        kctx = kbdev->as_to_kctx[i];
+        if (kctx) {
+            if (atomic_read(&kctx->refcount)) {
+                WARN_ON(kctx->as_nr != i);
 
-				kbase_mmu_update(kctx);
-			} else {
-				/* This context might have been assigned an
-				 * AS before, clear it.
-				 */
-				kbdev->as_to_kctx[kctx->as_nr] = NULL;
-				kctx->as_nr = KBASEP_AS_NR_INVALID;
-			}
-		} else {
-			kbase_mmu_disable_as(kbdev, i);
-		}
-	}
+                kbase_mmu_update(kctx);
+            } else {
+                /* This context might have been assigned an
+                 * AS before, clear it.
+                 */
+                kbdev->as_to_kctx[kctx->as_nr] = NULL;
+                kctx->as_nr = KBASEP_AS_NR_INVALID;
+            }
+        } else {
+            kbase_mmu_disable_as(kbdev, i);
+        }
+    }
 }

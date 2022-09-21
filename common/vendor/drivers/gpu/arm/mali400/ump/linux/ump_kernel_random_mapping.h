@@ -27,13 +27,13 @@
  * Provides a separate namespace where we can map an integer to a pointer
  */
 typedef struct ump_random_mapping {
-	_mali_osk_mutex_rw_t *lock; /**< Lock protecting access to the mapping object */
-	struct rb_root root;
+    _mali_osk_mutex_rw_t *lock; /**< Lock protecting access to the mapping object */
+    struct rb_root root;
 #if UMP_RANDOM_MAP_DELAY
-	struct {
-		unsigned long count;
-		unsigned long timestamp;
-	} failed;
+    struct {
+        unsigned long count;
+        unsigned long timestamp;
+    } failed;
 #endif
 } ump_random_mapping;
 

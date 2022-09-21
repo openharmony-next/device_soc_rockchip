@@ -31,9 +31,9 @@ int kbase_context_set_create_flags(struct kbase_context *kctx, u32 flags);
  * Return: true if @flag is set on @kctx, false if not.
  */
 static inline bool kbase_ctx_flag(struct kbase_context *kctx,
-				      enum kbase_context_flags flag)
+                      enum kbase_context_flags flag)
 {
-	return atomic_read(&kctx->flags) & flag;
+    return atomic_read(&kctx->flags) & flag;
 }
 
 /**
@@ -48,26 +48,26 @@ static inline bool kbase_ctx_flag(struct kbase_context *kctx,
  * respective flags.
  */
 static inline void kbase_ctx_flag_clear(struct kbase_context *kctx,
-					enum kbase_context_flags flag)
+                    enum kbase_context_flags flag)
 {
 #if KERNEL_VERSION(4, 3, 0) > LINUX_VERSION_CODE
-	/*
-	 * Earlier kernel versions doesn't have atomic_andnot() or
-	 * atomic_and(). atomic_clear_mask() was only available on some
-	 * architectures and removed on arm in v3.13 on arm and arm64.
-	 *
-	 * Use a compare-exchange loop to clear the flag on pre 4.3 kernels,
-	 * when atomic_andnot() becomes available.
-	 */
-	int old, new;
+    /*
+     * Earlier kernel versions doesn't have atomic_andnot() or
+     * atomic_and(). atomic_clear_mask() was only available on some
+     * architectures and removed on arm in v3.13 on arm and arm64.
+     *
+     * Use a compare-exchange loop to clear the flag on pre 4.3 kernels,
+     * when atomic_andnot() becomes available.
+     */
+    int old, new;
 
-	do {
-		old = atomic_read(&kctx->flags);
-		new = old & ~flag;
+    do {
+        old = atomic_read(&kctx->flags);
+        new = old & ~flag;
 
-	} while (atomic_cmpxchg(&kctx->flags, old, new) != old);
+    } while (atomic_cmpxchg(&kctx->flags, old, new) != old);
 #else
-	atomic_andnot(flag, &kctx->flags);
+    atomic_andnot(flag, &kctx->flags);
 #endif
 }
 
@@ -83,8 +83,8 @@ static inline void kbase_ctx_flag_clear(struct kbase_context *kctx,
  * respective flags.
  */
 static inline void kbase_ctx_flag_set(struct kbase_context *kctx,
-				      enum kbase_context_flags flag)
+                      enum kbase_context_flags flag)
 {
-	atomic_or(flag, &kctx->flags);
+    atomic_or(flag, &kctx->flags);
 }
 #endif /* _KBASE_CONTEXT_H_ */

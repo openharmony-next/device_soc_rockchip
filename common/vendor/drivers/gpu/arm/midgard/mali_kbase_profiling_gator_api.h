@@ -20,8 +20,8 @@
  * Model interface
  */
 
-#ifndef _KBASE_PROFILING_GATOR_API_H_
-#define _KBASE_PROFILING_GATOR_API_H_
+#ifndef H_KBASE_PROFILING_GATOR_API_H_
+#define H_KBASE_PROFILING_GATOR_API_H_
 
 /*
  * List of possible actions to be controlled by Streamline.
@@ -35,6 +35,6 @@
 #define FBDUMP_CONTROL_MAX (5)
 #define FBDUMP_CONTROL_MIN FBDUMP_CONTROL_ENABLE
 
-void _mali_profiling_control(u32 action, u32 value);
+void mali_profiling_control(u32 action, u32 value);
 
-#endif				/* _KBASE_PROFILING_GATOR_API */
+#endif                /* _KBASE_PROFILING_GATOR_API */

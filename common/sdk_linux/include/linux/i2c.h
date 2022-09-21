@@ -10,22 +10,22 @@
 #ifndef _LINUX_I2C_H
 #define _LINUX_I2C_H
 
-#include <linux/acpi.h>		/* for acpi_handle */
+#include <linux/acpi.h>        /* for acpi_handle */
 #include <linux/mod_devicetable.h>
-#include <linux/device.h>	/* for struct device */
-#include <linux/sched.h>	/* for completion */
+#include <linux/device.h>    /* for struct device */
+#include <linux/sched.h>    /* for completion */
 #include <linux/mutex.h>
 #include <linux/rtmutex.h>
-#include <linux/irqdomain.h>		/* for Host Notify IRQ */
-#include <linux/of.h>		/* for struct device_node */
-#include <linux/swab.h>		/* for swab16 */
+#include <linux/irqdomain.h>        /* for Host Notify IRQ */
+#include <linux/of.h>        /* for struct device_node */
+#include <linux/swab.h>        /* for swab16 */
 #include <uapi/linux/i2c.h>
 
 extern struct bus_type i2c_bus_type;
 extern struct device_type i2c_adapter_type;
 extern struct device_type i2c_client_type;
 
-/* --- General options ------------------------------------------------	*/
+/* --- General options ------------------------------------------------    */
 
 struct i2c_msg;
 struct i2c_algorithm;
@@ -37,15 +37,15 @@ union i2c_smbus_data;
 struct i2c_board_info;
 enum i2c_slave_event;
 typedef int (*i2c_slave_cb_t)(struct i2c_client *client,
-			      enum i2c_slave_event event, u8 *val);
+                  enum i2c_slave_event event, u8 *val);
 
 /* I2C Frequency Modes */
-#define I2C_MAX_STANDARD_MODE_FREQ	100000
-#define I2C_MAX_FAST_MODE_FREQ		400000
-#define I2C_MAX_FAST_MODE_PLUS_FREQ	1000000
-#define I2C_MAX_TURBO_MODE_FREQ		1400000
-#define I2C_MAX_HIGH_SPEED_MODE_FREQ	3400000
-#define I2C_MAX_ULTRA_FAST_MODE_FREQ	5000000
+#define I2C_MAX_STANDARD_MODE_FREQ    100000
+#define I2C_MAX_FAST_MODE_FREQ        400000
+#define I2C_MAX_FAST_MODE_PLUS_FREQ    1000000
+#define I2C_MAX_TURBO_MODE_FREQ        1400000
+#define I2C_MAX_HIGH_SPEED_MODE_FREQ    3400000
+#define I2C_MAX_ULTRA_FAST_MODE_FREQ    5000000
 
 struct module;
 struct property_entry;
@@ -59,7 +59,7 @@ struct property_entry;
  * @count must be less than 64k since msg.len is u16.
  */
 int i2c_transfer_buffer_flags(const struct i2c_client *client,
-			      char *buf, int count, u16 flags);
+                  char *buf, int count, u16 flags);
 
 /**
  * i2c_master_recv - issue a single I2C message in master receive mode
@@ -70,14 +70,14 @@ int i2c_transfer_buffer_flags(const struct i2c_client *client,
  * Returns negative errno, or else the number of bytes read.
  */
 static inline int i2c_master_recv(const struct i2c_client *client,
-				  char *buf, int count)
+                  char *buf, int count)
 {
-	return i2c_transfer_buffer_flags(client, buf, count, I2C_M_RD);
+    return i2c_transfer_buffer_flags(client, buf, count, I2C_M_RD);
 };
 
 /**
  * i2c_master_recv_dmasafe - issue a single I2C message in master receive mode
- *			     using a DMA safe buffer
+ *                 using a DMA safe buffer
  * @client: Handle to slave device
  * @buf: Where to store data read from slave, must be safe to use with DMA
  * @count: How many bytes to read, must be less than 64k since msg.len is u16
@@ -85,10 +85,10 @@ static inline int i2c_master_recv(const struct i2c_client *client,
  * Returns negative errno, or else the number of bytes read.
  */
 static inline int i2c_master_recv_dmasafe(const struct i2c_client *client,
-					  char *buf, int count)
+                      char *buf, int count)
 {
-	return i2c_transfer_buffer_flags(client, buf, count,
-					 I2C_M_RD | I2C_M_DMA_SAFE);
+    return i2c_transfer_buffer_flags(client, buf, count,
+                     I2C_M_RD | I2C_M_DMA_SAFE);
 };
 
 /**
@@ -100,14 +100,14 @@ static inline int i2c_master_recv_dmasafe(const struct i2c_client *client,
  * Returns negative errno, or else the number of bytes written.
  */
 static inline int i2c_master_send(const struct i2c_client *client,
-				  const char *buf, int count)
+                  const char *buf, int count)
 {
-	return i2c_transfer_buffer_flags(client, (char *)buf, count, 0);
+    return i2c_transfer_buffer_flags(client, (char *)buf, count, 0);
 };
 
 /**
  * i2c_master_send_dmasafe - issue a single I2C message in master transmit mode
- *			     using a DMA safe buffer
+ *                 using a DMA safe buffer
  * @client: Handle to slave device
  * @buf: Data that will be written to the slave, must be safe to use with DMA
  * @count: How many bytes to write, must be less than 64k since msg.len is u16
@@ -115,10 +115,10 @@ static inline int i2c_master_send(const struct i2c_client *client,
  * Returns negative errno, or else the number of bytes written.
  */
 static inline int i2c_master_send_dmasafe(const struct i2c_client *client,
-					  const char *buf, int count)
+                      const char *buf, int count)
 {
-	return i2c_transfer_buffer_flags(client, (char *)buf, count,
-					 I2C_M_DMA_SAFE);
+    return i2c_transfer_buffer_flags(client, (char *)buf, count,
+                     I2C_M_DMA_SAFE);
 };
 
 /* Transfer num messages.
@@ -133,13 +133,13 @@ int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num);
    Note that we use i2c_adapter here, because you do not need a specific
    smbus adapter to call this function. */
 s32 i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
-		   unsigned short flags, char read_write, u8 command,
-		   int protocol, union i2c_smbus_data *data);
+           unsigned short flags, char read_write, u8 command,
+           int protocol, union i2c_smbus_data *data);
 
 /* Unlocked flavor */
 s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
-		     unsigned short flags, char read_write, u8 command,
-		     int protocol, union i2c_smbus_data *data);
+             unsigned short flags, char read_write, u8 command,
+             int protocol, union i2c_smbus_data *data);
 
 /* Now follow the 'nice' access routines. These also document the calling
    conventions of i2c_smbus_xfer. */
@@ -148,41 +148,41 @@ s32 i2c_smbus_read_byte(const struct i2c_client *client);
 s32 i2c_smbus_write_byte(const struct i2c_client *client, u8 value);
 s32 i2c_smbus_read_byte_data(const struct i2c_client *client, u8 command);
 s32 i2c_smbus_write_byte_data(const struct i2c_client *client,
-			      u8 command, u8 value);
+                  u8 command, u8 value);
 s32 i2c_smbus_read_word_data(const struct i2c_client *client, u8 command);
 s32 i2c_smbus_write_word_data(const struct i2c_client *client,
-			      u8 command, u16 value);
+                  u8 command, u16 value);
 
 static inline s32
 i2c_smbus_read_word_swapped(const struct i2c_client *client, u8 command)
 {
-	s32 value = i2c_smbus_read_word_data(client, command);
+    s32 value = i2c_smbus_read_word_data(client, command);
 
-	return (value < 0) ? value : swab16(value);
+    return (value < 0) ? value : swab16(value);
 }
 
 static inline s32
 i2c_smbus_write_word_swapped(const struct i2c_client *client,
-			     u8 command, u16 value)
+                 u8 command, u16 value)
 {
-	return i2c_smbus_write_word_data(client, command, swab16(value));
+    return i2c_smbus_write_word_data(client, command, swab16(value));
 }
 
 /* Returns the number of read bytes */
 s32 i2c_smbus_read_block_data(const struct i2c_client *client,
-			      u8 command, u8 *values);
+                  u8 command, u8 *values);
 s32 i2c_smbus_write_block_data(const struct i2c_client *client,
-			       u8 command, u8 length, const u8 *values);
+                   u8 command, u8 length, const u8 *values);
 /* Returns the number of read bytes */
 s32 i2c_smbus_read_i2c_block_data(const struct i2c_client *client,
-				  u8 command, u8 length, u8 *values);
+                  u8 command, u8 length, u8 *values);
 s32 i2c_smbus_write_i2c_block_data(const struct i2c_client *client,
-				   u8 command, u8 length, const u8 *values);
+                   u8 command, u8 length, const u8 *values);
 s32 i2c_smbus_read_i2c_block_data_or_emulated(const struct i2c_client *client,
-					      u8 command, u8 length,
-					      u8 *values);
+                          u8 command, u8 length,
+                          u8 *values);
 int i2c_get_device_id(const struct i2c_client *client,
-		      struct i2c_device_identity *id);
+              struct i2c_device_identity *id);
 #endif /* I2C */
 
 /**
@@ -192,7 +192,7 @@ int i2c_get_device_id(const struct i2c_client *client,
  * @die_revision: 0 - 7, according to manufacturer
  */
 struct i2c_device_identity {
-	u16 manufacturer_id;
+    u16 manufacturer_id;
 #define I2C_DEVICE_ID_NXP_SEMICONDUCTORS                0
 #define I2C_DEVICE_ID_NXP_SEMICONDUCTORS_1              1
 #define I2C_DEVICE_ID_NXP_SEMICONDUCTORS_2              2
@@ -208,13 +208,13 @@ struct i2c_device_identity {
 #define I2C_DEVICE_ID_O2MICRO                          12
 #define I2C_DEVICE_ID_ATMEL                            13
 #define I2C_DEVICE_ID_NONE                         0xffff
-	u16 part_id;
-	u8 die_revision;
+    u16 part_id;
+    u8 die_revision;
 };
 
 enum i2c_alert_protocol {
-	I2C_PROTOCOL_SMBUS_ALERT,
-	I2C_PROTOCOL_SMBUS_HOST_NOTIFY,
+    I2C_PROTOCOL_SMBUS_ALERT,
+    I2C_PROTOCOL_SMBUS_HOST_NOTIFY,
 };
 
 /**
@@ -253,42 +253,42 @@ enum i2c_alert_protocol {
  * not allowed.
  */
 struct i2c_driver {
-	unsigned int class;
+    unsigned int class;
 
-	/* Standard driver model interfaces */
-	int (*probe)(struct i2c_client *client, const struct i2c_device_id *id);
-	int (*remove)(struct i2c_client *client);
+    /* Standard driver model interfaces */
+    int (*probe)(struct i2c_client *client, const struct i2c_device_id *id);
+    int (*remove)(struct i2c_client *client);
 
-	/* New driver model interface to aid the seamless removal of the
-	 * current probe()'s, more commonly unused than used second parameter.
-	 */
-	int (*probe_new)(struct i2c_client *client);
+    /* New driver model interface to aid the seamless removal of the
+     * current probe()'s, more commonly unused than used second parameter.
+     */
+    int (*probe_new)(struct i2c_client *client);
 
-	/* driver model interfaces that don't relate to enumeration  */
-	void (*shutdown)(struct i2c_client *client);
+    /* driver model interfaces that don't relate to enumeration  */
+    void (*shutdown)(struct i2c_client *client);
 
-	/* Alert callback, for example for the SMBus alert protocol.
-	 * The format and meaning of the data value depends on the protocol.
-	 * For the SMBus alert protocol, there is a single bit of data passed
-	 * as the alert response's low bit ("event flag").
-	 * For the SMBus Host Notify protocol, the data corresponds to the
-	 * 16-bit payload data reported by the slave device acting as master.
-	 */
-	void (*alert)(struct i2c_client *client, enum i2c_alert_protocol protocol,
-		      unsigned int data);
+    /* Alert callback, for example for the SMBus alert protocol.
+     * The format and meaning of the data value depends on the protocol.
+     * For the SMBus alert protocol, there is a single bit of data passed
+     * as the alert response's low bit ("event flag").
+     * For the SMBus Host Notify protocol, the data corresponds to the
+     * 16-bit payload data reported by the slave device acting as master.
+     */
+    void (*alert)(struct i2c_client *client, enum i2c_alert_protocol protocol,
+              unsigned int data);
 
-	/* a ioctl like command that can be used to perform specific functions
-	 * with the device.
-	 */
-	int (*command)(struct i2c_client *client, unsigned int cmd, void *arg);
+    /* a ioctl like command that can be used to perform specific functions
+     * with the device.
+     */
+    int (*command)(struct i2c_client *client, unsigned int cmd, void *arg);
 
-	struct device_driver driver;
-	const struct i2c_device_id *id_table;
+    struct device_driver driver;
+    const struct i2c_device_id *id_table;
 
-	/* Device detection callback for automatic device creation */
-	int (*detect)(struct i2c_client *client, struct i2c_board_info *info);
-	const unsigned short *address_list;
-	struct list_head clients;
+    /* Device detection callback for automatic device creation */
+    int (*detect)(struct i2c_client *client, struct i2c_board_info *info);
+    const unsigned short *address_list;
+    struct list_head clients;
 };
 #define to_i2c_driver(d) container_of(d, struct i2c_driver, driver)
 
@@ -297,42 +297,42 @@ struct i2c_driver {
  * @flags: see I2C_CLIENT_* for possible flags
  * @addr: Address used on the I2C bus connected to the parent adapter.
  * @name: Indicates the type of the device, usually a chip name that's
- *	generic enough to hide second-sourcing and compatible revisions.
+ *    generic enough to hide second-sourcing and compatible revisions.
  * @adapter: manages the bus segment hosting this I2C device
  * @dev: Driver model device node for the slave.
  * @init_irq: IRQ that was set at initialization
  * @irq: indicates the IRQ generated by this device (if any)
  * @detected: member of an i2c_driver.clients list or i2c-core's
- *	userspace_devices list
+ *    userspace_devices list
  * @slave_cb: Callback when I2C slave mode of an adapter is used. The adapter
- *	calls it to pass on slave events to the slave driver.
+ *    calls it to pass on slave events to the slave driver.
  *
  * An i2c_client identifies a single device (i.e. chip) connected to an
  * i2c bus. The behaviour exposed to Linux is defined by the driver
  * managing the device.
  */
 struct i2c_client {
-	unsigned short flags;		/* div., see below		*/
-#define I2C_CLIENT_PEC		0x04	/* Use Packet Error Checking */
-#define I2C_CLIENT_TEN		0x10	/* we have a ten bit chip address */
-					/* Must equal I2C_M_TEN below */
-#define I2C_CLIENT_SLAVE	0x20	/* we are the slave */
-#define I2C_CLIENT_HOST_NOTIFY	0x40	/* We want to use I2C host notify */
-#define I2C_CLIENT_WAKE		0x80	/* for board_info; true iff can wake */
-#define I2C_CLIENT_SCCB		0x9000	/* Use Omnivision SCCB protocol */
-					/* Must match I2C_M_STOP|IGNORE_NAK */
+    unsigned short flags;        /* div., see below        */
+#define I2C_CLIENT_PEC        0x04    /* Use Packet Error Checking */
+#define I2C_CLIENT_TEN        0x10    /* we have a ten bit chip address */
+                    /* Must equal I2C_M_TEN below */
+#define I2C_CLIENT_SLAVE    0x20    /* we are the slave */
+#define I2C_CLIENT_HOST_NOTIFY    0x40    /* We want to use I2C host notify */
+#define I2C_CLIENT_WAKE        0x80    /* for board_info; true iff can wake */
+#define I2C_CLIENT_SCCB        0x9000    /* Use Omnivision SCCB protocol */
+                    /* Must match I2C_M_STOP|IGNORE_NAK */
 
-	unsigned short addr;		/* chip address - NOTE: 7bit	*/
-					/* addresses are stored in the	*/
-					/* _LOWER_ 7 bits		*/
-	char name[I2C_NAME_SIZE];
-	struct i2c_adapter *adapter;	/* the adapter we sit on	*/
-	struct device dev;		/* the device structure		*/
-	int init_irq;			/* irq set at initialization	*/
-	int irq;			/* irq issued by device		*/
-	struct list_head detected;
+    unsigned short addr;        /* chip address - NOTE: 7bit    */
+                    /* addresses are stored in the    */
+                    /* _LOWER_ 7 bits        */
+    char name[I2C_NAME_SIZE];
+    struct i2c_adapter *adapter;    /* the adapter we sit on    */
+    struct device dev;        /* the device structure        */
+    int init_irq;            /* irq set at initialization    */
+    int irq;            /* irq issued by device        */
+    struct list_head detected;
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
-	i2c_slave_cb_t slave_cb;	/* callback for slave mode	*/
+    i2c_slave_cb_t slave_cb;    /* callback for slave mode    */
 #endif
 };
 #define to_i2c_client(d) container_of(d, struct i2c_client, dev)
@@ -340,33 +340,33 @@ struct i2c_client {
 struct i2c_client *i2c_verify_client(struct device *dev);
 struct i2c_adapter *i2c_verify_adapter(struct device *dev);
 const struct i2c_device_id *i2c_match_id(const struct i2c_device_id *id,
-					 const struct i2c_client *client);
+                     const struct i2c_client *client);
 
 static inline struct i2c_client *kobj_to_i2c_client(struct kobject *kobj)
 {
-	struct device * const dev = kobj_to_dev(kobj);
-	return to_i2c_client(dev);
+    struct device * const dev = kobj_to_dev(kobj);
+    return to_i2c_client(dev);
 }
 
 static inline void *i2c_get_clientdata(const struct i2c_client *client)
 {
-	return dev_get_drvdata(&client->dev);
+    return dev_get_drvdata(&client->dev);
 }
 
 static inline void i2c_set_clientdata(struct i2c_client *client, void *data)
 {
-	dev_set_drvdata(&client->dev, data);
+    dev_set_drvdata(&client->dev, data);
 }
 
 /* I2C slave support */
 
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
 enum i2c_slave_event {
-	I2C_SLAVE_READ_REQUESTED,
-	I2C_SLAVE_WRITE_REQUESTED,
-	I2C_SLAVE_READ_PROCESSED,
-	I2C_SLAVE_WRITE_RECEIVED,
-	I2C_SLAVE_STOP,
+    I2C_SLAVE_READ_REQUESTED,
+    I2C_SLAVE_WRITE_REQUESTED,
+    I2C_SLAVE_READ_PROCESSED,
+    I2C_SLAVE_WRITE_RECEIVED,
+    I2C_SLAVE_STOP,
 };
 
 int i2c_slave_register(struct i2c_client *client, i2c_slave_cb_t slave_cb);
@@ -374,9 +374,9 @@ int i2c_slave_unregister(struct i2c_client *client);
 bool i2c_detect_slave_mode(struct device *dev);
 
 static inline int i2c_slave_event(struct i2c_client *client,
-				  enum i2c_slave_event event, u8 *val)
+                  enum i2c_slave_event event, u8 *val)
 {
-	return client->slave_cb(client, event, val);
+    return client->slave_cb(client, event, val);
 }
 #else
 static inline bool i2c_detect_slave_mode(struct device *dev) { return false; }
@@ -408,17 +408,17 @@ static inline bool i2c_detect_slave_mode(struct device *dev) { return false; }
  * i2c_new_client_device() does this dynamically with the adapter already known.
  */
 struct i2c_board_info {
-	char		type[I2C_NAME_SIZE];
-	unsigned short	flags;
-	unsigned short	addr;
-	const char	*dev_name;
-	void		*platform_data;
-	struct device_node *of_node;
-	struct fwnode_handle *fwnode;
-	const struct property_entry *properties;
-	const struct resource *resources;
-	unsigned int	num_resources;
-	int		irq;
+    char        type[I2C_NAME_SIZE];
+    unsigned short    flags;
+    unsigned short    addr;
+    const char    *dev_name;
+    void        *platform_data;
+    struct device_node *of_node;
+    struct fwnode_handle *fwnode;
+    const struct property_entry *properties;
+    const struct resource *resources;
+    unsigned int    num_resources;
+    int        irq;
 };
 
 /**
@@ -432,7 +432,7 @@ struct i2c_board_info {
  * are provided using conventional syntax.
  */
 #define I2C_BOARD_INFO(dev_type, dev_addr) \
-	.type = dev_type, .addr = (dev_addr)
+    .type = dev_type, .addr = (dev_addr)
 
 
 #if IS_ENABLED(CONFIG_I2C)
@@ -452,9 +452,9 @@ i2c_new_client_device(struct i2c_adapter *adap, struct i2c_board_info const *inf
  */
 struct i2c_client *
 i2c_new_scanned_device(struct i2c_adapter *adap,
-		       struct i2c_board_info *info,
-		       unsigned short const *addr_list,
-		       int (*probe)(struct i2c_adapter *adap, unsigned short addr));
+               struct i2c_board_info *info,
+               unsigned short const *addr_list,
+               int (*probe)(struct i2c_adapter *adap, unsigned short addr));
 
 /* Common custom probe functions */
 int i2c_probe_func_quick_read(struct i2c_adapter *adap, unsigned short addr);
@@ -467,8 +467,8 @@ devm_i2c_new_dummy_device(struct device *dev, struct i2c_adapter *adap, u16 addr
 
 struct i2c_client *
 i2c_new_ancillary_device(struct i2c_client *client,
-			 const char *name,
-			 u16 default_addr);
+             const char *name,
+             u16 default_addr);
 
 void i2c_unregister_device(struct i2c_client *client);
 #endif /* I2C */
@@ -480,13 +480,13 @@ void i2c_unregister_device(struct i2c_client *client);
 #ifdef CONFIG_I2C_BOARDINFO
 int
 i2c_register_board_info(int busnum, struct i2c_board_info const *info,
-			unsigned n);
+            unsigned n);
 #else
 static inline int
 i2c_register_board_info(int busnum, struct i2c_board_info const *info,
-			unsigned n)
+            unsigned n)
 {
-	return 0;
+    return 0;
 }
 #endif /* I2C_BOARDINFO */
 
@@ -517,32 +517,32 @@ i2c_register_board_info(int busnum, struct i2c_board_info const *info,
  * Kernel Documentation file Documentation/i2c/fault-codes.rst.
  */
 struct i2c_algorithm {
-	/*
-	 * If an adapter algorithm can't do I2C-level access, set master_xfer
-	 * to NULL. If an adapter algorithm can do SMBus access, set
-	 * smbus_xfer. If set to NULL, the SMBus protocol is simulated
-	 * using common I2C messages.
-	 *
-	 * master_xfer should return the number of messages successfully
-	 * processed, or a negative value on error
-	 */
-	int (*master_xfer)(struct i2c_adapter *adap, struct i2c_msg *msgs,
-			   int num);
-	int (*master_xfer_atomic)(struct i2c_adapter *adap,
-				   struct i2c_msg *msgs, int num);
-	int (*smbus_xfer)(struct i2c_adapter *adap, u16 addr,
-			  unsigned short flags, char read_write,
-			  u8 command, int size, union i2c_smbus_data *data);
-	int (*smbus_xfer_atomic)(struct i2c_adapter *adap, u16 addr,
-				 unsigned short flags, char read_write,
-				 u8 command, int size, union i2c_smbus_data *data);
+    /*
+     * If an adapter algorithm can't do I2C-level access, set master_xfer
+     * to NULL. If an adapter algorithm can do SMBus access, set
+     * smbus_xfer. If set to NULL, the SMBus protocol is simulated
+     * using common I2C messages.
+     *
+     * master_xfer should return the number of messages successfully
+     * processed, or a negative value on error
+     */
+    int (*master_xfer)(struct i2c_adapter *adap, struct i2c_msg *msgs,
+               int num);
+    int (*master_xfer_atomic)(struct i2c_adapter *adap,
+                   struct i2c_msg *msgs, int num);
+    int (*smbus_xfer)(struct i2c_adapter *adap, u16 addr,
+              unsigned short flags, char read_write,
+              u8 command, int size, union i2c_smbus_data *data);
+    int (*smbus_xfer_atomic)(struct i2c_adapter *adap, u16 addr,
+                 unsigned short flags, char read_write,
+                 u8 command, int size, union i2c_smbus_data *data);
 
-	/* To determine what the adapter supports */
-	u32 (*functionality)(struct i2c_adapter *adap);
+    /* To determine what the adapter supports */
+    u32 (*functionality)(struct i2c_adapter *adap);
 
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
-	int (*reg_slave)(struct i2c_client *client);
-	int (*unreg_slave)(struct i2c_client *client);
+    int (*reg_slave)(struct i2c_client *client);
+    int (*unreg_slave)(struct i2c_client *client);
 #endif
 };
 
@@ -555,9 +555,9 @@ struct i2c_algorithm {
  * The main operations are wrapped by i2c_lock_bus and i2c_unlock_bus.
  */
 struct i2c_lock_operations {
-	void (*lock_bus)(struct i2c_adapter *adapter, unsigned int flags);
-	int (*trylock_bus)(struct i2c_adapter *adapter, unsigned int flags);
-	void (*unlock_bus)(struct i2c_adapter *adapter, unsigned int flags);
+    void (*lock_bus)(struct i2c_adapter *adapter, unsigned int flags);
+    int (*trylock_bus)(struct i2c_adapter *adapter, unsigned int flags);
+    void (*unlock_bus)(struct i2c_adapter *adapter, unsigned int flags);
 };
 
 /**
@@ -569,41 +569,41 @@ struct i2c_lock_operations {
  * @sda_fall_ns: time SDA signal takes to fall in ns; t(f) in the I2C specification
  * @sda_hold_ns: time IP core additionally needs to hold SDA in ns
  * @digital_filter_width_ns: width in ns of spikes on i2c lines that the IP core
- *	digital filter can filter out
+ *    digital filter can filter out
  * @analog_filter_cutoff_freq_hz: threshold frequency for the low pass IP core
- *	analog filter
+ *    analog filter
  */
 struct i2c_timings {
-	u32 bus_freq_hz;
-	u32 scl_rise_ns;
-	u32 scl_fall_ns;
-	u32 scl_int_delay_ns;
-	u32 sda_fall_ns;
-	u32 sda_hold_ns;
-	u32 digital_filter_width_ns;
-	u32 analog_filter_cutoff_freq_hz;
+    u32 bus_freq_hz;
+    u32 scl_rise_ns;
+    u32 scl_fall_ns;
+    u32 scl_int_delay_ns;
+    u32 sda_fall_ns;
+    u32 sda_hold_ns;
+    u32 digital_filter_width_ns;
+    u32 analog_filter_cutoff_freq_hz;
 };
 
 /**
  * struct i2c_bus_recovery_info - I2C bus recovery information
  * @recover_bus: Recover routine. Either pass driver's recover_bus() routine, or
- *	i2c_generic_scl_recovery().
+ *    i2c_generic_scl_recovery().
  * @get_scl: This gets current value of SCL line. Mandatory for generic SCL
  *      recovery. Populated internally for generic GPIO recovery.
  * @set_scl: This sets/clears the SCL line. Mandatory for generic SCL recovery.
  *      Populated internally for generic GPIO recovery.
  * @get_sda: This gets current value of SDA line. This or set_sda() is mandatory
- *	for generic SCL recovery. Populated internally, if sda_gpio is a valid
- *	GPIO, for generic GPIO recovery.
+ *    for generic SCL recovery. Populated internally, if sda_gpio is a valid
+ *    GPIO, for generic GPIO recovery.
  * @set_sda: This sets/clears the SDA line. This or get_sda() is mandatory for
- *	generic SCL recovery. Populated internally, if sda_gpio is a valid GPIO,
- *	for generic GPIO recovery.
+ *    generic SCL recovery. Populated internally, if sda_gpio is a valid GPIO,
+ *    for generic GPIO recovery.
  * @get_bus_free: Returns the bus free state as seen from the IP core in case it
- *	has a more complex internal logic than just reading SDA. Optional.
+ *    has a more complex internal logic than just reading SDA. Optional.
  * @prepare_recovery: This will be called before starting recovery. Platform may
- *	configure padmux here for SDA/SCL line or something else they want.
+ *    configure padmux here for SDA/SCL line or something else they want.
  * @unprepare_recovery: This will be called after completing recovery. Platform
- *	may configure padmux here for SDA/SCL line or something else they want.
+ *    may configure padmux here for SDA/SCL line or something else they want.
  * @scl_gpiod: gpiod of the SCL line. Only required for GPIO recovery.
  * @sda_gpiod: gpiod of the SDA line. Only required for GPIO recovery.
  * @pinctrl: pinctrl used by GPIO recovery to change the state of the I2C pins.
@@ -616,23 +616,23 @@ struct i2c_timings {
  *      is called "gpio" or "recovery" and pinctrl is valid.
  */
 struct i2c_bus_recovery_info {
-	int (*recover_bus)(struct i2c_adapter *adap);
+    int (*recover_bus)(struct i2c_adapter *adap);
 
-	int (*get_scl)(struct i2c_adapter *adap);
-	void (*set_scl)(struct i2c_adapter *adap, int val);
-	int (*get_sda)(struct i2c_adapter *adap);
-	void (*set_sda)(struct i2c_adapter *adap, int val);
-	int (*get_bus_free)(struct i2c_adapter *adap);
+    int (*get_scl)(struct i2c_adapter *adap);
+    void (*set_scl)(struct i2c_adapter *adap, int val);
+    int (*get_sda)(struct i2c_adapter *adap);
+    void (*set_sda)(struct i2c_adapter *adap, int val);
+    int (*get_bus_free)(struct i2c_adapter *adap);
 
-	void (*prepare_recovery)(struct i2c_adapter *adap);
-	void (*unprepare_recovery)(struct i2c_adapter *adap);
+    void (*prepare_recovery)(struct i2c_adapter *adap);
+    void (*unprepare_recovery)(struct i2c_adapter *adap);
 
-	/* gpio recovery */
-	struct gpio_desc *scl_gpiod;
-	struct gpio_desc *sda_gpiod;
-	struct pinctrl *pinctrl;
-	struct pinctrl_state *pins_default;
-	struct pinctrl_state *pins_gpio;
+    /* gpio recovery */
+    struct gpio_desc *scl_gpiod;
+    struct gpio_desc *sda_gpiod;
+    struct pinctrl *pinctrl;
+    struct pinctrl_state *pins_default;
+    struct pinctrl_state *pins_gpio;
 };
 
 int i2c_recover_bus(struct i2c_adapter *adap);
@@ -662,91 +662,91 @@ int i2c_generic_scl_recovery(struct i2c_adapter *adap);
  */
 
 struct i2c_adapter_quirks {
-	u64 flags;
-	int max_num_msgs;
-	u16 max_write_len;
-	u16 max_read_len;
-	u16 max_comb_1st_msg_len;
-	u16 max_comb_2nd_msg_len;
+    u64 flags;
+    int max_num_msgs;
+    u16 max_write_len;
+    u16 max_read_len;
+    u16 max_comb_1st_msg_len;
+    u16 max_comb_2nd_msg_len;
 };
 
 /* enforce max_num_msgs = 2 and use max_comb_*_len for length checks */
-#define I2C_AQ_COMB			BIT(0)
+#define I2C_AQ_COMB            BIT(0)
 /* first combined message must be write */
-#define I2C_AQ_COMB_WRITE_FIRST		BIT(1)
+#define I2C_AQ_COMB_WRITE_FIRST        BIT(1)
 /* second combined message must be read */
-#define I2C_AQ_COMB_READ_SECOND		BIT(2)
+#define I2C_AQ_COMB_READ_SECOND        BIT(2)
 /* both combined messages must have the same target address */
-#define I2C_AQ_COMB_SAME_ADDR		BIT(3)
+#define I2C_AQ_COMB_SAME_ADDR        BIT(3)
 /* convenience macro for typical write-then read case */
-#define I2C_AQ_COMB_WRITE_THEN_READ	(I2C_AQ_COMB | I2C_AQ_COMB_WRITE_FIRST | \
-					 I2C_AQ_COMB_READ_SECOND | I2C_AQ_COMB_SAME_ADDR)
+#define I2C_AQ_COMB_WRITE_THEN_READ    (I2C_AQ_COMB | I2C_AQ_COMB_WRITE_FIRST | \
+                     I2C_AQ_COMB_READ_SECOND | I2C_AQ_COMB_SAME_ADDR)
 /* clock stretching is not supported */
-#define I2C_AQ_NO_CLK_STRETCH		BIT(4)
+#define I2C_AQ_NO_CLK_STRETCH        BIT(4)
 /* message cannot have length of 0 */
-#define I2C_AQ_NO_ZERO_LEN_READ		BIT(5)
-#define I2C_AQ_NO_ZERO_LEN_WRITE	BIT(6)
-#define I2C_AQ_NO_ZERO_LEN		(I2C_AQ_NO_ZERO_LEN_READ | I2C_AQ_NO_ZERO_LEN_WRITE)
+#define I2C_AQ_NO_ZERO_LEN_READ        BIT(5)
+#define I2C_AQ_NO_ZERO_LEN_WRITE    BIT(6)
+#define I2C_AQ_NO_ZERO_LEN        (I2C_AQ_NO_ZERO_LEN_READ | I2C_AQ_NO_ZERO_LEN_WRITE)
 /* adapter cannot do repeated START */
-#define I2C_AQ_NO_REP_START		BIT(7)
+#define I2C_AQ_NO_REP_START        BIT(7)
 
 /*
  * i2c_adapter is the structure used to identify a physical i2c bus along
  * with the access algorithms necessary to access it.
  */
 struct i2c_adapter {
-	struct module *owner;
-	unsigned int class;		  /* classes to allow probing for */
-	const struct i2c_algorithm *algo; /* the algorithm to access the bus */
-	void *algo_data;
+    struct module *owner;
+    unsigned int class;          /* classes to allow probing for */
+    const struct i2c_algorithm *algo; /* the algorithm to access the bus */
+    void *algo_data;
 
-	/* data fields that are valid for all devices	*/
-	const struct i2c_lock_operations *lock_ops;
-	struct rt_mutex bus_lock;
-	struct rt_mutex mux_lock;
+    /* data fields that are valid for all devices    */
+    const struct i2c_lock_operations *lock_ops;
+    struct rt_mutex bus_lock;
+    struct rt_mutex mux_lock;
 
-	int timeout;			/* in jiffies */
-	int retries;
-	struct device dev;		/* the adapter device */
-	unsigned long locked_flags;	/* owned by the I2C core */
-#define I2C_ALF_IS_SUSPENDED		0
-#define I2C_ALF_SUSPEND_REPORTED	1
+    int timeout;            /* in jiffies */
+    int retries;
+    struct device dev;        /* the adapter device */
+    unsigned long locked_flags;    /* owned by the I2C core */
+#define I2C_ALF_IS_SUSPENDED        0
+#define I2C_ALF_SUSPEND_REPORTED    1
 
-	int nr;
-	char name[48];
-	struct completion dev_released;
+    int nr;
+    char name[48];
+    struct completion dev_released;
 
-	struct mutex userspace_clients_lock;
-	struct list_head userspace_clients;
+    struct mutex userspace_clients_lock;
+    struct list_head userspace_clients;
 
-	struct i2c_bus_recovery_info *bus_recovery_info;
-	const struct i2c_adapter_quirks *quirks;
+    struct i2c_bus_recovery_info *bus_recovery_info;
+    const struct i2c_adapter_quirks *quirks;
 
-	struct irq_domain *host_notify_domain;
+    struct irq_domain *host_notify_domain;
 };
 #define to_i2c_adapter(d) container_of(d, struct i2c_adapter, dev)
 
 static inline void *i2c_get_adapdata(const struct i2c_adapter *adap)
 {
-	return dev_get_drvdata(&adap->dev);
+    return dev_get_drvdata(&adap->dev);
 }
 
 static inline void i2c_set_adapdata(struct i2c_adapter *adap, void *data)
 {
-	dev_set_drvdata(&adap->dev, data);
+    dev_set_drvdata(&adap->dev, data);
 }
 
 static inline struct i2c_adapter *
 i2c_parent_is_i2c_adapter(const struct i2c_adapter *adapter)
 {
 #if IS_ENABLED(CONFIG_I2C_MUX)
-	struct device *parent = adapter->dev.parent;
+    struct device *parent = adapter->dev.parent;
 
-	if (parent != NULL && parent->type == &i2c_adapter_type)
-		return to_i2c_adapter(parent);
-	else
+    if (parent != NULL && parent->type == &i2c_adapter_type)
+        return to_i2c_adapter(parent);
+    else
 #endif
-		return NULL;
+        return NULL;
 }
 
 int i2c_for_each_dev(void *data, int (*fn)(struct device *dev, void *data));
@@ -759,38 +759,38 @@ int i2c_for_each_dev(void *data, int (*fn)(struct device *dev, void *data));
  * i2c_lock_bus - Get exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
  * @flags: I2C_LOCK_ROOT_ADAPTER locks the root i2c adapter, I2C_LOCK_SEGMENT
- *	locks only this branch in the adapter tree
+ *    locks only this branch in the adapter tree
  */
 static inline void
 i2c_lock_bus(struct i2c_adapter *adapter, unsigned int flags)
 {
-	adapter->lock_ops->lock_bus(adapter, flags);
+    adapter->lock_ops->lock_bus(adapter, flags);
 }
 
 /**
  * i2c_trylock_bus - Try to get exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
  * @flags: I2C_LOCK_ROOT_ADAPTER tries to locks the root i2c adapter,
- *	I2C_LOCK_SEGMENT tries to lock only this branch in the adapter tree
+ *    I2C_LOCK_SEGMENT tries to lock only this branch in the adapter tree
  *
  * Return: true if the I2C bus segment is locked, false otherwise
  */
 static inline int
 i2c_trylock_bus(struct i2c_adapter *adapter, unsigned int flags)
 {
-	return adapter->lock_ops->trylock_bus(adapter, flags);
+    return adapter->lock_ops->trylock_bus(adapter, flags);
 }
 
 /**
  * i2c_unlock_bus - Release exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
  * @flags: I2C_LOCK_ROOT_ADAPTER unlocks the root i2c adapter, I2C_LOCK_SEGMENT
- *	unlocks only this branch in the adapter tree
+ *    unlocks only this branch in the adapter tree
  */
 static inline void
 i2c_unlock_bus(struct i2c_adapter *adapter, unsigned int flags)
 {
-	adapter->lock_ops->unlock_bus(adapter, flags);
+    adapter->lock_ops->unlock_bus(adapter, flags);
 }
 
 /**
@@ -805,9 +805,9 @@ i2c_unlock_bus(struct i2c_adapter *adapter, unsigned int flags)
  */
 static inline void i2c_mark_adapter_suspended(struct i2c_adapter *adap)
 {
-	i2c_lock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
-	set_bit(I2C_ALF_IS_SUSPENDED, &adap->locked_flags);
-	i2c_unlock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
+    i2c_lock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
+    set_bit(I2C_ALF_IS_SUSPENDED, &adap->locked_flags);
+    i2c_unlock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
 }
 
 /**
@@ -820,24 +820,24 @@ static inline void i2c_mark_adapter_suspended(struct i2c_adapter *adap)
  */
 static inline void i2c_mark_adapter_resumed(struct i2c_adapter *adap)
 {
-	i2c_lock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
-	clear_bit(I2C_ALF_IS_SUSPENDED, &adap->locked_flags);
-	i2c_unlock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
+    i2c_lock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
+    clear_bit(I2C_ALF_IS_SUSPENDED, &adap->locked_flags);
+    i2c_unlock_bus(adap, I2C_LOCK_ROOT_ADAPTER);
 }
 
 /* i2c adapter classes (bitmask) */
-#define I2C_CLASS_HWMON		(1<<0)	/* lm_sensors, ... */
-#define I2C_CLASS_DDC		(1<<3)	/* DDC bus on graphics adapters */
-#define I2C_CLASS_SPD		(1<<7)	/* Memory modules */
+#define I2C_CLASS_HWMON        (1<<0)    /* lm_sensors, ... */
+#define I2C_CLASS_DDC        (1<<3)    /* DDC bus on graphics adapters */
+#define I2C_CLASS_SPD        (1<<7)    /* Memory modules */
 /* Warn users that the adapter doesn't support classes anymore */
-#define I2C_CLASS_DEPRECATED	(1<<8)
+#define I2C_CLASS_DEPRECATED    (1<<8)
 
 /* Internal numbers to terminate lists */
-#define I2C_CLIENT_END		0xfffeU
+#define I2C_CLIENT_END        0xfffeU
 
 /* Construct an I2C_CLIENT_END-terminated array of i2c addresses */
 #define I2C_ADDRS(addr, addrs...) \
-	((const unsigned short []){ addr, ## addrs, I2C_CLIENT_END })
+    ((const unsigned short []){ addr, ## addrs, I2C_CLIENT_END })
 
 
 /* ----- functions exported by i2c.o */
@@ -854,17 +854,17 @@ void i2c_del_driver(struct i2c_driver *driver);
 
 /* use a define to avoid include chaining to get THIS_MODULE */
 #define i2c_add_driver(driver) \
-	i2c_register_driver(THIS_MODULE, driver)
+    i2c_register_driver(THIS_MODULE, driver)
 
 static inline bool i2c_client_has_driver(struct i2c_client *client)
 {
-	return !IS_ERR_OR_NULL(client) && client->dev.driver;
+    return !IS_ERR_OR_NULL(client) && client->dev.driver;
 }
 
 /* call the i2c_client->command() of all attached clients with
  * the given arguments */
 void i2c_clients_command(struct i2c_adapter *adap,
-			 unsigned int cmd, void *arg);
+             unsigned int cmd, void *arg);
 
 struct i2c_adapter *i2c_get_adapter(int nr);
 void i2c_put_adapter(struct i2c_adapter *adap);
@@ -875,13 +875,13 @@ void i2c_parse_fw_timings(struct device *dev, struct i2c_timings *t, bool use_de
 /* Return the functionality mask */
 static inline u32 i2c_get_functionality(struct i2c_adapter *adap)
 {
-	return adap->algo->functionality(adap);
+    return adap->algo->functionality(adap);
 }
 
 /* Return 1 if adapter supports everything we need, 0 if not. */
 static inline int i2c_check_functionality(struct i2c_adapter *adap, u32 func)
 {
-	return (func & i2c_get_functionality(adap)) == func;
+    return (func & i2c_get_functionality(adap)) == func;
 }
 
 /**
@@ -893,20 +893,20 @@ static inline int i2c_check_functionality(struct i2c_adapter *adap, u32 func)
  */
 static inline bool i2c_check_quirks(struct i2c_adapter *adap, u64 quirks)
 {
-	if (!adap->quirks)
-		return false;
-	return (adap->quirks->flags & quirks) == quirks;
+    if (!adap->quirks)
+        return false;
+    return (adap->quirks->flags & quirks) == quirks;
 }
 
 /* Return the adapter number for a specific adapter */
 static inline int i2c_adapter_id(struct i2c_adapter *adap)
 {
-	return adap->nr;
+    return adap->nr;
 }
 
 static inline u8 i2c_8bit_addr_from_msg(const struct i2c_msg *msg)
 {
-	return (msg->addr << 1) | (msg->flags & I2C_M_RD ? 1 : 0);
+    return (msg->addr << 1) | (msg->flags & I2C_M_RD ? 1 : 0);
 }
 
 u8 *i2c_get_dma_safe_msg_buf(struct i2c_msg *msg, unsigned int threshold);
@@ -922,8 +922,8 @@ int i2c_handle_smbus_host_notify(struct i2c_adapter *adap, unsigned short addr);
  * use this macro once, and calling it replaces module_init() and module_exit()
  */
 #define module_i2c_driver(__i2c_driver) \
-	module_driver(__i2c_driver, i2c_add_driver, \
-			i2c_del_driver)
+    module_driver(__i2c_driver, i2c_add_driver, \
+            i2c_del_driver)
 
 /**
  * builtin_i2c_driver() - Helper macro for registering a builtin I2C driver
@@ -934,7 +934,7 @@ int i2c_handle_smbus_host_notify(struct i2c_adapter *adap, unsigned short addr);
  * use this macro once, and calling it replaces device_initcall().
  */
 #define builtin_i2c_driver(__i2c_driver) \
-	builtin_driver(__i2c_driver, i2c_add_driver)
+    builtin_driver(__i2c_driver, i2c_add_driver)
 
 #endif /* I2C */
 
@@ -950,40 +950,40 @@ struct i2c_adapter *of_get_i2c_adapter_by_node(struct device_node *node);
 
 const struct of_device_id
 *i2c_of_match_device(const struct of_device_id *matches,
-		     struct i2c_client *client);
+             struct i2c_client *client);
 
 int of_i2c_get_board_info(struct device *dev, struct device_node *node,
-			  struct i2c_board_info *info);
+              struct i2c_board_info *info);
 
 #else
 
 static inline struct i2c_client *of_find_i2c_device_by_node(struct device_node *node)
 {
-	return NULL;
+    return NULL;
 }
 
 static inline struct i2c_adapter *of_find_i2c_adapter_by_node(struct device_node *node)
 {
-	return NULL;
+    return NULL;
 }
 
 static inline struct i2c_adapter *of_get_i2c_adapter_by_node(struct device_node *node)
 {
-	return NULL;
+    return NULL;
 }
 
 static inline const struct of_device_id
 *i2c_of_match_device(const struct of_device_id *matches,
-		     struct i2c_client *client)
+             struct i2c_client *client)
 {
-	return NULL;
+    return NULL;
 }
 
 static inline int of_i2c_get_board_info(struct device *dev,
-					struct device_node *node,
-					struct i2c_board_info *info)
+                    struct device_node *node,
+                    struct i2c_board_info *info)
 {
-	return -ENOTSUPP;
+    return -ENOTSUPP;
 }
 
 #endif /* CONFIG_OF */
@@ -993,29 +993,29 @@ struct acpi_resource_i2c_serialbus;
 
 #if IS_ENABLED(CONFIG_ACPI)
 bool i2c_acpi_get_i2c_resource(struct acpi_resource *ares,
-			       struct acpi_resource_i2c_serialbus **i2c);
+                   struct acpi_resource_i2c_serialbus **i2c);
 u32 i2c_acpi_find_bus_speed(struct device *dev);
 struct i2c_client *i2c_acpi_new_device(struct device *dev, int index,
-				       struct i2c_board_info *info);
+                       struct i2c_board_info *info);
 struct i2c_adapter *i2c_acpi_find_adapter_by_handle(acpi_handle handle);
 #else
 static inline bool i2c_acpi_get_i2c_resource(struct acpi_resource *ares,
-					     struct acpi_resource_i2c_serialbus **i2c)
+                         struct acpi_resource_i2c_serialbus **i2c)
 {
-	return false;
+    return false;
 }
 static inline u32 i2c_acpi_find_bus_speed(struct device *dev)
 {
-	return 0;
+    return 0;
 }
 static inline struct i2c_client *i2c_acpi_new_device(struct device *dev,
-					int index, struct i2c_board_info *info)
+                    int index, struct i2c_board_info *info)
 {
-	return ERR_PTR(-ENODEV);
+    return ERR_PTR(-ENODEV);
 }
 static inline struct i2c_adapter *i2c_acpi_find_adapter_by_handle(acpi_handle handle)
 {
-	return NULL;
+    return NULL;
 }
 #endif /* CONFIG_ACPI */
 

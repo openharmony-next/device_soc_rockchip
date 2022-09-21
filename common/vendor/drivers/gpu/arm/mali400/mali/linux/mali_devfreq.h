@@ -7,8 +7,8 @@
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef _MALI_DEVFREQ_H_
-#define _MALI_DEVFREQ_H_
+#ifndef MALI_DEVFREQ_H
+#define MALI_DEVFREQ_H
 
 int mali_devfreq_init(struct mali_device *mdev);
 

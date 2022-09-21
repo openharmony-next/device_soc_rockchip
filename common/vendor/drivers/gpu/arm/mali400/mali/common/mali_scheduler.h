@@ -17,10 +17,10 @@
 #include "mali_session.h"
 
 struct mali_scheduler_job_queue {
-	_MALI_OSK_LIST_HEAD(normal_pri); /* Queued jobs with normal priority */
-	_MALI_OSK_LIST_HEAD(high_pri);   /* Queued jobs with high priority */
-	u32 depth;                       /* Depth of combined queues. */
-	u32 big_job_num;
+    MALI_OSK_LIST_HEAD(normal_pri); /* Queued jobs with normal priority */
+    MALI_OSK_LIST_HEAD(high_pri);   /* Queued jobs with high priority */
+    u32 depth;                       /* Depth of combined queues. */
+    u32 big_job_num;
 };
 
 extern _mali_osk_spinlock_irq_t *mali_scheduler_lock_obj;
@@ -36,28 +36,28 @@ extern _mali_osk_atomic_t mali_job_cache_order_autonumber;
 
 #define MALI_DEBUG_ASSERT_SCHEDULER_LOCK_HELD() MALI_DEBUG_ASSERT_LOCK_HELD(mali_scheduler_lock_obj);
 
-_mali_osk_errcode_t mali_scheduler_initialize(void);
+mali_osk_errcode_t mali_scheduler_initialize(void);
 void mali_scheduler_terminate(void);
 
 MALI_STATIC_INLINE void mali_scheduler_lock(void)
 {
-	_mali_osk_spinlock_irq_lock(mali_scheduler_lock_obj);
-	MALI_DEBUG_PRINT(5, ("Mali scheduler: scheduler lock taken.\n"));
+    mali_osk_spinlock_irq_lock(mali_scheduler_lock_obj);
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Mali scheduler: scheduler lock taken.\n"));
 }
 
 MALI_STATIC_INLINE void mali_scheduler_unlock(void)
 {
-	MALI_DEBUG_PRINT(5, ("Mali scheduler: Releasing scheduler lock.\n"));
-	_mali_osk_spinlock_irq_unlock(mali_scheduler_lock_obj);
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Mali scheduler: Releasing scheduler lock.\n"));
+    mali_osk_spinlock_irq_unlock(mali_scheduler_lock_obj);
 }
 
 MALI_STATIC_INLINE u32 mali_scheduler_job_gp_count(void)
 {
-	return job_queue_gp.depth;
+    return job_queue_gp.depth;
 }
 MALI_STATIC_INLINE u32 mali_scheduler_job_gp_big_job_count(void)
 {
-	return job_queue_gp.big_job_num;
+    return job_queue_gp.big_job_num;
 }
 
 u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure);
@@ -73,12 +73,12 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_get(void);
 
 MALI_STATIC_INLINE u32 mali_scheduler_get_new_id(void)
 {
-	return _mali_osk_atomic_inc_return(&mali_job_id_autonumber);
+    return mali_osk_atomic_inc_return(&mali_job_id_autonumber);
 }
 
 MALI_STATIC_INLINE u32 mali_scheduler_get_new_cache_order(void)
 {
-	return _mali_osk_atomic_inc_return(&mali_job_cache_order_autonumber);
+    return mali_osk_atomic_inc_return(&mali_job_cache_order_autonumber);
 }
 
 /**
@@ -108,19 +108,19 @@ mali_scheduler_mask mali_scheduler_activate_gp_job(struct mali_gp_job *job);
 mali_scheduler_mask mali_scheduler_activate_pp_job(struct mali_pp_job *job);
 
 void mali_scheduler_complete_gp_job(struct mali_gp_job *job,
-				    mali_bool success,
-				    mali_bool user_notification,
-				    mali_bool dequeued);
+                    mali_bool success,
+                    mali_bool user_notification,
+                    mali_bool dequeued);
 
 void mali_scheduler_complete_pp_job(struct mali_pp_job *job,
-				    u32 num_cores_in_virtual,
-				    mali_bool user_notification,
-				    mali_bool dequeued);
+                    u32 num_cores_in_virtual,
+                    mali_bool user_notification,
+                    mali_bool dequeued);
 
 void mali_scheduler_abort_session(struct mali_session_data *session);
 
 void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job,
-		u32 num_cores_in_virtual);
+        u32 num_cores_in_virtual);
 
 #if MALI_STATE_TRACKING
 u32 mali_scheduler_dump_state(char *buf, u32 size);

@@ -32,24 +32,24 @@ struct protected_mode_device;
  * @protected_mode_disable: Callback to disable protected mode for device
  */
 struct protected_mode_ops {
-	/**
-	 * protected_mode_enable() - Enable protected mode on device
-	 * @dev:	The struct device
-	 *
-	 * Return: 0 on success, non-zero on error
-	 */
-	int (*protected_mode_enable)(
-			struct protected_mode_device *protected_dev);
+    /**
+     * protected_mode_enable() - Enable protected mode on device
+     * @dev:    The struct device
+     *
+     * Return: 0 on success, non-zero on error
+     */
+    int (*protected_mode_enable)(
+            struct protected_mode_device *protected_dev);
 
-	/**
-	 * protected_mode_disable() - Disable protected mode on device, and
-	 *                            reset device
-	 * @dev:	The struct device
-	 *
-	 * Return: 0 on success, non-zero on error
-	 */
-	int (*protected_mode_disable)(
-			struct protected_mode_device *protected_dev);
+    /**
+     * protected_mode_disable() - Disable protected mode on device, and
+     *                            reset device
+     * @dev:    The struct device
+     *
+     * Return: 0 on success, non-zero on error
+     */
+    int (*protected_mode_disable)(
+            struct protected_mode_device *protected_dev);
 };
 
 /**
@@ -62,8 +62,8 @@ struct protected_mode_ops {
  * platform_set_drvdata().
  */
 struct protected_mode_device {
-	struct protected_mode_ops ops;
-	void *data;
+    struct protected_mode_ops ops;
+    void *data;
 };
 
 #endif /* _PROTECTED_MODE_SWITCH_H_ */

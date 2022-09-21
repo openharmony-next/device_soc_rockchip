@@ -24,8 +24,8 @@
  * Hardware counter accumulator API.
  */
 
-#ifndef _KBASE_HWCNT_ACCUMULATOR_H_
-#define _KBASE_HWCNT_ACCUMULATOR_H_
+#ifndef KBASE_HWCNT_ACCUMULATOR_H
+#define KBASE_HWCNT_ACCUMULATOR_H
 
 #include <linux/types.h>
 
@@ -69,8 +69,8 @@ struct kbase_hwcnt_dump_buffer;
  * Return: 0 on success or error code.
  */
 int kbase_hwcnt_accumulator_acquire(
-	struct kbase_hwcnt_context *hctx,
-	struct kbase_hwcnt_accumulator **accum);
+    struct kbase_hwcnt_context *hctx,
+    struct kbase_hwcnt_accumulator **accum);
 
 /**
  * kbase_hwcnt_accumulator_release() - Release a hardware counter accumulator.
@@ -104,11 +104,11 @@ void kbase_hwcnt_accumulator_release(struct kbase_hwcnt_accumulator *accum);
  * Return: 0 on success or error code.
  */
 int kbase_hwcnt_accumulator_set_counters(
-	struct kbase_hwcnt_accumulator *accum,
-	const struct kbase_hwcnt_enable_map *new_map,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf);
+    struct kbase_hwcnt_accumulator *accum,
+    const struct kbase_hwcnt_enable_map *new_map,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf);
 
 /**
  * kbase_hwcnt_accumulator_dump() - Perform a dump of the currently enabled
@@ -129,10 +129,10 @@ int kbase_hwcnt_accumulator_set_counters(
  * Return: 0 on success or error code.
  */
 int kbase_hwcnt_accumulator_dump(
-	struct kbase_hwcnt_accumulator *accum,
-	u64 *ts_start_ns,
-	u64 *ts_end_ns,
-	struct kbase_hwcnt_dump_buffer *dump_buf);
+    struct kbase_hwcnt_accumulator *accum,
+    u64 *ts_start_ns,
+    u64 *ts_end_ns,
+    struct kbase_hwcnt_dump_buffer *dump_buf);
 
 /**
  * kbase_hwcnt_accumulator_timestamp_ns() - Get the current accumulator backend

@@ -38,7 +38,7 @@ int kbase_backend_devfreq_init(struct kbase_device *kbdev);
 
 /**
  * kbase_backend_devfreq_term - Perform backend-devfreq termination.
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  */
 void kbase_backend_devfreq_term(struct kbase_device *kbdev);
 

@@ -20,8 +20,8 @@
  *
  */
 
-#if !defined(_KBASE_TIMELINE_PRIV_H)
-#define _KBASE_TIMELINE_PRIV_H
+#if !defined(KBASE_TIMELINE_PRIV_H)
+#define KBASE_TIMELINE_PRIV_H
 
 #include <mali_kbase.h>
 #include "mali_kbase_tlstream.h"
@@ -50,19 +50,19 @@
  * @aux_header_btc:         Remaining bytes to copy for the aux stream header
  */
 struct kbase_timeline {
-	struct kbase_tlstream streams[TL_STREAM_TYPE_COUNT];
-	struct timer_list autoflush_timer;
-	atomic_t          autoflush_timer_active;
-	struct mutex      reader_lock;
-	wait_queue_head_t event_queue;
+    struct kbase_tlstream streams[TL_STREAM_TYPE_COUNT];
+    struct timer_list autoflush_timer;
+    atomic_t          autoflush_timer_active;
+    struct mutex      reader_lock;
+    wait_queue_head_t event_queue;
 #if MALI_UNIT_TEST
-	atomic_t          bytes_collected;
+    atomic_t          bytes_collected;
 #endif /* MALI_UNIT_TEST */
-	atomic_t         *timeline_flags;
-	size_t            obj_header_btc;
-	size_t            aux_header_btc;
+    atomic_t         *timeline_flags;
+    size_t            obj_header_btc;
+    size_t            aux_header_btc;
 #if MALI_USE_CSF
-	struct kbase_csf_tl_reader csf_tl_reader;
+    struct kbase_csf_tl_reader csf_tl_reader;
 #endif
 };
 

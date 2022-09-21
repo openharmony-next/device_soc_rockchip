@@ -34,9 +34,9 @@
  * @cores_used: Cores currently powered or transitioning
  */
 struct kbasep_pm_ca_policy_devfreq {
-	u64 cores_desired;
-	u64 cores_enabled;
-	u64 cores_used;
+    u64 cores_desired;
+    u64 cores_enabled;
+    u64 cores_used;
 };
 
 extern const struct kbase_pm_ca_policy kbase_pm_ca_devfreq_policy_ops;

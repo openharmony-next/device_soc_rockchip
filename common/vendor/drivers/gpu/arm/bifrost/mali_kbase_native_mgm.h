@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_NATIVE_MGM_H_
-#define _KBASE_NATIVE_MGM_H_
+#ifndef KBASE_NATIVE_MGM_H
+#define KBASE_NATIVE_MGM_H
 
 #include <linux/memory_group_manager.h>
 

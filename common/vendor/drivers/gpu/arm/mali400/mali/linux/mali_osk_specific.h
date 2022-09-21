@@ -49,10 +49,10 @@ typedef u32 mali_dma_addr;
    the cpu cores when using this functionallity.*/
 static inline unsigned int mali_get_cpu_cyclecount(void)
 {
-	unsigned int value;
-	/* Reading the CCNT Register - CPU clock counter */
-	asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n": "=r"(value));
-	return value;
+    unsigned int value;
+    /* Reading the CCNT Register - CPU clock counter */
+    asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n": "=r"(value));
+    return value;
 }
 
 void mali_init_cpu_time_counters(int reset, int enable_divide_by_64);
@@ -61,12 +61,12 @@ void mali_init_cpu_time_counters(int reset, int enable_divide_by_64);
 
 MALI_STATIC_INLINE u32 _mali_osk_copy_from_user(void *to, void *from, u32 n)
 {
-	return (u32)copy_from_user(to, from, (unsigned long)n);
+    return (u32)copy_from_user(to, from, (unsigned long)n);
 }
 
 MALI_STATIC_INLINE mali_bool _mali_osk_in_atomic(void)
 {
-	return in_atomic();
+    return in_atomic();
 }
 
 #define _mali_osk_put_user(x, ptr) put_user(x, ptr)

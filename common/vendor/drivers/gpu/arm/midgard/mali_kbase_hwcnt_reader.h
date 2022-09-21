@@ -15,8 +15,8 @@
 
 
 
-#ifndef _KBASE_HWCNT_READER_H_
-#define _KBASE_HWCNT_READER_H_
+#ifndef H_KBASE_HWCNT_READER_H_
+#define H_KBASE_HWCNT_READER_H_
 
 /* The ids of ioctl commands. */
 #define KBASE_HWCNT_READER 0xBE
@@ -25,9 +25,9 @@
 #define KBASE_HWCNT_READER_DUMP            _IOW(KBASE_HWCNT_READER, 0x10, u32)
 #define KBASE_HWCNT_READER_CLEAR           _IOW(KBASE_HWCNT_READER, 0x11, u32)
 #define KBASE_HWCNT_READER_GET_BUFFER      _IOR(KBASE_HWCNT_READER, 0x20,\
-		struct kbase_hwcnt_reader_metadata)
+        struct kbase_hwcnt_reader_metadata)
 #define KBASE_HWCNT_READER_PUT_BUFFER      _IOW(KBASE_HWCNT_READER, 0x21,\
-		struct kbase_hwcnt_reader_metadata)
+        struct kbase_hwcnt_reader_metadata)
 #define KBASE_HWCNT_READER_SET_INTERVAL    _IOW(KBASE_HWCNT_READER, 0x30, u32)
 #define KBASE_HWCNT_READER_ENABLE_EVENT    _IOW(KBASE_HWCNT_READER, 0x40, u32)
 #define KBASE_HWCNT_READER_DISABLE_EVENT   _IOW(KBASE_HWCNT_READER, 0x41, u32)
@@ -40,9 +40,9 @@
  * @buffer_idx: position in sampling area where sample buffer was stored
  */
 struct kbase_hwcnt_reader_metadata {
-	u64 timestamp;
-	u32 event_id;
-	u32 buffer_idx;
+    u64 timestamp;
+    u32 event_id;
+    u32 buffer_idx;
 };
 
 /**
@@ -54,12 +54,12 @@ struct kbase_hwcnt_reader_metadata {
  * @BASE_HWCNT_READER_EVENT_COUNT:    number of supported events
  */
 enum base_hwcnt_reader_event {
-	BASE_HWCNT_READER_EVENT_MANUAL,
-	BASE_HWCNT_READER_EVENT_PERIODIC,
-	BASE_HWCNT_READER_EVENT_PREJOB,
-	BASE_HWCNT_READER_EVENT_POSTJOB,
+    BASE_HWCNT_READER_EVENT_MANUAL,
+    BASE_HWCNT_READER_EVENT_PERIODIC,
+    BASE_HWCNT_READER_EVENT_PREJOB,
+    BASE_HWCNT_READER_EVENT_POSTJOB,
 
-	BASE_HWCNT_READER_EVENT_COUNT
+    BASE_HWCNT_READER_EVENT_COUNT
 };
 
 #endif /* _KBASE_HWCNT_READER_H_ */

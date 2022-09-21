@@ -61,9 +61,9 @@ void kbase_pm_update_cores(struct kbase_device *kbdev);
 
 
 enum kbase_pm_cores_ready {
-	KBASE_CORES_NOT_READY = 0,
-	KBASE_NEW_AFFINITY = 1,
-	KBASE_CORES_READY = 2
+    KBASE_CORES_NOT_READY = 0,
+    KBASE_NEW_AFFINITY = 1,
+    KBASE_CORES_READY = 2
 };
 
 
@@ -82,7 +82,7 @@ enum kbase_pm_cores_ready {
  * is made.
  */
 void kbase_pm_request_cores_sync(struct kbase_device *kbdev,
-				bool tiler_required, u64 shader_cores);
+                bool tiler_required, u64 shader_cores);
 
 /**
  * kbase_pm_request_cores - Mark one or more cores as being required
@@ -107,7 +107,7 @@ void kbase_pm_request_cores_sync(struct kbase_device *kbdev,
  * Return: 0 if the cores were successfully requested, or -errno otherwise.
  */
 void kbase_pm_request_cores(struct kbase_device *kbdev,
-				bool tiler_required, u64 shader_cores);
+                bool tiler_required, u64 shader_cores);
 
 /**
  * kbase_pm_unrequest_cores - Unmark one or more cores as being required for
@@ -129,7 +129,7 @@ void kbase_pm_request_cores(struct kbase_device *kbdev,
  * The policy may use this as an indication that it can power down cores.
  */
 void kbase_pm_unrequest_cores(struct kbase_device *kbdev,
-				bool tiler_required, u64 shader_cores);
+                bool tiler_required, u64 shader_cores);
 
 /**
  * kbase_pm_register_inuse_cores - Register a set of cores as in use by a job
@@ -154,9 +154,9 @@ void kbase_pm_unrequest_cores(struct kbase_device *kbdev,
  *         %KBASE_CORES_READY if the cores requested are already available
  */
 enum kbase_pm_cores_ready kbase_pm_register_inuse_cores(
-						struct kbase_device *kbdev,
-						bool tiler_required,
-						u64 shader_cores);
+                        struct kbase_device *kbdev,
+                        bool tiler_required,
+                        u64 shader_cores);
 
 /**
  * kbase_pm_release_cores - Release cores after a job has run
@@ -173,7 +173,7 @@ enum kbase_pm_cores_ready kbase_pm_register_inuse_cores(
  * may then turn off any cores which are no longer 'inuse'.
  */
 void kbase_pm_release_cores(struct kbase_device *kbdev,
-				bool tiler_required, u64 shader_cores);
+                bool tiler_required, u64 shader_cores);
 
 /**
  * kbase_pm_request_l2_caches - Request l2 caches

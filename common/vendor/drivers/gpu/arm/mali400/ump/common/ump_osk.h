@@ -25,17 +25,17 @@
 extern "C" {
 #endif
 
-_mali_osk_errcode_t _ump_osk_init(void);
+mali_osk_errcode_t _ump_osk_init(void);
 
-_mali_osk_errcode_t _ump_osk_term(void);
+mali_osk_errcode_t _ump_osk_term(void);
 
 int _ump_osk_atomic_inc_and_read(_mali_osk_atomic_t *atom);
 
 int _ump_osk_atomic_dec_and_read(_mali_osk_atomic_t *atom);
 
-_mali_osk_errcode_t _ump_osk_mem_mapregion_init(ump_memory_allocation *descriptor);
+mali_osk_errcode_t _ump_osk_mem_mapregion_init(ump_memory_allocation *descriptor);
 
-_mali_osk_errcode_t _ump_osk_mem_mapregion_map(ump_memory_allocation *descriptor, u32 offset, u32 *phys_addr, unsigned long size);
+mali_osk_errcode_t _ump_osk_mem_mapregion_map(ump_memory_allocation *descriptor, u32 offset, u32 *phys_addr, unsigned long size);
 
 void _ump_osk_mem_mapregion_term(ump_memory_allocation *descriptor);
 

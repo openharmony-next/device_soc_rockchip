@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _KBASE_CONFIG_DEFAULTS_H_
-#define _KBASE_CONFIG_DEFAULTS_H_
+#ifndef KBASE_CONFIG_DEFAULTS_H
+#define KBASE_CONFIG_DEFAULTS_H
 
 /* Include mandatory definitions per platform */
 #include <mali_kbase_config_platform.h>
@@ -50,28 +50,28 @@
 #define DEFAULT_SECURE_BUT_LOSS_OF_PERFORMANCE false
 
 enum {
-	/**
-	 * Use unrestricted Address ID width on the AXI bus.
-	 */
-	KBASE_AID_32 = 0x0,
+    /**
+     * Use unrestricted Address ID width on the AXI bus.
+     */
+    KBASE_AID_32 = 0x0,
 
-	/**
-	 * Restrict GPU to a half of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_16 = 0x3,
+    /**
+     * Restrict GPU to a half of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_16 = 0x3,
 
-	/**
-	 * Restrict GPU to a quarter of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_8  = 0x2,
+    /**
+     * Restrict GPU to a quarter of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_8  = 0x2,
 
-	/**
-	 * Restrict GPU to an eighth of maximum Address ID count.
-	 * This will reduce performance, but reduce bus load due to GPU.
-	 */
-	KBASE_AID_4  = 0x1
+    /**
+     * Restrict GPU to an eighth of maximum Address ID count.
+     * This will reduce performance, but reduce bus load due to GPU.
+     */
+    KBASE_AID_4  = 0x1
 };
 
 /**

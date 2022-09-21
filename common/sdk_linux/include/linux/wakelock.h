@@ -25,52 +25,52 @@
  */
 
 enum {
-	WAKE_LOCK_SUSPEND, /* Prevent suspend */
-	WAKE_LOCK_TYPE_COUNT
+    WAKE_LOCK_SUSPEND, /* Prevent suspend */
+    WAKE_LOCK_TYPE_COUNT
 };
 
 struct wake_lock {
-	struct wakeup_source ws;
+    struct wakeup_source ws;
 };
 
 static inline void wake_lock_init(struct wake_lock *lock, int type,
-				  const char *name)
+                  const char *name)
 {
-	struct wakeup_source *ws = &lock->ws;
+    struct wakeup_source *ws = &lock->ws;
 
-	if (ws) {
-		memset(ws, 0, sizeof(*ws));
-		ws->name = name;
-	}
-	wakeup_source_add(ws);
+    if (ws) {
+        memset(ws, 0, sizeof(*ws));
+        ws->name = name;
+    }
+    wakeup_source_add(ws);
 }
 
 static inline void wake_lock_destroy(struct wake_lock *lock)
 {
-	struct wakeup_source *ws = &lock->ws;
+    struct wakeup_source *ws = &lock->ws;
 
-	wakeup_source_remove(ws);
-	__pm_relax(ws);
+    wakeup_source_remove(ws);
+    __pm_relax(ws);
 }
 
 static inline void wake_lock(struct wake_lock *lock)
 {
-	__pm_stay_awake(&lock->ws);
+    __pm_stay_awake(&lock->ws);
 }
 
 static inline void wake_lock_timeout(struct wake_lock *lock, long timeout)
 {
-	__pm_wakeup_event(&lock->ws, jiffies_to_msecs(timeout));
+    __pm_wakeup_event(&lock->ws, jiffies_to_msecs(timeout));
 }
 
 static inline void wake_unlock(struct wake_lock *lock)
 {
-	__pm_relax(&lock->ws);
+    __pm_relax(&lock->ws);
 }
 
 static inline int wake_lock_active(struct wake_lock *lock)
 {
-	return lock->ws.active;
+    return lock->ws.active;
 }
 
 #endif

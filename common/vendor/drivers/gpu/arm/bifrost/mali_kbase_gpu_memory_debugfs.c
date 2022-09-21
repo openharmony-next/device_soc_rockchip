@@ -38,32 +38,32 @@
 
 static int kbasep_gpu_memory_seq_show(struct seq_file *sfile, void *data)
 {
-	struct list_head *entry;
-	const struct list_head *kbdev_list;
+    struct list_head *entry;
+    const struct list_head *kbdev_list;
 
-	kbdev_list = kbase_device_get_list();
-	list_for_each(entry, kbdev_list) {
-		struct kbase_device *kbdev = NULL;
-		struct kbase_context *kctx;
+    kbdev_list = kbase_device_get_list();
+    list_for_each(entry, kbdev_list) {
+        struct kbase_device *kbdev = NULL;
+        struct kbase_context *kctx;
 
-		kbdev = list_entry(entry, struct kbase_device, entry);
-		/* output the total memory usage and cap for this device */
-		seq_printf(sfile, "%-16s  %10u\n",
-				kbdev->devname,
-				atomic_read(&(kbdev->memdev.used_pages)));
-		mutex_lock(&kbdev->kctx_list_lock);
-		list_for_each_entry(kctx, &kbdev->kctx_list, kctx_list_link) {
-			/* output the memory usage and cap for each kctx
-			* opened on this device */
-			seq_printf(sfile, "  %s-0x%p %10u\n",
-				"kctx",
-				kctx,
-				atomic_read(&(kctx->used_pages)));
-		}
-		mutex_unlock(&kbdev->kctx_list_lock);
-	}
-	kbase_device_put_list(kbdev_list);
-	return 0;
+        kbdev = list_entry(entry, struct kbase_device, entry);
+        /* output the total memory usage and cap for this device */
+        seq_printf(sfile, "%-16s  %10u\n",
+                kbdev->devname,
+                atomic_read(&(kbdev->memdev.used_pages)));
+        mutex_lock(&kbdev->kctx_list_lock);
+        list_for_each_entry(kctx, &kbdev->kctx_list, kctx_list_link) {
+            /* output the memory usage and cap for each kctx
+            * opened on this device */
+            seq_printf(sfile, "  %s-0x%p %10u\n",
+                "kctx",
+                kctx,
+                atomic_read(&(kctx->used_pages)));
+        }
+        mutex_unlock(&kbdev->kctx_list_lock);
+    }
+    kbase_device_put_list(kbdev_list);
+    return 0;
 }
 
 /*
@@ -71,15 +71,15 @@ static int kbasep_gpu_memory_seq_show(struct seq_file *sfile, void *data)
  */
 static int kbasep_gpu_memory_debugfs_open(struct inode *in, struct file *file)
 {
-	return single_open(file, kbasep_gpu_memory_seq_show, NULL);
+    return single_open(file, kbasep_gpu_memory_seq_show, NULL);
 }
 
 static const struct file_operations kbasep_gpu_memory_debugfs_fops = {
-	.owner = THIS_MODULE,
-	.open = kbasep_gpu_memory_debugfs_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
+    .owner = THIS_MODULE,
+    .open = kbasep_gpu_memory_debugfs_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
 };
 
 /*
@@ -87,10 +87,10 @@ static const struct file_operations kbasep_gpu_memory_debugfs_fops = {
  */
 void kbasep_gpu_memory_debugfs_init(struct kbase_device *kbdev)
 {
-	debugfs_create_file("gpu_memory", S_IRUGO,
-			kbdev->mali_debugfs_directory, NULL,
-			&kbasep_gpu_memory_debugfs_fops);
-	return;
+    debugfs_create_file("gpu_memory", S_IRUGO,
+            kbdev->mali_debugfs_directory, NULL,
+            &kbasep_gpu_memory_debugfs_fops);
+    return;
 }
 
 #else
@@ -99,6 +99,6 @@ void kbasep_gpu_memory_debugfs_init(struct kbase_device *kbdev)
  */
 void kbasep_gpu_memory_debugfs_init(struct kbase_device *kbdev)
 {
-	return;
+    return;
 }
 #endif

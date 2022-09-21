@@ -24,8 +24,8 @@
  * They are placed here to allow the hierarchy of header files to work.
  */
 
-#ifndef _KBASE_CSF_DEFS_H_
-#define _KBASE_CSF_DEFS_H_
+#ifndef KBASE_CSF_DEFS_H
+#define KBASE_CSF_DEFS_H
 
 #include <linux/types.h>
 #include <linux/wait.h>
@@ -57,9 +57,9 @@
  * pages have been mapped in the process address space.
  */
 enum kbase_csf_queue_bind_state {
-	KBASE_CSF_QUEUE_UNBOUND,
-	KBASE_CSF_QUEUE_BIND_IN_PROGRESS,
-	KBASE_CSF_QUEUE_BOUND,
+    KBASE_CSF_QUEUE_UNBOUND,
+    KBASE_CSF_QUEUE_BIND_IN_PROGRESS,
+    KBASE_CSF_QUEUE_BOUND,
 };
 
 /**
@@ -75,10 +75,10 @@ enum kbase_csf_queue_bind_state {
  * the Driver module is the only option.
  */
 enum kbase_csf_reset_gpu_state {
-	KBASE_CSF_RESET_GPU_NOT_PENDING,
-	KBASE_CSF_RESET_GPU_HAPPENING,
-	KBASE_CSF_RESET_GPU_SILENT,
-	KBASE_CSF_RESET_GPU_FAILED,
+    KBASE_CSF_RESET_GPU_NOT_PENDING,
+    KBASE_CSF_RESET_GPU_HAPPENING,
+    KBASE_CSF_RESET_GPU_SILENT,
+    KBASE_CSF_RESET_GPU_FAILED,
 };
 
 /**
@@ -140,14 +140,14 @@ enum kbase_csf_reset_gpu_state {
  *                                     queues bound to it have been unbound.
  */
 enum kbase_csf_group_state {
-	KBASE_CSF_GROUP_INACTIVE,
-	KBASE_CSF_GROUP_RUNNABLE,
-	KBASE_CSF_GROUP_IDLE,
-	KBASE_CSF_GROUP_SUSPENDED,
-	KBASE_CSF_GROUP_SUSPENDED_ON_IDLE,
-	KBASE_CSF_GROUP_SUSPENDED_ON_WAIT_SYNC,
-	KBASE_CSF_GROUP_FAULT_EVICTED,
-	KBASE_CSF_GROUP_TERMINATED,
+    KBASE_CSF_GROUP_INACTIVE,
+    KBASE_CSF_GROUP_RUNNABLE,
+    KBASE_CSF_GROUP_IDLE,
+    KBASE_CSF_GROUP_SUSPENDED,
+    KBASE_CSF_GROUP_SUSPENDED_ON_IDLE,
+    KBASE_CSF_GROUP_SUSPENDED_ON_WAIT_SYNC,
+    KBASE_CSF_GROUP_FAULT_EVICTED,
+    KBASE_CSF_GROUP_TERMINATED,
 };
 
 /**
@@ -172,13 +172,13 @@ enum kbase_csf_group_state {
  *                               group on the slot timed out.
  */
 enum kbase_csf_csg_slot_state {
-	CSG_SLOT_READY,
-	CSG_SLOT_READY2RUN,
-	CSG_SLOT_RUNNING,
-	CSG_SLOT_DOWN2STOP,
-	CSG_SLOT_STOPPED,
-	CSG_SLOT_READY2RUN_TIMEDOUT,
-	CSG_SLOT_DOWN2STOP_TIMEDOUT,
+    CSG_SLOT_READY,
+    CSG_SLOT_READY2RUN,
+    CSG_SLOT_RUNNING,
+    CSG_SLOT_DOWN2STOP,
+    CSG_SLOT_STOPPED,
+    CSG_SLOT_READY2RUN_TIMEDOUT,
+    CSG_SLOT_DOWN2STOP_TIMEDOUT,
 };
 
 /**
@@ -197,9 +197,9 @@ enum kbase_csf_csg_slot_state {
  *                      or due to a system triggered suspend action.
  */
 enum kbase_csf_scheduler_state {
-	SCHED_BUSY,
-	SCHED_INACTIVE,
-	SCHED_SUSPENDED,
+    SCHED_BUSY,
+    SCHED_INACTIVE,
+    SCHED_SUSPENDED,
 };
 
 /**
@@ -210,8 +210,8 @@ enum kbase_csf_scheduler_state {
  * @link:      Link to the linked list, &struct_kbase_csf_context.error_list.
  */
 struct kbase_csf_notification {
-	struct base_csf_notification data;
-	struct list_head link;
+    struct base_csf_notification data;
+    struct list_head link;
 };
 
 /**
@@ -273,54 +273,54 @@ struct kbase_csf_notification {
  * @error:          GPU command queue fatal information to pass to user space.
  */
 struct kbase_queue {
-	struct kbase_context *kctx;
-	struct kbase_va_region *reg;
-	struct tagged_addr phys[2];
-	char *user_io_addr;
-	u64 handle;
-	int doorbell_nr;
-	unsigned long db_file_offset;
-	struct list_head link;
-	atomic_t refcount;
-	struct kbase_queue_group *group;
-	struct kbase_va_region *queue_reg;
-	struct work_struct oom_event_work;
-	struct work_struct fault_event_work;
-	u64 base_addr;
-	u32 size;
-	u8 priority;
-	u8 bind_state;
-	s8 csi_index;
-	bool enabled;
-	u32 status_wait;
-	u64 sync_ptr;
-	u32 sync_value;
-	struct kbase_csf_notification error;
+    struct kbase_context *kctx;
+    struct kbase_va_region *reg;
+    struct tagged_addr phys[2];
+    char *user_io_addr;
+    u64 handle;
+    int doorbell_nr;
+    unsigned long db_file_offset;
+    struct list_head link;
+    atomic_t refcount;
+    struct kbase_queue_group *group;
+    struct kbase_va_region *queue_reg;
+    struct work_struct oom_event_work;
+    struct work_struct fault_event_work;
+    u64 base_addr;
+    u32 size;
+    u8 priority;
+    u8 bind_state;
+    s8 csi_index;
+    bool enabled;
+    u32 status_wait;
+    u64 sync_ptr;
+    u32 sync_value;
+    struct kbase_csf_notification error;
 };
 
 /**
  * struct kbase_normal_suspend_buffer - Object representing a normal
- *		suspend buffer for queue group.
- * @reg:	Memory region allocated for the normal-mode suspend buffer.
- * @phy:	Array of physical memory pages allocated for the normal-
- *		mode suspend buffer.
+ *        suspend buffer for queue group.
+ * @reg:    Memory region allocated for the normal-mode suspend buffer.
+ * @phy:    Array of physical memory pages allocated for the normal-
+ *        mode suspend buffer.
  */
 struct kbase_normal_suspend_buffer {
-	struct kbase_va_region *reg;
-	struct tagged_addr *phy;
+    struct kbase_va_region *reg;
+    struct tagged_addr *phy;
 };
 
 /**
  * struct kbase_protected_suspend_buffer - Object representing a protected
- *		suspend buffer for queue group.
- * @reg:	Memory region allocated for the protected-mode suspend buffer.
- * @pma:	Array of pointer to protected mode allocations containing
- *		information about memory pages allocated for protected mode
- *		suspend	buffer.
+ *        suspend buffer for queue group.
+ * @reg:    Memory region allocated for the protected-mode suspend buffer.
+ * @pma:    Array of pointer to protected mode allocations containing
+ *        information about memory pages allocated for protected mode
+ *        suspend    buffer.
  */
 struct kbase_protected_suspend_buffer {
-	struct kbase_va_region *reg;
-	struct protected_memory_allocation **pma;
+    struct kbase_va_region *reg;
+    struct protected_memory_allocation **pma;
 };
 
 /**
@@ -328,12 +328,12 @@ struct kbase_protected_suspend_buffer {
  *
  * @kctx:           Pointer to the kbase context with which this queue group
  *                  is associated.
- * @normal_suspend_buf:		Object representing the normal suspend buffer.
- *				Normal-mode suspend buffer that is used for
- *				group context switch.
- * @protected_suspend_buf:	Object representing the protected suspend
- *				buffer. Protected-mode suspend buffer that is
- *				used for group context switch.
+ * @normal_suspend_buf:        Object representing the normal suspend buffer.
+ *                Normal-mode suspend buffer that is used for
+ *                group context switch.
+ * @protected_suspend_buf:    Object representing the protected suspend
+ *                buffer. Protected-mode suspend buffer that is
+ *                used for group context switch.
  * @handle:         Handle which identifies this queue group.
  * @csg_nr:         Number/index of the command stream group to
  *                  which this queue group is mapped; KBASEP_CSG_NR_INVALID
@@ -379,37 +379,37 @@ struct kbase_protected_suspend_buffer {
  *                   to be returned to userspace if such an error has occurred.
  */
 struct kbase_queue_group {
-	struct kbase_context *kctx;
-	struct kbase_normal_suspend_buffer normal_suspend_buf;
-	struct kbase_protected_suspend_buffer protected_suspend_buf;
-	u8 handle;
-	s8 csg_nr;
-	u8 priority;
+    struct kbase_context *kctx;
+    struct kbase_normal_suspend_buffer normal_suspend_buf;
+    struct kbase_protected_suspend_buffer protected_suspend_buf;
+    u8 handle;
+    s8 csg_nr;
+    u8 priority;
 
-	u8 tiler_max;
-	u8 fragment_max;
-	u8 compute_max;
+    u8 tiler_max;
+    u8 fragment_max;
+    u8 compute_max;
 
-	u64 tiler_mask;
-	u64 fragment_mask;
-	u64 compute_mask;
+    u64 tiler_mask;
+    u64 fragment_mask;
+    u64 compute_mask;
 
-	struct list_head link;
-	struct list_head link_to_schedule;
-	struct work_struct timer_event_work;
-	enum kbase_csf_group_state run_state;
-	u32 prepared_seq_num;
-	bool faulted;
+    struct list_head link;
+    struct list_head link_to_schedule;
+    struct work_struct timer_event_work;
+    enum kbase_csf_group_state run_state;
+    u32 prepared_seq_num;
+    bool faulted;
 
-	struct kbase_queue *bound_queues[MAX_SUPPORTED_STREAMS_PER_GROUP];
+    struct kbase_queue *bound_queues[MAX_SUPPORTED_STREAMS_PER_GROUP];
 
-	int doorbell_nr;
-	struct work_struct protm_event_work;
-	DECLARE_BITMAP(protm_pending_bitmap, MAX_SUPPORTED_STREAMS_PER_GROUP);
+    int doorbell_nr;
+    struct work_struct protm_event_work;
+    DECLARE_BITMAP(protm_pending_bitmap, MAX_SUPPORTED_STREAMS_PER_GROUP);
 
-	struct kbase_csf_notification error_fatal;
-	struct kbase_csf_notification error_timeout;
-	struct kbase_csf_notification error_tiler_oom;
+    struct kbase_csf_notification error_fatal;
+    struct kbase_csf_notification error_timeout;
+    struct kbase_csf_notification error_tiler_oom;
 };
 
 /**
@@ -432,14 +432,14 @@ struct kbase_queue_group {
  *                      allocations.
  */
 struct kbase_csf_kcpu_queue_context {
-	struct mutex lock;
-	struct kbase_kcpu_command_queue *array[KBASEP_MAX_KCPU_QUEUES];
-	DECLARE_BITMAP(in_use, KBASEP_MAX_KCPU_QUEUES);
-	struct workqueue_struct *wq;
-	u64 num_cmds;
+    struct mutex lock;
+    struct kbase_kcpu_command_queue *array[KBASEP_MAX_KCPU_QUEUES];
+    DECLARE_BITMAP(in_use, KBASEP_MAX_KCPU_QUEUES);
+    struct workqueue_struct *wq;
+    u64 num_cmds;
 
-	struct list_head jit_cmds_head;
-	struct list_head jit_blocked_queues;
+    struct list_head jit_cmds_head;
+    struct list_head jit_blocked_queues;
 };
 
 /**
@@ -461,11 +461,11 @@ struct kbase_csf_kcpu_queue_context {
  *            allocated (in @region).
  */
 struct kbase_csf_heap_context_allocator {
-	struct kbase_context *kctx;
-	struct kbase_va_region *region;
-	u64 gpu_va;
-	struct mutex lock;
-	DECLARE_BITMAP(in_use, MAX_TILER_HEAPS);
+    struct kbase_context *kctx;
+    struct kbase_va_region *region;
+    u64 gpu_va;
+    struct mutex lock;
+    DECLARE_BITMAP(in_use, MAX_TILER_HEAPS);
 };
 
 /**
@@ -481,9 +481,9 @@ struct kbase_csf_heap_context_allocator {
  * @ctx_alloc: Allocator for heap context structures.
  */
 struct kbase_csf_tiler_heap_context {
-	struct mutex lock;
-	struct list_head list;
-	struct kbase_csf_heap_context_allocator ctx_alloc;
+    struct mutex lock;
+    struct list_head list;
+    struct kbase_csf_heap_context_allocator ctx_alloc;
 };
 
 /**
@@ -505,17 +505,17 @@ struct kbase_csf_tiler_heap_context {
  * @sync_update_work:   work item to process the sync_update events by
  *                      sync_set / sync_add instruction execution on command
  *                      streams bound to groups of @idle_wait_groups list.
- * @ngrp_to_schedule:	Number of groups added for the context to the
+ * @ngrp_to_schedule:    Number of groups added for the context to the
  *                      'groups_to_schedule' list of scheduler instance.
  */
 struct kbase_csf_scheduler_context {
-	struct list_head runnable_groups[BASE_QUEUE_GROUP_PRIORITY_COUNT];
-	u32 num_runnable_grps;
-	struct list_head idle_wait_groups;
-	u32 num_idle_wait_grps;
-	struct workqueue_struct *sync_update_wq;
-	struct work_struct sync_update_work;
-	u32 ngrp_to_schedule;
+    struct list_head runnable_groups[BASE_QUEUE_GROUP_PRIORITY_COUNT];
+    u32 num_runnable_grps;
+    struct list_head idle_wait_groups;
+    u32 num_idle_wait_grps;
+    struct workqueue_struct *sync_update_wq;
+    struct work_struct sync_update_work;
+    u32 ngrp_to_schedule;
 };
 
 /**
@@ -569,22 +569,22 @@ struct kbase_csf_scheduler_context {
  *                    @lock needs to be held to access to this list.
  */
 struct kbase_csf_context {
-	struct list_head event_pages_head;
-	DECLARE_BITMAP(cookies, KBASE_CSF_NUM_USER_IO_PAGES_HANDLE);
-	struct kbase_queue *user_pages_info[
-		KBASE_CSF_NUM_USER_IO_PAGES_HANDLE];
-	struct mutex lock;
-	struct kbase_queue_group *queue_groups[MAX_QUEUE_GROUP_NUM];
-	struct list_head queue_list;
-	struct kbase_csf_kcpu_queue_context kcpu_queues;
-	spinlock_t event_lock;
-	struct list_head event_callback_list;
-	struct kbase_csf_tiler_heap_context tiler_heaps;
-	struct workqueue_struct *wq;
-	struct list_head link;
-	struct vm_area_struct *user_reg_vma;
-	struct kbase_csf_scheduler_context sched;
-	struct list_head error_list;
+    struct list_head event_pages_head;
+    DECLARE_BITMAP(cookies, KBASE_CSF_NUM_USER_IO_PAGES_HANDLE);
+    struct kbase_queue *user_pages_info[
+        KBASE_CSF_NUM_USER_IO_PAGES_HANDLE];
+    struct mutex lock;
+    struct kbase_queue_group *queue_groups[MAX_QUEUE_GROUP_NUM];
+    struct list_head queue_list;
+    struct kbase_csf_kcpu_queue_context kcpu_queues;
+    spinlock_t event_lock;
+    struct list_head event_callback_list;
+    struct kbase_csf_tiler_heap_context tiler_heaps;
+    struct workqueue_struct *wq;
+    struct list_head link;
+    struct vm_area_struct *user_reg_vma;
+    struct kbase_csf_scheduler_context sched;
+    struct list_head error_list;
 };
 
 /**
@@ -596,10 +596,10 @@ struct kbase_csf_context {
  * @state:         Tracks if the GPU reset is in progress or not.
  */
 struct kbase_csf_reset_gpu {
-	struct workqueue_struct *workq;
-	struct work_struct work;
-	wait_queue_head_t wait;
-	atomic_t state;
+    struct workqueue_struct *workq;
+    struct work_struct work;
+    wait_queue_head_t wait;
+    atomic_t state;
 };
 
 /**
@@ -612,10 +612,10 @@ struct kbase_csf_reset_gpu {
  * @priority:         dynamic priority assigned to command stream group slot.
  */
 struct kbase_csf_csg_slot {
-	struct kbase_queue_group *resident_group;
-	atomic_t state;
-	unsigned long trigger_jiffies;
-	u8 priority;
+    struct kbase_queue_group *resident_group;
+    atomic_t state;
+    unsigned long trigger_jiffies;
+    u8 priority;
 };
 
 /**
@@ -712,36 +712,36 @@ struct kbase_csf_csg_slot {
  *                          this count is zero, MCU will not be powered up.
  */
 struct kbase_csf_scheduler {
-	struct mutex lock;
-	spinlock_t interrupt_lock;
-	enum kbase_csf_scheduler_state state;
-	DECLARE_BITMAP(doorbell_inuse_bitmap, CSF_NUM_DOORBELL);
-	DECLARE_BITMAP(csg_inuse_bitmap, MAX_SUPPORTED_CSGS);
-	struct kbase_csf_csg_slot *csg_slots;
-	struct list_head runnable_kctxs;
-	struct list_head groups_to_schedule;
-	u32 ngrp_to_schedule;
-	u32 num_active_address_spaces;
-	u32 num_csg_slots_for_tick;
-	struct list_head idle_groups_to_schedule;
-	u32 total_runnable_grps;
-	DECLARE_BITMAP(csgs_events_enable_mask, MAX_SUPPORTED_CSGS);
-	DECLARE_BITMAP(csg_slots_idle_mask, MAX_SUPPORTED_CSGS);
-	DECLARE_BITMAP(csg_slots_prio_update, MAX_SUPPORTED_CSGS);
-	unsigned long last_schedule;
-	bool timer_enabled;
-	struct workqueue_struct *wq;
-	struct delayed_work tick_work;
-	struct delayed_work tock_work;
-	struct delayed_work ping_work;
-	struct kbase_context *top_ctx;
-	struct kbase_queue_group *top_grp;
-	u8 head_slot_priority;
-	bool tock_pending_request;
-	struct kbase_queue_group *active_protm_grp;
-	struct delayed_work gpu_idle_work;
-	atomic_t non_idle_suspended_grps;
-	u32 pm_active_count;
+    struct mutex lock;
+    spinlock_t interrupt_lock;
+    enum kbase_csf_scheduler_state state;
+    DECLARE_BITMAP(doorbell_inuse_bitmap, CSF_NUM_DOORBELL);
+    DECLARE_BITMAP(csg_inuse_bitmap, MAX_SUPPORTED_CSGS);
+    struct kbase_csf_csg_slot *csg_slots;
+    struct list_head runnable_kctxs;
+    struct list_head groups_to_schedule;
+    u32 ngrp_to_schedule;
+    u32 num_active_address_spaces;
+    u32 num_csg_slots_for_tick;
+    struct list_head idle_groups_to_schedule;
+    u32 total_runnable_grps;
+    DECLARE_BITMAP(csgs_events_enable_mask, MAX_SUPPORTED_CSGS);
+    DECLARE_BITMAP(csg_slots_idle_mask, MAX_SUPPORTED_CSGS);
+    DECLARE_BITMAP(csg_slots_prio_update, MAX_SUPPORTED_CSGS);
+    unsigned long last_schedule;
+    bool timer_enabled;
+    struct workqueue_struct *wq;
+    struct delayed_work tick_work;
+    struct delayed_work tock_work;
+    struct delayed_work ping_work;
+    struct kbase_context *top_ctx;
+    struct kbase_queue_group *top_grp;
+    u8 head_slot_priority;
+    bool tock_pending_request;
+    struct kbase_queue_group *active_protm_grp;
+    struct delayed_work gpu_idle_work;
+    atomic_t non_idle_suspended_grps;
+    u32 pm_active_count;
 };
 
 /**
@@ -753,9 +753,9 @@ struct kbase_csf_scheduler {
  * Maximum value of the global progress timeout.
  */
 #define GLB_PROGRESS_TIMER_TIMEOUT_MAX \
-	((GLB_PROGRESS_TIMER_TIMEOUT_MASK >> \
-		GLB_PROGRESS_TIMER_TIMEOUT_SHIFT) * \
-	GLB_PROGRESS_TIMER_TIMEOUT_SCALE)
+    ((GLB_PROGRESS_TIMER_TIMEOUT_MASK >> \
+        GLB_PROGRESS_TIMER_TIMEOUT_SHIFT) * \
+    GLB_PROGRESS_TIMER_TIMEOUT_SCALE)
 
 /**
  * struct kbase_csf      -  Object representing command-stream front-end for an
@@ -827,30 +827,30 @@ struct kbase_csf_scheduler {
  *                            acknowledgement is pending.
  */
 struct kbase_csf_device {
-	struct kbase_mmu_table mcu_mmu;
-	struct list_head firmware_interfaces;
-	struct list_head firmware_config;
-	struct list_head firmware_timeline_metadata;
-	struct kobject *fw_cfg_kobj;
-	struct kbase_csf_trace_buffers firmware_trace_buffers;
-	void *shared_interface;
-	struct rb_root shared_reg_rbtree;
-	struct file *db_filp;
-	u32 db_file_offsets;
-	struct tagged_addr dummy_db_page;
-	struct mutex reg_lock;
-	wait_queue_head_t event_wait;
-	bool interrupt_received;
-	struct kbase_csf_global_iface global_iface;
-	struct kbase_csf_scheduler scheduler;
-	struct kbase_csf_reset_gpu reset;
-	atomic64_t progress_timeout;
-	struct protected_memory_allocator_device *pma_dev;
-	bool firmware_inited;
-	bool firmware_reloaded;
-	bool firmware_reload_needed;
-	struct work_struct firmware_reload_work;
-	bool glb_init_request_pending;
+    struct kbase_mmu_table mcu_mmu;
+    struct list_head firmware_interfaces;
+    struct list_head firmware_config;
+    struct list_head firmware_timeline_metadata;
+    struct kobject *fw_cfg_kobj;
+    struct kbase_csf_trace_buffers firmware_trace_buffers;
+    void *shared_interface;
+    struct rb_root shared_reg_rbtree;
+    struct file *db_filp;
+    u32 db_file_offsets;
+    struct tagged_addr dummy_db_page;
+    struct mutex reg_lock;
+    wait_queue_head_t event_wait;
+    bool interrupt_received;
+    struct kbase_csf_global_iface global_iface;
+    struct kbase_csf_scheduler scheduler;
+    struct kbase_csf_reset_gpu reset;
+    atomic64_t progress_timeout;
+    struct protected_memory_allocator_device *pma_dev;
+    bool firmware_inited;
+    bool firmware_reloaded;
+    bool firmware_reload_needed;
+    struct work_struct firmware_reload_work;
+    bool glb_init_request_pending;
 };
 
 /**
@@ -869,15 +869,15 @@ struct kbase_csf_device {
  * @current_setup:     Stores the MMU configuration for this address space.
  */
 struct kbase_as {
-	int number;
-	struct workqueue_struct *pf_wq;
-	struct work_struct work_pagefault;
-	struct work_struct work_busfault;
-	struct work_struct work_gpufault;
-	struct kbase_fault pf_data;
-	struct kbase_fault bf_data;
-	struct kbase_fault gf_data;
-	struct kbase_mmu_setup current_setup;
+    int number;
+    struct workqueue_struct *pf_wq;
+    struct work_struct work_pagefault;
+    struct work_struct work_busfault;
+    struct work_struct work_gpufault;
+    struct kbase_fault pf_data;
+    struct kbase_fault bf_data;
+    struct kbase_fault gf_data;
+    struct kbase_mmu_setup current_setup;
 };
 
 #endif /* _KBASE_CSF_DEFS_H_ */

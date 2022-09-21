@@ -15,18 +15,22 @@
 
 
 
-#ifndef _KBASE_DEBUG_JOB_FAULT_H
-#define _KBASE_DEBUG_JOB_FAULT_H
+#ifndef KBASE_DEBUG_JOB_FAULT_H
+#define KBASE_DEBUG_JOB_FAULT_H
 
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 
 #define REGISTER_DUMP_TERMINATION_FLAG 0xFFFFFFFF
+#define REGISTER_ADDRESS_NEED          0x4000
+#define REGISTER_ADDRESS_DOUBLE        2
+#define REGISTER_OFFSET_FLAG           50
+#define REGISTER_OFFSET_UNIT           2
 
 /**
  * kbase_debug_job_fault_dev_init - Create the fault event wait queue
- *		per device and initialize the required lists.
- * @kbdev:	Device pointer
+ *        per device and initialize the required lists.
+ * @kbdev:    Device pointer
  *
  * Return: Zero on success or a negative error code.
  */
@@ -34,27 +38,27 @@ int kbase_debug_job_fault_dev_init(struct kbase_device *kbdev);
 
 /**
  * kbase_debug_job_fault_debugfs_init - Initialize job fault debug sysfs
- * @kbdev:	Device pointer
+ * @kbdev:    Device pointer
  */
 void kbase_debug_job_fault_debugfs_init(struct kbase_device *kbdev);
 
 /**
  * kbase_debug_job_fault_dev_term - Clean up resources created in
- *		kbase_debug_job_fault_dev_init.
- * @kbdev:	Device pointer
+ *        kbase_debug_job_fault_dev_init.
+ * @kbdev:    Device pointer
  */
 void kbase_debug_job_fault_dev_term(struct kbase_device *kbdev);
 
 /**
  * kbase_debug_job_fault_context_init - Initialize the relevant
- *		data structure per context
+ *        data structure per context
  * @kctx: KBase context pointer
  */
 void kbase_debug_job_fault_context_init(struct kbase_context *kctx);
 
 /**
  * kbase_debug_job_fault_context_term - Release the relevant
- *		resource per context
+ *        resource per context
  * @kctx: KBase context pointer
  */
 void kbase_debug_job_fault_context_term(struct kbase_context *kctx);
@@ -71,7 +75,7 @@ void kbase_debug_job_fault_context_term(struct kbase_context *kctx);
  * @return true if dump is going on
  */
 bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom,
-		u32 completion_code);
+        u32 completion_code);
 
 
 /**
@@ -83,7 +87,7 @@ bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom,
  * @return true if initializing successfully
  */
 bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx,
-		int reg_range);
+        int reg_range);
 
 /**
  * kbase_job_fault_get_reg_snapshot - Read the interested registers for

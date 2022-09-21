@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_TILER_HEAP_DEF_H_
-#define _KBASE_CSF_TILER_HEAP_DEF_H_
+#ifndef KBASE_CSF_TILER_HEAP_DEF_H
+#define KBASE_CSF_TILER_HEAP_DEF_H
 
 #include <mali_kbase.h>
 
@@ -49,13 +49,13 @@
 /* Bitmask of valid chunk sizes. This is also the maximum chunk size, in bytes.
  */
 #define CHUNK_SIZE_MASK \
-	((CHUNK_HDR_NEXT_SIZE_MASK >> CHUNK_HDR_NEXT_SIZE_POS) << \
-	 CHUNK_HDR_NEXT_SIZE_ENCODE_SHIFT)
+    ((CHUNK_HDR_NEXT_SIZE_MASK >> CHUNK_HDR_NEXT_SIZE_POS) << \
+     CHUNK_HDR_NEXT_SIZE_ENCODE_SHIFT)
 
 /* Bitmask of valid chunk addresses. This is also the highest address. */
 #define CHUNK_ADDR_MASK \
-	((CHUNK_HDR_NEXT_ADDR_MASK >> CHUNK_HDR_NEXT_ADDR_POS) << \
-	 CHUNK_HDR_NEXT_ADDR_ENCODE_SHIFT)
+    ((CHUNK_HDR_NEXT_ADDR_MASK >> CHUNK_HDR_NEXT_ADDR_POS) << \
+     CHUNK_HDR_NEXT_ADDR_ENCODE_SHIFT)
 
 /**
  * struct kbase_csf_tiler_heap_chunk - A tiler heap chunk managed by the kernel
@@ -74,9 +74,9 @@
  *          of free memory within it.
  */
 struct kbase_csf_tiler_heap_chunk {
-	struct list_head link;
-	struct kbase_va_region *region;
-	u64 gpu_va;
+    struct list_head link;
+    struct kbase_va_region *region;
+    u64 gpu_va;
 };
 
 /**
@@ -100,13 +100,13 @@ struct kbase_csf_tiler_heap_chunk {
  * @chunks_list:     Linked list of allocated chunks.
  */
 struct kbase_csf_tiler_heap {
-	struct kbase_context *kctx;
-	struct list_head link;
-	u32 chunk_size;
-	u32 chunk_count;
-	u32 max_chunks;
-	u16 target_in_flight;
-	u64 gpu_va;
-	struct list_head chunks_list;
+    struct kbase_context *kctx;
+    struct list_head link;
+    u32 chunk_size;
+    u32 chunk_count;
+    u32 max_chunks;
+    u16 target_in_flight;
+    u64 gpu_va;
+    struct list_head chunks_list;
 };
 #endif /* !_KBASE_CSF_TILER_HEAP_DEF_H_ */

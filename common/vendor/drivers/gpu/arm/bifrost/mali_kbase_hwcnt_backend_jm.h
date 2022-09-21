@@ -25,8 +25,8 @@
  * backend.
  */
 
-#ifndef _KBASE_HWCNT_BACKEND_JM_H_
-#define _KBASE_HWCNT_BACKEND_JM_H_
+#ifndef KBASE_HWCNT_BACKEND_JM_H
+#define KBASE_HWCNT_BACKEND_JM_H
 
 #include "mali_kbase_hwcnt_backend.h"
 
@@ -44,8 +44,8 @@ struct kbase_device;
  * Return: 0 on success, else error code.
  */
 int kbase_hwcnt_backend_jm_create(
-	struct kbase_device *kbdev,
-	struct kbase_hwcnt_backend_interface *iface);
+    struct kbase_device *kbdev,
+    struct kbase_hwcnt_backend_interface *iface);
 
 /**
  * kbase_hwcnt_backend_jm_destroy() - Destroy a JM hardware counter backend
@@ -56,6 +56,6 @@ int kbase_hwcnt_backend_jm_create(
  * interface.
  */
 void kbase_hwcnt_backend_jm_destroy(
-	struct kbase_hwcnt_backend_interface *iface);
+    struct kbase_hwcnt_backend_interface *iface);
 
 #endif /* _KBASE_HWCNT_BACKEND_JM_H_ */

@@ -23,17 +23,17 @@ extern int RGA2_INT_FLAG;
  */
 struct rga_debugger {
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUG_FS
-	/* Directory of debugfs file */
-	struct dentry *debugfs_dir;
-	struct list_head debugfs_entry_list;
-	struct mutex debugfs_lock;
+    /* Directory of debugfs file */
+    struct dentry *debugfs_dir;
+    struct list_head debugfs_entry_list;
+    struct mutex debugfs_lock;
 #endif
 
 #ifdef CONFIG_ROCKCHIP_RGA2_PROC_FS
-	/* Directory of procfs file */
-	struct proc_dir_entry *procfs_dir;
-	struct list_head procfs_entry_list;
-	struct mutex procfs_lock;
+    /* Directory of procfs file */
+    struct proc_dir_entry *procfs_dir;
+    struct list_head procfs_entry_list;
+    struct mutex procfs_lock;
 #endif
 };
 
@@ -44,22 +44,22 @@ struct rga_debugger {
  * driver or core.
  */
 struct rga_debugger_list {
-	/* File name */
-	const char *name;
-	/*
-	 * Show callback. &seq_file->private will be set to the &struct
-	 * rga_debugger_node corresponding to the instance of this info on a given
-	 * &struct rga_debugger.
-	 */
-	int (*show)(struct seq_file *seq, void *data);
-	/*
-	 * Write callback. &seq_file->private will be set to the &struct
-	 * rga_debugger_node corresponding to the instance of this info on a given
-	 * &struct rga_debugger.
-	 */
-	ssize_t (*write)(struct file *file, const char __user *ubuf, size_t len, loff_t *offp);
-	/* Procfs/Debugfs private data. */
-	void *data;
+    /* File name */
+    const char *name;
+    /*
+     * Show callback. &seq_file->private will be set to the &struct
+     * rga_debugger_node corresponding to the instance of this info on a given
+     * &struct rga_debugger.
+     */
+    int (*show)(struct seq_file *seq, void *data);
+    /*
+     * Write callback. &seq_file->private will be set to the &struct
+     * rga_debugger_node corresponding to the instance of this info on a given
+     * &struct rga_debugger.
+     */
+    ssize_t (*write)(struct file *file, const char __user *ubuf, size_t len, loff_t *offp);
+    /* Procfs/Debugfs private data. */
+    void *data;
 };
 
 /*
@@ -69,21 +69,21 @@ struct rga_debugger_list {
  * template.
  */
 struct rga_debugger_node {
-	struct rga_debugger *debugger;
+    struct rga_debugger *debugger;
 
-	/* template for this node. */
-	const struct rga_debugger_list *info_ent;
+    /* template for this node. */
+    const struct rga_debugger_list *info_ent;
 
-	/* Each Procfs/Debugfs file. */
+    /* Each Procfs/Debugfs file. */
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUG_FS
-	struct dentry *dent;
+    struct dentry *dent;
 #endif
 
 #ifdef CONFIG_ROCKCHIP_RGA2_PROC_FS
-	struct proc_dir_entry *pent;
+    struct proc_dir_entry *pent;
 #endif
 
-	struct list_head list;
+    struct list_head list;
 };
 
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUG_FS
@@ -92,11 +92,11 @@ int rga2_debugfs_remove(void);
 #else
 static inline int rga2_debugfs_remove(void)
 {
-	return 0;
+    return 0;
 }
 static inline int rga2_debugfs_init(void)
 {
-	return 0;
+    return 0;
 }
 #endif /* #ifdef CONFIG_ROCKCHIP_RGA2_DEBUG_FS */
 
@@ -106,11 +106,11 @@ int rga2_procfs_init(void);
 #else
 static inline int rga2_procfs_remove(void)
 {
-	return 0;
+    return 0;
 }
 static inline int rga2_procfs_init(void)
 {
-	return 0;
+    return 0;
 }
 #endif /* #ifdef CONFIG_ROCKCHIP_RGA2_PROC_FS */
 

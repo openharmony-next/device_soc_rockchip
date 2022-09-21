@@ -104,10 +104,10 @@ struct kbase_ktrace_backend;
 
 /* Collect all the common flags together for debug checking */
 #define KBASE_KTRACE_FLAG_COMMON_ALL \
-		(KBASE_KTRACE_FLAG_BACKEND)
+        (KBASE_KTRACE_FLAG_BACKEND)
 
 #define KBASE_KTRACE_FLAG_ALL \
-		(KBASE_KTRACE_FLAG_COMMON_ALL | KBASE_KTRACE_FLAG_BACKEND_ALL)
+        (KBASE_KTRACE_FLAG_COMMON_ALL | KBASE_KTRACE_FLAG_BACKEND_ALL)
 
 #define KBASE_KTRACE_SHIFT 8 /* 256 entries */
 #define KBASE_KTRACE_SIZE (1 << KBASE_KTRACE_SHIFT)
@@ -119,17 +119,17 @@ struct kbase_ktrace_backend;
  * kbase_ktrace_init()
  */
 enum kbase_ktrace_code {
-	/*
-	 * IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
-	 * THIS MUST BE USED AT THE START OF THE ENUM
-	 */
+    /*
+     * IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
+     * THIS MUST BE USED AT THE START OF THE ENUM
+     */
 #define KBASE_KTRACE_CODE_MAKE_CODE(X) KBASE_KTRACE_CODE(X)
 #include <debug/mali_kbase_debug_ktrace_codes.h>
 #undef  KBASE_KTRACE_CODE_MAKE_CODE
-	/* Comma on its own, to extend the list */
-	,
-	/* Must be the last in the enum */
-	KBASE_KTRACE_CODE_COUNT
+    /* Comma on its own, to extend the list */
+    ,
+    /* Must be the last in the enum */
+    KBASE_KTRACE_CODE_COUNT
 };
 
 /**
@@ -150,32 +150,32 @@ enum kbase_ktrace_code {
  *             a minimum common set of members
  */
 struct kbase_ktrace_msg {
-	struct timespec64 timestamp;
-	u32 thread_id;
-	u32 cpu;
-	pid_t kctx_tgid;
-	u32 kctx_id;
-	u64 info_val;
+    struct timespec64 timestamp;
+    u32 thread_id;
+    u32 cpu;
+    pid_t kctx_tgid;
+    u32 kctx_id;
+    u64 info_val;
 
-	struct kbase_ktrace_backend backend;
+    struct kbase_ktrace_backend backend;
 };
 
 struct kbase_ktrace {
-	spinlock_t              lock;
-	u16                     first_out;
-	u16                     next_in;
-	struct kbase_ktrace_msg *rbuf;
+    spinlock_t              lock;
+    u16                     first_out;
+    u16                     next_in;
+    struct kbase_ktrace_msg *rbuf;
 };
 
 
 static inline void kbase_ktrace_compiletime_asserts(void)
 {
-	/* See also documentation of enum kbase_ktrace_code */
-	compiletime_assert(sizeof(kbase_ktrace_code_t) == sizeof(unsigned long long) ||
-			KBASE_KTRACE_CODE_COUNT <= (1ull << (sizeof(kbase_ktrace_code_t) * BITS_PER_BYTE)),
-			"kbase_ktrace_code_t not wide enough for KBASE_KTRACE_CODE_COUNT");
-	compiletime_assert((KBASE_KTRACE_FLAG_BACKEND_ALL & KBASE_KTRACE_FLAG_COMMON_ALL) == 0,
-			"KTrace backend flags intersect with KTrace common flags");
+    /* See also documentation of enum kbase_ktrace_code */
+    compiletime_assert(sizeof(kbase_ktrace_code_t) == sizeof(unsigned long long) ||
+            KBASE_KTRACE_CODE_COUNT <= (1ull << (sizeof(kbase_ktrace_code_t) * BITS_PER_BYTE)),
+            "kbase_ktrace_code_t not wide enough for KBASE_KTRACE_CODE_COUNT");
+    compiletime_assert((KBASE_KTRACE_FLAG_BACKEND_ALL & KBASE_KTRACE_FLAG_COMMON_ALL) == 0,
+            "KTrace backend flags intersect with KTrace common flags");
 
 }
 

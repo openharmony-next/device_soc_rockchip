@@ -26,22 +26,22 @@
 
 static u64 always_on_get_core_mask(struct kbase_device *kbdev)
 {
-	return kbdev->gpu_props.props.raw_props.shader_present;
+    return kbdev->gpu_props.props.raw_props.shader_present;
 }
 
 static bool always_on_get_core_active(struct kbase_device *kbdev)
 {
-	return true;
+    return true;
 }
 
 static void always_on_init(struct kbase_device *kbdev)
 {
-	CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(kbdev);
 }
 
 static void always_on_term(struct kbase_device *kbdev)
 {
-	CSTD_UNUSED(kbdev);
+    CSTD_UNUSED(kbdev);
 }
 
 /*
@@ -51,13 +51,13 @@ static void always_on_term(struct kbase_device *kbdev)
  * and name.
  */
 const struct kbase_pm_policy kbase_pm_always_on_policy_ops = {
-	"always_on",			/* name */
-	always_on_init,			/* init */
-	always_on_term,			/* term */
-	always_on_get_core_mask,	/* get_core_mask */
-	always_on_get_core_active,	/* get_core_active */
-	0u,				/* flags */
-	KBASE_PM_POLICY_ID_ALWAYS_ON,	/* id */
+    "always_on",            /* name */
+    always_on_init,            /* init */
+    always_on_term,            /* term */
+    always_on_get_core_mask,    /* get_core_mask */
+    always_on_get_core_active,    /* get_core_active */
+    0u,                /* flags */
+    KBASE_PM_POLICY_ID_ALWAYS_ON,    /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_always_on_policy_ops);

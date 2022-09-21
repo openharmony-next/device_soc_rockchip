@@ -26,8 +26,8 @@
  * HW access common definitions
  */
 
-#ifndef _KBASE_HWACCESS_DEFS_H_
-#define _KBASE_HWACCESS_DEFS_H_
+#ifndef KBASE_HWACCESS_DEFS_H
+#define KBASE_HWACCESS_DEFS_H
 
 #include <mali_kbase_jm_defs.h>
 
@@ -43,9 +43,9 @@
  * @backend:         GPU backend specific data for HW access layer
  */
 struct kbase_hwaccess_data {
-	struct kbase_context *active_kctx[BASE_JM_MAX_NR_SLOTS];
+    struct kbase_context *active_kctx[BASE_JM_MAX_NR_SLOTS];
 
-	struct kbase_backend_data backend;
+    struct kbase_backend_data backend;
 };
 
 #endif /* _KBASE_HWACCESS_DEFS_H_ */

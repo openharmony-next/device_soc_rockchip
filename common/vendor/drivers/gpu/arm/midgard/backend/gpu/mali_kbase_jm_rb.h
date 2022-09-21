@@ -49,9 +49,9 @@ bool kbase_gpu_irq_evict(struct kbase_device *kbdev, int js);
  * @end_timestamp:   Time of completion
  */
 void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js,
-				u32 completion_code,
-				u64 job_tail,
-				ktime_t *end_timestamp);
+                u32 completion_code,
+                u64 job_tail,
+                ktime_t *end_timestamp);
 
 /**
  * kbase_gpu_inspect - Inspect the contents of the HW access ringbuffer
@@ -64,7 +64,7 @@ void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js,
  *          or NULL if no atom present
  */
 struct kbase_jd_atom *kbase_gpu_inspect(struct kbase_device *kbdev, int js,
-					int idx);
+                    int idx);
 
 /**
  * kbase_gpu_dump_slots - Print the contents of the slot ringbuffers

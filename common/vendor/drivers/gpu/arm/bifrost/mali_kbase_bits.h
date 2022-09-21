@@ -29,8 +29,8 @@
  * of such GNU licence.
  */
 
-#ifndef _KBASE_BITS_H_
-#define _KBASE_BITS_H_
+#ifndef KBASE_BITS_H
+#define KBASE_BITS_H
 
 #if (KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE)
 #include <linux/bits.h>

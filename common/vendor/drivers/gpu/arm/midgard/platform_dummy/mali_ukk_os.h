@@ -43,7 +43,7 @@
  * of a ukk_session object.
  */
 typedef struct ukkp_session {
-	int dummy;     /**< No internal OS specific data at this time */
+    int dummy;     /**< No internal OS specific data at this time */
 } ukkp_session;
 
 /** @} end group uk_api_kernel */

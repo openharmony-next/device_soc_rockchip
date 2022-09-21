@@ -51,7 +51,7 @@ void mali_bcast_disable(struct mali_bcast_unit *bcast_unit);
  */
 MALI_STATIC_INLINE void mali_bcast_enable(struct mali_bcast_unit *bcast_unit)
 {
-	mali_bcast_reset(bcast_unit);
+    mali_bcast_reset(bcast_unit);
 }
 
 #endif /* __MALI_BROADCAST_H__ */

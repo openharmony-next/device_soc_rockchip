@@ -17,9 +17,9 @@
 /**
  * Initialize/start the Mali GPU utilization metrics reporting.
  *
- * @return _MALI_OSK_ERR_OK on success, otherwise failure.
+ * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
-_mali_osk_errcode_t mali_utilization_init(void);
+mali_osk_errcode_t mali_utilization_init(void);
 
 /**
  * Terminate the Mali GPU utilization metrics reporting

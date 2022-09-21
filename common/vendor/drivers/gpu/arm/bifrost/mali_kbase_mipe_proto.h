@@ -30,13 +30,13 @@
 #define _KBASE_MIPE_PROTO_H
 
 #define _BITFIELD_MASK_FIELD(pos, len) \
-	(((1u << len) - 1) << pos)
+    (((1u << len) - 1) << pos)
 
 #define _BITFIELD_SET_FIELD(pos, len, value) \
-	(_BITFIELD_MASK_FIELD(pos, len) & (((u32) value) << pos))
+    (_BITFIELD_MASK_FIELD(pos, len) & (((u32) value) << pos))
 
 #define BITFIELD_SET(field_name, value) \
-	_BITFIELD_SET_FIELD(field_name ## _POS, field_name ## _LEN, value)
+    _BITFIELD_SET_FIELD(field_name ## _POS, field_name ## _LEN, value)
 
 /* The version of swtrace protocol used in timeline stream. */
 #define SWTRACE_VERSION    3
@@ -67,17 +67,17 @@
 
 /* First word of a MIPE packet */
 #define MIPE_PACKET_HEADER_W0(pkt_family, pkt_class, pkt_type, stream_id) \
-	(0                                          \
-	| BITFIELD_SET(PACKET_FAMILY,   pkt_family) \
-	| BITFIELD_SET(PACKET_CLASS,    pkt_class)  \
-	| BITFIELD_SET(PACKET_TYPE,     pkt_type)   \
-	| BITFIELD_SET(PACKET_STREAMID, stream_id))
+    (0                                          \
+    | BITFIELD_SET(PACKET_FAMILY,   pkt_family) \
+    | BITFIELD_SET(PACKET_CLASS,    pkt_class)  \
+    | BITFIELD_SET(PACKET_TYPE,     pkt_type)   \
+    | BITFIELD_SET(PACKET_STREAMID, stream_id))
 
 /* Second word of a MIPE packet */
 #define MIPE_PACKET_HEADER_W1(packet_length, seqbit) \
-	(0                                           \
-	| BITFIELD_SET(PACKET_LENGTH, packet_length) \
-	| BITFIELD_SET(PACKET_SEQBIT, seqbit))
+    (0                                           \
+    | BITFIELD_SET(PACKET_LENGTH, packet_length) \
+    | BITFIELD_SET(PACKET_SEQBIT, seqbit))
 
 /* The number of bytes reserved for packet header.
  * These value must be defined according to MIPE documentation.
@@ -93,33 +93,33 @@
  * Values are significant! Check MIPE documentation.
  */
 enum tl_packet_family {
-	TL_PACKET_FAMILY_CTRL = 0, /* control packets */
-	TL_PACKET_FAMILY_TL = 1,   /* timeline packets */
-	TL_PACKET_FAMILY_COUNT
+    TL_PACKET_FAMILY_CTRL = 0, /* control packets */
+    TL_PACKET_FAMILY_TL = 1,   /* timeline packets */
+    TL_PACKET_FAMILY_COUNT
 };
 
 /* Packet classes used in timeline streams.
  * Values are significant! Check MIPE documentation.
  */
 enum tl_packet_class {
-	TL_PACKET_CLASS_OBJ = 0, /* timeline objects packet */
-	TL_PACKET_CLASS_AUX = 1, /* auxiliary events packet */
+    TL_PACKET_CLASS_OBJ = 0, /* timeline objects packet */
+    TL_PACKET_CLASS_AUX = 1, /* auxiliary events packet */
 };
 
 /* Packet types used in timeline streams.
  * Values are significant! Check MIPE documentation.
  */
 enum tl_packet_type {
-	TL_PACKET_TYPE_HEADER = 0,  /* stream's header/directory */
-	TL_PACKET_TYPE_BODY = 1,    /* stream's body */
-	TL_PACKET_TYPE_SUMMARY = 2, /* stream's summary */
+    TL_PACKET_TYPE_HEADER = 0,  /* stream's header/directory */
+    TL_PACKET_TYPE_BODY = 1,    /* stream's body */
+    TL_PACKET_TYPE_SUMMARY = 2, /* stream's summary */
 };
 
 /* Stream ID types (timeline family). */
 enum tl_stream_id {
-	TL_STREAM_ID_USER = 0, /* User-space driver Timeline stream. */
-	TL_STREAM_ID_KERNEL = 1, /* Kernel-space driver Timeline stream. */
-	TL_STREAM_ID_CSFFW = 2, /* CSF firmware driver Timeline stream. */
+    TL_STREAM_ID_USER = 0, /* User-space driver Timeline stream. */
+    TL_STREAM_ID_KERNEL = 1, /* Kernel-space driver Timeline stream. */
+    TL_STREAM_ID_CSFFW = 2, /* CSF firmware driver Timeline stream. */
 };
 
 #endif /* _KBASE_MIPE_PROTO_H */

@@ -10,11 +10,6 @@
 
 #ifndef __MALI_KERNEL_LINUX_H__
 #define __MALI_KERNEL_LINUX_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <linux/cdev.h>     /* character device definitions */
 #include <linux/idr.h>
 #include <linux/rbtree.h>
@@ -22,7 +17,14 @@ extern "C" {
 #include "mali_osk_types.h"
 #include <linux/version.h>
 
-extern struct platform_device *mali_platform_device;
+#ifdef __cplusplus
+extern "C" {
+#endif
+#define MILI_KERNEL_EXT extern
+#define MILI_CPU_MAX_UNIT 8
+#define MILI_JEFFIES_WAIT 2
+
+MILI_KERNEL_EXT struct platform_device *mali_platform_device;
 
 /* After 3.19.0 kenrel droped CONFIG_PM_RUNTIME define,define by ourself */
 #if defined(CONFIG_PM) && LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
