@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#define PORT_FILE_PATH "/sys/kernel/debug/usb/fcc00000.dwc3/mode"
+#define PORT_FILE_PATH "/data/usb/mode"
 #define UDC_NAME "fcc00000.dwc3"
 
 #ifdef __cplusplus
