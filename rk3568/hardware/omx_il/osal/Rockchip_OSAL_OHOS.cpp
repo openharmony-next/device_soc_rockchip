@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <codec_omx_ext.h>
 #ifdef OHOS_BUFFER_HANDLE
 #include <display_type.h>
 #include <buffer_handle.h>
@@ -257,11 +258,23 @@ EXIT:
 }
 
 #ifdef OHOS_BUFFER_HANDLE
+OMX_U32 CodecOmxExtColor2CodecFormat(enum CodecOmxColorFormatExt codecExtColor)
+{
+    OMX_U32 codecFormat = PIXEL_FMT_BUTT;
+    switch (codecExtColor) {
+    case CODEC_OMX_COLOR_FORMAT_RGBA8888:
+        codecFormat = PIXEL_FMT_RGBA_8888;
+        break;
+    default:
+        omx_err("%s: undefined omxColorFormat[%d]", __func__, codecExtColor);
+        break;
+    }
+    return codecFormat;
+}
 OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFormat)
 {
     OMX_U32 codecFormat = PIXEL_FMT_BUTT;
-    switch (omxColorFormat)
-    {
+    switch (omxColorFormat) {
     case OMX_COLOR_Format16bitRGB565:
         codecFormat = PIXEL_FMT_RGB_565;
         break;
@@ -302,7 +315,7 @@ OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFo
         codecFormat = PIXEL_FMT_VYUY_422_PKG;
         break;
     default:
-        omx_err("%s: undefined omxColorFormat[%d]", __func__, omxColorFormat);
+        codecFormat = CodecOmxExtColor2CodecFormat((enum CodecOmxColorFormatExt)omxColorFormat);
         break;
     }
     return codecFormat;
@@ -310,8 +323,7 @@ OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFo
 OMX_COLOR_FORMATTYPE Rochip_OSAL_CodecFormat2OmxColorFormat(OMX_U32 codecFormat)
 {
     OMX_COLOR_FORMATTYPE omxColorFormat = OMX_COLOR_FormatUnused;
-    switch (codecFormat)
-    {
+    switch (codecFormat) {
     case PIXEL_FMT_RGB_565:
         omxColorFormat = OMX_COLOR_Format16bitRGB565;
         break;
@@ -350,6 +362,9 @@ OMX_COLOR_FORMATTYPE Rochip_OSAL_CodecFormat2OmxColorFormat(OMX_U32 codecFormat)
         break;
     case PIXEL_FMT_VYUY_422_PKG:
         omxColorFormat = OMX_COLOR_FormatCrYCbY;
+        break;
+    case PIXEL_FMT_RGBA_8888:
+        omxColorFormat = (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888;
         break;
     default:
         omx_err("%s: undefined codecColorFormat[%d]", __func__, omxColorFormat);

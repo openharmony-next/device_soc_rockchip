@@ -49,6 +49,7 @@ ohos_static_library("RkOMX_OSAL") {
     "//drivers/hdf_core/adapter/uhdf2/osal/include",
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/codec/interfaces/include",
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",
     "//commonlibrary/c_utils/base/include",

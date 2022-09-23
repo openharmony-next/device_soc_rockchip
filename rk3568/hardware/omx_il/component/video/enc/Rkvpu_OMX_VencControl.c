@@ -1008,7 +1008,13 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     }
                     case supportFormat_1: {
                         portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                        portFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)OMX_COLOR_FormatAndroidOpaque;
+                        portFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888;
+                        portFormat->xFramerate         = portDefinition->format.video.xFramerate;
+                        break;
+                    }
+                    case supportFormat_2: {
+                        portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
+                        portFormat->eColorFormat       = OMX_COLOR_Format32bitBGRA8888;
                         portFormat->xFramerate         = portDefinition->format.video.xFramerate;
                         break;
                     }

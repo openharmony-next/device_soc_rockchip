@@ -260,6 +260,8 @@ static int copy_align_raw_buffer_to_dest(RK_U8 *dst, RK_U8 *src, RK_U32 width,
                 index += width / 2; // width / 2
             }
             } break;
+        case MPP_FMT_RGBA8888 :
+        case MPP_FMT_BGRA8888 :
         case MPP_FMT_ABGR8888 :
         case MPP_FMT_ARGB8888 : {
             for (row = 0; row < height; row++) {
