@@ -58,6 +58,7 @@
 #ifdef USE_ANB
 
 #endif
+#include <codec_omx_ext.h>
 #ifdef OHOS_BUFFER_HANDLE
 #include <buffer_handle.h>
 #include <display_type.h>
@@ -578,18 +579,7 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
                     H264EncPictureType encType = VPU_H264ENC_RGB888;
                     p_vpu_ctx->control(p_vpu_ctx, VPU_API_ENC_SETFORMAT, (void *)&encType);
                 }
-            } else if (rockchipInputPort->portDefinition.format.video.eColorFormat == OMX_COLOR_FormatYUV420Planar) {
-                H264EncPictureType encType = VPU_H264ENC_YUV420_PLANAR;
-                p_vpu_ctx->control(p_vpu_ctx, VPU_API_ENC_SETFORMAT, (void *)&encType);
             }
-#ifdef OHOS_BUFFER_HANDLE
-            omx_info("pVideoEnc->bOhosDynamicBuffer is %d", pVideoEnc->bOhosDynamicBuffer);
-            if (pVideoEnc->bOhosDynamicBuffer) {
-                H264EncPictureType encType = RkGetPicTypeInBufferHandle(inputUseBuffer);
-                p_vpu_ctx->control(p_vpu_ctx, VPU_API_ENC_SETFORMAT, (void *)&encType);
-                // add more color format here
-            }
-#endif  // OHOS_BUFFER_HANDLE
             /*
              * Improve encode quality for CtsTestCases input.
              * - android.media.cts.DecodeEditEncodeTest#testVideoEditQCIF
@@ -676,7 +666,7 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
 
             omx_info("inputUseBuffer->dataLen = %d, width = %d, stride = %d, height = %d", inputUseBuffer->dataLen,
                      bufferHandle->width, bufferHandle->stride, bufferHandle->height);
-            aInput.size = new_width * new_height * 3 / 2; // 3:byte alignment, 2:byte alignment
+            aInput.size = bufferHandle->stride * bufferHandle->height;
             aInput.timeUs = inputUseBuffer->timeStamp;
         } else {
             OMX_BUFFERHEADERTYPE *pInputBuffer = inputUseBuffer->bufferHeader;
@@ -1518,27 +1508,33 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
                 (*encParams)->rc_mode = Video_RC_Mode_VBR;
                 break;
         }
-        OMX_COLOR_FORMATEXTTYPE eColorFormatExt =
-            (OMX_COLOR_FORMATEXTTYPE)pRockchipInputPort->portDefinition.format.video.eColorFormat;
+        enum CodecOmxColorFormatExt eColorFormatExt =
+            (enum CodecOmxColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
+        omx_err("inputPort colorformat= %d", eColorFormatExt);
         switch (pRockchipInputPort->portDefinition.format.video.eColorFormat) {
             case OMX_COLOR_FormatYUV420Planar: {
                 (*encParams)->format = VPU_H264ENC_YUV420_PLANAR;
-            }
                 break;
+            }
             case OMX_COLOR_FormatYUV420SemiPlanar: {
                 (*encParams)->format = VPU_H264ENC_YUV420_SEMIPLANAR;
-            }
                 break;
+            }
+            case OMX_COLOR_Format32bitBGRA8888 : {
+                (*encParams)->rc_mode = Video_RC_Mode_VBR;
+                (*encParams)->format = VPU_H264ENC_BGR888;
+                break;
+            }
             default:
                 switch (eColorFormatExt) {
-                    case OMX_COLOR_FormatAndroidOpaque: {
+                    case CODEC_OMX_COLOR_FORMAT_RGBA8888: {
                         (*encParams)->rc_mode = Video_RC_Mode_VBR;
                         (*encParams)->format = VPU_H264ENC_RGB888;
-                        }
                         break;
+                    }
                     default:
-                        omx_err("inputPort colorformat is not support format = %d", \
-                            pRockchipInputPort->portDefinition.format.video.eColorFormat);
+                        omx_err("inputPort colorformat is not support format = %d, line=%d", \
+                            pRockchipInputPort->portDefinition.format.video.eColorFormat, __LINE__);
                         break;
                 }
                 break;
@@ -1574,8 +1570,8 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
                 (*encParams)->rc_mode = Video_RC_Mode_VBR;
                 break;
         }
-        OMX_COLOR_FORMATEXTTYPE eColorFormatExt =
-            (OMX_COLOR_FORMATEXTTYPE)pRockchipInputPort->portDefinition.format.video.eColorFormat;
+        enum CodecOmxColorFormatExt eColorFormatExt =
+            (enum CodecOmxColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
         switch (pRockchipInputPort->portDefinition.format.video.eColorFormat) {
             case OMX_COLOR_FormatYUV420Planar: {
                 (*encParams)->format = VPU_H264ENC_YUV420_PLANAR;
@@ -1585,17 +1581,21 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
                 (*encParams)->format = VPU_H264ENC_YUV420_SEMIPLANAR;
             }
                 break;
+            case OMX_COLOR_Format32bitBGRA8888 : {
+                (*encParams)->rc_mode = Video_RC_Mode_VBR;
+                (*encParams)->format = VPU_H264ENC_BGR888;
+                break;
+            }
             default:
                 switch (eColorFormatExt) {
-                    case (OMX_COLOR_FORMATTYPE)OMX_COLOR_FormatAndroidOpaque: {
+                    case CODEC_OMX_COLOR_FORMAT_RGBA8888: {
                         (*encParams)->rc_mode = Video_RC_Mode_VBR;
                         (*encParams)->format = VPU_H264ENC_RGB888;
-                    }
                         break;
-                
+                    }
                     default:
-                        omx_err("inputPort colorformat is not support format = %d",\
-                            pRockchipInputPort->portDefinition.format.video.eColorFormat);
+                        omx_err("inputPort colorformat is not support format = %d, line=%d",\
+                            pRockchipInputPort->portDefinition.format.video.eColorFormat, __LINE__);
                         break;
                 }
                 break;

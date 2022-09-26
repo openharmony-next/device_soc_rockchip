@@ -1487,7 +1487,6 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
             if (portIndex == INPUT_PORT_INDEX) {
                 videoFormat->codecColorFormat =
                     Rockchip_OSAL_OmxColorFormat2CodecFormat(portDefinition->format.video.eColorFormat);
-                ;
                 videoFormat->codecCompressFormat = portDefinition->format.video.eCompressionFormat;
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
             } else {
