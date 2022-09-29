@@ -20,36 +20,36 @@
 #include "dw-hdmi-cec.h"
 
 enum {
-    HDMI_IH_CEC_STAT0    = 0x0106,
-    HDMI_IH_MUTE_CEC_STAT0    = 0x0186,
+    HDMI_IH_CEC_STAT0 = 0x0106,
+    HDMI_IH_MUTE_CEC_STAT0 = 0x0186,
 
-    HDMI_CEC_CTRL        = 0x7d00,
-    CEC_CTRL_START        = BIT(0),
-    CEC_CTRL_FRAME_TYP    = 3 << 1,
-    CEC_CTRL_RETRY        = 0 << 1,
-    CEC_CTRL_NORMAL        = 1 << 1,
-    CEC_CTRL_IMMED        = 2 << 1,
+    HDMI_CEC_CTRL = 0x7d00,
+    CEC_CTRL_START = BIT(0),
+    CEC_CTRL_FRAME_TYP = 3 << 1,
+    CEC_CTRL_RETRY = 0 << 1,
+    CEC_CTRL_NORMAL = 1 << 1,
+    CEC_CTRL_IMMED = 2 << 1,
 
-    HDMI_CEC_STAT        = 0x7d01,
-    CEC_STAT_DONE        = BIT(0),
-    CEC_STAT_EOM        = BIT(1),
-    CEC_STAT_NACK        = BIT(2),
-    CEC_STAT_ARBLOST    = BIT(3),
-    CEC_STAT_ERROR_INIT    = BIT(4),
-    CEC_STAT_ERROR_FOLL    = BIT(5),
-    CEC_STAT_WAKEUP        = BIT(6),
+    HDMI_CEC_STAT = 0x7d01,
+    CEC_STAT_DONE = BIT(0),
+    CEC_STAT_EOM = BIT(1),
+    CEC_STAT_NACK = BIT(2),
+    CEC_STAT_ARBLOST = BIT(3),
+    CEC_STAT_ERROR_INIT = BIT(4),
+    CEC_STAT_ERROR_FOLL = BIT(5),
+    CEC_STAT_WAKEUP = BIT(6),
 
-    HDMI_CEC_MASK        = 0x7d02,
-    HDMI_CEC_POLARITY    = 0x7d03,
-    HDMI_CEC_INT        = 0x7d04,
-    HDMI_CEC_ADDR_L        = 0x7d05,
-    HDMI_CEC_ADDR_H        = 0x7d06,
-    HDMI_CEC_TX_CNT        = 0x7d07,
-    HDMI_CEC_RX_CNT        = 0x7d08,
-    HDMI_CEC_TX_DATA0    = 0x7d10,
-    HDMI_CEC_RX_DATA0    = 0x7d20,
-    HDMI_CEC_LOCK        = 0x7d30,
-    HDMI_CEC_WKUPCTRL    = 0x7d31,
+    HDMI_CEC_MASK = 0x7d02,
+    HDMI_CEC_POLARITY = 0x7d03,
+    HDMI_CEC_INT = 0x7d04,
+    HDMI_CEC_ADDR_L = 0x7d05,
+    HDMI_CEC_ADDR_H = 0x7d06,
+    HDMI_CEC_TX_CNT = 0x7d07,
+    HDMI_CEC_RX_CNT = 0x7d08,
+    HDMI_CEC_TX_DATA0 = 0x7d10,
+    HDMI_CEC_RX_DATA0 = 0x7d20,
+    HDMI_CEC_LOCK = 0x7d30,
+    HDMI_CEC_WKUPCTRL = 0x7d31,
 };
 
 struct dw_hdmi_cec {
@@ -79,38 +79,39 @@ static int dw_hdmi_cec_log_addr(struct cec_adapter *adap, u8 logical_addr)
 {
     struct dw_hdmi_cec *cec = cec_get_drvdata(adap);
 
-    if (logical_addr == CEC_LOG_ADDR_INVALID)
+    if (logical_addr == CEC_LOG_ADDR_INVALID) {
         cec->addresses = 0;
-    else
-        cec->addresses |= BIT(logical_addr) | BIT(15);
+    } else {
+        cec->addresses |= BIT(logical_addr) | BIT(0x0f);
+    }
 
-    dw_hdmi_write(cec, cec->addresses & 255, HDMI_CEC_ADDR_L);
-    dw_hdmi_write(cec, cec->addresses >> 8, HDMI_CEC_ADDR_H);
+    dw_hdmi_write(cec, cec->addresses & 0xff, HDMI_CEC_ADDR_L);
+    dw_hdmi_write(cec, cec->addresses >> 0x8, HDMI_CEC_ADDR_H);
 
     return 0;
 }
 
-static int dw_hdmi_cec_transmit(struct cec_adapter *adap, u8 attempts,
-                u32 signal_free_time, struct cec_msg *msg)
+static int dw_hdmi_cec_transmit(struct cec_adapter *adap, u8 attempts, u32 signal_free_time, struct cec_msg *msg)
 {
     struct dw_hdmi_cec *cec = cec_get_drvdata(adap);
     unsigned int i, ctrl;
 
     switch (signal_free_time) {
-    case CEC_SIGNAL_FREE_TIME_RETRY:
-        ctrl = CEC_CTRL_RETRY;
-        break;
-    case CEC_SIGNAL_FREE_TIME_NEW_INITIATOR:
-    default:
-        ctrl = CEC_CTRL_NORMAL;
-        break;
-    case CEC_SIGNAL_FREE_TIME_NEXT_XFER:
-        ctrl = CEC_CTRL_IMMED;
-        break;
+        case CEC_SIGNAL_FREE_TIME_RETRY:
+            ctrl = CEC_CTRL_RETRY;
+            break;
+        case CEC_SIGNAL_FREE_TIME_NEW_INITIATOR:
+        default:
+            ctrl = CEC_CTRL_NORMAL;
+            break;
+        case CEC_SIGNAL_FREE_TIME_NEXT_XFER:
+            ctrl = CEC_CTRL_IMMED;
+            break;
     }
 
-    for (i = 0; i < msg->len; i++)
+    for (i = 0; i < msg->len; i++) {
         dw_hdmi_write(cec, msg->msg[i], HDMI_CEC_TX_DATA0 + i);
+    }
 
     dw_hdmi_write(cec, msg->len, HDMI_CEC_TX_CNT);
     dw_hdmi_write(cec, ctrl | CEC_CTRL_START, HDMI_CEC_CTRL);
@@ -125,8 +126,9 @@ static irqreturn_t dw_hdmi_cec_hardirq(int irq, void *data)
     unsigned int stat = dw_hdmi_read(cec, HDMI_IH_CEC_STAT0);
     irqreturn_t ret = IRQ_HANDLED;
 
-    if (stat == 0)
+    if (stat == 0) {
         return IRQ_NONE;
+    }
 
     dw_hdmi_write(cec, stat, HDMI_IH_CEC_STAT0);
 
@@ -148,12 +150,13 @@ static irqreturn_t dw_hdmi_cec_hardirq(int irq, void *data)
         unsigned int len, i;
 
         len = dw_hdmi_read(cec, HDMI_CEC_RX_CNT);
-        if (len > sizeof(cec->rx_msg.msg))
+        if (len > sizeof(cec->rx_msg.msg)) {
             len = sizeof(cec->rx_msg.msg);
+        }
 
-        for (i = 0; i < len; i++)
-            cec->rx_msg.msg[i] =
-                dw_hdmi_read(cec, HDMI_CEC_RX_DATA0 + i);
+        for (i = 0; i < len; i++) {
+            cec->rx_msg.msg[i] = dw_hdmi_read(cec, HDMI_CEC_RX_DATA0 + i);
+        }
 
         dw_hdmi_write(cec, 0, HDMI_CEC_LOCK);
 
@@ -205,8 +208,7 @@ static int dw_hdmi_cec_enable(struct cec_adapter *adap, bool enable)
 
         cec->ops->enable(cec->hdmi);
 
-        irqs = CEC_STAT_ERROR_INIT | CEC_STAT_NACK | CEC_STAT_EOM |
-               CEC_STAT_DONE;
+        irqs = CEC_STAT_ERROR_INIT | CEC_STAT_NACK | CEC_STAT_EOM | CEC_STAT_DONE;
         dw_hdmi_write(cec, irqs, HDMI_CEC_POLARITY);
         dw_hdmi_write(cec, ~irqs, HDMI_CEC_MASK);
         dw_hdmi_write(cec, ~irqs, HDMI_IH_MUTE_CEC_STAT0);
@@ -233,8 +235,9 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
     struct dw_hdmi_cec *cec;
     int ret;
 
-    if (!data)
+    if (!data) {
         return -ENXIO;
+    }
 
     /*
      * Our device is just a convenience - we want to link to the real
@@ -242,8 +245,9 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
      * between the HDMI hardware and its associated CEC chardev.
      */
     cec = devm_kzalloc(&pdev->dev, sizeof(*cec), GFP_KERNEL);
-    if (!cec)
+    if (!cec) {
         return -ENOMEM;
+    }
 
     cec->irq = data->irq;
     cec->ops = data->ops;
@@ -256,12 +260,11 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
     dw_hdmi_write(cec, ~0, HDMI_IH_MUTE_CEC_STAT0);
     dw_hdmi_write(cec, 0, HDMI_CEC_POLARITY);
 
-    cec->adap = cec_allocate_adapter(&dw_hdmi_cec_ops, cec, "dw_hdmi",
-                     CEC_CAP_DEFAULTS |
-                     CEC_CAP_CONNECTOR_INFO,
-                     CEC_MAX_LOG_ADDRS);
-    if (IS_ERR(cec->adap))
+    cec->adap = cec_allocate_adapter(&dw_hdmi_cec_ops, cec, "dw_hdmi", CEC_CAP_DEFAULTS | CEC_CAP_CONNECTOR_INFO,
+                                     CEC_MAX_LOG_ADDRS);
+    if (IS_ERR(cec->adap)) {
         return PTR_ERR(cec->adap);
+    }
 
     dw_hdmi_set_cec_adap(cec->hdmi, cec->adap);
 
@@ -274,17 +277,16 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
         return ret;
     }
 
-    ret = devm_request_threaded_irq(&pdev->dev, cec->irq,
-                    dw_hdmi_cec_hardirq,
-                    dw_hdmi_cec_thread, IRQF_SHARED,
-                    "dw-hdmi-cec", cec->adap);
-    if (ret < 0)
+    ret = devm_request_threaded_irq(&pdev->dev, cec->irq, dw_hdmi_cec_hardirq, dw_hdmi_cec_thread, IRQF_SHARED,
+                                    "dw-hdmi-cec", cec->adap);
+    if (ret < 0) {
         return ret;
+    }
 
-    cec->notify = cec_notifier_cec_adap_register(pdev->dev.parent,
-                             NULL, cec->adap);
-    if (!cec->notify)
+    cec->notify = cec_notifier_cec_adap_register(pdev->dev.parent, NULL, cec->adap);
+    if (!cec->notify) {
         return -ENOMEM;
+    }
 
     ret = cec_register_adapter(cec->adap, pdev->dev.parent);
     if (ret < 0) {
@@ -312,11 +314,12 @@ static int dw_hdmi_cec_remove(struct platform_device *pdev)
 }
 
 static struct platform_driver dw_hdmi_cec_driver = {
-    .probe    = dw_hdmi_cec_probe,
-    .remove    = dw_hdmi_cec_remove,
-    .driver = {
-        .name = "dw-hdmi-cec",
-    },
+    .probe = dw_hdmi_cec_probe,
+    .remove = dw_hdmi_cec_remove,
+    .driver =
+        {
+            .name = "dw-hdmi-cec",
+        },
 };
 module_platform_driver(dw_hdmi_cec_driver);
 

@@ -24,36 +24,35 @@
 
 #include "rockchip_drm_debugfs.h"
 
-#define ROCKCHIP_MAX_FB_BUFFER    3
-#define ROCKCHIP_MAX_CONNECTOR    2
-#define ROCKCHIP_MAX_CRTC    4
-#define ROCKCHIP_MAX_LAYER    16
-
+#define ROCKCHIP_MAX_FB_BUFFER 3
+#define ROCKCHIP_MAX_CONNECTOR 2
+#define ROCKCHIP_MAX_CRTC 4
+#define ROCKCHIP_MAX_LAYER 16
 
 struct drm_device;
 struct drm_connector;
 struct iommu_domain;
 
-#define VOP_OUTPUT_IF_RGB    BIT(0)
-#define VOP_OUTPUT_IF_BT1120    BIT(1)
-#define VOP_OUTPUT_IF_BT656    BIT(2)
-#define VOP_OUTPUT_IF_LVDS0    BIT(3)
-#define VOP_OUTPUT_IF_LVDS1    BIT(4)
-#define VOP_OUTPUT_IF_MIPI0    BIT(5)
-#define VOP_OUTPUT_IF_MIPI1    BIT(6)
-#define VOP_OUTPUT_IF_eDP0    BIT(7)
-#define VOP_OUTPUT_IF_eDP1    BIT(8)
-#define VOP_OUTPUT_IF_DP0    BIT(9)
-#define VOP_OUTPUT_IF_DP1    BIT(10)
-#define VOP_OUTPUT_IF_HDMI0    BIT(11)
-#define VOP_OUTPUT_IF_HDMI1    BIT(12)
+#define VOP_OUTPUT_IF_RGB BIT(0)
+#define VOP_OUTPUT_IF_BT1120 BIT(1)
+#define VOP_OUTPUT_IF_BT656 BIT(2)
+#define VOP_OUTPUT_IF_LVDS0 BIT(3)
+#define VOP_OUTPUT_IF_LVDS1 BIT(4)
+#define VOP_OUTPUT_IF_MIPI0 BIT(5)
+#define VOP_OUTPUT_IF_MIPI1 BIT(6)
+#define VOP_OUTPUT_IF_eDP0 BIT(7)
+#define VOP_OUTPUT_IF_eDP1 BIT(8)
+#define VOP_OUTPUT_IF_DP0 BIT(9)
+#define VOP_OUTPUT_IF_DP1 BIT(10)
+#define VOP_OUTPUT_IF_HDMI0 BIT(11)
+#define VOP_OUTPUT_IF_HDMI1 BIT(12)
 
 #ifndef DRM_FORMAT_NV20
-#define DRM_FORMAT_NV20        fourcc_code('N', 'V', '2', '0') /* 2x1 subsampled Cr:Cb plane */
+#define DRM_FORMAT_NV20 fourcc_code('N', 'V', '2', '0') /* 2x1 subsampled Cr:Cb plane */
 #endif
 
 #ifndef DRM_FORMAT_NV30
-#define DRM_FORMAT_NV30        fourcc_code('N', 'V', '3', '0') /* non-subsampled Cr:Cb plane */
+#define DRM_FORMAT_NV30 fourcc_code('N', 'V', '3', '0') /* non-subsampled Cr:Cb plane */
 #endif
 
 struct rockchip_drm_sub_dev {
@@ -195,8 +194,7 @@ struct rockchip_crtc_state {
     struct rockchip_hdr_state hdr;
 };
 
-#define to_rockchip_crtc_state(s) \
-        container_of(s, struct rockchip_crtc_state, base)
+#define to_rockchip_crtc_state(s) container_of(s, struct rockchip_crtc_state, base)
 
 struct rockchip_drm_vcnt {
     struct drm_pending_vblank_event *event;
@@ -317,17 +315,12 @@ struct rockchip_crtc_funcs {
     int (*loader_protect)(struct drm_crtc *crtc, bool on);
     int (*enable_vblank)(struct drm_crtc *crtc);
     void (*disable_vblank)(struct drm_crtc *crtc);
-    size_t (*bandwidth)(struct drm_crtc *crtc,
-                struct drm_crtc_state *crtc_state,
-                struct dmcfreq_vop_info *vop_bw_info);
-    void (*cancel_pending_vblank)(struct drm_crtc *crtc,
-                      struct drm_file *file_priv);
+    size_t (*bandwidth)(struct drm_crtc *crtc, struct drm_crtc_state *crtc_state, struct dmcfreq_vop_info *vop_bw_info);
+    void (*cancel_pending_vblank)(struct drm_crtc *crtc, struct drm_file *file_priv);
     int (*debugfs_init)(struct drm_minor *minor, struct drm_crtc *crtc);
     int (*debugfs_dump)(struct drm_crtc *crtc, struct seq_file *s);
     void (*regs_dump)(struct drm_crtc *crtc, struct seq_file *s);
-    enum drm_mode_status (*mode_valid)(struct drm_crtc *crtc,
-                       const struct drm_display_mode *mode,
-                       int output_type);
+    enum drm_mode_status (*mode_valid)(struct drm_crtc *crtc, const struct drm_display_mode *mode, int output_type);
     void (*crtc_close)(struct drm_crtc *crtc);
     void (*crtc_send_mcu_cmd)(struct drm_crtc *crtc, u32 type, u32 value);
     void (*te_handler)(struct drm_crtc *crtc);
@@ -396,13 +389,10 @@ struct rockchip_drm_private {
     struct loader_cubic_lut cubic_lut[ROCKCHIP_MAX_CRTC];
 };
 
-int rockchip_drm_dma_attach_device(struct drm_device *drm_dev,
-                   struct device *dev);
-void rockchip_drm_dma_detach_device(struct drm_device *drm_dev,
-                    struct device *dev);
+int rockchip_drm_dma_attach_device(struct drm_device *drm_dev, struct device *dev);
+void rockchip_drm_dma_detach_device(struct drm_device *drm_dev, struct device *dev);
 int rockchip_drm_wait_vact_end(struct drm_crtc *crtc, unsigned int mstimeout);
-int rockchip_register_crtc_funcs(struct drm_crtc *crtc,
-                 const struct rockchip_crtc_funcs *crtc_funcs);
+int rockchip_register_crtc_funcs(struct drm_crtc *crtc, const struct rockchip_crtc_funcs *crtc_funcs);
 void rockchip_unregister_crtc_funcs(struct drm_crtc *crtc);
 
 void rockchip_drm_register_sub_dev(struct rockchip_drm_sub_dev *sub_dev);
@@ -422,16 +412,12 @@ static inline int rockchip_drm_get_sub_dev_type(void)
 #endif
 
 int rockchip_drm_endpoint_is_subdriver(struct device_node *ep);
-uint32_t rockchip_drm_of_find_possible_crtcs(struct drm_device *dev,
-                         struct device_node *port);
+uint32_t rockchip_drm_of_find_possible_crtcs(struct drm_device *dev, struct device_node *port);
 uint32_t rockchip_drm_get_bpp(const struct drm_format_info *info);
-int rockchip_drm_get_yuv422_format(struct drm_connector *connector,
-                   struct edid *edid);
-int rockchip_drm_parse_cea_ext(struct rockchip_drm_dsc_cap *dsc_cap,
-                   u8 *max_frl_rate_per_lane, u8 *max_lanes,
-                   const struct edid *edid);
-int rockchip_drm_parse_next_hdr(struct next_hdr_sink_data *sink_data,
-                const struct edid *edid);
+int rockchip_drm_get_yuv422_format(struct drm_connector *connector, struct edid *edid);
+int rockchip_drm_parse_cea_ext(struct rockchip_drm_dsc_cap *dsc_cap, u8 *max_frl_rate_per_lane, u8 *max_lanes,
+                               const struct edid *edid);
+int rockchip_drm_parse_next_hdr(struct next_hdr_sink_data *sink_data, const struct edid *edid);
 
 extern struct platform_driver cdn_dp_driver;
 extern struct platform_driver dw_hdmi_rockchip_pltfm_driver;

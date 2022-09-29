@@ -20,10 +20,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_H_
-#define _KBASE_H_
+#ifndef KBASE_H_
+#define KBASE_H_
 
 #include <mali_malisw.h>
 
@@ -89,7 +87,7 @@
 
 #ifndef u64_to_user_ptr
 /* Introduced in Linux v4.6 */
-#define u64_to_user_ptr(x) ((void __user *)(uintptr_t)x)
+#define u64_to_user_ptr(x) ((void __user *)(uintptr_t)(x))
 #endif
 
 #if MALI_USE_CSF
@@ -112,9 +110,9 @@
 
 struct kbase_device *kbase_device_alloc(void);
 /*
-* note: configuration attributes member of kbdev needs to have
-* been setup before calling kbase_device_init
-*/
+ * note: configuration attributes member of kbdev needs to have
+ * been setup before calling kbase_device_init
+ */
 
 int kbase_device_misc_init(struct kbase_device *kbdev);
 void kbase_device_misc_term(struct kbase_device *kbdev);
@@ -163,16 +161,14 @@ void kbase_release_device(struct kbase_device *kbdev);
  * Return: if successful, address of the unmapped area aligned as required;
  *         error code (negative) in case of failure;
  */
-unsigned long kbase_context_get_unmapped_area(struct kbase_context *kctx,
-        const unsigned long addr, const unsigned long len,
-        const unsigned long pgoff, const unsigned long flags);
-
+unsigned long kbase_context_get_unmapped_area(struct kbase_context *kctx, const unsigned long addr,
+                                              const unsigned long len, const unsigned long pgoff,
+                                              const unsigned long flags);
 
 int assign_irqs(struct kbase_device *kbdev);
 
 int kbase_sysfs_init(struct kbase_device *kbdev);
 void kbase_sysfs_term(struct kbase_device *kbdev);
-
 
 int kbase_protected_mode_init(struct kbase_device *kbdev);
 void kbase_protected_mode_term(struct kbase_device *kbdev);
@@ -195,23 +191,24 @@ int kbase_device_pm_init(struct kbase_device *kbdev);
  */
 void kbase_device_pm_term(struct kbase_device *kbdev);
 
-
 int power_control_init(struct kbase_device *kbdev);
 void power_control_term(struct kbase_device *kbdev);
 
 #ifdef CONFIG_DEBUG_FS
 void kbase_device_debugfs_term(struct kbase_device *kbdev);
 int kbase_device_debugfs_init(struct kbase_device *kbdev);
-#else /* CONFIG_DEBUG_FS */
+#else  /* CONFIG_DEBUG_FS */
 static inline int kbase_device_debugfs_init(struct kbase_device *kbdev)
 {
     return 0;
 }
 
-static inline void kbase_device_debugfs_term(struct kbase_device *kbdev) { }
+static inline void kbase_device_debugfs_term(struct kbase_device *kbdev)
+{
+}
 #endif /* CONFIG_DEBUG_FS */
 
-int registers_map(struct kbase_device *kbdev);
+int registers_map(struct kbase_device *const kbdev);
 void registers_unmap(struct kbase_device *kbdev);
 
 int kbase_device_coherency_init(struct kbase_device *kbdev);
@@ -236,9 +233,7 @@ void kbase_jd_exit(struct kbase_context *kctx);
  *
  * Return: 0 on success or error code
  */
-int kbase_jd_submit(struct kbase_context *kctx,
-        void __user *user_addr, u32 nr_atoms, u32 stride,
-        bool uk6_atom);
+int kbase_jd_submit(struct kbase_context *kctx, void __user *user_addr, u32 nr_atoms, u32 stride, bool uk6_atom);
 
 /**
  * kbase_jd_done_worker - Handle a job completion
@@ -260,11 +255,10 @@ int kbase_jd_submit(struct kbase_context *kctx,
 void kbase_jd_done_worker(struct work_struct *data);
 
 void kbase_jd_done(struct kbase_jd_atom *katom, int slot_nr, ktime_t *end_timestamp,
-        kbasep_js_atom_done_code done_code);
+                   kbasep_js_atom_done_code done_code);
 void kbase_jd_cancel(struct kbase_device *kbdev, struct kbase_jd_atom *katom);
 void kbase_jd_zap_context(struct kbase_context *kctx);
-bool jd_done_nolock(struct kbase_jd_atom *katom,
-        struct list_head *completed_jobs_ctx);
+bool jd_done_nolock(struct kbase_jd_atom *katom, struct list_head *completed_jobs_ctx);
 void kbase_jd_free_external_resources(struct kbase_jd_atom *katom);
 void kbase_jd_dep_clear_locked(struct kbase_jd_atom *katom);
 
@@ -292,8 +286,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done);
  *
  * The hwaccess_lock must be held when calling this function.
  */
-void kbase_job_slot_ctx_priority_check_locked(struct kbase_context *kctx,
-                struct kbase_jd_atom *katom);
+void kbase_job_slot_ctx_priority_check_locked(struct kbase_context *kctx, struct kbase_jd_atom *katom);
 
 /**
  * kbase_job_slot_softstop_start_rp() - Soft-stop the atom at the start
@@ -308,23 +301,19 @@ void kbase_job_slot_ctx_priority_check_locked(struct kbase_context *kctx,
  *
  * Return 0 if successful, otherwise a negative error code.
  */
-int kbase_job_slot_softstop_start_rp(struct kbase_context *kctx,
-        struct kbase_va_region *reg);
+int kbase_job_slot_softstop_start_rp(struct kbase_context *kctx, struct kbase_va_region *reg);
 
-void kbase_job_slot_softstop(struct kbase_device *kbdev, int js,
-        struct kbase_jd_atom *target_katom);
-void kbase_job_slot_softstop_swflags(struct kbase_device *kbdev, int js,
-        struct kbase_jd_atom *target_katom, u32 sw_flags);
-void kbase_job_slot_hardstop(struct kbase_context *kctx, int js,
-        struct kbase_jd_atom *target_katom);
-void kbase_job_check_enter_disjoint(struct kbase_device *kbdev, u32 action,
-        base_jd_core_req core_reqs, struct kbase_jd_atom *target_katom);
-void kbase_job_check_leave_disjoint(struct kbase_device *kbdev,
-        struct kbase_jd_atom *target_katom);
+void kbase_job_slot_softstop(struct kbase_device *kbdev, int js, struct kbase_jd_atom *target_katom);
+void kbase_job_slot_softstop_swflags(struct kbase_device *kbdev, int js, struct kbase_jd_atom *target_katom,
+                                     u32 sw_flags);
+void kbase_job_slot_hardstop(struct kbase_context *kctx, int js, struct kbase_jd_atom *target_katom);
+void kbase_job_check_enter_disjoint(struct kbase_device *kbdev, u32 action, base_jd_core_req core_reqs,
+                                    struct kbase_jd_atom *target_katom);
+void kbase_job_check_leave_disjoint(struct kbase_device *kbdev, struct kbase_jd_atom *target_katom);
 
 #endif /* !MALI_USE_CSF */
 
-void kbase_event_post(struct kbase_context *ctx, struct kbase_jd_atom *event);
+void kbase_event_post(struct kbase_context *ctx, struct kbase_jd_atom *atom);
 #if !MALI_USE_CSF
 int kbase_event_dequeue(struct kbase_context *ctx, struct base_jd_event_v2 *uevent);
 #endif /* !MALI_USE_CSF */
@@ -343,8 +332,7 @@ void kbase_event_wakeup(struct kbase_context *kctx);
  *            which is to be validated.
  * @return: 0 if jit allocation is valid; negative error code otherwise
  */
-int kbasep_jit_alloc_validate(struct kbase_context *kctx,
-                    struct base_jit_alloc_info *info);
+int kbasep_jit_alloc_validate(struct kbase_context *kctx, struct base_jit_alloc_info *info);
 
 /**
  * kbase_jit_retry_pending_alloc() - Retry blocked just-in-time memory
@@ -362,8 +350,7 @@ void kbase_jit_retry_pending_alloc(struct kbase_context *kctx);
  * @buffer:    Pointer to the memory location allocated for the object
  *        of the type struct @kbase_debug_copy_buffer.
  */
-static inline void kbase_free_user_buffer(
-        struct kbase_debug_copy_buffer *buffer)
+static inline void kbase_free_user_buffer(struct kbase_debug_copy_buffer *buffer)
 {
     struct page **pages = buffer->extres_pages;
     int nr_pages = buffer->nr_extres_pages;
@@ -374,8 +361,9 @@ static inline void kbase_free_user_buffer(
         for (i = 0; i < nr_pages; i++) {
             struct page *pg = pages[i];
 
-            if (pg)
+            if (pg) {
                 put_page(pg);
+            }
         }
         kfree(pages);
     }
@@ -389,8 +377,7 @@ static inline void kbase_free_user_buffer(
  *        pages pertaining to the external resource, number of
  *        pages to copy.
  */
-int kbase_mem_copy_from_extres(struct kbase_context *kctx,
-        struct kbase_debug_copy_buffer *buf_data);
+int kbase_mem_copy_from_extres(struct kbase_context *kctx, struct kbase_debug_copy_buffer *buf_data);
 #if !MALI_USE_CSF
 int kbase_process_soft_job(struct kbase_jd_atom *katom);
 int kbase_prepare_soft_job(struct kbase_jd_atom *katom);
@@ -401,9 +388,7 @@ void kbasep_remove_waiting_soft_job(struct kbase_jd_atom *katom);
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
 void kbase_soft_event_wait_callback(struct kbase_jd_atom *katom);
 #endif
-int kbase_soft_event_update(struct kbase_context *kctx,
-                u64 event,
-                unsigned char new_status);
+int kbase_soft_event_update(struct kbase_context *kctx, u64 event, unsigned char new_status);
 
 void kbasep_soft_job_timeout_worker(struct timer_list *timer);
 void kbasep_complete_triggered_soft_events(struct kbase_context *kctx, u64 evt);
@@ -453,8 +438,7 @@ static inline bool kbase_pm_is_gpu_lost(struct kbase_device *kbdev)
  * state.  Once in gpu lost state new GPU jobs will no longer be
  * scheduled.
  */
-static inline void kbase_pm_set_gpu_lost(struct kbase_device *kbdev,
-    bool gpu_lost)
+static inline void kbase_pm_set_gpu_lost(struct kbase_device *kbdev, bool gpu_lost)
 {
     atomic_set(&kbdev->pm.gpu_lost, (gpu_lost ? 1 : 0));
 }
@@ -517,8 +501,7 @@ static inline int kbase_jd_atom_id(struct kbase_context *kctx, struct kbase_jd_a
  *
  * Return: Pointer to struct kbase_jd_atom associated with the supplied ID
  */
-static inline struct kbase_jd_atom *kbase_jd_atom_from_id(
-        struct kbase_context *kctx, int id)
+static inline struct kbase_jd_atom *kbase_jd_atom_from_id(struct kbase_context *kctx, int id)
 {
     return &kctx->jctx.atoms[id];
 }
@@ -608,7 +591,7 @@ void kbase_disjoint_state_down(struct kbase_device *kbdev);
 #define KBASE_DISJOINT_STATE_INTERLEAVED_CONTEXT_COUNT_THRESHOLD 2
 
 #if !defined(UINT64_MAX)
-    #define UINT64_MAX ((uint64_t)0xFFFFFFFFFFFFFFFFULL)
+#define UINT64_MAX ((uint64_t)0xFFFFFFFFFFFFFFFFULL)
 #endif
 
 #endif

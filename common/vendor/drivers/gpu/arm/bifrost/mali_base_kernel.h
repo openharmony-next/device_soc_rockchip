@@ -20,14 +20,12 @@
  *
  */
 
-
-
 /*
  * Base structures shared with the kernel.
  */
 
-#ifndef _BASE_KERNEL_H_
-#define _BASE_KERNEL_H_
+#ifndef BASE_KERNEL_H_
+#define BASE_KERNEL_H_
 
 struct base_mem_handle {
     struct {
@@ -90,18 +88,14 @@ typedef u32 base_mem_alloc_flags;
 /* A mask for all the flags which are modifiable via the base_mem_set_flags
  * interface.
  */
-#define BASE_MEM_FLAGS_MODIFIABLE \
-    (BASE_MEM_DONT_NEED | BASE_MEM_COHERENT_SYSTEM | \
-     BASE_MEM_COHERENT_LOCAL)
+#define BASE_MEM_FLAGS_MODIFIABLE (BASE_MEM_DONT_NEED | BASE_MEM_COHERENT_SYSTEM | BASE_MEM_COHERENT_LOCAL)
 
 /* A mask of all the flags that can be returned via the base_mem_get_flags()
  * interface.
  */
-#define BASE_MEM_FLAGS_QUERYABLE \
-    (BASE_MEM_FLAGS_INPUT_MASK & ~(BASE_MEM_SAME_VA | \
-        BASE_MEM_COHERENT_SYSTEM_REQUIRED | BASE_MEM_DONT_NEED | \
-        BASE_MEM_IMPORT_SHARED | BASE_MEM_FLAGS_RESERVED | \
-        BASEP_MEM_FLAGS_KERNEL_ONLY))
+#define BASE_MEM_FLAGS_QUERYABLE                                                                                       \
+    (BASE_MEM_FLAGS_INPUT_MASK & ~(BASE_MEM_SAME_VA | BASE_MEM_COHERENT_SYSTEM_REQUIRED | BASE_MEM_DONT_NEED |         \
+                                   BASE_MEM_IMPORT_SHARED | BASE_MEM_FLAGS_RESERVED | BASEP_MEM_FLAGS_KERNEL_ONLY))
 
 /**
  * enum base_mem_import_type - Memory types supported by @a base_mem_import
@@ -143,22 +137,20 @@ struct base_mem_import_user_buffer {
 };
 
 /* Mask to detect 4GB boundary alignment */
-#define BASE_MEM_MASK_4GB  0xfffff000UL
+#define BASE_MEM_MASK_4GB 0xfffff000UL
 /* Mask to detect 4GB boundary (in page units) alignment */
-#define BASE_MEM_PFN_MASK_4GB  (BASE_MEM_MASK_4GB >> LOCAL_PAGE_SHIFT)
+#define BASE_MEM_PFN_MASK_4GB (BASE_MEM_MASK_4GB >> LOCAL_PAGE_SHIFT)
 
 /* Limit on the 'extent' parameter for an allocation with the
  * BASE_MEM_TILER_ALIGN_TOP flag set
  *
  * This is the same as the maximum limit for a Buffer Descriptor's chunk size
  */
-#define BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES_LOG2 \
-        (21u - (LOCAL_PAGE_SHIFT))
-#define BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES \
-        (1ull << (BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES_LOG2))
+#define BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES_LOG2 (21u - (LOCAL_PAGE_SHIFT))
+#define BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES (1ull << (BASE_MEM_TILER_ALIGN_TOP_EXTENT_MAX_PAGES_LOG2))
 
 /* Bit mask of cookies used for for memory allocation setup */
-#define KBASE_COOKIE_MASK  ~1UL /* bit 0 is reserved */
+#define KBASE_COOKIE_MASK ~1UL /* bit 0 is reserved */
 
 /* Maximum size allowed in a single KBASE_IOCTL_MEM_ALLOC call */
 #define KBASE_MEM_ALLOC_MAX_SIZE ((8ull << 30) >> PAGE_SHIFT) /* 8 GB */
@@ -318,15 +310,11 @@ struct base_jit_alloc_info {
     u64 heap_info_gpu_addr;
 };
 
-enum base_external_resource_access {
-    BASE_EXT_RES_ACCESS_SHARED,
-    BASE_EXT_RES_ACCESS_EXCLUSIVE
-};
+enum base_external_resource_access { BASE_EXT_RES_ACCESS_SHARED, BASE_EXT_RES_ACCESS_EXCLUSIVE };
 
 struct base_external_resource {
     u64 ext_resource;
 };
-
 
 /**
  * The maximum number of external resources which can be mapped/unmapped
@@ -549,24 +537,24 @@ struct mali_base_gpu_l2_cache_props {
 
 struct mali_base_gpu_tiler_props {
     u32 bin_size_bytes;    /* Max is 4*2^15 */
-    u32 max_active_levels;    /* Max is 2^15 */
+    u32 max_active_levels; /* Max is 2^15 */
 };
 
 /**
  * GPU threading system details.
  */
 struct mali_base_gpu_thread_props {
-    u32 max_threads;            /* Max. number of threads per core */
-    u32 max_workgroup_size;     /* Max. number of threads per workgroup */
-    u32 max_barrier_size;       /* Max. number of threads that can synchronize on a simple barrier */
-    u16 max_registers;          /* Total size [1..65535] of the register file available per core. */
-    u8  max_task_queue;         /* Max. tasks [1..255] which may be sent to a core before it becomes blocked. */
-    u8  max_thread_group_split; /* Max. allowed value [1..15] of the Thread Group Split field. */
-    u8  impl_tech;              /* 0 = Not specified, 1 = Silicon, 2 = FPGA, 3 = SW Model/Emulation */
-    u8  padding[3];
-    u32 tls_alloc;              /* Number of threads per core that TLS must
-                     * be allocated for
-                     */
+    u32 max_threads;           /* Max. number of threads per core */
+    u32 max_workgroup_size;    /* Max. number of threads per workgroup */
+    u32 max_barrier_size;      /* Max. number of threads that can synchronize on a simple barrier */
+    u16 max_registers;         /* Total size [1..65535] of the register file available per core. */
+    u8 max_task_queue;         /* Max. tasks [1..255] which may be sent to a core before it becomes blocked. */
+    u8 max_thread_group_split; /* Max. allowed value [1..15] of the Thread Group Split field. */
+    u8 impl_tech;              /* 0 = Not specified, 1 = Silicon, 2 = FPGA, 3 = SW Model/Emulation */
+    u8 padding[3];
+    u32 tls_alloc; /* Number of threads per core that TLS must
+                    * be allocated for
+                    */
 };
 
 /**
@@ -581,8 +569,8 @@ struct mali_base_gpu_thread_props {
  * @note if u64s must be 8-byte aligned, then this structure has 32-bits of wastage.
  */
 struct mali_base_gpu_coherent_group {
-    u64 core_mask;           /**< Core restriction mask required for the group */
-    u16 num_cores;           /**< Number of cores in the group */
+    u64 core_mask; /**< Core restriction mask required for the group */
+    u16 num_cores; /**< Number of cores in the group */
     u16 padding[3];
 };
 
@@ -715,8 +703,7 @@ struct base_gpu_props {
 static inline int base_mem_group_id_get(base_mem_alloc_flags flags)
 {
     LOCAL_ASSERT((flags & ~BASE_MEM_FLAGS_INPUT_MASK) == 0);
-    return (int)((flags & BASE_MEM_GROUP_ID_MASK) >>
-            BASEP_MEM_GROUP_ID_SHIFT);
+    return (int)((flags & BASE_MEM_GROUP_ID_MASK) >> BASEP_MEM_GROUP_ID_SHIFT);
 }
 
 /**
@@ -738,8 +725,7 @@ static inline base_mem_alloc_flags base_mem_group_id_set(int id)
         id = BASE_MEM_GROUP_DEFAULT;
     }
 
-    return ((base_mem_alloc_flags)id << BASEP_MEM_GROUP_ID_SHIFT) &
-        BASE_MEM_GROUP_ID_MASK;
+    return ((base_mem_alloc_flags)id << BASEP_MEM_GROUP_ID_SHIFT) & BASE_MEM_GROUP_ID_MASK;
 }
 
 /**
@@ -752,14 +738,11 @@ static inline base_mem_alloc_flags base_mem_group_id_set(int id)
  *
  * Return: Bitmask of flags to pass to base_context_init.
  */
-static inline base_context_create_flags base_context_mmu_group_id_set(
-    int const group_id)
+static inline base_context_create_flags base_context_mmu_group_id_set(int const group_id)
 {
     LOCAL_ASSERT(group_id >= 0);
     LOCAL_ASSERT(group_id < BASE_MEM_GROUP_COUNT);
-    return BASEP_CONTEXT_MMU_GROUP_ID_MASK &
-        ((base_context_create_flags)group_id <<
-        BASEP_CONTEXT_MMU_GROUP_ID_SHIFT);
+    return BASEP_CONTEXT_MMU_GROUP_ID_MASK & ((base_context_create_flags)group_id << BASEP_CONTEXT_MMU_GROUP_ID_SHIFT);
 }
 
 /**
@@ -772,12 +755,10 @@ static inline base_context_create_flags base_context_mmu_group_id_set(
  *
  * Return: Physical memory group ID. Valid range is 0..(BASE_MEM_GROUP_COUNT-1).
  */
-static inline int base_context_mmu_group_id_get(
-    base_context_create_flags const flags)
+static inline int base_context_mmu_group_id_get(base_context_create_flags const flags)
 {
     LOCAL_ASSERT(flags == (flags & BASEP_CONTEXT_CREATE_ALLOWED_FLAGS));
-    return (int)((flags & BASEP_CONTEXT_MMU_GROUP_ID_MASK) >>
-            BASEP_CONTEXT_MMU_GROUP_ID_SHIFT);
+    return (int)((flags & BASEP_CONTEXT_MMU_GROUP_ID_MASK) >> BASEP_CONTEXT_MMU_GROUP_ID_SHIFT);
 }
 
 /*
@@ -797,11 +778,8 @@ static inline int base_context_mmu_group_id_get(
 /* Specify userspace cntvct_el0 timestamp source */
 #define BASE_TIMEINFO_USER_SOURCE_FLAG (1UL << 31)
 
-#define BASE_TIMEREQUEST_ALLOWED_FLAGS (\
-        BASE_TIMEINFO_MONOTONIC_FLAG | \
-        BASE_TIMEINFO_TIMESTAMP_FLAG | \
-        BASE_TIMEINFO_CYCLE_COUNTER_FLAG | \
-        BASE_TIMEINFO_KERNEL_SOURCE_FLAG | \
-        BASE_TIMEINFO_USER_SOURCE_FLAG)
+#define BASE_TIMEREQUEST_ALLOWED_FLAGS                                                                                 \
+    (BASE_TIMEINFO_MONOTONIC_FLAG | BASE_TIMEINFO_TIMESTAMP_FLAG | BASE_TIMEINFO_CYCLE_COUNTER_FLAG |                  \
+     BASE_TIMEINFO_KERNEL_SOURCE_FLAG | BASE_TIMEINFO_USER_SOURCE_FLAG)
 
-#endif                /* _BASE_KERNEL_H_ */
+#endif /* _BASE_KERNEL_H_ */

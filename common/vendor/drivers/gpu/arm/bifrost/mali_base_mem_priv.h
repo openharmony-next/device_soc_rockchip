@@ -20,13 +20,11 @@
  *
  */
 
-
-
 #ifndef BASE_MEM_PRIV_H
 #define BASE_MEM_PRIV_H
 
-#define BASE_SYNCSET_OP_MSYNC    (1U << 0)
-#define BASE_SYNCSET_OP_CSYNC    (1U << 1)
+#define BASE_SYNCSET_OP_MSYNC (1U << 0)
+#define BASE_SYNCSET_OP_CSYNC (1U << 1)
 
 /*
  * This structure describe a basic memory coherency operation.

@@ -104,9 +104,7 @@ struct kbase_hwcnt_gpu_info {
  *
  * The initialised info struct will only be valid for use while kbdev is valid.
  */
-int kbase_hwcnt_gpu_info_init(
-    struct kbase_device *kbdev,
-    struct kbase_hwcnt_gpu_info *info);
+int kbase_hwcnt_gpu_info_init(struct kbase_device *kbdev, struct kbase_hwcnt_gpu_info *info);
 
 /**
  * kbase_hwcnt_gpu_metadata_create() - Create hardware counter metadata for the
@@ -122,18 +120,14 @@ int kbase_hwcnt_gpu_info_init(
  *
  * Return: 0 on success, else error code.
  */
-int kbase_hwcnt_gpu_metadata_create(
-    const struct kbase_hwcnt_gpu_info *info,
-    bool use_secondary,
-    const struct kbase_hwcnt_metadata **out_metadata,
-    size_t *out_dump_bytes);
+int kbase_hwcnt_gpu_metadata_create(const struct kbase_hwcnt_gpu_info *info, bool use_secondary,
+                                    const struct kbase_hwcnt_metadata **out_metadata, size_t *out_dump_bytes);
 
 /**
  * kbase_hwcnt_gpu_metadata_destroy() - Destroy GPU hardware counter metadata.
  * @metadata: Pointer to metadata to destroy.
  */
-void kbase_hwcnt_gpu_metadata_destroy(
-    const struct kbase_hwcnt_metadata *metadata);
+void kbase_hwcnt_gpu_metadata_destroy(const struct kbase_hwcnt_metadata *metadata);
 
 /**
  * kbase_hwcnt_gpu_dump_get() - Copy or accumulate enabled counters from the raw
@@ -154,12 +148,9 @@ void kbase_hwcnt_gpu_metadata_destroy(
  *
  * Return: 0 on success, else error code.
  */
-int kbase_hwcnt_gpu_dump_get(
-    struct kbase_hwcnt_dump_buffer *dst,
-    void *src,
-    const struct kbase_hwcnt_enable_map *dst_enable_map,
-    const u64 pm_core_mask,
-    bool accumulate);
+int kbase_hwcnt_gpu_dump_get(struct kbase_hwcnt_dump_buffer *dst, void *src,
+                             const struct kbase_hwcnt_enable_map *dst_enable_map, const u64 pm_core_mask,
+                             bool accumulate);
 
 /**
  * kbase_hwcnt_gpu_enable_map_to_physical() - Convert an enable map abstraction
@@ -174,9 +165,8 @@ int kbase_hwcnt_gpu_dump_get(
  * individual counter block value, but the physical enable map uses 1 bit for
  * every 4 counters, shared over all instances of a block.
  */
-void kbase_hwcnt_gpu_enable_map_to_physical(
-    struct kbase_hwcnt_physical_enable_map *dst,
-    const struct kbase_hwcnt_enable_map *src);
+void kbase_hwcnt_gpu_enable_map_to_physical(struct kbase_hwcnt_physical_enable_map *dst,
+                                            const struct kbase_hwcnt_enable_map *src);
 
 /**
  * kbase_hwcnt_gpu_enable_map_from_physical() - Convert a physical enable map to
@@ -192,9 +182,8 @@ void kbase_hwcnt_gpu_enable_map_to_physical(
  * more than 64, so the enable map abstraction has nowhere to store the enable
  * information for the 64 non-existent counters.
  */
-void kbase_hwcnt_gpu_enable_map_from_physical(
-    struct kbase_hwcnt_enable_map *dst,
-    const struct kbase_hwcnt_physical_enable_map *src);
+void kbase_hwcnt_gpu_enable_map_from_physical(struct kbase_hwcnt_enable_map *dst,
+                                              const struct kbase_hwcnt_physical_enable_map *src);
 
 /**
  * kbase_hwcnt_gpu_patch_dump_headers() - Patch all the performance counter
@@ -210,8 +199,7 @@ void kbase_hwcnt_gpu_enable_map_from_physical(
  * kernel-user boundary, to ensure the header is accurate for the enable map
  * used by the user.
  */
-void kbase_hwcnt_gpu_patch_dump_headers(
-    struct kbase_hwcnt_dump_buffer *buf,
-    const struct kbase_hwcnt_enable_map *enable_map);
+void kbase_hwcnt_gpu_patch_dump_headers(struct kbase_hwcnt_dump_buffer *buf,
+                                        const struct kbase_hwcnt_enable_map *enable_map);
 
 #endif /* _KBASE_HWCNT_GPU_H_ */

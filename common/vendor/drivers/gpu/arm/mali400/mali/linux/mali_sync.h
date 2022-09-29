@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2015, 2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -29,7 +30,6 @@
 #else
 #include "mali_internal_sync.h"
 #endif
-
 
 #include "mali_osk.h"
 
@@ -70,7 +70,6 @@ struct sync_fence *mali_sync_fence_merge(struct sync_fence *sync_fence1, struct 
  * @return New signaled sync fence if successful, NULL if not.
  */
 struct sync_fence *mali_sync_timeline_create_signaled_fence(struct sync_timeline *sync_tl);
-
 
 /**
  * Create a sync flag.
@@ -113,7 +112,8 @@ s32 mali_sync_fence_fd_alloc(struct mali_internal_sync_fence *sync_fence);
  * @param sync_fence2 Second sync fence.
  * @return New sync fence that is the result of the merger if successful, or NULL if not.
  */
-struct mali_internal_sync_fence *mali_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1, struct mali_internal_sync_fence *sync_fence2);
+struct mali_internal_sync_fence *mali_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
+                                                       struct mali_internal_sync_fence *sync_fence2);
 
 /**
  * Create a sync fence that is already signaled.
@@ -122,7 +122,6 @@ struct mali_internal_sync_fence *mali_sync_fence_merge(struct mali_internal_sync
  * @return New signaled sync fence if successful, NULL if not.
  */
 struct mali_internal_sync_fence *mali_sync_timeline_create_signaled_fence(struct mali_internal_sync_timeline *sync_tl);
-
 
 /**
  * Create a sync flag.

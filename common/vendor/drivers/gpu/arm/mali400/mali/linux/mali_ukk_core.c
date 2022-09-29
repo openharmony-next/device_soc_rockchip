@@ -1,15 +1,16 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <linux/fs.h>       /* file system operations */
-#include <linux/slab.h>     /* memort allocation functions */
-#include <linux/uaccess.h>  /* user space access */
+#include <linux/fs.h>      /* file system operations */
+#include <linux/slab.h>    /* memort allocation functions */
+#include <linux/uaccess.h> /* user space access */
 
 #include "mali_ukk.h"
 #include "mali_osk.h"
@@ -24,14 +25,22 @@ int get_api_version_wrapper(struct mali_session_data *session_data, mali_uk_get_
 
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
 
-    if (0 != get_user(kargs.version, &uargs->version)) return -EFAULT;
+    if (0 != get_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
 
     kargs.ctx = (uintptr_t)session_data;
     err = _mali_ukk_get_api_version(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
-    if (0 != put_user(kargs.version, &uargs->version)) return -EFAULT;
-    if (0 != put_user(kargs.compatible, &uargs->compatible)) return -EFAULT;
+    if (0 != put_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
+    if (0 != put_user(kargs.compatible, &uargs->compatible)) {
+        return -EFAULT;
+    }
 
     return 0;
 }
@@ -43,31 +52,26 @@ int get_api_version_v2_wrapper(struct mali_session_data *session_data, mali_uk_g
 
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
 
-    if (0 != get_user(kargs.version, &uargs->version)) return -EFAULT;
+    if (0 != get_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
 
     kargs.ctx = (uintptr_t)session_data;
     err = _mali_ukk_get_api_version_v2(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
-    if (0 != put_user(kargs.version, &uargs->version)) return -EFAULT;
-    if (0 != put_user(kargs.compatible, &uargs->compatible)) return -EFAULT;
+    if (0 != put_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
+    if (0 != put_user(kargs.compatible, &uargs->compatible)) {
+        return -EFAULT;
+    }
 
     return 0;
 }
 
-/* rk_ext : 从对 r5p0-01rel0 集成开始, 不再使用. */
-#if 0
-#define mali400_in_rk30_version 0x01
-int get_mali_version_in_rk30_wrapper(struct mali_session_data *session_data, mali_uk_get_mali_version_in_rk30_s __user *uargs)
-{
-    mali_uk_get_mali_version_in_rk30_s kargs;
-    MALI_CHECK_NON_NULL(uargs, -EINVAL);
-    kargs.ctx = (uintptr_t)session_data;
-    kargs.version = mali400_in_rk30_version;
-    if (0 != put_user(kargs.version, &uargs->version)) return -EFAULT;
-    return 0;
-}
-#else
 #include "../platform/rk/rk_ext.h"
 int get_rk_ko_version_wrapper(struct mali_session_data *session_data, mali_rk_ko_version_s __user *uargs)
 {
@@ -75,10 +79,11 @@ int get_rk_ko_version_wrapper(struct mali_session_data *session_data, mali_rk_ko
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
     kargs.ctx = (uintptr_t)session_data;
     kargs.version = RK_KO_VER;
-    if (0 != put_user(kargs.version, &uargs->version)) return -EFAULT;
+    if (0 != put_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
     return 0;
 }
-#endif
 
 int wait_for_notification_wrapper(struct mali_session_data *session_data, mali_uk_wait_for_notification_s __user *uargs)
 {
@@ -89,13 +94,19 @@ int wait_for_notification_wrapper(struct mali_session_data *session_data, mali_u
 
     kargs.ctx = (uintptr_t)session_data;
     err = _mali_ukk_wait_for_notification(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
     if (MALI_NOTIFICATION_CORE_SHUTDOWN_IN_PROGRESS != kargs.type) {
         kargs.ctx = (uintptr_t)NULL; /* prevent kernel address to be returned to user space */
-        if (0 != copy_to_user(uargs, &kargs, sizeof(mali_uk_wait_for_notification_s))) return -EFAULT;
+        if (0 != copy_to_user(uargs, &kargs, sizeof(mali_uk_wait_for_notification_s))) {
+            return -EFAULT;
+        }
     } else {
-        if (0 != put_user(kargs.type, &uargs->type)) return -EFAULT;
+        if (0 != put_user(kargs.type, &uargs->type)) {
+            return -EFAULT;
+        }
     }
 
     return 0;
@@ -136,7 +147,9 @@ int get_user_settings_wrapper(struct mali_session_data *session_data, mali_uk_ge
     }
 
     kargs.ctx = 0; /* prevent kernel address to be returned to user space */
-    if (0 != copy_to_user(uargs, &kargs, sizeof(mali_uk_get_user_settings_s))) return -EFAULT;
+    if (0 != copy_to_user(uargs, &kargs, sizeof(mali_uk_get_user_settings_s))) {
+        return -EFAULT;
+    }
 
     return 0;
 }
@@ -165,7 +178,9 @@ int pending_submit_wrapper(struct mali_session_data *session_data, mali_uk_pendi
 
     kargs.ctx = (uintptr_t)session_data;
     err = _mali_ukk_pending_submit(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
     return 0;
 }

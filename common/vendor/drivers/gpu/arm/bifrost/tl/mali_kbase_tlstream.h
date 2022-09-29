@@ -20,25 +20,25 @@
  *
  */
 
-#if !defined(_KBASE_TLSTREAM_H)
-#define _KBASE_TLSTREAM_H
+#if !defined(KBASE_TLSTREAM_H)
+#define KBASE_TLSTREAM_H
 
 #include <linux/spinlock.h>
 #include <linux/atomic.h>
 #include <linux/wait.h>
 
 /* The maximum size of a single packet used by timeline. */
-#define PACKET_SIZE        4096 /* bytes */
+#define PACKET_SIZE 4096 /* bytes */
 
 /* The number of packets used by one timeline stream. */
 #if defined(CONFIG_MALI_JOB_DUMP) || defined(CONFIG_MALI_VECTOR_DUMP)
-    #define PACKET_COUNT       64
+#define PACKET_COUNT 64
 #else
-    #define PACKET_COUNT       32
+#define PACKET_COUNT 32
 #endif
 
 /* The maximum expected length of string in tracepoint descriptor. */
-#define STRLEN_MAX         64 /* bytes */
+#define STRLEN_MAX 64 /* bytes */
 
 /**
  * struct kbase_tlstream - timeline stream structure
@@ -76,14 +76,14 @@ struct kbase_tlstream {
     spinlock_t lock;
 
     struct {
-        atomic_t size;              /* number of bytes in buffer */
-        char     data[PACKET_SIZE]; /* buffer's data */
+        atomic_t size;          /* number of bytes in buffer */
+        char data[PACKET_SIZE]; /* buffer's data */
     } buffer[PACKET_COUNT];
 
     atomic_t wbi;
     atomic_t rbi;
 
-    int      numbered;
+    int numbered;
     atomic_t autoflush_counter;
     wait_queue_head_t *ready_read;
 #if MALI_UNIT_TEST
@@ -110,9 +110,7 @@ enum tl_stream_type {
  * @ready_read:  Pointer to a wait queue to signal when
  *               timeline messages are ready for collection.
  */
-void kbase_tlstream_init(struct kbase_tlstream *stream,
-    enum tl_stream_type stream_type,
-    wait_queue_head_t  *ready_read);
+void kbase_tlstream_init(struct kbase_tlstream *stream, enum tl_stream_type stream_type, wait_queue_head_t *ready_read);
 
 /**
  * kbase_tlstream_term - terminate timeline stream
@@ -143,8 +141,8 @@ void kbase_tlstream_reset(struct kbase_tlstream *stream);
  *          Only atomic operations are allowed while the stream is locked
  *          (i.e. do not use any operation that may sleep).
  */
-char *kbase_tlstream_msgbuf_acquire(struct kbase_tlstream *stream,
-    size_t msg_size, unsigned long *flags) __acquires(&stream->lock);
+char *kbase_tlstream_msgbuf_acquire(struct kbase_tlstream *stream, size_t msg_size, unsigned long *flags)
+    __acquires(&stream->lock);
 
 /**
  * kbase_tlstream_msgbuf_release - unlock selected stream
@@ -154,8 +152,7 @@ char *kbase_tlstream_msgbuf_acquire(struct kbase_tlstream *stream,
  * Release the stream that has been previously
  * locked with a call to kbase_tlstream_msgbuf_acquire().
  */
-void kbase_tlstream_msgbuf_release(struct kbase_tlstream *stream,
-    unsigned long flags) __releases(&stream->lock);
+void kbase_tlstream_msgbuf_release(struct kbase_tlstream *stream, unsigned long flags) __releases(&stream->lock);
 
 /**
  * kbase_tlstream_flush_stream - flush stream
@@ -166,4 +163,3 @@ void kbase_tlstream_msgbuf_release(struct kbase_tlstream *stream,
 void kbase_tlstream_flush_stream(struct kbase_tlstream *stream);
 
 #endif /* _KBASE_TLSTREAM_H */
-

@@ -91,9 +91,8 @@ void kbase_clk_rate_trace_manager_gpu_idle(struct kbase_device *kbdev);
  *
  * kbase_clk_rate_trace_manager:lock must be held by the caller.
  */
-static inline void kbase_clk_rate_trace_manager_subscribe_no_lock(
-    struct kbase_clk_rate_trace_manager *clk_rtm,
-    struct kbase_clk_rate_listener *listener)
+static inline void kbase_clk_rate_trace_manager_subscribe_no_lock(struct kbase_clk_rate_trace_manager *clk_rtm,
+                                                                  struct kbase_clk_rate_listener *listener)
 {
     lockdep_assert_held(&clk_rtm->lock);
     list_add(&listener->node, &clk_rtm->listeners);
@@ -105,15 +104,13 @@ static inline void kbase_clk_rate_trace_manager_subscribe_no_lock(
  * @clk_rtm:    Clock rate manager instance.
  * @listener:   Listener handle
  */
-static inline void kbase_clk_rate_trace_manager_subscribe(
-    struct kbase_clk_rate_trace_manager *clk_rtm,
-    struct kbase_clk_rate_listener *listener)
+static inline void kbase_clk_rate_trace_manager_subscribe(struct kbase_clk_rate_trace_manager *clk_rtm,
+                                                          struct kbase_clk_rate_listener *listener)
 {
     unsigned long flags;
 
     spin_lock_irqsave(&clk_rtm->lock, flags);
-    kbase_clk_rate_trace_manager_subscribe_no_lock(
-        clk_rtm, listener);
+    kbase_clk_rate_trace_manager_subscribe_no_lock(clk_rtm, listener);
     spin_unlock_irqrestore(&clk_rtm->lock, flags);
 }
 
@@ -123,9 +120,8 @@ static inline void kbase_clk_rate_trace_manager_subscribe(
  * @clk_rtm:    Clock rate manager instance.
  * @listener:   Listener handle
  */
-static inline void kbase_clk_rate_trace_manager_unsubscribe(
-    struct kbase_clk_rate_trace_manager *clk_rtm,
-    struct kbase_clk_rate_listener *listener)
+static inline void kbase_clk_rate_trace_manager_unsubscribe(struct kbase_clk_rate_trace_manager *clk_rtm,
+                                                            struct kbase_clk_rate_listener *listener)
 {
     unsigned long flags;
 
@@ -146,10 +142,7 @@ static inline void kbase_clk_rate_trace_manager_unsubscribe(
  * This function is exported to be used by clock rate trace test
  * portal.
  */
-void kbase_clk_rate_trace_manager_notify_all(
-    struct kbase_clk_rate_trace_manager *clk_rtm,
-    u32 clock_index,
-    unsigned long new_rate);
+void kbase_clk_rate_trace_manager_notify_all(struct kbase_clk_rate_trace_manager *clk_rtm, u32 clock_index,
+                                             unsigned long new_rate);
 
 #endif /* _KBASE_CLK_RATE_TRACE_MGR_ */
-

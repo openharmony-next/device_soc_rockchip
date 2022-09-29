@@ -52,7 +52,7 @@ static void guc_ct_pool_entries_init(struct guc_ct_pool_entry *pool, u32 num)
  * The first 80 dwords of the register state context, containing the
  * execlists and ppgtt registers.
  */
-#define LR_HW_CONTEXT_SIZE    (80 * sizeof(u32))
+#define LR_HW_CONTEXT_SIZE (80 * sizeof(u32))
 
 /* The ads obj includes the struct itself and buffers passed to GuC */
 struct __guc_ads_blob {
@@ -85,17 +85,15 @@ static void __guc_ads_init(struct intel_guc *guc)
      * to validate that the LRC base + size fall within allowed GGTT.
      */
     for (engine_class = 0; engine_class <= MAX_ENGINE_CLASS; ++engine_class) {
-        if (engine_class == OTHER_CLASS)
+        if (engine_class == OTHER_CLASS) {
             continue;
+        }
         /*
          * TODO: Set context pointer to default state to allow
          * GuC to re-init guilty contexts after internal reset.
          */
         blob->ads.golden_context_lrca[engine_class] = 0;
-        blob->ads.eng_state_size[engine_class] =
-            intel_engine_context_size(guc_to_gt(guc),
-                          engine_class) -
-            skipped_size;
+        blob->ads.eng_state_size[engine_class] = intel_engine_context_size(guc_to_gt(guc), engine_class) - skipped_size;
     }
 
     /* System info */
@@ -140,11 +138,11 @@ int intel_guc_ads_create(struct intel_guc *guc)
 
     GEM_BUG_ON(guc->ads_vma);
 
-    ret = intel_guc_allocate_and_map_vma(guc, size, &guc->ads_vma,
-                         (void **)&guc->ads_blob);
+    ret = intel_guc_allocate_and_map_vma(guc, size, &guc->ads_vma, (void **)&guc->ads_blob);
 
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     __guc_ads_init(guc);
 
@@ -166,7 +164,8 @@ void intel_guc_ads_destroy(struct intel_guc *guc)
  */
 void intel_guc_ads_reset(struct intel_guc *guc)
 {
-    if (!guc->ads_vma)
+    if (!guc->ads_vma) {
         return;
+    }
     __guc_ads_init(guc);
 }

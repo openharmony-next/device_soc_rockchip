@@ -1,23 +1,24 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_MEMORY_DMA_BUF_H__
-#define __MALI_MEMORY_DMA_BUF_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef H__MALI_MEMORY_DMA_BUF_H__
+#define H__MALI_MEMORY_DMA_BUF_H__
 
 #include "mali_uk_types.h"
 #include "mali_osk.h"
 #include "mali_memory.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct mali_pp_job;
 
@@ -37,9 +38,7 @@ int mali_dma_buf_get_size(struct mali_session_data *session, mali_uk_dma_buf_get
 
 void mali_mem_unbind_dma_buf(mali_mem_backend *mem_backend);
 
-mali_osk_errcode_t mali_mem_bind_dma_buf(mali_mem_allocation *alloc,
-        mali_mem_backend *mem_backend,
-        int fd, u32 flags);
+mali_osk_errcode_t mali_mem_bind_dma_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_backend, int fd, u32 flags);
 
 #if !defined(CONFIG_MALI_DMA_BUF_MAP_ON_ATTACH)
 int mali_dma_buf_map_job(struct mali_pp_job *job);

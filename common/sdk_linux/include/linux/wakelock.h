@@ -33,8 +33,7 @@ struct wake_lock {
     struct wakeup_source ws;
 };
 
-static inline void wake_lock_init(struct wake_lock *lock, int type,
-                  const char *name)
+static inline void wake_lock_init(struct wake_lock *lock, int type, const char *name)
 {
     struct wakeup_source *ws = &lock->ws;
 

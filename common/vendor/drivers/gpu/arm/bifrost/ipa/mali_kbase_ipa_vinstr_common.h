@@ -20,25 +20,24 @@
  *
  */
 
-#ifndef _KBASE_IPA_VINSTR_COMMON_H_
-#define _KBASE_IPA_VINSTR_COMMON_H_
+#ifndef KBASE_IPA_VINSTR_COMMON_H_
+#define KBASE_IPA_VINSTR_COMMON_H_
 
 #include "mali_kbase.h"
 #include "mali_kbase_hwcnt_virtualizer.h"
 #include "mali_kbase_hwcnt_types.h"
 
 /* Maximum number of IPA groups for an IPA model. */
-#define KBASE_IPA_MAX_GROUP_DEF_NUM  16
+#define KBASE_IPA_MAX_GROUP_DEF_NUM 16
 
 /* Number of bytes per hardware counter in a vinstr_buffer. */
-#define KBASE_IPA_NR_BYTES_PER_CNT    4
+#define KBASE_IPA_NR_BYTES_PER_CNT 4
 
 /* Number of hardware counters per block in a vinstr_buffer. */
-#define KBASE_IPA_NR_CNT_PER_BLOCK   64
+#define KBASE_IPA_NR_CNT_PER_BLOCK 64
 
 /* Number of bytes per block in a vinstr_buffer. */
-#define KBASE_IPA_NR_BYTES_PER_BLOCK \
-    (KBASE_IPA_NR_CNT_PER_BLOCK * KBASE_IPA_NR_BYTES_PER_CNT)
+#define KBASE_IPA_NR_BYTES_PER_BLOCK (KBASE_IPA_NR_CNT_PER_BLOCK * KBASE_IPA_NR_BYTES_PER_CNT)
 
 struct kbase_ipa_model_vinstr_data;
 
@@ -110,9 +109,7 @@ struct kbase_ipa_group {
  *
  * Return: Sum of counter values. Range: -2^54 < ret < 2^54
  */
-s64 kbase_ipa_sum_all_shader_cores(
-    struct kbase_ipa_model_vinstr_data *model_data,
-    s32 coeff, u32 counter);
+s64 kbase_ipa_sum_all_shader_cores(struct kbase_ipa_model_vinstr_data *model_data, s32 coeff, u32 counter);
 
 /**
  * kbase_ipa_sum_all_memsys_blocks() - sum a counter over all mem system blocks
@@ -127,9 +124,7 @@ s64 kbase_ipa_sum_all_shader_cores(
  *
  * Return: Sum of counter values. Range: -2^51 < ret < 2^51
  */
-s64 kbase_ipa_sum_all_memsys_blocks(
-    struct kbase_ipa_model_vinstr_data *model_data,
-    s32 coeff, u32 counter);
+s64 kbase_ipa_sum_all_memsys_blocks(struct kbase_ipa_model_vinstr_data *model_data, s32 coeff, u32 counter);
 
 /**
  * kbase_ipa_single_counter() - sum a single counter
@@ -143,9 +138,7 @@ s64 kbase_ipa_sum_all_memsys_blocks(
  *
  * Return: Counter value. Range: -2^49 < ret < 2^49
  */
-s64 kbase_ipa_single_counter(
-    struct kbase_ipa_model_vinstr_data *model_data,
-    s32 coeff, u32 counter);
+s64 kbase_ipa_single_counter(struct kbase_ipa_model_vinstr_data *model_data, s32 coeff, u32 counter);
 
 /**
  * attach_vinstr() - attach a vinstr_buffer to an IPA model.
@@ -199,11 +192,9 @@ int kbase_ipa_vinstr_dynamic_coeff(struct kbase_ipa_model *model, u32 *coeffp);
  *
  * Return: 0 on success, error code otherwise
  */
-int kbase_ipa_vinstr_common_model_init(struct kbase_ipa_model *model,
-                       const struct kbase_ipa_group *ipa_groups_def,
-                       size_t ipa_group_size,
-                       kbase_ipa_get_active_cycles_callback get_active_cycles,
-                       s32 reference_voltage);
+int kbase_ipa_vinstr_common_model_init(struct kbase_ipa_model *model, const struct kbase_ipa_group *ipa_groups_def,
+                                       size_t ipa_group_size, kbase_ipa_get_active_cycles_callback get_active_cycles,
+                                       s32 reference_voltage);
 
 /**
  * kbase_ipa_vinstr_common_model_term() - terminate ipa power model

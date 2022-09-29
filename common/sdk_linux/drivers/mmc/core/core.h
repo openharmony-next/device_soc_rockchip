@@ -15,7 +15,7 @@ struct mmc_host;
 struct mmc_card;
 struct mmc_request;
 
-#define MMC_CMD_RETRIES        3
+#define MMC_CMD_RETRIES 3
 #define MMC_DELAY_TWENTY_MS 20
 #define MMC_DELAY_RANGE_START 1000
 #define MMC_DELAY_RANGE_END 1250
@@ -38,8 +38,7 @@ struct mmc_bus_ops {
 void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
 void mmc_detach_bus(struct mmc_host *host);
 
-struct device_node *mmc_of_find_child_device(struct mmc_host *host,
-        unsigned func_num);
+struct device_node *mmc_of_find_child_device(struct mmc_host *host, unsigned func_num);
 
 void mmc_init_erase(struct mmc_card *card);
 
@@ -54,8 +53,7 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage);
 void mmc_set_initial_signal_voltage(struct mmc_host *host);
 void mmc_set_timing(struct mmc_host *host, unsigned int timing);
 void mmc_set_driver_type(struct mmc_host *host, unsigned int drv_type);
-int mmc_select_drive_strength(struct mmc_card *card, unsigned int max_dtr,
-                  int card_drv_type, int *drv_type);
+int mmc_select_drive_strength(struct mmc_card *card, unsigned int max_dtr, int card_drv_type, int *drv_type);
 void mmc_power_up(struct mmc_host *host, u32 ocr);
 void mmc_power_off(struct mmc_host *host);
 void mmc_power_cycle(struct mmc_host *host, u32 ocr);
@@ -64,18 +62,18 @@ u32 mmc_vddrange_to_ocrmask(int vdd_min, int vdd_max);
 
 static inline void mmc_delay(unsigned int ms)
 {
-    if (ms <= MMC_DELAY_TWENTY_MS)
+    if (ms <= MMC_DELAY_TWENTY_MS) {
         usleep_range(ms * MMC_DELAY_RANGE_START, ms * MMC_DELAY_RANGE_END);
-    else
+    } else {
         msleep(ms);
+    }
 }
 
 void mmc_rescan(struct work_struct *work);
 void mmc_start_host(struct mmc_host *host);
 void mmc_stop_host(struct mmc_host *host);
 
-void _mmc_detect_change(struct mmc_host *host, unsigned long delay,
-            bool cd_irq);
+void _mmc_detect_change(struct mmc_host *host, unsigned long delay, bool cd_irq);
 int _mmc_detect_card_removed(struct mmc_host *host);
 int mmc_detect_card_removed(struct mmc_host *host);
 
@@ -104,21 +102,18 @@ bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq);
 
 int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq);
 
-int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
-        unsigned int arg);
+int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr, unsigned int arg);
 int mmc_can_erase(struct mmc_card *card);
 int mmc_can_trim(struct mmc_card *card);
 int mmc_can_discard(struct mmc_card *card);
 int mmc_can_sanitize(struct mmc_card *card);
 int mmc_can_secure_erase_trim(struct mmc_card *card);
-int mmc_erase_group_aligned(struct mmc_card *card, unsigned int from,
-            unsigned int nr);
+int mmc_erase_group_aligned(struct mmc_card *card, unsigned int from, unsigned int nr);
 unsigned int mmc_calc_max_discard(struct mmc_card *card);
 
 int mmc_set_blocklen(struct mmc_card *card, unsigned int blocklen);
 
-int __mmc_claim_host(struct mmc_host *host, struct mmc_ctx *ctx,
-             atomic_t *abort);
+int __mmc_claim_host(struct mmc_host *host, struct mmc_ctx *ctx, atomic_t *abort);
 void mmc_release_host(struct mmc_host *host);
 void mmc_get_card(struct mmc_card *card, struct mmc_ctx *ctx);
 void mmc_put_card(struct mmc_card *card, struct mmc_ctx *ctx);
@@ -149,8 +144,9 @@ int mmc_cqe_recovery(struct mmc_host *host);
  */
 static inline void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
 {
-    if (host->ops->pre_req)
+    if (host->ops->pre_req) {
         host->ops->pre_req(host, mrq);
+    }
 }
 
 /**
@@ -162,17 +158,18 @@ static inline void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
  *    Let the host post process a completed request. Post processing of
  *    a request may be performed while another request is running.
  */
-static inline void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq,
-                int err)
+static inline void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq, int err)
 {
-    if (host->ops->post_req)
+    if (host->ops->post_req) {
         host->ops->post_req(host, mrq, err);
+    }
 }
 
 static inline bool mmc_cache_enabled(struct mmc_host *host)
 {
-    if (host->bus_ops->cache_enabled)
+    if (host->bus_ops->cache_enabled) {
         return host->bus_ops->cache_enabled(host);
+    }
 
     return false;
 }

@@ -4,12 +4,9 @@
 #ifndef _RKISP_EXTERNAL_H
 #define _RKISP_EXTERNAL_H
 
+#define RKISP_VICAP_CMD_MODE _IOW('V', BASE_VIDIOC_PRIVATE + 0, struct rkisp_vicap_mode)
 
-#define RKISP_VICAP_CMD_MODE \
-    _IOW('V', BASE_VIDIOC_PRIVATE + 0, struct rkisp_vicap_mode)
-
-#define RKISP_VICAP_CMD_INIT_BUF \
-     _IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
+#define RKISP_VICAP_CMD_INIT_BUF _IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
 
 #define RKISP_VICAP_BUF_CNT 1
 #define RKISP_RX_BUF_POOL_MAX (RKISP_VICAP_BUF_CNT * 3)

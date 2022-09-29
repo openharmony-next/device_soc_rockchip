@@ -43,22 +43,19 @@ struct intel_gt;
 
 enum intel_uc_fw_status {
     INTEL_UC_FIRMWARE_NOT_SUPPORTED = -1, /* no uc HW */
-    INTEL_UC_FIRMWARE_UNINITIALIZED = 0, /* used to catch checks done too early */
-    INTEL_UC_FIRMWARE_DISABLED, /* disabled */
-    INTEL_UC_FIRMWARE_SELECTED, /* selected the blob we want to load */
-    INTEL_UC_FIRMWARE_MISSING, /* blob not found on the system */
-    INTEL_UC_FIRMWARE_ERROR, /* invalid format or version */
-    INTEL_UC_FIRMWARE_AVAILABLE, /* blob found and copied in mem */
-    INTEL_UC_FIRMWARE_LOADABLE, /* all fw-required objects are ready */
-    INTEL_UC_FIRMWARE_FAIL, /* failed to xfer or init/auth the fw */
-    INTEL_UC_FIRMWARE_TRANSFERRED, /* dma xfer done */
-    INTEL_UC_FIRMWARE_RUNNING /* init/auth done */
+    INTEL_UC_FIRMWARE_UNINITIALIZED = 0,  /* used to catch checks done too early */
+    INTEL_UC_FIRMWARE_DISABLED,           /* disabled */
+    INTEL_UC_FIRMWARE_SELECTED,           /* selected the blob we want to load */
+    INTEL_UC_FIRMWARE_MISSING,            /* blob not found on the system */
+    INTEL_UC_FIRMWARE_ERROR,              /* invalid format or version */
+    INTEL_UC_FIRMWARE_AVAILABLE,          /* blob found and copied in mem */
+    INTEL_UC_FIRMWARE_LOADABLE,           /* all fw-required objects are ready */
+    INTEL_UC_FIRMWARE_FAIL,               /* failed to xfer or init/auth the fw */
+    INTEL_UC_FIRMWARE_TRANSFERRED,        /* dma xfer done */
+    INTEL_UC_FIRMWARE_RUNNING             /* init/auth done */
 };
 
-enum intel_uc_fw_type {
-    INTEL_UC_FW_TYPE_GUC = 0,
-    INTEL_UC_FW_TYPE_HUC
-};
+enum intel_uc_fw_type { INTEL_UC_FW_TYPE_GUC = 0, INTEL_UC_FW_TYPE_HUC };
 #define INTEL_UC_FW_NUM_TYPES 2
 
 /*
@@ -91,42 +88,39 @@ struct intel_uc_fw {
 };
 
 #ifdef CONFIG_DRM_I915_DEBUG_GUC
-void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw,
-                   enum intel_uc_fw_status status);
+void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_status status);
 #else
-static inline void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw,
-                         enum intel_uc_fw_status status)
+static inline void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_status status)
 {
     uc_fw->__status = status;
 }
 #endif
 
-static inline
-const char *intel_uc_fw_status_repr(enum intel_uc_fw_status status)
+static inline const char *intel_uc_fw_status_repr(enum intel_uc_fw_status status)
 {
     switch (status) {
-    case INTEL_UC_FIRMWARE_NOT_SUPPORTED:
-        return "N/A";
-    case INTEL_UC_FIRMWARE_UNINITIALIZED:
-        return "UNINITIALIZED";
-    case INTEL_UC_FIRMWARE_DISABLED:
-        return "DISABLED";
-    case INTEL_UC_FIRMWARE_SELECTED:
-        return "SELECTED";
-    case INTEL_UC_FIRMWARE_MISSING:
-        return "MISSING";
-    case INTEL_UC_FIRMWARE_ERROR:
-        return "ERROR";
-    case INTEL_UC_FIRMWARE_AVAILABLE:
-        return "AVAILABLE";
-    case INTEL_UC_FIRMWARE_LOADABLE:
-        return "LOADABLE";
-    case INTEL_UC_FIRMWARE_FAIL:
-        return "FAIL";
-    case INTEL_UC_FIRMWARE_TRANSFERRED:
-        return "TRANSFERRED";
-    case INTEL_UC_FIRMWARE_RUNNING:
-        return "RUNNING";
+        case INTEL_UC_FIRMWARE_NOT_SUPPORTED:
+            return "N/A";
+        case INTEL_UC_FIRMWARE_UNINITIALIZED:
+            return "UNINITIALIZED";
+        case INTEL_UC_FIRMWARE_DISABLED:
+            return "DISABLED";
+        case INTEL_UC_FIRMWARE_SELECTED:
+            return "SELECTED";
+        case INTEL_UC_FIRMWARE_MISSING:
+            return "MISSING";
+        case INTEL_UC_FIRMWARE_ERROR:
+            return "ERROR";
+        case INTEL_UC_FIRMWARE_AVAILABLE:
+            return "AVAILABLE";
+        case INTEL_UC_FIRMWARE_LOADABLE:
+            return "LOADABLE";
+        case INTEL_UC_FIRMWARE_FAIL:
+            return "FAIL";
+        case INTEL_UC_FIRMWARE_TRANSFERRED:
+            return "TRANSFERRED";
+        case INTEL_UC_FIRMWARE_RUNNING:
+            return "RUNNING";
     }
     return "<invalid>";
 }
@@ -134,25 +128,25 @@ const char *intel_uc_fw_status_repr(enum intel_uc_fw_status status)
 static inline int intel_uc_fw_status_to_error(enum intel_uc_fw_status status)
 {
     switch (status) {
-    case INTEL_UC_FIRMWARE_NOT_SUPPORTED:
-        return -ENODEV;
-    case INTEL_UC_FIRMWARE_UNINITIALIZED:
-        return -EACCES;
-    case INTEL_UC_FIRMWARE_DISABLED:
-        return -EPERM;
-    case INTEL_UC_FIRMWARE_MISSING:
-        return -ENOENT;
-    case INTEL_UC_FIRMWARE_ERROR:
-        return -ENOEXEC;
-    case INTEL_UC_FIRMWARE_FAIL:
-        return -EIO;
-    case INTEL_UC_FIRMWARE_SELECTED:
-        return -ESTALE;
-    case INTEL_UC_FIRMWARE_AVAILABLE:
-    case INTEL_UC_FIRMWARE_LOADABLE:
-    case INTEL_UC_FIRMWARE_TRANSFERRED:
-    case INTEL_UC_FIRMWARE_RUNNING:
-        return 0;
+        case INTEL_UC_FIRMWARE_NOT_SUPPORTED:
+            return -ENODEV;
+        case INTEL_UC_FIRMWARE_UNINITIALIZED:
+            return -EACCES;
+        case INTEL_UC_FIRMWARE_DISABLED:
+            return -EPERM;
+        case INTEL_UC_FIRMWARE_MISSING:
+            return -ENOENT;
+        case INTEL_UC_FIRMWARE_ERROR:
+            return -ENOEXEC;
+        case INTEL_UC_FIRMWARE_FAIL:
+            return -EIO;
+        case INTEL_UC_FIRMWARE_SELECTED:
+            return -ESTALE;
+        case INTEL_UC_FIRMWARE_AVAILABLE:
+        case INTEL_UC_FIRMWARE_LOADABLE:
+        case INTEL_UC_FIRMWARE_TRANSFERRED:
+        case INTEL_UC_FIRMWARE_RUNNING:
+            return 0;
     }
     return -EINVAL;
 }
@@ -160,16 +154,15 @@ static inline int intel_uc_fw_status_to_error(enum intel_uc_fw_status status)
 static inline const char *intel_uc_fw_type_repr(enum intel_uc_fw_type type)
 {
     switch (type) {
-    case INTEL_UC_FW_TYPE_GUC:
-        return "GuC";
-    case INTEL_UC_FW_TYPE_HUC:
-        return "HuC";
+        case INTEL_UC_FW_TYPE_GUC:
+            return "GuC";
+        case INTEL_UC_FW_TYPE_HUC:
+            return "HuC";
     }
     return "uC";
 }
 
-static inline enum intel_uc_fw_status
-__intel_uc_fw_status(struct intel_uc_fw *uc_fw)
+static inline enum intel_uc_fw_status __intel_uc_fw_status(struct intel_uc_fw *uc_fw)
 {
     /* shouldn't call this before checking hw/blob availability */
     GEM_BUG_ON(uc_fw->status == INTEL_UC_FIRMWARE_UNINITIALIZED);
@@ -213,8 +206,9 @@ static inline bool intel_uc_fw_is_overridden(const struct intel_uc_fw *uc_fw)
 
 static inline void intel_uc_fw_sanitize(struct intel_uc_fw *uc_fw)
 {
-    if (intel_uc_fw_is_loaded(uc_fw))
+    if (intel_uc_fw_is_loaded(uc_fw)) {
         intel_uc_fw_change_status(uc_fw, INTEL_UC_FIRMWARE_LOADABLE);
+    }
 }
 
 static inline u32 __intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
@@ -232,14 +226,14 @@ static inline u32 __intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
  */
 static inline u32 intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
 {
-    if (!intel_uc_fw_is_available(uc_fw))
+    if (!intel_uc_fw_is_available(uc_fw)) {
         return 0;
+    }
 
     return __intel_uc_fw_get_upload_size(uc_fw);
 }
 
-void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw,
-                enum intel_uc_fw_type type);
+void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type type);
 int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw);
 void intel_uc_fw_cleanup_fetch(struct intel_uc_fw *uc_fw);
 int intel_uc_fw_upload(struct intel_uc_fw *uc_fw, u32 offset, u32 dma_flags);

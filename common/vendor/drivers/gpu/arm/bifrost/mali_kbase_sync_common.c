@@ -42,10 +42,11 @@ void kbase_sync_fence_wait_worker(struct work_struct *data)
 
 const char *kbase_sync_status_string(int status)
 {
-    if (status == 0)
+    if (status == 0) {
         return "active";
-    else if (status > 0)
+    } else if (status > 0) {
         return "signaled";
-    else
+    } else {
         return "error";
+    }
 }

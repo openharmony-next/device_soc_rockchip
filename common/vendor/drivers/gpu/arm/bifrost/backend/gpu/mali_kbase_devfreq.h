@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _BASE_DEVFREQ_H_
-#define _BASE_DEVFREQ_H_
+#ifndef BASE_DEVFREQ_H_
+#define BASE_DEVFREQ_H_
 
 int kbase_devfreq_init(struct kbase_device *kbdev);
 
@@ -41,7 +41,6 @@ void kbase_devfreq_force_freq(struct kbase_device *kbdev, unsigned long freq);
  * @kbdev:      Device pointer
  * @work_type:  The type of the devfreq work item, i.e. suspend or resume
  */
-void kbase_devfreq_enqueue_work(struct kbase_device *kbdev,
-                enum kbase_devfreq_work_type work_type);
+void kbase_devfreq_enqueue_work(struct kbase_device *kbdev, enum kbase_devfreq_work_type work_type);
 
 #endif /* _BASE_DEVFREQ_H_ */

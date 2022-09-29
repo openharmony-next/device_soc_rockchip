@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * Metrics for power management
  */
@@ -36,16 +34,16 @@
 #include <mali_linux_trace.h>
 
 /* When VSync is being hit aim for utilisation between 70-90% */
-#define KBASE_PM_VSYNC_MIN_UTILISATION          70
-#define KBASE_PM_VSYNC_MAX_UTILISATION          90
+#define KBASE_PM_VSYNC_MIN_UTILISATION 70
+#define KBASE_PM_VSYNC_MAX_UTILISATION 90
 /* Otherwise aim for 10-40% */
-#define KBASE_PM_NO_VSYNC_MIN_UTILISATION       10
-#define KBASE_PM_NO_VSYNC_MAX_UTILISATION       40
+#define KBASE_PM_NO_VSYNC_MIN_UTILISATION 10
+#define KBASE_PM_NO_VSYNC_MAX_UTILISATION 40
 
 /* Shift used for kbasep_pm_metrics_data.time_busy/idle - units of (1 << 8) ns
  * This gives a maximum period between samples of 2^(32+8)/100 ns = slightly
  * under 11s. Exceeding this will cause overflow */
-#define KBASE_PM_TIME_SHIFT            8
+#define KBASE_PM_TIME_SHIFT 8
 
 #ifdef CONFIG_MALI_BIFROST_DVFS
 static enum hrtimer_restart dvfs_callback(struct hrtimer *timer)
@@ -60,10 +58,9 @@ static enum hrtimer_restart dvfs_callback(struct hrtimer *timer)
 
     spin_lock_irqsave(&metrics->lock, flags);
 
-    if (metrics->timer_active)
-        hrtimer_start(timer,
-            HR_TIMER_DELAY_MSEC(metrics->kbdev->pm.dvfs_period),
-            HRTIMER_MODE_REL);
+    if (metrics->timer_active) {
+        hrtimer_start(timer, HR_TIMER_DELAY_MSEC(metrics->kbdev->pm.dvfs_period), HRTIMER_MODE_REL);
+    }
 
     spin_unlock_irqrestore(&metrics->lock, flags);
 
@@ -79,8 +76,8 @@ int kbasep_pm_metrics_init(struct kbase_device *kbdev)
 
     kbdev->pm.backend.metrics.time_period_start = ktime_get();
     kbdev->pm.backend.metrics.gpu_active = false;
-    memset( kbdev->pm.backend.metrics.active_gl_ctx, 0, sizeof(u32)*BASE_JM_MAX_NR_SLOTS );
-    memset( kbdev->pm.backend.metrics.active_cl_ctx, 0, sizeof(u32)*BASE_MAX_NR_CLOCKS_REGULATORS );
+    memset(kbdev->pm.backend.metrics.active_gl_ctx, 0, sizeof(u32) * BASE_JM_MAX_NR_SLOTS);
+    memset(kbdev->pm.backend.metrics.active_cl_ctx, 0, sizeof(u32) * BASE_MAX_NR_CLOCKS_REGULATORS);
 
     kbdev->pm.backend.metrics.values.time_busy = 0;
     kbdev->pm.backend.metrics.values.time_idle = 0;
@@ -91,8 +88,7 @@ int kbasep_pm_metrics_init(struct kbase_device *kbdev)
     spin_lock_init(&kbdev->pm.backend.metrics.lock);
 
 #ifdef CONFIG_MALI_BIFROST_DVFS
-    hrtimer_init(&kbdev->pm.backend.metrics.timer, CLOCK_MONOTONIC,
-                            HRTIMER_MODE_REL);
+    hrtimer_init(&kbdev->pm.backend.metrics.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
     kbdev->pm.backend.metrics.timer.function = dvfs_callback;
 
     kbase_pm_metrics_start(kbdev);
@@ -122,8 +118,7 @@ KBASE_EXPORT_TEST_API(kbasep_pm_metrics_term);
 /* caller needs to hold kbdev->pm.backend.metrics.lock before calling this
  * function
  */
-static void kbase_pm_get_dvfs_utilisation_calc(struct kbase_device *kbdev,
-                                ktime_t now)
+static void kbase_pm_get_dvfs_utilisation_calc(struct kbase_device *kbdev, ktime_t now)
 {
     ktime_t diff;
     int js;
@@ -131,34 +126,36 @@ static void kbase_pm_get_dvfs_utilisation_calc(struct kbase_device *kbdev,
     lockdep_assert_held(&kbdev->pm.backend.metrics.lock);
 
     diff = ktime_sub(now, kbdev->pm.backend.metrics.time_period_start);
-    if (ktime_to_ns(diff) < 0)
+    if (ktime_to_ns(diff) < 0) {
         return;
+    }
 
     if (kbdev->pm.backend.metrics.gpu_active) {
-        u32 ns_time = (u32) (ktime_to_ns(diff) >> KBASE_PM_TIME_SHIFT);
+        u32 ns_time = (u32)(ktime_to_ns(diff) >> KBASE_PM_TIME_SHIFT);
 
         kbdev->pm.backend.metrics.values.time_busy += ns_time;
-        if (kbdev->pm.backend.metrics.active_cl_ctx[0])
+        if (kbdev->pm.backend.metrics.active_cl_ctx[0]) {
             kbdev->pm.backend.metrics.values.busy_cl[0] += ns_time;
-        if (kbdev->pm.backend.metrics.active_cl_ctx[1])
+        }
+        if (kbdev->pm.backend.metrics.active_cl_ctx[1]) {
             kbdev->pm.backend.metrics.values.busy_cl[1] += ns_time;
-        
+        }
+
         for (js = 0; js < BASE_JM_MAX_NR_SLOTS; js++) {
-            if (kbdev->pm.backend.metrics.active_gl_ctx[js])
+            if (kbdev->pm.backend.metrics.active_gl_ctx[js]) {
                 kbdev->pm.backend.metrics.values.busy_gl += ns_time;
+            }
         }
     } else {
-        kbdev->pm.backend.metrics.values.time_idle += (u32) (ktime_to_ns(diff)
-                            >> KBASE_PM_TIME_SHIFT);
+        kbdev->pm.backend.metrics.values.time_idle += (u32)(ktime_to_ns(diff) >> KBASE_PM_TIME_SHIFT);
     }
 
     kbdev->pm.backend.metrics.time_period_start = now;
 }
 
 #if defined(CONFIG_MALI_BIFROST_DEVFREQ) || defined(CONFIG_MALI_BIFROST_DVFS)
-void kbase_pm_get_dvfs_metrics(struct kbase_device *kbdev,
-                   struct kbasep_pm_metrics *last,
-                   struct kbasep_pm_metrics *diff)
+void kbase_pm_get_dvfs_metrics(struct kbase_device *kbdev, struct kbasep_pm_metrics *last,
+                               struct kbasep_pm_metrics *diff)
 {
     struct kbasep_pm_metrics *cur = &kbdev->pm.backend.metrics.values;
     unsigned long flags;
@@ -194,8 +191,7 @@ void kbase_pm_get_dvfs_action(struct kbase_device *kbdev)
 
     kbase_pm_get_dvfs_metrics(kbdev, &kbdev->pm.backend.metrics.dvfs_last, diff);
 
-    utilisation = (UTILISATION_TIME * diff->time_busy) /
-            max(diff->time_busy + diff->time_idle, 1u);
+    utilisation = (UTILISATION_TIME * diff->time_busy) / max(diff->time_busy + diff->time_idle, 1u);
 
     busy = max(diff->busy_gl + diff->busy_cl[0] + diff->busy_cl[1], 1u);
     util_gl_share = (UTILISATION_TIME * diff->busy_gl) / busy;
@@ -227,9 +223,7 @@ void kbase_pm_metrics_start(struct kbase_device *kbdev)
     spin_lock_irqsave(&kbdev->pm.backend.metrics.lock, flags);
     kbdev->pm.backend.metrics.timer_active = true;
     spin_unlock_irqrestore(&kbdev->pm.backend.metrics.lock, flags);
-    hrtimer_start(&kbdev->pm.backend.metrics.timer,
-            HR_TIMER_DELAY_MSEC(kbdev->pm.dvfs_period),
-            HRTIMER_MODE_REL);
+    hrtimer_start(&kbdev->pm.backend.metrics.timer, HR_TIMER_DELAY_MSEC(kbdev->pm.dvfs_period), HRTIMER_MODE_REL);
 }
 
 void kbase_pm_metrics_stop(struct kbase_device *kbdev)
@@ -241,7 +235,6 @@ void kbase_pm_metrics_stop(struct kbase_device *kbdev)
     spin_unlock_irqrestore(&kbdev->pm.backend.metrics.lock, flags);
     hrtimer_cancel(&kbdev->pm.backend.metrics.timer);
 }
-
 
 #endif /* CONFIG_MALI_BIFROST_DVFS */
 
@@ -259,8 +252,8 @@ static void kbase_pm_metrics_active_calc(struct kbase_device *kbdev)
 
     lockdep_assert_held(&kbdev->pm.backend.metrics.lock);
 
-    memset( kbdev->pm.backend.metrics.active_gl_ctx, 0, sizeof(u32)*BASE_JM_MAX_NR_SLOTS );
-    memset( kbdev->pm.backend.metrics.active_cl_ctx, 0, sizeof(u32)*BASE_MAX_NR_CLOCKS_REGULATORS );
+    memset(kbdev->pm.backend.metrics.active_gl_ctx, 0, sizeof(u32) * BASE_JM_MAX_NR_SLOTS);
+    memset(kbdev->pm.backend.metrics.active_cl_ctx, 0, sizeof(u32) * BASE_MAX_NR_CLOCKS_REGULATORS);
     kbdev->pm.backend.metrics.gpu_active = false;
 
     for (js = 0; js < BASE_JM_MAX_NR_SLOTS; js++) {
@@ -268,18 +261,16 @@ static void kbase_pm_metrics_active_calc(struct kbase_device *kbdev)
 
         /* Head atom may have just completed, so if it isn't running
          * then try the next atom */
-        if (katom && katom->gpu_rb_state != KBASE_ATOM_GPU_RB_SUBMITTED)
+        if (katom && katom->gpu_rb_state != KBASE_ATOM_GPU_RB_SUBMITTED) {
             katom = kbase_gpu_inspect(kbdev, js, 1);
+        }
 
-        if (katom && katom->gpu_rb_state ==
-                KBASE_ATOM_GPU_RB_SUBMITTED) {
+        if (katom && katom->gpu_rb_state == KBASE_ATOM_GPU_RB_SUBMITTED) {
             if (katom->core_req & BASE_JD_REQ_ONLY_COMPUTE) {
-                int device_nr = (katom->core_req &
-                    BASE_JD_REQ_SPECIFIC_COHERENT_GROUP)
-                        ? katom->device_nr : 0;
-                if (!WARN_ON(device_nr > 1))
-                    kbdev->pm.backend.metrics.
-                        active_cl_ctx[device_nr] = 1;
+                int device_nr = (katom->core_req & BASE_JD_REQ_SPECIFIC_COHERENT_GROUP) ? katom->device_nr : 0;
+                if (!WARN_ON(device_nr > 1)) {
+                    kbdev->pm.backend.metrics.active_cl_ctx[device_nr] = 1;
+                }
             } else {
                 kbdev->pm.backend.metrics.active_gl_ctx[js] = 1;
                 trace_sysgraph(SGR_ACTIVE, 0, js);

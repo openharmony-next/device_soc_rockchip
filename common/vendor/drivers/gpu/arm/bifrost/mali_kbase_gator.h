@@ -28,14 +28,14 @@
  * they are unknown inside gator.
  */
 
-#ifndef _KBASE_GATOR_H_
-#define _KBASE_GATOR_H_
+#ifndef H_GPU_ARM_BIFROST_MALI_KBASE_GATOR_H
+#define H_GPU_ARM_BIFROST_MALI_KBASE_GATOR_H
 
 #include <linux/types.h>
 
 #define GATOR_JOB_SLOT_START 1
-#define GATOR_JOB_SLOT_STOP  2
-#define GATOR_JOB_SLOT_SOFT_STOPPED  3
+#define GATOR_JOB_SLOT_STOP 2
+#define GATOR_JOB_SLOT_SOFT_STOPPED 3
 
 #ifdef CONFIG_MALI_BIFROST_GATOR_SUPPORT
 
@@ -50,4 +50,4 @@ void kbase_trace_mali_total_alloc_pages_change(u32 dev_id, long long int event);
 
 #endif /* CONFIG_MALI_BIFROST_GATOR_SUPPORT */
 
-#endif  /* _KBASE_GATOR_H_ */
+#endif /* H_GPU_ARM_BIFROST_MALI_KBASE_GATOR_H */

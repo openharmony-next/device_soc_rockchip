@@ -34,13 +34,12 @@
  *
  */
 
-
 /**
  * Base kernel property query backend APIs
  */
 
-#ifndef _KBASE_HWACCESS_GPUPROPS_H_
-#define _KBASE_HWACCESS_GPUPROPS_H_
+#ifndef KBASE_HWACCESS_GPUPROPS_H_
+#define KBASE_HWACCESS_GPUPROPS_H_
 
 /**
  * kbase_backend_gpuprops_get() - Fill @regdump with GPU properties read from
@@ -52,8 +51,7 @@
  *
  * Return: Zero for succeess or a Linux error code
  */
-int kbase_backend_gpuprops_get(struct kbase_device *kbdev,
-                    struct kbase_gpuprops_regdump *regdump);
+int kbase_backend_gpuprops_get(struct kbase_device *kbdev, struct kbase_gpuprops_regdump *regdump);
 
 /**
  * kbase_backend_gpuprops_get_features - Fill @regdump with GPU properties read
@@ -66,8 +64,7 @@ int kbase_backend_gpuprops_get(struct kbase_device *kbdev,
  *
  * Return: Zero for succeess or a Linux error code
  */
-int kbase_backend_gpuprops_get_features(struct kbase_device *kbdev,
-                    struct kbase_gpuprops_regdump *regdump);
+int kbase_backend_gpuprops_get_features(struct kbase_device *kbdev, struct kbase_gpuprops_regdump *regdump);
 
 /**
  * kbase_backend_gpuprops_get_l2_features - Fill @regdump with L2_FEATURES read
@@ -80,8 +77,6 @@ int kbase_backend_gpuprops_get_features(struct kbase_device *kbdev,
  *
  * Return: Zero on success, Linux error code on failure
  */
-int kbase_backend_gpuprops_get_l2_features(struct kbase_device *kbdev,
-                    struct kbase_gpuprops_regdump *regdump);
-
+int kbase_backend_gpuprops_get_l2_features(struct kbase_device *kbdev, struct kbase_gpuprops_regdump *regdump);
 
 #endif /* _KBASE_HWACCESS_GPUPROPS_H_ */

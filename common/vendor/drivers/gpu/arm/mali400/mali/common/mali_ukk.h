@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -155,13 +156,13 @@ extern "C" {
  * @{
  */
 
-
 /** @defgroup _mali_uk_context U/K Context management
  *
  * These functions allow for initialisation of the user-kernel interface once per process.
  *
  * Generally the context will store the OS specific object to communicate with the kernel device driver and further
- * state information required by the specific implementation. The context is shareable among all threads in the caller process.
+ * state information required by the specific implementation. The context is shareable among all threads in the caller
+ * process.
  *
  * On IOCTL systems, this is likely to be a file descriptor as a result of opening the kernel device driver.
  *
@@ -206,7 +207,6 @@ mali_osk_errcode_t _mali_ukk_open(void **context);
 mali_osk_errcode_t _mali_ukk_close(void **context);
 
 /** @} */ /* end group _mali_uk_context */
-
 
 /** @addtogroup _mali_uk_core U/K Core
  *
@@ -277,7 +277,6 @@ mali_osk_errcode_t _mali_ukk_request_high_priority(mali_uk_request_high_priority
 mali_osk_errcode_t _mali_ukk_pending_submit(mali_uk_pending_submit_s *args);
 
 /** @} */ /* end group _mali_uk_core */
-
 
 /** @addtogroup _mali_uk_memory U/K Memory
  *
@@ -357,7 +356,6 @@ mali_osk_errcode_t _mali_ukk_mem_write_safe(mali_uk_mem_write_safe_s *args);
 
 /** @} */ /* end group _mali_uk_memory */
 
-
 /** @addtogroup _mali_uk_pp U/K Fragment Processor
  *
  * The Fragment Processor (aka PP (Pixel Processor)) functions provide the following functionality:
@@ -391,7 +389,8 @@ mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx, mali_uk_pp_start_job_s *uar
  * @note Will call into @ref _mali_ukk_pp_start_job and @ref _mali_ukk_gp_start_job.
  *
  * @param ctx user-kernel context (mali_session)
- * @param uargs see mali_uk_pp_and_gp_start_job_s in "mali_utgard_uk_types.h". Use _mali_osk_copy_from_user to retrieve data!
+ * @param uargs see mali_uk_pp_and_gp_start_job_s in "mali_utgard_uk_types.h". Use _mali_osk_copy_from_user to retrieve
+ * data!
  * @return MALI_OSK_ERR_OK on success, otherwise a suitable mali_osk_errcode_t on failure.
  */
 mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx, mali_uk_pp_and_gp_start_job_s *uargs);
@@ -419,9 +418,7 @@ mali_osk_errcode_t _mali_ukk_get_pp_core_version(mali_uk_get_pp_core_version_s *
  */
 void _mali_ukk_pp_job_disable_wb(mali_uk_pp_disable_wb_s *args);
 
-
 /** @} */ /* end group _mali_uk_pp */
-
 
 /** @addtogroup _mali_uk_gp U/K Vertex Processor
  *

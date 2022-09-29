@@ -37,11 +37,11 @@ int kbase_pm_ca_init(struct kbase_device *kbdev)
 #ifdef CONFIG_MALI_BIFROST_DEVFREQ
     struct kbase_pm_backend_data *pm_backend = &kbdev->pm.backend;
 
-    if (kbdev->current_core_mask)
+    if (kbdev->current_core_mask) {
         pm_backend->ca_cores_enabled = kbdev->current_core_mask;
-    else
-        pm_backend->ca_cores_enabled =
-                kbdev->gpu_props.props.raw_props.shader_present;
+    } else {
+        pm_backend->ca_cores_enabled = kbdev->gpu_props.props.raw_props.shader_present;
+    }
 #endif
 
     return 0;
@@ -60,8 +60,8 @@ void kbase_devfreq_set_core_mask(struct kbase_device *kbdev, u64 core_mask)
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
 
     if (!(core_mask & kbdev->pm.debug_core_mask_all)) {
-        dev_err(kbdev->dev, "OPP core mask 0x%llX does not intersect with debug mask 0x%llX\n",
-                core_mask, kbdev->pm.debug_core_mask_all);
+        dev_err(kbdev->dev, "OPP core mask 0x%llX does not intersect with debug mask 0x%llX\n", core_mask,
+                kbdev->pm.debug_core_mask_all);
         goto unlock;
     }
 
@@ -77,8 +77,7 @@ void kbase_devfreq_set_core_mask(struct kbase_device *kbdev, u64 core_mask)
 unlock:
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 
-    dev_dbg(kbdev->dev, "Devfreq policy : new core mask=%llX\n",
-            pm_backend->ca_cores_enabled);
+    dev_dbg(kbdev->dev, "Devfreq policy : new core mask=%llX\n", pm_backend->ca_cores_enabled);
 }
 #endif
 
@@ -93,8 +92,7 @@ u64 kbase_pm_ca_get_core_mask(struct kbase_device *kbdev)
 #ifdef CONFIG_MALI_BIFROST_DEVFREQ
     return pm_backend->ca_cores_enabled & kbdev->pm.debug_core_mask_all;
 #else
-    return kbdev->gpu_props.props.raw_props.shader_present &
-            kbdev->pm.debug_core_mask_all;
+    return kbdev->gpu_props.props.raw_props.shader_present & kbdev->pm.debug_core_mask_all;
 #endif
 }
 

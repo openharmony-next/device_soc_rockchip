@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * "Coarse Demand" power management policy
  */
@@ -55,12 +53,12 @@ static void coarse_demand_term(struct kbase_device *kbdev)
  * and name.
  */
 const struct kbase_pm_policy kbase_pm_coarse_demand_policy_ops = {
-    "coarse_demand",            /* name */
-    coarse_demand_init,            /* init */
-    coarse_demand_term,            /* term */
-    coarse_demand_shaders_needed,        /* shaders_needed */
-    coarse_demand_get_core_active,        /* get_core_active */
-    KBASE_PM_POLICY_ID_COARSE_DEMAND,    /* id */
+    "coarse_demand",                  /* name */
+    coarse_demand_init,               /* init */
+    coarse_demand_term,               /* term */
+    coarse_demand_shaders_needed,     /* shaders_needed */
+    coarse_demand_get_core_active,    /* get_core_active */
+    KBASE_PM_POLICY_ID_COARSE_DEMAND, /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_coarse_demand_policy_ops);

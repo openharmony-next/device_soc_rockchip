@@ -1,14 +1,15 @@
 /*
  * Copyright (C) 2013-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <linux/fs.h>       /* file system operations */
-#include <linux/uaccess.h>  /* user space access */
+#include <linux/fs.h>      /* file system operations */
+#include <linux/uaccess.h> /* user space access */
 
 #include "mali_ukk.h"
 #include "mali_osk.h"
@@ -82,7 +83,9 @@ int soft_job_signal_wrapper(struct mali_session_data *session, mali_uk_soft_job_
 
     MALI_DEBUG_ASSERT_POINTER(session);
 
-    if (0 != get_user(job_id, &uargs->job_id)) return -EFAULT;
+    if (0 != get_user(job_id, &uargs->job_id)) {
+        return -EFAULT;
+    }
 
     err = mali_soft_job_system_signal_job(session->soft_job_system, job_id);
 

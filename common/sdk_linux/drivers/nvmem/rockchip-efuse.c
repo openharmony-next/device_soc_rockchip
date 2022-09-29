@@ -19,79 +19,79 @@
 #include <linux/platform_device.h>
 #include <linux/rockchip/rockchip_sip.h>
 
-#define T_CSB_P_S        0
-#define T_PGENB_P_S        0
-#define T_LOAD_P_S        0
-#define T_ADDR_P_S        0
-#define T_STROBE_P_S        (0 + 110) /* 1.1us */
-#define T_CSB_P_L        (0 + 110 + 1000 + 20) /* 200ns */
-#define T_PGENB_P_L        (0 + 110 + 1000 + 20)
-#define T_LOAD_P_L        (0 + 110 + 1000 + 20)
-#define T_ADDR_P_L        (0 + 110 + 1000 + 20)
-#define T_STROBE_P_L        (0 + 110 + 1000) /* 10us */
-#define T_CSB_R_S        0
-#define T_PGENB_R_S        0
-#define T_LOAD_R_S        0
-#define T_ADDR_R_S        2
-#define T_STROBE_R_S        (2 + 3)
-#define T_CSB_R_L        (2 + 3 + 3 + 3)
-#define T_PGENB_R_L        (2 + 3 + 3 + 3)
-#define T_LOAD_R_L        (2 + 3 + 3 + 3)
-#define T_ADDR_R_L        (2 + 3 + 3 + 2)
-#define T_STROBE_R_L        (2 + 3 + 3)
+#define T_CSB_P_S 0
+#define T_PGENB_P_S 0
+#define T_LOAD_P_S 0
+#define T_ADDR_P_S 0
+#define T_STROBE_P_S (0 + 110)          /* 1.1us */
+#define T_CSB_P_L (0 + 110 + 1000 + 20) /* 200ns */
+#define T_PGENB_P_L (0 + 110 + 1000 + 20)
+#define T_LOAD_P_L (0 + 110 + 1000 + 20)
+#define T_ADDR_P_L (0 + 110 + 1000 + 20)
+#define T_STROBE_P_L (0 + 110 + 1000) /* 10us */
+#define T_CSB_R_S 0
+#define T_PGENB_R_S 0
+#define T_LOAD_R_S 0
+#define T_ADDR_R_S 2
+#define T_STROBE_R_S (2 + 3)
+#define T_CSB_R_L (2 + 3 + 3 + 3)
+#define T_PGENB_R_L (2 + 3 + 3 + 3)
+#define T_LOAD_R_L (2 + 3 + 3 + 3)
+#define T_ADDR_R_L (2 + 3 + 3 + 2)
+#define T_STROBE_R_L (2 + 3 + 3)
 
-#define T_CSB_P            0x28
-#define T_PGENB_P        0x2c
-#define T_LOAD_P        0x30
-#define T_ADDR_P        0x34
-#define T_STROBE_P        0x38
-#define T_CSB_R            0x3c
-#define T_PGENB_R        0x40
-#define T_LOAD_R        0x44
-#define T_ADDR_R        0x48
-#define T_STROBE_R        0x4c
+#define T_CSB_P 0x28
+#define T_PGENB_P 0x2c
+#define T_LOAD_P 0x30
+#define T_ADDR_P 0x34
+#define T_STROBE_P 0x38
+#define T_CSB_R 0x3c
+#define T_PGENB_R 0x40
+#define T_LOAD_R 0x44
+#define T_ADDR_R 0x48
+#define T_STROBE_R 0x4c
 
-#define RK1808_MOD        0x00
-#define RK1808_INT_STATUS    RK3328_INT_STATUS
-#define RK1808_DOUT        RK3328_DOUT
-#define RK1808_AUTO_CTRL    RK3328_AUTO_CTRL
-#define RK1808_USER_MODE    BIT(0)
-#define RK1808_INT_FINISH    RK3328_INT_FINISH
-#define RK1808_AUTO_ENB        RK3328_AUTO_ENB
-#define RK1808_AUTO_RD        RK3328_AUTO_RD
-#define RK1808_A_SHIFT        RK3399_A_SHIFT
-#define RK1808_A_MASK        RK3399_A_MASK
-#define RK1808_NBYTES        RK3399_NBYTES
+#define RK1808_MOD 0x00
+#define RK1808_INT_STATUS RK3328_INT_STATUS
+#define RK1808_DOUT RK3328_DOUT
+#define RK1808_AUTO_CTRL RK3328_AUTO_CTRL
+#define RK1808_USER_MODE BIT(0)
+#define RK1808_INT_FINISH RK3328_INT_FINISH
+#define RK1808_AUTO_ENB RK3328_AUTO_ENB
+#define RK1808_AUTO_RD RK3328_AUTO_RD
+#define RK1808_A_SHIFT RK3399_A_SHIFT
+#define RK1808_A_MASK RK3399_A_MASK
+#define RK1808_NBYTES RK3399_NBYTES
 
-#define RK3128_A_SHIFT        7
-#define RK3288_A_SHIFT        6
-#define RK3288_A_MASK        0x3ff
-#define RK3288_PGENB        BIT(3)
-#define RK3288_LOAD        BIT(2)
-#define RK3288_STROBE        BIT(1)
-#define RK3288_CSB        BIT(0)
+#define RK3128_A_SHIFT 7
+#define RK3288_A_SHIFT 6
+#define RK3288_A_MASK 0x3ff
+#define RK3288_PGENB BIT(3)
+#define RK3288_LOAD BIT(2)
+#define RK3288_STROBE BIT(1)
+#define RK3288_CSB BIT(0)
 
-#define RK3328_SECURE_SIZES    96
-#define RK3328_INT_STATUS    0x0018
-#define RK3328_DOUT        0x0020
-#define RK3328_AUTO_CTRL    0x0024
-#define RK3328_INT_FINISH    BIT(0)
-#define RK3328_AUTO_ENB        BIT(0)
-#define RK3328_AUTO_RD        BIT(1)
+#define RK3328_SECURE_SIZES 96
+#define RK3328_INT_STATUS 0x0018
+#define RK3328_DOUT 0x0020
+#define RK3328_AUTO_CTRL 0x0024
+#define RK3328_INT_FINISH BIT(0)
+#define RK3328_AUTO_ENB BIT(0)
+#define RK3328_AUTO_RD BIT(1)
 
-#define RK3399_A_SHIFT        16
-#define RK3399_A_MASK        0x3ff
-#define RK3399_NBYTES        4
-#define RK3399_STROBSFTSEL    BIT(9)
-#define RK3399_RSB        BIT(7)
-#define RK3399_PD        BIT(5)
-#define RK3399_PGENB        BIT(3)
-#define RK3399_LOAD        BIT(2)
-#define RK3399_STROBE        BIT(1)
-#define RK3399_CSB        BIT(0)
+#define RK3399_A_SHIFT 16
+#define RK3399_A_MASK 0x3ff
+#define RK3399_NBYTES 4
+#define RK3399_STROBSFTSEL BIT(9)
+#define RK3399_RSB BIT(7)
+#define RK3399_PD BIT(5)
+#define RK3399_PGENB BIT(3)
+#define RK3399_LOAD BIT(2)
+#define RK3399_STROBE BIT(1)
+#define RK3399_CSB BIT(0)
 
-#define REG_EFUSE_CTRL        0x0000
-#define REG_EFUSE_DOUT        0x0004
+#define REG_EFUSE_CTRL 0x0000
+#define REG_EFUSE_DOUT 0x0004
 
 struct rockchip_efuse_chip {
     struct device *dev;
@@ -105,8 +105,7 @@ struct rockchip_efuse_chip {
 static void rk1808_efuse_timing_init(void __iomem *base)
 {
     /* enable auto mode */
-    writel(readl(base + RK1808_MOD) & (~RK1808_USER_MODE),
-           base + RK1808_MOD);
+    writel(readl(base + RK1808_MOD) & (~RK1808_USER_MODE), base + RK1808_MOD);
 
     /* setup efuse timing */
     writel((T_CSB_P_S << 16) | T_CSB_P_L, base + T_CSB_P);
@@ -124,8 +123,7 @@ static void rk1808_efuse_timing_init(void __iomem *base)
 static void rk1808_efuse_timing_deinit(void __iomem *base)
 {
     /* disable auto mode */
-    writel(readl(base + RK1808_MOD) | RK1808_USER_MODE,
-           base + RK1808_MOD);
+    writel(readl(base + RK1808_MOD) | RK1808_USER_MODE, base + RK1808_MOD);
 
     /* clear efuse timing */
     writel(0, base + T_CSB_P);
@@ -140,8 +138,7 @@ static void rk1808_efuse_timing_deinit(void __iomem *base)
     writel(0, base + T_STROBE_R);
 }
 
-static int rockchip_rk1808_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk1808_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     unsigned int addr_start, addr_end, addr_offset, addr_len;
@@ -171,10 +168,9 @@ static int rockchip_rk1808_efuse_read(void *context, unsigned int offset,
     rk1808_efuse_timing_init(efuse->base);
 
     while (addr_len--) {
-        writel(RK1808_AUTO_RD | RK1808_AUTO_ENB |
-               ((addr_start++ & RK1808_A_MASK) << RK1808_A_SHIFT),
+        writel(RK1808_AUTO_RD | RK1808_AUTO_ENB | ((addr_start++ & RK1808_A_MASK) << RK1808_A_SHIFT),
                efuse->base + RK1808_AUTO_CTRL);
-        udelay(2);
+        udelay(0x2);
         status = readl(efuse->base + RK1808_INT_STATUS);
         if (!(status & RK1808_INT_FINISH)) {
             ret = -EIO;
@@ -199,8 +195,7 @@ out:
     return ret;
 }
 
-static int rockchip_rk3128_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk3128_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     u8 *buf = val;
@@ -215,19 +210,15 @@ static int rockchip_rk3128_efuse_read(void *context, unsigned int offset,
     writel(RK3288_LOAD | RK3288_PGENB, efuse->base + REG_EFUSE_CTRL);
     udelay(1);
     while (bytes--) {
-        writel(readl(efuse->base + REG_EFUSE_CTRL) &
-                 (~(RK3288_A_MASK << RK3128_A_SHIFT)),
-                 efuse->base + REG_EFUSE_CTRL);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) |
-                 ((offset++ & RK3288_A_MASK) << RK3128_A_SHIFT),
-                 efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~(RK3288_A_MASK << RK3128_A_SHIFT)),
+               efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) | ((offset++ & RK3288_A_MASK) << RK3128_A_SHIFT),
+               efuse->base + REG_EFUSE_CTRL);
         udelay(1);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) |
-                 RK3288_STROBE, efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) | RK3288_STROBE, efuse->base + REG_EFUSE_CTRL);
         udelay(1);
         *buf++ = readb(efuse->base + REG_EFUSE_DOUT);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) &
-               (~RK3288_STROBE), efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~RK3288_STROBE), efuse->base + REG_EFUSE_CTRL);
         udelay(1);
     }
 
@@ -239,8 +230,7 @@ static int rockchip_rk3128_efuse_read(void *context, unsigned int offset,
     return 0;
 }
 
-static int rockchip_rk3288_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk3288_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     u8 *buf = val;
@@ -255,19 +245,15 @@ static int rockchip_rk3288_efuse_read(void *context, unsigned int offset,
     writel(RK3288_LOAD | RK3288_PGENB, efuse->base + REG_EFUSE_CTRL);
     udelay(1);
     while (bytes--) {
-        writel(readl(efuse->base + REG_EFUSE_CTRL) &
-                 (~(RK3288_A_MASK << RK3288_A_SHIFT)),
-                 efuse->base + REG_EFUSE_CTRL);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) |
-                 ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT),
-                 efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~(RK3288_A_MASK << RK3288_A_SHIFT)),
+               efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) | ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT),
+               efuse->base + REG_EFUSE_CTRL);
         udelay(1);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) |
-                 RK3288_STROBE, efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) | RK3288_STROBE, efuse->base + REG_EFUSE_CTRL);
         udelay(1);
         *buf++ = readb(efuse->base + REG_EFUSE_DOUT);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) &
-               (~RK3288_STROBE), efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~RK3288_STROBE), efuse->base + REG_EFUSE_CTRL);
         udelay(1);
     }
 
@@ -279,9 +265,7 @@ static int rockchip_rk3288_efuse_read(void *context, unsigned int offset,
     return 0;
 }
 
-static int rockchip_rk3288_efuse_secure_read(void *context,
-                         unsigned int offset,
-                         void *val, size_t bytes)
+static int rockchip_rk3288_efuse_secure_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     u8 *buf = val;
@@ -294,39 +278,32 @@ static int rockchip_rk3288_efuse_secure_read(void *context,
         return ret;
     }
 
-    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL,
-                 RK3288_LOAD | RK3288_PGENB);
+    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, RK3288_LOAD | RK3288_PGENB);
     udelay(1);
     while (bytes--) {
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) &
-             (~(RK3288_A_MASK << RK3288_A_SHIFT));
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) & (~(RK3288_A_MASK << RK3288_A_SHIFT));
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) |
-             ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT);
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) | ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT);
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) |
-             RK3288_STROBE;
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) | RK3288_STROBE;
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
         *buf++ = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_DOUT);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) &
-             (~RK3288_STROBE);
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) & (~RK3288_STROBE);
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
     }
 
     /* Switch to standby mode */
-    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL,
-                 RK3288_PGENB | RK3288_CSB);
+    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, RK3288_PGENB | RK3288_CSB);
 
     clk_bulk_disable_unprepare(efuse->num_clks, efuse->clks);
 
     return 0;
 }
 
-static int rockchip_rk3328_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk3328_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     unsigned int addr_start, addr_end, addr_offset, addr_len;
@@ -347,18 +324,16 @@ static int rockchip_rk3328_efuse_read(void *context, unsigned int offset,
     addr_offset = offset % RK3399_NBYTES;
     addr_len = addr_end - addr_start;
 
-    buf = kzalloc(array3_size(addr_len, RK3399_NBYTES, sizeof(*buf)),
-              GFP_KERNEL);
+    buf = kzalloc(array3_size(addr_len, RK3399_NBYTES, sizeof(*buf)), GFP_KERNEL);
     if (!buf) {
         ret = -ENOMEM;
         goto nomem;
     }
 
     while (addr_len--) {
-        writel(RK3328_AUTO_RD | RK3328_AUTO_ENB |
-               ((addr_start++ & RK3399_A_MASK) << RK3399_A_SHIFT),
+        writel(RK3328_AUTO_RD | RK3328_AUTO_ENB | ((addr_start++ & RK3399_A_MASK) << RK3399_A_SHIFT),
                efuse->base + RK3328_AUTO_CTRL);
-        udelay(4);
+        udelay(0x4);
         status = readl(efuse->base + RK3328_INT_STATUS);
         if (!(status & RK3328_INT_FINISH)) {
             ret = -EIO;
@@ -380,8 +355,7 @@ nomem:
     return ret;
 }
 
-static int rockchip_rk3368_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk3368_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     u8 *buf = val;
@@ -394,39 +368,32 @@ static int rockchip_rk3368_efuse_read(void *context, unsigned int offset,
         return ret;
     }
 
-    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL,
-                 RK3288_LOAD | RK3288_PGENB);
+    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, RK3288_LOAD | RK3288_PGENB);
     udelay(1);
     while (bytes--) {
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) &
-             (~(RK3288_A_MASK << RK3288_A_SHIFT));
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) & (~(RK3288_A_MASK << RK3288_A_SHIFT));
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) |
-             ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT);
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) | ((offset++ & RK3288_A_MASK) << RK3288_A_SHIFT);
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) |
-             RK3288_STROBE;
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) | RK3288_STROBE;
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
         *buf++ = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_DOUT);
-        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) &
-             (~RK3288_STROBE);
+        wr_val = sip_smc_secure_reg_read(efuse->phys + REG_EFUSE_CTRL) & (~RK3288_STROBE);
         sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, wr_val);
         udelay(1);
     }
 
     /* Switch to standby mode */
-    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL,
-                 RK3288_PGENB | RK3288_CSB);
+    sip_smc_secure_reg_write(efuse->phys + REG_EFUSE_CTRL, RK3288_PGENB | RK3288_CSB);
 
     clk_bulk_disable_unprepare(efuse->num_clks, efuse->clks);
 
     return 0;
 }
 
-static int rockchip_rk3399_efuse_read(void *context, unsigned int offset,
-                      void *val, size_t bytes)
+static int rockchip_rk3399_efuse_read(void *context, unsigned int offset, void *val, size_t bytes)
 {
     struct rockchip_efuse_chip *efuse = context;
     unsigned int addr_start, addr_end, addr_offset, addr_len;
@@ -445,24 +412,20 @@ static int rockchip_rk3399_efuse_read(void *context, unsigned int offset,
     addr_offset = offset % RK3399_NBYTES;
     addr_len = addr_end - addr_start;
 
-    buf = kzalloc(array3_size(addr_len, RK3399_NBYTES, sizeof(*buf)),
-              GFP_KERNEL);
+    buf = kzalloc(array3_size(addr_len, RK3399_NBYTES, sizeof(*buf)), GFP_KERNEL);
     if (!buf) {
         ret = -ENOMEM;
         goto disable_clks;
     }
 
-    writel(RK3399_LOAD | RK3399_PGENB | RK3399_STROBSFTSEL | RK3399_RSB,
-           efuse->base + REG_EFUSE_CTRL);
+    writel(RK3399_LOAD | RK3399_PGENB | RK3399_STROBSFTSEL | RK3399_RSB, efuse->base + REG_EFUSE_CTRL);
     udelay(1);
     while (addr_len--) {
-        writel(readl(efuse->base + REG_EFUSE_CTRL) | RK3399_STROBE |
-               ((addr_start++ & RK3399_A_MASK) << RK3399_A_SHIFT),
+        writel(readl(efuse->base + REG_EFUSE_CTRL) | RK3399_STROBE | ((addr_start++ & RK3399_A_MASK) << RK3399_A_SHIFT),
                efuse->base + REG_EFUSE_CTRL);
         udelay(1);
         out_value = readl(efuse->base + REG_EFUSE_DOUT);
-        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~RK3399_STROBE),
-               efuse->base + REG_EFUSE_CTRL);
+        writel(readl(efuse->base + REG_EFUSE_CTRL) & (~RK3399_STROBE), efuse->base + REG_EFUSE_CTRL);
         udelay(1);
 
         memcpy(&buf[i], &out_value, RK3399_NBYTES);
@@ -535,7 +498,7 @@ static const struct of_device_id rockchip_efuse_match[] = {
         .compatible = "rockchip,rk3399-efuse",
         .data = (void *)&rockchip_rk3399_efuse_read,
     },
-    { /* sentinel */},
+    {/* sentinel */},
 };
 MODULE_DEVICE_TABLE(of, rockchip_efuse_match);
 
@@ -553,27 +516,29 @@ static int rockchip_efuse_probe(struct platform_device *pdev)
         return -EINVAL;
     }
 
-    efuse = devm_kzalloc(dev, sizeof(struct rockchip_efuse_chip),
-                 GFP_KERNEL);
-    if (!efuse)
+    efuse = devm_kzalloc(dev, sizeof(struct rockchip_efuse_chip), GFP_KERNEL);
+    if (!efuse) {
         return -ENOMEM;
+    }
 
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
     efuse->phys = res->start;
     efuse->base = devm_ioremap_resource(dev, res);
-    if (IS_ERR(efuse->base))
+    if (IS_ERR(efuse->base)) {
         return PTR_ERR(efuse->base);
+    }
 
     efuse->num_clks = devm_clk_bulk_get_all(dev, &efuse->clks);
-    if (efuse->num_clks < 1)
+    if (efuse->num_clks < 1) {
         return -ENODEV;
+    }
 
     mutex_init(&efuse->mutex);
 
     efuse->dev = dev;
-    if (of_property_read_u32(dev->of_node, "rockchip,efuse-size",
-                 &econfig.size))
+    if (of_property_read_u32(dev->of_node, "rockchip,efuse-size", &econfig.size)) {
         econfig.size = resource_size(res);
+    }
     econfig.reg_read = data;
     econfig.priv = efuse;
     econfig.dev = efuse->dev;
@@ -584,10 +549,11 @@ static int rockchip_efuse_probe(struct platform_device *pdev)
 
 static struct platform_driver rockchip_efuse_driver = {
     .probe = rockchip_efuse_probe,
-    .driver = {
-        .name = "rockchip-efuse",
-        .of_match_table = rockchip_efuse_match,
-    },
+    .driver =
+        {
+            .name = "rockchip-efuse",
+            .of_match_table = rockchip_efuse_match,
+        },
 };
 
 static int __init rockchip_efuse_init(void)

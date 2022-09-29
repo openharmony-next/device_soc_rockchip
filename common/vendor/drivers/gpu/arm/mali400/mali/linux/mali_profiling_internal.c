@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -38,8 +39,8 @@ static u32 profile_mask = 0;
 
 static inline void add_event(u32 event_id, u32 data0, u32 data1, u32 data2, u32 data3, u32 data4);
 
-void probe_mali_timeline_event(void *data, TP_PROTO(unsigned int event_id, unsigned int d0, unsigned int d1, unsigned
-                   int d2, unsigned int d3, unsigned int d4))
+void probe_mali_timeline_event(void *data, TP_PROTO(unsigned int event_id, unsigned int d0, unsigned int d1,
+                                                    unsigned int d2, unsigned int d3, unsigned int d4))
 {
     add_event(event_id, d0, d1, d2, d3, d4);
 }
@@ -161,7 +162,8 @@ static inline void add_event(u32 event_id, u32 data0, u32 data1, u32 data2, u32 
     /* If event is "leave API function", add current memory usage to the event
      * as data point 4.  This is used in timeline profiling to indicate how
      * much memory was used when leaving a function. */
-    if (event_id == (MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_SOFTWARE | MALI_PROFILING_EVENT_REASON_SINGLE_SW_LEAVE_API_FUNC)) {
+    if (event_id == (MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_SOFTWARE |
+                     MALI_PROFILING_EVENT_REASON_SINGLE_SW_LEAVE_API_FUNC)) {
         profile_entries[cur_index].data[MAIL_EVENT_FO] = _mali_ukk_report_memory_usage();
     }
 }
@@ -185,7 +187,9 @@ mali_osk_errcode_t _mali_internal_profiling_stop(u32 *count)
     tracepoint_synchronize_unregister();
 
     *count = mali_osk_atomic_read(&profile_insert_index);
-    if (*count > profile_mask) *count = profile_mask;
+    if (*count > profile_mask) {
+        *count = profile_mask;
+    }
 
     return MALI_OSK_ERR_OK;
 }
@@ -197,7 +201,9 @@ u32 _mali_internal_profiling_get_count(void)
     mali_osk_mutex_wait(lock);
     if (MALI_PROFILING_STATE_RETURN == prof_state) {
         retval = mali_osk_atomic_read(&profile_insert_index);
-        if (retval > profile_mask) retval = profile_mask;
+        if (retval > profile_mask) {
+            retval = profile_mask;
+        }
     }
     mali_osk_mutex_signal(lock);
 

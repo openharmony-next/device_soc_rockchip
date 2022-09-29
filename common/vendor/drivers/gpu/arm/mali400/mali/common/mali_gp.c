@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -43,20 +44,18 @@ struct mali_gp_core *mali_gp_create(const _mali_osk_resource_t *resource, struct
                 ret = mali_group_add_gp_core(group, core);
                 if (MALI_OSK_ERR_OK == ret) {
                     /* Setup IRQ handlers (which will do IRQ probing if needed) */
-                    core->irq = _mali_osk_irq_init(resource->irq,
-                                       mali_group_upper_half_gp,
-                                       group,
-                                       mali_gp_irq_probe_trigger,
-                                       mali_gp_irq_probe_ack,
-                                       core,
-                                       resource->description);
+                    core->irq =
+                        _mali_osk_irq_init(resource->irq, mali_group_upper_half_gp, group, mali_gp_irq_probe_trigger,
+                                           mali_gp_irq_probe_ack, core, resource->description);
                     if (NULL != core->irq) {
-                        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali GP: set global gp core from 0x%08X to 0x%08X\n", mali_global_gp_core, core));
+                        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali GP: set global gp core from 0x%08X to 0x%08X\n",
+                                                                  mali_global_gp_core, core));
                         mali_global_gp_core = core;
 
                         return core;
                     } else {
-                        MALI_PRINT_ERROR(("Mali GP: Failed to setup interrupt handlers for GP core %s\n", core->hw_core.description));
+                        MALI_PRINT_ERROR(("Mali GP: Failed to setup interrupt handlers for GP core %s\n",
+                                          core->hw_core.description));
                     }
                     mali_group_remove_gp_core(group);
                 } else {
@@ -102,7 +101,8 @@ mali_osk_errcode_t mali_gp_stop_bus_wait(struct mali_gp_core *core)
 
     /* Wait for bus to be stopped */
     for (i = 0; i < MALI_REG_POLL_COUNT_SLOW; i++) {
-        if (mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_STATUS) & MALIGP2_REG_VAL_STATUS_BUS_STOPPED) {
+        if (mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_STATUS) &
+            MALIGP2_REG_VAL_STATUS_BUS_STOPPED) {
             break;
         }
     }
@@ -140,11 +140,11 @@ void mali_gp_hard_reset(struct mali_gp_core *core)
         MALI_PRINT_ERROR(("Mali GP: The hard reset loop didn't work, unable to recover\n"));
     }
 
-    mali_hw_core_register_write(&core->hw_core, reset_wait_target_register, reset_default_value); /* set it back to the default */
+    mali_hw_core_register_write(&core->hw_core, reset_wait_target_register,
+                                reset_default_value); /* set it back to the default */
     /* Re-enable interrupts */
     mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_CLEAR, MALIGP2_REG_VAL_IRQ_MASK_ALL);
     mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_MASK, MALIGP2_REG_VAL_IRQ_MASK_USED);
-
 }
 
 void mali_gp_reset_async(struct mali_gp_core *core)
@@ -156,7 +156,6 @@ void mali_gp_reset_async(struct mali_gp_core *core)
     mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_MASK, 0); /* disable the IRQs */
     mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_CLEAR, MALI400GP_REG_VAL_IRQ_RESET_COMPLETED);
     mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_CMD, MALI400GP_REG_VAL_CMD_SOFT_RESET);
-
 }
 
 mali_osk_errcode_t mali_gp_reset_wait(struct mali_gp_core *core)
@@ -174,8 +173,7 @@ mali_osk_errcode_t mali_gp_reset_wait(struct mali_gp_core *core)
     }
 
     if (i == MALI_REG_POLL_COUNT_FAST) {
-        MALI_PRINT_ERROR(("Mali GP: Failed to reset core %s, rawstat: 0x%08x\n",
-                  core->hw_core.description, rawstat));
+        MALI_PRINT_ERROR(("Mali GP: Failed to reset core %s, rawstat: 0x%08x\n", core->hw_core.description, rawstat));
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -202,29 +200,34 @@ void mali_gp_job_start(struct mali_gp_core *core, struct mali_gp_job *job)
     MALI_DEBUG_ASSERT_POINTER(core);
 
     if (mali_gp_job_has_vs_job(job)) {
-        startcmd |= (u32) MALIGP2_REG_VAL_CMD_START_VS;
+        startcmd |= (u32)MALIGP2_REG_VAL_CMD_START_VS;
     }
 
     if (mali_gp_job_has_plbu_job(job)) {
-        startcmd |= (u32) MALIGP2_REG_VAL_CMD_START_PLBU;
+        startcmd |= (u32)MALIGP2_REG_VAL_CMD_START_PLBU;
     }
 
     MALI_DEBUG_ASSERT(0 != startcmd);
 
-    mali_hw_core_register_write_array_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_VSCL_START_ADDR, frame_registers, MALIGP2_NUM_REGS_FRAME);
+    mali_hw_core_register_write_array_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_VSCL_START_ADDR, frame_registers,
+                                              MALIGP2_NUM_REGS_FRAME);
 
     if (MALI_HW_CORE_NO_COUNTER != counter_src0) {
         mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_0_SRC, counter_src0);
-        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_0_ENABLE, MALIGP2_REG_VAL_PERF_CNT_ENABLE);
+        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_0_ENABLE,
+                                    MALIGP2_REG_VAL_PERF_CNT_ENABLE);
     }
     if (MALI_HW_CORE_NO_COUNTER != counter_src1) {
         mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_1_SRC, counter_src1);
-        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_1_ENABLE, MALIGP2_REG_VAL_PERF_CNT_ENABLE);
+        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PERF_CNT_1_ENABLE,
+                                    MALIGP2_REG_VAL_PERF_CNT_ENABLE);
     }
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali GP: Starting job (0x%08x) on core %s with command 0x%08X\n", job, core->hw_core.description, startcmd));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali GP: Starting job (0x%08x) on core %s with command 0x%08X\n", job,
+                                                 core->hw_core.description, startcmd));
 
-    mali_hw_core_register_write_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_CMD, MALIGP2_REG_VAL_CMD_UPDATE_PLBU_ALLOC);
+    mali_hw_core_register_write_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_CMD,
+                                        MALIGP2_REG_VAL_CMD_UPDATE_PLBU_ALLOC);
 
     /* Barrier to make sure the previous register write is finished */
     _mali_osk_write_mem_barrier();
@@ -240,13 +243,14 @@ void mali_gp_job_start(struct mali_gp_core *core, struct mali_gp_job *job)
     {
         u32 bits = 0;
 
-        if (mali_gp_job_has_vs_job(job))
+        if (mali_gp_job_has_vs_job(job)) {
             bits = MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST;
-        if (mali_gp_job_has_plbu_job(job))
+        }
+        if (mali_gp_job_has_plbu_job(job)) {
             bits |= MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST;
+        }
 
-        mali_hw_core_register_write_relaxed(&core->hw_core,
-                            MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT, bits);
+        mali_hw_core_register_write_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT, bits);
     }
 #endif
 
@@ -263,8 +267,10 @@ void mali_gp_resume_with_new_heap(struct mali_gp_core *core, u32 start_addr, u32
     irq_readout = mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT);
 
     if (irq_readout & MALIGP2_REG_VAL_IRQ_PLBU_OUT_OF_MEM) {
-        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_CLEAR, (MALIGP2_REG_VAL_IRQ_PLBU_OUT_OF_MEM | MALIGP2_REG_VAL_IRQ_HANG));
-        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_MASK, MALIGP2_REG_VAL_IRQ_MASK_USED); /* re-enable interrupts */
+        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_CLEAR,
+                                    (MALIGP2_REG_VAL_IRQ_PLBU_OUT_OF_MEM | MALIGP2_REG_VAL_IRQ_HANG));
+        mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_MASK,
+                                    MALIGP2_REG_VAL_IRQ_MASK_USED); /* re-enable interrupts */
         mali_hw_core_register_write_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PLBU_ALLOC_START_ADDR, start_addr);
         mali_hw_core_register_write_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_PLBU_ALLOC_END_ADDR, end_addr);
 
@@ -342,7 +348,6 @@ void mali_gp_update_performance_counters(struct mali_gp_core *core, struct mali_
         _mali_osk_profiling_report_hw_counter(COUNTER_VP_0_C0, val0);
         _mali_osk_profiling_record_global_counters(COUNTER_VP_0_C0, val0);
 #endif
-
     }
 
     if (MALI_HW_CORE_NO_COUNTER != counter_src1) {

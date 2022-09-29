@@ -13,23 +13,18 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_pm.h
  * Power management API definitions
  */
 
-#ifndef _KBASE_PM_H_
-#define _KBASE_PM_H_
+#ifndef KBASE_PM_H_
+#define KBASE_PM_H_
 
 #include "mali_kbase_hwaccess_pm.h"
 
-#define PM_ENABLE_IRQS       0x01
-#define PM_HW_ISSUES_DETECT  0x02
-
+#define PM_ENABLE_IRQS 0x01
+#define PM_HW_ISSUES_DETECT 0x02
 
 /** Initialize the power management framework.
  *
@@ -88,7 +83,6 @@ void kbase_pm_term(struct kbase_device *kbdev);
  * @param kbdev     The kbase device structure for the device (must be a valid pointer)
  */
 void kbase_pm_context_active(struct kbase_device *kbdev);
-
 
 /** Handler codes for doing kbase_pm_context_active_handle_suspend() */
 enum kbase_pm_suspend_handler {
@@ -168,4 +162,4 @@ void kbase_pm_resume(struct kbase_device *kbdev);
  */
 void kbase_pm_vsync_callback(int buffer_updated, void *data);
 
-#endif                /* _KBASE_PM_H_ */
+#endif /* _KBASE_PM_H_ */

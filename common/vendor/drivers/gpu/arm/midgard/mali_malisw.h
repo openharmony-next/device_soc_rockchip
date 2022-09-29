@@ -13,32 +13,30 @@
  *
  */
 
-
-
 /**
  * Kernel-wide include for common macros and types.
  */
 
-#ifndef _MALISW_H_
-#define _MALISW_H_
+#ifndef MALISW_H_
+#define MALISW_H_
 
 #include <linux/version.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)
-#define U8_MAX          ((u8)~0U)
-#define S8_MAX          ((s8)(U8_MAX>>1))
-#define S8_MIN          ((s8)(-S8_MAX - 1))
-#define U16_MAX         ((u16)~0U)
-#define S16_MAX         ((s16)(U16_MAX>>1))
-#define S16_MIN         ((s16)(-S16_MAX - 1))
-#define U32_MAX         ((u32)~0U)
-#define S32_MAX         ((s32)(U32_MAX>>1))
-#define S32_MIN         ((s32)(-S32_MAX - 1))
-#define U64_MAX         ((u64)~0ULL)
-#define S64_MAX         ((s64)(U64_MAX>>1))
-#define S64_MIN         ((s64)(-S64_MAX - 1))
+#define U8_MAX ((u8)~0U)
+#define S8_MAX ((s8)(U8_MAX >> 1))
+#define S8_MIN ((s8)(-S8_MAX - 1))
+#define U16_MAX ((u16)~0U)
+#define S16_MAX ((s16)(U16_MAX >> 1))
+#define S16_MIN ((s16)(-S16_MAX - 1))
+#define U32_MAX ((u32)~0U)
+#define S32_MAX ((s32)(U32_MAX >> 1))
+#define S32_MIN ((s32)(-S32_MAX - 1))
+#define U64_MAX ((u64)~0ULL)
+#define S64_MAX ((s64)(U64_MAX >> 1))
+#define S64_MIN ((s64)(-S64_MAX - 1))
 #endif /* LINUX_VERSION_CODE */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
-#define SIZE_MAX        (~(size_t)0)
+#define SIZE_MAX (~(size_t)0)
 #endif /* LINUX_VERSION_CODE */
 
 /**
@@ -47,7 +45,7 @@
  * As a macro it may evaluate its arguments more than once.
  * Refer to MAX macro for more details
  */
-#define MIN(x, y)    ((x) < (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 /**
  * MAX -  Return the greater of two values.
@@ -59,7 +57,7 @@
  * to retrieve the min and max of two values, consider using a conditional swap
  * instead.
  */
-#define MAX(x, y)    ((x) < (y) ? (y) : (x))
+#define MAX(x, y) ((x) < (y) ? (y) : (x))
 
 /**
  * @hideinitializer
@@ -67,7 +65,7 @@
  * such variables should be removed; this macro is present for cases where we
  * much support API backwards compatibility.
  */
-#define CSTD_UNUSED(x)    ((void)(x))
+#define CSTD_UNUSED(x) ((void)(x))
 
 /**
  * @hideinitializer
@@ -75,7 +73,7 @@
  * when compile time macros turn a function-like macro in to a no-op, but
  * where having no statement is otherwise invalid.
  */
-#define CSTD_NOP(...)    ((void)#__VA_ARGS__)
+#define CSTD_NOP(...) ((void)#__VA_ARGS__)
 
 /**
  * Function-like macro for converting a pointer in to a u64 for storing into
@@ -84,7 +82,7 @@
  * is complex and a straight cast does not work reliably as pointers are
  * often considered as signed.
  */
-#define PTR_TO_U64(x)    ((uint64_t)((uintptr_t)(x)))
+#define PTR_TO_U64(x) ((uint64_t)((uintptr_t)(x)))
 
 /**
  * @hideinitializer
@@ -95,7 +93,7 @@
  * > "MY_MACRO"
  * @endcode
  */
-#define CSTD_STR1(x)    #x
+#define CSTD_STR1(x) #x
 
 /**
  * @hideinitializer
@@ -108,7 +106,7 @@
  * > "32"
  * @endcode
  */
-#define CSTD_STR2(x)    CSTD_STR1(x)
+#define CSTD_STR2(x) CSTD_STR1(x)
 
 /**
  * Specify an assertion value which is evaluated at compile time. Recommended
@@ -125,7 +123,12 @@
  * @note Use @c static not @c STATIC. We never want to turn off this @c static
  * specification for testing purposes.
  */
-#define CSTD_COMPILE_TIME_ASSERT(expr) \
-    do { switch (0) { case 0: case (expr):; } } while (false)
+#define CSTD_COMPILE_TIME_ASSERT(expr)                                                                                 \
+    do {                                                                                                               \
+        switch (0) {                                                                                                   \
+            case 0:                                                                                                    \
+            case (expr):;                                                                                              \
+        }                                                                                                              \
+    } while (false)
 
 #endif /* _MALISW_H_ */

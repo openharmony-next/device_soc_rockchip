@@ -1,15 +1,16 @@
 /*
  * Copyright (C) 2010, 2013, 2015-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_BLOCK_ALLOCATOR_H__
-#define __MALI_BLOCK_ALLOCATOR_H__
+#ifndef H__MALI_BLOCK_ALLOCATOR_H
+#define H__MALI_BLOCK_ALLOCATOR_H
 
 #include "mali_session.h"
 #include "mali_memory.h"
@@ -17,22 +18,20 @@
 
 #include "mali_memory_types.h"
 
-#define MALI_BLOCK_SIZE (PAGE_SIZE)  /* 4 kB, manage BLOCK memory as page size */
+#define MALI_BLOCK_SIZE (PAGE_SIZE) /* 4 kB, manage BLOCK memory as page size */
 #define MALI_BLOCK_REF_MASK (0xFFF)
 #define MALI_BLOCK_MAX_REF_COUNT (0xFFF)
 
-
-
 typedef struct mali_block_allocator {
     /*
-    * In free list, each node's ref_count is 0,
-    * ref_count added when allocated or referenced in COW
-    */
+     * In free list, each node's ref_count is 0,
+     * ref_count added when allocated or referenced in COW
+     */
     mali_block_item *items; /* information for each block item*/
-    struct list_head free; /*free list of mali_memory_node*/
-    spinlock_t sp_lock; /*lock for reference count & free list opertion*/
-    u32 total_num; /* Number of total pages*/
-    atomic_t free_num; /*number of free pages*/
+    struct list_head free;  /*free list of mali_memory_node*/
+    spinlock_t sp_lock;     /*lock for reference count & free list opertion*/
+    u32 total_num;          /* Number of total pages*/
+    atomic_t free_num;      /*number of free pages*/
 } mali_block_allocator;
 
 unsigned long _mali_blk_item_get_phy_addr(mali_block_item *item);

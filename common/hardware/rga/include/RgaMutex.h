@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 #ifndef _LIBS_RGA_MUTEX_H
 #define _LIBS_RGA_MUTEX_H
 
@@ -26,13 +25,12 @@
 
 #include <pthread.h>
 
-
 // Enable thread safety attributes only with clang.
 // The attributes can be safely erased when compiling with other compilers.
 #if defined(__clang__) && (!defined(SWIG))
 #define THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
 #else
-#define THREAD_ANNOTATION_ATTRIBUTE__(x)  // no-op
+#define THREAD_ANNOTATION_ATTRIBUTE__(x) // no-op
 #endif
 
 #define CAPABILITY(x) THREAD_ANNOTATION_ATTRIBUTE__(capability(x))
@@ -61,8 +59,7 @@
 
 #define TRY_ACQUIRE(...) THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_capability(__VA_ARGS__))
 
-#define TRY_ACQUIRE_SHARED(...) \
-    THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_shared_capability(__VA_ARGS__))
+#define TRY_ACQUIRE_SHARED(...) THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_shared_capability(__VA_ARGS__))
 
 #define EXCLUDES(...) THREAD_ANNOTATION_ATTRIBUTE__(locks_excluded(__VA_ARGS__))
 
@@ -86,16 +83,14 @@ class Condition;
  * The mutex must be unlocked by the thread that locked it.  They are not
  * recursive, i.e. the same thread can't lock it multiple times.
  */
-class CAPABILITY("mutex") Mutex {
+class CAPABILITY("mutex") Mutex
+{
 public:
-    enum {
-        PRIVATE = 0,
-        SHARED = 1
-    };
+    enum { PRIVATE = 0, SHARED = 1 };
 
     Mutex();
-    explicit Mutex(const char* name);
-    explicit Mutex(int type, const char* name = nullptr);
+    explicit Mutex(const char *name);
+    explicit Mutex(int type, const char *name = nullptr);
     ~Mutex();
 
     // lock or unlock the mutex
@@ -109,13 +104,14 @@ public:
 
     // Manages the mutex automatically. It'll be locked when Autolock is
     // constructed and released when Autolock goes out of scope.
-    class SCOPED_CAPABILITY Autolock {
+    class SCOPED_CAPABILITY Autolock
+    {
     public:
-        inline explicit Autolock(Mutex& mutex) ACQUIRE(mutex) : mLock(mutex)
+        inline explicit Autolock(Mutex &mutex) ACQUIRE(mutex) : mLock(mutex)
         {
             mLock.lock();
         }
-        inline explicit Autolock(Mutex* mutex) ACQUIRE(mutex) : mLock(*mutex)
+        inline explicit Autolock(Mutex *mutex) ACQUIRE(mutex) : mLock(*mutex)
         {
             mLock.lock();
         }
@@ -125,18 +121,18 @@ public:
         }
 
     private:
-        Mutex& mLock;
+        Mutex &mLock;
         // Cannot be copied or moved - declarations only
-        Autolock(const Autolock&);
-        Autolock& operator=(const Autolock&);
+        Autolock(const Autolock &);
+        Autolock &operator=(const Autolock &);
     };
 
 private:
     friend class Condition;
 
     // A mutex cannot be copied
-    Mutex(const Mutex&);
-    Mutex& operator=(const Mutex&);
+    Mutex(const Mutex &);
+    Mutex &operator=(const Mutex &);
 
     pthread_mutex_t mMutex;
 };
@@ -146,11 +142,11 @@ inline Mutex::Mutex()
 {
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(__attribute__((unused)) const char* name)
+inline Mutex::Mutex(__attribute__((unused)) const char *name)
 {
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(int type, __attribute__((unused)) const char* name)
+inline Mutex::Mutex(int type, __attribute__((unused)) const char *name)
 {
     if (type == SHARED) {
         pthread_mutexattr_t attr;
@@ -185,7 +181,7 @@ inline int32_t Mutex::timedLock(int64_t timeoutNs)
     timeoutNs += now.tv_sec * 1000000000 + now.tv_nsec; // 1000000000:unit conversion
     const struct timespec ts = {
         static_cast<time_t>(timeoutNs / 1000000000), // 1000000000:unit conversion
-        static_cast<long>(timeoutNs % 1000000000), // 1000000000:unit conversion
+        static_cast<long>(timeoutNs % 1000000000),   // 1000000000:unit conversion
     };
     return -pthread_mutex_timedlock(&mMutex, &ts);
 }

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_CSG_DEBUGFS_H_
-#define _KBASE_CSF_CSG_DEBUGFS_H_
+#ifndef KBASE_CSF_CSG_DEBUGFS_H_
+#define KBASE_CSF_CSG_DEBUGFS_H_
 
 /* Forward declarations */
 struct kbase_device;

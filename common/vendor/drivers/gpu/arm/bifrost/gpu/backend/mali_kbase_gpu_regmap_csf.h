@@ -28,45 +28,44 @@
 #endif
 
 #include "csf/mali_gpu_csf_control_registers.h"
-#define GPU_CONTROL_MCU_REG(r)  (GPU_CONTROL_MCU + (r))
-
+#define GPU_CONTROL_MCU_REG(r) (GPU_CONTROL_MCU + (r))
 
 /* Set to implementation defined, outer caching */
 #define AS_MEMATTR_AARCH64_OUTER_IMPL_DEF 0x88ull
 /* Set to write back memory, outer caching */
-#define AS_MEMATTR_AARCH64_OUTER_WA       0x8Dull
+#define AS_MEMATTR_AARCH64_OUTER_WA 0x8Dull
 /* Set to inner non-cacheable, outer-non-cacheable
  * Setting defined by the alloc bits is ignored, but set to a valid encoding:
  * - no-alloc on read
  * - no alloc on write
  */
-#define AS_MEMATTR_AARCH64_NON_CACHEABLE  0x4Cull
+#define AS_MEMATTR_AARCH64_NON_CACHEABLE 0x4Cull
 /* Set to shared memory, that is inner cacheable on ACE and inner or outer
  * shared, otherwise inner non-cacheable.
  * Outer cacheable if inner or outer shared, otherwise outer non-cacheable.
  */
-#define AS_MEMATTR_AARCH64_SHARED         0x8ull
+#define AS_MEMATTR_AARCH64_SHARED 0x8ull
 
 /* Symbols for default MEMATTR to use
  * Default is - HW implementation defined caching
  */
-#define AS_MEMATTR_INDEX_DEFAULT               0
-#define AS_MEMATTR_INDEX_DEFAULT_ACE           3
+#define AS_MEMATTR_INDEX_DEFAULT 0
+#define AS_MEMATTR_INDEX_DEFAULT_ACE 3
 
 /* HW implementation defined caching */
 #define AS_MEMATTR_INDEX_IMPL_DEF_CACHE_POLICY 0
 /* Force cache on */
-#define AS_MEMATTR_INDEX_FORCE_TO_CACHE_ALL    1
+#define AS_MEMATTR_INDEX_FORCE_TO_CACHE_ALL 1
 /* Write-alloc */
-#define AS_MEMATTR_INDEX_WRITE_ALLOC           2
+#define AS_MEMATTR_INDEX_WRITE_ALLOC 2
 /* Outer coherent, inner implementation defined policy */
-#define AS_MEMATTR_INDEX_OUTER_IMPL_DEF        3
+#define AS_MEMATTR_INDEX_OUTER_IMPL_DEF 3
 /* Outer coherent, write alloc inner */
-#define AS_MEMATTR_INDEX_OUTER_WA              4
+#define AS_MEMATTR_INDEX_OUTER_WA 4
 /* Normal memory, inner non-cacheable, outer non-cacheable (ARMv8 mode only) */
-#define AS_MEMATTR_INDEX_NON_CACHEABLE         5
+#define AS_MEMATTR_INDEX_NON_CACHEABLE 5
 /* Normal memory, shared between MCU and Host */
-#define AS_MEMATTR_INDEX_SHARED                6
+#define AS_MEMATTR_INDEX_SHARED 6
 
 /* Configuration bits for the Command Stream Frontend. */
 #define CSF_CONFIG 0xF00
@@ -75,51 +74,58 @@
 #define CSF_CONFIG_FORCE_COHERENCY_FEATURES_SHIFT 2
 
 /* GPU control registers */
-#define MCU_CONTROL             0x700
-#define MCU_STATUS              0x704
+#define MCU_CONTROL 0x700
+#define MCU_STATUS 0x704
 
-#define MCU_CNTRL_ENABLE        (1 << 0)
-#define MCU_CNTRL_AUTO          (1 << 1)
-#define MCU_CNTRL_DISABLE       (0)
+#define MCU_CNTRL_ENABLE (1 << 0)
+#define MCU_CNTRL_AUTO (1 << 1)
+#define MCU_CNTRL_DISABLE (0)
 
-#define MCU_STATUS_HALTED        (1 << 1)
+#define MCU_STATUS_HALTED (1 << 1)
 
-#define PRFCNT_BASE_LO   0x060  /* (RW) Performance counter memory
-                 * region base address, low word
-                 */
-#define PRFCNT_BASE_HI   0x064  /* (RW) Performance counter memory
-                 * region base address, high word
-                 */
-#define PRFCNT_CONFIG    0x068  /* (RW) Performance counter
-                 * configuration
-                 */
+#define PRFCNT_BASE_LO                                                                                                 \
+    0x060 /* (RW) Performance counter memory                                                                           \
+           * region base address, low word                                                                             \
+           */
+#define PRFCNT_BASE_HI                                                                                                 \
+    0x064 /* (RW) Performance counter memory                                                                           \
+           * region base address, high word                                                                            \
+           */
+#define PRFCNT_CONFIG                                                                                                  \
+    0x068 /* (RW) Performance counter                                                                                  \
+           * configuration                                                                                             \
+           */
 
-#define PRFCNT_CSHW_EN   0x06C  /* (RW) Performance counter
-                 * enable for Command Stream Hardware
-                 */
+#define PRFCNT_CSHW_EN                                                                                                 \
+    0x06C /* (RW) Performance counter                                                                                  \
+           * enable for Command Stream Hardware                                                                        \
+           */
 
-#define PRFCNT_SHADER_EN 0x070  /* (RW) Performance counter enable
-                 * flags for shader cores
-                 */
-#define PRFCNT_TILER_EN  0x074  /* (RW) Performance counter enable
-                 * flags for tiler
-                 */
-#define PRFCNT_MMU_L2_EN 0x07C  /* (RW) Performance counter enable
-                 * flags for MMU/L2 cache
-                 */
+#define PRFCNT_SHADER_EN                                                                                               \
+    0x070 /* (RW) Performance counter enable                                                                           \
+           * flags for shader cores                                                                                    \
+           */
+#define PRFCNT_TILER_EN                                                                                                \
+    0x074 /* (RW) Performance counter enable                                                                           \
+           * flags for tiler                                                                                           \
+           */
+#define PRFCNT_MMU_L2_EN                                                                                               \
+    0x07C /* (RW) Performance counter enable                                                                           \
+           * flags for MMU/L2 cache                                                                                    \
+           */
 
 /* JOB IRQ flags */
-#define JOB_IRQ_GLOBAL_IF       (1 << 31)   /* Global interface interrupt received */
+#define JOB_IRQ_GLOBAL_IF (1 << 31) /* Global interface interrupt received */
 
 /* GPU_COMMAND codes */
-#define GPU_COMMAND_CODE_NOP                0x00 /* No operation, nothing happens */
-#define GPU_COMMAND_CODE_RESET              0x01 /* Reset the GPU */
-#define GPU_COMMAND_CODE_PRFCNT             0x02 /* Clear or sample performance counters */
-#define GPU_COMMAND_CODE_TIME               0x03 /* Configure time sources */
-#define GPU_COMMAND_CODE_FLUSH_CACHES       0x04 /* Flush caches */
+#define GPU_COMMAND_CODE_NOP 0x00                /* No operation, nothing happens */
+#define GPU_COMMAND_CODE_RESET 0x01              /* Reset the GPU */
+#define GPU_COMMAND_CODE_PRFCNT 0x02             /* Clear or sample performance counters */
+#define GPU_COMMAND_CODE_TIME 0x03               /* Configure time sources */
+#define GPU_COMMAND_CODE_FLUSH_CACHES 0x04       /* Flush caches */
 #define GPU_COMMAND_CODE_SET_PROTECTED_MODE 0x05 /* Places the GPU in protected mode */
-#define GPU_COMMAND_CODE_FINISH_HALT        0x06 /* Halt CSF */
-#define GPU_COMMAND_CODE_CLEAR_FAULT        0x07 /* Clear GPU_FAULTSTATUS and GPU_FAULTADDRESS, TODX */
+#define GPU_COMMAND_CODE_FINISH_HALT 0x06        /* Halt CSF */
+#define GPU_COMMAND_CODE_CLEAR_FAULT 0x07        /* Clear GPU_FAULTSTATUS and GPU_FAULTADDRESS, TODX */
 
 /* GPU_COMMAND_RESET payloads */
 
@@ -140,102 +146,85 @@
 
 /* GPU_COMMAND_PRFCNT payloads */
 #define GPU_COMMAND_PRFCNT_PAYLOAD_SAMPLE 0x01 /* Sample performance counters */
-#define GPU_COMMAND_PRFCNT_PAYLOAD_CLEAR  0x02 /* Clear performance counters */
+#define GPU_COMMAND_PRFCNT_PAYLOAD_CLEAR 0x02  /* Clear performance counters */
 
 /* GPU_COMMAND_TIME payloads */
 #define GPU_COMMAND_TIME_DISABLE 0x00 /* Disable cycle counter */
-#define GPU_COMMAND_TIME_ENABLE  0x01 /* Enable cycle counter */
+#define GPU_COMMAND_TIME_ENABLE 0x01  /* Enable cycle counter */
 
 /* GPU_COMMAND_FLUSH_CACHES payloads */
-#define GPU_COMMAND_FLUSH_PAYLOAD_NONE             0x00 /* No flush */
-#define GPU_COMMAND_FLUSH_PAYLOAD_CLEAN            0x01 /* Clean the caches */
-#define GPU_COMMAND_FLUSH_PAYLOAD_INVALIDATE       0x02 /* Invalidate the caches */
+#define GPU_COMMAND_FLUSH_PAYLOAD_NONE 0x00             /* No flush */
+#define GPU_COMMAND_FLUSH_PAYLOAD_CLEAN 0x01            /* Clean the caches */
+#define GPU_COMMAND_FLUSH_PAYLOAD_INVALIDATE 0x02       /* Invalidate the caches */
 #define GPU_COMMAND_FLUSH_PAYLOAD_CLEAN_INVALIDATE 0x03 /* Clean and invalidate the caches */
 
 /* GPU_COMMAND command + payload */
-#define GPU_COMMAND_CODE_PAYLOAD(opcode, payload) \
-    ((u32)opcode | ((u32)payload << 8))
+#define GPU_COMMAND_CODE_PAYLOAD(opcode, payload) ((u32)(opcode) | ((u32)(payload) << 8))
 
 /* Final GPU_COMMAND form */
 /* No operation, nothing happens */
-#define GPU_COMMAND_NOP \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_NOP, 0)
+#define GPU_COMMAND_NOP GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_NOP, 0)
 
 /* Stop all external bus interfaces, and then reset the entire GPU. */
-#define GPU_COMMAND_SOFT_RESET \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_RESET, GPU_COMMAND_RESET_PAYLOAD_SOFT_RESET)
+#define GPU_COMMAND_SOFT_RESET GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_RESET, GPU_COMMAND_RESET_PAYLOAD_SOFT_RESET)
 
 /* Immediately reset the entire GPU. */
-#define GPU_COMMAND_HARD_RESET \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_RESET, GPU_COMMAND_RESET_PAYLOAD_HARD_RESET)
+#define GPU_COMMAND_HARD_RESET GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_RESET, GPU_COMMAND_RESET_PAYLOAD_HARD_RESET)
 
 /* Clear all performance counters, setting them all to zero. */
-#define GPU_COMMAND_PRFCNT_CLEAR \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_PRFCNT, GPU_COMMAND_PRFCNT_PAYLOAD_CLEAR)
+#define GPU_COMMAND_PRFCNT_CLEAR GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_PRFCNT, GPU_COMMAND_PRFCNT_PAYLOAD_CLEAR)
 
 /* Sample all performance counters, writing them out to memory */
-#define GPU_COMMAND_PRFCNT_SAMPLE \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_PRFCNT, GPU_COMMAND_PRFCNT_PAYLOAD_SAMPLE)
+#define GPU_COMMAND_PRFCNT_SAMPLE GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_PRFCNT, GPU_COMMAND_PRFCNT_PAYLOAD_SAMPLE)
 
 /* Starts the cycle counter, and system timestamp propagation */
-#define GPU_COMMAND_CYCLE_COUNT_START \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_TIME, GPU_COMMAND_TIME_ENABLE)
+#define GPU_COMMAND_CYCLE_COUNT_START GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_TIME, GPU_COMMAND_TIME_ENABLE)
 
 /* Stops the cycle counter, and system timestamp propagation */
-#define GPU_COMMAND_CYCLE_COUNT_STOP \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_TIME, GPU_COMMAND_TIME_DISABLE)
+#define GPU_COMMAND_CYCLE_COUNT_STOP GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_TIME, GPU_COMMAND_TIME_DISABLE)
 
 /* Clean all caches */
-#define GPU_COMMAND_CLEAN_CACHES \
+#define GPU_COMMAND_CLEAN_CACHES                                                                                       \
     GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_FLUSH_CACHES, GPU_COMMAND_FLUSH_PAYLOAD_CLEAN)
 
 /* Clean and invalidate all caches */
-#define GPU_COMMAND_CLEAN_INV_CACHES \
+#define GPU_COMMAND_CLEAN_INV_CACHES                                                                                   \
     GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_FLUSH_CACHES, GPU_COMMAND_FLUSH_PAYLOAD_CLEAN_INVALIDATE)
 
 /* Places the GPU in protected mode */
-#define GPU_COMMAND_SET_PROTECTED_MODE \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_SET_PROTECTED_MODE, 0)
+#define GPU_COMMAND_SET_PROTECTED_MODE GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_SET_PROTECTED_MODE, 0)
 
 /* Halt CSF */
-#define GPU_COMMAND_FINISH_HALT \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_FINISH_HALT, 0)
+#define GPU_COMMAND_FINISH_HALT GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_FINISH_HALT, 0)
 
 /* Clear GPU faults */
-#define GPU_COMMAND_CLEAR_FAULT \
-    GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_CLEAR_FAULT, 0)
+#define GPU_COMMAND_CLEAR_FAULT GPU_COMMAND_CODE_PAYLOAD(GPU_COMMAND_CODE_CLEAR_FAULT, 0)
 
 /* End Command Values */
 
 /* GPU_FAULTSTATUS register */
 #define GPU_FAULTSTATUS_EXCEPTION_TYPE_SHIFT 0
 #define GPU_FAULTSTATUS_EXCEPTION_TYPE_MASK (0xFFul)
-#define GPU_FAULTSTATUS_EXCEPTION_TYPE_GET(reg_val) \
-    (((reg_val)&GPU_FAULTSTATUS_EXCEPTION_TYPE_MASK) \
-     >> GPU_FAULTSTATUS_EXCEPTION_TYPE_SHIFT)
+#define GPU_FAULTSTATUS_EXCEPTION_TYPE_GET(reg_val)                                                                    \
+    (((reg_val)&GPU_FAULTSTATUS_EXCEPTION_TYPE_MASK) >> GPU_FAULTSTATUS_EXCEPTION_TYPE_SHIFT)
 #define GPU_FAULTSTATUS_ACCESS_TYPE_SHIFT 8
-#define GPU_FAULTSTATUS_ACCESS_TYPE_MASK \
-    (0x3ul << GPU_FAULTSTATUS_ACCESS_TYPE_SHIFT)
+#define GPU_FAULTSTATUS_ACCESS_TYPE_MASK (0x3ul << GPU_FAULTSTATUS_ACCESS_TYPE_SHIFT)
 
 #define GPU_FAULTSTATUS_ADDR_VALID_SHIFT 10
-#define GPU_FAULTSTATUS_ADDR_VALID_FLAG \
-    (1ul << GPU_FAULTSTATUS_ADDR_VALID_SHIFT)
+#define GPU_FAULTSTATUS_ADDR_VALID_FLAG (1ul << GPU_FAULTSTATUS_ADDR_VALID_SHIFT)
 
 #define GPU_FAULTSTATUS_JASID_VALID_SHIFT 11
-#define GPU_FAULTSTATUS_JASID_VALID_FLAG \
-    (1ul << GPU_FAULTSTATUS_JASID_VALID_SHIFT)
+#define GPU_FAULTSTATUS_JASID_VALID_FLAG (1ul << GPU_FAULTSTATUS_JASID_VALID_SHIFT)
 
 #define GPU_FAULTSTATUS_JASID_SHIFT 12
 #define GPU_FAULTSTATUS_JASID_MASK (0xF << GPU_FAULTSTATUS_JASID_SHIFT)
-#define GPU_FAULTSTATUS_JASID_GET(reg_val) \
-    (((reg_val)&GPU_FAULTSTATUS_JASID_MASK) >> GPU_FAULTSTATUS_JASID_SHIFT)
-#define GPU_FAULTSTATUS_JASID_SET(reg_val, value) \
-    (((reg_val) & ~GPU_FAULTSTATUS_JASID_MASK) |  \
-    (((value) << GPU_FAULTSTATUS_JASID_SHIFT) & GPU_FAULTSTATUS_JASID_MASK))
+#define GPU_FAULTSTATUS_JASID_GET(reg_val) (((reg_val)&GPU_FAULTSTATUS_JASID_MASK) >> GPU_FAULTSTATUS_JASID_SHIFT)
+#define GPU_FAULTSTATUS_JASID_SET(reg_val, value)                                                                      \
+    (((reg_val) & ~GPU_FAULTSTATUS_JASID_MASK) |                                                                       \
+     (((value) << GPU_FAULTSTATUS_JASID_SHIFT) & GPU_FAULTSTATUS_JASID_MASK))
 
 #define GPU_FAULTSTATUS_SOURCE_ID_SHIFT 16
-#define GPU_FAULTSTATUS_SOURCE_ID_MASK \
-    (0xFFFFul << GPU_FAULTSTATUS_SOURCE_ID_SHIFT)
+#define GPU_FAULTSTATUS_SOURCE_ID_MASK (0xFFFFul << GPU_FAULTSTATUS_SOURCE_ID_SHIFT)
 /* End GPU_FAULTSTATUS register */
 
 /* GPU_FAULTSTATUS_ACCESS_TYPE values */
@@ -259,21 +248,21 @@
 
 #define GPU_FAULTSTATUS_ADDRESS_VALID_SHIFT GPU_U(10)
 #define GPU_FAULTSTATUS_ADDRESS_VALID_MASK (GPU_U(0x1) << GPU_FAULTSTATUS_ADDRESS_VALID_SHIFT)
-#define GPU_FAULTSTATUS_ADDRESS_VALID_GET(reg_val) \
+#define GPU_FAULTSTATUS_ADDRESS_VALID_GET(reg_val)                                                                     \
     (((reg_val)&GPU_FAULTSTATUS_ADDRESS_VALID_MASK) >> GPU_FAULTSTATUS_ADDRESS_VALID_SHIFT)
-#define GPU_FAULTSTATUS_ADDRESS_VALID_SET(reg_val, value) \
-    (((reg_val) & ~GPU_FAULTSTATUS_ADDRESS_VALID_MASK) |  \
-    (((value) << GPU_FAULTSTATUS_ADDRESS_VALID_SHIFT) & GPU_FAULTSTATUS_ADDRESS_VALID_MASK))
+#define GPU_FAULTSTATUS_ADDRESS_VALID_SET(reg_val, value)                                                              \
+    (((reg_val) & ~GPU_FAULTSTATUS_ADDRESS_VALID_MASK) |                                                               \
+     (((value) << GPU_FAULTSTATUS_ADDRESS_VALID_SHIFT) & GPU_FAULTSTATUS_ADDRESS_VALID_MASK))
 
 /* IRQ flags */
-#define GPU_FAULT               (1 << 0)    /* A GPU Fault has occurred */
-#define GPU_PROTECTED_FAULT     (1 << 1)    /* A GPU fault has occurred in protected mode */
-#define RESET_COMPLETED         (1 << 8)    /* Set when a reset has completed.  */
-#define POWER_CHANGED_SINGLE    (1 << 9)    /* Set when a single core has finished powering up or down. */
-#define POWER_CHANGED_ALL       (1 << 10)   /* Set when all cores have finished powering up or down. */
-#define CLEAN_CACHES_COMPLETED  (1 << 17)   /* Set when a cache clean operation has completed. */
-#define DOORBELL_MIRROR         (1 << 18)   /* Mirrors the doorbell interrupt line to the CPU */
-#define MCU_STATUS_GPU_IRQ      (1 << 19)   /* MCU requires attention */
+#define GPU_FAULT (1 << 0)               /* A GPU Fault has occurred */
+#define GPU_PROTECTED_FAULT (1 << 1)     /* A GPU fault has occurred in protected mode */
+#define RESET_COMPLETED (1 << 8)         /* Set when a reset has completed.  */
+#define POWER_CHANGED_SINGLE (1 << 9)    /* Set when a single core has finished powering up or down. */
+#define POWER_CHANGED_ALL (1 << 10)      /* Set when all cores have finished powering up or down. */
+#define CLEAN_CACHES_COMPLETED (1 << 17) /* Set when a cache clean operation has completed. */
+#define DOORBELL_MIRROR (1 << 18)        /* Mirrors the doorbell interrupt line to the CPU */
+#define MCU_STATUS_GPU_IRQ (1 << 19)     /* MCU requires attention */
 
 /*
  * In Debug build,
@@ -288,10 +277,9 @@
  * DOORBELL_MIRROR - Do not have it included for GPU_IRQ_REG_COMMON
  *                   as it can't be cleared by GPU_IRQ_CLEAR, thus interrupt storm might happen
  */
-#define GPU_IRQ_REG_COMMON (GPU_FAULT | GPU_PROTECTED_FAULT | RESET_COMPLETED \
-            | POWER_CHANGED_ALL | MCU_STATUS_GPU_IRQ)
+#define GPU_IRQ_REG_COMMON (GPU_FAULT | GPU_PROTECTED_FAULT | RESET_COMPLETED | POWER_CHANGED_ALL | MCU_STATUS_GPU_IRQ)
 
 /* GPU_CONTROL_MCU.GPU_IRQ_RAWSTAT */
-#define PRFCNT_SAMPLE_COMPLETED (1 << 16)   /* Set when performance count sample has completed */
+#define PRFCNT_SAMPLE_COMPLETED (1 << 16) /* Set when performance count sample has completed */
 
 #endif /* _KBASE_GPU_REGMAP_CSF_H_ */

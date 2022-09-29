@@ -31,11 +31,11 @@
 #include <linux/usb/otg.h>
 #include <linux/wakelock.h>
 
-#define BIT_WRITEABLE_SHIFT    16
-#define SCHEDULE_DELAY        (60 * HZ)
-#define OTG_SCHEDULE_DELAY    (1 * HZ)
-#define BYPASS_SCHEDULE_DELAY    (2 * HZ)
-#define FILTER_COUNTER        0xF4240
+#define BIT_WRITEABLE_SHIFT 16
+#define SCHEDULE_DELAY (60 * HZ)
+#define OTG_SCHEDULE_DELAY (1 * HZ)
+#define BYPASS_SCHEDULE_DELAY (2 * HZ)
+#define FILTER_COUNTER 0xF4240
 
 struct rockchip_usb2phy;
 
@@ -46,10 +46,10 @@ enum rockchip_usb2phy_port_id {
 };
 
 enum rockchip_usb2phy_host_state {
-    PHY_STATE_HS_ONLINE    = 0,
-    PHY_STATE_DISCONNECT    = 1,
-    PHY_STATE_CONNECT    = 2,
-    PHY_STATE_FS_LS_ONLINE    = 4,
+    PHY_STATE_HS_ONLINE = 0,
+    PHY_STATE_DISCONNECT = 1,
+    PHY_STATE_CONNECT = 2,
+    PHY_STATE_FS_LS_ONLINE = 4,
 };
 
 /**
@@ -74,22 +74,16 @@ enum usb_chg_state {
 };
 
 static const unsigned int rockchip_usb2phy_extcon_cable[] = {
-    EXTCON_USB,
-    EXTCON_USB_HOST,
-    EXTCON_USB_VBUS_EN,
-    EXTCON_CHG_USB_SDP,
-    EXTCON_CHG_USB_CDP,
-    EXTCON_CHG_USB_DCP,
-    EXTCON_CHG_USB_SLOW,
-    EXTCON_NONE,
+    EXTCON_USB,         EXTCON_USB_HOST,    EXTCON_USB_VBUS_EN,  EXTCON_CHG_USB_SDP,
+    EXTCON_CHG_USB_CDP, EXTCON_CHG_USB_DCP, EXTCON_CHG_USB_SLOW, EXTCON_NONE,
 };
 
 struct usb2phy_reg {
-    unsigned int    offset;
-    unsigned int    bitend;
-    unsigned int    bitstart;
-    unsigned int    disable;
-    unsigned int    enable;
+    unsigned int offset;
+    unsigned int bitend;
+    unsigned int bitstart;
+    unsigned int disable;
+    unsigned int enable;
 };
 
 /**
@@ -106,16 +100,16 @@ struct usb2phy_reg {
  * @chg_mode: set phy in charge detection mode.
  */
 struct rockchip_chg_det_reg {
-    struct usb2phy_reg    cp_det;
-    struct usb2phy_reg    dcp_det;
-    struct usb2phy_reg    dp_det;
-    struct usb2phy_reg    idm_sink_en;
-    struct usb2phy_reg    idp_sink_en;
-    struct usb2phy_reg    idp_src_en;
-    struct usb2phy_reg    rdm_pdwn_en;
-    struct usb2phy_reg    vdm_src_en;
-    struct usb2phy_reg    vdp_src_en;
-    struct usb2phy_reg    chg_mode;
+    struct usb2phy_reg cp_det;
+    struct usb2phy_reg dcp_det;
+    struct usb2phy_reg dp_det;
+    struct usb2phy_reg idm_sink_en;
+    struct usb2phy_reg idp_sink_en;
+    struct usb2phy_reg idp_src_en;
+    struct usb2phy_reg rdm_pdwn_en;
+    struct usb2phy_reg vdm_src_en;
+    struct usb2phy_reg vdp_src_en;
+    struct usb2phy_reg chg_mode;
 };
 
 /**
@@ -157,40 +151,40 @@ struct rockchip_chg_det_reg {
  * @vbus_det_en: vbus detect function power down register.
  */
 struct rockchip_usb2phy_port_cfg {
-    struct usb2phy_reg    phy_sus;
-    struct usb2phy_reg    bvalid_det_en;
-    struct usb2phy_reg    bvalid_det_st;
-    struct usb2phy_reg    bvalid_det_clr;
-    struct usb2phy_reg    bvalid_grf_con;
-    struct usb2phy_reg    bypass_dm_en;
-    struct usb2phy_reg    bypass_sel;
-    struct usb2phy_reg    bypass_iomux;
-    struct usb2phy_reg    bypass_bc;
-    struct usb2phy_reg    bypass_otg;
-    struct usb2phy_reg    bypass_host;
-    struct usb2phy_reg    disfall_en;
-    struct usb2phy_reg    disfall_st;
-    struct usb2phy_reg    disfall_clr;
-    struct usb2phy_reg    disrise_en;
-    struct usb2phy_reg    disrise_st;
-    struct usb2phy_reg    disrise_clr;
-    struct usb2phy_reg    ls_det_en;
-    struct usb2phy_reg    ls_det_st;
-    struct usb2phy_reg    ls_det_clr;
-    struct usb2phy_reg    iddig_output;
-    struct usb2phy_reg    iddig_en;
-    struct usb2phy_reg    idfall_det_en;
-    struct usb2phy_reg    idfall_det_st;
-    struct usb2phy_reg    idfall_det_clr;
-    struct usb2phy_reg    idrise_det_en;
-    struct usb2phy_reg    idrise_det_st;
-    struct usb2phy_reg    idrise_det_clr;
-    struct usb2phy_reg    utmi_avalid;
-    struct usb2phy_reg    utmi_bvalid;
-    struct usb2phy_reg    utmi_iddig;
-    struct usb2phy_reg    utmi_ls;
-    struct usb2phy_reg    utmi_hstdet;
-    struct usb2phy_reg    vbus_det_en;
+    struct usb2phy_reg phy_sus;
+    struct usb2phy_reg bvalid_det_en;
+    struct usb2phy_reg bvalid_det_st;
+    struct usb2phy_reg bvalid_det_clr;
+    struct usb2phy_reg bvalid_grf_con;
+    struct usb2phy_reg bypass_dm_en;
+    struct usb2phy_reg bypass_sel;
+    struct usb2phy_reg bypass_iomux;
+    struct usb2phy_reg bypass_bc;
+    struct usb2phy_reg bypass_otg;
+    struct usb2phy_reg bypass_host;
+    struct usb2phy_reg disfall_en;
+    struct usb2phy_reg disfall_st;
+    struct usb2phy_reg disfall_clr;
+    struct usb2phy_reg disrise_en;
+    struct usb2phy_reg disrise_st;
+    struct usb2phy_reg disrise_clr;
+    struct usb2phy_reg ls_det_en;
+    struct usb2phy_reg ls_det_st;
+    struct usb2phy_reg ls_det_clr;
+    struct usb2phy_reg iddig_output;
+    struct usb2phy_reg iddig_en;
+    struct usb2phy_reg idfall_det_en;
+    struct usb2phy_reg idfall_det_st;
+    struct usb2phy_reg idfall_det_clr;
+    struct usb2phy_reg idrise_det_en;
+    struct usb2phy_reg idrise_det_st;
+    struct usb2phy_reg idrise_det_clr;
+    struct usb2phy_reg utmi_avalid;
+    struct usb2phy_reg utmi_bvalid;
+    struct usb2phy_reg utmi_iddig;
+    struct usb2phy_reg utmi_ls;
+    struct usb2phy_reg utmi_hstdet;
+    struct usb2phy_reg vbus_det_en;
 };
 
 /**
@@ -204,13 +198,13 @@ struct rockchip_usb2phy_port_cfg {
  * @chg_det: charger detection registers.
  */
 struct rockchip_usb2phy_cfg {
-    unsigned int    reg;
-    unsigned int    num_ports;
+    unsigned int reg;
+    unsigned int num_ports;
     int (*phy_tuning)(struct rockchip_usb2phy *rphy);
     int (*vbus_detect)(struct rockchip_usb2phy *rphy, bool en);
-    struct usb2phy_reg    clkout_ctl;
-    const struct rockchip_usb2phy_port_cfg    port_cfgs[USB2PHY_NUM_PORTS];
-    const struct rockchip_chg_det_reg    chg_det;
+    struct usb2phy_reg clkout_ctl;
+    const struct rockchip_usb2phy_port_cfg port_cfgs[USB2PHY_NUM_PORTS];
+    const struct rockchip_chg_det_reg chg_det;
 };
 
 /**
@@ -247,34 +241,34 @@ struct rockchip_usb2phy_cfg {
  * @mode: the dr_mode of the controller.
  */
 struct rockchip_usb2phy_port {
-    struct phy    *phy;
-    unsigned int    port_id;
-    bool        low_power_en;
-    bool        perip_connected;
-    bool        prev_iddig;
-    bool        suspended;
-    bool        typec_vbus_det;
-    bool        utmi_avalid;
-    bool        vbus_attached;
-    bool        vbus_always_on;
-    bool        vbus_enabled;
-    bool        bypass_uart_en;
-    bool        host_disconnect;
-    int        bvalid_irq;
-    int        ls_irq;
-    int             id_irq;
-    int        otg_mux_irq;
-    struct mutex    mutex;
-    struct        delayed_work bypass_uart_work;
-    struct        delayed_work chg_work;
-    struct        delayed_work otg_sm_work;
-    struct        delayed_work sm_work;
-    struct        regulator *vbus;
-    const struct    rockchip_usb2phy_port_cfg *port_cfg;
-    struct notifier_block    event_nb;
-    struct wake_lock    wakelock;
-    enum usb_otg_state    state;
-    enum usb_dr_mode    mode;
+    struct phy *phy;
+    unsigned int port_id;
+    bool low_power_en;
+    bool perip_connected;
+    bool prev_iddig;
+    bool suspended;
+    bool typec_vbus_det;
+    bool utmi_avalid;
+    bool vbus_attached;
+    bool vbus_always_on;
+    bool vbus_enabled;
+    bool bypass_uart_en;
+    bool host_disconnect;
+    int bvalid_irq;
+    int ls_irq;
+    int id_irq;
+    int otg_mux_irq;
+    struct mutex mutex;
+    struct delayed_work bypass_uart_work;
+    struct delayed_work chg_work;
+    struct delayed_work otg_sm_work;
+    struct delayed_work sm_work;
+    struct regulator *vbus;
+    const struct rockchip_usb2phy_port_cfg *port_cfg;
+    struct notifier_block event_nb;
+    struct wake_lock wakelock;
+    enum usb_otg_state state;
+    enum usb_dr_mode mode;
 };
 
 /**
@@ -302,24 +296,24 @@ struct rockchip_usb2phy_port {
  * @ports: phy port instance.
  */
 struct rockchip_usb2phy {
-    struct device    *dev;
-    struct regmap    *grf;
-    struct regmap    *usbgrf;
-    void __iomem    *phy_base;
-    struct reset_control    *phy_reset;
-    struct clk    *clk;
-    struct clk    *clk480m;
-    struct clk_hw    clk480m_hw;
-    enum usb_chg_state    chg_state;
-    enum power_supply_type    chg_type;
-    u8            dcd_retries;
-    u8            primary_retries;
-    unsigned int        phy_sus_cfg;
-    bool            edev_self;
-    int            irq;
-    struct extcon_dev    *edev;
-    const struct rockchip_usb2phy_cfg    *phy_cfg;
-    struct rockchip_usb2phy_port    ports[USB2PHY_NUM_PORTS];
+    struct device *dev;
+    struct regmap *grf;
+    struct regmap *usbgrf;
+    void __iomem *phy_base;
+    struct reset_control *phy_reset;
+    struct clk *clk;
+    struct clk *clk480m;
+    struct clk_hw clk480m_hw;
+    enum usb_chg_state chg_state;
+    enum power_supply_type chg_type;
+    u8 dcd_retries;
+    u8 primary_retries;
+    unsigned int phy_sus_cfg;
+    bool edev_self;
+    int irq;
+    struct extcon_dev *edev;
+    const struct rockchip_usb2phy_cfg *phy_cfg;
+    struct rockchip_usb2phy_port ports[USB2PHY_NUM_PORTS];
 };
 
 static inline struct regmap *get_reg_base(struct rockchip_usb2phy *rphy)
@@ -327,8 +321,7 @@ static inline struct regmap *get_reg_base(struct rockchip_usb2phy *rphy)
     return rphy->usbgrf == NULL ? rphy->grf : rphy->usbgrf;
 }
 
-static inline int property_enable(struct regmap *base,
-                  const struct usb2phy_reg *reg, bool en)
+static inline int property_enable(struct regmap *base, const struct usb2phy_reg *reg, bool en)
 {
     unsigned int val, mask, tmp;
 
@@ -339,16 +332,16 @@ static inline int property_enable(struct regmap *base,
     return regmap_write(base, reg->offset, val);
 }
 
-static inline bool property_enabled(struct regmap *base,
-                    const struct usb2phy_reg *reg)
+static inline bool property_enabled(struct regmap *base, const struct usb2phy_reg *reg)
 {
     int ret;
     unsigned int tmp, orig;
     unsigned int mask = GENMASK(reg->bitend, reg->bitstart);
 
     ret = regmap_read(base, reg->offset, &orig);
-    if (ret)
+    if (ret) {
         return false;
+    }
 
     tmp = (orig & mask) >> reg->bitstart;
     return tmp == reg->enable;
@@ -359,35 +352,37 @@ static int rockchip_usb2phy_reset(struct rockchip_usb2phy *rphy)
     int ret;
 
     ret = reset_control_assert(rphy->phy_reset);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
-    udelay(10);
+    udelay(0xa);
 
     ret = reset_control_deassert(rphy->phy_reset);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
-    usleep_range(100, 200);
+    usleep_range(0x64, 0xc8);
 
     return 0;
 }
 
 static int rockchip_usb2phy_clk480m_prepare(struct clk_hw *hw)
 {
-    struct rockchip_usb2phy *rphy =
-        container_of(hw, struct rockchip_usb2phy, clk480m_hw);
+    struct rockchip_usb2phy *rphy = container_of(hw, struct rockchip_usb2phy, clk480m_hw);
     struct regmap *base = get_reg_base(rphy);
     int ret;
 
     /* turn on 480m clk output if it is off */
     if (!property_enabled(base, &rphy->phy_cfg->clkout_ctl)) {
         ret = property_enable(base, &rphy->phy_cfg->clkout_ctl, true);
-        if (ret)
+        if (ret) {
             return ret;
+        }
 
         /* waiting for the clk become stable */
-        usleep_range(1200, 1300);
+        usleep_range(0x4b0, 0x514);
     }
 
     return 0;
@@ -395,8 +390,7 @@ static int rockchip_usb2phy_clk480m_prepare(struct clk_hw *hw)
 
 static void rockchip_usb2phy_clk480m_unprepare(struct clk_hw *hw)
 {
-    struct rockchip_usb2phy *rphy =
-        container_of(hw, struct rockchip_usb2phy, clk480m_hw);
+    struct rockchip_usb2phy *rphy = container_of(hw, struct rockchip_usb2phy, clk480m_hw);
     struct regmap *base = get_reg_base(rphy);
 
     /* turn off 480m clk output */
@@ -405,18 +399,15 @@ static void rockchip_usb2phy_clk480m_unprepare(struct clk_hw *hw)
 
 static int rockchip_usb2phy_clk480m_prepared(struct clk_hw *hw)
 {
-    struct rockchip_usb2phy *rphy =
-        container_of(hw, struct rockchip_usb2phy, clk480m_hw);
+    struct rockchip_usb2phy *rphy = container_of(hw, struct rockchip_usb2phy, clk480m_hw);
     struct regmap *base = get_reg_base(rphy);
 
     return property_enabled(base, &rphy->phy_cfg->clkout_ctl);
 }
 
-static unsigned long
-rockchip_usb2phy_clk480m_recalc_rate(struct clk_hw *hw,
-                     unsigned long parent_rate)
+static unsigned long rockchip_usb2phy_clk480m_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 {
-    return 480000000;
+    return 0x1c9c3800;
 }
 
 static const struct clk_ops rockchip_usb2phy_clkout_ops = {
@@ -434,8 +425,7 @@ static void rockchip_usb2phy_clk480m_unregister(void *data)
     clk_unregister(rphy->clk480m);
 }
 
-static int
-rockchip_usb2phy_clk480m_register(struct rockchip_usb2phy *rphy)
+static int rockchip_usb2phy_clk480m_register(struct rockchip_usb2phy *rphy)
 {
     struct device_node *node = rphy->dev->of_node;
     struct clk_init_data init = {};
@@ -468,13 +458,14 @@ rockchip_usb2phy_clk480m_register(struct rockchip_usb2phy *rphy)
     }
 
     ret = of_clk_add_provider(node, of_clk_src_simple_get, rphy->clk480m);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_clk_provider;
+    }
 
-    ret = devm_add_action(rphy->dev, rockchip_usb2phy_clk480m_unregister,
-                  rphy);
-    if (ret < 0)
+    ret = devm_add_action(rphy->dev, rockchip_usb2phy_clk480m_unregister, rphy);
+    if (ret < 0) {
         goto err_unreg_action;
+    }
 
     return 0;
 
@@ -495,17 +486,18 @@ static int rockchip_usb2phy_extcon_register(struct rockchip_usb2phy *rphy)
     if (of_property_read_bool(node, "extcon")) {
         edev = extcon_get_edev_by_phandle(rphy->dev, 0);
         if (IS_ERR(edev)) {
-            if (PTR_ERR(edev) != -EPROBE_DEFER)
+            if (PTR_ERR(edev) != -EPROBE_DEFER) {
                 dev_err(rphy->dev, "Invalid or missing extcon\n");
+            }
             return PTR_ERR(edev);
         }
     } else {
         /* Initialize extcon device */
-        edev = devm_extcon_dev_allocate(rphy->dev,
-                        rockchip_usb2phy_extcon_cable);
+        edev = devm_extcon_dev_allocate(rphy->dev, rockchip_usb2phy_extcon_cable);
 
-        if (IS_ERR(edev))
+        if (IS_ERR(edev)) {
             return -ENOMEM;
+        }
 
         ret = devm_extcon_dev_register(rphy->dev, edev);
         if (ret) {
@@ -522,23 +514,24 @@ static int rockchip_usb2phy_extcon_register(struct rockchip_usb2phy *rphy)
 }
 
 /* The caller must hold rport->mutex lock */
-static int rockchip_usb2phy_enable_id_irq(struct rockchip_usb2phy *rphy,
-                      struct rockchip_usb2phy_port *rport,
-                      bool en)
+static int rockchip_usb2phy_enable_id_irq(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport, bool en)
 {
     int ret;
 
     ret = property_enable(rphy->grf, &rport->port_cfg->idfall_det_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->idfall_det_en, en);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->idrise_det_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->idrise_det_en, en);
 out:
@@ -546,61 +539,60 @@ out:
 }
 
 /* The caller must hold rport->mutex lock */
-static int rockchip_usb2phy_enable_vbus_irq(struct rockchip_usb2phy *rphy,
-                        struct rockchip_usb2phy_port *rport,
-                        bool en)
+static int rockchip_usb2phy_enable_vbus_irq(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport, bool en)
 {
     int ret;
 
     ret = property_enable(rphy->grf, &rport->port_cfg->bvalid_det_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->bvalid_det_en, en);
 out:
     return ret;
 }
 
-static int rockchip_usb2phy_enable_line_irq(struct rockchip_usb2phy *rphy,
-                        struct rockchip_usb2phy_port *rport,
-                        bool en)
+static int rockchip_usb2phy_enable_line_irq(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport, bool en)
 {
     int ret;
 
     ret = property_enable(rphy->grf, &rport->port_cfg->ls_det_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->ls_det_en, en);
 out:
     return ret;
 }
 
-static int rockchip_usb2phy_enable_host_disc_irq(struct rockchip_usb2phy *rphy,
-                         struct rockchip_usb2phy_port *rport,
-                         bool en)
+static int rockchip_usb2phy_enable_host_disc_irq(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport,
+                                                 bool en)
 {
     int ret;
 
     ret = property_enable(rphy->grf, &rport->port_cfg->disfall_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->disfall_en, en);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->disrise_clr, true);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     ret = property_enable(rphy->grf, &rport->port_cfg->disrise_en, en);
 out:
     return ret;
 }
 
-static int rockchip_usb_bypass_uart(struct rockchip_usb2phy_port *rport,
-                    bool en)
+static int rockchip_usb_bypass_uart(struct rockchip_usb2phy_port *rport, bool en)
 {
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
     const struct usb2phy_reg *iomux = &rport->port_cfg->bypass_iomux;
@@ -610,8 +602,7 @@ static int rockchip_usb_bypass_uart(struct rockchip_usb2phy_port *rport,
     mutex_lock(&rport->mutex);
 
     if (en == property_enabled(base, &rport->port_cfg->bypass_sel)) {
-        dev_info(&rport->phy->dev,
-             "bypass uart %s is already set\n", en ? "on" : "off");
+        dev_info(&rport->phy->dev, "bypass uart %s is already set\n", en ? "on" : "off");
         goto unlock;
     }
 
@@ -629,24 +620,22 @@ static int rockchip_usb_bypass_uart(struct rockchip_usb2phy_port *rport,
          * set phy in non-driving mode, it will cause UART to print
          * random codes. So just put USB PHY in normal mode.
          */
-        ret |= property_enable(base, &rport->port_cfg->bypass_sel,
-                       true);
-        ret |= property_enable(base, &rport->port_cfg->bypass_dm_en,
-                       true);
+        ret |= property_enable(base, &rport->port_cfg->bypass_sel, true);
+        ret |= property_enable(base, &rport->port_cfg->bypass_dm_en, true);
 
         /* Some platforms required to set iomux of bypass uart */
-        if (iomux->offset)
+        if (iomux->offset) {
             ret |= property_enable(rphy->grf, iomux, true);
+        }
     } else {
         /* just disable bypass, and resume phy in phy power_on later */
-        ret |= property_enable(base, &rport->port_cfg->bypass_sel,
-                       false);
-        ret |= property_enable(base, &rport->port_cfg->bypass_dm_en,
-                       false);
+        ret |= property_enable(base, &rport->port_cfg->bypass_sel, false);
+        ret |= property_enable(base, &rport->port_cfg->bypass_dm_en, false);
 
         /* Some platforms required to set iomux of bypass uart */
-        if (iomux->offset)
+        if (iomux->offset) {
             ret |= property_enable(rphy->grf, iomux, false);
+        }
     }
 
 unlock:
@@ -657,9 +646,7 @@ unlock:
 
 static void rockchip_usb_bypass_uart_work(struct work_struct *work)
 {
-    struct rockchip_usb2phy_port *rport =
-        container_of(work, struct rockchip_usb2phy_port,
-                 bypass_uart_work.work);
+    struct rockchip_usb2phy_port *rport = container_of(work, struct rockchip_usb2phy_port, bypass_uart_work.work);
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
     bool vbus, iddig;
     int ret;
@@ -668,10 +655,11 @@ static void rockchip_usb_bypass_uart_work(struct work_struct *work)
 
     iddig = property_enabled(rphy->grf, &rport->port_cfg->utmi_iddig);
 
-    if (rport->utmi_avalid)
+    if (rport->utmi_avalid) {
         vbus = property_enabled(rphy->grf, &rport->port_cfg->utmi_avalid);
-    else
+    } else {
         vbus = property_enabled(rphy->grf, &rport->port_cfg->utmi_bvalid);
+    }
 
     mutex_unlock(&rport->mutex);
 
@@ -683,12 +671,11 @@ static void rockchip_usb_bypass_uart_work(struct work_struct *work)
      */
     if (!vbus && iddig) {
         ret = rockchip_usb_bypass_uart(rport, true);
-        if (ret)
-            dev_warn(&rport->phy->dev,
-                 "failed to enable bypass uart\n");
+        if (ret) {
+            dev_warn(&rport->phy->dev, "failed to enable bypass uart\n");
+        }
     } else {
-        schedule_delayed_work(&rport->bypass_uart_work,
-                      BYPASS_SCHEDULE_DELAY);
+        schedule_delayed_work(&rport->bypass_uart_work, BYPASS_SCHEDULE_DELAY);
     }
 }
 
@@ -701,28 +688,21 @@ static int rockchip_usb2phy_init(struct phy *phy)
     mutex_lock(&rport->mutex);
 
     if (rport->port_id == USB2PHY_PORT_OTG &&
-        (rport->mode == USB_DR_MODE_PERIPHERAL ||
-         rport->mode == USB_DR_MODE_OTG)) {
+        (rport->mode == USB_DR_MODE_PERIPHERAL || rport->mode == USB_DR_MODE_OTG)) {
         /* clear id status and enable id detect irq */
-        if (rport->id_irq > 0 || rport->otg_mux_irq > 0 ||
-            rphy->irq > 0) {
-            ret = rockchip_usb2phy_enable_id_irq(rphy, rport,
-                                 true);
+        if (rport->id_irq > 0 || rport->otg_mux_irq > 0 || rphy->irq > 0) {
+            ret = rockchip_usb2phy_enable_id_irq(rphy, rport, true);
             if (ret) {
-                dev_err(rphy->dev,
-                    "failed to enable id irq\n");
+                dev_err(rphy->dev, "failed to enable id irq\n");
                 goto out;
             }
         }
 
         /* clear bvalid status and enable bvalid detect irq */
-        if ((rport->bvalid_irq > 0 || rport->otg_mux_irq > 0 ||
-            rphy->irq > 0) && !rport->vbus_always_on) {
-            ret = rockchip_usb2phy_enable_vbus_irq(rphy, rport,
-                                   true);
+        if ((rport->bvalid_irq > 0 || rport->otg_mux_irq > 0 || rphy->irq > 0) && !rport->vbus_always_on) {
+            ret = rockchip_usb2phy_enable_vbus_irq(rphy, rport, true);
             if (ret) {
-                dev_err(rphy->dev,
-                    "failed to enable bvalid irq\n");
+                dev_err(rphy->dev, "failed to enable bvalid irq\n");
                 goto out;
             }
 
@@ -765,8 +745,7 @@ static int rockchip_usb2phy_power_on(struct phy *phy)
     if (rport->bypass_uart_en) {
         ret = rockchip_usb_bypass_uart(rport, false);
         if (ret) {
-            dev_warn(&rport->phy->dev,
-                 "failed to disable bypass uart\n");
+            dev_warn(&rport->phy->dev, "failed to disable bypass uart\n");
             goto exit;
         }
     }
@@ -779,12 +758,14 @@ static int rockchip_usb2phy_power_on(struct phy *phy)
     }
 
     ret = clk_prepare_enable(rphy->clk480m);
-    if (ret)
+    if (ret) {
         goto unlock;
+    }
 
     ret = property_enable(base, &rport->port_cfg->phy_sus, false);
-    if (ret)
+    if (ret) {
         goto unlock;
+    }
 
     /*
      * For rk3588, it needs to reset phy when exit from
@@ -795,11 +776,12 @@ static int rockchip_usb2phy_power_on(struct phy *phy)
      * remain powered.
      */
     ret = rockchip_usb2phy_reset(rphy);
-    if (ret)
+    if (ret) {
         goto unlock;
+    }
 
     /* waiting for the utmi_clk to become stable */
-    usleep_range(1500, 2000);
+    usleep_range(0x5dc, 0x7d0);
 
     rport->suspended = false;
 
@@ -807,8 +789,9 @@ unlock:
     mutex_unlock(&rport->mutex);
 
     /* Enable bypass uart in the bypass_uart_work. */
-    if (rport->bypass_uart_en)
+    if (rport->bypass_uart_en) {
         schedule_delayed_work(&rport->bypass_uart_work, 0);
+    }
 
 exit:
     return ret;
@@ -831,8 +814,9 @@ static int rockchip_usb2phy_power_off(struct phy *phy)
     }
 
     ret = property_enable(base, &rport->port_cfg->phy_sus, true);
-    if (ret)
+    if (ret) {
         goto unlock;
+    }
 
     rport->suspended = true;
     clk_disable_unprepare(rphy->clk480m);
@@ -841,8 +825,9 @@ unlock:
     mutex_unlock(&rport->mutex);
 
     /* Enable bypass uart in the bypass_uart_work. */
-    if (rport->bypass_uart_en)
+    if (rport->bypass_uart_en) {
         schedule_delayed_work(&rport->bypass_uart_work, 0);
+    }
 
     return ret;
 }
@@ -851,109 +836,107 @@ static int rockchip_usb2phy_exit(struct phy *phy)
 {
     struct rockchip_usb2phy_port *rport = phy_get_drvdata(phy);
 
-    if (rport->port_id == USB2PHY_PORT_HOST)
+    if (rport->port_id == USB2PHY_PORT_HOST) {
         cancel_delayed_work_sync(&rport->sm_work);
-    else if (rport->port_id == USB2PHY_PORT_OTG &&
-         rport->bvalid_irq > 0)
+    } else if (rport->port_id == USB2PHY_PORT_OTG && rport->bvalid_irq > 0) {
         flush_delayed_work(&rport->otg_sm_work);
+    }
 
     return 0;
 }
 
-static int rockchip_set_vbus_power(struct rockchip_usb2phy_port *rport,
-                   bool en)
+static int rockchip_set_vbus_power(struct rockchip_usb2phy_port *rport, bool en)
 {
     int ret = 0;
 
-    if (!rport->vbus)
+    if (!rport->vbus) {
         return 0;
+    }
 
     if (en && !rport->vbus_enabled) {
         ret = regulator_enable(rport->vbus);
-        if (ret)
-            dev_err(&rport->phy->dev,
-                "Failed to enable VBUS supply\n");
+        if (ret) {
+            dev_err(&rport->phy->dev, "Failed to enable VBUS supply\n");
+        }
     } else if (!en && rport->vbus_enabled) {
         ret = regulator_disable(rport->vbus);
     }
 
-    if (ret == 0)
+    if (ret == 0) {
         rport->vbus_enabled = en;
+    }
 
     return ret;
 }
 
-static int rockchip_usb2phy_set_mode(struct phy *phy,
-                     enum phy_mode mode, int submode)
+static int rockchip_usb2phy_set_mode(struct phy *phy, enum phy_mode mode, int submode)
 {
     struct rockchip_usb2phy_port *rport = phy_get_drvdata(phy);
     struct rockchip_usb2phy *rphy = dev_get_drvdata(phy->dev.parent);
     bool vbus_det_en;
     int ret = 0;
 
-    if (rport->port_id != USB2PHY_PORT_OTG)
-        return ret;
-
-    switch (mode) {
-    case PHY_MODE_USB_OTG:
-        /*
-         * In case of using vbus to detect connect state by u2phy,
-         * enable vbus detect on otg mode.
-         */
-        fallthrough;
-    case PHY_MODE_USB_DEVICE:
-        /* Disable VBUS supply */
-        rockchip_set_vbus_power(rport, false);
-        extcon_set_state_sync(rphy->edev, EXTCON_USB_VBUS_EN, false);
-        /* For vbus always on, set EXTCON_USB to true. */
-        extcon_set_state(rphy->edev, EXTCON_USB, true);
-        rport->perip_connected = true;
-        vbus_det_en = true;
-        break;
-    case PHY_MODE_USB_HOST:
-        /* Enable VBUS supply */
-        ret = rockchip_set_vbus_power(rport, true);
-        if (ret) {
-            dev_err(&rport->phy->dev,
-                "Failed to set host mode\n");
-            return ret;
-        }
-
-        extcon_set_state_sync(rphy->edev, EXTCON_USB_VBUS_EN, true);
-        /* For vbus always on, deinit EXTCON_USB to false. */
-        extcon_set_state(rphy->edev, EXTCON_USB, false);
-        rport->perip_connected = false;
-        fallthrough;
-    case PHY_MODE_INVALID:
-        vbus_det_en = false;
-        break;
-    default:
-        dev_info(&rport->phy->dev, "illegal mode\n");
+    if (rport->port_id != USB2PHY_PORT_OTG) {
         return ret;
     }
 
-    if (rphy->phy_cfg->vbus_detect)
+    switch (mode) {
+        case PHY_MODE_USB_OTG:
+            /*
+             * In case of using vbus to detect connect state by u2phy,
+             * enable vbus detect on otg mode.
+             */
+            fallthrough;
+        case PHY_MODE_USB_DEVICE:
+            /* Disable VBUS supply */
+            rockchip_set_vbus_power(rport, false);
+            extcon_set_state_sync(rphy->edev, EXTCON_USB_VBUS_EN, false);
+            /* For vbus always on, set EXTCON_USB to true. */
+            extcon_set_state(rphy->edev, EXTCON_USB, true);
+            rport->perip_connected = true;
+            vbus_det_en = true;
+            break;
+        case PHY_MODE_USB_HOST:
+            /* Enable VBUS supply */
+            ret = rockchip_set_vbus_power(rport, true);
+            if (ret) {
+                dev_err(&rport->phy->dev, "Failed to set host mode\n");
+                return ret;
+            }
+
+            extcon_set_state_sync(rphy->edev, EXTCON_USB_VBUS_EN, true);
+            /* For vbus always on, deinit EXTCON_USB to false. */
+            extcon_set_state(rphy->edev, EXTCON_USB, false);
+            rport->perip_connected = false;
+            fallthrough;
+        case PHY_MODE_INVALID:
+            vbus_det_en = false;
+            break;
+        default:
+            dev_info(&rport->phy->dev, "illegal mode\n");
+            return ret;
+    }
+
+    if (rphy->phy_cfg->vbus_detect) {
         rphy->phy_cfg->vbus_detect(rphy, vbus_det_en);
-    else
-        ret = property_enable(rphy->grf, &rport->port_cfg->vbus_det_en,
-                      vbus_det_en);
+    } else {
+        ret = property_enable(rphy->grf, &rport->port_cfg->vbus_det_en, vbus_det_en);
+    }
 
     return ret;
 }
 
 static const struct phy_ops rockchip_usb2phy_ops = {
-    .init        = rockchip_usb2phy_init,
-    .exit        = rockchip_usb2phy_exit,
-    .power_on    = rockchip_usb2phy_power_on,
-    .power_off    = rockchip_usb2phy_power_off,
-    .set_mode    = rockchip_usb2phy_set_mode,
-    .owner        = THIS_MODULE,
+    .init = rockchip_usb2phy_init,
+    .exit = rockchip_usb2phy_exit,
+    .power_on = rockchip_usb2phy_power_on,
+    .power_off = rockchip_usb2phy_power_off,
+    .set_mode = rockchip_usb2phy_set_mode,
+    .owner = THIS_MODULE,
 };
 
 /* Show & store the current value of otg mode for otg port */
-static ssize_t otg_mode_show(struct device *device,
-                 struct device_attribute *attr,
-                 char *buf)
+static ssize_t otg_mode_show(struct device *device, struct device_attribute *attr, char *buf)
 {
     struct rockchip_usb2phy *rphy = dev_get_drvdata(device);
     struct rockchip_usb2phy_port *rport = NULL;
@@ -961,8 +944,9 @@ static ssize_t otg_mode_show(struct device *device,
 
     for (index = 0; index < rphy->phy_cfg->num_ports; index++) {
         rport = &rphy->ports[index];
-        if (rport->port_id == USB2PHY_PORT_OTG)
+        if (rport->port_id == USB2PHY_PORT_OTG) {
             break;
+        }
     }
 
     if (!rport) {
@@ -974,22 +958,20 @@ static ssize_t otg_mode_show(struct device *device,
     }
 
     switch (rport->mode) {
-    case USB_DR_MODE_HOST:
-        return sprintf(buf, "host\n");
-    case USB_DR_MODE_PERIPHERAL:
-        return sprintf(buf, "peripheral\n");
-    case USB_DR_MODE_OTG:
-        return sprintf(buf, "otg\n");
-    case USB_DR_MODE_UNKNOWN:
-        return sprintf(buf, "UNKNOWN\n");
+        case USB_DR_MODE_HOST:
+            return sprintf(buf, "host\n");
+        case USB_DR_MODE_PERIPHERAL:
+            return sprintf(buf, "peripheral\n");
+        case USB_DR_MODE_OTG:
+            return sprintf(buf, "otg\n");
+        case USB_DR_MODE_UNKNOWN:
+            return sprintf(buf, "UNKNOWN\n");
     }
 
     return -EINVAL;
 }
 
-static ssize_t otg_mode_store(struct device *device,
-                  struct device_attribute *attr,
-                  const char *buf, size_t count)
+static ssize_t otg_mode_store(struct device *device, struct device_attribute *attr, const char *buf, size_t count)
 {
     struct rockchip_usb2phy *rphy = dev_get_drvdata(device);
     struct rockchip_usb2phy_port *rport = NULL;
@@ -1000,16 +982,16 @@ static ssize_t otg_mode_store(struct device *device,
 
     for (index = 0; index < rphy->phy_cfg->num_ports; index++) {
         rport = &rphy->ports[index];
-        if (rport->port_id == USB2PHY_PORT_OTG)
+        if (rport->port_id == USB2PHY_PORT_OTG) {
             break;
+        }
     }
 
     if (!rport) {
         dev_err(rphy->dev, "Fail to get otg port\n");
         rc = -EINVAL;
         goto err0;
-    } else if (rport->port_id != USB2PHY_PORT_OTG ||
-           rport->mode == USB_DR_MODE_UNKNOWN) {
+    } else if (rport->port_id != USB2PHY_PORT_OTG || rport->mode == USB_DR_MODE_UNKNOWN) {
         dev_err(rphy->dev, "No support otg\n");
         rc = -EINVAL;
         goto err0;
@@ -1037,23 +1019,23 @@ static ssize_t otg_mode_store(struct device *device,
     rport->mode = new_dr_mode;
 
     switch (rport->mode) {
-    case USB_DR_MODE_HOST:
-        rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_HOST, 0);
-        property_enable(base, &rport->port_cfg->iddig_output, false);
-        property_enable(base, &rport->port_cfg->iddig_en, true);
-        break;
-    case USB_DR_MODE_PERIPHERAL:
-        rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_DEVICE, 0);
-        property_enable(base, &rport->port_cfg->iddig_output, true);
-        property_enable(base, &rport->port_cfg->iddig_en, true);
-        break;
-    case USB_DR_MODE_OTG:
-        rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_OTG, 0);
-        property_enable(base, &rport->port_cfg->iddig_output, false);
-        property_enable(base, &rport->port_cfg->iddig_en, false);
-        break;
-    default:
-        break;
+        case USB_DR_MODE_HOST:
+            rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_HOST, 0);
+            property_enable(base, &rport->port_cfg->iddig_output, false);
+            property_enable(base, &rport->port_cfg->iddig_en, true);
+            break;
+        case USB_DR_MODE_PERIPHERAL:
+            rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_DEVICE, 0);
+            property_enable(base, &rport->port_cfg->iddig_output, true);
+            property_enable(base, &rport->port_cfg->iddig_en, true);
+            break;
+        case USB_DR_MODE_OTG:
+            rockchip_usb2phy_set_mode(rport->phy, PHY_MODE_USB_OTG, 0);
+            property_enable(base, &rport->port_cfg->iddig_output, false);
+            property_enable(base, &rport->port_cfg->iddig_en, false);
+            break;
+        default:
+            break;
     }
 
 err1:
@@ -1071,15 +1053,13 @@ static struct attribute *usb2_phy_attrs[] = {
 };
 
 static struct attribute_group usb2_phy_attr_group = {
-    .name = NULL,    /* we want them in the same directory */
+    .name = NULL, /* we want them in the same directory */
     .attrs = usb2_phy_attrs,
 };
 
 static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
 {
-    struct rockchip_usb2phy_port *rport =
-        container_of(work, struct rockchip_usb2phy_port,
-                 otg_sm_work.work);
+    struct rockchip_usb2phy_port *rport = container_of(work, struct rockchip_usb2phy_port, otg_sm_work.work);
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
     static unsigned int cable;
     unsigned long delay;
@@ -1087,139 +1067,134 @@ static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
 
     mutex_lock(&rport->mutex);
 
-    if (rport->port_cfg->bvalid_grf_con.enable && rport->typec_vbus_det)
-        rport->vbus_attached =
-            property_enabled(rphy->grf, &rport->port_cfg->bvalid_grf_con);
-    else if (rport->utmi_avalid)
-        rport->vbus_attached =
-            property_enabled(rphy->grf, &rport->port_cfg->utmi_avalid);
-    else
-        rport->vbus_attached =
-            property_enabled(rphy->grf, &rport->port_cfg->utmi_bvalid);
+    if (rport->port_cfg->bvalid_grf_con.enable && rport->typec_vbus_det) {
+        rport->vbus_attached = property_enabled(rphy->grf, &rport->port_cfg->bvalid_grf_con);
+    } else if (rport->utmi_avalid) {
+        rport->vbus_attached = property_enabled(rphy->grf, &rport->port_cfg->utmi_avalid);
+    } else {
+        rport->vbus_attached = property_enabled(rphy->grf, &rport->port_cfg->utmi_bvalid);
+    }
 
     sch_work = false;
     delay = OTG_SCHEDULE_DELAY;
 
-    dev_dbg(&rport->phy->dev, "%s otg sm work\n",
-        usb_otg_state_string(rport->state));
+    dev_dbg(&rport->phy->dev, "%s otg sm work\n", usb_otg_state_string(rport->state));
 
     switch (rport->state) {
-    case OTG_STATE_UNDEFINED:
-        rport->state = OTG_STATE_B_IDLE;
-        if (!rport->vbus_attached) {
-            mutex_unlock(&rport->mutex);
-            rockchip_usb2phy_power_off(rport->phy);
-            mutex_lock(&rport->mutex);
-        }
-        fallthrough;
-    case OTG_STATE_B_IDLE:
-        if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) > 0 ||
-            extcon_get_state(rphy->edev, EXTCON_USB_VBUS_EN) > 0) {
-            dev_dbg(&rport->phy->dev, "usb otg host connect\n");
-            rport->state = OTG_STATE_A_HOST;
-            rphy->chg_state = USB_CHG_STATE_UNDEFINED;
-            rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
-            mutex_unlock(&rport->mutex);
-            rockchip_usb2phy_power_on(rport->phy);
-            return;
-        } else if (rport->vbus_attached) {
-            dev_dbg(&rport->phy->dev, "vbus_attach\n");
-            switch (rphy->chg_state) {
-            case USB_CHG_STATE_UNDEFINED:
+        case OTG_STATE_UNDEFINED:
+            rport->state = OTG_STATE_B_IDLE;
+            if (!rport->vbus_attached) {
                 mutex_unlock(&rport->mutex);
-                schedule_delayed_work(&rport->chg_work, 0);
-                return;
-            case USB_CHG_STATE_DETECTED:
-                switch (rphy->chg_type) {
-                case POWER_SUPPLY_TYPE_USB:
-                    dev_dbg(&rport->phy->dev, "sdp cable is connected\n");
-                    wake_lock(&rport->wakelock);
-                    cable = EXTCON_CHG_USB_SDP;
-                    mutex_unlock(&rport->mutex);
-                    rockchip_usb2phy_power_on(rport->phy);
-                    mutex_lock(&rport->mutex);
-                    rport->state = OTG_STATE_B_PERIPHERAL;
-                    rport->perip_connected = true;
-                    sch_work = true;
-                    break;
-                case POWER_SUPPLY_TYPE_USB_DCP:
-                    dev_dbg(&rport->phy->dev, "dcp cable is connected\n");
-                    cable = EXTCON_CHG_USB_DCP;
-                    sch_work = true;
-                    break;
-                case POWER_SUPPLY_TYPE_USB_CDP:
-                    dev_dbg(&rport->phy->dev, "cdp cable is connected\n");
-                    wake_lock(&rport->wakelock);
-                    cable = EXTCON_CHG_USB_CDP;
-                    mutex_unlock(&rport->mutex);
-                    rockchip_usb2phy_power_on(rport->phy);
-                    mutex_lock(&rport->mutex);
-                    rport->state = OTG_STATE_B_PERIPHERAL;
-                    rport->perip_connected = true;
-                    sch_work = true;
-                    break;
-                default:
-                    break;
-                }
-                break;
-            default:
-                break;
+                rockchip_usb2phy_power_off(rport->phy);
+                mutex_lock(&rport->mutex);
             }
-        } else {
-            rphy->chg_state = USB_CHG_STATE_UNDEFINED;
-            rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
-            mutex_unlock(&rport->mutex);
-            rockchip_usb2phy_power_off(rport->phy);
-            mutex_lock(&rport->mutex);
-        }
-        break;
-    case OTG_STATE_B_PERIPHERAL:
-        sch_work = true;
-
-        if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) > 0 ||
-            extcon_get_state(rphy->edev,
-                        EXTCON_USB_VBUS_EN) > 0) {
-            dev_dbg(&rport->phy->dev, "usb otg host connect\n");
-            rport->state = OTG_STATE_A_HOST;
-            rphy->chg_state = USB_CHG_STATE_UNDEFINED;
-            rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
-            rport->perip_connected = false;
-            sch_work = false;
-            wake_unlock(&rport->wakelock);
-        } else if (!rport->vbus_attached) {
-            dev_dbg(&rport->phy->dev, "usb disconnect\n");
-            rport->state = OTG_STATE_B_IDLE;
-            rport->perip_connected = false;
-            rphy->chg_state = USB_CHG_STATE_UNDEFINED;
-            rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
-            delay = OTG_SCHEDULE_DELAY;
-            wake_unlock(&rport->wakelock);
-        }
-        sch_work = true;
-        break;
-    case OTG_STATE_A_HOST:
-        if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) == 0) {
-            dev_dbg(&rport->phy->dev, "usb otg host disconnect\n");
-            rport->state = OTG_STATE_B_IDLE;
+            fallthrough;
+        case OTG_STATE_B_IDLE:
+            if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) > 0 ||
+                extcon_get_state(rphy->edev, EXTCON_USB_VBUS_EN) > 0) {
+                dev_dbg(&rport->phy->dev, "usb otg host connect\n");
+                rport->state = OTG_STATE_A_HOST;
+                rphy->chg_state = USB_CHG_STATE_UNDEFINED;
+                rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
+                mutex_unlock(&rport->mutex);
+                rockchip_usb2phy_power_on(rport->phy);
+                return;
+            } else if (rport->vbus_attached) {
+                dev_dbg(&rport->phy->dev, "vbus_attach\n");
+                switch (rphy->chg_state) {
+                    case USB_CHG_STATE_UNDEFINED:
+                        mutex_unlock(&rport->mutex);
+                        schedule_delayed_work(&rport->chg_work, 0);
+                        return;
+                    case USB_CHG_STATE_DETECTED:
+                        switch (rphy->chg_type) {
+                            case POWER_SUPPLY_TYPE_USB:
+                                dev_dbg(&rport->phy->dev, "sdp cable is connected\n");
+                                wake_lock(&rport->wakelock);
+                                cable = EXTCON_CHG_USB_SDP;
+                                mutex_unlock(&rport->mutex);
+                                rockchip_usb2phy_power_on(rport->phy);
+                                mutex_lock(&rport->mutex);
+                                rport->state = OTG_STATE_B_PERIPHERAL;
+                                rport->perip_connected = true;
+                                sch_work = true;
+                                break;
+                            case POWER_SUPPLY_TYPE_USB_DCP:
+                                dev_dbg(&rport->phy->dev, "dcp cable is connected\n");
+                                cable = EXTCON_CHG_USB_DCP;
+                                sch_work = true;
+                                break;
+                            case POWER_SUPPLY_TYPE_USB_CDP:
+                                dev_dbg(&rport->phy->dev, "cdp cable is connected\n");
+                                wake_lock(&rport->wakelock);
+                                cable = EXTCON_CHG_USB_CDP;
+                                mutex_unlock(&rport->mutex);
+                                rockchip_usb2phy_power_on(rport->phy);
+                                mutex_lock(&rport->mutex);
+                                rport->state = OTG_STATE_B_PERIPHERAL;
+                                rport->perip_connected = true;
+                                sch_work = true;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                rphy->chg_state = USB_CHG_STATE_UNDEFINED;
+                rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
+                mutex_unlock(&rport->mutex);
+                rockchip_usb2phy_power_off(rport->phy);
+                mutex_lock(&rport->mutex);
+            }
+            break;
+        case OTG_STATE_B_PERIPHERAL:
             sch_work = true;
-        } else {
+
+            if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) > 0 ||
+                extcon_get_state(rphy->edev, EXTCON_USB_VBUS_EN) > 0) {
+                dev_dbg(&rport->phy->dev, "usb otg host connect\n");
+                rport->state = OTG_STATE_A_HOST;
+                rphy->chg_state = USB_CHG_STATE_UNDEFINED;
+                rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
+                rport->perip_connected = false;
+                sch_work = false;
+                wake_unlock(&rport->wakelock);
+            } else if (!rport->vbus_attached) {
+                dev_dbg(&rport->phy->dev, "usb disconnect\n");
+                rport->state = OTG_STATE_B_IDLE;
+                rport->perip_connected = false;
+                rphy->chg_state = USB_CHG_STATE_UNDEFINED;
+                rphy->chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
+                delay = OTG_SCHEDULE_DELAY;
+                wake_unlock(&rport->wakelock);
+            }
+            sch_work = true;
+            break;
+        case OTG_STATE_A_HOST:
+            if (extcon_get_state(rphy->edev, EXTCON_USB_HOST) == 0) {
+                dev_dbg(&rport->phy->dev, "usb otg host disconnect\n");
+                rport->state = OTG_STATE_B_IDLE;
+                sch_work = true;
+            } else {
+                mutex_unlock(&rport->mutex);
+                return;
+            }
+            break;
+        default:
             mutex_unlock(&rport->mutex);
             return;
-        }
-        break;
-    default:
-        mutex_unlock(&rport->mutex);
-        return;
     }
 
     if (extcon_get_state(rphy->edev, cable) != rport->vbus_attached) {
-        extcon_set_state_sync(rphy->edev,
-                    cable, rport->vbus_attached);
+        extcon_set_state_sync(rphy->edev, cable, rport->vbus_attached);
 
-        if (!rport->vbus_attached)
+        if (!rport->vbus_attached) {
             cable = EXTCON_NONE;
-    } else if (rport->state == OTG_STATE_A_HOST &&
-         extcon_get_state(rphy->edev, cable)) {
+        }
+    } else if (rport->state == OTG_STATE_A_HOST && extcon_get_state(rphy->edev, cable)) {
         /*
          * If plug in OTG host cable when the rport state is
          * OTG_STATE_B_PERIPHERAL, the vbus voltage will stay
@@ -1230,16 +1205,13 @@ static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
         cable = EXTCON_NONE;
     }
 
-    if (rphy->edev_self &&
-        (extcon_get_state(rphy->edev, EXTCON_USB) !=
-         rport->perip_connected)) {
-        extcon_set_state_sync(rphy->edev,
-                    EXTCON_USB,
-                    rport->perip_connected);
+    if (rphy->edev_self && (extcon_get_state(rphy->edev, EXTCON_USB) != rport->perip_connected)) {
+        extcon_set_state_sync(rphy->edev, EXTCON_USB, rport->perip_connected);
         extcon_sync(rphy->edev, EXTCON_USB_HOST);
     }
-    if (sch_work)
+    if (sch_work) {
         schedule_delayed_work(&rport->otg_sm_work, delay);
+    }
 
     mutex_unlock(&rport->mutex);
 }
@@ -1247,19 +1219,18 @@ static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
 static const char *chg_to_string(enum power_supply_type chg_type)
 {
     switch (chg_type) {
-    case POWER_SUPPLY_TYPE_USB:
-        return "USB_SDP_CHARGER";
-    case POWER_SUPPLY_TYPE_USB_DCP:
-        return "USB_DCP_CHARGER";
-    case POWER_SUPPLY_TYPE_USB_CDP:
-        return "USB_CDP_CHARGER";
-    default:
-        return "INVALID_CHARGER";
+        case POWER_SUPPLY_TYPE_USB:
+            return "USB_SDP_CHARGER";
+        case POWER_SUPPLY_TYPE_USB_DCP:
+            return "USB_DCP_CHARGER";
+        case POWER_SUPPLY_TYPE_USB_CDP:
+            return "USB_CDP_CHARGER";
+        default:
+            return "INVALID_CHARGER";
     }
 }
 
-static void rockchip_chg_enable_dcd(struct rockchip_usb2phy *rphy,
-                    bool en)
+static void rockchip_chg_enable_dcd(struct rockchip_usb2phy *rphy, bool en)
 {
     struct regmap *base = get_reg_base(rphy);
 
@@ -1267,8 +1238,7 @@ static void rockchip_chg_enable_dcd(struct rockchip_usb2phy *rphy,
     property_enable(base, &rphy->phy_cfg->chg_det.idp_src_en, en);
 }
 
-static void rockchip_chg_enable_primary_det(struct rockchip_usb2phy *rphy,
-                        bool en)
+static void rockchip_chg_enable_primary_det(struct rockchip_usb2phy *rphy, bool en)
 {
     struct regmap *base = get_reg_base(rphy);
 
@@ -1276,8 +1246,7 @@ static void rockchip_chg_enable_primary_det(struct rockchip_usb2phy *rphy,
     property_enable(base, &rphy->phy_cfg->chg_det.idm_sink_en, en);
 }
 
-static void rockchip_chg_enable_secondary_det(struct rockchip_usb2phy *rphy,
-                          bool en)
+static void rockchip_chg_enable_secondary_det(struct rockchip_usb2phy *rphy, bool en)
 {
     struct regmap *base = get_reg_base(rphy);
 
@@ -1285,14 +1254,13 @@ static void rockchip_chg_enable_secondary_det(struct rockchip_usb2phy *rphy,
     property_enable(base, &rphy->phy_cfg->chg_det.idp_sink_en, en);
 }
 
-#define CHG_DCD_POLL_TIME    (100 * HZ / 1000)
-#define CHG_DCD_MAX_RETRIES    6
-#define CHG_PRIMARY_DET_TIME    (40 * HZ / 1000)
-#define CHG_SECONDARY_DET_TIME    (40 * HZ / 1000)
+#define CHG_DCD_POLL_TIME (0x64 * HZ / 0x3e8)
+#define CHG_DCD_MAX_RETRIES 0x6
+#define CHG_PRIMARY_DET_TIME (0x28 * HZ / 0x3e8)
+#define CHG_SECONDARY_DET_TIME (0x28 * HZ / 0x3e8)
 static void rockchip_chg_detect_work(struct work_struct *work)
 {
-    struct rockchip_usb2phy_port *rport =
-        container_of(work, struct rockchip_usb2phy_port, chg_work.work);
+    struct rockchip_usb2phy_port *rport = container_of(work, struct rockchip_usb2phy_port, chg_work.work);
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
     struct regmap *base = get_reg_base(rphy);
     const struct usb2phy_reg *phy_sus_reg;
@@ -1301,8 +1269,7 @@ static void rockchip_chg_detect_work(struct work_struct *work)
     unsigned int mask;
     int ret;
 
-    dev_dbg(&rport->phy->dev, "chg detection work state = %d\n",
-        rphy->chg_state);
+    dev_dbg(&rport->phy->dev, "chg detection work state = %d\n", rphy->chg_state);
 
     /*
      * The conditions for charger detection:
@@ -1313,118 +1280,108 @@ static void rockchip_chg_detect_work(struct work_struct *work)
      * 5. Enable the DP/DM pulldown resistor.
      */
     switch (rphy->chg_state) {
-    case USB_CHG_STATE_UNDEFINED:
-        mutex_lock(&rport->mutex);
-        /* Store the PHY current suspend configuration */
-        phy_sus_reg = &rport->port_cfg->phy_sus;
-        ret = regmap_read(base, phy_sus_reg->offset,
-                  &rphy->phy_sus_cfg);
-        if (ret) {
-            dev_err(&rport->phy->dev,
-                "Fail to read phy_sus reg offset 0x%x, ret %d\n",
-                phy_sus_reg->offset, ret);
+        case USB_CHG_STATE_UNDEFINED:
+            mutex_lock(&rport->mutex);
+            /* Store the PHY current suspend configuration */
+            phy_sus_reg = &rport->port_cfg->phy_sus;
+            ret = regmap_read(base, phy_sus_reg->offset, &rphy->phy_sus_cfg);
+            if (ret) {
+                dev_err(&rport->phy->dev, "Fail to read phy_sus reg offset 0x%x, ret %d\n", phy_sus_reg->offset, ret);
+                mutex_unlock(&rport->mutex);
+                return;
+            }
+
+            /* Set the PHY in charger detection mode */
+            property_enable(base, &rphy->phy_cfg->chg_det.chg_mode, true);
+            /* Start DCD processing stage 1 */
+            rockchip_chg_enable_dcd(rphy, true);
+            rphy->chg_state = USB_CHG_STATE_WAIT_FOR_DCD;
+            rphy->dcd_retries = 0;
+            rphy->primary_retries = 0;
+            delay = CHG_DCD_POLL_TIME;
+            break;
+        case USB_CHG_STATE_WAIT_FOR_DCD:
+            /* get data contact detection status */
+            is_dcd = property_enabled(rphy->grf, &rphy->phy_cfg->chg_det.dp_det);
+            tmout = ++rphy->dcd_retries == CHG_DCD_MAX_RETRIES;
+            /* stage 2 */
+            if (is_dcd || tmout) {
+                /* stage 4 */
+                /* Turn off DCD circuitry */
+                rockchip_chg_enable_dcd(rphy, false);
+                /* Voltage Source on DP, Probe on DM */
+                rockchip_chg_enable_primary_det(rphy, true);
+                delay = CHG_PRIMARY_DET_TIME;
+                rphy->chg_state = USB_CHG_STATE_DCD_DONE;
+            } else {
+                /* stage 3 */
+                delay = CHG_DCD_POLL_TIME;
+            }
+            break;
+        case USB_CHG_STATE_DCD_DONE:
+            vout = property_enabled(rphy->grf, &rphy->phy_cfg->chg_det.cp_det);
+            rockchip_chg_enable_primary_det(rphy, false);
+            if (vout) {
+                /* Voltage Source on DM, Probe on DP  */
+                rockchip_chg_enable_secondary_det(rphy, true);
+                delay = CHG_SECONDARY_DET_TIME;
+                rphy->chg_state = USB_CHG_STATE_PRIMARY_DONE;
+            } else {
+                if (rphy->dcd_retries == CHG_DCD_MAX_RETRIES) {
+                    /* floating charger found */
+                    rphy->chg_type = POWER_SUPPLY_TYPE_USB_DCP;
+                    rphy->chg_state = USB_CHG_STATE_DETECTED;
+                    delay = 0;
+                } else {
+                    if (rphy->primary_retries < 2) {
+                        /* Turn off DCD circuitry */
+                        rockchip_chg_enable_dcd(rphy, false);
+                        /* Voltage Source on DP, Probe on DM */
+                        rockchip_chg_enable_primary_det(rphy, true);
+                        delay = CHG_PRIMARY_DET_TIME;
+                        rphy->chg_state = USB_CHG_STATE_DCD_DONE;
+                        rphy->primary_retries++;
+                        /* break USB_CHG_STATE_DCD_DONE */
+                        break;
+                    }
+                    rphy->chg_type = POWER_SUPPLY_TYPE_USB;
+                    rphy->chg_state = USB_CHG_STATE_DETECTED;
+                    delay = 0;
+                }
+            }
+            break;
+        case USB_CHG_STATE_PRIMARY_DONE:
+            vout = property_enabled(rphy->grf, &rphy->phy_cfg->chg_det.dcp_det);
+            /* Turn off voltage source */
+            rockchip_chg_enable_secondary_det(rphy, false);
+            if (vout) {
+                rphy->chg_type = POWER_SUPPLY_TYPE_USB_DCP;
+            } else {
+                rphy->chg_type = POWER_SUPPLY_TYPE_USB_CDP;
+            }
+            fallthrough;
+        case USB_CHG_STATE_SECONDARY_DONE:
+            rphy->chg_state = USB_CHG_STATE_DETECTED;
+            fallthrough;
+        case USB_CHG_STATE_DETECTED:
+            if (rphy->phy_cfg->chg_det.chg_mode.offset != rport->port_cfg->phy_sus.offset) {
+                property_enable(base, &rphy->phy_cfg->chg_det.chg_mode, false);
+            }
+
+            /* Restore the PHY suspend configuration */
+            phy_sus_reg = &rport->port_cfg->phy_sus;
+            mask = GENMASK(phy_sus_reg->bitend, phy_sus_reg->bitstart);
+            ret = regmap_write(base, phy_sus_reg->offset, (rphy->phy_sus_cfg | (mask << BIT_WRITEABLE_SHIFT)));
+            if (ret) {
+                dev_err(&rport->phy->dev, "Fail to set phy_sus reg offset 0x%x, ret %d\n", phy_sus_reg->offset, ret);
+            }
+            mutex_unlock(&rport->mutex);
+            rockchip_usb2phy_otg_sm_work(&rport->otg_sm_work.work);
+            dev_dbg(&rport->phy->dev, "charger = %s\n", chg_to_string(rphy->chg_type));
+            return;
+        default:
             mutex_unlock(&rport->mutex);
             return;
-        }
-
-        /* Set the PHY in charger detection mode */
-        property_enable(base, &rphy->phy_cfg->chg_det.chg_mode, true);
-        /* Start DCD processing stage 1 */
-        rockchip_chg_enable_dcd(rphy, true);
-        rphy->chg_state = USB_CHG_STATE_WAIT_FOR_DCD;
-        rphy->dcd_retries = 0;
-        rphy->primary_retries = 0;
-        delay = CHG_DCD_POLL_TIME;
-        break;
-    case USB_CHG_STATE_WAIT_FOR_DCD:
-        /* get data contact detection status */
-        is_dcd = property_enabled(rphy->grf,
-                      &rphy->phy_cfg->chg_det.dp_det);
-        tmout = ++rphy->dcd_retries == CHG_DCD_MAX_RETRIES;
-        /* stage 2 */
-        if (is_dcd || tmout) {
-            /* stage 4 */
-            /* Turn off DCD circuitry */
-            rockchip_chg_enable_dcd(rphy, false);
-            /* Voltage Source on DP, Probe on DM */
-            rockchip_chg_enable_primary_det(rphy, true);
-            delay = CHG_PRIMARY_DET_TIME;
-            rphy->chg_state = USB_CHG_STATE_DCD_DONE;
-        } else {
-            /* stage 3 */
-            delay = CHG_DCD_POLL_TIME;
-        }
-        break;
-    case USB_CHG_STATE_DCD_DONE:
-        vout = property_enabled(rphy->grf,
-                    &rphy->phy_cfg->chg_det.cp_det);
-        rockchip_chg_enable_primary_det(rphy, false);
-        if (vout) {
-            /* Voltage Source on DM, Probe on DP  */
-            rockchip_chg_enable_secondary_det(rphy, true);
-            delay = CHG_SECONDARY_DET_TIME;
-            rphy->chg_state = USB_CHG_STATE_PRIMARY_DONE;
-        } else {
-            if (rphy->dcd_retries == CHG_DCD_MAX_RETRIES) {
-                /* floating charger found */
-                rphy->chg_type = POWER_SUPPLY_TYPE_USB_DCP;
-                rphy->chg_state = USB_CHG_STATE_DETECTED;
-                delay = 0;
-            } else {
-                if (rphy->primary_retries < 2) {
-                    /* Turn off DCD circuitry */
-                    rockchip_chg_enable_dcd(rphy, false);
-                    /* Voltage Source on DP, Probe on DM */
-                    rockchip_chg_enable_primary_det(rphy,
-                                    true);
-                    delay = CHG_PRIMARY_DET_TIME;
-                    rphy->chg_state =
-                        USB_CHG_STATE_DCD_DONE;
-                    rphy->primary_retries++;
-                    /* break USB_CHG_STATE_DCD_DONE */
-                    break;
-                }
-                rphy->chg_type = POWER_SUPPLY_TYPE_USB;
-                rphy->chg_state = USB_CHG_STATE_DETECTED;
-                delay = 0;
-            }
-        }
-        break;
-    case USB_CHG_STATE_PRIMARY_DONE:
-        vout = property_enabled(rphy->grf,
-                    &rphy->phy_cfg->chg_det.dcp_det);
-        /* Turn off voltage source */
-        rockchip_chg_enable_secondary_det(rphy, false);
-        if (vout)
-            rphy->chg_type = POWER_SUPPLY_TYPE_USB_DCP;
-        else
-            rphy->chg_type = POWER_SUPPLY_TYPE_USB_CDP;
-        fallthrough;
-    case USB_CHG_STATE_SECONDARY_DONE:
-        rphy->chg_state = USB_CHG_STATE_DETECTED;
-        fallthrough;
-    case USB_CHG_STATE_DETECTED:
-        if (rphy->phy_cfg->chg_det.chg_mode.offset !=
-            rport->port_cfg->phy_sus.offset)
-            property_enable(base, &rphy->phy_cfg->chg_det.chg_mode, false);
-
-        /* Restore the PHY suspend configuration */
-        phy_sus_reg = &rport->port_cfg->phy_sus;
-        mask = GENMASK(phy_sus_reg->bitend, phy_sus_reg->bitstart);
-        ret = regmap_write(base, phy_sus_reg->offset,
-                   (rphy->phy_sus_cfg | (mask << BIT_WRITEABLE_SHIFT)));
-        if (ret)
-            dev_err(&rport->phy->dev,
-                "Fail to set phy_sus reg offset 0x%x, ret %d\n",
-                phy_sus_reg->offset, ret);
-        mutex_unlock(&rport->mutex);
-        rockchip_usb2phy_otg_sm_work(&rport->otg_sm_work.work);
-        dev_dbg(&rport->phy->dev, "charger = %s\n",
-             chg_to_string(rphy->chg_type));
-        return;
-    default:
-        mutex_unlock(&rport->mutex);
-        return;
     }
 
     /*
@@ -1450,16 +1407,14 @@ static void rockchip_chg_detect_work(struct work_struct *work)
  */
 static void rockchip_usb2phy_sm_work(struct work_struct *work)
 {
-    struct rockchip_usb2phy_port *rport =
-        container_of(work, struct rockchip_usb2phy_port, sm_work.work);
+    struct rockchip_usb2phy_port *rport = container_of(work, struct rockchip_usb2phy_port, sm_work.work);
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
     unsigned int sh, ul, uhd, state;
     unsigned int ul_mask, uhd_mask;
     int ret;
 
     if (!rport->port_cfg->utmi_ls.offset ||
-        (!rport->port_cfg->utmi_hstdet.offset &&
-         !rport->port_cfg->disfall_en.offset)) {
+        (!rport->port_cfg->utmi_hstdet.offset && !rport->port_cfg->disfall_en.offset)) {
         dev_dbg(&rport->phy->dev, "some property may not be specified\n");
         return;
     }
@@ -1467,86 +1422,84 @@ static void rockchip_usb2phy_sm_work(struct work_struct *work)
     mutex_lock(&rport->mutex);
 
     ret = regmap_read(rphy->grf, rport->port_cfg->utmi_ls.offset, &ul);
-    if (ret < 0)
+    if (ret < 0) {
         goto next_schedule;
+    }
 
-    ul_mask = GENMASK(rport->port_cfg->utmi_ls.bitend,
-              rport->port_cfg->utmi_ls.bitstart);
+    ul_mask = GENMASK(rport->port_cfg->utmi_ls.bitend, rport->port_cfg->utmi_ls.bitstart);
 
     if (rport->port_cfg->utmi_hstdet.offset) {
         ret = regmap_read(rphy->grf, rport->port_cfg->utmi_hstdet.offset, &uhd);
-        if (ret < 0)
+        if (ret < 0) {
             goto next_schedule;
+        }
 
-        uhd_mask = GENMASK(rport->port_cfg->utmi_hstdet.bitend,
-                   rport->port_cfg->utmi_hstdet.bitstart);
+        uhd_mask = GENMASK(rport->port_cfg->utmi_hstdet.bitend, rport->port_cfg->utmi_hstdet.bitstart);
 
-        sh = rport->port_cfg->utmi_hstdet.bitend -
-             rport->port_cfg->utmi_hstdet.bitstart + 1;
+        sh = rport->port_cfg->utmi_hstdet.bitend - rport->port_cfg->utmi_hstdet.bitstart + 1;
         /* stitch on utmi_ls and utmi_hstdet as phy state */
         state = ((uhd & uhd_mask) >> rport->port_cfg->utmi_hstdet.bitstart) |
-            (((ul & ul_mask) >> rport->port_cfg->utmi_ls.bitstart) << sh);
+                (((ul & ul_mask) >> rport->port_cfg->utmi_ls.bitstart) << sh);
     } else {
-        state = ((ul & ul_mask) >> rport->port_cfg->utmi_ls.bitstart) << 1 |
-            rport->host_disconnect;
+        state = ((ul & ul_mask) >> rport->port_cfg->utmi_ls.bitstart) << 1 | rport->host_disconnect;
     }
 
     switch (state) {
-    case PHY_STATE_HS_ONLINE:
-        dev_dbg(&rport->phy->dev, "HS online\n");
-        break;
-    case PHY_STATE_FS_LS_ONLINE:
-        /*
-         * For FS/LS device, the online state share with connect state
-         * from utmi_ls and utmi_hstdet register, so we distinguish
-         * them via suspended flag.
-         *
-         * Plus, there are two cases, one is D- Line pull-up, and D+
-         * line pull-down, the state is 4; another is D+ line pull-up,
-         * and D- line pull-down, the state is 2.
-         */
-        if (!rport->suspended) {
-            /* D- line pull-up, D+ line pull-down */
-            dev_dbg(&rport->phy->dev, "FS/LS online\n");
+        case PHY_STATE_HS_ONLINE:
+            dev_dbg(&rport->phy->dev, "HS online\n");
             break;
-        }
-        fallthrough;
-    case PHY_STATE_CONNECT:
-        if (rport->suspended) {
-            dev_dbg(&rport->phy->dev, "Connected\n");
-            mutex_unlock(&rport->mutex);
-            rockchip_usb2phy_power_on(rport->phy);
-            mutex_lock(&rport->mutex);
-            rport->suspended = false;
-        } else {
-            /* D+ line pull-up, D- line pull-down */
-            dev_dbg(&rport->phy->dev, "FS/LS online\n");
-        }
-        break;
-    case PHY_STATE_DISCONNECT:
-        if (!rport->suspended) {
-            dev_dbg(&rport->phy->dev, "Disconnected\n");
-            mutex_unlock(&rport->mutex);
-            rockchip_usb2phy_power_off(rport->phy);
-            mutex_lock(&rport->mutex);
-            rport->suspended = true;
-        }
+        case PHY_STATE_FS_LS_ONLINE:
+            /*
+             * For FS/LS device, the online state share with connect state
+             * from utmi_ls and utmi_hstdet register, so we distinguish
+             * them via suspended flag.
+             *
+             * Plus, there are two cases, one is D- Line pull-up, and D+
+             * line pull-down, the state is 4; another is D+ line pull-up,
+             * and D- line pull-down, the state is 2.
+             */
+            if (!rport->suspended) {
+                /* D- line pull-up, D+ line pull-down */
+                dev_dbg(&rport->phy->dev, "FS/LS online\n");
+                break;
+            }
+            fallthrough;
+        case PHY_STATE_CONNECT:
+            if (rport->suspended) {
+                dev_dbg(&rport->phy->dev, "Connected\n");
+                mutex_unlock(&rport->mutex);
+                rockchip_usb2phy_power_on(rport->phy);
+                mutex_lock(&rport->mutex);
+                rport->suspended = false;
+            } else {
+                /* D+ line pull-up, D- line pull-down */
+                dev_dbg(&rport->phy->dev, "FS/LS online\n");
+            }
+            break;
+        case PHY_STATE_DISCONNECT:
+            if (!rport->suspended) {
+                dev_dbg(&rport->phy->dev, "Disconnected\n");
+                mutex_unlock(&rport->mutex);
+                rockchip_usb2phy_power_off(rport->phy);
+                mutex_lock(&rport->mutex);
+                rport->suspended = true;
+            }
 
-        /*
-         * activate the linestate detection to get the next device
-         * plug-in irq.
-         */
-        rockchip_usb2phy_enable_line_irq(rphy, rport, true);
+            /*
+             * activate the linestate detection to get the next device
+             * plug-in irq.
+             */
+            rockchip_usb2phy_enable_line_irq(rphy, rport, true);
 
-        /*
-         * we don't need to rearm the delayed work when the phy port
-         * is suspended.
-         */
-        mutex_unlock(&rport->mutex);
-        return;
-    default:
-        dev_dbg(&rport->phy->dev, "unknown phy state %d\n", state);
-        break;
+            /*
+             * we don't need to rearm the delayed work when the phy port
+             * is suspended.
+             */
+            mutex_unlock(&rport->mutex);
+            return;
+        default:
+            dev_dbg(&rport->phy->dev, "unknown phy state %d\n", state);
+            break;
     }
 
 next_schedule:
@@ -1559,8 +1512,9 @@ static irqreturn_t rockchip_usb2phy_linestate_irq(int irq, void *data)
     struct rockchip_usb2phy_port *rport = data;
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
 
-    if (!property_enabled(rphy->grf, &rport->port_cfg->ls_det_st))
+    if (!property_enabled(rphy->grf, &rport->port_cfg->ls_det_st)) {
         return IRQ_NONE;
+    }
 
     dev_dbg(&rport->phy->dev, "linestate interrupt\n");
 
@@ -1576,8 +1530,9 @@ static irqreturn_t rockchip_usb2phy_linestate_irq(int irq, void *data)
      * meanwhile, if the phy port is suspended, we need rearm the work to
      * resume it and mange its states; otherwise, we do nothing about that.
      */
-    if (rport->suspended && rport->port_id == USB2PHY_PORT_HOST)
+    if (rport->suspended && rport->port_id == USB2PHY_PORT_HOST) {
         rockchip_usb2phy_sm_work(&rport->sm_work.work);
+    }
 
     return IRQ_HANDLED;
 }
@@ -1587,8 +1542,9 @@ static irqreturn_t rockchip_usb2phy_bvalid_irq(int irq, void *data)
     struct rockchip_usb2phy_port *rport = data;
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
 
-    if (!property_enabled(rphy->grf, &rport->port_cfg->bvalid_det_st))
+    if (!property_enabled(rphy->grf, &rport->port_cfg->bvalid_det_st)) {
         return IRQ_NONE;
+    }
 
     mutex_lock(&rport->mutex);
 
@@ -1597,8 +1553,9 @@ static irqreturn_t rockchip_usb2phy_bvalid_irq(int irq, void *data)
 
     mutex_unlock(&rport->mutex);
 
-    if (rport->bypass_uart_en)
+    if (rport->bypass_uart_en) {
         rockchip_usb_bypass_uart(rport, false);
+    }
 
     cancel_delayed_work_sync(&rport->otg_sm_work);
     rockchip_usb2phy_otg_sm_work(&rport->otg_sm_work.work);
@@ -1613,19 +1570,18 @@ static irqreturn_t rockchip_usb2phy_id_irq(int irq, void *data)
     bool cable_vbus_state = false;
 
     if (!property_enabled(rphy->grf, &rport->port_cfg->idfall_det_st) &&
-        !property_enabled(rphy->grf, &rport->port_cfg->idrise_det_st))
+        !property_enabled(rphy->grf, &rport->port_cfg->idrise_det_st)) {
         return IRQ_NONE;
+    }
 
     mutex_lock(&rport->mutex);
 
     /* clear id fall or rise detect irq pending status */
     if (property_enabled(rphy->grf, &rport->port_cfg->idfall_det_st)) {
-        property_enable(rphy->grf, &rport->port_cfg->idfall_det_clr,
-                true);
+        property_enable(rphy->grf, &rport->port_cfg->idfall_det_clr, true);
         cable_vbus_state = true;
     } else if (property_enabled(rphy->grf, &rport->port_cfg->idrise_det_st)) {
-        property_enable(rphy->grf, &rport->port_cfg->idrise_det_clr,
-                true);
+        property_enable(rphy->grf, &rport->port_cfg->idrise_det_clr, true);
         cable_vbus_state = false;
     }
 
@@ -1648,19 +1604,18 @@ static irqreturn_t rockchip_usb2phy_host_disc_irq(int irq, void *data)
     struct rockchip_usb2phy *rphy = dev_get_drvdata(rport->phy->dev.parent);
 
     if (!property_enabled(rphy->grf, &rport->port_cfg->disfall_st) &&
-        !property_enabled(rphy->grf, &rport->port_cfg->disrise_st))
+        !property_enabled(rphy->grf, &rport->port_cfg->disrise_st)) {
         return IRQ_NONE;
+    }
 
     mutex_lock(&rport->mutex);
 
     /* clear disconnect fall or rise detect irq pending status */
     if (property_enabled(rphy->grf, &rport->port_cfg->disfall_st)) {
-        property_enable(rphy->grf, &rport->port_cfg->disfall_clr,
-                true);
+        property_enable(rphy->grf, &rport->port_cfg->disfall_clr, true);
         rport->host_disconnect = false;
     } else if (property_enabled(rphy->grf, &rport->port_cfg->disrise_st)) {
-        property_enable(rphy->grf, &rport->port_cfg->disrise_clr,
-                true);
+        property_enable(rphy->grf, &rport->port_cfg->disrise_clr, true);
         rport->host_disconnect = true;
     }
 
@@ -1673,7 +1628,7 @@ static irqreturn_t rockchip_usb2phy_otg_mux_irq(int irq, void *data)
 {
     irqreturn_t ret = IRQ_NONE;
 
-    ret  = rockchip_usb2phy_id_irq(irq, data);
+    ret = rockchip_usb2phy_id_irq(irq, data);
     ret |= rockchip_usb2phy_bvalid_irq(irq, data);
     ret |= rockchip_usb2phy_linestate_irq(irq, data);
 
@@ -1690,12 +1645,13 @@ static irqreturn_t rockchip_usb2phy_irq(int irq, void *data)
 
     for (index = 0; index < rphy->phy_cfg->num_ports; index++) {
         rport = &rphy->ports[index];
-        if (!rport->phy)
+        if (!rport->phy) {
             continue;
+        }
 
-        if (rport->port_id == USB2PHY_PORT_HOST &&
-            rport->port_cfg->disfall_en.offset)
+        if (rport->port_id == USB2PHY_PORT_HOST && rport->port_cfg->disfall_en.offset) {
             ret = rockchip_usb2phy_host_disc_irq(irq, rport);
+        }
 
         /* Handle linestate irq for both otg port and host port */
         ret = rockchip_usb2phy_linestate_irq(irq, rport);
@@ -1704,8 +1660,7 @@ static irqreturn_t rockchip_usb2phy_irq(int irq, void *data)
          * Handle bvalid irq and id irq for otg port which
          * is assigned to otg controller.
          */
-        if (rport->port_id == USB2PHY_PORT_OTG &&
-            rport->mode != USB_DR_MODE_UNKNOWN) {
+        if (rport->port_id == USB2PHY_PORT_OTG && rport->mode != USB_DR_MODE_UNKNOWN) {
             if (rport->mode == USB_DR_MODE_HOST) {
                 /*
                  * If otg port work as usb host mode and
@@ -1715,14 +1670,15 @@ static irqreturn_t rockchip_usb2phy_irq(int irq, void *data)
                  * interface "otg_mode". We need to handle
                  * the bvalid irq and id irq in this case.
                  */
-                force_mode = property_enabled(rphy->grf,
-                        &rport->port_cfg->iddig_en);
-                if (!force_mode)
+                force_mode = property_enabled(rphy->grf, &rport->port_cfg->iddig_en);
+                if (!force_mode) {
                     continue;
+                }
             }
 
-            if (!rport->vbus_always_on)
+            if (!rport->vbus_always_on) {
                 ret |= rockchip_usb2phy_bvalid_irq(irq, rport);
+            }
 
             ret |= rockchip_usb2phy_id_irq(irq, rport);
         }
@@ -1731,9 +1687,8 @@ static irqreturn_t rockchip_usb2phy_irq(int irq, void *data)
     return ret;
 }
 
-static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
-                      struct rockchip_usb2phy_port *rport,
-                      struct device_node *child_np)
+static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport,
+                                          struct device_node *child_np)
 {
     int ret;
 
@@ -1741,8 +1696,9 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
      * If the usb2 phy used combined irq for otg and host port,
      * don't need to init otg and host port irq separately.
      */
-    if (rphy->irq > 0)
+    if (rphy->irq > 0) {
         return 0;
+    }
 
     /*
      * Some SoCs (e.g. RV1108) use one combined irq for all of
@@ -1751,15 +1707,11 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
      */
     rport->otg_mux_irq = of_irq_get_byname(child_np, "otg-mux");
     if (rport->otg_mux_irq > 0) {
-        ret = devm_request_threaded_irq(rphy->dev, rport->otg_mux_irq,
-                        NULL,
-                        rockchip_usb2phy_otg_mux_irq,
-                        IRQF_ONESHOT,
-                        "rockchip_usb2phy_otg",
-                        rport);
-        if (ret)
-            dev_err(rphy->dev,
-                "failed to request otg-mux irq handle\n");
+        ret = devm_request_threaded_irq(rphy->dev, rport->otg_mux_irq, NULL, rockchip_usb2phy_otg_mux_irq, IRQF_ONESHOT,
+                                        "rockchip_usb2phy_otg", rport);
+        if (ret) {
+            dev_err(rphy->dev, "failed to request otg-mux irq handle\n");
+        }
 
         return ret;
     }
@@ -1771,10 +1723,8 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
         return -EINVAL;
     }
 
-    ret = devm_request_threaded_irq(rphy->dev, rport->ls_irq, NULL,
-                    rockchip_usb2phy_linestate_irq,
-                    IRQF_ONESHOT,
-                    "rockchip_usb2phy_ls", rport);
+    ret = devm_request_threaded_irq(rphy->dev, rport->ls_irq, NULL, rockchip_usb2phy_linestate_irq, IRQF_ONESHOT,
+                                    "rockchip_usb2phy_ls", rport);
     if (ret) {
         dev_err(rphy->dev, "failed to request linestate irq handle\n");
         return ret;
@@ -1785,30 +1735,22 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
      * host mode, return immediately without init the bvalid
      * and id irqs/
      */
-    if (rport->port_id == USB2PHY_PORT_HOST ||
-        rport->mode == USB_DR_MODE_HOST ||
-        rport->mode == USB_DR_MODE_UNKNOWN)
+    if (rport->port_id == USB2PHY_PORT_HOST || rport->mode == USB_DR_MODE_HOST || rport->mode == USB_DR_MODE_UNKNOWN) {
         return ret;
+    }
 
     /* Init the bvalid irq for otg port */
     if (!rport->vbus_always_on) {
-        rport->bvalid_irq = of_irq_get_byname(child_np,
-                              "otg-bvalid");
+        rport->bvalid_irq = of_irq_get_byname(child_np, "otg-bvalid");
         if (rport->bvalid_irq <= 0) {
             dev_err(rphy->dev, "no bvalid irq provided\n");
             return -EINVAL;
         }
 
-        ret = devm_request_threaded_irq(rphy->dev,
-                        rport->bvalid_irq,
-                        NULL,
-                        rockchip_usb2phy_bvalid_irq,
-                        IRQF_ONESHOT,
-                        "rockchip_usb2phy_bvalid",
-                        rport);
+        ret = devm_request_threaded_irq(rphy->dev, rport->bvalid_irq, NULL, rockchip_usb2phy_bvalid_irq, IRQF_ONESHOT,
+                                        "rockchip_usb2phy_bvalid", rport);
         if (ret) {
-            dev_err(rphy->dev,
-                "failed to request otg-bvalid irq handle\n");
+            dev_err(rphy->dev, "failed to request otg-bvalid irq handle\n");
             return ret;
         }
     }
@@ -1821,15 +1763,10 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
             return -EINVAL;
         }
 
-        ret = devm_request_threaded_irq(rphy->dev,
-                        rport->id_irq, NULL,
-                        rockchip_usb2phy_id_irq,
-                        IRQF_ONESHOT,
-                        "rockchip_usb2phy_id",
-                        rport);
+        ret = devm_request_threaded_irq(rphy->dev, rport->id_irq, NULL, rockchip_usb2phy_id_irq, IRQF_ONESHOT,
+                                        "rockchip_usb2phy_id", rport);
         if (ret) {
-            dev_err(rphy->dev,
-                "failed to request otg-id irq handle\n");
+            dev_err(rphy->dev, "failed to request otg-id irq handle\n");
             return ret;
         }
     }
@@ -1837,9 +1774,8 @@ static int rockchip_usb2phy_port_irq_init(struct rockchip_usb2phy *rphy,
     return ret;
 }
 
-static int rockchip_usb2phy_host_port_init(struct rockchip_usb2phy *rphy,
-                       struct rockchip_usb2phy_port *rport,
-                       struct device_node *child_np)
+static int rockchip_usb2phy_host_port_init(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport,
+                                           struct device_node *child_np)
 {
     int ret;
     struct regmap *base = get_reg_base(rphy);
@@ -1848,8 +1784,7 @@ static int rockchip_usb2phy_host_port_init(struct rockchip_usb2phy *rphy,
     rport->port_cfg = &rphy->phy_cfg->port_cfgs[USB2PHY_PORT_HOST];
 
     /* enter lower power state when suspend */
-    rport->low_power_en =
-        of_property_read_bool(child_np, "rockchip,low-power-mode");
+    rport->low_power_en = of_property_read_bool(child_np, "rockchip,low-power-mode");
 
     mutex_init(&rport->mutex);
     INIT_DELAYED_WORK(&rport->sm_work, rockchip_usb2phy_sm_work);
@@ -1866,27 +1801,25 @@ static int rockchip_usb2phy_host_port_init(struct rockchip_usb2phy *rphy,
      * time if needed.
      */
     ret = property_enable(base, &rport->port_cfg->phy_sus, true);
-    if (ret)
+    if (ret) {
         return ret;
+    }
     rport->suspended = true;
 
     return 0;
 }
 
-static int rockchip_otg_event(struct notifier_block *nb,
-                  unsigned long event, void *ptr)
+static int rockchip_otg_event(struct notifier_block *nb, unsigned long event, void *ptr)
 {
-    struct rockchip_usb2phy_port *rport =
-        container_of(nb, struct rockchip_usb2phy_port, event_nb);
+    struct rockchip_usb2phy_port *rport = container_of(nb, struct rockchip_usb2phy_port, event_nb);
 
     schedule_delayed_work(&rport->otg_sm_work, OTG_SCHEDULE_DELAY);
 
     return NOTIFY_DONE;
 }
 
-static int rockchip_usb2phy_otg_port_init(struct rockchip_usb2phy *rphy,
-                      struct rockchip_usb2phy_port *rport,
-                      struct device_node *child_np)
+static int rockchip_usb2phy_otg_port_init(struct rockchip_usb2phy *rphy, struct rockchip_usb2phy_port *rport,
+                                          struct device_node *child_np)
 {
     int ret;
     int iddig;
@@ -1903,44 +1836,41 @@ static int rockchip_usb2phy_otg_port_init(struct rockchip_usb2phy *rphy,
     mutex_init(&rport->mutex);
 
     /* bypass uart function is only used in debug stage. */
-    rport->bypass_uart_en =
-        of_property_read_bool(child_np, "rockchip,bypass-uart");
-    rport->vbus_always_on =
-        of_property_read_bool(child_np, "rockchip,vbus-always-on");
-    rport->utmi_avalid =
-        of_property_read_bool(child_np, "rockchip,utmi-avalid");
+    rport->bypass_uart_en = of_property_read_bool(child_np, "rockchip,bypass-uart");
+    rport->vbus_always_on = of_property_read_bool(child_np, "rockchip,vbus-always-on");
+    rport->utmi_avalid = of_property_read_bool(child_np, "rockchip,utmi-avalid");
 
     /* enter lower power state when suspend */
-    rport->low_power_en =
-        of_property_read_bool(child_np, "rockchip,low-power-mode");
+    rport->low_power_en = of_property_read_bool(child_np, "rockchip,low-power-mode");
 
     /* For type-c with vbus_det always pull up */
-    rport->typec_vbus_det =
-        of_property_read_bool(child_np, "rockchip,typec-vbus-det");
+    rport->typec_vbus_det = of_property_read_bool(child_np, "rockchip,typec-vbus-det");
 
     /* Get Vbus regulators */
     rport->vbus = devm_regulator_get_optional(&rport->phy->dev, "vbus");
     if (IS_ERR(rport->vbus)) {
         ret = PTR_ERR(rport->vbus);
-        if (ret == -EPROBE_DEFER)
+        if (ret == -EPROBE_DEFER) {
             return ret;
+        }
 
-        if (rport->mode == USB_DR_MODE_OTG)
+        if (rport->mode == USB_DR_MODE_OTG) {
             dev_warn(&rport->phy->dev, "No vbus specified for otg port\n");
+        }
         rport->vbus = NULL;
     }
 
     rport->mode = of_usb_get_dr_mode_by_phy(child_np, -1);
     iddig = property_enabled(rphy->grf, &rport->port_cfg->utmi_iddig);
-    if (rphy->edev_self && (rport->mode == USB_DR_MODE_HOST ||
-        rport->mode == USB_DR_MODE_UNKNOWN || !iddig)) {
+    if (rphy->edev_self && (rport->mode == USB_DR_MODE_HOST || rport->mode == USB_DR_MODE_UNKNOWN || !iddig)) {
         /* Enable VBUS supply for otg port */
         extcon_set_state(rphy->edev, EXTCON_USB, false);
         extcon_set_state(rphy->edev, EXTCON_USB_HOST, true);
         extcon_set_state(rphy->edev, EXTCON_USB_VBUS_EN, true);
         ret = rockchip_set_vbus_power(rport, true);
-        if (ret)
+        if (ret) {
             return ret;
+        }
     }
 
     ret = rockchip_usb2phy_port_irq_init(rphy, rport, child_np);
@@ -1949,25 +1879,24 @@ static int rockchip_usb2phy_otg_port_init(struct rockchip_usb2phy *rphy,
         return ret;
     }
 
-    if (rport->vbus_always_on || rport->mode == USB_DR_MODE_HOST ||
-        rport->mode == USB_DR_MODE_UNKNOWN)
+    if (rport->vbus_always_on || rport->mode == USB_DR_MODE_HOST || rport->mode == USB_DR_MODE_UNKNOWN) {
         goto out;
+    }
 
     /* Select bvalid of usb phy as bvalid of usb controller */
-    if (rport->port_cfg->bvalid_grf_con.enable != 0)
+    if (rport->port_cfg->bvalid_grf_con.enable != 0) {
         property_enable(base, &rport->port_cfg->bvalid_grf_con, false);
+    }
 
     wake_lock_init(&rport->wakelock, WAKE_LOCK_SUSPEND, "rockchip_otg");
-    INIT_DELAYED_WORK(&rport->bypass_uart_work,
-              rockchip_usb_bypass_uart_work);
+    INIT_DELAYED_WORK(&rport->bypass_uart_work, rockchip_usb_bypass_uart_work);
     INIT_DELAYED_WORK(&rport->chg_work, rockchip_chg_detect_work);
     INIT_DELAYED_WORK(&rport->otg_sm_work, rockchip_usb2phy_otg_sm_work);
 
     if (!IS_ERR(rphy->edev)) {
         rport->event_nb.notifier_call = rockchip_otg_event;
 
-        ret = devm_extcon_register_notifier(rphy->dev, rphy->edev,
-                    EXTCON_USB_HOST, &rport->event_nb);
+        ret = devm_extcon_register_notifier(rphy->dev, rphy->edev, EXTCON_USB_HOST, &rport->event_nb);
         if (ret) {
             dev_err(rphy->dev, "register USB HOST notifier failed\n");
             goto err;
@@ -1981,8 +1910,9 @@ out:
      * time if needed.
      */
     ret = property_enable(base, &rport->port_cfg->phy_sus, true);
-    if (ret)
+    if (ret) {
         return ret;
+    }
     rport->suspended = true;
 
     return 0;
@@ -2007,8 +1937,9 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
     int ret;
 
     rphy = devm_kzalloc(dev, sizeof(*rphy), GFP_KERNEL);
-    if (!rphy)
+    if (!rphy) {
         return -ENOMEM;
+    }
 
     match = of_match_device(dev->driver->of_match_table, dev);
     if (!match || !match->data) {
@@ -2024,33 +1955,33 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
         }
 
         rphy->phy_base = devm_ioremap_resource(dev, res);
-        if (IS_ERR(rphy->phy_base))
+        if (IS_ERR(rphy->phy_base)) {
             return PTR_ERR(rphy->phy_base);
+        }
 
-        rphy->grf = syscon_regmap_lookup_by_phandle(np,
-                                "rockchip,usbgrf");
-        if (IS_ERR(rphy->grf))
+        rphy->grf = syscon_regmap_lookup_by_phandle(np, "rockchip,usbgrf");
+        if (IS_ERR(rphy->grf)) {
             return PTR_ERR(rphy->grf);
+        }
 
         reg = res->start;
     } else {
         rphy->grf = syscon_node_to_regmap(dev->parent->of_node);
-        if (IS_ERR(rphy->grf))
+        if (IS_ERR(rphy->grf)) {
             return PTR_ERR(rphy->grf);
+        }
 
         if (of_device_is_compatible(np, "rockchip,rv1108-usb2phy")) {
-            rphy->usbgrf =
-                syscon_regmap_lookup_by_phandle(dev->of_node,
-                            "rockchip,usbgrf");
-            if (IS_ERR(rphy->usbgrf))
+            rphy->usbgrf = syscon_regmap_lookup_by_phandle(dev->of_node, "rockchip,usbgrf");
+            if (IS_ERR(rphy->usbgrf)) {
                 return PTR_ERR(rphy->usbgrf);
+            }
         } else {
             rphy->usbgrf = NULL;
         }
 
         if (of_property_read_u32(np, "reg", &reg)) {
-            dev_err(dev, "missing reg property in %s node\n",
-                np->name);
+            dev_err(dev, "missing reg property in %s node\n", np->name);
             return -EINVAL;
         }
     }
@@ -2064,8 +1995,9 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
     platform_set_drvdata(pdev, rphy);
 
     ret = rockchip_usb2phy_extcon_register(rphy);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* find out a proper config which can be matched with dt. */
     index = 0;
@@ -2079,8 +2011,7 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
     } while (phy_cfgs[index].reg);
 
     if (!rphy->phy_cfg) {
-        dev_err(dev, "no phy-config can be matched with %pOFn node\n",
-            np);
+        dev_err(dev, "no phy-config can be matched with %pOFn node\n", np);
         return -EINVAL;
     }
 
@@ -2088,10 +2019,10 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
     pm_runtime_enable(dev);
     pm_runtime_get_sync(dev);
 
-
     rphy->phy_reset = devm_reset_control_get_optional(dev, "phy");
-    if (IS_ERR(rphy->phy_reset))
+    if (IS_ERR(rphy->phy_reset)) {
         return PTR_ERR(rphy->phy_reset);
+    }
 
     rphy->clk = of_clk_get_by_name(np, "phyclk");
     if (!IS_ERR(rphy->clk)) {
@@ -2103,19 +2034,21 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
 
     if (rphy->phy_cfg->phy_tuning) {
         ret = rphy->phy_cfg->phy_tuning(rphy);
-        if (ret)
+        if (ret) {
             goto disable_clks;
+        }
     }
 
     index = 0;
-    for_each_available_child_of_node(np, child_np) {
+    for_each_available_child_of_node(np, child_np)
+    {
         struct rockchip_usb2phy_port *rport = &rphy->ports[index];
         struct phy *phy;
 
         /* This driver aims to support both otg-port and host-port */
-        if (!of_node_name_eq(child_np, "host-port") &&
-            !of_node_name_eq(child_np, "otg-port"))
+        if (!of_node_name_eq(child_np, "host-port") && !of_node_name_eq(child_np, "otg-port")) {
             goto next_child;
+        }
 
         phy = devm_phy_create(dev, child_np, &rockchip_usb2phy_ops);
         if (IS_ERR(phy)) {
@@ -2129,21 +2062,22 @@ static int rockchip_usb2phy_probe(struct platform_device *pdev)
 
         /* initialize otg/host port separately */
         if (of_node_name_eq(child_np, "host-port")) {
-            ret = rockchip_usb2phy_host_port_init(rphy, rport,
-                                  child_np);
-            if (ret)
+            ret = rockchip_usb2phy_host_port_init(rphy, rport, child_np);
+            if (ret) {
                 goto put_child;
+            }
         } else {
-            ret = rockchip_usb2phy_otg_port_init(rphy, rport,
-                                 child_np);
-            if (ret)
+            ret = rockchip_usb2phy_otg_port_init(rphy, rport, child_np);
+            if (ret) {
                 goto put_child;
+            }
         }
 
-next_child:
+    next_child:
         /* to prevent out of boundary */
-        if (++index >= rphy->phy_cfg->num_ports)
+        if (++index >= rphy->phy_cfg->num_ports) {
             break;
+        }
     }
 
     provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);
@@ -2167,22 +2101,19 @@ next_child:
     }
 
     if (rphy->irq > 0) {
-        ret = devm_request_threaded_irq(rphy->dev, rphy->irq, NULL,
-                        rockchip_usb2phy_irq,
-                        IRQF_ONESHOT,
-                        "rockchip_usb2phy",
-                        rphy);
+        ret = devm_request_threaded_irq(rphy->dev, rphy->irq, NULL, rockchip_usb2phy_irq, IRQF_ONESHOT,
+                                        "rockchip_usb2phy", rphy);
         if (ret) {
-            dev_err(rphy->dev,
-                "failed to request usb2 phy irq handle\n");
+            dev_err(rphy->dev, "failed to request usb2 phy irq handle\n");
             goto put_child;
         }
     }
 
-    if (of_property_read_bool(np, "wakeup-source"))
+    if (of_property_read_bool(np, "wakeup-source")) {
         device_init_wakeup(rphy->dev, true);
-    else
+    } else {
         device_init_wakeup(rphy->dev, false);
+    }
 
     return 0;
 
@@ -2198,37 +2129,32 @@ disable_clks:
     return ret;
 }
 
-static int __maybe_unused
-rockchip_usb2phy_low_power_enable(struct rockchip_usb2phy *rphy,
-                  struct rockchip_usb2phy_port *rport,
-                  bool value)
+static int __maybe_unused rockchip_usb2phy_low_power_enable(struct rockchip_usb2phy *rphy,
+                                                            struct rockchip_usb2phy_port *rport, bool value)
 {
     int ret = 0;
 
-    if (!rport->low_power_en)
+    if (!rport->low_power_en) {
         return ret;
+    }
 
     if (rport->port_id == USB2PHY_PORT_OTG) {
-        dev_info(&rport->phy->dev, "set otg port low power state %d\n",
-             value);
-        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_bc,
-                      value);
-        if (ret)
+        dev_info(&rport->phy->dev, "set otg port low power state %d\n", value);
+        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_bc, value);
+        if (ret) {
             return ret;
+        }
 
-        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_otg,
-                      value);
-        if (ret)
+        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_otg, value);
+        if (ret) {
             return ret;
+        }
 
-        ret = property_enable(rphy->grf, &rport->port_cfg->vbus_det_en,
-                      !value);
+        ret = property_enable(rphy->grf, &rport->port_cfg->vbus_det_en, !value);
     } else if (rport->port_id == USB2PHY_PORT_HOST) {
-        dev_info(&rport->phy->dev, "set host port low power state %d\n",
-             value);
+        dev_info(&rport->phy->dev, "set host port low power state %d\n", value);
 
-        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_host,
-                      value);
+        ret = property_enable(rphy->grf, &rport->port_cfg->bypass_host, value);
     }
 
     return ret;
@@ -2240,8 +2166,9 @@ static int rk312x_usb2phy_tuning(struct rockchip_usb2phy *rphy)
 
     /* Turn off differential receiver in suspend mode */
     ret = regmap_write(rphy->grf, 0x298, 0x00040000);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     return 0;
 }
@@ -2251,8 +2178,9 @@ static int rk3228_usb2phy_tuning(struct rockchip_usb2phy *rphy)
     int ret = 0;
 
     /* Open pre-emphasize in non-chirp state for PHY0 otg port */
-    if (rphy->phy_cfg->reg == 0x760)
+    if (rphy->phy_cfg->reg == 0x760) {
         ret = regmap_write(rphy->grf, 0x76c, 0x00070004);
+    }
 
     return ret;
 }
@@ -2263,18 +2191,21 @@ static int rk3308_usb2phy_tuning(struct rockchip_usb2phy *rphy)
 
     /* Open pre-emphasize in non-chirp state for otg port */
     ret = regmap_write(rphy->grf, 0x0, 0x00070004);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* Open pre-emphasize in non-chirp state for host port */
     ret = regmap_write(rphy->grf, 0x30, 0x00070004);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* Turn off differential receiver in suspend mode */
     ret = regmap_write(rphy->grf, 0x18, 0x00040000);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     return 0;
 }
@@ -2285,23 +2216,27 @@ static int rk3328_usb2phy_tuning(struct rockchip_usb2phy *rphy)
 
     /* Open debug mode for tuning */
     ret = regmap_write(rphy->grf, 0x2c, 0xffff0400);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* Open pre-emphasize in non-chirp state for otg port */
     ret = regmap_write(rphy->grf, 0x0, 0x00070004);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* Open pre-emphasize in non-chirp state for host port */
     ret = regmap_write(rphy->grf, 0x30, 0x00070004);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     /* Turn off differential receiver in suspend mode */
     ret = regmap_write(rphy->grf, 0x18, 0x00040000);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     return 0;
 }
@@ -2337,10 +2272,8 @@ static int rk3399_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * disconnect detection and also avoid hs
          * handshake fail for PHY0.
          */
-        ret |= regmap_write(rphy->grf, 0x4480,
-                    GENMASK(17, 16) | 0x0);
-        ret |= regmap_write(rphy->grf, 0x44b4,
-                    GENMASK(17, 16) | 0x0);
+        ret |= regmap_write(rphy->grf, 0x4480, GENMASK(0x11, 0x10) | 0x0);
+        ret |= regmap_write(rphy->grf, 0x44b4, GENMASK(0x11, 0x10) | 0x0);
     } else {
         /*
          * Disable the pre-emphasize in eop state
@@ -2348,49 +2281,42 @@ static int rk3399_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * disconnect detection and also avoid hs
          * handshake fail for PHY1.
          */
-        ret |= regmap_write(rphy->grf, 0x4500,
-                    GENMASK(17, 16) | 0x0);
-        ret |= regmap_write(rphy->grf, 0x4534,
-                    GENMASK(17, 16) | 0x0);
+        ret |= regmap_write(rphy->grf, 0x4500, GENMASK(0x11, 0x10) | 0x0);
+        ret |= regmap_write(rphy->grf, 0x4534, GENMASK(0x11, 0x10) | 0x0);
     }
 
-    if (!of_property_read_bool(node, "rockchip,u2phy-tuning"))
+    if (!of_property_read_bool(node, "rockchip,u2phy-tuning")) {
         return ret;
+    }
 
     if (rphy->phy_cfg->reg == 0xe450) {
         /*
          * Set max ODT compensation voltage and
          * current tuning reference for PHY0.
          */
-        ret |= regmap_write(rphy->grf, 0x448c,
-                    GENMASK(23, 16) | 0xe3);
+        ret |= regmap_write(rphy->grf, 0x448c, GENMASK(0x17, 0x10) | 0xe3);
 
         /* Set max pre-emphasis level for PHY0 */
-        ret |= regmap_write(rphy->grf, 0x44b0,
-                    GENMASK(18, 16) | 0x07);
+        ret |= regmap_write(rphy->grf, 0x44b0, GENMASK(0x12, 0x10) | 0x07);
 
         /*
          * Set PHY0 A port squelch trigger point to 125mv
          */
-        ret |= regmap_write(rphy->grf, 0x4480,
-                    GENMASK(30, 30) | 0x4000);
+        ret |= regmap_write(rphy->grf, 0x4480, GENMASK(0x1e, 0x1e) | 0x4000);
     } else {
         /*
          * Set max ODT compensation voltage and
          * current tuning reference for PHY1.
          */
-        ret |= regmap_write(rphy->grf, 0x450c,
-                    GENMASK(23, 16) | 0xe3);
+        ret |= regmap_write(rphy->grf, 0x450c, GENMASK(0x17, 0x10) | 0xe3);
 
         /* Set max pre-emphasis level for PHY1 */
-        ret |= regmap_write(rphy->grf, 0x4530,
-                    GENMASK(18, 16) | 0x07);
+        ret |= regmap_write(rphy->grf, 0x4530, GENMASK(0x12, 0x10) | 0x07);
 
         /*
          * Set PHY1 A port squelch trigger point to 125mv
          */
-        ret |= regmap_write(rphy->grf, 0x4500,
-                    GENMASK(30, 30) | 0x4000);
+        ret |= regmap_write(rphy->grf, 0x4500, GENMASK(0x1e, 0x1e) | 0x4000);
     }
 
     return ret;
@@ -2403,7 +2329,7 @@ static int rk3568_usb2phy_tuning(struct rockchip_usb2phy *rphy)
 
     reg = readl(rphy->phy_base + 0x30);
     /* turn off differential reciver in suspend mode */
-    writel(reg & ~BIT(2), rphy->phy_base + 0x30);
+    writel(reg & ~BIT(0x2), rphy->phy_base + 0x30);
 
     reg = readl(rphy->phy_base);
     /* Enable otg port pre-emphasis during non-chirp phase */
@@ -2420,8 +2346,8 @@ static int rk3568_usb2phy_tuning(struct rockchip_usb2phy *rphy)
     if (rphy->phy_cfg->reg == 0xfe8a0000) {
         /* Set otg port HS eye height to 437.5mv(default is 400mv) */
         reg = readl(rphy->phy_base + 0x30);
-        reg &= ~(0x07 << 4);
-        reg |= (0x06 << 4);
+        reg &= ~(0x07 << 0x4);
+        reg |= (0x06 << 0x4);
         writel(reg, rphy->phy_base + 0x30);
 
         /*
@@ -2447,11 +2373,11 @@ static int rk3568_vbus_detect_control(struct rockchip_usb2phy *rphy, bool en)
     if (en) {
         reg = readl(rphy->phy_base + 0x3c);
         /* Enable vbus voltage level detection function */
-        writel(reg & ~BIT(7), rphy->phy_base + 0x3c);
+        writel(reg & ~BIT(0x7), rphy->phy_base + 0x3c);
     } else {
         reg = readl(rphy->phy_base + 0x3c);
         /* Disable vbus voltage level detection function */
-        writel(reg | BIT(7), rphy->phy_base + 0x3c);
+        writel(reg | BIT(0x7), rphy->phy_base + 0x3c);
     }
 
     return 0;
@@ -2462,15 +2388,16 @@ static int rk3588_usb2phy_tuning(struct rockchip_usb2phy *rphy)
     int ret = 0;
 
     /* Deassert SIDDQ to power on analog block */
-    ret = regmap_write(rphy->grf, 0x0008,
-               GENMASK(29, 29) | 0x0000);
-    if (ret)
+    ret = regmap_write(rphy->grf, 0x0008, GENMASK(0x1d, 0x1d) | 0x0000);
+    if (ret) {
         return ret;
+    }
 
     /* Do reset after exit IDDQ mode */
     ret = rockchip_usb2phy_reset(rphy);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     if (rphy->phy_cfg->reg == 0x0000) {
         /*
@@ -2479,20 +2406,16 @@ static int rk3588_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * 2. Set utmi_xcvrselect to 2'b01 (FS transceiver)
          * 3. Set utmi_opmode to 2'b01 (no-driving)
          */
-        ret |= regmap_write(rphy->grf, 0x000c,
-                    GENMASK(20, 16) | 0x0015);
+        ret |= regmap_write(rphy->grf, 0x000c, GENMASK(0x14, 0x10) | 0x0015);
 
         /* HS DC Voltage Level Adjustment 4'b1001 : +5.89% */
-        ret |= regmap_write(rphy->grf, 0x0004,
-                   GENMASK(27, 24) | 0x0900);
+        ret |= regmap_write(rphy->grf, 0x0004, GENMASK(0x1b, 0x18) | 0x0900);
 
         /* HS Transmitter Pre-Emphasis Current Control 2'b10 : 2x */
-        ret |= regmap_write(rphy->grf, 0x0008,
-                   GENMASK(20, 19) | 0x0010);
+        ret |= regmap_write(rphy->grf, 0x0008, GENMASK(0x14, 0x13) | 0x0010);
 
         /* Pullup iddig pin for USB3_0 OTG mode */
-        ret |= regmap_write(rphy->grf, 0x0010,
-                    GENMASK(17, 16) | 0x0003);
+        ret |= regmap_write(rphy->grf, 0x0010, GENMASK(0x11, 0x10) | 0x0003);
     } else if (rphy->phy_cfg->reg == 0x4000) {
         /*
          * Set USB2 PHY1 suspend configuration for USB3_1
@@ -2500,20 +2423,16 @@ static int rk3588_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * 2. Set utmi_xcvrselect to 2'b01(FS transceiver)
          * 3. Set utmi_opmode to 2'b01 (no-driving)
          */
-        ret |= regmap_write(rphy->grf, 0x000c,
-                    GENMASK(20, 16) | 0x0015);
+        ret |= regmap_write(rphy->grf, 0x000c, GENMASK(0x14, 0x10) | 0x0015);
 
         /* HS DC Voltage Level Adjustment 4'b1001 : +5.89% */
-        ret |= regmap_write(rphy->grf, 0x0004,
-                   GENMASK(27, 24) | 0x0900);
+        ret |= regmap_write(rphy->grf, 0x0004, GENMASK(0x1b, 0x18) | 0x0900);
 
         /* HS Transmitter Pre-Emphasis Current Control 2'b10 : 2x */
-        ret |= regmap_write(rphy->grf, 0x0008,
-                   GENMASK(20, 19) | 0x0010);
+        ret |= regmap_write(rphy->grf, 0x0008, GENMASK(0x14, 0x13) | 0x0010);
 
         /* Pullup iddig pin for USB3_1 OTG mode */
-        ret |= regmap_write(rphy->grf, 0x0010,
-                    GENMASK(17, 16) | 0x0003);
+        ret |= regmap_write(rphy->grf, 0x0010, GENMASK(17, 0x10) | 0x0003);
     } else if (rphy->phy_cfg->reg == 0x8000) {
         /*
          * Set USB2 PHY2 suspend configuration for USB2_0
@@ -2521,16 +2440,13 @@ static int rk3588_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * 2. Set utmi_xcvrselect to 2'b01(FS transceiver)
          * 3. Set utmi_opmode to 2'b00 (normal)
          */
-        ret |= regmap_write(rphy->grf, 0x000c,
-                    GENMASK(20, 16) | 0x0014);
+        ret |= regmap_write(rphy->grf, 0x000c, GENMASK(0x14, 0x10) | 0x0014);
 
         /* HS DC Voltage Level Adjustment 4'b1001 : +5.89% */
-        ret |= regmap_write(rphy->grf, 0x0004,
-                   GENMASK(27, 24) | 0x0900);
+        ret |= regmap_write(rphy->grf, 0x0004, GENMASK(0x1b, 0x18) | 0x0900);
 
         /* HS Transmitter Pre-Emphasis Current Control 2'b10 : 2x */
-        ret |= regmap_write(rphy->grf, 0x0008,
-                   GENMASK(20, 19) | 0x0010);
+        ret |= regmap_write(rphy->grf, 0x0008, GENMASK(0x14, 0x13) | 0x0010);
     } else if (rphy->phy_cfg->reg == 0xc000) {
         /*
          * Set USB2 PHY3 suspend configuration for USB2_1
@@ -2538,16 +2454,13 @@ static int rk3588_usb2phy_tuning(struct rockchip_usb2phy *rphy)
          * 2. Set utmi_xcvrselect to 2'b01(FS transceiver)
          * 3. Set utmi_opmode to 2'b00 (normal)
          */
-        ret |= regmap_write(rphy->grf, 0x000c,
-                    GENMASK(20, 16) | 0x0014);
+        ret |= regmap_write(rphy->grf, 0x000c, GENMASK(0x14, 0x10) | 0x0014);
 
         /* HS DC Voltage Level Adjustment 4'b1001 : +5.89% */
-        ret |= regmap_write(rphy->grf, 0x0004,
-                   GENMASK(27, 24) | 0x0900);
+        ret |= regmap_write(rphy->grf, 0x0004, GENMASK(0x1b, 0x18) | 0x0900);
 
         /* HS Transmitter Pre-Emphasis Current Control 2'b10 : 2x */
-        ret |= regmap_write(rphy->grf, 0x0008,
-                   GENMASK(20, 19) | 0x0010);
+        ret |= regmap_write(rphy->grf, 0x0008, GENMASK(0x14, 0x13) | 0x0010);
     }
 
     return ret;
@@ -2562,32 +2475,30 @@ static int rockchip_usb2phy_pm_suspend(struct device *dev)
     int ret = 0;
     bool wakeup_enable = false;
 
-    if (device_may_wakeup(rphy->dev))
+    if (device_may_wakeup(rphy->dev)) {
         wakeup_enable = true;
+    }
 
     for (index = 0; index < rphy->phy_cfg->num_ports; index++) {
         rport = &rphy->ports[index];
-        if (!rport->phy)
+        if (!rport->phy) {
             continue;
+        }
 
-        if (rport->port_id == USB2PHY_PORT_OTG &&
-            (rport->id_irq > 0 || rphy->irq > 0)) {
+        if (rport->port_id == USB2PHY_PORT_OTG && (rport->id_irq > 0 || rphy->irq > 0)) {
             mutex_lock(&rport->mutex);
-            rport->prev_iddig = property_enabled(rphy->grf,
-                        &rport->port_cfg->utmi_iddig);
-            ret = rockchip_usb2phy_enable_id_irq(rphy, rport,
-                                 false);
+            rport->prev_iddig = property_enabled(rphy->grf, &rport->port_cfg->utmi_iddig);
+            ret = rockchip_usb2phy_enable_id_irq(rphy, rport, false);
             mutex_unlock(&rport->mutex);
             if (ret) {
-                dev_err(rphy->dev,
-                    "failed to disable id irq\n");
+                dev_err(rphy->dev, "failed to disable id irq\n");
                 return ret;
             }
         }
 
-        if (rport->port_id == USB2PHY_PORT_OTG && wakeup_enable &&
-            rport->bvalid_irq > 0)
+        if (rport->port_id == USB2PHY_PORT_OTG && wakeup_enable && rport->bvalid_irq > 0) {
             enable_irq_wake(rport->bvalid_irq);
+        }
 
         /* activate the linestate to detect the next interrupt. */
         mutex_lock(&rport->mutex);
@@ -2598,8 +2509,9 @@ static int rockchip_usb2phy_pm_suspend(struct device *dev)
             return ret;
         }
 
-        if (wakeup_enable && rport->ls_irq > 0)
+        if (wakeup_enable && rport->ls_irq > 0) {
             enable_irq_wake(rport->ls_irq);
+        }
 
         /* enter low power state */
         rockchip_usb2phy_low_power_enable(rphy, rport, true);
@@ -2617,53 +2529,49 @@ static int rockchip_usb2phy_pm_resume(struct device *dev)
     int ret = 0;
     bool wakeup_enable = false;
 
-    if (device_may_wakeup(rphy->dev))
+    if (device_may_wakeup(rphy->dev)) {
         wakeup_enable = true;
+    }
 
-    if (rphy->phy_cfg->phy_tuning)
+    if (rphy->phy_cfg->phy_tuning) {
         ret = rphy->phy_cfg->phy_tuning(rphy);
+    }
 
     for (index = 0; index < rphy->phy_cfg->num_ports; index++) {
         rport = &rphy->ports[index];
-        if (!rport->phy)
+        if (!rport->phy) {
             continue;
+        }
 
-        if (rport->port_id == USB2PHY_PORT_OTG &&
-            (rport->id_irq > 0 || rphy->irq > 0)) {
+        if (rport->port_id == USB2PHY_PORT_OTG && (rport->id_irq > 0 || rphy->irq > 0)) {
             mutex_lock(&rport->mutex);
-            iddig = property_enabled(rphy->grf,
-                         &rport->port_cfg->utmi_iddig);
-            ret = rockchip_usb2phy_enable_id_irq(rphy, rport,
-                                 true);
+            iddig = property_enabled(rphy->grf, &rport->port_cfg->utmi_iddig);
+            ret = rockchip_usb2phy_enable_id_irq(rphy, rport, true);
             mutex_unlock(&rport->mutex);
             if (ret) {
-                dev_err(rphy->dev,
-                    "failed to enable id irq\n");
+                dev_err(rphy->dev, "failed to enable id irq\n");
                 return ret;
             }
 
             if (iddig != rport->prev_iddig) {
-                dev_dbg(&rport->phy->dev,
-                    "iddig changed during resume\n");
+                dev_dbg(&rport->phy->dev, "iddig changed during resume\n");
                 rport->prev_iddig = iddig;
-                extcon_set_state_sync(rphy->edev,
-                              EXTCON_USB_HOST,
-                              !iddig);
-                extcon_set_state_sync(rphy->edev,
-                              EXTCON_USB_VBUS_EN,
-                              !iddig);
+                extcon_set_state_sync(rphy->edev, EXTCON_USB_HOST, !iddig);
+                extcon_set_state_sync(rphy->edev, EXTCON_USB_VBUS_EN, !iddig);
                 ret = rockchip_set_vbus_power(rport, !iddig);
-                if (ret)
+                if (ret) {
                     return ret;
+                }
             }
         }
 
-        if (rport->port_id == USB2PHY_PORT_OTG && wakeup_enable &&
-            rport->bvalid_irq > 0)
+        if (rport->port_id == USB2PHY_PORT_OTG && wakeup_enable && rport->bvalid_irq > 0) {
             disable_irq_wake(rport->bvalid_irq);
+        }
 
-        if (wakeup_enable && rport->ls_irq > 0)
+        if (wakeup_enable && rport->ls_irq > 0) {
             disable_irq_wake(rport->ls_irq);
+        }
 
         /* exit low power state */
         rockchip_usb2phy_low_power_enable(rphy, rport, false);
@@ -2673,773 +2581,724 @@ static int rockchip_usb2phy_pm_resume(struct device *dev)
 }
 
 static const struct dev_pm_ops rockchip_usb2phy_dev_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(rockchip_usb2phy_pm_suspend,
-                rockchip_usb2phy_pm_resume)
-};
+    SET_SYSTEM_SLEEP_PM_OPS(rockchip_usb2phy_pm_suspend, rockchip_usb2phy_pm_resume)};
 
-#define ROCKCHIP_USB2PHY_DEV_PM    (&rockchip_usb2phy_dev_pm_ops)
+#define ROCKCHIP_USB2PHY_DEV_PM (&rockchip_usb2phy_dev_pm_ops)
 #else
-#define ROCKCHIP_USB2PHY_DEV_PM    NULL
+#define ROCKCHIP_USB2PHY_DEV_PM NULL
 #endif /* CONFIG_PM_SLEEP */
 
-static const struct rockchip_usb2phy_cfg rk1808_phy_cfgs[] = {
-    {
-        .reg = 0x100,
-        .num_ports    = 2,
-        .clkout_ctl    = { 0x108, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0100, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0110, 2, 2, 0, 1 },
-                .bvalid_det_st    = { 0x0114, 2, 2, 0, 1 },
-                .bvalid_det_clr = { 0x0118, 2, 2, 0, 1 },
-                .bypass_dm_en    = { 0x0108, 2, 2, 0, 1},
-                .bypass_sel    = { 0x0108, 3, 3, 0, 1},
-                .iddig_output    = { 0x0100, 10, 10, 0, 1 },
-                .iddig_en    = { 0x0100, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x0110, 5, 5, 0, 1 },
-                .idfall_det_st    = { 0x0114, 5, 5, 0, 1 },
-                .idfall_det_clr = { 0x0118, 5, 5, 0, 1 },
-                .idrise_det_en    = { 0x0110, 4, 4, 0, 1 },
-                .idrise_det_st    = { 0x0114, 4, 4, 0, 1 },
-                .idrise_det_clr = { 0x0118, 4, 4, 0, 1 },
-                .ls_det_en    = { 0x0110, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0114, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0118, 0, 0, 0, 1 },
-                .utmi_avalid    = { 0x0120, 10, 10, 0, 1 },
-                .utmi_bvalid    = { 0x0120, 9, 9, 0, 1 },
-                .utmi_iddig    = { 0x0120, 6, 6, 0, 1 },
-                .utmi_ls    = { 0x0120, 5, 4, 0, 1 },
-                .vbus_det_en    = { 0x001c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x104, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x110, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x114, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x118, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x120, 17, 16, 0, 1 },
-                .utmi_hstdet    = { 0x120, 19, 19, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0100, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x0120, 24, 24, 0, 1 },
-            .dcp_det    = { 0x0120, 23, 23, 0, 1 },
-            .dp_det        = { 0x0120, 25, 25, 0, 1 },
-            .idm_sink_en    = { 0x0108, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0108, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0108, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0108, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0108, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0108, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk1808_phy_cfgs[] = {{
+                             .reg = 0x100,
+                             .num_ports = 2,
+                             .clkout_ctl = {0x108, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0100, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0110, 2, 2, 0, 1},
+                                                   .bvalid_det_st = {0x0114, 2, 2, 0, 1},
+                                                   .bvalid_det_clr = {0x0118, 2, 2, 0, 1},
+                                                   .bypass_dm_en = {0x0108, 2, 2, 0, 1},
+                                                   .bypass_sel = {0x0108, 3, 3, 0, 1},
+                                                   .iddig_output = {0x0100, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0100, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x0110, 5, 5, 0, 1},
+                                                   .idfall_det_st = {0x0114, 5, 5, 0, 1},
+                                                   .idfall_det_clr = {0x0118, 5, 5, 0, 1},
+                                                   .idrise_det_en = {0x0110, 4, 4, 0, 1},
+                                                   .idrise_det_st = {0x0114, 4, 4, 0, 1},
+                                                   .idrise_det_clr = {0x0118, 4, 4, 0, 1},
+                                                   .ls_det_en = {0x0110, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0114, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0118, 0, 0, 0, 1},
+                                                   .utmi_avalid = {0x0120, 10, 10, 0, 1},
+                                                   .utmi_bvalid = {0x0120, 9, 9, 0, 1},
+                                                   .utmi_iddig = {0x0120, 6, 6, 0, 1},
+                                                   .utmi_ls = {0x0120, 5, 4, 0, 1},
+                                                   .vbus_det_en = {0x001c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x104, 8, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x110, 1, 1, 0, 1},
+                                                                  .ls_det_st = {0x114, 1, 1, 0, 1},
+                                                                  .ls_det_clr = {0x118, 1, 1, 0, 1},
+                                                                  .utmi_ls = {0x120, 17, 16, 0, 1},
+                                                                  .utmi_hstdet = {0x120, 19, 19, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0100, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x0120, 24, 24, 0, 1},
+                                     .dcp_det = {0x0120, 23, 23, 0, 1},
+                                     .dp_det = {0x0120, 25, 25, 0, 1},
+                                     .idm_sink_en = {0x0108, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0108, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0108, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0108, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0108, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0108, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk312x_phy_cfgs[] = {
-    {
-        .reg = 0x17c,
-        .num_ports    = 2,
-        .phy_tuning    = rk312x_usb2phy_tuning,
-        .clkout_ctl    = { 0x0190, 15, 15, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x017c, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x017c, 14, 14, 0, 1 },
-                .bvalid_det_st    = { 0x017c, 15, 15, 0, 1 },
-                .bvalid_det_clr    = { 0x017c, 15, 15, 0, 1 },
-                .bypass_dm_en    = { 0x0190, 12, 12, 0, 1},
-                .bypass_sel    = { 0x0190, 13, 13, 0, 1},
-                .iddig_output    = { 0x017c, 10, 10, 0, 1 },
-                .iddig_en    = { 0x017c, 9, 9, 0, 1 },
-                .idfall_det_en  = { 0x01a0, 2, 2, 0, 1 },
-                .idfall_det_st  = { 0x01a0, 3, 3, 0, 1 },
-                .idfall_det_clr = { 0x01a0, 3, 3, 0, 1 },
-                .idrise_det_en  = { 0x01a0, 0, 0, 0, 1 },
-                .idrise_det_st  = { 0x01a0, 1, 1, 0, 1 },
-                .idrise_det_clr = { 0x01a0, 1, 1, 0, 1 },
-                .ls_det_en    = { 0x017c, 12, 12, 0, 1 },
-                .ls_det_st    = { 0x017c, 13, 13, 0, 1 },
-                .ls_det_clr    = { 0x017c, 13, 13, 0, 1 },
-                .utmi_bvalid    = { 0x014c, 5, 5, 0, 1 },
-                .utmi_iddig    = { 0x014c, 8, 8, 0, 1 },
-                .utmi_ls    = { 0x014c, 7, 6, 0, 1 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0194, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0194, 14, 14, 0, 1 },
-                .ls_det_st    = { 0x0194, 15, 15, 0, 1 },
-                .ls_det_clr    = { 0x0194, 15, 15, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x017c, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x02c0, 6, 6, 0, 1 },
-            .dcp_det    = { 0x02c0, 5, 5, 0, 1 },
-            .dp_det        = { 0x02c0, 7, 7, 0, 1 },
-            .idm_sink_en    = { 0x0184, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0184, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0184, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0184, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0184, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0184, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk312x_phy_cfgs[] = {{
+                             .reg = 0x17c,
+                             .num_ports = 2,
+                             .phy_tuning = rk312x_usb2phy_tuning,
+                             .clkout_ctl = {0x0190, 15, 15, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x017c, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x017c, 14, 14, 0, 1},
+                                                   .bvalid_det_st = {0x017c, 15, 15, 0, 1},
+                                                   .bvalid_det_clr = {0x017c, 15, 15, 0, 1},
+                                                   .bypass_dm_en = {0x0190, 12, 12, 0, 1},
+                                                   .bypass_sel = {0x0190, 13, 13, 0, 1},
+                                                   .iddig_output = {0x017c, 10, 10, 0, 1},
+                                                   .iddig_en = {0x017c, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x01a0, 2, 2, 0, 1},
+                                                   .idfall_det_st = {0x01a0, 3, 3, 0, 1},
+                                                   .idfall_det_clr = {0x01a0, 3, 3, 0, 1},
+                                                   .idrise_det_en = {0x01a0, 0, 0, 0, 1},
+                                                   .idrise_det_st = {0x01a0, 1, 1, 0, 1},
+                                                   .idrise_det_clr = {0x01a0, 1, 1, 0, 1},
+                                                   .ls_det_en = {0x017c, 12, 12, 0, 1},
+                                                   .ls_det_st = {0x017c, 13, 13, 0, 1},
+                                                   .ls_det_clr = {0x017c, 13, 13, 0, 1},
+                                                   .utmi_bvalid = {0x014c, 5, 5, 0, 1},
+                                                   .utmi_iddig = {0x014c, 8, 8, 0, 1},
+                                                   .utmi_ls = {0x014c, 7, 6, 0, 1},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0194, 8, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x0194, 14, 14, 0, 1},
+                                                                  .ls_det_st = {0x0194, 15, 15, 0, 1},
+                                                                  .ls_det_clr = {0x0194, 15, 15, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x017c, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x02c0, 6, 6, 0, 1},
+                                     .dcp_det = {0x02c0, 5, 5, 0, 1},
+                                     .dp_det = {0x02c0, 7, 7, 0, 1},
+                                     .idm_sink_en = {0x0184, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0184, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0184, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0184, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0184, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0184, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3228_phy_cfgs[] = {
-    {
-        .reg = 0x760,
-        .num_ports    = 2,
-        .phy_tuning    = rk3228_usb2phy_tuning,
-        .clkout_ctl    = { 0x0768, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0760, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0680, 3, 3, 0, 1 },
-                .bvalid_det_st    = { 0x0690, 3, 3, 0, 1 },
-                .bvalid_det_clr    = { 0x06a0, 3, 3, 0, 1 },
-                .iddig_output   = { 0x0760, 10, 10, 0, 1 },
-                .iddig_en       = { 0x0760, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x0680, 6, 6, 0, 1 },
-                .idfall_det_st    = { 0x0690, 6, 6, 0, 1 },
-                .idfall_det_clr    = { 0x06a0, 6, 6, 0, 1 },
-                .idrise_det_en    = { 0x0680, 5, 5, 0, 1 },
-                .idrise_det_st    = { 0x0690, 5, 5, 0, 1 },
-                .idrise_det_clr    = { 0x06a0, 5, 5, 0, 1 },
-                .ls_det_en    = { 0x0680, 2, 2, 0, 1 },
-                .ls_det_st    = { 0x0690, 2, 2, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 2, 2, 0, 1 },
-                .utmi_bvalid    = { 0x0480, 4, 4, 0, 1 },
-                .utmi_iddig    = { 0x0480, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x0480, 3, 2, 0, 1 },
-                .vbus_det_en    = { 0x0788, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0764, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0680, 4, 4, 0, 1 },
-                .ls_det_st    = { 0x0690, 4, 4, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 4, 4, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0760, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x0884, 4, 4, 0, 1 },
-            .dcp_det    = { 0x0884, 3, 3, 0, 1 },
-            .dp_det        = { 0x0884, 5, 5, 0, 1 },
-            .idm_sink_en    = { 0x0768, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0768, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0768, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0768, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0768, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0768, 11, 11, 0, 1 },
-        },
-    },
-    {
-        .reg = 0x800,
-        .num_ports    = 2,
-        .clkout_ctl    = { 0x0808, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x804, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0684, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x0694, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x06a4, 1, 1, 0, 1 }
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x800, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0684, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0694, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x06a4, 0, 0, 0, 1 }
-            }
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3228_phy_cfgs[] = {{
+                             .reg = 0x760,
+                             .num_ports = 2,
+                             .phy_tuning = rk3228_usb2phy_tuning,
+                             .clkout_ctl = {0x0768, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0760, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0680, 3, 3, 0, 1},
+                                                   .bvalid_det_st = {0x0690, 3, 3, 0, 1},
+                                                   .bvalid_det_clr = {0x06a0, 3, 3, 0, 1},
+                                                   .iddig_output = {0x0760, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0760, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x0680, 6, 6, 0, 1},
+                                                   .idfall_det_st = {0x0690, 6, 6, 0, 1},
+                                                   .idfall_det_clr = {0x06a0, 6, 6, 0, 1},
+                                                   .idrise_det_en = {0x0680, 5, 5, 0, 1},
+                                                   .idrise_det_st = {0x0690, 5, 5, 0, 1},
+                                                   .idrise_det_clr = {0x06a0, 5, 5, 0, 1},
+                                                   .ls_det_en = {0x0680, 2, 2, 0, 1},
+                                                   .ls_det_st = {0x0690, 2, 2, 0, 1},
+                                                   .ls_det_clr = {0x06a0, 2, 2, 0, 1},
+                                                   .utmi_bvalid = {0x0480, 4, 4, 0, 1},
+                                                   .utmi_iddig = {0x0480, 1, 1, 0, 1},
+                                                   .utmi_ls = {0x0480, 3, 2, 0, 1},
+                                                   .vbus_det_en = {0x0788, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0764, 8, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x0680, 4, 4, 0, 1},
+                                                                  .ls_det_st = {0x0690, 4, 4, 0, 1},
+                                                                  .ls_det_clr = {0x06a0, 4, 4, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0760, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x0884, 4, 4, 0, 1},
+                                     .dcp_det = {0x0884, 3, 3, 0, 1},
+                                     .dp_det = {0x0884, 5, 5, 0, 1},
+                                     .idm_sink_en = {0x0768, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0768, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0768, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0768, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0768, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0768, 11, 11, 0, 1},
+                                 },
+                         },
+                         {
+                             .reg = 0x800,
+                             .num_ports = 2,
+                             .clkout_ctl = {0x0808, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] = {.phy_sus = {0x804, 8, 0, 0, 0x1d1},
+                                                                 .ls_det_en = {0x0684, 1, 1, 0, 1},
+                                                                 .ls_det_st = {0x0694, 1, 1, 0, 1},
+                                                                 .ls_det_clr = {0x06a4, 1, 1, 0, 1}},
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x800, 8, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x0684, 0, 0, 0, 1},
+                                                                  .ls_det_st = {0x0694, 0, 0, 0, 1},
+                                                                  .ls_det_clr = {0x06a4, 0, 0, 0, 1}}},
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3308_phy_cfgs[] = {
-    {
-        .reg = 0x100,
-        .num_ports    = 2,
-        .phy_tuning    = rk3308_usb2phy_tuning,
-        .clkout_ctl    = { 0x0108, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0100, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x3020, 2, 2, 0, 1 },
-                .bvalid_det_st    = { 0x3024, 2, 2, 0, 1 },
-                .bvalid_det_clr = { 0x3028, 2, 2, 0, 1 },
-                .iddig_output    = { 0x0100, 10, 10, 0, 1 },
-                .iddig_en    = { 0x0100, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x3020, 5, 5, 0, 1 },
-                .idfall_det_st    = { 0x3024, 5, 5, 0, 1 },
-                .idfall_det_clr = { 0x3028, 5, 5, 0, 1 },
-                .idrise_det_en    = { 0x3020, 4, 4, 0, 1 },
-                .idrise_det_st    = { 0x3024, 4, 4, 0, 1 },
-                .idrise_det_clr = { 0x3028, 4, 4, 0, 1 },
-                .ls_det_en    = { 0x3020, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x3024, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x3028, 0, 0, 0, 1 },
-                .utmi_avalid    = { 0x0120, 10, 10, 0, 1 },
-                .utmi_bvalid    = { 0x0120, 9, 9, 0, 1 },
-                .utmi_iddig    = { 0x0120, 6, 6, 0, 1 },
-                .utmi_ls    = { 0x0120, 5, 4, 0, 1 },
-                .vbus_det_en    = { 0x001c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0104, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x3020, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x3024, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x3028, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x120, 17, 16, 0, 1 },
-                .utmi_hstdet    = { 0x120, 19, 19, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0100, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x0120, 24, 24, 0, 1 },
-            .dcp_det    = { 0x0120, 23, 23, 0, 1 },
-            .dp_det        = { 0x0120, 25, 25, 0, 1 },
-            .idm_sink_en    = { 0x0108, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0108, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0108, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0108, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0108, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0108, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3308_phy_cfgs[] = {{
+                             .reg = 0x100,
+                             .num_ports = 2,
+                             .phy_tuning = rk3308_usb2phy_tuning,
+                             .clkout_ctl = {0x0108, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0100, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x3020, 2, 2, 0, 1},
+                                                   .bvalid_det_st = {0x3024, 2, 2, 0, 1},
+                                                   .bvalid_det_clr = {0x3028, 2, 2, 0, 1},
+                                                   .iddig_output = {0x0100, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0100, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x3020, 5, 5, 0, 1},
+                                                   .idfall_det_st = {0x3024, 5, 5, 0, 1},
+                                                   .idfall_det_clr = {0x3028, 5, 5, 0, 1},
+                                                   .idrise_det_en = {0x3020, 4, 4, 0, 1},
+                                                   .idrise_det_st = {0x3024, 4, 4, 0, 1},
+                                                   .idrise_det_clr = {0x3028, 4, 4, 0, 1},
+                                                   .ls_det_en = {0x3020, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x3024, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x3028, 0, 0, 0, 1},
+                                                   .utmi_avalid = {0x0120, 10, 10, 0, 1},
+                                                   .utmi_bvalid = {0x0120, 9, 9, 0, 1},
+                                                   .utmi_iddig = {0x0120, 6, 6, 0, 1},
+                                                   .utmi_ls = {0x0120, 5, 4, 0, 1},
+                                                   .vbus_det_en = {0x001c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0104, 8, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x3020, 1, 1, 0, 1},
+                                                                  .ls_det_st = {0x3024, 1, 1, 0, 1},
+                                                                  .ls_det_clr = {0x3028, 1, 1, 0, 1},
+                                                                  .utmi_ls = {0x120, 17, 16, 0, 1},
+                                                                  .utmi_hstdet = {0x120, 19, 19, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0100, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x0120, 24, 24, 0, 1},
+                                     .dcp_det = {0x0120, 23, 23, 0, 1},
+                                     .dp_det = {0x0120, 25, 25, 0, 1},
+                                     .idm_sink_en = {0x0108, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0108, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0108, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0108, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0108, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0108, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3328_phy_cfgs[] = {
-    {
-        .reg = 0x100,
-        .num_ports    = 2,
-        .phy_tuning = rk3328_usb2phy_tuning,
-        .clkout_ctl    = { 0x108, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0100, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0110, 2, 2, 0, 1 },
-                .bvalid_det_st    = { 0x0114, 2, 2, 0, 1 },
-                .bvalid_det_clr = { 0x0118, 2, 2, 0, 1 },
-                .bypass_bc      = { 0x0008, 14, 14, 0, 1 },
-                .bypass_otg     = { 0x0018, 15, 15, 1, 0 },
-                .iddig_output   = { 0x0100, 10, 10, 0, 1 },
-                .iddig_en       = { 0x0100, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x0110, 5, 5, 0, 1 },
-                .idfall_det_st    = { 0x0114, 5, 5, 0, 1 },
-                .idfall_det_clr = { 0x0118, 5, 5, 0, 1 },
-                .idrise_det_en    = { 0x0110, 4, 4, 0, 1 },
-                .idrise_det_st    = { 0x0114, 4, 4, 0, 1 },
-                .idrise_det_clr = { 0x0118, 4, 4, 0, 1 },
-                .ls_det_en    = { 0x0110, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0114, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0118, 0, 0, 0, 1 },
-                .utmi_avalid    = { 0x0120, 10, 10, 0, 1 },
-                .utmi_bvalid    = { 0x0120, 9, 9, 0, 1 },
-                .utmi_iddig    = { 0x0120, 6, 6, 0, 1 },
-                .utmi_ls    = { 0x0120, 5, 4, 0, 1 },
-                .vbus_det_en    = { 0x001c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x104, 8, 0, 0, 0x1d1 },
-                .bypass_host    = { 0x048, 15, 15, 1, 0 },
-                .ls_det_en    = { 0x110, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x114, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x118, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x120, 17, 16, 0, 1 },
-                .utmi_hstdet    = { 0x120, 19, 19, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0100, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x0120, 24, 24, 0, 1 },
-            .dcp_det    = { 0x0120, 23, 23, 0, 1 },
-            .dp_det        = { 0x0120, 25, 25, 0, 1 },
-            .idm_sink_en    = { 0x0108, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0108, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0108, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0108, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0108, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0108, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3328_phy_cfgs[] = {{
+                             .reg = 0x100,
+                             .num_ports = 2,
+                             .phy_tuning = rk3328_usb2phy_tuning,
+                             .clkout_ctl = {0x108, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0100, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0110, 2, 2, 0, 1},
+                                                   .bvalid_det_st = {0x0114, 2, 2, 0, 1},
+                                                   .bvalid_det_clr = {0x0118, 2, 2, 0, 1},
+                                                   .bypass_bc = {0x0008, 14, 14, 0, 1},
+                                                   .bypass_otg = {0x0018, 15, 15, 1, 0},
+                                                   .iddig_output = {0x0100, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0100, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x0110, 5, 5, 0, 1},
+                                                   .idfall_det_st = {0x0114, 5, 5, 0, 1},
+                                                   .idfall_det_clr = {0x0118, 5, 5, 0, 1},
+                                                   .idrise_det_en = {0x0110, 4, 4, 0, 1},
+                                                   .idrise_det_st = {0x0114, 4, 4, 0, 1},
+                                                   .idrise_det_clr = {0x0118, 4, 4, 0, 1},
+                                                   .ls_det_en = {0x0110, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0114, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0118, 0, 0, 0, 1},
+                                                   .utmi_avalid = {0x0120, 10, 10, 0, 1},
+                                                   .utmi_bvalid = {0x0120, 9, 9, 0, 1},
+                                                   .utmi_iddig = {0x0120, 6, 6, 0, 1},
+                                                   .utmi_ls = {0x0120, 5, 4, 0, 1},
+                                                   .vbus_det_en = {0x001c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x104, 8, 0, 0, 0x1d1},
+                                                                  .bypass_host = {0x048, 15, 15, 1, 0},
+                                                                  .ls_det_en = {0x110, 1, 1, 0, 1},
+                                                                  .ls_det_st = {0x114, 1, 1, 0, 1},
+                                                                  .ls_det_clr = {0x118, 1, 1, 0, 1},
+                                                                  .utmi_ls = {0x120, 17, 16, 0, 1},
+                                                                  .utmi_hstdet = {0x120, 19, 19, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0100, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x0120, 24, 24, 0, 1},
+                                     .dcp_det = {0x0120, 23, 23, 0, 1},
+                                     .dp_det = {0x0120, 25, 25, 0, 1},
+                                     .idm_sink_en = {0x0108, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0108, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0108, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0108, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0108, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0108, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
 static const struct rockchip_usb2phy_cfg rk3366_phy_cfgs[] = {
     {
         .reg = 0x700,
-        .num_ports    = 2,
-        .phy_tuning    = rk3366_usb2phy_tuning,
-        .clkout_ctl    = { 0x0724, 15, 15, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0728, 8, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0680, 4, 4, 0, 1 },
-                .ls_det_st    = { 0x0690, 4, 4, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 4, 4, 0, 1 },
-                .utmi_ls    = { 0x049c, 14, 13, 0, 1 },
-                .utmi_hstdet    = { 0x049c, 12, 12, 0, 1 }
-            }
-        },
+        .num_ports = 2,
+        .phy_tuning = rk3366_usb2phy_tuning,
+        .clkout_ctl = {0x0724, 15, 15, 1, 0},
+        .port_cfgs = {[USB2PHY_PORT_HOST] = {.phy_sus = {0x0728, 8, 0, 0, 0x1d1},
+                                             .ls_det_en = {0x0680, 4, 4, 0, 1},
+                                             .ls_det_st = {0x0690, 4, 4, 0, 1},
+                                             .ls_det_clr = {0x06a0, 4, 4, 0, 1},
+                                             .utmi_ls = {0x049c, 14, 13, 0, 1},
+                                             .utmi_hstdet = {0x049c, 12, 12, 0, 1}}},
     },
-    { /* sentinel */ }
-};
+    {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3368_phy_cfgs[] = {
-    {
-        .reg = 0x700,
-        .num_ports    = 2,
-        .clkout_ctl    = { 0x0724, 15, 15, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0700, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0680, 3, 3, 0, 1 },
-                .bvalid_det_st    = { 0x0690, 3, 3, 0, 1 },
-                .bvalid_det_clr = { 0x06a0, 3, 3, 0, 1 },
-                .iddig_output    = { 0x0700, 10, 10, 0, 1 },
-                .iddig_en    = { 0x0700, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x0680, 6, 6, 0, 1 },
-                .idfall_det_st    = { 0x0690, 6, 6, 0, 1 },
-                .idfall_det_clr    = { 0x06a0, 6, 6, 0, 1 },
-                .idrise_det_en    = { 0x0680, 5, 5, 0, 1 },
-                .idrise_det_st    = { 0x0690, 5, 5, 0, 1 },
-                .idrise_det_clr    = { 0x06a0, 5, 5, 0, 1 },
-                .ls_det_en    = { 0x0680, 2, 2, 0, 1 },
-                .ls_det_st    = { 0x0690, 2, 2, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 2, 2, 0, 1 },
-                .utmi_bvalid    = { 0x04bc, 23, 23, 0, 1 },
-                .utmi_iddig     = { 0x04bc, 26, 26, 0, 1 },
-                .utmi_ls    = { 0x04bc, 25, 24, 0, 1 },
-                .vbus_det_en    = { 0x079c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0728, 15, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0680, 4, 4, 0, 1 },
-                .ls_det_st    = { 0x0690, 4, 4, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 4, 4, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0700, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x04b8, 30, 30, 0, 1 },
-            .dcp_det    = { 0x04b8, 29, 29, 0, 1 },
-            .dp_det        = { 0x04b8, 31, 31, 0, 1 },
-            .idm_sink_en    = { 0x0718, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0718, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0718, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0718, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0718, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0718, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3368_phy_cfgs[] = {{
+                             .reg = 0x700,
+                             .num_ports = 2,
+                             .clkout_ctl = {0x0724, 15, 15, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0700, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0680, 3, 3, 0, 1},
+                                                   .bvalid_det_st = {0x0690, 3, 3, 0, 1},
+                                                   .bvalid_det_clr = {0x06a0, 3, 3, 0, 1},
+                                                   .iddig_output = {0x0700, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0700, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x0680, 6, 6, 0, 1},
+                                                   .idfall_det_st = {0x0690, 6, 6, 0, 1},
+                                                   .idfall_det_clr = {0x06a0, 6, 6, 0, 1},
+                                                   .idrise_det_en = {0x0680, 5, 5, 0, 1},
+                                                   .idrise_det_st = {0x0690, 5, 5, 0, 1},
+                                                   .idrise_det_clr = {0x06a0, 5, 5, 0, 1},
+                                                   .ls_det_en = {0x0680, 2, 2, 0, 1},
+                                                   .ls_det_st = {0x0690, 2, 2, 0, 1},
+                                                   .ls_det_clr = {0x06a0, 2, 2, 0, 1},
+                                                   .utmi_bvalid = {0x04bc, 23, 23, 0, 1},
+                                                   .utmi_iddig = {0x04bc, 26, 26, 0, 1},
+                                                   .utmi_ls = {0x04bc, 25, 24, 0, 1},
+                                                   .vbus_det_en = {0x079c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0728, 15, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x0680, 4, 4, 0, 1},
+                                                                  .ls_det_st = {0x0690, 4, 4, 0, 1},
+                                                                  .ls_det_clr = {0x06a0, 4, 4, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0700, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x04b8, 30, 30, 0, 1},
+                                     .dcp_det = {0x04b8, 29, 29, 0, 1},
+                                     .dp_det = {0x04b8, 31, 31, 0, 1},
+                                     .idm_sink_en = {0x0718, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0718, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0718, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0718, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0718, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0718, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
-    {
-        .reg        = 0xe450,
-        .num_ports    = 2,
-        .phy_tuning    = rk3399_usb2phy_tuning,
-        .clkout_ctl    = { 0xe450, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus = { 0xe454, 8, 0, 0x052, 0x1d1 },
-                .bvalid_det_en    = { 0xe3c0, 3, 3, 0, 1 },
-                .bvalid_det_st    = { 0xe3e0, 3, 3, 0, 1 },
-                .bvalid_det_clr    = { 0xe3d0, 3, 3, 0, 1 },
-                .bypass_dm_en   = { 0xe450, 2, 2, 0, 1 },
-                .bypass_sel     = { 0xe450, 3, 3, 0, 1 },
-                .iddig_output    = { 0xe454, 10, 10, 0, 1 },
-                .iddig_en    = { 0xe454, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0xe3c0, 5, 5, 0, 1 },
-                .idfall_det_st    = { 0xe3e0, 5, 5, 0, 1 },
-                .idfall_det_clr    = { 0xe3d0, 5, 5, 0, 1 },
-                .idrise_det_en    = { 0xe3c0, 4, 4, 0, 1 },
-                .idrise_det_st    = { 0xe3e0, 4, 4, 0, 1 },
-                .idrise_det_clr    = { 0xe3d0, 4, 4, 0, 1 },
-                .ls_det_en    = { 0xe3c0, 2, 2, 0, 1 },
-                .ls_det_st    = { 0xe3e0, 2, 2, 0, 1 },
-                .ls_det_clr    = { 0xe3d0, 2, 2, 0, 1 },
-                .utmi_avalid    = { 0xe2ac, 7, 7, 0, 1 },
-                .utmi_bvalid    = { 0xe2ac, 12, 12, 0, 1 },
-                .utmi_iddig     = { 0xe2ac, 8, 8, 0, 1 },
-                .utmi_ls    = { 0xe2ac, 14, 13, 0, 1 },
-                .vbus_det_en    = { 0x449c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0xe458, 1, 0, 0x2, 0x1 },
-                .ls_det_en    = { 0xe3c0, 6, 6, 0, 1 },
-                .ls_det_st    = { 0xe3e0, 6, 6, 0, 1 },
-                .ls_det_clr    = { 0xe3d0, 6, 6, 0, 1 },
-                .utmi_ls    = { 0xe2ac, 22, 21, 0, 1 },
-                .utmi_hstdet    = { 0xe2ac, 23, 23, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0xe454, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0xe2ac, 2, 2, 0, 1 },
-            .dcp_det    = { 0xe2ac, 1, 1, 0, 1 },
-            .dp_det        = { 0xe2ac, 0, 0, 0, 1 },
-            .idm_sink_en    = { 0xe450, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0xe450, 7, 7, 0, 1 },
-            .idp_src_en    = { 0xe450, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0xe450, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0xe450, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0xe450, 11, 11, 0, 1 },
-        },
-    },
-    {
-        .reg        = 0xe460,
-        .num_ports    = 2,
-        .phy_tuning    = rk3399_usb2phy_tuning,
-        .clkout_ctl    = { 0xe460, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus = { 0xe464, 8, 0, 0x052, 0x1d1 },
-                .bvalid_det_en  = { 0xe3c0, 8, 8, 0, 1 },
-                .bvalid_det_st  = { 0xe3e0, 8, 8, 0, 1 },
-                .bvalid_det_clr = { 0xe3d0, 8, 8, 0, 1 },
-                .iddig_output    = { 0xe464, 10, 10, 0, 1 },
-                .iddig_en    = { 0xe464, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0xe3c0, 10, 10, 0, 1 },
-                .idfall_det_st    = { 0xe3e0, 10, 10, 0, 1 },
-                .idfall_det_clr    = { 0xe3d0, 10, 10, 0, 1 },
-                .idrise_det_en    = { 0xe3c0, 9, 9, 0, 1 },
-                .idrise_det_st    = { 0xe3e0, 9, 9, 0, 1 },
-                .idrise_det_clr    = { 0xe3d0, 9, 9, 0, 1 },
-                .ls_det_en    = { 0xe3c0, 7, 7, 0, 1 },
-                .ls_det_st    = { 0xe3e0, 7, 7, 0, 1 },
-                .ls_det_clr    = { 0xe3d0, 7, 7, 0, 1 },
-                .utmi_avalid    = { 0xe2ac, 10, 10, 0, 1 },
-                .utmi_bvalid    = { 0xe2ac, 16, 16, 0, 1 },
-                .utmi_iddig     = { 0xe2ac, 11, 11, 0, 1 },
-                .utmi_ls    = { 0xe2ac, 18, 17, 0, 1 },
-                .vbus_det_en    = { 0x451c, 15, 15, 1, 0 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0xe468, 1, 0, 0x2, 0x1 },
-                .ls_det_en    = { 0xe3c0, 11, 11, 0, 1 },
-                .ls_det_st    = { 0xe3e0, 11, 11, 0, 1 },
-                .ls_det_clr    = { 0xe3d0, 11, 11, 0, 1 },
-                .utmi_ls    = { 0xe2ac, 26, 25, 0, 1 },
-                .utmi_hstdet    = { 0xe2ac, 27, 27, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0xe464, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0xe2ac, 5, 5, 0, 1 },
-            .dcp_det    = { 0xe2ac, 4, 4, 0, 1 },
-            .dp_det        = { 0xe2ac, 3, 3, 0, 1 },
-            .idm_sink_en    = { 0xe460, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0xe460, 7, 7, 0, 1 },
-            .idp_src_en    = { 0xe460, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0xe460, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0xe460, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0xe460, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3399_phy_cfgs[] = {{
+                             .reg = 0xe450,
+                             .num_ports = 2,
+                             .phy_tuning = rk3399_usb2phy_tuning,
+                             .clkout_ctl = {0xe450, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0xe454, 8, 0, 0x052, 0x1d1},
+                                                   .bvalid_det_en = {0xe3c0, 3, 3, 0, 1},
+                                                   .bvalid_det_st = {0xe3e0, 3, 3, 0, 1},
+                                                   .bvalid_det_clr = {0xe3d0, 3, 3, 0, 1},
+                                                   .bypass_dm_en = {0xe450, 2, 2, 0, 1},
+                                                   .bypass_sel = {0xe450, 3, 3, 0, 1},
+                                                   .iddig_output = {0xe454, 10, 10, 0, 1},
+                                                   .iddig_en = {0xe454, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0xe3c0, 5, 5, 0, 1},
+                                                   .idfall_det_st = {0xe3e0, 5, 5, 0, 1},
+                                                   .idfall_det_clr = {0xe3d0, 5, 5, 0, 1},
+                                                   .idrise_det_en = {0xe3c0, 4, 4, 0, 1},
+                                                   .idrise_det_st = {0xe3e0, 4, 4, 0, 1},
+                                                   .idrise_det_clr = {0xe3d0, 4, 4, 0, 1},
+                                                   .ls_det_en = {0xe3c0, 2, 2, 0, 1},
+                                                   .ls_det_st = {0xe3e0, 2, 2, 0, 1},
+                                                   .ls_det_clr = {0xe3d0, 2, 2, 0, 1},
+                                                   .utmi_avalid = {0xe2ac, 7, 7, 0, 1},
+                                                   .utmi_bvalid = {0xe2ac, 12, 12, 0, 1},
+                                                   .utmi_iddig = {0xe2ac, 8, 8, 0, 1},
+                                                   .utmi_ls = {0xe2ac, 14, 13, 0, 1},
+                                                   .vbus_det_en = {0x449c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0xe458, 1, 0, 0x2, 0x1},
+                                                                  .ls_det_en = {0xe3c0, 6, 6, 0, 1},
+                                                                  .ls_det_st = {0xe3e0, 6, 6, 0, 1},
+                                                                  .ls_det_clr = {0xe3d0, 6, 6, 0, 1},
+                                                                  .utmi_ls = {0xe2ac, 22, 21, 0, 1},
+                                                                  .utmi_hstdet = {0xe2ac, 23, 23, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0xe454, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0xe2ac, 2, 2, 0, 1},
+                                     .dcp_det = {0xe2ac, 1, 1, 0, 1},
+                                     .dp_det = {0xe2ac, 0, 0, 0, 1},
+                                     .idm_sink_en = {0xe450, 8, 8, 0, 1},
+                                     .idp_sink_en = {0xe450, 7, 7, 0, 1},
+                                     .idp_src_en = {0xe450, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0xe450, 10, 10, 0, 1},
+                                     .vdm_src_en = {0xe450, 12, 12, 0, 1},
+                                     .vdp_src_en = {0xe450, 11, 11, 0, 1},
+                                 },
+                         },
+                         {
+                             .reg = 0xe460,
+                             .num_ports = 2,
+                             .phy_tuning = rk3399_usb2phy_tuning,
+                             .clkout_ctl = {0xe460, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0xe464, 8, 0, 0x052, 0x1d1},
+                                                   .bvalid_det_en = {0xe3c0, 8, 8, 0, 1},
+                                                   .bvalid_det_st = {0xe3e0, 8, 8, 0, 1},
+                                                   .bvalid_det_clr = {0xe3d0, 8, 8, 0, 1},
+                                                   .iddig_output = {0xe464, 10, 10, 0, 1},
+                                                   .iddig_en = {0xe464, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0xe3c0, 10, 10, 0, 1},
+                                                   .idfall_det_st = {0xe3e0, 10, 10, 0, 1},
+                                                   .idfall_det_clr = {0xe3d0, 10, 10, 0, 1},
+                                                   .idrise_det_en = {0xe3c0, 9, 9, 0, 1},
+                                                   .idrise_det_st = {0xe3e0, 9, 9, 0, 1},
+                                                   .idrise_det_clr = {0xe3d0, 9, 9, 0, 1},
+                                                   .ls_det_en = {0xe3c0, 7, 7, 0, 1},
+                                                   .ls_det_st = {0xe3e0, 7, 7, 0, 1},
+                                                   .ls_det_clr = {0xe3d0, 7, 7, 0, 1},
+                                                   .utmi_avalid = {0xe2ac, 10, 10, 0, 1},
+                                                   .utmi_bvalid = {0xe2ac, 16, 16, 0, 1},
+                                                   .utmi_iddig = {0xe2ac, 11, 11, 0, 1},
+                                                   .utmi_ls = {0xe2ac, 18, 17, 0, 1},
+                                                   .vbus_det_en = {0x451c, 15, 15, 1, 0},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0xe468, 1, 0, 0x2, 0x1},
+                                                                  .ls_det_en = {0xe3c0, 11, 11, 0, 1},
+                                                                  .ls_det_st = {0xe3e0, 11, 11, 0, 1},
+                                                                  .ls_det_clr = {0xe3d0, 11, 11, 0, 1},
+                                                                  .utmi_ls = {0xe2ac, 26, 25, 0, 1},
+                                                                  .utmi_hstdet = {0xe2ac, 27, 27, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0xe464, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0xe2ac, 5, 5, 0, 1},
+                                     .dcp_det = {0xe2ac, 4, 4, 0, 1},
+                                     .dp_det = {0xe2ac, 3, 3, 0, 1},
+                                     .idm_sink_en = {0xe460, 8, 8, 0, 1},
+                                     .idp_sink_en = {0xe460, 7, 7, 0, 1},
+                                     .idp_src_en = {0xe460, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0xe460, 10, 10, 0, 1},
+                                     .vdm_src_en = {0xe460, 12, 12, 0, 1},
+                                     .vdp_src_en = {0xe460, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3568_phy_cfgs[] = {
-    {
-        .reg = 0xfe8a0000,
-        .num_ports    = 2,
-        .phy_tuning    = rk3568_usb2phy_tuning,
-        .vbus_detect    = rk3568_vbus_detect_control,
-        .clkout_ctl    = { 0x0008, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0000, 8, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0080, 2, 2, 0, 1 },
-                .bvalid_det_st    = { 0x0084, 2, 2, 0, 1 },
-                .bvalid_det_clr = { 0x0088, 2, 2, 0, 1 },
-                .bvalid_grf_con    = { 0x0008, 15, 14, 0, 3 },
-                .bypass_dm_en    = { 0x0008, 2, 2, 0, 1},
-                .bypass_sel    = { 0x0008, 3, 3, 0, 1},
-                .iddig_output    = { 0x0000, 10, 10, 0, 1 },
-                .iddig_en    = { 0x0000, 9, 9, 0, 1 },
-                .idfall_det_en    = { 0x0080, 5, 5, 0, 1 },
-                .idfall_det_st    = { 0x0084, 5, 5, 0, 1 },
-                .idfall_det_clr = { 0x0088, 5, 5, 0, 1 },
-                .idrise_det_en    = { 0x0080, 4, 4, 0, 1 },
-                .idrise_det_st    = { 0x0084, 4, 4, 0, 1 },
-                .idrise_det_clr = { 0x0088, 4, 4, 0, 1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .utmi_avalid    = { 0x00c0, 10, 10, 0, 1 },
-                .utmi_bvalid    = { 0x00c0, 9, 9, 0, 1 },
-                .utmi_iddig    = { 0x00c0, 6, 6, 0, 1 },
-                .utmi_ls    = { 0x00c0, 5, 4, 0, 1 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                /* Select suspend control from controller */
-                .phy_sus    = { 0x0004, 8, 0, 0x1d2, 0x1d2 },
-                .ls_det_en    = { 0x0080, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x0084, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x0088, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x00c0, 17, 16, 0, 1 },
-                .utmi_hstdet    = { 0x00c0, 19, 19, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0000, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x00c0, 24, 24, 0, 1 },
-            .dcp_det    = { 0x00c0, 23, 23, 0, 1 },
-            .dp_det        = { 0x00c0, 25, 25, 0, 1 },
-            .idm_sink_en    = { 0x0008, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0008, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0008, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0008, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0008, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0008, 11, 11, 0, 1 },
-        },
-    },
-    {
-        .reg = 0xfe8b0000,
-        .num_ports    = 2,
-        .phy_tuning    = rk3568_usb2phy_tuning,
-        .clkout_ctl    = { 0x0008, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0000, 8, 0, 0x1d2, 0x1d1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .utmi_ls    = { 0x00c0, 5, 4, 0, 1 },
-                .utmi_hstdet    = { 0x00c0, 7, 7, 0, 1 }
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0004, 8, 0, 0x1d2, 0x1d1 },
-                .ls_det_en    = { 0x0080, 1, 1, 0, 1 },
-                .ls_det_st    = { 0x0084, 1, 1, 0, 1 },
-                .ls_det_clr    = { 0x0088, 1, 1, 0, 1 },
-                .utmi_ls    = { 0x00c0, 17, 16, 0, 1 },
-                .utmi_hstdet    = { 0x00c0, 19, 19, 0, 1 }
-            }
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3568_phy_cfgs[] = {{
+                             .reg = 0xfe8a0000,
+                             .num_ports = 2,
+                             .phy_tuning = rk3568_usb2phy_tuning,
+                             .vbus_detect = rk3568_vbus_detect_control,
+                             .clkout_ctl = {0x0008, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0000, 8, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0080, 2, 2, 0, 1},
+                                                   .bvalid_det_st = {0x0084, 2, 2, 0, 1},
+                                                   .bvalid_det_clr = {0x0088, 2, 2, 0, 1},
+                                                   .bvalid_grf_con = {0x0008, 15, 14, 0, 3},
+                                                   .bypass_dm_en = {0x0008, 2, 2, 0, 1},
+                                                   .bypass_sel = {0x0008, 3, 3, 0, 1},
+                                                   .iddig_output = {0x0000, 10, 10, 0, 1},
+                                                   .iddig_en = {0x0000, 9, 9, 0, 1},
+                                                   .idfall_det_en = {0x0080, 5, 5, 0, 1},
+                                                   .idfall_det_st = {0x0084, 5, 5, 0, 1},
+                                                   .idfall_det_clr = {0x0088, 5, 5, 0, 1},
+                                                   .idrise_det_en = {0x0080, 4, 4, 0, 1},
+                                                   .idrise_det_st = {0x0084, 4, 4, 0, 1},
+                                                   .idrise_det_clr = {0x0088, 4, 4, 0, 1},
+                                                   .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                                   .utmi_avalid = {0x00c0, 10, 10, 0, 1},
+                                                   .utmi_bvalid = {0x00c0, 9, 9, 0, 1},
+                                                   .utmi_iddig = {0x00c0, 6, 6, 0, 1},
+                                                   .utmi_ls = {0x00c0, 5, 4, 0, 1},
+                                               },
+                                           [USB2PHY_PORT_HOST] =
+                                               {/* Select suspend control from controller */
+                                                .phy_sus = {0x0004, 8, 0, 0x1d2, 0x1d2},
+                                                .ls_det_en = {0x0080, 1, 1, 0, 1},
+                                                .ls_det_st = {0x0084, 1, 1, 0, 1},
+                                                .ls_det_clr = {0x0088, 1, 1, 0, 1},
+                                                .utmi_ls = {0x00c0, 17, 16, 0, 1},
+                                                .utmi_hstdet = {0x00c0, 19, 19, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0000, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x00c0, 24, 24, 0, 1},
+                                     .dcp_det = {0x00c0, 23, 23, 0, 1},
+                                     .dp_det = {0x00c0, 25, 25, 0, 1},
+                                     .idm_sink_en = {0x0008, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0008, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0008, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0008, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0008, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0008, 11, 11, 0, 1},
+                                 },
+                         },
+                         {
+                             .reg = 0xfe8b0000,
+                             .num_ports = 2,
+                             .phy_tuning = rk3568_usb2phy_tuning,
+                             .clkout_ctl = {0x0008, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] = {.phy_sus = {0x0000, 8, 0, 0x1d2, 0x1d1},
+                                                                 .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                                                 .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                                                 .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                                                 .utmi_ls = {0x00c0, 5, 4, 0, 1},
+                                                                 .utmi_hstdet = {0x00c0, 7, 7, 0, 1}},
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0004, 8, 0, 0x1d2, 0x1d1},
+                                                                  .ls_det_en = {0x0080, 1, 1, 0, 1},
+                                                                  .ls_det_st = {0x0084, 1, 1, 0, 1},
+                                                                  .ls_det_clr = {0x0088, 1, 1, 0, 1},
+                                                                  .utmi_ls = {0x00c0, 17, 16, 0, 1},
+                                                                  .utmi_hstdet = {0x00c0, 19, 19, 0, 1}}},
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rk3588_phy_cfgs[] = {
-    {
-        .reg = 0x0000,
-        .num_ports    = 1,
-        .phy_tuning    = rk3588_usb2phy_tuning,
-        .clkout_ctl    = { 0x0000, 0, 0, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x000c, 11, 11, 0, 1 },
-                .bvalid_det_en    = { 0x0080, 1, 1, 0, 1 },
-                .bvalid_det_st    = { 0x0084, 1, 1, 0, 1 },
-                .bvalid_det_clr = { 0x0088, 1, 1, 0, 1 },
-                .bvalid_grf_con    = { 0x0010, 3, 2, 0, 3 },
-                .bypass_dm_en    = { 0x000c, 5, 5, 0, 1 },
-                .bypass_sel    = { 0x000c, 6, 6, 0, 1 },
-                .iddig_output    = { 0x0010, 0, 0, 0, 1 },
-                .iddig_en    = { 0x0010, 1, 1, 0, 1 },
-                .idfall_det_en    = { 0x0080, 4, 4, 0, 1 },
-                .idfall_det_st    = { 0x0084, 4, 4, 0, 1 },
-                .idfall_det_clr = { 0x0088, 4, 4, 0, 1 },
-                .idrise_det_en    = { 0x0080, 3, 3, 0, 1 },
-                .idrise_det_st    = { 0x0084, 3, 3, 0, 1 },
-                .idrise_det_clr = { 0x0088, 3, 3, 0, 1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .disfall_en    = { 0x0080, 6, 6, 0, 1 },
-                .disfall_st    = { 0x0084, 6, 6, 0, 1 },
-                .disfall_clr    = { 0x0088, 6, 6, 0, 1 },
-                .disrise_en    = { 0x0080, 5, 5, 0, 1 },
-                .disrise_st    = { 0x0084, 5, 5, 0, 1 },
-                .disrise_clr    = { 0x0088, 5, 5, 0, 1 },
-                .utmi_avalid    = { 0x00c0, 7, 7, 0, 1 },
-                .utmi_bvalid    = { 0x00c0, 6, 6, 0, 1 },
-                .utmi_iddig    = { 0x00c0, 5, 5, 0, 1 },
-                .utmi_ls    = { 0x00c0, 10, 9, 0, 1 },
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0008, 2, 2, 0, 1 },
-            .cp_det        = { 0x00c0, 0, 0, 0, 1 },
-            .dcp_det    = { 0x00c0, 0, 0, 0, 1 },
-            .dp_det        = { 0x00c0, 1, 1, 1, 0 },
-            .idm_sink_en    = { 0x0008, 5, 5, 1, 0 },
-            .idp_sink_en    = { 0x0008, 5, 5, 0, 1 },
-            .idp_src_en    = { 0x0008, 14, 14, 0, 1 },
-            .rdm_pdwn_en    = { 0x0008, 14, 14, 0, 1 },
-            .vdm_src_en    = { 0x0008, 7, 6, 0, 3 },
-            .vdp_src_en    = { 0x0008, 7, 6, 0, 3 },
-        },
-    },
-    {
-        .reg = 0x4000,
-        .num_ports    = 1,
-        .phy_tuning    = rk3588_usb2phy_tuning,
-        .clkout_ctl    = { 0x0000, 0, 0, 1, 0 },
-        .port_cfgs    = {
-            /* Select suspend control from controller */
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x000c, 11, 11, 0, 0 },
-                .bvalid_det_en    = { 0x0080, 1, 1, 0, 1 },
-                .bvalid_det_st    = { 0x0084, 1, 1, 0, 1 },
-                .bvalid_det_clr = { 0x0088, 1, 1, 0, 1 },
-                .bypass_dm_en    = { 0x000c, 5, 5, 0, 1 },
-                .bypass_sel    = { 0x000c, 6, 6, 0, 1 },
-                .iddig_output    = { 0x0010, 0, 0, 0, 1 },
-                .iddig_en    = { 0x0010, 1, 1, 0, 1 },
-                .idfall_det_en    = { 0x0080, 4, 4, 0, 1 },
-                .idfall_det_st    = { 0x0084, 4, 4, 0, 1 },
-                .idfall_det_clr = { 0x0088, 4, 4, 0, 1 },
-                .idrise_det_en    = { 0x0080, 3, 3, 0, 1 },
-                .idrise_det_st    = { 0x0084, 3, 3, 0, 1 },
-                .idrise_det_clr = { 0x0088, 3, 3, 0, 1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .disfall_en    = { 0x0080, 6, 6, 0, 1 },
-                .disfall_st    = { 0x0084, 6, 6, 0, 1 },
-                .disfall_clr    = { 0x0088, 6, 6, 0, 1 },
-                .disrise_en    = { 0x0080, 5, 5, 0, 1 },
-                .disrise_st    = { 0x0084, 5, 5, 0, 1 },
-                .disrise_clr    = { 0x0088, 5, 5, 0, 1 },
-                .utmi_avalid    = { 0x00c0, 7, 7, 0, 1 },
-                .utmi_bvalid    = { 0x00c0, 6, 6, 0, 1 },
-                .utmi_iddig    = { 0x00c0, 5, 5, 0, 1 },
-                .utmi_ls    = { 0x00c0, 10, 9, 0, 1 },
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0008, 2, 2, 0, 1 },
-            .cp_det        = { 0x00c0, 0, 0, 0, 1 },
-            .dcp_det    = { 0x00c0, 0, 0, 0, 1 },
-            .dp_det        = { 0x00c0, 1, 1, 1, 0 },
-            .idm_sink_en    = { 0x0008, 5, 5, 1, 0 },
-            .idp_sink_en    = { 0x0008, 5, 5, 0, 1 },
-            .idp_src_en    = { 0x0008, 14, 14, 0, 1 },
-            .rdm_pdwn_en    = { 0x0008, 14, 14, 0, 1 },
-            .vdm_src_en    = { 0x0008, 7, 6, 0, 3 },
-            .vdp_src_en    = { 0x0008, 7, 6, 0, 3 },
-        },
-    },
-    {
-        .reg = 0x8000,
-        .num_ports    = 1,
-        .phy_tuning    = rk3588_usb2phy_tuning,
-        .clkout_ctl    = { 0x0000, 0, 0, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0008, 2, 2, 0, 1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .disfall_en    = { 0x0080, 6, 6, 0, 1 },
-                .disfall_st    = { 0x0084, 6, 6, 0, 1 },
-                .disfall_clr    = { 0x0088, 6, 6, 0, 1 },
-                .disrise_en    = { 0x0080, 5, 5, 0, 1 },
-                .disrise_st    = { 0x0084, 5, 5, 0, 1 },
-                .disrise_clr    = { 0x0088, 5, 5, 0, 1 },
-                .utmi_ls    = { 0x00c0, 10, 9, 0, 1 },
-            }
-        },
-    },
-    {
-        .reg = 0xc000,
-        .num_ports    = 1,
-        .phy_tuning    = rk3588_usb2phy_tuning,
-        .clkout_ctl    = { 0x0000, 0, 0, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0008, 2, 2, 0, 1 },
-                .ls_det_en    = { 0x0080, 0, 0, 0, 1 },
-                .ls_det_st    = { 0x0084, 0, 0, 0, 1 },
-                .ls_det_clr    = { 0x0088, 0, 0, 0, 1 },
-                .disfall_en    = { 0x0080, 6, 6, 0, 1 },
-                .disfall_st    = { 0x0084, 6, 6, 0, 1 },
-                .disfall_clr    = { 0x0088, 6, 6, 0, 1 },
-                .disrise_en    = { 0x0080, 5, 5, 0, 1 },
-                .disrise_st    = { 0x0084, 5, 5, 0, 1 },
-                .disrise_clr    = { 0x0088, 5, 5, 0, 1 },
-                .utmi_ls    = { 0x00c0, 10, 9, 0, 1 },
-            }
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rk3588_phy_cfgs[] = {{
+                             .reg = 0x0000,
+                             .num_ports = 1,
+                             .phy_tuning = rk3588_usb2phy_tuning,
+                             .clkout_ctl = {0x0000, 0, 0, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x000c, 11, 11, 0, 1},
+                                                   .bvalid_det_en = {0x0080, 1, 1, 0, 1},
+                                                   .bvalid_det_st = {0x0084, 1, 1, 0, 1},
+                                                   .bvalid_det_clr = {0x0088, 1, 1, 0, 1},
+                                                   .bvalid_grf_con = {0x0010, 3, 2, 0, 3},
+                                                   .bypass_dm_en = {0x000c, 5, 5, 0, 1},
+                                                   .bypass_sel = {0x000c, 6, 6, 0, 1},
+                                                   .iddig_output = {0x0010, 0, 0, 0, 1},
+                                                   .iddig_en = {0x0010, 1, 1, 0, 1},
+                                                   .idfall_det_en = {0x0080, 4, 4, 0, 1},
+                                                   .idfall_det_st = {0x0084, 4, 4, 0, 1},
+                                                   .idfall_det_clr = {0x0088, 4, 4, 0, 1},
+                                                   .idrise_det_en = {0x0080, 3, 3, 0, 1},
+                                                   .idrise_det_st = {0x0084, 3, 3, 0, 1},
+                                                   .idrise_det_clr = {0x0088, 3, 3, 0, 1},
+                                                   .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                                   .disfall_en = {0x0080, 6, 6, 0, 1},
+                                                   .disfall_st = {0x0084, 6, 6, 0, 1},
+                                                   .disfall_clr = {0x0088, 6, 6, 0, 1},
+                                                   .disrise_en = {0x0080, 5, 5, 0, 1},
+                                                   .disrise_st = {0x0084, 5, 5, 0, 1},
+                                                   .disrise_clr = {0x0088, 5, 5, 0, 1},
+                                                   .utmi_avalid = {0x00c0, 7, 7, 0, 1},
+                                                   .utmi_bvalid = {0x00c0, 6, 6, 0, 1},
+                                                   .utmi_iddig = {0x00c0, 5, 5, 0, 1},
+                                                   .utmi_ls = {0x00c0, 10, 9, 0, 1},
+                                               }},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0008, 2, 2, 0, 1},
+                                     .cp_det = {0x00c0, 0, 0, 0, 1},
+                                     .dcp_det = {0x00c0, 0, 0, 0, 1},
+                                     .dp_det = {0x00c0, 1, 1, 1, 0},
+                                     .idm_sink_en = {0x0008, 5, 5, 1, 0},
+                                     .idp_sink_en = {0x0008, 5, 5, 0, 1},
+                                     .idp_src_en = {0x0008, 14, 14, 0, 1},
+                                     .rdm_pdwn_en = {0x0008, 14, 14, 0, 1},
+                                     .vdm_src_en = {0x0008, 7, 6, 0, 3},
+                                     .vdp_src_en = {0x0008, 7, 6, 0, 3},
+                                 },
+                         },
+                         {
+                             .reg = 0x4000,
+                             .num_ports = 1,
+                             .phy_tuning = rk3588_usb2phy_tuning,
+                             .clkout_ctl = {0x0000, 0, 0, 1, 0},
+                             .port_cfgs =
+                                 {/* Select suspend control from controller */
+                                  [USB2PHY_PORT_OTG] =
+                                      {
+                                          .phy_sus = {0x000c, 11, 11, 0, 0},
+                                          .bvalid_det_en = {0x0080, 1, 1, 0, 1},
+                                          .bvalid_det_st = {0x0084, 1, 1, 0, 1},
+                                          .bvalid_det_clr = {0x0088, 1, 1, 0, 1},
+                                          .bypass_dm_en = {0x000c, 5, 5, 0, 1},
+                                          .bypass_sel = {0x000c, 6, 6, 0, 1},
+                                          .iddig_output = {0x0010, 0, 0, 0, 1},
+                                          .iddig_en = {0x0010, 1, 1, 0, 1},
+                                          .idfall_det_en = {0x0080, 4, 4, 0, 1},
+                                          .idfall_det_st = {0x0084, 4, 4, 0, 1},
+                                          .idfall_det_clr = {0x0088, 4, 4, 0, 1},
+                                          .idrise_det_en = {0x0080, 3, 3, 0, 1},
+                                          .idrise_det_st = {0x0084, 3, 3, 0, 1},
+                                          .idrise_det_clr = {0x0088, 3, 3, 0, 1},
+                                          .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                          .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                          .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                          .disfall_en = {0x0080, 6, 6, 0, 1},
+                                          .disfall_st = {0x0084, 6, 6, 0, 1},
+                                          .disfall_clr = {0x0088, 6, 6, 0, 1},
+                                          .disrise_en = {0x0080, 5, 5, 0, 1},
+                                          .disrise_st = {0x0084, 5, 5, 0, 1},
+                                          .disrise_clr = {0x0088, 5, 5, 0, 1},
+                                          .utmi_avalid = {0x00c0, 7, 7, 0, 1},
+                                          .utmi_bvalid = {0x00c0, 6, 6, 0, 1},
+                                          .utmi_iddig = {0x00c0, 5, 5, 0, 1},
+                                          .utmi_ls = {0x00c0, 10, 9, 0, 1},
+                                      }},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0008, 2, 2, 0, 1},
+                                     .cp_det = {0x00c0, 0, 0, 0, 1},
+                                     .dcp_det = {0x00c0, 0, 0, 0, 1},
+                                     .dp_det = {0x00c0, 1, 1, 1, 0},
+                                     .idm_sink_en = {0x0008, 5, 5, 1, 0},
+                                     .idp_sink_en = {0x0008, 5, 5, 0, 1},
+                                     .idp_src_en = {0x0008, 14, 14, 0, 1},
+                                     .rdm_pdwn_en = {0x0008, 14, 14, 0, 1},
+                                     .vdm_src_en = {0x0008, 7, 6, 0, 3},
+                                     .vdp_src_en = {0x0008, 7, 6, 0, 3},
+                                 },
+                         },
+                         {
+                             .reg = 0x8000,
+                             .num_ports = 1,
+                             .phy_tuning = rk3588_usb2phy_tuning,
+                             .clkout_ctl = {0x0000, 0, 0, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_HOST] =
+                                               {
+                                                   .phy_sus = {0x0008, 2, 2, 0, 1},
+                                                   .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                                   .disfall_en = {0x0080, 6, 6, 0, 1},
+                                                   .disfall_st = {0x0084, 6, 6, 0, 1},
+                                                   .disfall_clr = {0x0088, 6, 6, 0, 1},
+                                                   .disrise_en = {0x0080, 5, 5, 0, 1},
+                                                   .disrise_st = {0x0084, 5, 5, 0, 1},
+                                                   .disrise_clr = {0x0088, 5, 5, 0, 1},
+                                                   .utmi_ls = {0x00c0, 10, 9, 0, 1},
+                                               }},
+                         },
+                         {
+                             .reg = 0xc000,
+                             .num_ports = 1,
+                             .phy_tuning = rk3588_usb2phy_tuning,
+                             .clkout_ctl = {0x0000, 0, 0, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_HOST] =
+                                               {
+                                                   .phy_sus = {0x0008, 2, 2, 0, 1},
+                                                   .ls_det_en = {0x0080, 0, 0, 0, 1},
+                                                   .ls_det_st = {0x0084, 0, 0, 0, 1},
+                                                   .ls_det_clr = {0x0088, 0, 0, 0, 1},
+                                                   .disfall_en = {0x0080, 6, 6, 0, 1},
+                                                   .disfall_st = {0x0084, 6, 6, 0, 1},
+                                                   .disfall_clr = {0x0088, 6, 6, 0, 1},
+                                                   .disrise_en = {0x0080, 5, 5, 0, 1},
+                                                   .disrise_st = {0x0084, 5, 5, 0, 1},
+                                                   .disrise_clr = {0x0088, 5, 5, 0, 1},
+                                                   .utmi_ls = {0x00c0, 10, 9, 0, 1},
+                                               }},
+                         },
+                         {/* sentinel */}};
 
-static const struct rockchip_usb2phy_cfg rv1108_phy_cfgs[] = {
-    {
-        .reg = 0x100,
-        .num_ports    = 2,
-        .clkout_ctl    = { 0x108, 4, 4, 1, 0 },
-        .port_cfgs    = {
-            [USB2PHY_PORT_OTG] = {
-                .phy_sus    = { 0x0100, 15, 0, 0, 0x1d1 },
-                .bvalid_det_en    = { 0x0680, 3, 3, 0, 1 },
-                .bvalid_det_st    = { 0x0690, 3, 3, 0, 1 },
-                .bvalid_det_clr = { 0x06a0, 3, 3, 0, 1 },
-                .ls_det_en    = { 0x0680, 2, 2, 0, 1 },
-                .ls_det_st    = { 0x0690, 2, 2, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 2, 2, 0, 1 },
-                .utmi_bvalid    = { 0x0804, 10, 10, 0, 1 },
-                .utmi_ls    = { 0x0804, 13, 12, 0, 1 },
-            },
-            [USB2PHY_PORT_HOST] = {
-                .phy_sus    = { 0x0104, 15, 0, 0, 0x1d1 },
-                .ls_det_en    = { 0x0680, 4, 4, 0, 1 },
-                .ls_det_st    = { 0x0690, 4, 4, 0, 1 },
-                .ls_det_clr    = { 0x06a0, 4, 4, 0, 1 },
-                .utmi_ls    = { 0x0804, 9, 8, 0, 1 },
-                .utmi_hstdet    = { 0x0804, 7, 7, 0, 1 }
-            }
-        },
-        .chg_det = {
-            .chg_mode    = { 0x0100, 8, 0, 0, 0x1d7 },
-            .cp_det        = { 0x0804, 1, 1, 0, 1 },
-            .dcp_det    = { 0x0804, 0, 0, 0, 1 },
-            .dp_det        = { 0x0804, 2, 2, 0, 1 },
-            .idm_sink_en    = { 0x0108, 8, 8, 0, 1 },
-            .idp_sink_en    = { 0x0108, 7, 7, 0, 1 },
-            .idp_src_en    = { 0x0108, 9, 9, 0, 1 },
-            .rdm_pdwn_en    = { 0x0108, 10, 10, 0, 1 },
-            .vdm_src_en    = { 0x0108, 12, 12, 0, 1 },
-            .vdp_src_en    = { 0x0108, 11, 11, 0, 1 },
-        },
-    },
-    { /* sentinel */ }
-};
+static const struct rockchip_usb2phy_cfg
+    rv1108_phy_cfgs[] = {{
+                             .reg = 0x100,
+                             .num_ports = 2,
+                             .clkout_ctl = {0x108, 4, 4, 1, 0},
+                             .port_cfgs = {[USB2PHY_PORT_OTG] =
+                                               {
+                                                   .phy_sus = {0x0100, 15, 0, 0, 0x1d1},
+                                                   .bvalid_det_en = {0x0680, 3, 3, 0, 1},
+                                                   .bvalid_det_st = {0x0690, 3, 3, 0, 1},
+                                                   .bvalid_det_clr = {0x06a0, 3, 3, 0, 1},
+                                                   .ls_det_en = {0x0680, 2, 2, 0, 1},
+                                                   .ls_det_st = {0x0690, 2, 2, 0, 1},
+                                                   .ls_det_clr = {0x06a0, 2, 2, 0, 1},
+                                                   .utmi_bvalid = {0x0804, 10, 10, 0, 1},
+                                                   .utmi_ls = {0x0804, 13, 12, 0, 1},
+                                               },
+                                           [USB2PHY_PORT_HOST] = {.phy_sus = {0x0104, 15, 0, 0, 0x1d1},
+                                                                  .ls_det_en = {0x0680, 4, 4, 0, 1},
+                                                                  .ls_det_st = {0x0690, 4, 4, 0, 1},
+                                                                  .ls_det_clr = {0x06a0, 4, 4, 0, 1},
+                                                                  .utmi_ls = {0x0804, 9, 8, 0, 1},
+                                                                  .utmi_hstdet = {0x0804, 7, 7, 0, 1}}},
+                             .chg_det =
+                                 {
+                                     .chg_mode = {0x0100, 8, 0, 0, 0x1d7},
+                                     .cp_det = {0x0804, 1, 1, 0, 1},
+                                     .dcp_det = {0x0804, 0, 0, 0, 1},
+                                     .dp_det = {0x0804, 2, 2, 0, 1},
+                                     .idm_sink_en = {0x0108, 8, 8, 0, 1},
+                                     .idp_sink_en = {0x0108, 7, 7, 0, 1},
+                                     .idp_src_en = {0x0108, 9, 9, 0, 1},
+                                     .rdm_pdwn_en = {0x0108, 10, 10, 0, 1},
+                                     .vdm_src_en = {0x0108, 12, 12, 0, 1},
+                                     .vdp_src_en = {0x0108, 11, 11, 0, 1},
+                                 },
+                         },
+                         {/* sentinel */}};
 
 static const struct of_device_id rockchip_usb2phy_dt_match[] = {
-    { .compatible = "rockchip,px30-usb2phy", .data = &rk3328_phy_cfgs },
-    { .compatible = "rockchip,rk1808-usb2phy", .data = &rk1808_phy_cfgs },
-    { .compatible = "rockchip,rk3128-usb2phy", .data = &rk312x_phy_cfgs },
-    { .compatible = "rockchip,rk3228-usb2phy", .data = &rk3228_phy_cfgs },
-    { .compatible = "rockchip,rk3308-usb2phy", .data = &rk3308_phy_cfgs },
-    { .compatible = "rockchip,rk3328-usb2phy", .data = &rk3328_phy_cfgs },
-    { .compatible = "rockchip,rk3366-usb2phy", .data = &rk3366_phy_cfgs },
-    { .compatible = "rockchip,rk3368-usb2phy", .data = &rk3368_phy_cfgs },
-    { .compatible = "rockchip,rk3399-usb2phy", .data = &rk3399_phy_cfgs },
-    { .compatible = "rockchip,rk3568-usb2phy", .data = &rk3568_phy_cfgs },
-    { .compatible = "rockchip,rk3588-usb2phy", .data = &rk3588_phy_cfgs },
-    { .compatible = "rockchip,rv1108-usb2phy", .data = &rv1108_phy_cfgs },
-    {}
-};
+    {.compatible = "rockchip,px30-usb2phy", .data = &rk3328_phy_cfgs},
+    {.compatible = "rockchip,rk1808-usb2phy", .data = &rk1808_phy_cfgs},
+    {.compatible = "rockchip,rk3128-usb2phy", .data = &rk312x_phy_cfgs},
+    {.compatible = "rockchip,rk3228-usb2phy", .data = &rk3228_phy_cfgs},
+    {.compatible = "rockchip,rk3308-usb2phy", .data = &rk3308_phy_cfgs},
+    {.compatible = "rockchip,rk3328-usb2phy", .data = &rk3328_phy_cfgs},
+    {.compatible = "rockchip,rk3366-usb2phy", .data = &rk3366_phy_cfgs},
+    {.compatible = "rockchip,rk3368-usb2phy", .data = &rk3368_phy_cfgs},
+    {.compatible = "rockchip,rk3399-usb2phy", .data = &rk3399_phy_cfgs},
+    {.compatible = "rockchip,rk3568-usb2phy", .data = &rk3568_phy_cfgs},
+    {.compatible = "rockchip,rk3588-usb2phy", .data = &rk3588_phy_cfgs},
+    {.compatible = "rockchip,rv1108-usb2phy", .data = &rv1108_phy_cfgs},
+    {}};
 MODULE_DEVICE_TABLE(of, rockchip_usb2phy_dt_match);
 
 static struct platform_driver rockchip_usb2phy_driver = {
-    .probe        = rockchip_usb2phy_probe,
-    .driver        = {
-        .name    = "rockchip-usb2phy",
-        .pm    = ROCKCHIP_USB2PHY_DEV_PM,
-        .of_match_table = rockchip_usb2phy_dt_match,
-    },
+    .probe = rockchip_usb2phy_probe,
+    .driver =
+        {
+            .name = "rockchip-usb2phy",
+            .pm = ROCKCHIP_USB2PHY_DEV_PM,
+            .of_match_table = rockchip_usb2phy_dt_match,
+        },
 };
 module_platform_driver(rockchip_usb2phy_driver);
 

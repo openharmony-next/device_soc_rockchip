@@ -65,7 +65,7 @@ struct em_perf_domain {
  * are pretty high and the returns do not justify the increased costs.
  */
 #ifdef CONFIG_64BIT
-#define em_scale_power(p) ((p) * 1000)
+#define em_scale_power(p) ((p)*1000)
 #else
 #define em_scale_power(p) (p)
 #endif
@@ -90,16 +90,17 @@ struct em_data_callback {
      *
      * Return 0 on success.
      */
-    int (*active_power)(unsigned long *power, unsigned long *freq,
-                struct device *dev);
+    int (*active_power)(unsigned long *power, unsigned long *freq, struct device *dev);
 };
-#define EM_DATA_CB(_active_power_cb) { .active_power = &_active_power_cb }
+#define EM_DATA_CB(_active_power_cb)                                                                                   \
+    {                                                                                                                  \
+        .active_power = &_active_power_cb                                                                              \
+    }
 
 struct em_perf_domain *em_cpu_get(int cpu);
 struct em_perf_domain *em_pd_get(struct device *dev);
-int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
-                struct em_data_callback *cb, cpumask_t *span,
-                bool milliwatts);
+int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states, struct em_data_callback *cb,
+                                cpumask_t *span, bool milliwatts);
 void em_dev_unregister_perf_domain(struct device *dev);
 
 /**
@@ -116,15 +117,15 @@ void em_dev_unregister_perf_domain(struct device *dev);
  * Return: the sum of the energy consumed by the CPUs of the domain assuming
  * a capacity state satisfying the max utilization of the domain.
  */
-static inline unsigned long em_cpu_energy(struct em_perf_domain *pd,
-                unsigned long max_util, unsigned long sum_util)
+static inline unsigned long em_cpu_energy(struct em_perf_domain *pd, unsigned long max_util, unsigned long sum_util)
 {
     unsigned long freq, scale_cpu;
     struct em_perf_state *ps;
     int i, cpu;
 
-    if (!sum_util)
+    if (!sum_util) {
         return 0;
+    }
 
     /*
      * In order to predict the performance state, map the utilization of
@@ -142,8 +143,9 @@ static inline unsigned long em_cpu_energy(struct em_perf_domain *pd,
      */
     for (i = 0; i < pd->nr_perf_states; i++) {
         ps = &pd->table[i];
-        if (ps->frequency >= freq)
+        if (ps->frequency >= freq) {
             break;
+        }
     }
 
     /*
@@ -204,13 +206,14 @@ static inline int em_pd_nr_perf_states(struct em_perf_domain *pd)
 }
 
 #else
-struct em_data_callback {};
-#define EM_DATA_CB(_active_power_cb) { }
+struct em_data_callback {
+};
+#define EM_DATA_CB(_active_power_cb)                                                                                   \
+    {                                                                                                                  \
+    }
 
-static inline
-int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
-                struct em_data_callback *cb, cpumask_t *span,
-                bool milliwatts)
+static inline int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states, struct em_data_callback *cb,
+                                              cpumask_t *span, bool milliwatts)
 {
     return -EINVAL;
 }
@@ -225,8 +228,7 @@ static inline struct em_perf_domain *em_pd_get(struct device *dev)
 {
     return NULL;
 }
-static inline unsigned long em_cpu_energy(struct em_perf_domain *pd,
-            unsigned long max_util, unsigned long sum_util)
+static inline unsigned long em_cpu_energy(struct em_perf_domain *pd, unsigned long max_util, unsigned long sum_util)
 {
     return 0;
 }

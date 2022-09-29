@@ -74,9 +74,8 @@ struct drm_mode_config_funcs {
      * A new framebuffer with an initial reference count of 1 or a negative
      * error code encoded with ERR_PTR().
      */
-    struct drm_framebuffer *(*fb_create)(struct drm_device *dev,
-                         struct drm_file *file_priv,
-                         const struct drm_mode_fb_cmd2 *mode_cmd);
+    struct drm_framebuffer *(*fb_create)(struct drm_device *dev, struct drm_file *file_priv,
+                                         const struct drm_mode_fb_cmd2 *mode_cmd);
 
     /**
      * @get_format_info:
@@ -116,8 +115,7 @@ struct drm_mode_config_funcs {
      * be checked here. crtc/encoder/bridge/connector specific constraints
      * should be checked in the .mode_valid() hook for each specific object.
      */
-    enum drm_mode_status (*mode_valid)(struct drm_device *dev,
-                       const struct drm_display_mode *mode);
+    enum drm_mode_status (*mode_valid)(struct drm_device *dev, const struct drm_display_mode *mode);
 
     /**
      * @atomic_check:
@@ -193,8 +191,7 @@ struct drm_mode_config_funcs {
      *    situation like a GPU hang. From a userspace point all errors are
      *    treated equally.
      */
-    int (*atomic_check)(struct drm_device *dev,
-                struct drm_atomic_state *state);
+    int (*atomic_check)(struct drm_device *dev, struct drm_atomic_state *state);
 
     /**
      * @atomic_commit:
@@ -275,9 +272,7 @@ struct drm_mode_config_funcs {
      * @atomic_check) or -EDEADLK (this function must not acquire
      * additional modeset locks).
      */
-    int (*atomic_commit)(struct drm_device *dev,
-                 struct drm_atomic_state *state,
-                 bool nonblock);
+    int (*atomic_commit)(struct drm_device *dev, struct drm_atomic_state *state, bool nonblock);
 
     /**
      * @atomic_state_alloc:
@@ -793,8 +788,6 @@ struct drm_mode_config {
      * gamma LUT as supported by the driver (read-only).
      */
     struct drm_property *gamma_lut_size_property;
-
-
 
     /**
      * @suggested_x_property: Optional connector property with a hint for

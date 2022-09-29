@@ -260,7 +260,8 @@
 #define kbasep_js_remove_cancelled_job midgard_kbasep_js_remove_cancelled_job
 #define kbasep_js_remove_job midgard_kbasep_js_remove_job
 #define kbasep_js_resume midgard_kbasep_js_resume
-#define kbasep_js_runpool_release_ctx_and_katom_retained_state midgard_kbasep_js_runpool_release_ctx_and_katom_retained_state
+#define kbasep_js_runpool_release_ctx_and_katom_retained_state                                                         \
+    midgard_kbasep_js_runpool_release_ctx_and_katom_retained_state
 #define kbasep_js_runpool_release_ctx midgard_kbasep_js_runpool_release_ctx
 #define kbasep_js_runpool_release_ctx_nolock midgard_kbasep_js_runpool_release_ctx_nolock
 #define kbasep_js_runpool_requeue_or_kill_ctx midgard_kbasep_js_runpool_requeue_or_kill_ctx

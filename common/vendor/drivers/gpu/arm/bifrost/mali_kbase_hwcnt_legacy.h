@@ -29,8 +29,8 @@
  * Different clients may safely be used concurrently.
  */
 
-#ifndef _KBASE_HWCNT_LEGACY_H_
-#define _KBASE_HWCNT_LEGACY_H_
+#ifndef KBASE_HWCNT_LEGACY_H_
+#define KBASE_HWCNT_LEGACY_H_
 
 struct kbase_hwcnt_legacy_client;
 struct kbase_ioctl_hwcnt_enable;
@@ -48,10 +48,8 @@ struct kbase_hwcnt_virtualizer;
  *
  * Return: 0 on success, else error code.
  */
-int kbase_hwcnt_legacy_client_create(
-    struct kbase_hwcnt_virtualizer *hvirt,
-    struct kbase_ioctl_hwcnt_enable *enable,
-    struct kbase_hwcnt_legacy_client **out_hlcli);
+int kbase_hwcnt_legacy_client_create(struct kbase_hwcnt_virtualizer *hvirt, struct kbase_ioctl_hwcnt_enable *enable,
+                                     struct kbase_hwcnt_legacy_client **out_hlcli);
 
 /**
  * kbase_hwcnt_legacy_client_destroy() - Destroy a legacy hardware counter

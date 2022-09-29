@@ -53,26 +53,24 @@ static int rk805_pwrkey_probe(struct platform_device *pdev)
     input_set_capability(pwr, EV_KEY, KEY_POWER);
 
     fall_irq = platform_get_irq(pdev, 0);
-    if (fall_irq < 0)
+    if (fall_irq < 0) {
         return fall_irq;
+    }
 
     rise_irq = platform_get_irq(pdev, 1);
-    if (rise_irq < 0)
+    if (rise_irq < 0) {
         return rise_irq;
+    }
 
-    err = devm_request_any_context_irq(&pwr->dev, fall_irq,
-                       pwrkey_fall_irq,
-                       IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-                       "rk805_pwrkey_fall", pwr);
+    err = devm_request_any_context_irq(&pwr->dev, fall_irq, pwrkey_fall_irq, IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+                                       "rk805_pwrkey_fall", pwr);
     if (err < 0) {
         dev_err(&pdev->dev, "Can't register fall irq: %d\n", err);
         return err;
     }
 
-    err = devm_request_any_context_irq(&pwr->dev, rise_irq,
-                       pwrkey_rise_irq,
-                       IRQF_TRIGGER_RISING | IRQF_ONESHOT,
-                       "rk805_pwrkey_rise", pwr);
+    err = devm_request_any_context_irq(&pwr->dev, rise_irq, pwrkey_rise_irq, IRQF_TRIGGER_RISING | IRQF_ONESHOT,
+                                       "rk805_pwrkey_rise", pwr);
     if (err < 0) {
         dev_err(&pdev->dev, "Can't register rise irq: %d\n", err);
         return err;
@@ -91,10 +89,11 @@ static int rk805_pwrkey_probe(struct platform_device *pdev)
 }
 
 static struct platform_driver rk805_pwrkey_driver = {
-    .probe    = rk805_pwrkey_probe,
-    .driver    = {
-        .name = "rk805-pwrkey",
-    },
+    .probe = rk805_pwrkey_probe,
+    .driver =
+        {
+            .name = "rk805-pwrkey",
+        },
 };
 module_platform_driver(rk805_pwrkey_driver);
 

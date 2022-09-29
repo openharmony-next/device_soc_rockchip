@@ -13,17 +13,14 @@
  *
  */
 
-
-
-#ifndef _KBASE_DMA_FENCE_H_
-#define _KBASE_DMA_FENCE_H_
+#ifndef KBASE_DMA_FENCE_H_
+#define KBASE_DMA_FENCE_H_
 
 #ifdef CONFIG_MALI_DMA_FENCE
 
 #include <linux/list.h>
 #include <linux/reservation.h>
 #include <mali_kbase_fence.h>
-
 
 /* Forward declaration from mali_kbase_defs.h */
 struct kbase_jd_atom;
@@ -55,9 +52,8 @@ struct kbase_dma_fence_resv_info {
  * reservation_objects. At the same time keeps track of which objects require
  * exclusive access in dma_fence_excl_bitmap.
  */
-void kbase_dma_fence_add_reservation(struct reservation_object *resv,
-                     struct kbase_dma_fence_resv_info *info,
-                     bool exclusive);
+void kbase_dma_fence_add_reservation(struct reservation_object *resv, struct kbase_dma_fence_resv_info *info,
+                                     bool exclusive);
 
 /**
  * kbase_dma_fence_wait() - Creates a new fence and attaches it to the resv_objs
@@ -66,8 +62,7 @@ void kbase_dma_fence_add_reservation(struct reservation_object *resv,
  *
  * Return: An error code or 0 if succeeds
  */
-int kbase_dma_fence_wait(struct kbase_jd_atom *katom,
-             struct kbase_dma_fence_resv_info *info);
+int kbase_dma_fence_wait(struct kbase_jd_atom *katom, struct kbase_dma_fence_resv_info *info);
 
 /**
  * kbase_dma_fence_cancel_ctx() - Cancel all dma-fences blocked atoms on kctx
@@ -117,8 +112,7 @@ void kbase_dma_fence_term(struct kbase_context *kctx);
  */
 int kbase_dma_fence_init(struct kbase_context *kctx);
 
-
-#else /* CONFIG_MALI_DMA_FENCE */
+#else  /* CONFIG_MALI_DMA_FENCE */
 /* Dummy functions for when dma-buf fence isn't enabled. */
 
 static inline int kbase_dma_fence_init(struct kbase_context *kctx)
@@ -126,6 +120,8 @@ static inline int kbase_dma_fence_init(struct kbase_context *kctx)
     return 0;
 }
 
-static inline void kbase_dma_fence_term(struct kbase_context *kctx) {}
+static inline void kbase_dma_fence_term(struct kbase_context *kctx)
+{
+}
 #endif /* CONFIG_MALI_DMA_FENCE */
 #endif

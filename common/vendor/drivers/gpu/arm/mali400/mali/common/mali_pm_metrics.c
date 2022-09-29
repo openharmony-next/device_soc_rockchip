@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -13,7 +14,7 @@
 #include <linux/ktime.h>
 
 #define MALI_PM_TIME_SHIFT 0
-#define MALI_UTILIZATION_MAX_PERIOD 80000000/* ns = 100ms */
+#define MALI_UTILIZATION_MAX_PERIOD 80000000 /* ns = 100ms */
 #define MALI_UTILIZATION_HALF_PERIOD 40000000
 
 mali_osk_errcode_t mali_pm_metrics_init(struct mali_device *mdev)
@@ -170,7 +171,6 @@ void mali_pm_record_gpu_active(mali_bool is_gp)
     mali_osk_spinlock_irq_unlock(mdev->mali_metrics.lock);
 }
 
-
 /*caller needs to hold mdev->mali_metrics.lock before calling this function*/
 static void mali_pm_get_dvfs_utilisation_calc(struct mali_device *mdev, ktime_t now)
 {
@@ -214,8 +214,7 @@ void mali_pm_reset_dvfs_utilisation(struct mali_device *mdev)
     mali_osk_spinlock_irq_unlock(mdev->mali_metrics.lock);
 }
 
-void mali_pm_get_dvfs_utilisation(struct mali_device *mdev,
-                  unsigned long *total_out, unsigned long *busy_out)
+void mali_pm_get_dvfs_utilisation(struct mali_device *mdev, unsigned long *total_out, unsigned long *busy_out)
 {
     ktime_t now = ktime_get();
     u64 busy = 0;
@@ -233,8 +232,7 @@ void mali_pm_get_dvfs_utilisation(struct mali_device *mdev,
     if (total >= MALI_UTILIZATION_MAX_PERIOD) {
         mali_pm_reset_dvfs_utilisation_unlocked(mdev, now);
     } else if (total < MALI_UTILIZATION_HALF_PERIOD) {
-        total += mdev->mali_metrics.prev_idle +
-             mdev->mali_metrics.prev_busy;
+        total += mdev->mali_metrics.prev_idle + mdev->mali_metrics.prev_busy;
         busy += mdev->mali_metrics.prev_busy;
     }
 

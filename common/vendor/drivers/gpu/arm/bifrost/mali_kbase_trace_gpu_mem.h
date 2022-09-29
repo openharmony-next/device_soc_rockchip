@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_TRACE_GPU_MEM_H_
-#define _KBASE_TRACE_GPU_MEM_H_
+#ifndef KBASE_TRACE_GPU_MEM_H_
+#define KBASE_TRACE_GPU_MEM_H_
 
 #ifdef CONFIG_TRACE_GPU_MEM
 #include <trace/events/gpu_mem.h>
@@ -29,30 +29,28 @@
 #include "mali_gpu_mem_trace.h"
 #endif
 
-#define DEVICE_TGID ((u32) 0U)
+#define DEVICE_TGID ((u32)0U)
 
-static void kbase_trace_gpu_mem_usage(struct kbase_device *kbdev,
-                      struct kbase_context *kctx)
+static void kbase_trace_gpu_mem_usage(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     lockdep_assert_held(&kbdev->gpu_mem_usage_lock);
 
 #if defined(CONFIG_TRACE_GPU_MEM) || !MALI_CUSTOMER_RELEASE
-    trace_gpu_mem_total(kbdev->id, DEVICE_TGID,
-                kbdev->total_gpu_pages << PAGE_SHIFT);
+    trace_gpu_mem_total(kbdev->id, DEVICE_TGID, kbdev->total_gpu_pages << PAGE_SHIFT);
 
-    if (likely(kctx))
-        trace_gpu_mem_total(kbdev->id, kctx->kprcs->tgid,
-                kctx->kprcs->total_gpu_pages << PAGE_SHIFT);
+    if (likely(kctx)) {
+        trace_gpu_mem_total(kbdev->id, kctx->kprcs->tgid, kctx->kprcs->total_gpu_pages << PAGE_SHIFT);
+    }
 #endif
 }
 
-static inline void kbase_trace_gpu_mem_usage_dec(struct kbase_device *kbdev,
-                struct kbase_context *kctx, size_t pages)
+static inline void kbase_trace_gpu_mem_usage_dec(struct kbase_device *kbdev, struct kbase_context *kctx, size_t pages)
 {
     spin_lock(&kbdev->gpu_mem_usage_lock);
 
-    if (likely(kctx))
+    if (likely(kctx)) {
         kctx->kprcs->total_gpu_pages -= pages;
+    }
 
     kbdev->total_gpu_pages -= pages;
 
@@ -61,13 +59,13 @@ static inline void kbase_trace_gpu_mem_usage_dec(struct kbase_device *kbdev,
     spin_unlock(&kbdev->gpu_mem_usage_lock);
 }
 
-static inline void kbase_trace_gpu_mem_usage_inc(struct kbase_device *kbdev,
-                struct kbase_context *kctx, size_t pages)
+static inline void kbase_trace_gpu_mem_usage_inc(struct kbase_device *kbdev, struct kbase_context *kctx, size_t pages)
 {
     spin_lock(&kbdev->gpu_mem_usage_lock);
 
-    if (likely(kctx))
+    if (likely(kctx)) {
         kctx->kprcs->total_gpu_pages += pages;
+    }
 
     kbdev->total_gpu_pages += pages;
 
@@ -85,8 +83,7 @@ static inline void kbase_trace_gpu_mem_usage_inc(struct kbase_device *kbdev,
  * Remove reference to dma buf been unmapped from kbase_device level
  * rb_tree and Kbase_process level dma buf rb_tree.
  */
-void kbase_remove_dma_buf_usage(struct kbase_context *kctx,
-                struct kbase_mem_phy_alloc *alloc);
+void kbase_remove_dma_buf_usage(struct kbase_context *kctx, struct kbase_mem_phy_alloc *alloc);
 
 /**
  * kbase_add_dma_buf_usage - Add a dma-buf entry captured.
@@ -97,7 +94,6 @@ void kbase_remove_dma_buf_usage(struct kbase_context *kctx,
  * Add reference to dma buf been mapped to kbase_device level
  * rb_tree and Kbase_process level dma buf rb_tree.
  */
-void kbase_add_dma_buf_usage(struct kbase_context *kctx,
-                    struct kbase_mem_phy_alloc *alloc);
+void kbase_add_dma_buf_usage(struct kbase_context *kctx, struct kbase_mem_phy_alloc *alloc);
 
 #endif /* _KBASE_TRACE_GPU_MEM_H_ */

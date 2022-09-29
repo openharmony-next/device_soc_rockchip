@@ -43,26 +43,28 @@ extern "C" {
  * compatibility with the old C interface, so please do
  * not use ctx, because it is usually a NULL.
  */
-#define RgaInit(ctx) ( { \
-    int ret = 0; \
-    ret = c_RkRgaInit(); \
-    c_RkRgaGetContext(ctx); \
-    ret; \
-})
-#define RgaDeInit(ctx) do { \
-    (void)(ctx);        /* unused */ \
-    c_RkRgaDeInit(); \
-} while (0)
+#define RgaInit(ctx)                                                                                                   \
+    ({                                                                                                                 \
+        int ret = 0;                                                                                                   \
+        ret = c_RkRgaInit();                                                                                           \
+        c_RkRgaGetContext(ctx);                                                                                        \
+        ret;                                                                                                           \
+    })
+#define RgaDeInit(ctx)                                                                                                 \
+    do {                                                                                                               \
+        (void)(ctx); /* unused */                                                                                      \
+        c_RkRgaDeInit();                                                                                               \
+    } while (0)
 #define RgaBlit(...) c_RkRgaBlit(__VA_ARGS__)
 #define RgaCollorFill(...) c_RkRgaColorFill(__VA_ARGS__)
 #define RgaFlush() c_RkRgaFlush()
 
-int  c_RkRgaInit(void);
+int c_RkRgaInit(void);
 void c_RkRgaDeInit(void);
 void c_RkRgaGetContext(void **ctx);
-int  c_RkRgaBlit(rga_info_t *src, rga_info_t *dst, rga_info_t *src1);
-int  c_RkRgaColorFill(rga_info_t *dst);
-int  c_RkRgaFlush(void);
+int c_RkRgaBlit(rga_info_t *src, rga_info_t *dst, rga_info_t *src1);
+int c_RkRgaColorFill(rga_info_t *dst);
+int c_RkRgaFlush(void);
 
 int c_RkRgaGetAllocBuffer(bo_t *bo_info, int width, int height, int bpp);
 int c_RkRgaGetAllocBufferCache(bo_t *bo_info, int width, int height, int bpp);

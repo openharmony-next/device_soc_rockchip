@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_IPA_H_
-#define _KBASE_IPA_H_
+#ifndef KBASE_IPA_H_
+#define KBASE_IPA_H_
 
 #if defined(CONFIG_MALI_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)
 
@@ -43,9 +41,8 @@ struct kbase_ipa_model {
  *
  * Return: 0 on success, or an error code
  */
-int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model,
-                  const char *name, s32 *addr,
-                  size_t num_elems, bool dt_required);
+int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model, const char *name, s32 *addr, size_t num_elems,
+                                  bool dt_required);
 
 /**
  * kbase_ipa_model_add_param_string - Add a string model parameter
@@ -60,9 +57,8 @@ int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model,
  *
  * Return: 0 on success, or an error code
  */
-int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model,
-                     const char *name, char *addr,
-                     size_t size, bool dt_required);
+int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model, const char *name, char *addr, size_t size,
+                                     bool dt_required);
 
 struct kbase_ipa_model_ops {
     char *name;
@@ -91,8 +87,7 @@ struct kbase_ipa_model_ops {
      *
      * Return: 0 on success, or an error code.
      */
-    int (*get_dynamic_coeff)(struct kbase_ipa_model *model, u32 *coeffp,
-                 u32 current_freq);
+    int (*get_dynamic_coeff)(struct kbase_ipa_model *model, u32 *coeffp, u32 current_freq);
     /*
      * get_static_coeff() - calculate static power coefficient
      * @model:        pointer to model
@@ -112,22 +107,18 @@ struct kbase_ipa_model_ops {
 };
 
 /* Models can be registered only in the platform's platform_init_func call */
-int kbase_ipa_model_ops_register(struct kbase_device *kbdev,
-                 struct kbase_ipa_model_ops *new_model_ops);
-struct kbase_ipa_model *kbase_ipa_get_model(struct kbase_device *kbdev,
-                        const char *name);
+int kbase_ipa_model_ops_register(struct kbase_device *kbdev, struct kbase_ipa_model_ops *new_model_ops);
+struct kbase_ipa_model *kbase_ipa_get_model(struct kbase_device *kbdev, const char *name);
 
 int kbase_ipa_init(struct kbase_device *kbdev);
 void kbase_ipa_term(struct kbase_device *kbdev);
 void kbase_ipa_model_use_fallback_locked(struct kbase_device *kbdev);
 void kbase_ipa_model_use_configured_locked(struct kbase_device *kbdev);
 int kbase_ipa_model_recalculate(struct kbase_ipa_model *model);
-struct kbase_ipa_model *kbase_ipa_init_model(struct kbase_device *kbdev,
-                         struct kbase_ipa_model_ops *ops);
+struct kbase_ipa_model *kbase_ipa_init_model(struct kbase_device *kbdev, struct kbase_ipa_model_ops *ops);
 void kbase_ipa_term_model(struct kbase_ipa_model *model);
 
 extern struct kbase_ipa_model_ops kbase_simple_ipa_model_ops;
-
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
 extern struct devfreq_cooling_ops kbase_ipa_power_model_ops;
@@ -138,10 +129,12 @@ extern struct devfreq_cooling_power kbase_ipa_power_model_ops;
 #else /* !(defined(CONFIG_MALI_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)) */
 
 static inline void kbase_ipa_model_use_fallback_locked(struct kbase_device *kbdev)
-{ }
+{
+}
 
 static inline void kbase_ipa_model_use_configured_locked(struct kbase_device *kbdev)
-{ }
+{
+}
 
 #endif /* (defined(CONFIG_MALI_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)) */
 

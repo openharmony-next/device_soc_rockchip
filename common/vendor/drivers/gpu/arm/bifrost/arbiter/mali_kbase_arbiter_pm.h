@@ -127,8 +127,7 @@ void kbase_arbiter_pm_release_interrupts(struct kbase_device *kbdev);
  * The state machine function. Receives events and transitions states
  * according the event received and the current state
  */
-void kbase_arbiter_pm_vm_event(struct kbase_device *kbdev,
-    enum kbase_arbif_evt event);
+void kbase_arbiter_pm_vm_event(struct kbase_device *kbdev, enum kbase_arbif_evt event);
 
 /**
  * kbase_arbiter_pm_ctx_active_handle_suspend() - Handle suspend operation for
@@ -144,8 +143,7 @@ void kbase_arbiter_pm_vm_event(struct kbase_device *kbdev,
  * Return: 0 if success, 1 if failure due to system suspending/suspended
  */
 int kbase_arbiter_pm_ctx_active_handle_suspend(struct kbase_device *kbdev,
-    enum kbase_pm_suspend_handler suspend_handler);
-
+                                               enum kbase_pm_suspend_handler suspend_handler);
 
 /**
  * kbase_arbiter_pm_vm_stopped() - Handle stop event for the VM

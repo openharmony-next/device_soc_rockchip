@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2012, 2014-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -28,7 +29,7 @@ static mali_bool timer_running = MALI_FALSE;
  */
 static u32 mali_control_timeout = 20;
 
-void mali_control_timer_add(u32 timeout)/* 'timeout' : 以 ms 为单位. */
+void mali_control_timer_add(u32 timeout) /* 'timeout' : 以 ms 为单位. */
 {
     _mali_osk_timer_add(mali_control_timer, _mali_osk_time_mstoticks(timeout));
 }
@@ -55,9 +56,10 @@ static void mali_control_timer_callback(void *arg)
             mali_utilization_platform_realize(util_data);
 #endif
 
-        if (MALI_TRUE == timer_running)
-            if (MALI_TRUE == need_add_timer) {
-                mali_control_timer_mod(mali_control_timeout);
+            if (MALI_TRUE == timer_running) {
+                if (MALI_TRUE == need_add_timer) {
+                    mali_control_timer_mod(mali_control_timeout);
+                }
             }
         }
     }

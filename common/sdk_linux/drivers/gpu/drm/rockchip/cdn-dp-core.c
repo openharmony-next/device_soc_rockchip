@@ -25,22 +25,20 @@
 #include "cdn-dp-reg.h"
 #include "rockchip_drm_vop.h"
 
-#define connector_to_dp(c) \
-        container_of(c, struct cdn_dp_device, connector)
+#define connector_to_dp(c) container_of(c, struct cdn_dp_device, connector)
 
-#define encoder_to_dp(c) \
-        container_of(c, struct cdn_dp_device, encoder)
+#define encoder_to_dp(c) container_of(c, struct cdn_dp_device, encoder)
 
-#define GRF_SOC_CON9        0x6224
-#define DP_SEL_VOP_LIT        BIT(12)
-#define GRF_SOC_CON26        0x6268
-#define DPTX_HPD_SEL        (3 << 12)
-#define DPTX_HPD_DEL        (2 << 12)
-#define DPTX_HPD_SEL_MASK    (3 << 28)
+#define GRF_SOC_CON9 0x6224
+#define DP_SEL_VOP_LIT BIT(12)
+#define GRF_SOC_CON26 0x6268
+#define DPTX_HPD_SEL (3 << 12)
+#define DPTX_HPD_DEL (2 << 12)
+#define DPTX_HPD_SEL_MASK (3 << 28)
 
-#define CDN_FW_TIMEOUT_MS    (64 * 1000)
-#define CDN_DPCD_TIMEOUT_MS    5000
-#define CDN_DP_FIRMWARE        "rockchip/dptx.bin"
+#define CDN_FW_TIMEOUT_MS (64 * 1000)
+#define CDN_DPCD_TIMEOUT_MS 5000
+#define CDN_DP_FIRMWARE "rockchip/dptx.bin"
 
 struct cdn_dp_data {
     u8 max_phy;
@@ -51,15 +49,11 @@ struct cdn_dp_data rk3399_cdn_dp = {
 };
 
 static const struct of_device_id cdn_dp_dt_ids[] = {
-    { .compatible = "rockchip,rk3399-cdn-dp",
-        .data = (void *)&rk3399_cdn_dp },
-    {}
-};
+    {.compatible = "rockchip,rk3399-cdn-dp", .data = (void *)&rk3399_cdn_dp}, {}};
 
 MODULE_DEVICE_TABLE(of, cdn_dp_dt_ids);
 
-static int cdn_dp_grf_write(struct cdn_dp_device *dp,
-                unsigned int reg, unsigned int val)
+static int cdn_dp_grf_write(struct cdn_dp_device *dp, unsigned int reg, unsigned int val)
 {
     int ret;
 
@@ -152,8 +146,9 @@ static int cdn_dp_get_sink_count(struct cdn_dp_device *dp, u8 *sink_count)
 
     *sink_count = 0;
     ret = cdn_dp_dpcd_read(dp, DP_SINK_COUNT, &value, 1);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     *sink_count = DP_GET_SINK_COUNT(value);
     return 0;
@@ -167,8 +162,9 @@ static struct cdn_dp_port *cdn_dp_connected_port(struct cdn_dp_device *dp)
     for (i = 0; i < dp->ports; i++) {
         port = dp->port[i];
         lanes = cdn_dp_get_port_lanes(port);
-        if (lanes)
+        if (lanes) {
             return port;
+        }
     }
     return NULL;
 }
@@ -190,25 +186,26 @@ static bool cdn_dp_check_sink_connection(struct cdn_dp_device *dp)
      * some docks need more time to power up.
      */
     while (time_before(jiffies, timeout)) {
-        if (!cdn_dp_get_sink_count(dp, &sink_count))
+        if (!cdn_dp_get_sink_count(dp, &sink_count)) {
             return sink_count ? true : false;
+        }
 
-        usleep_range(5000, 10000);
+        usleep_range(0x1388, 0x2710);
     }
 
     DRM_DEV_ERROR(dp->dev, "Get sink capability timed out\n");
     return false;
 }
 
-static enum drm_connector_status
-cdn_dp_connector_detect(struct drm_connector *connector, bool force)
+static enum drm_connector_status cdn_dp_connector_detect(struct drm_connector *connector, bool force)
 {
     struct cdn_dp_device *dp = connector_to_dp(connector);
     enum drm_connector_status status = connector_status_disconnected;
 
     mutex_lock(&dp->lock);
-    if (dp->connected)
+    if (dp->connected) {
         status = connector_status_connected;
+    }
     mutex_unlock(&dp->lock);
 
     return status;
@@ -224,7 +221,7 @@ static void cdn_dp_oob_hotplug_event(struct drm_connector *connector)
 {
     struct cdn_dp_device *dp = connector_to_dp(connector);
 
-    schedule_delayed_work(&dp->event_work, msecs_to_jiffies(100));
+    schedule_delayed_work(&dp->event_work, msecs_to_jiffies(0x64));
 }
 
 static const struct drm_connector_funcs cdn_dp_atomic_connector_funcs = {
@@ -245,22 +242,20 @@ static int cdn_dp_connector_get_modes(struct drm_connector *connector)
     mutex_lock(&dp->lock);
     edid = dp->edid;
     if (edid) {
-        DRM_DEV_DEBUG_KMS(dp->dev, "got edid: width[%d] x height[%d]\n",
-                  edid->width_cm, edid->height_cm);
+        DRM_DEV_DEBUG_KMS(dp->dev, "got edid: width[%d] x height[%d]\n", edid->width_cm, edid->height_cm);
 
         dp->sink_has_audio = drm_detect_monitor_audio(edid);
         ret = drm_add_edid_modes(connector, edid);
-        if (ret)
-            drm_connector_update_edid_property(connector,
-                                edid);
+        if (ret) {
+            drm_connector_update_edid_property(connector, edid);
+        }
     }
     mutex_unlock(&dp->lock);
 
     return ret;
 }
 
-static int cdn_dp_connector_mode_valid(struct drm_connector *connector,
-                       struct drm_display_mode *mode)
+static int cdn_dp_connector_mode_valid(struct drm_connector *connector, struct drm_display_mode *mode)
 {
     struct cdn_dp_device *dp = connector_to_dp(connector);
     struct drm_display_info *display_info = &dp->connector.display_info;
@@ -268,22 +263,23 @@ static int cdn_dp_connector_mode_valid(struct drm_connector *connector,
     u8 lanes, bpc;
 
     /* If DP is disconnected, every mode is invalid */
-    if (!dp->connected)
+    if (!dp->connected) {
         return MODE_BAD;
-
-    switch (display_info->bpc) {
-    case 10:
-        bpc = 10;
-        break;
-    case 6:
-        bpc = 6;
-        break;
-    default:
-        bpc = 8;
-        break;
     }
 
-    requested = mode->clock * bpc * 3 / 1000;
+    switch (display_info->bpc) {
+        case 0xa:
+            bpc = 0xa;
+            break;
+        case 0x6:
+            bpc = 0x6;
+            break;
+        default:
+            bpc = 0x8;
+            break;
+    }
+
+    requested = mode->clock * bpc * 0x3 / 0x3e8;
 
     source_max = dp->lanes;
     sink_max = drm_dp_max_lane_count(dp->dpcd);
@@ -293,15 +289,13 @@ static int cdn_dp_connector_mode_valid(struct drm_connector *connector,
     sink_max = drm_dp_max_link_rate(dp->dpcd);
     rate = min(source_max, sink_max);
 
-    actual = rate * lanes / 100;
+    actual = rate * lanes / 0x64;
 
     /* efficiency is about 0.8 */
-    actual = actual * 8 / 10;
+    actual = actual * 0x8 / 0xa;
 
     if (requested > actual) {
-        DRM_DEV_DEBUG_KMS(dp->dev,
-                  "requested=%d, actual=%d, clock=%d\n",
-                  requested, actual, mode->clock);
+        DRM_DEV_DEBUG_KMS(dp->dev, "requested=%d, actual=%d, clock=%d\n", requested, actual, mode->clock);
         return MODE_CLOCK_HIGH;
     }
 
@@ -329,10 +323,10 @@ static int cdn_dp_firmware_init(struct cdn_dp_device *dp)
     iram_data = (const u32 *)(fw->data + hdr->header_size);
     dram_data = (const u32 *)(fw->data + hdr->header_size + hdr->iram_size);
 
-    ret = cdn_dp_load_firmware(dp, iram_data, hdr->iram_size,
-                   dram_data, hdr->dram_size);
-    if (ret)
+    ret = cdn_dp_load_firmware(dp, iram_data, hdr->iram_size, dram_data, hdr->dram_size);
+    if (ret) {
         return ret;
+    }
 
     ret = cdn_dp_set_firmware_active(dp, true);
     if (ret) {
@@ -347,19 +341,18 @@ static int cdn_dp_get_sink_capability(struct cdn_dp_device *dp)
 {
     int ret;
 
-    if (!cdn_dp_check_sink_connection(dp))
+    if (!cdn_dp_check_sink_connection(dp)) {
         return -ENODEV;
+    }
 
-    ret = cdn_dp_dpcd_read(dp, DP_DPCD_REV, dp->dpcd,
-                   DP_RECEIVER_CAP_SIZE);
+    ret = cdn_dp_dpcd_read(dp, DP_DPCD_REV, dp->dpcd, DP_RECEIVER_CAP_SIZE);
     if (ret) {
         DRM_DEV_ERROR(dp->dev, "Failed to get caps %d\n", ret);
         return ret;
     }
 
     kfree(dp->edid);
-    dp->edid = drm_do_get_edid(&dp->connector,
-                   cdn_dp_get_edid_block, dp);
+    dp->edid = drm_do_get_edid(&dp->connector, cdn_dp_get_edid_block, dp);
     return 0;
 }
 
@@ -370,15 +363,13 @@ static int cdn_dp_enable_phy(struct cdn_dp_device *dp, struct cdn_dp_port *port)
     if (!port->phy_enabled) {
         ret = phy_power_on(port->phy);
         if (ret) {
-            DRM_DEV_ERROR(dp->dev, "phy power on failed: %d\n",
-                      ret);
+            DRM_DEV_ERROR(dp->dev, "phy power on failed: %d\n", ret);
             goto err_phy;
         }
         port->phy_enabled = true;
     }
 
-    ret = cdn_dp_grf_write(dp, GRF_SOC_CON26,
-                   DPTX_HPD_SEL_MASK | DPTX_HPD_SEL);
+    ret = cdn_dp_grf_write(dp, GRF_SOC_CON26, DPTX_HPD_SEL_MASK | DPTX_HPD_SEL);
     if (ret) {
         DRM_DEV_ERROR(dp->dev, "Failed to write HPD_SEL %d\n", ret);
         goto err_power_on;
@@ -386,16 +377,16 @@ static int cdn_dp_enable_phy(struct cdn_dp_device *dp, struct cdn_dp_port *port)
 
     ret = cdn_dp_get_hpd_status(dp);
     if (ret <= 0) {
-        if (!ret)
+        if (!ret) {
             DRM_DEV_ERROR(dp->dev, "hpd does not exist\n");
+        }
         goto err_power_on;
     }
 
     port->lanes = cdn_dp_get_port_lanes(port);
     ret = cdn_dp_set_host_cap(dp, port->lanes, 0);
     if (ret) {
-        DRM_DEV_ERROR(dp->dev, "set host capabilities failed: %d\n",
-                  ret);
+        DRM_DEV_ERROR(dp->dev, "set host capabilities failed: %d\n", ret);
         goto err_power_on;
     }
 
@@ -403,19 +394,18 @@ static int cdn_dp_enable_phy(struct cdn_dp_device *dp, struct cdn_dp_port *port)
     return 0;
 
 err_power_on:
-    if (phy_power_off(port->phy))
+    if (phy_power_off(port->phy)) {
         DRM_DEV_ERROR(dp->dev, "phy power off failed: %d", ret);
-    else
+    } else {
         port->phy_enabled = false;
+    }
 
 err_phy:
-    cdn_dp_grf_write(dp, GRF_SOC_CON26,
-             DPTX_HPD_SEL_MASK | DPTX_HPD_DEL);
+    cdn_dp_grf_write(dp, GRF_SOC_CON26, DPTX_HPD_SEL_MASK | DPTX_HPD_DEL);
     return ret;
 }
 
-static int cdn_dp_disable_phy(struct cdn_dp_device *dp,
-                  struct cdn_dp_port *port)
+static int cdn_dp_disable_phy(struct cdn_dp_device *dp, struct cdn_dp_port *port)
 {
     int ret;
 
@@ -437,17 +427,17 @@ static int cdn_dp_disable(struct cdn_dp_device *dp)
 {
     int ret, i;
 
-    if (!dp->active)
+    if (!dp->active) {
         return 0;
+    }
 
-    for (i = 0; i < dp->ports; i++)
+    for (i = 0; i < dp->ports; i++) {
         cdn_dp_disable_phy(dp, dp->port[i]);
+    }
 
-    ret = cdn_dp_grf_write(dp, GRF_SOC_CON26,
-                   DPTX_HPD_SEL_MASK | DPTX_HPD_DEL);
+    ret = cdn_dp_grf_write(dp, GRF_SOC_CON26, DPTX_HPD_SEL_MASK | DPTX_HPD_DEL);
     if (ret) {
-        DRM_DEV_ERROR(dp->dev, "Failed to clear hpd sel %d\n",
-                  ret);
+        DRM_DEV_ERROR(dp->dev, "Failed to clear hpd sel %d\n", ret);
         return ret;
     }
 
@@ -471,17 +461,18 @@ static int cdn_dp_enable(struct cdn_dp_device *dp)
 
     port = cdn_dp_connected_port(dp);
     if (!port) {
-        DRM_DEV_ERROR(dp->dev,
-                  "Can't enable without connection\n");
+        DRM_DEV_ERROR(dp->dev, "Can't enable without connection\n");
         return -ENODEV;
     }
 
-    if (dp->active)
+    if (dp->active) {
         return 0;
+    }
 
     ret = cdn_dp_clk_enable(dp);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     ret = cdn_dp_firmware_init(dp);
     if (ret) {
@@ -495,8 +486,9 @@ static int cdn_dp_enable(struct cdn_dp_device *dp)
         lanes = cdn_dp_get_port_lanes(port);
         if (lanes) {
             ret = cdn_dp_enable_phy(dp, port);
-            if (ret)
+            if (ret) {
                 continue;
+            }
 
             ret = cdn_dp_get_sink_capability(dp);
             if (ret) {
@@ -514,24 +506,23 @@ err_clk_disable:
     return ret;
 }
 
-static void cdn_dp_encoder_mode_set(struct drm_encoder *encoder,
-                    struct drm_display_mode *mode,
-                    struct drm_display_mode *adjusted)
+static void cdn_dp_encoder_mode_set(struct drm_encoder *encoder, struct drm_display_mode *mode,
+                                    struct drm_display_mode *adjusted)
 {
     struct cdn_dp_device *dp = encoder_to_dp(encoder);
     struct drm_display_info *display_info = &dp->connector.display_info;
     struct video_info *video = &dp->video_info;
 
     switch (display_info->bpc) {
-    case 10:
-        video->color_depth = 10;
-        break;
-    case 6:
-        video->color_depth = 6;
-        break;
-    default:
-        video->color_depth = 8;
-        break;
+        case 0xa:
+            video->color_depth = 0xa;
+            break;
+        case 0x6:
+            video->color_depth = 0x6;
+            break;
+        default:
+            video->color_depth = 0x8;
+            break;
     }
 
     video->color_fmt = PXL_RGB;
@@ -547,11 +538,11 @@ static bool cdn_dp_check_link_status(struct cdn_dp_device *dp)
     struct cdn_dp_port *port = cdn_dp_connected_port(dp);
     u8 sink_lanes = drm_dp_max_lane_count(dp->dpcd);
 
-    if (!port || !dp->max_rate || !dp->max_lanes)
+    if (!port || !dp->max_rate || !dp->max_lanes) {
         return false;
+    }
 
-    if (cdn_dp_dpcd_read(dp, DP_LANE0_1_STATUS, link_status,
-                 DP_LINK_STATUS_SIZE)) {
+    if (cdn_dp_dpcd_read(dp, DP_LANE0_1_STATUS, link_status, DP_LINK_STATUS_SIZE)) {
         DRM_ERROR("Failed to get link status\n");
         return false;
     }
@@ -571,23 +562,23 @@ static void cdn_dp_encoder_enable(struct drm_encoder *encoder)
         return;
     }
 
-    DRM_DEV_DEBUG_KMS(dp->dev, "vop %s output to cdn-dp\n",
-              (ret) ? "LIT" : "BIG");
-    if (ret)
-        val = DP_SEL_VOP_LIT | (DP_SEL_VOP_LIT << 16);
-    else
-        val = DP_SEL_VOP_LIT << 16;
+    DRM_DEV_DEBUG_KMS(dp->dev, "vop %s output to cdn-dp\n", (ret) ? "LIT" : "BIG");
+    if (ret) {
+        val = DP_SEL_VOP_LIT | (DP_SEL_VOP_LIT << 0x10);
+    } else {
+        val = DP_SEL_VOP_LIT << 0x10;
+    }
 
     ret = cdn_dp_grf_write(dp, GRF_SOC_CON9, val);
-    if (ret)
+    if (ret) {
         return;
+    }
 
     mutex_lock(&dp->lock);
 
     ret = cdn_dp_enable(dp);
     if (ret) {
-        DRM_DEV_ERROR(dp->dev, "Failed to enable encoder %d\n",
-                  ret);
+        DRM_DEV_ERROR(dp->dev, "Failed to enable encoder %d\n", ret);
         goto out;
     }
     if (!cdn_dp_check_link_status(dp)) {
@@ -628,8 +619,7 @@ static void cdn_dp_encoder_disable(struct drm_encoder *encoder)
     if (dp->active) {
         ret = cdn_dp_disable(dp);
         if (ret) {
-            DRM_DEV_ERROR(dp->dev, "Failed to disable encoder %d\n",
-                      ret);
+            DRM_DEV_ERROR(dp->dev, "Failed to disable encoder %d\n", ret);
         }
     }
     mutex_unlock(&dp->lock);
@@ -643,13 +633,13 @@ static void cdn_dp_encoder_disable(struct drm_encoder *encoder)
      * 2. If re-training or re-config failed, the DP will be disabled here.
      *    run the event_work to re-connect it.
      */
-    if (!dp->connected && cdn_dp_connected_port(dp))
+    if (!dp->connected && cdn_dp_connected_port(dp)) {
         schedule_delayed_work(&dp->event_work, 0);
+    }
 }
 
-static int cdn_dp_encoder_atomic_check(struct drm_encoder *encoder,
-                       struct drm_crtc_state *crtc_state,
-                       struct drm_connector_state *conn_state)
+static int cdn_dp_encoder_atomic_check(struct drm_encoder *encoder, struct drm_crtc_state *crtc_state,
+                                       struct drm_connector_state *conn_state)
 {
     struct rockchip_crtc_state *s = to_rockchip_crtc_state(crtc_state);
 
@@ -738,9 +728,8 @@ static int cdn_dp_parse_dt(struct cdn_dp_device *dp)
     return 0;
 }
 
-static int cdn_dp_audio_hw_params(struct device *dev,  void *data,
-                  struct hdmi_codec_daifmt *daifmt,
-                  struct hdmi_codec_params *params)
+static int cdn_dp_audio_hw_params(struct device *dev, void *data, struct hdmi_codec_daifmt *daifmt,
+                                  struct hdmi_codec_params *params)
 {
     struct cdn_dp_device *dp = dev_get_drvdata(dev);
     struct audio_info audio = {
@@ -757,21 +746,22 @@ static int cdn_dp_audio_hw_params(struct device *dev,  void *data,
     }
 
     switch (daifmt->fmt) {
-    case HDMI_I2S:
-        audio.format = AFMT_I2S;
-        break;
-    case HDMI_SPDIF:
-        audio.format = AFMT_SPDIF;
-        break;
-    default:
-        DRM_DEV_ERROR(dev, "Invalid format %d\n", daifmt->fmt);
-        ret = -EINVAL;
-        goto out;
+        case HDMI_I2S:
+            audio.format = AFMT_I2S;
+            break;
+        case HDMI_SPDIF:
+            audio.format = AFMT_SPDIF;
+            break;
+        default:
+            DRM_DEV_ERROR(dev, "Invalid format %d\n", daifmt->fmt);
+            ret = -EINVAL;
+            goto out;
     }
 
     ret = cdn_dp_audio_config(dp, &audio);
-    if (!ret)
+    if (!ret) {
         dp->audio_info = audio;
+    }
 
 out:
     mutex_unlock(&dp->lock);
@@ -784,18 +774,19 @@ static void cdn_dp_audio_shutdown(struct device *dev, void *data)
     int ret;
 
     mutex_lock(&dp->lock);
-    if (!dp->active)
+    if (!dp->active) {
         goto out;
+    }
 
     ret = cdn_dp_audio_stop(dp, &dp->audio_info);
-    if (!ret)
+    if (!ret) {
         dp->audio_info.format = AFMT_UNUSED;
+    }
 out:
     mutex_unlock(&dp->lock);
 }
 
-static int cdn_dp_audio_mute_stream(struct device *dev, void *data,
-                    bool enable, int direction)
+static int cdn_dp_audio_mute_stream(struct device *dev, void *data, bool enable, int direction)
 {
     struct cdn_dp_device *dp = dev_get_drvdata(dev);
     int ret;
@@ -813,8 +804,7 @@ out:
     return ret;
 }
 
-static int cdn_dp_audio_get_eld(struct device *dev, void *data,
-                u8 *buf, size_t len)
+static int cdn_dp_audio_get_eld(struct device *dev, void *data, u8 *buf, size_t len)
 {
     struct cdn_dp_device *dp = dev_get_drvdata(dev);
 
@@ -831,19 +821,17 @@ static const struct hdmi_codec_ops audio_codec_ops = {
     .no_capture_mute = 1,
 };
 
-static int cdn_dp_audio_codec_init(struct cdn_dp_device *dp,
-                   struct device *dev)
+static int cdn_dp_audio_codec_init(struct cdn_dp_device *dp, struct device *dev)
 {
     struct hdmi_codec_pdata codec_data = {
         .i2s = 1,
         .spdif = 1,
         .ops = &audio_codec_ops,
-        .max_i2s_channels = 8,
+        .max_i2s_channels = 0x8,
     };
 
-    dp->audio_pdev = platform_device_register_data(
-             dev, HDMI_CODEC_DRV_NAME, PLATFORM_DEVID_AUTO,
-             &codec_data, sizeof(codec_data));
+    dp->audio_pdev =
+        platform_device_register_data(dev, HDMI_CODEC_DRV_NAME, PLATFORM_DEVID_AUTO, &codec_data, sizeof(codec_data));
 
     return PTR_ERR_OR_ZERO(dp->audio_pdev);
 }
@@ -852,12 +840,13 @@ static int cdn_dp_request_firmware(struct cdn_dp_device *dp)
 {
     int ret;
     unsigned long timeout = jiffies + msecs_to_jiffies(CDN_FW_TIMEOUT_MS);
-    unsigned long sleep = 1000;
+    unsigned long sleep = 0x3e8;
 
     WARN_ON(!mutex_is_locked(&dp->lock));
 
-    if (dp->fw_loaded)
+    if (dp->fw_loaded) {
         return 0;
+    }
 
     /* Drop the lock before getting the firmware to avoid blocking boot */
     mutex_unlock(&dp->lock);
@@ -866,11 +855,10 @@ static int cdn_dp_request_firmware(struct cdn_dp_device *dp)
         ret = request_firmware(&dp->fw, CDN_DP_FIRMWARE, dp->dev);
         if (ret == -ENOENT) {
             msleep(sleep);
-            sleep *= 2;
+            sleep *= 0x2;
             continue;
         } else if (ret) {
-            DRM_DEV_ERROR(dp->dev,
-                      "failed to request firmware: %d\n", ret);
+            DRM_DEV_ERROR(dp->dev, "failed to request firmware: %d\n", ret);
             goto out;
         }
 
@@ -888,8 +876,7 @@ out:
 
 static void cdn_dp_pd_event_work(struct work_struct *work)
 {
-    struct cdn_dp_device *dp = container_of(to_delayed_work(work), struct cdn_dp_device,
-                        event_work);
+    struct cdn_dp_device *dp = container_of(to_delayed_work(work), struct cdn_dp_device, event_work);
     struct drm_connector *connector = &dp->connector;
     enum drm_connector_status old_status;
 
@@ -897,12 +884,14 @@ static void cdn_dp_pd_event_work(struct work_struct *work)
 
     mutex_lock(&dp->lock);
 
-    if (dp->suspended)
+    if (dp->suspended) {
         goto out;
+    }
 
     ret = cdn_dp_request_firmware(dp);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     dp->connected = true;
 
@@ -911,7 +900,7 @@ static void cdn_dp_pd_event_work(struct work_struct *work)
         DRM_DEV_INFO(dp->dev, "Not connected. Disabling cdn\n");
         dp->connected = false;
 
-    /* Connected but not enabled, enable the block */
+        /* Connected but not enabled, enable the block */
     } else if (!dp->active) {
         DRM_DEV_INFO(dp->dev, "Connected, not enabled. Enabling cdn\n");
         ret = cdn_dp_enable(dp);
@@ -920,12 +909,12 @@ static void cdn_dp_pd_event_work(struct work_struct *work)
             dp->connected = false;
         }
 
-    /* Enabled and connected to a dongle without a sink, notify userspace */
+        /* Enabled and connected to a dongle without a sink, notify userspace */
     } else if (!cdn_dp_check_sink_connection(dp)) {
         DRM_DEV_INFO(dp->dev, "Connected without sink. Assert hpd\n");
         dp->connected = false;
 
-    /* Enabled and connected with a sink, re-train if requested */
+        /* Enabled and connected with a sink, re-train if requested */
     } else if (!cdn_dp_check_link_status(dp)) {
         unsigned int rate = dp->max_rate;
         unsigned int lanes = dp->max_lanes;
@@ -940,14 +929,11 @@ static void cdn_dp_pd_event_work(struct work_struct *work)
         }
 
         /* If training result is changed, update the video config */
-        if (mode->clock &&
-            (rate != dp->max_rate || lanes != dp->max_lanes)) {
+        if (mode->clock && (rate != dp->max_rate || lanes != dp->max_lanes)) {
             ret = cdn_dp_config_video(dp);
             if (ret) {
                 dp->connected = false;
-                DRM_DEV_ERROR(dp->dev,
-                          "Failed to config video %d\n",
-                          ret);
+                DRM_DEV_ERROR(dp->dev, "Failed to config video %d\n", ret);
             }
         }
     }
@@ -957,8 +943,9 @@ out:
 
     old_status = connector->status;
     connector->status = connector->funcs->detect(connector, false);
-    if (old_status != connector->status)
+    if (old_status != connector->status) {
         drm_kms_helper_hotplug_event(dp->drm_dev);
+    }
 }
 
 static int cdn_dp_bind(struct device *dev, struct device *master, void *data)
@@ -970,8 +957,9 @@ static int cdn_dp_bind(struct device *dev, struct device *master, void *data)
     int ret;
 
     ret = cdn_dp_parse_dt(dp);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     dp->drm_dev = drm_dev;
     dp->connected = false;
@@ -983,12 +971,10 @@ static int cdn_dp_bind(struct device *dev, struct device *master, void *data)
 
     encoder = &dp->encoder;
 
-    encoder->possible_crtcs = rockchip_drm_of_find_possible_crtcs(drm_dev,
-                                      dev->of_node);
+    encoder->possible_crtcs = rockchip_drm_of_find_possible_crtcs(drm_dev, dev->of_node);
     DRM_DEBUG_KMS("possible_crtcs = 0x%x\n", encoder->possible_crtcs);
 
-    ret = drm_simple_encoder_init(drm_dev, encoder,
-                      DRM_MODE_ENCODER_TMDS);
+    ret = drm_simple_encoder_init(drm_dev, encoder, DRM_MODE_ENCODER_TMDS);
     if (ret) {
         DRM_ERROR("failed to initialize encoder with drm\n");
         return ret;
@@ -1000,9 +986,7 @@ static int cdn_dp_bind(struct device *dev, struct device *master, void *data)
     connector->polled = DRM_CONNECTOR_POLL_HPD;
     connector->dpms = DRM_MODE_DPMS_OFF;
 
-    ret = drm_connector_init(drm_dev, connector,
-                 &cdn_dp_atomic_connector_funcs,
-                 DRM_MODE_CONNECTOR_DisplayPort);
+    ret = drm_connector_init(drm_dev, connector, &cdn_dp_atomic_connector_funcs, DRM_MODE_CONNECTOR_DisplayPort);
     if (ret) {
         DRM_ERROR("failed to initialize connector with drm\n");
         goto err_free_encoder;
@@ -1046,8 +1030,9 @@ static void cdn_dp_unbind(struct device *dev, struct device *master, void *data)
     connector->funcs->destroy(connector);
 
     pm_runtime_disable(dev);
-    if (dp->fw_loaded)
+    if (dp->fw_loaded) {
         release_firmware(dp->fw);
+    }
     kfree(dp->edid);
     dp->edid = NULL;
 }
@@ -1063,8 +1048,9 @@ static int cdn_dp_suspend(struct device *dev)
     int ret = 0;
 
     mutex_lock(&dp->lock);
-    if (dp->active)
+    if (dp->active) {
         ret = cdn_dp_disable(dp);
+    }
     dp->suspended = true;
     mutex_unlock(&dp->lock);
 
@@ -1077,8 +1063,9 @@ static int cdn_dp_resume(struct device *dev)
 
     mutex_lock(&dp->lock);
     dp->suspended = false;
-    if (dp->fw_loaded)
+    if (dp->fw_loaded) {
         schedule_delayed_work(&dp->event_work, 0);
+    }
     mutex_unlock(&dp->lock);
 
     return 0;
@@ -1095,8 +1082,9 @@ static int cdn_dp_probe(struct platform_device *pdev)
     int i;
 
     dp = devm_kzalloc(dev, sizeof(*dp), GFP_KERNEL);
-    if (!dp)
+    if (!dp) {
         return -ENOMEM;
+    }
     dp->dev = dev;
 
     match = of_match_node(cdn_dp_dt_ids, pdev->dev.of_node);
@@ -1105,15 +1093,18 @@ static int cdn_dp_probe(struct platform_device *pdev)
     for (i = 0; i < dp_data->max_phy; i++) {
         phy = devm_of_phy_get_by_index(dev, dev->of_node, i);
 
-        if (PTR_ERR(phy) == -EPROBE_DEFER)
+        if (PTR_ERR(phy) == -EPROBE_DEFER) {
             return -EPROBE_DEFER;
+        }
 
-        if (IS_ERR(phy))
+        if (IS_ERR(phy)) {
             continue;
+        }
 
         port = devm_kzalloc(dev, sizeof(*port), GFP_KERNEL);
-        if (!port)
+        if (!port) {
             return -ENOMEM;
+        }
 
         port->phy = phy;
         port->dp = dp;
@@ -1152,19 +1143,17 @@ static void cdn_dp_shutdown(struct platform_device *pdev)
     cdn_dp_suspend(dp->dev);
 }
 
-static const struct dev_pm_ops cdn_dp_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(cdn_dp_suspend,
-                cdn_dp_resume)
-};
+static const struct dev_pm_ops cdn_dp_pm_ops = {SET_SYSTEM_SLEEP_PM_OPS(cdn_dp_suspend, cdn_dp_resume)};
 
 struct platform_driver cdn_dp_driver = {
     .probe = cdn_dp_probe,
     .remove = cdn_dp_remove,
     .shutdown = cdn_dp_shutdown,
-    .driver = {
-           .name = "cdn-dp",
-           .owner = THIS_MODULE,
-           .of_match_table = of_match_ptr(cdn_dp_dt_ids),
-           .pm = &cdn_dp_pm_ops,
-    },
+    .driver =
+        {
+            .name = "cdn-dp",
+            .owner = THIS_MODULE,
+            .of_match_table = of_match_ptr(cdn_dp_dt_ids),
+            .pm = &cdn_dp_pm_ops,
+        },
 };

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013, 2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -24,18 +25,20 @@
  * @return Sync fence that will be signaled when tracker is activated.
  */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-static struct sync_fence *mali_timeline_sync_fence_create_and_add_tracker(struct mali_timeline *timeline, mali_timeline_point point)
+static struct sync_fence *mali_timeline_sync_fence_create_and_add_tracker(struct mali_timeline *timeline,
+                                                                          mali_timeline_point point)
 #else
-static struct mali_internal_sync_fence *mali_timeline_sync_fence_create_and_add_tracker(struct mali_timeline *timeline, mali_timeline_point point)
+static struct mali_internal_sync_fence *mali_timeline_sync_fence_create_and_add_tracker(struct mali_timeline *timeline,
+                                                                                        mali_timeline_point point)
 #endif
 {
     struct mali_timeline_sync_fence_tracker *sync_fence_tracker;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-    struct sync_fence                       *sync_fence;
+    struct sync_fence *sync_fence;
 #else
-    struct mali_internal_sync_fence                       *sync_fence;
+    struct mali_internal_sync_fence *sync_fence;
 #endif
-    struct mali_timeline_fence               fence;
+    struct mali_timeline_fence fence;
 
     MALI_DEBUG_ASSERT_POINTER(timeline);
     MALI_DEBUG_ASSERT(MALI_TIMELINE_NO_POINT != point);
@@ -96,18 +99,24 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
 #else
         struct mali_internal_sync_fence *sync_fence;
 #endif
-        if (MALI_TIMELINE_NO_POINT == fence->points[i]) continue;
+        if (MALI_TIMELINE_NO_POINT == fence->points[i]) {
+            continue;
+        }
 
         timeline = system->timelines[i];
         MALI_DEBUG_ASSERT_POINTER(timeline);
 
         sync_fence = mali_timeline_sync_fence_create_and_add_tracker(timeline, fence->points[i]);
-        if (NULL == sync_fence) goto error;
+        if (NULL == sync_fence) {
+            goto error;
+        }
 
         if (NULL != sync_fence_acc) {
             /* Merge sync fences. */
             sync_fence_acc = mali_sync_fence_merge(sync_fence_acc, sync_fence);
-            if (NULL == sync_fence_acc) goto error;
+            if (NULL == sync_fence_acc) {
+                goto error;
+            }
         } else {
             /* This was the first sync fence created. */
             sync_fence_acc = sync_fence;
@@ -123,11 +132,15 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
         sync_fence = mali_internal_sync_fence_fdget(fence->sync_fd);
 #endif
 
-        if (NULL == sync_fence) goto error;
+        if (NULL == sync_fence) {
+            goto error;
+        }
 
         if (NULL != sync_fence_acc) {
             sync_fence_acc = mali_sync_fence_merge(sync_fence_acc, sync_fence);
-            if (NULL == sync_fence_acc) goto error;
+            if (NULL == sync_fence_acc) {
+                goto error;
+            }
         } else {
             sync_fence_acc = sync_fence;
         }
@@ -139,7 +152,9 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
         /* There was nothing to wait on, so return an already signaled fence. */
 
         sync_fence_acc = mali_sync_timeline_create_signaled_fence(system->signaled_sync_tl);
-        if (NULL == sync_fence_acc) goto error;
+        if (NULL == sync_fence_acc) {
+            goto error;
+        }
     }
 
     /* Return file descriptor for the accumulated sync fence. */

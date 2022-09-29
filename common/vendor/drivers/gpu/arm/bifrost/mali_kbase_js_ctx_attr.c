@@ -20,7 +20,6 @@
  *
  */
 
-
 #include <mali_kbase.h>
 #include <mali_kbase_config.h>
 
@@ -43,7 +42,8 @@
  * or similar is called sometime later.
  * @return false indicates no change in ctx attributes state of the runpool.
  */
-static bool kbasep_js_ctx_attr_runpool_retain_attr(struct kbase_device *kbdev, struct kbase_context *kctx, enum kbasep_js_ctx_attr attribute)
+static bool kbasep_js_ctx_attr_runpool_retain_attr(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                                   enum kbasep_js_ctx_attr attribute)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbasep_js_kctx_info *js_kctx_info;
@@ -89,7 +89,8 @@ static bool kbasep_js_ctx_attr_runpool_retain_attr(struct kbase_device *kbdev, s
  * or similar is called sometime later.
  * @return false indicates no change in ctx attributes state of the runpool.
  */
-static bool kbasep_js_ctx_attr_runpool_release_attr(struct kbase_device *kbdev, struct kbase_context *kctx, enum kbasep_js_ctx_attr attribute)
+static bool kbasep_js_ctx_attr_runpool_release_attr(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                                    enum kbasep_js_ctx_attr attribute)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbasep_js_kctx_info *js_kctx_info;
@@ -131,7 +132,8 @@ static bool kbasep_js_ctx_attr_runpool_release_attr(struct kbase_device *kbdev, 
  * This may allow the scheduler to submit more jobs than previously.
  * @return false indicates no change in ctx attributes state of the runpool.
  */
-static bool kbasep_js_ctx_attr_ctx_retain_attr(struct kbase_device *kbdev, struct kbase_context *kctx, enum kbasep_js_ctx_attr attribute)
+static bool kbasep_js_ctx_attr_ctx_retain_attr(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                               enum kbasep_js_ctx_attr attribute)
 {
     struct kbasep_js_kctx_info *js_kctx_info;
     bool runpool_state_changed = false;
@@ -168,7 +170,8 @@ static bool kbasep_js_ctx_attr_ctx_retain_attr(struct kbase_device *kbdev, struc
  * This may allow the scheduler to submit more jobs than previously.
  * @return false indicates no change in ctx attributes state of the runpool.
  */
-static bool kbasep_js_ctx_attr_ctx_release_attr(struct kbase_device *kbdev, struct kbase_context *kctx, enum kbasep_js_ctx_attr attribute)
+static bool kbasep_js_ctx_attr_ctx_release_attr(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                                enum kbasep_js_ctx_attr attribute)
 {
     struct kbasep_js_kctx_info *js_kctx_info;
     bool runpool_state_changed = false;
@@ -205,9 +208,9 @@ void kbasep_js_ctx_attr_runpool_retain_ctx(struct kbase_device *kbdev, struct kb
 
     /* Retain any existing attributes */
     for (i = 0; i < KBASEP_JS_CTX_ATTR_COUNT; ++i) {
-        if (kbasep_js_ctx_attr_is_attr_on_ctx(kctx, (enum kbasep_js_ctx_attr) i) != false) {
+        if (kbasep_js_ctx_attr_is_attr_on_ctx(kctx, (enum kbasep_js_ctx_attr)i) != false) {
             /* The context is being scheduled in, so update the runpool with the new attributes */
-            runpool_state_changed = kbasep_js_ctx_attr_runpool_retain_attr(kbdev, kctx, (enum kbasep_js_ctx_attr) i);
+            runpool_state_changed = kbasep_js_ctx_attr_runpool_retain_attr(kbdev, kctx, (enum kbasep_js_ctx_attr)i);
 
             /* We don't need to know about state changed, because retaining a
              * context occurs on scheduling it, and that itself will also try
@@ -224,16 +227,17 @@ bool kbasep_js_ctx_attr_runpool_release_ctx(struct kbase_device *kbdev, struct k
 
     /* Release any existing attributes */
     for (i = 0; i < KBASEP_JS_CTX_ATTR_COUNT; ++i) {
-        if (kbasep_js_ctx_attr_is_attr_on_ctx(kctx, (enum kbasep_js_ctx_attr) i) != false) {
+        if (kbasep_js_ctx_attr_is_attr_on_ctx(kctx, (enum kbasep_js_ctx_attr)i) != false) {
             /* The context is being scheduled out, so update the runpool on the removed attributes */
-            runpool_state_changed |= kbasep_js_ctx_attr_runpool_release_attr(kbdev, kctx, (enum kbasep_js_ctx_attr) i);
+            runpool_state_changed |= kbasep_js_ctx_attr_runpool_release_attr(kbdev, kctx, (enum kbasep_js_ctx_attr)i);
         }
     }
 
     return runpool_state_changed;
 }
 
-void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbase_jd_atom *katom)
+void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                        struct kbase_jd_atom *katom)
 {
     bool runpool_state_changed = false;
     base_jd_core_req core_req;
@@ -241,12 +245,14 @@ void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase
     KBASE_DEBUG_ASSERT(katom);
     core_req = katom->core_req;
 
-    if (core_req & BASE_JD_REQ_ONLY_COMPUTE)
+    if (core_req & BASE_JD_REQ_ONLY_COMPUTE) {
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_retain_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_COMPUTE);
-    else
+    } else {
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_retain_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_NON_COMPUTE);
+    }
 
-    if ((core_req & (BASE_JD_REQ_CS | BASE_JD_REQ_ONLY_COMPUTE | BASE_JD_REQ_T)) != 0 && (core_req & (BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP)) == 0) {
+    if ((core_req & (BASE_JD_REQ_CS | BASE_JD_REQ_ONLY_COMPUTE | BASE_JD_REQ_T)) != 0 &&
+        (core_req & (BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP)) == 0) {
         /* Atom that can run on slot1 or slot2, and can use all cores */
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_retain_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_COMPUTE_ALL_CORES);
     }
@@ -257,7 +263,8 @@ void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase
     CSTD_UNUSED(runpool_state_changed);
 }
 
-bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbasep_js_atom_retained_state *katom_retained_state)
+bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                         struct kbasep_js_atom_retained_state *katom_retained_state)
 {
     bool runpool_state_changed = false;
     base_jd_core_req core_req;
@@ -266,15 +273,18 @@ bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbas
     core_req = katom_retained_state->core_req;
 
     /* No-op for invalid atoms */
-    if (kbasep_js_atom_retained_state_is_valid(katom_retained_state) == false)
+    if (kbasep_js_atom_retained_state_is_valid(katom_retained_state) == false) {
         return false;
+    }
 
-    if (core_req & BASE_JD_REQ_ONLY_COMPUTE)
+    if (core_req & BASE_JD_REQ_ONLY_COMPUTE) {
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_release_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_COMPUTE);
-    else
+    } else {
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_release_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_NON_COMPUTE);
+    }
 
-    if ((core_req & (BASE_JD_REQ_CS | BASE_JD_REQ_ONLY_COMPUTE | BASE_JD_REQ_T)) != 0 && (core_req & (BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP)) == 0) {
+    if ((core_req & (BASE_JD_REQ_CS | BASE_JD_REQ_ONLY_COMPUTE | BASE_JD_REQ_T)) != 0 &&
+        (core_req & (BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP)) == 0) {
         /* Atom that can run on slot1 or slot2, and can use all cores */
         runpool_state_changed |= kbasep_js_ctx_attr_ctx_release_attr(kbdev, kctx, KBASEP_JS_CTX_ATTR_COMPUTE_ALL_CORES);
     }

@@ -7,10 +7,10 @@
 #include "capture.h"
 #include "common.h"
 
-#define DMA_VDEV_NAME DRIVER_NAME    "_dmapath"
-#define DMARX0_VDEV_NAME DRIVER_NAME    "_rawrd0_m"
-#define DMARX1_VDEV_NAME DRIVER_NAME    "_rawrd1_l"
-#define DMARX2_VDEV_NAME DRIVER_NAME    "_rawrd2_s"
+#define DMA_VDEV_NAME DRIVER_NAME "_dmapath"
+#define DMARX0_VDEV_NAME DRIVER_NAME "_rawrd0_m"
+#define DMARX1_VDEV_NAME DRIVER_NAME "_rawrd1_l"
+#define DMARX2_VDEV_NAME DRIVER_NAME "_rawrd2_s"
 
 struct rkisp_dmarx_device;
 
@@ -22,11 +22,7 @@ enum {
     RKISP_MAX_DMARX_STREAM,
 };
 
-enum rkisp_dmarx_pad {
-    RKISP_DMARX_PAD_SINK,
-    RKISP_DMARX_PAD_SOURCE,
-    RKISP_DMARX_PAD_MAX
-};
+enum rkisp_dmarx_pad { RKISP_DMARX_PAD_SINK, RKISP_DMARX_PAD_SOURCE, RKISP_DMARX_PAD_MAX };
 
 enum rkisp_dmarx_trigger {
     T_AUTO = 0,
@@ -55,13 +51,9 @@ struct rkisp_dmarx_device {
 
 void rkisp_dmarx_isr(u32 mis_val, struct rkisp_device *dev);
 void rkisp2_rawrd_isr(u32 mis_val, struct rkisp_device *dev);
-void rkisp_dmarx_set_fmt(struct rkisp_stream *stream,
-             struct v4l2_pix_format_mplane pixm);
-void rkisp_rawrd_set_pic_size(struct rkisp_device *dev,
-                  u32 width, u32 height);
-void rkisp_dmarx_get_frame(struct rkisp_device *dev, u32 *id,
-               u64 *sof_timestamp, u64 *timestamp,
-               bool sync);
+void rkisp_dmarx_set_fmt(struct rkisp_stream *stream, struct v4l2_pix_format_mplane pixm);
+void rkisp_rawrd_set_pic_size(struct rkisp_device *dev, u32 width, u32 height);
+void rkisp_dmarx_get_frame(struct rkisp_device *dev, u32 *id, u64 *sof_timestamp, u64 *timestamp, bool sync);
 void rkisp_unregister_dmarx_vdev(struct rkisp_device *dev);
 int rkisp_register_dmarx_vdev(struct rkisp_device *dev);
 #endif /* _RKISP_DMARX_H */

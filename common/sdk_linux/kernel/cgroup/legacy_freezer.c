@@ -31,18 +31,18 @@
  * its ancestors has FREEZING_SELF set.
  */
 enum freezer_state_flags {
-    CGROUP_FREEZER_ONLINE    = (1 << 0), /* freezer is fully online */
-    CGROUP_FREEZING_SELF    = (1 << 1), /* this freezer is freezing */
-    CGROUP_FREEZING_PARENT    = (1 << 2), /* the parent freezer is freezing */
-    CGROUP_FROZEN        = (1 << 3), /* this and its descendants frozen */
+    CGROUP_FREEZER_ONLINE = (1 << 0),  /* freezer is fully online */
+    CGROUP_FREEZING_SELF = (1 << 1),   /* this freezer is freezing */
+    CGROUP_FREEZING_PARENT = (1 << 2), /* the parent freezer is freezing */
+    CGROUP_FROZEN = (1 << 3),          /* this and its descendants frozen */
 
     /* mask for all FREEZING flags */
-    CGROUP_FREEZING        = CGROUP_FREEZING_SELF | CGROUP_FREEZING_PARENT,
+    CGROUP_FREEZING = CGROUP_FREEZING_SELF | CGROUP_FREEZING_PARENT,
 };
 
 struct freezer {
-    struct cgroup_subsys_state    css;
-    unsigned int            state;
+    struct cgroup_subsys_state css;
+    unsigned int state;
 };
 
 static DEFINE_MUTEX(freezer_mutex);
@@ -75,21 +75,23 @@ bool cgroup_freezing(struct task_struct *task)
 
 static const char *freezer_state_strs(unsigned int state)
 {
-    if (state & CGROUP_FROZEN)
+    if (state & CGROUP_FROZEN) {
         return "FROZEN";
-    if (state & CGROUP_FREEZING)
+    }
+    if (state & CGROUP_FREEZING) {
         return "FREEZING";
+    }
     return "THAWED";
 };
 
-static struct cgroup_subsys_state *
-freezer_css_alloc(struct cgroup_subsys_state *parent_css)
+static struct cgroup_subsys_state *freezer_css_alloc(struct cgroup_subsys_state *parent_css)
 {
     struct freezer *freezer;
 
     freezer = kzalloc(sizeof(struct freezer), GFP_KERNEL);
-    if (!freezer)
+    if (!freezer) {
         return ERR_PTR(-ENOMEM);
+    }
 
     return &freezer->css;
 }
@@ -133,8 +135,9 @@ static void freezer_css_offline(struct cgroup_subsys_state *css)
 
     mutex_lock(&freezer_mutex);
 
-    if (freezer->state & CGROUP_FREEZING)
+    if (freezer->state & CGROUP_FREEZING) {
         atomic_dec(&system_freezing_cnt);
+    }
 
     freezer->state = 0;
 
@@ -172,7 +175,8 @@ static void freezer_attach(struct cgroup_taskset *tset)
      * current state before executing the following - !frozen tasks may
      * be visible in a FROZEN cgroup and frozen tasks in a THAWED one.
      */
-    cgroup_taskset_for_each(task, new_css, tset) {
+    cgroup_taskset_for_each(task, new_css, tset)
+    {
         struct freezer *freezer = css_freezer(new_css);
 
         if (!(freezer->state & CGROUP_FREEZING)) {
@@ -211,15 +215,17 @@ static void freezer_fork(struct task_struct *task)
      * to do.  If we lost and root is the new cgroup, noop is still the
      * right thing to do.
      */
-    if (task_css_is_root(task, freezer_cgrp_id))
+    if (task_css_is_root(task, freezer_cgrp_id)) {
         return;
+    }
 
     mutex_lock(&freezer_mutex);
     rcu_read_lock();
 
     freezer = task_freezer(task);
-    if (freezer->state & CGROUP_FREEZING)
+    if (freezer->state & CGROUP_FREEZING) {
         freeze_task(task);
+    }
 
     rcu_read_unlock();
     mutex_unlock(&freezer_mutex);
@@ -250,17 +256,17 @@ static void update_if_frozen(struct cgroup_subsys_state *css)
 
     lockdep_assert_held(&freezer_mutex);
 
-    if (!(freezer->state & CGROUP_FREEZING) ||
-        (freezer->state & CGROUP_FROZEN))
+    if (!(freezer->state & CGROUP_FREEZING) || (freezer->state & CGROUP_FROZEN)) {
         return;
+    }
 
     /* are all (live) children frozen? */
     rcu_read_lock();
-    css_for_each_child(pos, css) {
+    css_for_each_child(pos, css)
+    {
         struct freezer *child = css_freezer(pos);
 
-        if ((child->state & CGROUP_FREEZER_ONLINE) &&
-            !(child->state & CGROUP_FROZEN)) {
+        if ((child->state & CGROUP_FREEZER_ONLINE) && !(child->state & CGROUP_FROZEN)) {
             rcu_read_unlock();
             return;
         }
@@ -278,8 +284,9 @@ static void update_if_frozen(struct cgroup_subsys_state *css)
              * completion.  Consider it frozen in addition to
              * the usual frozen condition.
              */
-            if (!frozen(task) && !freezer_should_skip(task))
+            if (!frozen(task) && !freezer_should_skip(task)) {
                 goto out_iter_end;
+            }
         }
     }
 
@@ -296,9 +303,11 @@ static int freezer_read(struct seq_file *m, void *v)
     rcu_read_lock();
 
     /* update states bottom-up */
-    css_for_each_descendant_post(pos, css) {
-        if (!css_tryget_online(pos))
+    css_for_each_descendant_post(pos, css)
+    {
+        if (!css_tryget_online(pos)) {
             continue;
+        }
         rcu_read_unlock();
 
         update_if_frozen(pos);
@@ -321,8 +330,9 @@ static void freeze_cgroup(struct freezer *freezer)
     struct task_struct *task;
 
     css_task_iter_start(&freezer->css, 0, &it);
-    while ((task = css_task_iter_next(&it)))
+    while ((task = css_task_iter_next(&it))) {
         freeze_task(task);
+    }
     css_task_iter_end(&it);
 }
 
@@ -332,8 +342,9 @@ static void unfreeze_cgroup(struct freezer *freezer)
     struct task_struct *task;
 
     css_task_iter_start(&freezer->css, 0, &it);
-    while ((task = css_task_iter_next(&it)))
+    while ((task = css_task_iter_next(&it))) {
         __thaw_task(task);
+    }
     css_task_iter_end(&it);
 }
 
@@ -346,18 +357,19 @@ static void unfreeze_cgroup(struct freezer *freezer)
  * Set or clear @state on @cgroup according to @freeze, and perform
  * freezing or thawing as necessary.
  */
-static void freezer_apply_state(struct freezer *freezer, bool freeze,
-                unsigned int state)
+static void freezer_apply_state(struct freezer *freezer, bool freeze, unsigned int state)
 {
     /* also synchronizes against task migration, see freezer_attach() */
     lockdep_assert_held(&freezer_mutex);
 
-    if (!(freezer->state & CGROUP_FREEZER_ONLINE))
+    if (!(freezer->state & CGROUP_FREEZER_ONLINE)) {
         return;
+    }
 
     if (freeze) {
-        if (!(freezer->state & CGROUP_FREEZING))
+        if (!(freezer->state & CGROUP_FREEZING)) {
             atomic_inc(&system_freezing_cnt);
+        }
         freezer->state |= state;
         freeze_cgroup(freezer);
     } else {
@@ -366,8 +378,9 @@ static void freezer_apply_state(struct freezer *freezer, bool freeze,
         freezer->state &= ~state;
 
         if (!(freezer->state & CGROUP_FREEZING)) {
-            if (was_freezing)
+            if (was_freezing) {
                 atomic_dec(&system_freezing_cnt);
+            }
             freezer->state &= ~CGROUP_FROZEN;
             unfreeze_cgroup(freezer);
         }
@@ -393,21 +406,21 @@ static void freezer_change_state(struct freezer *freezer, bool freeze)
      */
     mutex_lock(&freezer_mutex);
     rcu_read_lock();
-    css_for_each_descendant_pre(pos, &freezer->css) {
+    css_for_each_descendant_pre(pos, &freezer->css)
+    {
         struct freezer *pos_f = css_freezer(pos);
         struct freezer *parent = parent_freezer(pos_f);
 
-        if (!css_tryget_online(pos))
+        if (!css_tryget_online(pos)) {
             continue;
+        }
         rcu_read_unlock();
 
-        if (pos_f == freezer)
-            freezer_apply_state(pos_f, freeze,
-                        CGROUP_FREEZING_SELF);
-        else
-            freezer_apply_state(pos_f,
-                        parent->state & CGROUP_FREEZING,
-                        CGROUP_FREEZING_PARENT);
+        if (pos_f == freezer) {
+            freezer_apply_state(pos_f, freeze, CGROUP_FREEZING_SELF);
+        } else {
+            freezer_apply_state(pos_f, parent->state & CGROUP_FREEZING, CGROUP_FREEZING_PARENT);
+        }
 
         rcu_read_lock();
         css_put(pos);
@@ -416,34 +429,32 @@ static void freezer_change_state(struct freezer *freezer, bool freeze)
     mutex_unlock(&freezer_mutex);
 }
 
-static ssize_t freezer_write(struct kernfs_open_file *of,
-                 char *buf, size_t nbytes, loff_t off)
+static ssize_t freezer_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off)
 {
     bool freeze;
 
     buf = strstrip(buf);
 
-    if (strcmp(buf, freezer_state_strs(0)) == 0)
+    if (strcmp(buf, freezer_state_strs(0)) == 0) {
         freeze = false;
-    else if (strcmp(buf, freezer_state_strs(CGROUP_FROZEN)) == 0)
+    } else if (strcmp(buf, freezer_state_strs(CGROUP_FROZEN)) == 0) {
         freeze = true;
-    else
+    } else {
         return -EINVAL;
+    }
 
     freezer_change_state(css_freezer(of_css(of)), freeze);
     return nbytes;
 }
 
-static u64 freezer_self_freezing_read(struct cgroup_subsys_state *css,
-                      struct cftype *cft)
+static u64 freezer_self_freezing_read(struct cgroup_subsys_state *css, struct cftype *cft)
 {
     struct freezer *freezer = css_freezer(css);
 
     return (bool)(freezer->state & CGROUP_FREEZING_SELF);
 }
 
-static u64 freezer_parent_freezing_read(struct cgroup_subsys_state *css,
-                    struct cftype *cft)
+static u64 freezer_parent_freezing_read(struct cgroup_subsys_state *css, struct cftype *cft)
 {
     struct freezer *freezer = css_freezer(css);
 
@@ -467,16 +478,16 @@ static struct cftype files[] = {
         .flags = CFTYPE_NOT_ON_ROOT,
         .read_u64 = freezer_parent_freezing_read,
     },
-    { }    /* terminate */
+    {} /* terminate */
 };
 
 struct cgroup_subsys freezer_cgrp_subsys = {
-    .css_alloc    = freezer_css_alloc,
-    .css_online    = freezer_css_online,
-    .css_offline    = freezer_css_offline,
-    .css_free    = freezer_css_free,
-    .attach        = freezer_attach,
-    .fork        = freezer_fork,
-    .legacy_cftypes    = files,
+    .css_alloc = freezer_css_alloc,
+    .css_online = freezer_css_online,
+    .css_offline = freezer_css_offline,
+    .css_free = freezer_css_free,
+    .attach = freezer_attach,
+    .fork = freezer_fork,
+    .legacy_cftypes = files,
 };
 EXPORT_SYMBOL_GPL(freezer_cgrp_subsys);

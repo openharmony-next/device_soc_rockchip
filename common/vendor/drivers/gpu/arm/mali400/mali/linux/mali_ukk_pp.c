@@ -1,14 +1,15 @@
 /*
  * Copyright (C) 2010, 2012-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <linux/fs.h>       /* file system operations */
-#include <linux/uaccess.h>  /* user space access */
+#include <linux/fs.h>      /* file system operations */
+#include <linux/uaccess.h> /* user space access */
 
 #include "mali_ukk.h"
 #include "mali_osk.h"
@@ -27,7 +28,9 @@ int pp_start_job_wrapper(struct mali_session_data *session_data, mali_uk_pp_star
     MALI_CHECK_NON_NULL(session_data, -EINVAL);
 
     err = _mali_ukk_pp_start_job(session_data, uargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
     return 0;
 }
@@ -44,12 +47,15 @@ int pp_and_gp_start_job_wrapper(struct mali_session_data *session_data, mali_uk_
     MALI_CHECK_NON_NULL(session_data, -EINVAL);
 
     err = _mali_ukk_pp_and_gp_start_job(session_data, uargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
     return 0;
 }
 
-int pp_get_number_of_cores_wrapper(struct mali_session_data *session_data, mali_uk_get_pp_number_of_cores_s __user *uargs)
+int pp_get_number_of_cores_wrapper(struct mali_session_data *session_data,
+                                   mali_uk_get_pp_number_of_cores_s __user *uargs)
 {
     mali_uk_get_pp_number_of_cores_s kargs;
     mali_osk_errcode_t err;
@@ -82,9 +88,13 @@ int pp_get_core_version_wrapper(struct mali_session_data *session_data, mali_uk_
 
     kargs.ctx = (uintptr_t)session_data;
     err = _mali_ukk_get_pp_core_version(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
-    if (0 != put_user(kargs.version, &uargs->version)) return -EFAULT;
+    if (0 != put_user(kargs.version, &uargs->version)) {
+        return -EFAULT;
+    }
 
     return 0;
 }
@@ -96,7 +106,9 @@ int pp_disable_wb_wrapper(struct mali_session_data *session_data, mali_uk_pp_dis
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
     MALI_CHECK_NON_NULL(session_data, -EINVAL);
 
-    if (0 != copy_from_user(&kargs, uargs, sizeof(mali_uk_pp_disable_wb_s))) return -EFAULT;
+    if (0 != copy_from_user(&kargs, uargs, sizeof(mali_uk_pp_disable_wb_s))) {
+        return -EFAULT;
+    }
 
     kargs.ctx = (uintptr_t)session_data;
     _mali_ukk_pp_job_disable_wb(&kargs);

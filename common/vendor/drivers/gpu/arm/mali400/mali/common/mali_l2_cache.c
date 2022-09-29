@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -26,13 +27,13 @@
  * See the hardware documentation for more information about each register
  */
 typedef enum mali_l2_cache_register {
-    MALI400_L2_CACHE_REGISTER_SIZE         = 0x0004,
-    MALI400_L2_CACHE_REGISTER_STATUS       = 0x0008,
+    MALI400_L2_CACHE_REGISTER_SIZE = 0x0004,
+    MALI400_L2_CACHE_REGISTER_STATUS = 0x0008,
     /*unused                               = 0x000C */
-    MALI400_L2_CACHE_REGISTER_COMMAND      = 0x0010,
-    MALI400_L2_CACHE_REGISTER_CLEAR_PAGE   = 0x0014,
-    MALI400_L2_CACHE_REGISTER_MAX_READS    = 0x0018,
-    MALI400_L2_CACHE_REGISTER_ENABLE       = 0x001C,
+    MALI400_L2_CACHE_REGISTER_COMMAND = 0x0010,
+    MALI400_L2_CACHE_REGISTER_CLEAR_PAGE = 0x0014,
+    MALI400_L2_CACHE_REGISTER_MAX_READS = 0x0018,
+    MALI400_L2_CACHE_REGISTER_ENABLE = 0x001C,
     MALI400_L2_CACHE_REGISTER_PERFCNT_SRC0 = 0x0020,
     MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0 = 0x0024,
     MALI400_L2_CACHE_REGISTER_PERFCNT_SRC1 = 0x0028,
@@ -62,24 +63,23 @@ typedef enum mali_l2_cache_enable {
  */
 typedef enum mali_l2_cache_status {
     MALI400_L2_CACHE_STATUS_COMMAND_BUSY = 0x01,
-    MALI400_L2_CACHE_STATUS_DATA_BUSY    = 0x02,
+    MALI400_L2_CACHE_STATUS_DATA_BUSY = 0x02,
 } mali_l2_cache_status;
 
-#define MALI400_L2_MAX_READS_NOT_SET -1
+#define MALI400_L2_MAX_READS_NOT_SET (-1)
 
-static struct mali_l2_cache_core *
-    mali_global_l2s[MALI_MAX_NUMBER_OF_L2_CACHE_CORES] = { NULL, };
+static struct mali_l2_cache_core *mali_global_l2s[MALI_MAX_NUMBER_OF_L2_CACHE_CORES] = {
+    NULL,
+};
 static u32 mali_global_num_l2s = 0;
 
 int mali_l2_max_reads = MALI400_L2_MAX_READS_NOT_SET;
-
 
 /* Local helper functions */
 
 static void mali_l2_cache_reset(struct mali_l2_cache_core *cache);
 
-static mali_osk_errcode_t mali_l2_cache_send_command(
-    struct mali_l2_cache_core *cache, u32 reg, u32 val);
+static mali_osk_errcode_t mali_l2_cache_send_command(struct mali_l2_cache_core *cache, u32 reg, u32 val);
 
 static void mali_l2_cache_lock(struct mali_l2_cache_core *cache)
 {
@@ -95,16 +95,14 @@ static void mali_l2_cache_unlock(struct mali_l2_cache_core *cache)
 
 /* Implementation of the L2 cache interface */
 
-struct mali_l2_cache_core *mali_l2_cache_create(
-    _mali_osk_resource_t *resource, u32 domain_index)
+struct mali_l2_cache_core *mali_l2_cache_create(_mali_osk_resource_t *resource, u32 domain_index)
 {
     struct mali_l2_cache_core *cache = NULL;
 #if defined(DEBUG)
     u32 cache_size;
 #endif
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali L2 cache: Creating Mali L2 cache: %s\n",
-                 resource->description));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali L2 cache: Creating Mali L2 cache: %s\n", resource->description));
 
     if (mali_global_num_l2s >= MALI_MAX_NUMBER_OF_L2_CACHE_CORES) {
         MALI_PRINT_ERROR(("Mali L2 cache: Too many L2 caches\n"));
@@ -117,7 +115,7 @@ struct mali_l2_cache_core *mali_l2_cache_create(
         return NULL;
     }
 
-    cache->core_id =  mali_global_num_l2s;
+    cache->core_id = mali_global_num_l2s;
     cache->counter_src0 = MALI_HW_CORE_NO_COUNTER;
     cache->counter_src1 = MALI_HW_CORE_NO_COUNTER;
     cache->counter_value0_base = 0;
@@ -126,30 +124,26 @@ struct mali_l2_cache_core *mali_l2_cache_create(
     cache->power_is_on = MALI_FALSE;
     cache->last_invalidated_id = 0;
 
-    if (MALI_OSK_ERR_OK != mali_hw_core_create(&cache->hw_core,
-            resource, MALI400_L2_CACHE_REGISTERS_SIZE)) {
+    if (MALI_OSK_ERR_OK != mali_hw_core_create(&cache->hw_core, resource, MALI400_L2_CACHE_REGISTERS_SIZE)) {
         _mali_osk_free(cache);
         return NULL;
     }
 
 #if defined(DEBUG)
-    cache_size = mali_hw_core_register_read(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_SIZE);
+    cache_size = mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_SIZE);
 #endif
 
-    cache->lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED,
-            _MALI_OSK_LOCK_ORDER_L2);
+    cache->lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_L2);
     if (NULL == cache->lock) {
-        MALI_PRINT_ERROR(("Mali L2 cache: Failed to create counter lock for L2 cache core %s\n",
-                  cache->hw_core.description));
+        MALI_PRINT_ERROR(
+            ("Mali L2 cache: Failed to create counter lock for L2 cache core %s\n", cache->hw_core.description));
         mali_hw_core_delete(&cache->hw_core);
         _mali_osk_free(cache);
         return NULL;
     }
 
     /* register with correct power domain */
-    cache->pm_domain = mali_pm_register_l2_cache(
-                   domain_index, cache);
+    cache->pm_domain = mali_pm_register_l2_cache(domain_index, cache);
 
     mali_global_l2s[mali_global_num_l2s] = cache;
     mali_global_num_l2s++;
@@ -197,8 +191,9 @@ void mali_l2_cache_power_up(struct mali_l2_cache_core *cache)
 
     mali_l2_cache_reset(cache);
 
-    if ((1 << MALI_DOMAIN_INDEX_DUMMY) != cache->pm_domain->pmu_mask)
+    if ((1 << MALI_DOMAIN_INDEX_DUMMY) != cache->pm_domain->pmu_mask) {
         MALI_DEBUG_ASSERT(MALI_FALSE == cache->power_is_on);
+    }
     cache->power_is_on = MALI_TRUE;
 
     mali_l2_cache_unlock(cache);
@@ -224,29 +219,23 @@ void mali_l2_cache_power_down(struct mali_l2_cache_core *cache)
      */
 
     if (cache->counter_src0 != MALI_HW_CORE_NO_COUNTER) {
-        cache->counter_value0_base += mali_hw_core_register_read(
-                              &cache->hw_core,
-                              MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0);
-        mali_hw_core_register_write(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0, 0);
+        cache->counter_value0_base +=
+            mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0);
+        mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0, 0);
     }
 
     if (cache->counter_src1 != MALI_HW_CORE_NO_COUNTER) {
-        cache->counter_value1_base += mali_hw_core_register_read(
-                              &cache->hw_core,
-                              MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1);
-        mali_hw_core_register_write(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1, 0);
+        cache->counter_value1_base +=
+            mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1);
+        mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1, 0);
     }
-
 
     cache->power_is_on = MALI_FALSE;
 
     mali_l2_cache_unlock(cache);
 }
 
-void mali_l2_cache_core_set_counter_src(
-    struct mali_l2_cache_core *cache, u32 source_id, u32 counter)
+void mali_l2_cache_core_set_counter_src(struct mali_l2_cache_core *cache, u32 source_id, u32 counter)
 {
     u32 reg_offset_src;
     u32 reg_offset_val;
@@ -280,20 +269,17 @@ void mali_l2_cache_core_set_counter_src(
         }
 
         /* Set counter src */
-        mali_hw_core_register_write(&cache->hw_core,
-                        reg_offset_src, hw_src);
+        mali_hw_core_register_write(&cache->hw_core, reg_offset_src, hw_src);
 
         /* Make sure the HW starts counting from 0 again */
-        mali_hw_core_register_write(&cache->hw_core,
-                        reg_offset_val, 0);
+        mali_hw_core_register_write(&cache->hw_core, reg_offset_val, 0);
     }
 
     mali_l2_cache_unlock(cache);
 }
 
-void mali_l2_cache_core_get_counter_values(
-    struct mali_l2_cache_core *cache,
-    u32 *src0, u32 *value0, u32 *src1, u32 *value1)
+void mali_l2_cache_core_get_counter_values(struct mali_l2_cache_core *cache, u32 *src0, u32 *value0, u32 *src1,
+                                           u32 *value1)
 {
     MALI_DEBUG_ASSERT_POINTER(cache);
     MALI_DEBUG_ASSERT(NULL != src0);
@@ -308,8 +294,7 @@ void mali_l2_cache_core_get_counter_values(
 
     if (cache->counter_src0 != MALI_HW_CORE_NO_COUNTER) {
         if (MALI_TRUE == cache->power_is_on) {
-            *value0 = mali_hw_core_register_read(&cache->hw_core,
-                                 MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0);
+            *value0 = mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL0);
         } else {
             *value0 = 0;
         }
@@ -320,8 +305,7 @@ void mali_l2_cache_core_get_counter_values(
 
     if (cache->counter_src1 != MALI_HW_CORE_NO_COUNTER) {
         if (MALI_TRUE == cache->power_is_on) {
-            *value1 = mali_hw_core_register_read(&cache->hw_core,
-                                 MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1);
+            *value1 = mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_VAL1);
         } else {
             *value1 = 0;
         }
@@ -358,14 +342,12 @@ void mali_l2_cache_invalidate(struct mali_l2_cache_core *cache)
     mali_l2_cache_lock(cache);
 
     cache->last_invalidated_id = mali_scheduler_get_new_cache_order();
-    mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND,
-                   MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
+    mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND, MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
 
     mali_l2_cache_unlock(cache);
 }
 
-void mali_l2_cache_invalidate_conditional(
-    struct mali_l2_cache_core *cache, u32 id)
+void mali_l2_cache_invalidate_conditional(struct mali_l2_cache_core *cache, u32 id)
 {
     MALI_DEBUG_ASSERT_POINTER(cache);
 
@@ -386,11 +368,8 @@ void mali_l2_cache_invalidate_conditional(
 
     if (((s32)id) > ((s32)cache->last_invalidated_id)) {
         /* Set latest invalidated id to current "point in time" */
-        cache->last_invalidated_id =
-            mali_scheduler_get_new_cache_order();
-        mali_l2_cache_send_command(cache,
-                       MALI400_L2_CACHE_REGISTER_COMMAND,
-                       MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
+        cache->last_invalidated_id = mali_scheduler_get_new_cache_order();
+        mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND, MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
     }
 
     mali_l2_cache_unlock(cache);
@@ -412,12 +391,9 @@ void mali_l2_cache_invalidate_all(void)
             continue;
         }
 
-        cache->last_invalidated_id =
-            mali_scheduler_get_new_cache_order();
+        cache->last_invalidated_id = mali_scheduler_get_new_cache_order();
 
-        ret = mali_l2_cache_send_command(cache,
-                         MALI400_L2_CACHE_REGISTER_COMMAND,
-                         MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
+        ret = mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND, MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
         if (MALI_OSK_ERR_OK != ret) {
             MALI_PRINT_ERROR(("Failed to invalidate cache\n"));
         }
@@ -445,9 +421,7 @@ void mali_l2_cache_invalidate_all_pages(u32 *pages, u32 num_pages)
         for (j = 0; j < num_pages; j++) {
             mali_osk_errcode_t ret;
 
-            ret = mali_l2_cache_send_command(cache,
-                             MALI400_L2_CACHE_REGISTER_CLEAR_PAGE,
-                             pages[j]);
+            ret = mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_CLEAR_PAGE, pages[j]);
             if (MALI_OSK_ERR_OK != ret) {
                 MALI_PRINT_ERROR(("Failed to invalidate cache (page)\n"));
             }
@@ -465,38 +439,28 @@ static void mali_l2_cache_reset(struct mali_l2_cache_core *cache)
     MALI_DEBUG_ASSERT_LOCK_HELD(cache->lock);
 
     /* Invalidate cache (just to keep it in a known state at startup) */
-    mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND,
-                   MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
+    mali_l2_cache_send_command(cache, MALI400_L2_CACHE_REGISTER_COMMAND, MALI400_L2_CACHE_COMMAND_CLEAR_ALL);
 
     /* Enable cache */
-    mali_hw_core_register_write(&cache->hw_core,
-                    MALI400_L2_CACHE_REGISTER_ENABLE,
-                    (u32)MALI400_L2_CACHE_ENABLE_ACCESS |
-                    (u32)MALI400_L2_CACHE_ENABLE_READ_ALLOCATE);
+    mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_ENABLE,
+                                (u32)MALI400_L2_CACHE_ENABLE_ACCESS | (u32)MALI400_L2_CACHE_ENABLE_READ_ALLOCATE);
 
     if (MALI400_L2_MAX_READS_NOT_SET != mali_l2_max_reads) {
-        mali_hw_core_register_write(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_MAX_READS,
-                        (u32)mali_l2_max_reads);
+        mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_MAX_READS, (u32)mali_l2_max_reads);
     }
 
     /* Restart any performance counters (if enabled) */
     if (cache->counter_src0 != MALI_HW_CORE_NO_COUNTER) {
 
-        mali_hw_core_register_write(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_PERFCNT_SRC0,
-                        cache->counter_src0);
+        mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_SRC0, cache->counter_src0);
     }
 
     if (cache->counter_src1 != MALI_HW_CORE_NO_COUNTER) {
-        mali_hw_core_register_write(&cache->hw_core,
-                        MALI400_L2_CACHE_REGISTER_PERFCNT_SRC1,
-                        cache->counter_src1);
+        mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_SRC1, cache->counter_src1);
     }
 }
 
-static mali_osk_errcode_t mali_l2_cache_send_command(
-    struct mali_l2_cache_core *cache, u32 reg, u32 val)
+static mali_osk_errcode_t mali_l2_cache_send_command(struct mali_l2_cache_core *cache, u32 reg, u32 val)
 {
     int i = 0;
     const int loop_count = 100000;
@@ -509,15 +473,15 @@ static mali_osk_errcode_t mali_l2_cache_send_command(
      * (Commands received while processing another command will be ignored)
      */
     for (i = 0; i < loop_count; i++) {
-        if (!(mali_hw_core_register_read(&cache->hw_core,
-                         MALI400_L2_CACHE_REGISTER_STATUS) &
+        if (!(mali_hw_core_register_read(&cache->hw_core, MALI400_L2_CACHE_REGISTER_STATUS) &
               (u32)MALI400_L2_CACHE_STATUS_COMMAND_BUSY)) {
             break;
         }
     }
 
     if (i == loop_count) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Mali L2 cache: aborting wait for command interface to go idle\n"));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING,
+                         ("Mali L2 cache: aborting wait for command interface to go idle\n"));
         return MALI_OSK_ERR_FAULT;
     }
 

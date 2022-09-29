@@ -27,10 +27,10 @@
 #include <linux/seq_file.h>
 
 #define REGISTER_DUMP_TERMINATION_FLAG 0xFFFFFFFF
-#define REGISTER_ADDRESS_NEED          0x4000
-#define REGISTER_ADDRESS_DOUBLE        2
-#define REGISTER_OFFSET_FLAG           50
-#define REGISTER_OFFSET_UNIT           2
+#define REGISTER_ADDRESS_NEED 0x4000
+#define REGISTER_ADDRESS_DOUBLE 2
+#define REGISTER_OFFSET_FLAG 50
+#define REGISTER_OFFSET_UNIT 2
 
 /**
  * kbase_debug_job_fault_dev_init - Create the fault event wait queue
@@ -94,9 +94,7 @@ void kbase_debug_job_fault_kctx_unblock(struct kbase_context *kctx);
  * @completion_code: the job status
  * @return true if dump is going on
  */
-bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom,
-        u32 completion_code);
-
+bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom, u32 completion_code);
 
 /**
  * kbase_debug_job_fault_reg_snapshot_init - Set the interested registers
@@ -106,8 +104,7 @@ bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom,
  * @reg_range: Maximum register address space
  * @return true if initializing successfully
  */
-bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx,
-        int reg_range);
+bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx, int reg_range);
 
 /**
  * kbase_job_fault_get_reg_snapshot - Read the interested registers for
@@ -117,4 +114,4 @@ bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx,
  */
 bool kbase_job_fault_get_reg_snapshot(struct kbase_context *kctx);
 
-#endif  /*_KBASE_DEBUG_JOB_FAULT_H*/
+#endif /*_KBASE_DEBUG_JOB_FAULT_H*/

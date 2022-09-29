@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013-2014, 2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -20,7 +21,8 @@
  */
 static struct mali_timeline_fence_wait_tracker *mali_timeline_fence_wait_tracker_alloc(void)
 {
-    return (struct mali_timeline_fence_wait_tracker *) mali_osk_calloc(1, sizeof(struct mali_timeline_fence_wait_tracker));
+    return (struct mali_timeline_fence_wait_tracker *)mali_osk_calloc(1,
+                                                                      sizeof(struct mali_timeline_fence_wait_tracker));
 }
 
 /**
@@ -45,7 +47,7 @@ static mali_bool mali_timeline_fence_wait_tracker_is_activated(void *data)
 {
     struct mali_timeline_fence_wait_tracker *wait;
 
-    wait = (struct mali_timeline_fence_wait_tracker *) data;
+    wait = (struct mali_timeline_fence_wait_tracker *)data;
     MALI_DEBUG_ASSERT_POINTER(wait);
 
     return wait->activated;
@@ -58,7 +60,8 @@ static mali_bool mali_timeline_fence_wait_tracker_is_activated(void *data)
  * @param fence Timeline fence.
  * @return MALI_TRUE if fence is signaled, MALI_FALSE if not.
  */
-static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_system *system, struct mali_timeline_fence *fence)
+static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_system *system,
+                                                       struct mali_timeline_fence *fence)
 {
     int i;
     u32 tid = mali_osk_get_tid();
@@ -78,7 +81,7 @@ static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_syst
 
     for (i = 0; i < MALI_TIMELINE_MAX; ++i) {
         struct mali_timeline *timeline;
-        mali_timeline_point   point;
+        mali_timeline_point point;
 
         point = fence->points[i];
 
@@ -91,7 +94,8 @@ static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_syst
         MALI_DEBUG_ASSERT_POINTER(timeline);
 
         if (unlikely(!mali_timeline_is_point_valid(timeline, point))) {
-            MALI_PRINT_ERROR(("Mali Timeline: point %d is not valid (oldest=%d, next=%d)\n", point, timeline->point_oldest, timeline->point_next));
+            MALI_PRINT_ERROR(("Mali Timeline: point %d is not valid (oldest=%d, next=%d)\n", point,
+                              timeline->point_oldest, timeline->point_next));
         }
 
         if (!mali_timeline_is_point_released(timeline, point)) {
@@ -151,7 +155,7 @@ mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct m
     MALI_DEBUG_ASSERT_POINTER(system);
     MALI_DEBUG_ASSERT_POINTER(fence);
 
-    MALI_DEBUG_PRINT(4, ("Mali Timeline: wait on fence\n"));
+    MALI_DEBUG_PRINT(0x4, ("Mali Timeline: wait on fence\n"));
 
     if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_IMMEDIATELY == timeout) {
         return mali_timeline_fence_wait_check_status(system, fence);
@@ -169,7 +173,7 @@ mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct m
     /* Initialize refcount to two references.  The reference first will be released by this
      * function after the wait is over.  The second reference will be released when the tracker
      * is activated. */
-    mali_osk_atomic_init(&wait->refcount, 2);
+    mali_osk_atomic_init(&wait->refcount, 0x2);
 
     /* Add tracker to timeline system, but not to a timeline. */
     mali_timeline_tracker_init(&wait->tracker, MALI_TIMELINE_TRACKER_WAIT, fence, wait);
@@ -179,9 +183,11 @@ mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct m
 
     /* Wait for the tracker to be activated or time out. */
     if (MALI_TIMELINE_FENCE_WAIT_TIMEOUT_NEVER == timeout) {
-        _mali_osk_wait_queue_wait_event(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait);
+        _mali_osk_wait_queue_wait_event(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated,
+                                        (void *)wait);
     } else {
-        _mali_osk_wait_queue_wait_event_timeout(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated, (void *) wait, timeout);
+        _mali_osk_wait_queue_wait_event_timeout(system->wait_queue, mali_timeline_fence_wait_tracker_is_activated,
+                                                (void *)wait, timeout);
     }
 
     ret = wait->activated;
@@ -200,7 +206,7 @@ void mali_timeline_fence_wait_activate(struct mali_timeline_fence_wait_tracker *
     MALI_DEBUG_ASSERT_POINTER(wait);
     MALI_DEBUG_ASSERT_POINTER(wait->system);
 
-    MALI_DEBUG_PRINT(4, ("Mali Timeline: activation for fence wait tracker\n"));
+    MALI_DEBUG_PRINT(0x4, ("Mali Timeline: activation for fence wait tracker\n"));
 
     MALI_DEBUG_ASSERT(MALI_FALSE == wait->activated);
     wait->activated = MALI_TRUE;

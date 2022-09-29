@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -24,15 +25,15 @@ struct mali_group;
  * See the hardware documentation for more information about each register
  */
 typedef enum mali_mmu_register {
-    MALI_MMU_REGISTER_DTE_ADDR = 0x0000, /**< Current Page Directory Pointer */
-    MALI_MMU_REGISTER_STATUS = 0x0004, /**< Status of the MMU */
-    MALI_MMU_REGISTER_COMMAND = 0x0008, /**< Command register, used to control the MMU */
+    MALI_MMU_REGISTER_DTE_ADDR = 0x0000,        /**< Current Page Directory Pointer */
+    MALI_MMU_REGISTER_STATUS = 0x0004,          /**< Status of the MMU */
+    MALI_MMU_REGISTER_COMMAND = 0x0008,         /**< Command register, used to control the MMU */
     MALI_MMU_REGISTER_PAGE_FAULT_ADDR = 0x000C, /**< Logical address of the last page fault */
-    MALI_MMU_REGISTER_ZAP_ONE_LINE = 0x010, /**< Used to invalidate the mapping of a single page from the MMU */
-    MALI_MMU_REGISTER_INT_RAWSTAT = 0x0014, /**< Raw interrupt status, all interrupts visible */
-    MALI_MMU_REGISTER_INT_CLEAR = 0x0018, /**< Indicate to the MMU that the interrupt has been received */
-    MALI_MMU_REGISTER_INT_MASK = 0x001C, /**< Enable/disable types of interrupts */
-    MALI_MMU_REGISTER_INT_STATUS = 0x0020 /**< Interrupt status based on the mask */
+    MALI_MMU_REGISTER_ZAP_ONE_LINE = 0x010,     /**< Used to invalidate the mapping of a single page from the MMU */
+    MALI_MMU_REGISTER_INT_RAWSTAT = 0x0014,     /**< Raw interrupt status, all interrupts visible */
+    MALI_MMU_REGISTER_INT_CLEAR = 0x0018,       /**< Indicate to the MMU that the interrupt has been received */
+    MALI_MMU_REGISTER_INT_MASK = 0x001C,        /**< Enable/disable types of interrupts */
+    MALI_MMU_REGISTER_INT_STATUS = 0x0020       /**< Interrupt status based on the mask */
 } mali_mmu_register;
 
 /**
@@ -43,18 +44,18 @@ typedef enum mali_mmu_register {
  * can be set at once.
  */
 typedef enum mali_mmu_interrupt {
-    MALI_MMU_INTERRUPT_PAGE_FAULT = 0x01, /**< A page fault occured */
+    MALI_MMU_INTERRUPT_PAGE_FAULT = 0x01,    /**< A page fault occured */
     MALI_MMU_INTERRUPT_READ_BUS_ERROR = 0x02 /**< A bus read error occured */
 } mali_mmu_interrupt;
 
 typedef enum mali_mmu_status_bits {
-    MALI_MMU_STATUS_BIT_PAGING_ENABLED      = 1 << 0,
-    MALI_MMU_STATUS_BIT_PAGE_FAULT_ACTIVE   = 1 << 1,
-    MALI_MMU_STATUS_BIT_STALL_ACTIVE        = 1 << 2,
-    MALI_MMU_STATUS_BIT_IDLE                = 1 << 3,
+    MALI_MMU_STATUS_BIT_PAGING_ENABLED = 1 << 0,
+    MALI_MMU_STATUS_BIT_PAGE_FAULT_ACTIVE = 1 << 1,
+    MALI_MMU_STATUS_BIT_STALL_ACTIVE = 1 << 2,
+    MALI_MMU_STATUS_BIT_IDLE = 1 << 3,
     MALI_MMU_STATUS_BIT_REPLAY_BUFFER_EMPTY = 1 << 4,
     MALI_MMU_STATUS_BIT_PAGE_FAULT_IS_WRITE = 1 << 5,
-    MALI_MMU_STATUS_BIT_STALL_NOT_ACTIVE    = 1 << 31,
+    MALI_MMU_STATUS_BIT_STALL_NOT_ACTIVE = 1 << 31,
 } mali_mmu_status_bits;
 
 /**
@@ -94,7 +95,6 @@ MALI_STATIC_INLINE enum mali_interrupt_result mali_mmu_get_interrupt_result(stru
 
     return MALI_INTERRUPT_RESULT_ERROR;
 }
-
 
 MALI_STATIC_INLINE u32 mali_mmu_get_int_status(struct mali_mmu_core *mmu)
 {

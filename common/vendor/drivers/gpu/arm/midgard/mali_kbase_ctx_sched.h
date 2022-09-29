@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_CTX_SCHED_H_
-#define _KBASE_CTX_SCHED_H_
+#ifndef KBASE_CTX_SCHED_H_
+#define KBASE_CTX_SCHED_H_
 
 #include <mali_kbase.h>
 

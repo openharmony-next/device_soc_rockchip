@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #ifndef KBASE_DEBUG_MEM_VIEW_H
 #define KBASE_DEBUG_MEM_VIEW_H
 

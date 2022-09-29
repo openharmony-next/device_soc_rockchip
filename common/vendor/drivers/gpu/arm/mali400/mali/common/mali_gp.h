@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -23,8 +24,8 @@ struct mali_group;
  * Used to track a GP core in the system.
  */
 struct mali_gp_core {
-    struct mali_hw_core  hw_core;           /**< Common for all HW cores */
-    _mali_osk_irq_t     *irq;               /**< IRQ handler */
+    struct mali_hw_core hw_core; /**< Common for all HW cores */
+    _mali_osk_irq_t *irq;        /**< IRQ handler */
 };
 
 mali_osk_errcode_t mali_gp_initialize(void);
@@ -60,13 +61,12 @@ MALI_STATIC_INLINE const char *mali_gp_core_description(struct mali_gp_core *cor
 
 MALI_STATIC_INLINE enum mali_interrupt_result mali_gp_get_interrupt_result(struct mali_gp_core *core)
 {
-    u32 stat_used = mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_STAT) &
-            MALIGP2_REG_VAL_IRQ_MASK_USED;
+    u32 stat_used =
+        mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_STAT) & MALIGP2_REG_VAL_IRQ_MASK_USED;
 
     if (0 == stat_used) {
         return MALI_INTERRUPT_RESULT_NONE;
-    } else if ((MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST |
-            MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST) == stat_used) {
+    } else if ((MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST | MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST) == stat_used) {
         return MALI_INTERRUPT_RESULT_SUCCESS;
     } else if (MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST == stat_used) {
         return MALI_INTERRUPT_RESULT_SUCCESS_VS;
@@ -82,8 +82,7 @@ MALI_STATIC_INLINE enum mali_interrupt_result mali_gp_get_interrupt_result(struc
 MALI_STATIC_INLINE u32 mali_gp_get_rawstat(struct mali_gp_core *core)
 {
     MALI_DEBUG_ASSERT_POINTER(core);
-    return mali_hw_core_register_read(&core->hw_core,
-                      MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT);
+    return mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT);
 }
 
 MALI_STATIC_INLINE u32 mali_gp_is_active(struct mali_gp_core *core)
@@ -104,19 +103,14 @@ MALI_STATIC_INLINE void mali_gp_enable_interrupts(struct mali_gp_core *core, enu
 
     if (MALI_INTERRUPT_RESULT_SUCCESS_VS == exceptions) {
         /* Enable all used except VS complete */
-        value = MALIGP2_REG_VAL_IRQ_MASK_USED &
-            ~MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST;
+        value = MALIGP2_REG_VAL_IRQ_MASK_USED & ~MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST;
     } else {
-        MALI_DEBUG_ASSERT(MALI_INTERRUPT_RESULT_SUCCESS_PLBU ==
-                  exceptions);
+        MALI_DEBUG_ASSERT(MALI_INTERRUPT_RESULT_SUCCESS_PLBU == exceptions);
         /* Enable all used except PLBU complete */
-        value = MALIGP2_REG_VAL_IRQ_MASK_USED &
-            ~MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST;
+        value = MALIGP2_REG_VAL_IRQ_MASK_USED & ~MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST;
     }
 
-    mali_hw_core_register_write(&core->hw_core,
-                    MALIGP2_REG_ADDR_MGMT_INT_MASK,
-                    value);
+    mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_MASK, value);
 }
 
 MALI_STATIC_INLINE u32 mali_gp_read_plbu_alloc_start_addr(struct mali_gp_core *core)

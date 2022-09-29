@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -51,56 +52,63 @@ struct mali_pp_job {
      * and only read later on.
      * They do not require any lock protection.
      */
-    mali_uk_pp_start_job_s uargs;                     /**< Arguments from user space */
-    struct mali_session_data *session;                 /**< Session which submitted this job */
-    u32 pid;                                           /**< Process ID of submitting process */
-    u32 tid;                                           /**< Thread ID of submitting thread */
-    u32 id;                                            /**< Identifier for this job in kernel space (sequential numbering) */
-    u32 cache_order;                                   /**< Cache order used for L2 cache flushing (sequential numbering) */
-    struct mali_timeline_tracker tracker;              /**< Timeline tracker for this job */
-    _mali_osk_notification_t *finished_notification;   /**< Notification sent back to userspace on job complete */
-    u32 perf_counter_per_sub_job_count;                /**< Number of values in the two arrays which is != MALI_HW_CORE_NO_COUNTER */
+    mali_uk_pp_start_job_s uargs;         /**< Arguments from user space */
+    struct mali_session_data *session;    /**< Session which submitted this job */
+    u32 pid;                              /**< Process ID of submitting process */
+    u32 tid;                              /**< Thread ID of submitting thread */
+    u32 id;                               /**< Identifier for this job in kernel space (sequential numbering) */
+    u32 cache_order;                      /**< Cache order used for L2 cache flushing (sequential numbering) */
+    struct mali_timeline_tracker tracker; /**< Timeline tracker for this job */
+    _mali_osk_notification_t *finished_notification; /**< Notification sent back to userspace on job complete */
+    u32 perf_counter_per_sub_job_count; /**< Number of values in the two arrays which is != MALI_HW_CORE_NO_COUNTER */
     u32 perf_counter_per_sub_job_src0[MALI_PP_MAX_SUB_JOBS]; /**< Per sub job counters src0 */
     u32 perf_counter_per_sub_job_src1[MALI_PP_MAX_SUB_JOBS]; /**< Per sub job counters src1 */
-    u32 sub_jobs_num;                                  /**< Number of subjobs; set to 1 for Mali-450 if DLBU is used, otherwise equals number of PP cores */
+    u32 sub_jobs_num; /**< Number of subjobs; set to 1 for Mali-450 if DLBU is used, otherwise equals number of PP cores
+                       */
 
-    pp_job_status swap_status;                         /**< Used to track each PP job swap status, if fail, we need to drop them in scheduler part */
-    mali_bool user_notification;                       /**< When we deferred delete PP job, we need to judge if we need to send job finish notification to user space */
-    u32 num_pp_cores_in_virtual;                       /**< How many PP cores we have when job finished */
+    pp_job_status
+        swap_status; /**< Used to track each PP job swap status, if fail, we need to drop them in scheduler part */
+    mali_bool user_notification; /**< When we deferred delete PP job, we need to judge if we need to send job finish
+                                    notification to user space */
+    u32 num_pp_cores_in_virtual; /**< How many PP cores we have when job finished */
 
     /*
      * These members are used by both scheduler and executor.
      * They are "protected" by atomic operations.
      */
-    _mali_osk_atomic_t sub_jobs_completed;                            /**< Number of completed sub-jobs in this superjob */
-    _mali_osk_atomic_t sub_job_errors;                                /**< Bitfield with errors (errors for each single sub-job is or'ed together) */
+    _mali_osk_atomic_t sub_jobs_completed; /**< Number of completed sub-jobs in this superjob */
+    _mali_osk_atomic_t sub_job_errors; /**< Bitfield with errors (errors for each single sub-job is or'ed together) */
 
     /*
      * These members are used by scheduler, but only when no one else
      * knows about this job object but the working function.
      * No lock is thus needed for these.
      */
-    u32 *memory_cookies;                               /**< Memory cookies attached to job */
+    u32 *memory_cookies; /**< Memory cookies attached to job */
 
     /*
      * These members are used by the scheduler,
      * protected by scheduler lock
      */
-    _mali_osk_list_t list;                             /**< Used to link jobs together in the scheduler queue */
-    _mali_osk_list_t session_fb_lookup_list;           /**< Used to link jobs together from the same frame builder in the session */
+    _mali_osk_list_t list; /**< Used to link jobs together in the scheduler queue */
+    _mali_osk_list_t
+        session_fb_lookup_list; /**< Used to link jobs together from the same frame builder in the session */
 
-    u32 sub_jobs_started;                              /**< Total number of sub-jobs started (always started in ascending order) */
+    u32 sub_jobs_started; /**< Total number of sub-jobs started (always started in ascending order) */
 
     /*
      * Set by executor/group on job completion, read by scheduler when
      * returning job to user. Hold executor lock when setting,
      * no lock needed when reading
      */
-    u32 perf_counter_value0[MALI_PP_MAX_SUB_JOBS];    /**< Value of performance counter 0 (to be returned to user space), one for each sub job */
-    u32 perf_counter_value1[MALI_PP_MAX_SUB_JOBS];    /**< Value of performance counter 1 (to be returned to user space), one for each sub job */
+    u32 perf_counter_value0[MALI_PP_MAX_SUB_JOBS]; /**< Value of performance counter 0 (to be returned to user space),
+                                                      one for each sub job */
+    u32 perf_counter_value1[MALI_PP_MAX_SUB_JOBS]; /**< Value of performance counter 1 (to be returned to user space),
+                                                      one for each sub job */
 
 #if defined(CONFIG_MALI_DMA_BUF_FENCE)
-    struct mali_dma_fence_context dma_fence_context; /**< The mali dma fence context to record dma fence waiters that this job wait for */
+    struct mali_dma_fence_context
+        dma_fence_context; /**< The mali dma fence context to record dma fence waiters that this job wait for */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
     struct dma_fence *rendered_dma_fence; /**< the new dma fence link to this job */
 #else
@@ -134,8 +142,7 @@ MALI_STATIC_INLINE u32 mali_pp_job_get_id(struct mali_pp_job *job)
     return (NULL == job) ? 0 : job->id;
 }
 
-MALI_STATIC_INLINE void mali_pp_job_set_cache_order(struct mali_pp_job *job,
-        u32 cache_order)
+MALI_STATIC_INLINE void mali_pp_job_set_cache_order(struct mali_pp_job *job, u32 cache_order)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
     MALI_DEBUG_ASSERT_SCHEDULER_LOCK_HELD();
@@ -230,14 +237,12 @@ MALI_STATIC_INLINE u32 mali_pp_job_get_addr_stack(struct mali_pp_job *job, u32 s
 
 void mali_pp_job_list_add(struct mali_pp_job *job, _mali_osk_list_t *list);
 
-MALI_STATIC_INLINE void mali_pp_job_list_addtail(struct mali_pp_job *job,
-        _mali_osk_list_t *list)
+MALI_STATIC_INLINE void mali_pp_job_list_addtail(struct mali_pp_job *job, _mali_osk_list_t *list)
 {
     mali_osk_list_addtail(&job->list, list);
 }
 
-MALI_STATIC_INLINE void mali_pp_job_list_move(struct mali_pp_job *job,
-        _mali_osk_list_t *list)
+MALI_STATIC_INLINE void mali_pp_job_list_move(struct mali_pp_job *job, _mali_osk_list_t *list)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
     MALI_DEBUG_ASSERT_SCHEDULER_LOCK_HELD();
@@ -312,8 +317,7 @@ MALI_STATIC_INLINE mali_bool mali_pp_job_all_writeback_unit_disabled(struct mali
 
     if (job->uargs.wb0_registers[MALI200_REG_ADDR_WB_SOURCE_SELECT] ||
         job->uargs.wb1_registers[MALI200_REG_ADDR_WB_SOURCE_SELECT] ||
-        job->uargs.wb2_registers[MALI200_REG_ADDR_WB_SOURCE_SELECT]
-       ) {
+        job->uargs.wb2_registers[MALI200_REG_ADDR_WB_SOURCE_SELECT]) {
         /* At least one output unit active */
         return MALI_FALSE;
     }
@@ -333,8 +337,7 @@ MALI_STATIC_INLINE void mali_pp_job_fb_lookup_add(struct mali_pp_job *job)
 
     MALI_DEBUG_ASSERT(MALI_PP_JOB_FB_LOOKUP_LIST_SIZE > fb_lookup_id);
 
-    mali_osk_list_addtail(&job->session_fb_lookup_list,
-                   &job->session->pp_job_fb_lookup_list[fb_lookup_id]);
+    mali_osk_list_addtail(&job->session_fb_lookup_list, &job->session->pp_job_fb_lookup_list[fb_lookup_id]);
 }
 
 MALI_STATIC_INLINE void mali_pp_job_fb_lookup_remove(struct mali_pp_job *job)
@@ -387,9 +390,7 @@ MALI_STATIC_INLINE void mali_pp_job_mark_unstarted_failed(struct mali_pp_job *jo
 MALI_STATIC_INLINE mali_bool mali_pp_job_is_complete(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (job->sub_jobs_num ==
-        mali_osk_atomic_read(&job->sub_jobs_completed)) ?
-           MALI_TRUE : MALI_FALSE;
+    return (job->sub_jobs_num == mali_osk_atomic_read(&job->sub_jobs_completed)) ? MALI_TRUE : MALI_FALSE;
 }
 
 MALI_STATIC_INLINE u32 mali_pp_job_get_first_unstarted_sub_job(struct mali_pp_job *job)
@@ -419,8 +420,7 @@ MALI_STATIC_INLINE u32 mali_pp_job_num_memory_cookies(struct mali_pp_job *job)
     return job->uargs.num_memory_cookies;
 }
 
-MALI_STATIC_INLINE u32 mali_pp_job_get_memory_cookie(
-    struct mali_pp_job *job, u32 index)
+MALI_STATIC_INLINE u32 mali_pp_job_get_memory_cookie(struct mali_pp_job *job, u32 index)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
     MALI_DEBUG_ASSERT(index < job->uargs.num_memory_cookies);
@@ -469,12 +469,10 @@ MALI_STATIC_INLINE mali_bool mali_pp_job_was_success(struct mali_pp_job *job)
     return MALI_FALSE;
 }
 
-MALI_STATIC_INLINE mali_bool mali_pp_job_use_no_notification(
-    struct mali_pp_job *job)
+MALI_STATIC_INLINE mali_bool mali_pp_job_use_no_notification(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (job->uargs.flags & MALI_PP_JOB_FLAG_NO_NOTIFICATION) ?
-           MALI_TRUE : MALI_FALSE;
+    return (job->uargs.flags & MALI_PP_JOB_FLAG_NO_NOTIFICATION) ? MALI_TRUE : MALI_FALSE;
 }
 
 MALI_STATIC_INLINE mali_bool mali_pp_job_is_pilot_job(struct mali_pp_job *job)
@@ -486,8 +484,7 @@ MALI_STATIC_INLINE mali_bool mali_pp_job_is_pilot_job(struct mali_pp_job *job)
     return mali_pp_job_use_no_notification(job);
 }
 
-MALI_STATIC_INLINE _mali_osk_notification_t *
-mali_pp_job_get_finished_notification(struct mali_pp_job *job)
+MALI_STATIC_INLINE _mali_osk_notification_t *mali_pp_job_get_finished_notification(struct mali_pp_job *job)
 {
     _mali_osk_notification_t *notification;
 
@@ -500,19 +497,16 @@ mali_pp_job_get_finished_notification(struct mali_pp_job *job)
     return notification;
 }
 
-MALI_STATIC_INLINE mali_bool mali_pp_job_is_window_surface(
-    struct mali_pp_job *job)
+MALI_STATIC_INLINE mali_bool mali_pp_job_is_window_surface(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (job->uargs.flags & MALI_PP_JOB_FLAG_IS_WINDOW_SURFACE)
-           ? MALI_TRUE : MALI_FALSE;
+    return (job->uargs.flags & MALI_PP_JOB_FLAG_IS_WINDOW_SURFACE) ? MALI_TRUE : MALI_FALSE;
 }
 
 MALI_STATIC_INLINE mali_bool mali_pp_job_is_protected_job(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (job->uargs.flags & MALI_PP_JOB_FLAG_PROTECTED)
-           ? MALI_TRUE : MALI_FALSE;
+    return (job->uargs.flags & MALI_PP_JOB_FLAG_PROTECTED) ? MALI_TRUE : MALI_FALSE;
 }
 
 MALI_STATIC_INLINE u32 mali_pp_job_get_perf_counter_flag(struct mali_pp_job *job)
@@ -568,7 +562,7 @@ MALI_STATIC_INLINE mali_bool mali_pp_job_is_large_and_unstarted(struct mali_pp_j
     MALI_DEBUG_ASSERT_SCHEDULER_LOCK_HELD();
     MALI_DEBUG_ASSERT(!mali_pp_job_is_virtual(job));
 
-    return (0 == job->sub_jobs_started && 2 < job->sub_jobs_num);
+    return (0 == job->sub_jobs_started && 0X2 < job->sub_jobs_num);
 }
 
 /**
@@ -583,12 +577,10 @@ MALI_STATIC_INLINE struct mali_timeline_tracker *mali_pp_job_get_tracker(struct 
     return &(job->tracker);
 }
 
-MALI_STATIC_INLINE u32 *mali_pp_job_get_timeline_point_ptr(
-    struct mali_pp_job *job)
+MALI_STATIC_INLINE u32 *mali_pp_job_get_timeline_point_ptr(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
     return (u32 __user *)(uintptr_t)job->uargs.timeline_point_ptr;
 }
-
 
 #endif /* __MALI_PP_JOB_H__ */

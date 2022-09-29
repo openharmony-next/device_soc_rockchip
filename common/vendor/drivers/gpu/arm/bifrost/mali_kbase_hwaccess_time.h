@@ -20,7 +20,6 @@
  *
  */
 
-
 /**
  *
  */
@@ -36,8 +35,8 @@
  * @ts:            Pointer to struct timespec to store current monotonic
  *            time in
  */
-void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
-                u64 *system_time, struct timespec64 *ts);
+void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter, u64 *system_time,
+                                struct timespec64 *ts);
 
 /**
  * kbase_backend_get_gpu_time_norequest() - Get current GPU time without
@@ -48,9 +47,7 @@ void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
  * @ts:            Pointer to struct timespec to store current monotonic
  *            time in
  */
-void kbase_backend_get_gpu_time_norequest(struct kbase_device *kbdev,
-                      u64 *cycle_counter,
-                      u64 *system_time,
-                      struct timespec64 *ts);
+void kbase_backend_get_gpu_time_norequest(struct kbase_device *kbdev, u64 *cycle_counter, u64 *system_time,
+                                          struct timespec64 *ts);
 
 #endif /* _KBASE_BACKEND_TIME_H_ */

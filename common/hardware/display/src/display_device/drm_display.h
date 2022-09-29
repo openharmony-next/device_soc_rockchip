@@ -24,45 +24,49 @@
 #include "hdi_composer.h"
 #include "hdi_drm_composition.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class DrmDisplay : public HdiDisplay {
-public:
-    DrmDisplay(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
-        std::shared_ptr<DrmDevice> drmDevice);
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            class DrmDisplay : public HdiDisplay
+            {
+            public:
+                DrmDisplay(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
+                           std::shared_ptr<DrmDevice> drmDevice);
 
-    ~DrmDisplay() override;
+                ~DrmDisplay() override;
 
-    int32_t Init() override;
-    int32_t GetDisplayCapability(DisplayCapability *info) override;
-    int32_t GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *modes) override;
-    int32_t GetDisplayMode(uint32_t *modeId) override;
-    int32_t SetDisplayMode(uint32_t modeId) override;
-    int32_t GetDisplayPowerStatus(DispPowerStatus *status) override;
-    int32_t SetDisplayPowerStatus(DispPowerStatus status) override;
-    int32_t GetDisplayBacklight(uint32_t *value) override;
-    int32_t SetDisplayBacklight(uint32_t value) override;
-    int32_t ChosePreferenceMode();
-    int32_t RegDisplayVBlankCallback(VBlankCallback cb, void *data) override;
-    int32_t WaitForVBlank(uint64_t *ns) override;
-    bool IsConnected() override;
-    int32_t SetDisplayVsyncEnabled(bool enabled) override;
-    HdiDrmComposition *GetDrmComposition();
+                int32_t Init() override;
+                int32_t GetDisplayCapability(DisplayCapability *info) override;
+                int32_t GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *modes) override;
+                int32_t GetDisplayMode(uint32_t *modeId) override;
+                int32_t SetDisplayMode(uint32_t modeId) override;
+                int32_t GetDisplayPowerStatus(DispPowerStatus *status) override;
+                int32_t SetDisplayPowerStatus(DispPowerStatus status) override;
+                int32_t GetDisplayBacklight(uint32_t *value) override;
+                int32_t SetDisplayBacklight(uint32_t value) override;
+                int32_t ChosePreferenceMode();
+                int32_t RegDisplayVBlankCallback(VBlankCallback cb, void *data) override;
+                int32_t WaitForVBlank(uint64_t *ns) override;
+                bool IsConnected() override;
+                int32_t SetDisplayVsyncEnabled(bool enabled) override;
+                HdiDrmComposition *GetDrmComposition();
 
-protected:
-    std::unique_ptr<HdiLayer> CreateHdiLayer(LayerType type) override;
+            protected:
+                std::unique_ptr<HdiLayer> CreateHdiLayer(LayerType type) override;
 
-private:
-    int32_t PushFirstFrame();
-    int32_t ConvertToHdiPowerState(uint32_t drmPowerState, DispPowerStatus &hdiPowerState);
-    int32_t ConvertToDrmPowerState(DispPowerStatus hdiPowerState, uint32_t &drmPowerState);
-    std::shared_ptr<DrmDevice> mDrmDevice;
-    std::shared_ptr<DrmConnector> mConnector;
-    std::shared_ptr<DrmCrtc> mCrtc;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                int32_t PushFirstFrame();
+                int32_t ConvertToHdiPowerState(uint32_t drmPowerState, DispPowerStatus &hdiPowerState);
+                int32_t ConvertToDrmPowerState(DispPowerStatus hdiPowerState, uint32_t &drmPowerState);
+                std::shared_ptr<DrmDevice> mDrmDevice;
+                std::shared_ptr<DrmConnector> mConnector;
+                std::shared_ptr<DrmCrtc> mCrtc;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_DISPLAY_H

@@ -23,26 +23,19 @@
 #include <linux/soc/rockchip/pvtm.h>
 #include <linux/thermal.h>
 
-#define wr_mask_bit(v, off, mask)    ((v) << (off) | (mask) << (16 + off))
+#define wr_mask_bit(v, off, mask) ((v) << (off) | (mask) << (16 + (off)))
 #define IO_MEM __iomem
 
-#define PVTM(_id, _name, _num_rings, _start, _en, _cal, _done, _freq)    \
-{                    \
-    .id = _id,            \
-    .name = _name,            \
-    .num_rings = _num_rings,    \
-    .bit_start = _start,        \
-    .bit_en = _en,            \
-    .reg_cal = _cal,        \
-    .bit_freq_done = _done,        \
-    .reg_freq = _freq,        \
-}
+#define PVTM(_id, _name, _num_rings, _start, _en, _cal, _done, _freq)                                                  \
+    {                                                                                                                  \
+        .id = (_id), .name = (_name), .num_rings = (_num_rings), .bit_start = (_start), .bit_en = (_en),               \
+        .reg_cal = (_cal), .bit_freq_done = (_done), .reg_freq = (_freq),                                              \
+    }
 
 struct rockchip_pvtm;
 
 struct rockchip_pvtm_ops {
-    u32 (*get_value)(struct rockchip_pvtm *pvtm, unsigned int ring_sel,
-             unsigned int time_us);
+    u32 (*get_value)(struct rockchip_pvtm *pvtm, unsigned int ring_sel, unsigned int time_us);
     void (*set_ring_sel)(struct rockchip_pvtm *pvtm, unsigned int ring_sel);
 };
 
@@ -99,10 +92,11 @@ static int pvtm_value_show(struct seq_file *s, void *data)
 
     if (pvtm->tz && pvtm->tz->ops && pvtm->tz->ops->get_temp) {
         ret = pvtm->tz->ops->get_temp(pvtm->tz, &cur_temp);
-        if (ret)
+        if (ret) {
             dev_err(pvtm->dev, "debug failed to get temp\n");
-        else
+        } else {
             seq_printf(s, "temp: %d ", cur_temp);
+        }
     }
     seq_puts(s, "pvtm: ");
     for (i = 0; i < pvtm->info->num_rings; i++) {
@@ -120,10 +114,10 @@ static int pvtm_value_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations pvtm_value_fops = {
-    .open        = pvtm_value_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
+    .open = pvtm_value_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
 };
 
 static int rockchip_pvtm_debugfs_init(void)
@@ -147,22 +141,19 @@ static int rockchip_pvtm_add_debugfs(struct rockchip_pvtm *pvtm)
 {
     struct dentry *d;
 
-    if (!rockchip_pvtm_debugfs_root)
+    if (!rockchip_pvtm_debugfs_root) {
         return 0;
+    }
 
-    pvtm->dentry = debugfs_create_dir(pvtm->info->name,
-                      rockchip_pvtm_debugfs_root);
+    pvtm->dentry = debugfs_create_dir(pvtm->info->name, rockchip_pvtm_debugfs_root);
     if (!pvtm->dentry) {
-        dev_err(pvtm->dev, "failed to create pvtm %s debug dir\n",
-            pvtm->info->name);
+        dev_err(pvtm->dev, "failed to create pvtm %s debug dir\n", pvtm->info->name);
         return -ENOMEM;
     }
 
-    d = debugfs_create_file("value", 0444, pvtm->dentry,
-                (void *)pvtm, &pvtm_value_fops);
+    d = debugfs_create_file("value", 0444, pvtm->dentry, (void *)pvtm, &pvtm_value_fops);
     if (!d) {
-        dev_err(pvtm->dev, "failed to pvtm %s value node\n",
-            pvtm->info->name);
+        dev_err(pvtm->dev, "failed to pvtm %s value node\n", pvtm->info->name);
         debugfs_remove_recursive(pvtm->dentry);
         return -ENOMEM;
     }
@@ -206,8 +197,7 @@ static int rockchip_pvtm_reset(struct rockchip_pvtm *pvtm)
     return 0;
 }
 
-u32 rockchip_get_pvtm_value(unsigned int id, unsigned int ring_sel,
-                unsigned int time_us)
+u32 rockchip_get_pvtm_value(unsigned int id, unsigned int ring_sel, unsigned int time_us)
 {
     struct rockchip_pvtm *p, *pvtm = NULL;
 
@@ -216,7 +206,8 @@ u32 rockchip_get_pvtm_value(unsigned int id, unsigned int ring_sel,
         return -EINVAL;
     }
 
-    list_for_each_entry(p, &pvtm_list, node) {
+    list_for_each_entry(p, &pvtm_list, node)
+    {
         if (p->info->id == id) {
             pvtm = p;
             break;
@@ -243,52 +234,46 @@ static void rockchip_pvtm_delay(unsigned int delay)
     unsigned int us = delay % 1000;
 
     if (ms > 0) {
-        if (ms < 20)
+        if (ms < 20) {
             us += ms * 1000;
-        else
+        } else {
             msleep(ms);
+        }
     }
 
-    if (us >= 10)
+    if (us >= 10) {
         usleep_range(us, us + 100);
-    else
+    } else {
         udelay(us);
+    }
 }
 
-static void px30_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm,
-                   unsigned int ring_sel)
+static void px30_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)
 {
     unsigned int id = pvtm->info->id;
 
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(ring_sel, (id * 0x4 + 0x2), 0x3));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(ring_sel, (id * 0x4 + 0x2), 0x3));
 }
 
-static void rk1808_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm,
-                     unsigned int ring_sel)
+static void rk1808_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)
 {
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(ring_sel, 0x2, 0x7));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(ring_sel, 0x2, 0x7));
 }
 
-static void rk3399_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm,
-                     unsigned int ring_sel)
+static void rk3399_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)
 {
     unsigned int id = pvtm->info->id;
 
     if (id == 1) {
-        regmap_write(pvtm->grf, pvtm->con + 0x14,
-                 wr_mask_bit(ring_sel >> 0x3, 0, 0x1));
+        regmap_write(pvtm->grf, pvtm->con + 0x14, wr_mask_bit(ring_sel >> 0x3, 0, 0x1));
         ring_sel &= 0x3;
     }
-    if (id != 4)
-        regmap_write(pvtm->grf, pvtm->con,
-                 wr_mask_bit(ring_sel, (id * 0x4 + 0x2), 0x3));
+    if (id != 4) {
+        regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(ring_sel, (id * 0x4 + 0x2), 0x3));
+    }
 }
 
-static u32 rockchip_pvtm_get_value(struct rockchip_pvtm *pvtm,
-                   unsigned int ring_sel,
-                   unsigned int time_us)
+static u32 rockchip_pvtm_get_value(struct rockchip_pvtm *pvtm, unsigned int ring_sel, unsigned int time_us)
 {
     const struct rockchip_pvtm_info *info = pvtm->info;
     unsigned int clk_cnt, check_cnt = 100;
@@ -308,29 +293,29 @@ static u32 rockchip_pvtm_get_value(struct rockchip_pvtm *pvtm,
 
     /* if last status is enabled, stop calculating cycles first*/
     regmap_read(pvtm->grf, pvtm->con, &sta);
-    if (sta & BIT(info->bit_en))
-        regmap_write(pvtm->grf, pvtm->con,
-                 wr_mask_bit(0, info->bit_start, 0x1));
+    if (sta & BIT(info->bit_en)) {
+        regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(0, info->bit_start, 0x1));
+    }
 
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(0x1, info->bit_en, 0x1));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(0x1, info->bit_en, 0x1));
 
-    if (pvtm->ops->set_ring_sel)
+    if (pvtm->ops->set_ring_sel) {
         pvtm->ops->set_ring_sel(pvtm, ring_sel);
+    }
 
     /* clk = 24 Mhz, T = 1 / 24 us */
     clk_cnt = time_us * 24;
     regmap_write(pvtm->grf, pvtm->con + info->reg_cal, clk_cnt);
 
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(0x1, info->bit_start, 0x1));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(0x1, info->bit_start, 0x1));
 
     rockchip_pvtm_delay(time_us);
 
     while (check_cnt) {
         regmap_read(pvtm->grf, pvtm->sta, &sta);
-        if (sta & BIT(info->bit_freq_done))
+        if (sta & BIT(info->bit_freq_done)) {
             break;
+        }
         udelay(4);
         check_cnt--;
     }
@@ -342,11 +327,9 @@ static u32 rockchip_pvtm_get_value(struct rockchip_pvtm *pvtm,
         val = 0;
     }
 
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(0, info->bit_start, 0x1));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(0, info->bit_start, 0x1));
 
-    regmap_write(pvtm->grf, pvtm->con,
-             wr_mask_bit(0, info->bit_en, 0x1));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(0, info->bit_en, 0x1));
 
 disable_clks:
     clk_bulk_disable_unprepare(pvtm->num_clks, pvtm->clks);
@@ -354,15 +337,12 @@ disable_clks:
     return val;
 }
 
-static void rv1126_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm,
-                     unsigned int ring_sel)
+static void rv1126_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)
 {
     writel_relaxed(wr_mask_bit(ring_sel, 0x2, 0x7), pvtm->base + pvtm->con);
 }
 
-static u32 rv1126_pvtm_get_value(struct rockchip_pvtm *pvtm,
-                 unsigned int ring_sel,
-                 unsigned int time_us)
+static u32 rv1126_pvtm_get_value(struct rockchip_pvtm *pvtm, unsigned int ring_sel, unsigned int time_us)
 {
     const struct rockchip_pvtm_info *info = pvtm->info;
     unsigned int clk_cnt, check_cnt = 100;
@@ -382,29 +362,29 @@ static u32 rv1126_pvtm_get_value(struct rockchip_pvtm *pvtm,
 
     /* if last status is enabled, stop calculating cycles first*/
     sta = readl_relaxed(pvtm->base + pvtm->con);
-    if (sta & BIT(info->bit_en))
-        writel_relaxed(wr_mask_bit(0, info->bit_start, 0x1),
-                   pvtm->base + pvtm->con);
+    if (sta & BIT(info->bit_en)) {
+        writel_relaxed(wr_mask_bit(0, info->bit_start, 0x1), pvtm->base + pvtm->con);
+    }
 
-    writel_relaxed(wr_mask_bit(0x1, info->bit_en, 0x1),
-               pvtm->base + pvtm->con);
+    writel_relaxed(wr_mask_bit(0x1, info->bit_en, 0x1), pvtm->base + pvtm->con);
 
-    if (pvtm->ops->set_ring_sel)
+    if (pvtm->ops->set_ring_sel) {
         pvtm->ops->set_ring_sel(pvtm, ring_sel);
+    }
 
     /* clk = 24 Mhz, T = 1 / 24 us */
     clk_cnt = time_us * 24;
     writel_relaxed(clk_cnt, pvtm->base + pvtm->con + info->reg_cal);
 
-    writel_relaxed(wr_mask_bit(0x1, info->bit_start, 0x1),
-               pvtm->base + pvtm->con);
+    writel_relaxed(wr_mask_bit(0x1, info->bit_start, 0x1), pvtm->base + pvtm->con);
 
     rockchip_pvtm_delay(time_us);
 
     while (check_cnt) {
         sta = readl_relaxed(pvtm->base + pvtm->sta);
-        if (sta & BIT(info->bit_freq_done))
+        if (sta & BIT(info->bit_freq_done)) {
             break;
+        }
         udelay(4);
         check_cnt--;
     }
@@ -416,10 +396,8 @@ static u32 rv1126_pvtm_get_value(struct rockchip_pvtm *pvtm,
         val = 0;
     }
 
-    writel_relaxed(wr_mask_bit(0, info->bit_start, 0x1),
-               pvtm->base + pvtm->con);
-    writel_relaxed(wr_mask_bit(0, info->bit_en, 0x1),
-               pvtm->base + pvtm->con);
+    writel_relaxed(wr_mask_bit(0, info->bit_start, 0x1), pvtm->base + pvtm->con);
+    writel_relaxed(wr_mask_bit(0, info->bit_en, 0x1), pvtm->base + pvtm->con);
 
 disable_clks:
     clk_bulk_disable_unprepare(pvtm->num_clks, pvtm->clks);
@@ -436,10 +414,11 @@ static const struct rockchip_pvtm_data px30_pvtm = {
     .sta = 0x88,
     .num_pvtms = ARRAY_SIZE(px30_pvtm_infos),
     .infos = px30_pvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-        .set_ring_sel = px30_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+            .set_ring_sel = px30_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info px30_pmupvtm_infos[] = {
@@ -451,9 +430,10 @@ static const struct rockchip_pvtm_data px30_pmupvtm = {
     .sta = 0x190,
     .num_pvtms = ARRAY_SIZE(px30_pmupvtm_infos),
     .infos = px30_pmupvtm_infos,
-    .ops =  {
-        .get_value = rockchip_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_info rk1808_pvtm_infos[] = {
@@ -465,10 +445,11 @@ static const struct rockchip_pvtm_data rk1808_pvtm = {
     .sta = 0x88,
     .num_pvtms = ARRAY_SIZE(rk1808_pvtm_infos),
     .infos = rk1808_pvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-        .set_ring_sel = rk1808_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+            .set_ring_sel = rk1808_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk1808_pmupvtm_infos[] = {
@@ -480,9 +461,10 @@ static const struct rockchip_pvtm_data rk1808_pmupvtm = {
     .sta = 0x190,
     .num_pvtms = ARRAY_SIZE(rk1808_pmupvtm_infos),
     .infos = rk1808_pmupvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_info rk1808_npupvtm_infos[] = {
@@ -494,10 +476,11 @@ static const struct rockchip_pvtm_data rk1808_npupvtm = {
     .sta = 0x788,
     .num_pvtms = ARRAY_SIZE(rk1808_npupvtm_infos),
     .infos = rk1808_npupvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-        .set_ring_sel = rk1808_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+            .set_ring_sel = rk1808_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3288_pvtm_infos[] = {
@@ -510,9 +493,10 @@ static const struct rockchip_pvtm_data rk3288_pvtm = {
     .sta = 0x374,
     .num_pvtms = ARRAY_SIZE(rk3288_pvtm_infos),
     .infos = rk3288_pvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_data rk3308_pmupvtm = {
@@ -520,9 +504,10 @@ static const struct rockchip_pvtm_data rk3308_pmupvtm = {
     .sta = 0x448,
     .num_pvtms = ARRAY_SIZE(px30_pmupvtm_infos),
     .infos = px30_pmupvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3399_pvtm_infos[] = {
@@ -537,10 +522,11 @@ static const struct rockchip_pvtm_data rk3399_pvtm = {
     .sta = 0xe620,
     .num_pvtms = ARRAY_SIZE(rk3399_pvtm_infos),
     .infos = rk3399_pvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-        .set_ring_sel = rk3399_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+            .set_ring_sel = rk3399_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3399_pmupvtm_infos[] = {
@@ -552,9 +538,10 @@ static const struct rockchip_pvtm_data rk3399_pmupvtm = {
     .sta = 0x248,
     .num_pvtms = ARRAY_SIZE(rk3399_pmupvtm_infos),
     .infos = rk3399_pmupvtm_infos,
-    .ops = {
-        .get_value = rockchip_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rockchip_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3568_corepvtm_infos[] = {
@@ -566,10 +553,11 @@ static const struct rockchip_pvtm_data rk3568_corepvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3568_corepvtm_infos),
     .infos = rk3568_corepvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3568_gpupvtm_infos[] = {
@@ -581,10 +569,11 @@ static const struct rockchip_pvtm_data rk3568_gpupvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3568_gpupvtm_infos),
     .infos = rk3568_gpupvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3568_npupvtm_infos[] = {
@@ -596,10 +585,11 @@ static const struct rockchip_pvtm_data rk3568_npupvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3568_npupvtm_infos),
     .infos = rk3568_npupvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_bigcore0_pvtm_infos[] = {
@@ -611,10 +601,11 @@ static const struct rockchip_pvtm_data rk3588_bigcore0_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_bigcore0_pvtm_infos),
     .infos = rk3588_bigcore0_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_bigcore1_pvtm_infos[] = {
@@ -626,10 +617,11 @@ static const struct rockchip_pvtm_data rk3588_bigcore1_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_bigcore1_pvtm_infos),
     .infos = rk3588_bigcore1_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_litcore_pvtm_infos[] = {
@@ -641,10 +633,11 @@ static const struct rockchip_pvtm_data rk3588_litcore_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_litcore_pvtm_infos),
     .infos = rk3588_litcore_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_npu_pvtm_infos[] = {
@@ -656,10 +649,11 @@ static const struct rockchip_pvtm_data rk3588_npu_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_npu_pvtm_infos),
     .infos = rk3588_npu_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_gpu_pvtm_infos[] = {
@@ -671,10 +665,11 @@ static const struct rockchip_pvtm_data rk3588_gpu_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_gpu_pvtm_infos),
     .infos = rk3588_gpu_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rk3588_pmu_pvtm_infos[] = {
@@ -686,9 +681,10 @@ static const struct rockchip_pvtm_data rk3588_pmu_pvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rk3588_pmu_pvtm_infos),
     .infos = rk3588_pmu_pvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+        },
 };
 
 static const struct rockchip_pvtm_info rv1126_cpupvtm_infos[] = {
@@ -700,10 +696,11 @@ static const struct rockchip_pvtm_data rv1126_cpupvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rv1126_cpupvtm_infos),
     .infos = rv1126_cpupvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rv1126_npupvtm_infos[] = {
@@ -715,10 +712,11 @@ static const struct rockchip_pvtm_data rv1126_npupvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rv1126_npupvtm_infos),
     .infos = rv1126_npupvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-        .set_ring_sel = rv1126_pvtm_set_ring_sel,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+            .set_ring_sel = rv1126_pvtm_set_ring_sel,
+        },
 };
 
 static const struct rockchip_pvtm_info rv1126_pmupvtm_infos[] = {
@@ -730,9 +728,10 @@ static const struct rockchip_pvtm_data rv1126_pmupvtm = {
     .sta = 0x80,
     .num_pvtms = ARRAY_SIZE(rv1126_pmupvtm_infos),
     .infos = rv1126_pmupvtm_infos,
-    .ops = {
-        .get_value = rv1126_pvtm_get_value,
-    },
+    .ops =
+        {
+            .get_value = rv1126_pvtm_get_value,
+        },
 };
 
 static const struct of_device_id rockchip_pvtm_match[] = {
@@ -824,12 +823,11 @@ static const struct of_device_id rockchip_pvtm_match[] = {
         .compatible = "rockchip,rv1126-pmu-pvtm",
         .data = (void *)&rv1126_pmupvtm,
     },
-    { /* sentinel */ },
+    {/* sentinel */},
 };
 MODULE_DEVICE_TABLE(of, rockchip_pvtm_match);
 
-static int rockchip_pvtm_get_index(const struct rockchip_pvtm_data *data,
-                   u32 ch, u32 *index)
+static int rockchip_pvtm_get_index(const struct rockchip_pvtm_data *data, u32 ch, u32 *index)
 {
     int i;
 
@@ -843,10 +841,9 @@ static int rockchip_pvtm_get_index(const struct rockchip_pvtm_data *data,
     return -EINVAL;
 }
 
-static struct rockchip_pvtm *
-rockchip_pvtm_init(struct device *dev, struct device_node *node,
-           const struct rockchip_pvtm_data *data,
-           struct regmap *grf, void IO_MEM *base)
+static struct rockchip_pvtm *rockchip_pvtm_init(struct device *dev, struct device_node *node,
+                                                const struct rockchip_pvtm_data *data, struct regmap *grf,
+                                                void IO_MEM *base)
 {
     struct rockchip_pvtm *pvtm;
     const char *tz_name;
@@ -863,8 +860,9 @@ rockchip_pvtm_init(struct device *dev, struct device_node *node,
     }
 
     pvtm = devm_kzalloc(dev, sizeof(*pvtm), GFP_KERNEL);
-    if (!pvtm)
+    if (!pvtm) {
         return NULL;
+    }
 
     pvtm->dev = dev;
     pvtm->grf = grf;
@@ -887,30 +885,31 @@ rockchip_pvtm_init(struct device *dev, struct device_node *node,
         dev_err(dev, "%s: does not have clocks\n", node->name);
         goto clk_num_err;
     }
-    pvtm->clks = devm_kcalloc(dev, pvtm->num_clks, sizeof(*pvtm->clks),
-                  GFP_KERNEL);
-    if (!pvtm->clks)
+    pvtm->clks = devm_kcalloc(dev, pvtm->num_clks, sizeof(*pvtm->clks), GFP_KERNEL);
+    if (!pvtm->clks) {
         goto clk_num_err;
+    }
     for (i = 0; i < pvtm->num_clks; i++) {
         pvtm->clks[i].clk = of_clk_get(node, i);
         if (IS_ERR(pvtm->clks[i].clk)) {
-            dev_err(dev, "%s: failed to get clk at index %d\n",
-                node->name, i);
+            dev_err(dev, "%s: failed to get clk at index %d\n", node->name, i);
             goto clk_err;
         }
     }
 
     pvtm->rst = devm_reset_control_array_get_optional_exclusive(dev);
-    if (IS_ERR(pvtm->rst))
+    if (IS_ERR(pvtm->rst)) {
         dev_dbg(dev, "%s: failed to get reset\n", node->name);
+    }
 
     rockchip_pvtm_add_debugfs(pvtm);
 
     return pvtm;
 
 clk_err:
-    while (--i >= 0)
+    while (--i >= 0) {
         clk_put(pvtm->clks[i].clk);
+    }
     devm_kfree(dev, pvtm->clks);
 clk_num_err:
     devm_kfree(dev, pvtm);
@@ -936,19 +935,21 @@ static int rockchip_pvtm_probe(struct platform_device *pdev)
 
     if (dev->parent && dev->parent->of_node) {
         grf = syscon_node_to_regmap(dev->parent->of_node);
-        if (IS_ERR(grf))
+        if (IS_ERR(grf)) {
             return PTR_ERR(grf);
+        }
     } else {
         base = devm_platform_ioremap_resource(pdev, 0);
-        if (IS_ERR(base))
+        if (IS_ERR(base)) {
             return PTR_ERR(base);
+        }
     }
 
-    for_each_available_child_of_node(np, node) {
+    for_each_available_child_of_node(np, node)
+    {
         pvtm = rockchip_pvtm_init(dev, node, match->data, grf, base);
         if (!pvtm) {
-            dev_err(dev, "failed to handle node %s\n",
-                node->full_name);
+            dev_err(dev, "failed to handle node %s\n", node->full_name);
             continue;
         }
         list_add(&pvtm->node, &pvtm_list);
@@ -960,10 +961,11 @@ static int rockchip_pvtm_probe(struct platform_device *pdev)
 
 static struct platform_driver rockchip_pvtm_driver = {
     .probe = rockchip_pvtm_probe,
-    .driver = {
-        .name  = "rockchip-pvtm",
-        .of_match_table = rockchip_pvtm_match,
-    },
+    .driver =
+        {
+            .name = "rockchip-pvtm",
+            .of_match_table = rockchip_pvtm_match,
+        },
 };
 
 static int __init rockchip_pvtm_module_init(void)

@@ -51,17 +51,17 @@ static struct kbase_process *find_process_node(struct rb_node *node, pid_t tgid)
 
     /* Check if the kctx creation request is from a existing process.*/
     while (node) {
-        struct kbase_process *prcs_node =
-            rb_entry(node, struct kbase_process, kprcs_node);
+        struct kbase_process *prcs_node = rb_entry(node, struct kbase_process, kprcs_node);
         if (prcs_node->tgid == tgid) {
             kprcs = prcs_node;
             break;
         }
 
-        if (tgid < prcs_node->tgid)
+        if (tgid < prcs_node->tgid) {
             node = node->rb_left;
-        else
+        } else {
             node = node->rb_right;
+        }
     }
 
     return kprcs;
@@ -97,8 +97,9 @@ static int kbase_insert_kctx_to_process(struct kbase_context *kctx)
         struct rb_node **new = &prcs_root->rb_node, *parent = NULL;
 
         kprcs = kzalloc(sizeof(*kprcs), GFP_KERNEL);
-        if (kprcs == NULL)
+        if (kprcs == NULL) {
             return -ENOMEM;
+        }
         kprcs->tgid = tgid;
         INIT_LIST_HEAD(&kprcs->kctx_list);
         kprcs->dma_buf_root = RB_ROOT;
@@ -108,12 +109,12 @@ static int kbase_insert_kctx_to_process(struct kbase_context *kctx)
             struct kbase_process *prcs_node;
 
             parent = *new;
-            prcs_node = rb_entry(parent, struct kbase_process,
-                         kprcs_node);
-            if (tgid < prcs_node->tgid)
+            prcs_node = rb_entry(parent, struct kbase_process, kprcs_node);
+            if (tgid < prcs_node->tgid) {
                 new = &(*new)->rb_left;
-            else
+            } else {
                 new = &(*new)->rb_right;
+            }
         }
         rb_link_node(&kprcs->kprcs_node, parent, new);
         rb_insert_color(&kprcs->kprcs_node, prcs_root);
@@ -173,14 +174,12 @@ int kbase_context_common_init(struct kbase_context *kctx)
     list_add(&kctx->kctx_list_link, &kctx->kbdev->kctx_list);
 
     err = kbase_insert_kctx_to_process(kctx);
-    if (err)
-        dev_err(kctx->kbdev->dev,
-        "(err:%d) failed to insert kctx to kbase_process\n", err);
+    if (err) {
+        dev_err(kctx->kbdev->dev, "(err:%d) failed to insert kctx to kbase_process\n", err);
+    }
 
-    KBASE_TLSTREAM_TL_KBASE_NEW_CTX(kctx->kbdev, kctx->id,
-        kctx->kbdev->gpu_props.props.raw_props.gpu_id);
-    KBASE_TLSTREAM_TL_NEW_CTX(kctx->kbdev, kctx, kctx->id,
-            (u32)(kctx->tgid));
+    KBASE_TLSTREAM_TL_KBASE_NEW_CTX(kctx->kbdev, kctx->id, kctx->kbdev->gpu_props.props.raw_props.gpu_id);
+    KBASE_TLSTREAM_TL_NEW_CTX(kctx->kbdev, kctx, kctx->id, (u32)(kctx->tgid));
     mutex_unlock(&kctx->kbdev->kctx_list_lock);
 
     return err;
@@ -230,9 +229,9 @@ void kbase_context_common_term(struct kbase_context *kctx)
     mutex_unlock(&kctx->kbdev->mmu_hw_mutex);
 
     pages = atomic_read(&kctx->used_pages);
-    if (pages != 0)
-        dev_warn(kctx->kbdev->dev,
-            "%s: %d pages in use!\n", __func__, pages);
+    if (pages != 0) {
+        dev_warn(kctx->kbdev->dev, "%s: %d pages in use!\n", __func__, pages);
+    }
 
     WARN_ON(atomic_read(&kctx->nonmapped_pages) != 0);
 
@@ -252,18 +251,17 @@ void kbase_context_common_term(struct kbase_context *kctx)
      * The "if" statement below is for optimization. It is safe to call
      * kbase_timeline_streams_flush when timeline is disabled.
      */
-    if (atomic_read(&kctx->kbdev->timeline_flags) != 0)
+    if (atomic_read(&kctx->kbdev->timeline_flags) != 0) {
         kbase_timeline_streams_flush(kctx->kbdev->timeline);
+    }
 
     vfree(kctx);
 }
 
 int kbase_context_mem_pool_group_init(struct kbase_context *kctx)
 {
-    return kbase_mem_pool_group_init(&kctx->mem_pools,
-        kctx->kbdev,
-        &kctx->kbdev->mem_pool_defaults,
-        &kctx->kbdev->mem_pools);
+    return kbase_mem_pool_group_init(&kctx->mem_pools, kctx->kbdev, &kctx->kbdev->mem_pool_defaults,
+                                     &kctx->kbdev->mem_pools);
 }
 
 void kbase_context_mem_pool_group_term(struct kbase_context *kctx)
@@ -273,9 +271,7 @@ void kbase_context_mem_pool_group_term(struct kbase_context *kctx)
 
 int kbase_context_mmu_init(struct kbase_context *kctx)
 {
-    kbase_mmu_init(kctx->kbdev,
-        &kctx->mmu, kctx,
-        base_context_mmu_group_id_get(kctx->create_flags));
+    kbase_mmu_init(kctx->kbdev, &kctx->mmu, kctx, base_context_mmu_group_id_get(kctx->create_flags));
 
     return 0;
 }
@@ -290,8 +286,9 @@ int kbase_context_mem_alloc_page(struct kbase_context *kctx)
     struct page *p;
 
     p = kbase_mem_alloc_page(&kctx->mem_pools.small[KBASE_MEM_GROUP_SINK]);
-    if (!p)
+    if (!p) {
         return -ENOMEM;
+    }
 
     kctx->aliasing_sink_page = as_tagged(page_to_phys(p));
 
@@ -301,10 +298,7 @@ int kbase_context_mem_alloc_page(struct kbase_context *kctx)
 void kbase_context_mem_pool_free(struct kbase_context *kctx)
 {
     /* drop the aliasing sink page now that it can't be mapped anymore */
-    kbase_mem_pool_free(
-        &kctx->mem_pools.small[KBASE_MEM_GROUP_SINK],
-        as_page(kctx->aliasing_sink_page),
-        false);
+    kbase_mem_pool_free(&kctx->mem_pools.small[KBASE_MEM_GROUP_SINK], as_page(kctx->aliasing_sink_page), false);
 }
 
 void kbase_context_sticky_resource_term(struct kbase_context *kctx)
@@ -316,18 +310,14 @@ void kbase_context_sticky_resource_term(struct kbase_context *kctx)
 
     /* free pending region setups */
     pending_regions_to_clean = KBASE_COOKIE_MASK;
-    bitmap_andnot(&pending_regions_to_clean, &pending_regions_to_clean,
-              kctx->cookies, BITS_PER_LONG);
+    bitmap_andnot(&pending_regions_to_clean, &pending_regions_to_clean, kctx->cookies, BITS_PER_LONG);
     while (pending_regions_to_clean) {
-        unsigned int cookie = find_first_bit(&pending_regions_to_clean,
-                BITS_PER_LONG);
+        unsigned int cookie = find_first_bit(&pending_regions_to_clean, BITS_PER_LONG);
 
         if (!WARN_ON(!kctx->pending_regions[cookie])) {
             dev_dbg(kctx->kbdev->dev, "Freeing pending unmapped region\n");
-            kbase_mem_phy_alloc_put(
-                kctx->pending_regions[cookie]->cpu_alloc);
-            kbase_mem_phy_alloc_put(
-                kctx->pending_regions[cookie]->gpu_alloc);
+            kbase_mem_phy_alloc_put(kctx->pending_regions[cookie]->cpu_alloc);
+            kbase_mem_phy_alloc_put(kctx->pending_regions[cookie]->gpu_alloc);
             kfree(kctx->pending_regions[cookie]);
 
             kctx->pending_regions[cookie] = NULL;

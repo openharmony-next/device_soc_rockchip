@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _LINUX_INITRAMFS_H
-#define _LINUX_INITRAMFS_H
+#ifndef LINUX_INITRAMFS_H
+#define LINUX_INITRAMFS_H
 
 #include <linux/kconfig.h>
 
@@ -36,5 +36,7 @@ void __init wait_initrd_hw_decom_done(void);
 #if defined(CONFIG_ROCKCHIP_THUNDER_BOOT_CRYPTO)
 int __init rk_tb_crypto_sha256_wait_compare_done(void);
 #endif
+extern char __initramfs_start[];
+extern unsigned long __initramfs_size;
 
 #endif /* _LINUX_INITRAMFS_H */

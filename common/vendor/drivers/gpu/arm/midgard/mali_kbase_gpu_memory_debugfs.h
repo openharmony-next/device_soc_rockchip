@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_gpu_memory_debugfs.h
  * Header file for gpu_memory entry in debugfs
@@ -34,4 +30,4 @@
  */
 void kbasep_gpu_memory_debugfs_init(struct kbase_device *kbdev);
 
-#endif  /*_KBASE_GPU_MEMORY_DEBUGFS_H*/
+#endif /*_KBASE_GPU_MEMORY_DEBUGFS_H*/

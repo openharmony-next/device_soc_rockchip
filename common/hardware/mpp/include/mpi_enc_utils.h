@@ -21,18 +21,18 @@
 #include "rk_venc_cmd.h"
 
 typedef struct MpiEncTestArgs_t {
-    MppCodingType       type;
-    MppFrameFormat      format;
+    MppCodingType type;
+    MppFrameFormat format;
 
-    RK_S32              width;
-    RK_S32              height;
+    signed int width;
+    signed int height;
 } MpiEncTestArgs;
 
 typedef struct {
     // global flow control flag
-    RK_U32 frm_eos;
-    RK_U32 pkt_eos;
-    RK_S32 frame_count;
+    unsigned int frm_eos;
+    unsigned int pkt_eos;
+    signed int frame_count;
     RK_U64 stream_size;
 
     // base flow context
@@ -47,35 +47,35 @@ typedef struct {
     MppEncHeaderMode header_mode;
 
     // paramter for resource malloc
-    RK_U32 width;
-    RK_U32 height;
-    RK_U32 hor_stride;
-    RK_U32 ver_stride;
+    unsigned int width;
+    unsigned int height;
+    unsigned int hor_stride;
+    unsigned int ver_stride;
     MppFrameFormat fmt;
     MppCodingType type;
-    RK_S32 num_frames;
+    signed int num_frames;
 
     // resources
     size_t frame_size;
 
-    RK_U32 split_mode;
-    RK_U32 split_arg;
+    unsigned int split_mode;
+    unsigned int split_arg;
 
     // rate control runtime parameter
 
-    RK_S32 fps_in_flex;
-    RK_S32 fps_in_den;
-    RK_S32 fps_in_num;
-    RK_S32 fps_out_flex;
-    RK_S32 fps_out_den;
-    RK_S32 fps_out_num;
-    RK_S32 bps;
-    RK_S32 bps_max;
-    RK_S32 bps_min;
-    RK_S32 rc_mode;
-    RK_S32 gop_mode;
-    RK_S32 gop_len;
-    RK_S32 vi_len;
+    signed int fps_in_flex;
+    signed int fps_in_den;
+    signed int fps_in_num;
+    signed int fps_out_flex;
+    signed int fps_out_den;
+    signed int fps_out_num;
+    signed int bps;
+    signed int bps_max;
+    signed int bps_min;
+    signed int rc_mode;
+    signed int gop_mode;
+    signed int gop_len;
+    signed int vi_len;
 } MpiEncTestData;
 
 int hal_mpp_get_sps(void *ctx, unsigned char *buf, size_t *buf_size);

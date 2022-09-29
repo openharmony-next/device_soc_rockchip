@@ -14,6 +14,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+#ifndef H_FIQ_DEBUGGER_RINGBUF_H
+#define H_FIQ_DEBUGGER_RINGBUF_H
 
 #include <linux/kernel.h>
 #include <linux/slab.h>
@@ -25,14 +27,14 @@ struct fiq_debugger_ringbuf {
     u8 buf[];
 };
 
-
 static inline struct fiq_debugger_ringbuf *fiq_debugger_ringbuf_alloc(int len)
 {
     struct fiq_debugger_ringbuf *rbuf;
 
     rbuf = kzalloc(sizeof(*rbuf) + len, GFP_KERNEL);
-    if (rbuf == NULL)
+    if (rbuf == NULL) {
         return NULL;
+    }
 
     rbuf->len = len;
     rbuf->head = 0;
@@ -51,8 +53,9 @@ static inline int fiq_debugger_ringbuf_level(struct fiq_debugger_ringbuf *rbuf)
 {
     int level = rbuf->head - rbuf->tail;
 
-    if (level < 0)
+    if (level < 0) {
         level = rbuf->len + level;
+    }
 
     return level;
 }
@@ -62,14 +65,12 @@ static inline int fiq_debugger_ringbuf_room(struct fiq_debugger_ringbuf *rbuf)
     return rbuf->len - fiq_debugger_ringbuf_level(rbuf) - 1;
 }
 
-static inline u8
-fiq_debugger_ringbuf_peek(struct fiq_debugger_ringbuf *rbuf, int i)
+static inline u8 fiq_debugger_ringbuf_peek(struct fiq_debugger_ringbuf *rbuf, int i)
 {
     return rbuf->buf[(rbuf->tail + i) % rbuf->len];
 }
 
-static inline int
-fiq_debugger_ringbuf_consume(struct fiq_debugger_ringbuf *rbuf, int count)
+static inline int fiq_debugger_ringbuf_consume(struct fiq_debugger_ringbuf *rbuf, int count)
 {
     count = min(count, fiq_debugger_ringbuf_level(rbuf));
 
@@ -79,11 +80,11 @@ fiq_debugger_ringbuf_consume(struct fiq_debugger_ringbuf *rbuf, int count)
     return count;
 }
 
-static inline int
-fiq_debugger_ringbuf_push(struct fiq_debugger_ringbuf *rbuf, u8 datum)
+static inline int fiq_debugger_ringbuf_push(struct fiq_debugger_ringbuf *rbuf, u8 datum)
 {
-    if (fiq_debugger_ringbuf_room(rbuf) == 0)
+    if (fiq_debugger_ringbuf_room(rbuf) == 0) {
         return 0;
+    }
 
     rbuf->buf[rbuf->head] = datum;
     smp_mb();
@@ -92,3 +93,5 @@ fiq_debugger_ringbuf_push(struct fiq_debugger_ringbuf *rbuf, u8 datum)
 
     return 1;
 }
+
+#endif

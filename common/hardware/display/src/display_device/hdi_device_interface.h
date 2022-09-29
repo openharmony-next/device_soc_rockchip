@@ -20,20 +20,24 @@
 #include <memory>
 #include "hdi_display.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class HdiDeviceInterface {
-public:
-    static std::vector<std::shared_ptr<HdiDeviceInterface>> DiscoveryDevice();
-    virtual std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DiscoveryDisplay() = 0;
-    virtual bool HandleHotplug(uint32_t dispId, bool plugIn) = 0;
-    virtual int32_t Init() = 0;
-    virtual void DeInit() = 0;
-    virtual ~HdiDeviceInterface() {};
-};
-} // namespace OHOS
-} // namespace HDI
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            class HdiDeviceInterface
+            {
+            public:
+                static std::vector<std::shared_ptr<HdiDeviceInterface>> DiscoveryDevice();
+                virtual std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DiscoveryDisplay() = 0;
+                virtual bool HandleHotplug(uint32_t dispId, bool plugIn) = 0;
+                virtual int32_t Init() = 0;
+                virtual void DeInit() = 0;
+                virtual ~HdiDeviceInterface(){};
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_DEVICE_INTERFACE_H

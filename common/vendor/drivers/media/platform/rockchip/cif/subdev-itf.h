@@ -23,9 +23,9 @@
 #define RKISP1_DEVNAME "rkisp1"
 #define RKISP_UNITE_DEVNAME "rkisp-unite"
 
-#define RKCIF_TOISP_CH0    0
-#define RKCIF_TOISP_CH1    1
-#define RKCIF_TOISP_CH2    2
+#define RKCIF_TOISP_CH0 0
+#define RKCIF_TOISP_CH1 1
+#define RKCIF_TOISP_CH2 2
 #define TOISP_CH_MAX 3
 
 struct capture_info {
@@ -57,7 +57,7 @@ struct sditf_priv {
     struct v4l2_subdev sd;
     struct media_pad pads;
     struct rkcif_device *cif_dev;
-    struct rkmodule_hdr_cfg    hdr_cfg;
+    struct rkmodule_hdr_cfg hdr_cfg;
     struct capture_info cap_info;
     struct rkisp_vicap_mode mode;
     struct toisp_info toisp_inf;

@@ -46,13 +46,13 @@
 #include <linux/rockchip/rockchip_sip.h>
 #endif
 
-#define UART_USR    0x1f    /* In: UART Status Register */
-#define UART_USR_RX_FIFO_FULL        0x10 /* Receive FIFO full */
-#define UART_USR_RX_FIFO_NOT_EMPTY    0x08 /* Receive FIFO not empty */
-#define UART_USR_TX_FIFO_EMPTY        0x04 /* Transmit FIFO empty */
-#define UART_USR_TX_FIFO_NOT_FULL    0x02 /* Transmit FIFO not full */
-#define UART_USR_BUSY            0x01 /* UART busy indicator */
-#define UART_SRR            0x22 /* software reset register */
+#define UART_USR 0x1f                   /* In: UART Status Register */
+#define UART_USR_RX_FIFO_FULL 0x10      /* Receive FIFO full */
+#define UART_USR_RX_FIFO_NOT_EMPTY 0x08 /* Receive FIFO not empty */
+#define UART_USR_TX_FIFO_EMPTY 0x04     /* Transmit FIFO empty */
+#define UART_USR_TX_FIFO_NOT_FULL 0x02  /* Transmit FIFO not full */
+#define UART_USR_BUSY 0x01              /* UART busy indicator */
+#define UART_SRR 0x22                   /* software reset register */
 
 struct rk_fiq_debugger {
     int irq;
@@ -72,14 +72,12 @@ static int serial_hwirq;
 static bool tf_fiq_sup;
 #endif
 
-static inline void rk_fiq_write(struct rk_fiq_debugger *t,
-    unsigned int val, unsigned int off)
+static inline void rk_fiq_write(struct rk_fiq_debugger *t, unsigned int val, unsigned int off)
 {
     __raw_writel(val, t->debug_port_base + off * 4);
 }
 
-static inline unsigned int rk_fiq_read(struct rk_fiq_debugger *t,
-    unsigned int off)
+static inline unsigned int rk_fiq_read(struct rk_fiq_debugger *t, unsigned int off)
 {
     return __raw_readl(t->debug_port_base + off * 4);
 }
@@ -89,8 +87,9 @@ static inline unsigned int rk_fiq_read_lsr(struct rk_fiq_debugger *t)
     unsigned int lsr;
 
     lsr = rk_fiq_read(t, UART_LSR);
-    if (lsr & UART_LSR_BI)
+    if (lsr & UART_LSR_BI) {
         t->break_seen = true;
+    }
 
     return lsr;
 }
@@ -104,17 +103,18 @@ static int debug_port_init(struct platform_device *pdev)
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    if (rk_fiq_read(t, UART_LSR) & UART_LSR_DR)
+    if (rk_fiq_read(t, UART_LSR) & UART_LSR_DR) {
         (void)rk_fiq_read(t, UART_RX);
+    }
 
     switch (t->baudrate) {
-    case 1500000:
-        dll = 0x1;
-        break;
-    case 115200:
-    default:
-        dll = 0xd;
-        break;
+        case 1500000:
+            dll = 0x1;
+            break;
+        case 115200:
+        default:
+            dll = 0xd;
+            break;
     }
     /* reset uart */
     rk_fiq_write(t, 0x07, UART_SRR);
@@ -168,11 +168,11 @@ static int debug_getc(struct platform_device *pdev)
         buf[n & 0x1f] = temp;
         n++;
         if (temp == 'q' && n > 2) {
-            if ((buf[(n - 2) & 0x1f] == 'i') &&
-                (buf[(n - 3) & 0x1f] == 'f'))
+            if ((buf[(n - 2) & 0x1f] == 'i') && (buf[(n - 3) & 0x1f] == 'f')) {
                 return FIQ_DEBUGGER_BREAK;
-            else
+            } else {
                 return temp;
+            }
         } else {
             return temp;
         }
@@ -188,8 +188,9 @@ static void debug_putc(struct platform_device *pdev, unsigned int c)
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) && count--)
+    while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) && count--) {
         udelay(10);
+    }
 
     rk_fiq_write(t, c, UART_TX);
 }
@@ -209,16 +210,17 @@ static void debug_flush(struct platform_device *pdev)
     unsigned int count = 10000;
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--)
+    while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--) {
         udelay(10);
+    }
 }
 
 #ifdef CONFIG_RK_CONSOLE_THREAD
 #define FIFO_SIZE SZ_64K
 #define LINE_MAX 1024
 static DEFINE_KFIFO(fifo, unsigned char, FIFO_SIZE);
-static char console_buf[LINE_MAX]; /* avoid FRAME WARN */
-static bool console_thread_stop; /* write on console_write */
+static char console_buf[LINE_MAX];  /* avoid FRAME WARN */
+static bool console_thread_stop;    /* write on console_write */
 static bool console_thread_running; /* write on console_thread */
 static unsigned int console_dropped_messages;
 
@@ -229,9 +231,9 @@ static void console_putc(struct platform_device *pdev, unsigned int c)
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) &&
-           count--)
+    while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) && count--) {
         usleep_range(200, 210);
+    }
 
     rk_fiq_write(t, c, UART_TX);
 }
@@ -243,26 +245,27 @@ static void console_flush(struct platform_device *pdev)
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--)
+    while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--) {
         usleep_range(200, 210);
+    }
 }
 
-static void console_put(struct platform_device *pdev,
-            const char *s, unsigned int count)
+static void console_put(struct platform_device *pdev, const char *s, unsigned int count)
 {
     while (count--) {
-        if (*s == '\n')
+        if (*s == '\n') {
             console_putc(pdev, '\r');
+        }
         console_putc(pdev, *s++);
     }
 }
 
-static void debug_put(struct platform_device *pdev,
-              const char *s, unsigned int count)
+static void debug_put(struct platform_device *pdev, const char *s, unsigned int count)
 {
     while (count--) {
-        if (*s == '\n')
+        if (*s == '\n') {
             debug_putc(pdev, '\r');
+        }
         debug_putc(pdev, *s++);
     }
 }
@@ -282,26 +285,27 @@ static int console_thread(void *data)
             schedule();
             smp_store_mb(console_thread_running, true);
         }
-        if (kthread_should_stop())
+        if (kthread_should_stop()) {
             break;
+        }
         set_current_state(TASK_RUNNING);
         while (!console_thread_stop) {
             len = kfifo_out(&fifo, buf, LINE_MAX);
-            if (!len)
+            if (!len) {
                 break;
+            }
             console_put(pdev, buf, len);
         }
         dropped = console_dropped_messages;
         if (dropped && !console_thread_stop) {
             console_dropped_messages = 0;
             smp_wmb();
-            len = snprintf(buf, LINE_MAX,
-                       "** %u console messages dropped **\n",
-                       dropped);
+            len = snprintf(buf, LINE_MAX, "** %u console messages dropped **\n", dropped);
             console_put(pdev, buf, len);
         }
-        if (!console_thread_stop)
+        if (!console_thread_stop) {
             console_flush(pdev);
+        }
     }
 
     return 0;
@@ -315,25 +319,24 @@ static void console_write(struct platform_device *pdev, const char *s, unsigned 
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
-    if (console_thread_stop ||
-        oops_in_progress ||
-        system_state == SYSTEM_HALT ||
-        system_state == SYSTEM_POWER_OFF ||
+    if (console_thread_stop || oops_in_progress || system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF ||
         system_state == SYSTEM_RESTART) {
         if (!console_thread_stop) {
             console_thread_stop = true;
             smp_wmb();
             debug_flush(pdev);
-            while (fifo_count-- && kfifo_get(&fifo, &c))
+            while (fifo_count-- && kfifo_get(&fifo, &c)) {
                 debug_put(pdev, &c, 1);
+            }
         }
         debug_put(pdev, s, count);
         debug_flush(pdev);
     } else if (count) {
         unsigned int ret = 0;
 
-        if (kfifo_len(&fifo) + count < FIFO_SIZE)
+        if (kfifo_len(&fifo) + count < FIFO_SIZE) {
             ret = kfifo_in(&fifo, s, count);
+        }
         if (!ret) {
             console_dropped_messages++;
             smp_wmb();
@@ -362,20 +365,21 @@ static void console_write(struct platform_device *pdev, const char *s, unsigned 
              * console_thread_running==false guarantee that console_task
              * is not running on usleep_range().
              */
-            if (!READ_ONCE(console_thread_running))
+            if (!READ_ONCE(console_thread_running)) {
                 wake_up_process(t->console_task);
+            }
         }
     }
 }
 #endif
 
-
 static void fiq_enable(struct platform_device *pdev, unsigned int irq, bool on)
 {
-    if (on)
+    if (on) {
         enable_irq(irq);
-    else
+    } else {
         disable_irq(irq);
+    }
 }
 
 #ifdef CONFIG_FIQ_DEBUGGER_TRUST_ZONE
@@ -402,8 +406,7 @@ int sdei_fiq_debugger_is_enabled(void)
 
 int fiq_sdei_event_callback(u32 event, struct pt_regs *regs, void *arg)
 {
-    int cpu_id = get_logical_index(read_cpuid_mpidr() &
-                       MPIDR_HWID_BITMASK);
+    int cpu_id = get_logical_index(read_cpuid_mpidr() & MPIDR_HWID_BITMASK);
     fiq_debugger_fiq(regs, cpu_id);
 
     return 0;
@@ -417,16 +420,15 @@ void rk_fiq_sdei_event_sw_cpu(int wait_disable)
 
     do {
         ret = sdei_event_disable_nolock(rk_fiq_sdei.event_id);
-        if (!ret)
+        if (!ret) {
             break;
+        }
         cnt--;
         udelay(20);
     } while (wait_disable && cnt);
 
     affinity = cpu_logical_map(rk_fiq_sdei.sw_cpu) & MPIDR_HWID_BITMASK;
-    ret = sdei_event_routing_set_nolock(rk_fiq_sdei.event_id,
-                        SDEI_EVENT_REGISTER_RM_PE,
-                        affinity);
+    ret = sdei_event_routing_set_nolock(rk_fiq_sdei.event_id, SDEI_EVENT_REGISTER_RM_PE, affinity);
     ret = sdei_event_enable_nolock(rk_fiq_sdei.event_id);
     rk_fiq_sdei.cur_cpu = rk_fiq_sdei.sw_cpu;
 }
@@ -437,8 +439,7 @@ int fiq_sdei_sw_cpu_event_callback(u32 event, struct pt_regs *regs, void *arg)
     int ret = 0;
     int cpu_id = event - rk_fiq_sdei.cpu_sw_event_id;
 
-    WARN_ON(cpu_id !=
-        get_logical_index(read_cpuid_mpidr() & MPIDR_HWID_BITMASK));
+    WARN_ON(cpu_id != get_logical_index(read_cpuid_mpidr() & MPIDR_HWID_BITMASK));
 
     if (cpu_id == rk_fiq_sdei.sw_cpu) {
         if (!rk_fiq_sdei.cpu_off_sw) {
@@ -463,16 +464,16 @@ int fiq_sdei_sw_cpu_event_callback(u32 event, struct pt_regs *regs, void *arg)
 
 static void _rk_fiq_dbg_sdei_switch_cpu(unsigned int cpu, int cpu_off)
 {
-    if (cpu == rk_fiq_sdei.cur_cpu)
+    if (cpu == rk_fiq_sdei.cur_cpu) {
         return;
+    }
     rk_fiq_sdei.sw_cpu = cpu;
     rk_fiq_sdei.cpu_can_sw = 0;
     rk_fiq_sdei.cpu_off_sw = cpu_off;
     sip_fiq_debugger_sdei_switch_cpu(rk_fiq_sdei.cur_cpu, cpu, cpu_off);
 }
 
-static void rk_fiq_dbg_sdei_switch_cpu(struct platform_device *pdev,
-                       unsigned int cpu)
+static void rk_fiq_dbg_sdei_switch_cpu(struct platform_device *pdev, unsigned int cpu)
 {
     _rk_fiq_dbg_sdei_switch_cpu(cpu, 0);
 }
@@ -490,29 +491,29 @@ static int fiq_dbg_sdei_cpu_off_migrate_fiq(unsigned int cpu)
             udelay(10);
             cnt--;
         };
-        if (!cnt)
-            pr_err("%s: from %d to %d err!\n",
-                   __func__, cpu, target_cpu);
+        if (!cnt) {
+            pr_err("%s: from %d to %d err!\n", __func__, cpu, target_cpu);
+        }
     }
 
     return 0;
 }
 
-static int fiq_dbg_sdei_pm_callback(struct notifier_block *nb,
-                    unsigned long mode, void *_unused)
+static int fiq_dbg_sdei_pm_callback(struct notifier_block *nb, unsigned long mode, void *_unused)
 {
     unsigned int target_cpu;
 
     switch (mode) {
-    case PM_SUSPEND_PREPARE:
-        target_cpu = cpumask_first(cpu_online_mask);
-        if (target_cpu != 0)
-            pr_err("%s: fiq for core !\n", __func__);
-        else
-            _rk_fiq_dbg_sdei_switch_cpu(target_cpu, 1);
-        break;
-    default:
-    break;
+        case PM_SUSPEND_PREPARE:
+            target_cpu = cpumask_first(cpu_online_mask);
+            if (target_cpu != 0) {
+                pr_err("%s: fiq for core !\n", __func__);
+            } else {
+                _rk_fiq_dbg_sdei_switch_cpu(target_cpu, 1);
+            }
+            break;
+        default:
+            break;
     }
     return 0;
 }
@@ -525,22 +526,17 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
 {
     int ret, cpu, i;
 
-    ret = sip_fiq_debugger_sdei_get_event_id(&rk_fiq_sdei.event_id,
-                         &rk_fiq_sdei.cpu_sw_event_id,
-                         NULL);
+    ret = sip_fiq_debugger_sdei_get_event_id(&rk_fiq_sdei.event_id, &rk_fiq_sdei.cpu_sw_event_id, NULL);
 
     if (ret) {
         pr_err("%s: get event id error!\n", __func__);
         return ret;
     }
 
-    ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-                    "soc/rk_sdei_fiq_debugger",
-                    NULL,
-                    fiq_dbg_sdei_cpu_off_migrate_fiq);
+    ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "soc/rk_sdei_fiq_debugger", NULL,
+                                    fiq_dbg_sdei_cpu_off_migrate_fiq);
     if (ret < 0) {
-        pr_err("%s: cpuhp_setup_state_nocalls error! %d\n",
-               __func__, ret);
+        pr_err("%s: cpuhp_setup_state_nocalls error! %d\n", __func__, ret);
         return ret;
     }
 
@@ -549,8 +545,7 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
         return ret;
     }
 
-    ret = sdei_event_register(rk_fiq_sdei.event_id,
-                  fiq_sdei_event_callback, NULL);
+    ret = sdei_event_register(rk_fiq_sdei.event_id, fiq_sdei_event_callback, NULL);
 
     if (ret) {
         pr_err("%s: sdei_event_register error!\n", __func__);
@@ -560,9 +555,7 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
 
     rk_fiq_sdei.cur_cpu = 0;
 
-    ret = sdei_event_routing_set(rk_fiq_sdei.event_id,
-                     SDEI_EVENT_REGISTER_RM_PE,
-                     cpu_logical_map(rk_fiq_sdei.cur_cpu));
+    ret = sdei_event_routing_set(rk_fiq_sdei.event_id, SDEI_EVENT_REGISTER_RM_PE, cpu_logical_map(rk_fiq_sdei.cur_cpu));
 
     if (ret) {
         pr_err("%s: sdei_event_routing_set error!\n", __func__);
@@ -576,28 +569,22 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
     }
 
     for (cpu = 0; cpu < num_possible_cpus(); cpu++) {
-        ret = sdei_event_register(rk_fiq_sdei.cpu_sw_event_id + cpu,
-                      fiq_sdei_sw_cpu_event_callback,
-                      NULL);
+        ret = sdei_event_register(rk_fiq_sdei.cpu_sw_event_id + cpu, fiq_sdei_sw_cpu_event_callback, NULL);
         if (ret) {
-            pr_err("%s: cpu %d sdei_event_register error!\n",
-                   __func__, cpu);
+            pr_err("%s: cpu %d sdei_event_register error!\n", __func__, cpu);
             goto cpu_sw_err;
         }
-        ret = sdei_event_routing_set(rk_fiq_sdei.cpu_sw_event_id + cpu,
-                         SDEI_EVENT_REGISTER_RM_PE,
-                         cpu_logical_map(cpu));
+        ret =
+            sdei_event_routing_set(rk_fiq_sdei.cpu_sw_event_id + cpu, SDEI_EVENT_REGISTER_RM_PE, cpu_logical_map(cpu));
 
         if (ret) {
-            pr_err("%s:cpu %d fiq_sdei_event_routing_set error!\n",
-                   __func__, cpu);
+            pr_err("%s:cpu %d fiq_sdei_event_routing_set error!\n", __func__, cpu);
             goto cpu_sw_err;
         }
 
         ret = sdei_event_enable(rk_fiq_sdei.cpu_sw_event_id + cpu);
         if (ret) {
-            pr_err("%s: cpu %d sdei_event_enable error!\n",
-                   __func__, cpu);
+            pr_err("%s: cpu %d sdei_event_enable error!\n", __func__, cpu);
             goto cpu_sw_err;
         }
     }
@@ -606,8 +593,9 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
     rk_fiq_sdei.fiq_en = 1;
     return 0;
 cpu_sw_err:
-    for (i = 0; i < cpu; i++)
+    for (i = 0; i < cpu; i++) {
         sdei_event_unregister(rk_fiq_sdei.cpu_sw_event_id + i);
+    }
 err:
     unregister_pm_notifier(&fiq_dbg_sdei_pm_nb);
     sdei_event_unregister(rk_fiq_sdei.event_id);
@@ -624,8 +612,7 @@ static inline int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
 
 static struct pt_regs fiq_pt_regs;
 
-static void rk_fiq_debugger_switch_cpu(struct platform_device *pdev,
-                       unsigned int cpu)
+static void rk_fiq_debugger_switch_cpu(struct platform_device *pdev, unsigned int cpu)
 {
     sip_fiq_debugger_switch_cpu(cpu);
 }
@@ -647,8 +634,7 @@ static int rk_fiq_debugger_uart_dev_resume(struct platform_device *pdev)
     struct rk_fiq_debugger *t;
 
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
-    sip_fiq_debugger_uart_irq_tf_init(serial_hwirq,
-                      fiq_debugger_uart_irq_tf);
+    sip_fiq_debugger_uart_irq_tf_init(serial_hwirq, fiq_debugger_uart_irq_tf);
     return 0;
 }
 
@@ -658,17 +644,16 @@ static int rk_fiq_debugger_uart_dev_resume(struct platform_device *pdev)
  * so that fiq would be disabled in EL3 on purpose when cpu resume. We enable
  * it here since everything is okay.
  */
-static int fiq_debugger_cpuidle_resume_fiq(struct notifier_block *nb,
-                       unsigned long action, void *hcpu)
+static int fiq_debugger_cpuidle_resume_fiq(struct notifier_block *nb, unsigned long action, void *hcpu)
 {
     switch (action) {
-    case CPU_PM_EXIT:
-        if ((sip_fiq_debugger_is_enabled()) &&
-            (sip_fiq_debugger_get_target_cpu() == smp_processor_id()))
-            sip_fiq_debugger_enable_fiq(true, smp_processor_id());
-        break;
-    default:
-        break;
+        case CPU_PM_EXIT:
+            if ((sip_fiq_debugger_is_enabled()) && (sip_fiq_debugger_get_target_cpu() == smp_processor_id())) {
+                sip_fiq_debugger_enable_fiq(true, smp_processor_id());
+            }
+            break;
+        default:
+            break;
     }
 
     return NOTIFY_OK;
@@ -683,8 +668,7 @@ static int fiq_debugger_cpu_offine_migrate_fiq(unsigned int cpu)
 {
     unsigned int target_cpu;
 
-    if ((sip_fiq_debugger_is_enabled()) &&
-        (sip_fiq_debugger_get_target_cpu() == cpu)) {
+    if ((sip_fiq_debugger_is_enabled()) && (sip_fiq_debugger_get_target_cpu() == cpu)) {
         target_cpu = cpumask_first(cpu_online_mask);
         sip_fiq_debugger_switch_cpu(target_cpu);
     }
@@ -701,10 +685,8 @@ static int rk_fiq_debugger_register_cpu_pm_notify(void)
 {
     int err;
 
-    err = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-                    "soc/rk_fiq_debugger",
-                    NULL,
-                    fiq_debugger_cpu_offine_migrate_fiq);
+    err = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "soc/rk_fiq_debugger", NULL,
+                                    fiq_debugger_cpu_offine_migrate_fiq);
     if (err < 0) {
         pr_err("fiq debugger register cpu notifier failed!\n");
         return err;
@@ -719,11 +701,8 @@ static int rk_fiq_debugger_register_cpu_pm_notify(void)
     return 0;
 }
 
-static int fiq_debugger_bind_sip_smc(struct rk_fiq_debugger *t,
-                     phys_addr_t phy_base,
-                     int hwirq,
-                     int signal_irq,
-                     unsigned int baudrate)
+static int fiq_debugger_bind_sip_smc(struct rk_fiq_debugger *t, phys_addr_t phy_base, int hwirq, int signal_irq,
+                                     unsigned int baudrate)
 {
     int err;
 
@@ -739,8 +718,7 @@ static int fiq_debugger_bind_sip_smc(struct rk_fiq_debugger *t,
         goto exit;
     }
 
-    err = sip_fiq_debugger_uart_irq_tf_init(hwirq,
-                fiq_debugger_uart_irq_tf);
+    err = sip_fiq_debugger_uart_irq_tf_init(hwirq, fiq_debugger_uart_irq_tf);
     if (err) {
         pr_err("fiq debugger bind fiq to trustzone failed: %d\n", err);
         goto exit;
@@ -763,9 +741,8 @@ exit:
 }
 #endif
 
-void rk_serial_debug_init(void __iomem *base, phys_addr_t phy_base,
-              int irq, int signal_irq,
-              int wakeup_irq, unsigned int baudrate)
+void rk_serial_debug_init(void __iomem *base, phys_addr_t phy_base, int irq, int signal_irq, int wakeup_irq,
+                          unsigned int baudrate)
 {
     struct rk_fiq_debugger *t = NULL;
     struct platform_device *pdev = NULL;
@@ -815,14 +792,14 @@ void rk_serial_debug_init(void __iomem *base, phys_addr_t phy_base,
 #ifdef CONFIG_FIQ_DEBUGGER_TRUST_ZONE
     if ((signal_irq > 0) && (serial_hwirq > 0)) {
         ret = fiq_debugger_sdei_enable(t);
-        if (ret)
-            ret = fiq_debugger_bind_sip_smc(t, phy_base,
-                            serial_hwirq,
-                            signal_irq, baudrate);
-        if (ret)
+        if (ret) {
+            ret = fiq_debugger_bind_sip_smc(t, phy_base, serial_hwirq, signal_irq, baudrate);
+        }
+        if (ret) {
             tf_fiq_sup = false;
-        else
+        } else {
             tf_fiq_sup = true;
+        }
     }
 #endif
 
@@ -831,15 +808,17 @@ void rk_serial_debug_init(void __iomem *base, phys_addr_t phy_base,
         res[0].start = irq;
         res[0].end = irq;
 #if defined(CONFIG_FIQ_GLUE)
-        if (signal_irq > 0)
+        if (signal_irq > 0) {
             res[0].name = "fiq";
-        else
+        } else {
             res[0].name = "uart_irq";
+        }
 #elif defined(CONFIG_FIQ_DEBUGGER_TRUST_ZONE)
-        if (tf_fiq_sup && (signal_irq > 0))
+        if (tf_fiq_sup && (signal_irq > 0)) {
             res[0].name = "fiq";
-        else
+        } else {
             res[0].name = "uart_irq";
+        }
 #else
         res[0].name = "uart_irq";
 #endif
@@ -864,8 +843,9 @@ void rk_serial_debug_init(void __iomem *base, phys_addr_t phy_base,
 
 #ifdef CONFIG_RK_CONSOLE_THREAD
     t->console_task = kthread_run(console_thread, pdev, "kconsole");
-    if (!IS_ERR(t->console_task))
+    if (!IS_ERR(t->console_task)) {
         t->pdata.console_write = console_write;
+    }
 #endif
 
     pdev->name = "fiq_debugger";
@@ -924,7 +904,9 @@ out2:
 
 #if defined(CONFIG_OF)
 static const struct of_device_id rk_fiqdbg_of_match[] = {
-    { .compatible = "rockchip,fiq-debugger", },
+    {
+        .compatible = "rockchip,fiq-debugger",
+    },
     {},
 };
 MODULE_DEVICE_TABLE(of, rk_fiqdbg_of_match);
@@ -949,26 +931,31 @@ static int __init rk_fiqdbg_probe(struct platform_device *pdev)
         return -ENODEV;
     }
 
-    if (of_property_read_u32(np, "rockchip,serial-id", &serial_id))
+    if (of_property_read_u32(np, "rockchip,serial-id", &serial_id)) {
         return -EINVAL;
+    }
 
     if (serial_id == -1) {
         rk_serial_debug_init_dummy();
         return 0;
     }
 
-    if (of_property_read_u32(np, "rockchip,irq-mode-enable", &irq_mode))
+    if (of_property_read_u32(np, "rockchip,irq-mode-enable", &irq_mode)) {
         irq_mode = -1;
+    }
 
     signal_irq = irq_of_parse_and_map(np, 0);
-    if (!signal_irq)
+    if (!signal_irq) {
         return -EINVAL;
+    }
 
-    if (of_property_read_u32(np, "rockchip,wake-irq", &wake_irq))
+    if (of_property_read_u32(np, "rockchip,wake-irq", &wake_irq)) {
         wake_irq = -1;
+    }
 
-    if (of_property_read_u32(np, "rockchip,baudrate", &baudrate))
+    if (of_property_read_u32(np, "rockchip,baudrate", &baudrate)) {
         baudrate = -1;
+    }
 
     np = NULL;
 
@@ -981,10 +968,11 @@ static int __init rk_fiqdbg_probe(struct platform_device *pdev)
                 break;
             }
         }
-    } while(np);
+    } while (np);
 
-    if (!ok)
+    if (!ok) {
         return -EINVAL;
+    }
 
     if (of_device_is_available(np)) {
         pr_err("uart%d is enabled, please disable it\n", serial_id);
@@ -992,12 +980,14 @@ static int __init rk_fiqdbg_probe(struct platform_device *pdev)
     }
 
     /* parse serial hw irq */
-    if (irq_mode != 1 && !of_irq_parse_one(np, 0, &oirq))
+    if (irq_mode != 1 && !of_irq_parse_one(np, 0, &oirq)) {
         serial_hwirq = oirq.args[1] + 32;
+    }
 
     /* parse serial phy base address */
-    if (!of_address_to_resource(np, 0, &res))
+    if (!of_address_to_resource(np, 0, &res)) {
         phy_base = res.start;
+    }
 
     pclk = of_clk_get_by_name(np, "apb_pclk");
     clk = of_clk_get_by_name(np, "baudclk");
@@ -1010,27 +1000,28 @@ static int __init rk_fiqdbg_probe(struct platform_device *pdev)
     clk_prepare_enable(pclk);
 
     irq = irq_of_parse_and_map(np, 0);
-    if (!irq)
+    if (!irq) {
         return -EINVAL;
+    }
 
     base = of_iomap(np, 0);
-    if (base)
-        rk_serial_debug_init(base, phy_base,
-                     irq, signal_irq, wake_irq, baudrate);
+    if (base) {
+        rk_serial_debug_init(base, phy_base, irq, signal_irq, wake_irq, baudrate);
+    }
     return 0;
 }
 
 static struct platform_driver rk_fiqdbg_driver = {
-    .driver = {
-        .name   = "rk-fiq-debugger",
-        .of_match_table = of_match_ptr(rk_fiqdbg_of_match),
-    },
+    .driver =
+        {
+            .name = "rk-fiq-debugger",
+            .of_match_table = of_match_ptr(rk_fiqdbg_of_match),
+        },
 };
 
 static int __init rk_fiqdbg_init(void)
 {
-    return platform_driver_probe(&rk_fiqdbg_driver,
-                     rk_fiqdbg_probe);
+    return platform_driver_probe(&rk_fiqdbg_driver, rk_fiqdbg_probe);
 }
 
 #if defined(CONFIG_FIQ_DEBUGGER_TRUST_ZONE) && defined(CONFIG_ARM_SDE_INTERFACE)

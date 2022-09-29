@@ -62,21 +62,20 @@ static bool in_range(const u8 *base, const u8 *end, off_t off, size_t sz)
 static u32 wait_any(struct kbase_device *kbdev, off_t offset, u32 bits)
 {
     int loop;
-    const int timeout = 100;
+    const int timeout = 0x64;
     u32 val;
 
     for (loop = 0; loop < timeout; loop++) {
         val = kbase_reg_read(kbdev, offset);
-        if (val & bits)
+        if (val & bits) {
             break;
-        udelay(10);
+        }
+        udelay(0xa);
     }
 
     if (loop == timeout) {
-        dev_err(kbdev->dev,
-            "Timeout reading register 0x%lx, bits 0x%lx, last read was 0x%lx\n",
-            (unsigned long)offset, (unsigned long)bits,
-            (unsigned long)val);
+        dev_err(kbdev->dev, "Timeout reading register 0x%lx, bits 0x%lx, last read was 0x%lx\n", (unsigned long)offset,
+                (unsigned long)bits, (unsigned long)val);
     }
 
     return (val & bits);
@@ -85,65 +84,54 @@ static u32 wait_any(struct kbase_device *kbdev, off_t offset, u32 bits)
 static int wait(struct kbase_device *kbdev, off_t offset, u32 bits, bool set)
 {
     int loop;
-    const int timeout = 100;
+    const int timeout = 0x64;
     u32 val;
     u32 target = 0;
 
-    if (set)
+    if (set) {
         target = bits;
+    }
 
     for (loop = 0; loop < timeout; loop++) {
         val = kbase_reg_read(kbdev, (offset));
-        if ((val & bits) == target)
+        if ((val & bits) == target) {
             break;
+        }
 
-        udelay(10);
+        udelay(0xa);
     }
 
     if (loop == timeout) {
-        dev_err(kbdev->dev,
-            "Timeout reading register 0x%lx, bits 0x%lx, last read was 0x%lx\n",
-            (unsigned long)offset, (unsigned long)bits,
-            (unsigned long)val);
+        dev_err(kbdev->dev, "Timeout reading register 0x%lx, bits 0x%lx, last read was 0x%lx\n", (unsigned long)offset,
+                (unsigned long)bits, (unsigned long)val);
         return -ETIMEDOUT;
     }
 
     return 0;
 }
 
-static inline int run_job(struct kbase_device *kbdev, int as, int slot,
-              u64 cores, u64 jc)
+static inline int run_job(struct kbase_device *kbdev, int as, int slot, u64 cores, u64 jc)
 {
     u32 done;
 
     /* setup job */
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_HEAD_NEXT_LO),
-            jc & U32_MAX);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_HEAD_NEXT_HI),
-            jc >> 32);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_AFFINITY_NEXT_LO),
-            cores & U32_MAX);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_AFFINITY_NEXT_HI),
-            cores >> 32);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_CONFIG_NEXT),
-            JS_CONFIG_DISABLE_DESCRIPTOR_WR_BK | as);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_HEAD_NEXT_LO), jc & U32_MAX);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_HEAD_NEXT_HI), jc >> 0x20);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_AFFINITY_NEXT_LO), cores & U32_MAX);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_AFFINITY_NEXT_HI), cores >> 0x20);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_CONFIG_NEXT), JS_CONFIG_DISABLE_DESCRIPTOR_WR_BK | as);
 
     /* go */
-    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_COMMAND_NEXT),
-            JS_COMMAND_START);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(slot, JS_COMMAND_NEXT), JS_COMMAND_START);
 
     /* wait for the slot to finish (done, error) */
-    done = wait_any(kbdev, JOB_CONTROL_REG(JOB_IRQ_RAWSTAT),
-            (1ul << (16+slot)) | (1ul << slot));
+    done = wait_any(kbdev, JOB_CONTROL_REG(JOB_IRQ_RAWSTAT), (1ul << (0x10 + slot)) | (1ul << slot));
     kbase_reg_write(kbdev, JOB_CONTROL_REG(JOB_IRQ_CLEAR), done);
 
     if (done != (1ul << slot)) {
-        dev_err(kbdev->dev,
-            "Failed to run WA job on slot %d cores 0x%llx: done 0x%lx\n",
-            slot, (unsigned long long)cores,
-            (unsigned long)done);
-        dev_err(kbdev->dev, "JS_STATUS on failure: 0x%x\n",
-            kbase_reg_read(kbdev, JOB_SLOT_REG(slot, JS_STATUS)));
+        dev_err(kbdev->dev, "Failed to run WA job on slot %d cores 0x%llx: done 0x%lx\n", slot,
+                (unsigned long long)cores, (unsigned long)done);
+        dev_err(kbdev->dev, "JS_STATUS on failure: 0x%x\n", kbase_reg_read(kbdev, JOB_SLOT_REG(slot, JS_STATUS)));
 
         return -EFAULT;
     } else {
@@ -162,11 +150,13 @@ int kbase_dummy_job_wa_execute(struct kbase_device *kbdev, u64 cores)
     u32 old_gpu_mask;
     u32 old_job_mask;
 
-    if (!kbdev)
+    if (!kbdev) {
         return -EFAULT;
+    }
 
-    if (!kbdev->dummy_job_wa.ctx)
+    if (!kbdev->dummy_job_wa.ctx) {
         return -EFAULT;
+    }
 
     as = kbdev->dummy_job_wa.ctx->as_nr;
     slot = kbdev->dummy_job_wa.slot;
@@ -180,50 +170,53 @@ int kbase_dummy_job_wa_execute(struct kbase_device *kbdev, u64 cores)
 
     /* power up requested cores */
     kbase_reg_write(kbdev, SHADER_PWRON_LO, (cores & U32_MAX));
-    kbase_reg_write(kbdev, SHADER_PWRON_HI, (cores >> 32));
+    kbase_reg_write(kbdev, SHADER_PWRON_HI, (cores >> 0x20));
 
     if (kbdev->dummy_job_wa.flags & KBASE_DUMMY_JOB_WA_FLAG_WAIT_POWERUP) {
         /* wait for power-ups */
         wait(kbdev, SHADER_READY_LO, (cores & U32_MAX), true);
-        if (cores >> 32)
-            wait(kbdev, SHADER_READY_HI, (cores >> 32), true);
+        if (cores >> 0x20) {
+            wait(kbdev, SHADER_READY_HI, (cores >> 0x20), true);
+        }
     }
 
     if (kbdev->dummy_job_wa.flags & KBASE_DUMMY_JOB_WA_FLAG_SERIALIZE) {
         int i;
 
         /* do for each requested core */
-        for (i = 0; i < sizeof(cores) * 8; i++) {
+        for (i = 0; i < sizeof(cores) * 0x8; i++) {
             u64 affinity;
 
             affinity = 1ull << i;
 
-            if (!(cores & affinity))
+            if (!(cores & affinity)) {
                 continue;
+            }
 
-            if (run_job(kbdev, as, slot, affinity, jc))
+            if (run_job(kbdev, as, slot, affinity, jc)) {
                 failed++;
+            }
             runs++;
         }
 
     } else {
-        if (run_job(kbdev, as, slot, cores, jc))
+        if (run_job(kbdev, as, slot, cores, jc)) {
             failed++;
+        }
         runs++;
     }
 
-    if (kbdev->dummy_job_wa.flags &
-            KBASE_DUMMY_JOB_WA_FLAG_LOGICAL_SHADER_POWER) {
+    if (kbdev->dummy_job_wa.flags & KBASE_DUMMY_JOB_WA_FLAG_LOGICAL_SHADER_POWER) {
         /* power off shader cores (to reduce any dynamic leakage) */
         kbase_reg_write(kbdev, SHADER_PWROFF_LO, (cores & U32_MAX));
-        kbase_reg_write(kbdev, SHADER_PWROFF_HI, (cores >> 32));
+        kbase_reg_write(kbdev, SHADER_PWROFF_HI, (cores >> 0x20));
 
         /* wait for power off complete */
         wait(kbdev, SHADER_READY_LO, (cores & U32_MAX), false);
         wait(kbdev, SHADER_PWRTRANS_LO, (cores & U32_MAX), false);
-        if (cores >> 32) {
-            wait(kbdev, SHADER_READY_HI, (cores >> 32), false);
-            wait(kbdev, SHADER_PWRTRANS_HI, (cores >> 32), false);
+        if (cores >> 0x20) {
+            wait(kbdev, SHADER_READY_HI, (cores >> 0x20), false);
+            wait(kbdev, SHADER_PWRTRANS_HI, (cores >> 0x20), false);
         }
         kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_CLEAR), U32_MAX);
     }
@@ -232,25 +225,23 @@ int kbase_dummy_job_wa_execute(struct kbase_device *kbdev, u64 cores)
     kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK), old_gpu_mask);
     kbase_reg_write(kbdev, JOB_CONTROL_REG(JOB_IRQ_MASK), old_job_mask);
 
-    if (failed)
-        dev_err(kbdev->dev,
-            "WA complete with %d failures out of %d runs\n", failed,
-            runs);
+    if (failed) {
+        dev_err(kbdev->dev, "WA complete with %d failures out of %d runs\n", failed, runs);
+    }
 
     return failed ? -EFAULT : 0;
 }
 
-static ssize_t show_dummy_job_wa_info(struct device * const dev,
-        struct device_attribute * const attr, char * const buf)
+static ssize_t show_dummy_job_wa_info(struct device *const dev, struct device_attribute *const attr, char *const buf)
 {
     struct kbase_device *const kbdev = dev_get_drvdata(dev);
     int err;
 
-    if (!kbdev || !kbdev->dummy_job_wa.ctx)
+    if (!kbdev || !kbdev->dummy_job_wa.ctx) {
         return -ENODEV;
+    }
 
-    err = scnprintf(buf, PAGE_SIZE, "slot %u flags %llx\n",
-            kbdev->dummy_job_wa.slot, kbdev->dummy_job_wa.flags);
+    err = scnprintf(buf, PAGE_SIZE, "slot %u flags %llx\n", kbdev->dummy_job_wa.slot, kbdev->dummy_job_wa.flags);
 
     return err;
 }
@@ -259,11 +250,13 @@ static DEVICE_ATTR(dummy_job_wa_info, 0444, show_dummy_job_wa_info, NULL);
 
 static bool wa_blob_load_needed(struct kbase_device *kbdev)
 {
-    if (of_machine_is_compatible("arm,juno"))
+    if (of_machine_is_compatible("arm,juno")) {
         return false;
+    }
 
-    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_TTRX_3485))
+    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_TTRX_3485)) {
         return true;
+    }
 
     return false;
 }
@@ -282,21 +275,20 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
     int err;
     struct kbase_context *kctx;
 
-    if (!wa_blob_load_needed(kbdev))
+    if (!wa_blob_load_needed(kbdev)) {
         return 0;
+    }
 
     /* load the wa */
     err = request_firmware(&firmware, wa_name, kbdev->dev);
 
     if (err) {
         dev_err(kbdev->dev, "WA blob missing. Please refer to the Arm Mali DDK Valhall Release Notes, "
-                    "Part number DC-06002 or contact support-mali@arm.com - driver probe will be failed");
+                            "Part number DC-06002 or contact support-mali@arm.com - driver probe will be failed");
         return -ENODEV;
     }
 
-    kctx = kbase_create_context(kbdev, true,
-                    BASE_CONTEXT_CREATE_FLAG_NONE, 0,
-                    NULL);
+    kctx = kbase_create_context(kbdev, true, BASE_CONTEXT_CREATE_FLAG_NONE, 0, NULL);
 
     if (!kctx) {
         dev_err(kbdev->dev, "Failed to create WA context\n");
@@ -306,8 +298,7 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
     fw = firmware->data;
     fw_end = fw + firmware->size;
 
-    dev_dbg(kbdev->dev, "Loaded firmware of size %zu bytes\n",
-        firmware->size);
+    dev_dbg(kbdev->dev, "Loaded firmware of size %zu bytes\n", firmware->size);
 
     if (!in_range(fw, fw_end, 0, sizeof(*header))) {
         dev_err(kbdev->dev, "WA too small\n");
@@ -317,14 +308,12 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
     header = (const struct wa_header *)(fw + 0);
 
     if (header->signature != signature) {
-        dev_err(kbdev->dev, "WA signature failure: 0x%lx\n",
-            (unsigned long)header->signature);
+        dev_err(kbdev->dev, "WA signature failure: 0x%lx\n", (unsigned long)header->signature);
         goto bad_fw;
     }
 
     if (header->version != version) {
-        dev_err(kbdev->dev, "WA version 0x%lx not supported\n",
-            (unsigned long)header->version);
+        dev_err(kbdev->dev, "WA version 0x%lx not supported\n", (unsigned long)header->version);
         goto bad_fw;
     }
 
@@ -336,8 +325,7 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
     v2_info = (const struct wa_v2_info *)(fw + header->info_offset);
 
     if (v2_info->flags & ~KBASE_DUMMY_JOB_WA_FLAGS) {
-        dev_err(kbdev->dev, "Unsupported WA flag(s): 0x%llx\n",
-            (unsigned long long)v2_info->flags);
+        dev_err(kbdev->dev, "Unsupported WA flag(s): 0x%llx\n", (unsigned long long)v2_info->flags);
         goto bad_fw;
     }
 
@@ -355,8 +343,7 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
         struct kbase_va_region *va_region;
 
         if (!in_range(fw, fw_end, blob_offset, sizeof(*blob))) {
-            dev_err(kbdev->dev, "Blob offset out-of-range: 0x%lx\n",
-                (unsigned long)blob_offset);
+            dev_err(kbdev->dev, "Blob offset out-of-range: 0x%lx\n", (unsigned long)blob_offset);
             goto bad_fw;
         }
 
@@ -374,31 +361,26 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
         nr_pages = PFN_UP(blob->size);
         flags = blob->map_flags | BASE_MEM_FLAG_MAP_FIXED;
 
-        va_region = kbase_mem_alloc(kctx, nr_pages, nr_pages,
-                        0, &flags, &gpu_va);
+        va_region = kbase_mem_alloc(kctx, nr_pages, nr_pages, 0, &flags, &gpu_va);
 
         if (!va_region) {
             dev_err(kbdev->dev, "Failed to allocate for blob\n");
         } else {
-            struct kbase_vmap_struct vmap = { 0 };
+            struct kbase_vmap_struct vmap = {0};
             const u8 *payload;
             void *dst;
 
             /* copy the payload,  */
             payload = fw + blob->payload_offset;
 
-            dst = kbase_vmap(kctx,
-                     va_region->start_pfn << PAGE_SHIFT,
-                     nr_pages << PAGE_SHIFT, &vmap);
+            dst = kbase_vmap(kctx, va_region->start_pfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT, &vmap);
 
             if (dst) {
                 memcpy(dst, payload, blob->size);
                 kbase_vunmap(kctx, &vmap);
             } else {
-                dev_err(kbdev->dev,
-                    "Failed to copy payload\n");
+                dev_err(kbdev->dev, "Failed to copy payload\n");
             }
-
         }
         blob_offset = blob->blob_offset; /* follow chain */
     }
@@ -409,10 +391,10 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
 
     kbdev->dummy_job_wa.ctx = kctx;
 
-    err = sysfs_create_file(&kbdev->dev->kobj,
-                &dev_attr_dummy_job_wa_info.attr);
-    if (err)
+    err = sysfs_create_file(&kbdev->dev->kobj, &dev_attr_dummy_job_wa_info.attr);
+    if (err) {
         dev_err(kbdev->dev, "SysFS file creation for dummy job wa failed\n");
+    }
 
     return 0;
 

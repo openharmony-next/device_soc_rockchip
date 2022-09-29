@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -13,8 +14,8 @@
  * Defines types of the OS abstraction layer for the kernel device driver (OSK)
  */
 
-#ifndef __MALI_OSK_TYPES_H__
-#define __MALI_OSK_TYPES_H__
+#ifndef H__MALI_OSK_TYPES_H__
+#define H__MALI_OSK_TYPES_H__
 #include <linux/types.h>
 
 #ifdef __cplusplus
@@ -36,20 +37,8 @@ extern "C" {
 /** @defgroup _mali_osk_miscellaneous OSK Miscellaneous functions, constants and types
  * @{ */
 
-/* Define integer types used by OSK. Note: these currently clash with Linux so we only define them if not defined already */
-#ifndef __KERNEL__
-typedef unsigned char      u8;
-typedef signed char        s8;
-typedef unsigned short     u16;
-typedef signed short       s16;
-typedef unsigned int       u32;
-typedef signed int         s32;
-typedef unsigned long long u64;
-#define BITS_PER_LONG (sizeof(long)*8)
-#endif
-
 /** @brief Mali Boolean type which uses MALI_TRUE and MALI_FALSE
-  */
+ */
 typedef unsigned long mali_bool;
 
 #ifndef MALI_TRUE
@@ -60,8 +49,7 @@ typedef unsigned long mali_bool;
 #define MALI_FALSE ((mali_bool)0)
 #endif
 
-#define MALI_HW_CORE_NO_COUNTER     ((u32)-1)
-
+#define MALI_HW_CORE_NO_COUNTER ((u32)-1)
 
 #define MALI_S32_MAX 0x7fffffff
 
@@ -79,16 +67,18 @@ typedef unsigned long mali_bool;
  * mali_osk_errcode_t codes to native OS error codes.
  */
 typedef enum {
-    MALI_OSK_ERR_OK = 0, /**< Success. */
+    MALI_OSK_ERR_OK = 0,     /**< Success. */
     MALI_OSK_ERR_FAULT = -1, /**< General non-success */
-    MALI_OSK_ERR_INVALID_FUNC = -2, /**< Invalid function requested through User/Kernel interface (e.g. bad IOCTL number) */
+    MALI_OSK_ERR_INVALID_FUNC =
+        -2, /**< Invalid function requested through User/Kernel interface (e.g. bad IOCTL number) */
     MALI_OSK_ERR_INVALID_ARGS = -3, /**< Invalid arguments passed through User/Kernel interface */
-    MALI_OSK_ERR_NOMEM = -4, /**< Insufficient memory */
-    MALI_OSK_ERR_TIMEOUT = -5, /**< Timeout occurred */
-    MALI_OSK_ERR_RESTARTSYSCALL = -6, /**< Special: On certain OSs, must report when an interruptable mutex is interrupted. Ignore otherwise. */
+    MALI_OSK_ERR_NOMEM = -4,        /**< Insufficient memory */
+    MALI_OSK_ERR_TIMEOUT = -5,      /**< Timeout occurred */
+    MALI_OSK_ERR_RESTARTSYSCALL =
+        -6, /**< Special: On certain OSs, must report when an interruptable mutex is interrupted. Ignore otherwise. */
     MALI_OSK_ERR_ITEM_NOT_FOUND = -7, /**< Table Lookup failed */
-    _MALI_OSK_ERR_BUSY = -8, /**< Device/operation is busy. Try again later */
-    _MALI_OSK_ERR_UNSUPPORTED = -9, /**< Optional part of the interface used, and is unsupported */
+    _MALI_OSK_ERR_BUSY = -8,          /**< Device/operation is busy. Try again later */
+    _MALI_OSK_ERR_UNSUPPORTED = -9,   /**< Optional part of the interface used, and is unsupported */
 } mali_osk_errcode_t;
 
 /** @} */ /* end group _mali_osk_miscellaneous */
@@ -157,9 +147,7 @@ typedef mali_osk_errcode_t (*_mali_osk_irq_ack_t)(void *arg);
  */
 typedef mali_osk_errcode_t (*_mali_osk_irq_uhandler_t)(void *arg);
 
-
 /** @} */ /* end group _mali_osk_irq */
-
 
 /** @defgroup _mali_osk_atomic OSK Atomic counters
  * @{ */
@@ -181,10 +169,8 @@ typedef struct {
 } _mali_osk_atomic_t;
 /** @} */ /* end group _mali_osk_atomic */
 
-
 /** @defgroup _mali_osk_lock OSK Mutual Exclusion Locks
  * @{ */
-
 
 /** @brief OSK Mutual Exclusion Lock ordered list
  *
@@ -226,14 +212,13 @@ typedef enum {
     _MALI_OSK_LOCK_ORDER_LAST,
 } _mali_osk_lock_order_t;
 
-
 /** @brief OSK Mutual Exclusion Lock flags type
  *
  * - Any lock can use the order parameter.
  */
 typedef enum {
-    _MALI_OSK_LOCKFLAG_UNORDERED        = 0x1, /**< Indicate that the order of this lock should not be checked */
-    _MALI_OSK_LOCKFLAG_ORDERED          = 0x2,
+    _MALI_OSK_LOCKFLAG_UNORDERED = 0x1, /**< Indicate that the order of this lock should not be checked */
+    _MALI_OSK_LOCKFLAG_ORDERED = 0x2,
     /** @enum _mali_osk_lock_flags_t
      *
      * Flags from 0x10000--0x80000000 are RESERVED for User-mode */
@@ -256,9 +241,10 @@ typedef enum {
  *
  */
 typedef enum {
-    _MALI_OSK_LOCKMODE_UNDEF = -1,  /**< Undefined lock mode. For internal use only */
-    _MALI_OSK_LOCKMODE_RW    = 0x0, /**< Read-write mode, default. All readers and writers are mutually-exclusive */
-    _MALI_OSK_LOCKMODE_RO,          /**< Read-only mode, to support multiple concurrent readers, but mutual exclusion in the presence of writers. */
+    _MALI_OSK_LOCKMODE_UNDEF = -1, /**< Undefined lock mode. For internal use only */
+    _MALI_OSK_LOCKMODE_RW = 0x0,   /**< Read-write mode, default. All readers and writers are mutually-exclusive */
+    _MALI_OSK_LOCKMODE_RO, /**< Read-only mode, to support multiple concurrent readers, but mutual exclusion in the
+                              presence of writers. */
     /** @enum _mali_osk_lock_mode_t
      *
      * Lock modes 0x40--0x7F are RESERVED for User-mode */
@@ -309,11 +295,11 @@ typedef struct _mali_io_address *mali_io_address;
  */
 
 /** CPU Page Order, as log to base 2 of the Page size. @see _MALI_OSK_CPU_PAGE_SIZE */
-#define _MALI_OSK_CPU_PAGE_ORDER ((u32)12)
+#define MALI_OSK_CPU_PAGE_ORDER ((u32)12)
 /** CPU Page Size, in bytes.               */
-#define _MALI_OSK_CPU_PAGE_SIZE (((u32)1) << (_MALI_OSK_CPU_PAGE_ORDER))
+#define MALI_OSK_CPU_PAGE_SIZE (((u32)1) << (MALI_OSK_CPU_PAGE_ORDER))
 /** CPU Page Mask, which masks off the offset within a page */
-#define _MALI_OSK_CPU_PAGE_MASK (~((((u32)1) << (_MALI_OSK_CPU_PAGE_ORDER)) - ((u32)1)))
+#define MALI_OSK_CPU_PAGE_MASK (~((((u32)1) << (MALI_OSK_CPU_PAGE_ORDER)) - ((u32)1)))
 /** @} */ /* end of group _MALI_OSK_CPU_PAGE */
 
 /** @defgroup _MALI_OSK_MALI_PAGE Mali Physical Page size macros
@@ -336,11 +322,11 @@ typedef struct _mali_io_address *mali_io_address;
  */
 
 /** Mali Page Order, as log to base 2 of the Page size. @see MALI_OSK_MALI_PAGE_SIZE */
-#define _MALI_OSK_MALI_PAGE_ORDER PAGE_SHIFT
+#define MALI_OSK_MALI_PAGE_ORDER PAGE_SHIFT
 /** Mali Page Size, in bytes.               */
 #define MALI_OSK_MALI_PAGE_SIZE PAGE_SIZE
 /** Mali Page Mask, which masks off the offset within a page */
-#define _MALI_OSK_MALI_PAGE_MASK PAGE_MASK
+#define MALI_OSK_MALI_PAGE_MASK PAGE_MASK
 /** @} */ /* end of group _MALI_OSK_MALI_PAGE*/
 
 /** @brief flags for mapping a user-accessible memory range
@@ -366,13 +352,12 @@ typedef struct _mali_osk_notification_queue_t_struct _mali_osk_notification_queu
 
 /** @brief Public notification data object type */
 typedef struct _mali_osk_notification_t_struct {
-    u32 notification_type;   /**< The notification type */
+    u32 notification_type;  /**< The notification type */
     u32 result_buffer_size; /**< Size of the result buffer to copy to user space */
     void *result_buffer;    /**< Buffer containing any type specific data */
 } _mali_osk_notification_t;
 
 /** @} */ /* end group _mali_osk_notification */
-
 
 /** @defgroup _mali_osk_timer OSK Timer Callbacks
  * @{ */
@@ -398,7 +383,6 @@ typedef void (*_mali_osk_timer_callback_t)(void *arg);
 /** @brief Private type for Timer Callback Objects */
 typedef struct _mali_osk_timer_t_struct _mali_osk_timer_t;
 /** @} */ /* end group _mali_osk_timer */
-
 
 /** @addtogroup _mali_osk_list OSK Doubly-Linked Circular Lists
  * @{ */
@@ -429,10 +413,10 @@ typedef struct _mali_osk_list_s {
  * Platform independent representation of a Mali HW resource
  */
 typedef struct _mali_osk_resource {
-    const char *description;        /**< short description of the resource */
-    uintptr_t base;                 /**< Physical base address of the resource, as seen by Mali resources. */
-    const char *irq_name;           /**< Name of irq belong to this resource */
-    u32 irq;                        /**< IRQ number delivered to the CPU, or -1 to tell the driver to probe for it (if possible) */
+    const char *description; /**< short description of the resource */
+    uintptr_t base;          /**< Physical base address of the resource, as seen by Mali resources. */
+    const char *irq_name;    /**< Name of irq belong to this resource */
+    u32 irq; /**< IRQ number delivered to the CPU, or -1 to tell the driver to probe for it (if possible) */
 } _mali_osk_resource_t;
 /** @} */ /* end group _mali_osk_miscellaneous */
 
@@ -447,20 +431,19 @@ typedef struct _mali_osk_wait_queue_t_struct _mali_osk_wait_queue_t;
 /** @} */ /* end group uddapi */
 
 /** @brief Mali print ctx type which uses seq_file
-  */
+ */
 typedef struct seq_file _mali_osk_print_ctx;
 
-#define _MALI_OSK_BITMAP_INVALIDATE_INDEX -1
+#define MALI_OSK_BITMAP_INVALIDATE_INDEX -1
 
 typedef struct _mali_osk_bitmap {
-    u32         reserve;
-    u32         last;
-    u32         max;
-    u32         avail;
-    _mali_osk_spinlock_t   *lock;
-    unsigned long          *table;
+    u32 reserve;
+    u32 last;
+    u32 max;
+    u32 avail;
+    _mali_osk_spinlock_t *lock;
+    unsigned long *table;
 } _mali_osk_bitmap_t;
-
 
 #ifdef __cplusplus
 }

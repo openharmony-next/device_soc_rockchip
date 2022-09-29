@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /*
  * Register-based HW access backend specific job scheduler APIs
  */

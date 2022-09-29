@@ -14,9 +14,9 @@
 
 char *storage_material =
 #ifdef CONFIG_DEF_BLACKBOX_STORAGE
-        CONFIG_DEF_BLACKBOX_STORAGE;
+    CONFIG_DEF_BLACKBOX_STORAGE;
 #else
-        NULL;
+    NULL;
 #endif
 const struct reboot_crashlog_storage *storage_lastword __ro_after_init;
 
@@ -31,8 +31,9 @@ static int get_log_by_memory(void *in, unsigned int inlen)
 
 static int storage_log_by_memory(void *out, unsigned int outlen)
 {
-    if (unlikely(!out))
+    if (unlikely(!out)) {
         return -EINVAL;
+    }
 
     /* Initialized from caller. */
     lastlog = out;
@@ -41,13 +42,13 @@ static int storage_log_by_memory(void *out, unsigned int outlen)
 }
 
 /* Called after storage_log_by_memory successfully. */
-static void do_kmsg_dump(struct kmsg_dumper *dumper,
-                enum kmsg_dump_reason reason)
+static void do_kmsg_dump(struct kmsg_dumper *dumper, enum kmsg_dump_reason reason)
 {
     struct fault_log_info *pinfo;
 
-    if (unlikely(!lastlog))
+    if (unlikely(!lastlog)) {
         return;
+    }
 
     /* get kernel log from kmsg dump module */
     if (down_trylock(&kmsg_sem) != 0) {
@@ -55,18 +56,17 @@ static void do_kmsg_dump(struct kmsg_dumper *dumper,
         return;
     }
     pinfo = (struct fault_log_info *)lastlog;
-    (void)kmsg_dump_get_buffer(dumper, true, lastlog + sizeof(*pinfo),
-            lastlog_len - sizeof(*pinfo), (size_t *)&pinfo->len);
+    (void)kmsg_dump_get_buffer(dumper, true, lastlog + sizeof(*pinfo), lastlog_len - sizeof(*pinfo),
+                               (size_t *)&pinfo->len);
     up(&kmsg_sem);
 }
 #endif
 
-#if defined(CONFIG_DEF_BLACKBOX_STORAGE_BY_PSTORE_BLK) ||  \
-    defined(CONFIG_DEF_BLACKBOX_STORAGE_BY_PSTORE_RAM)
-#define LOG_FILE_WAIT_TIME               1000 /* unit: ms */
-#define RETRY_MAX_COUNT                  10
-#define PSTORE_MOUNT_POINT               "/sys/fs/pstore/"
-#define FILE_LIMIT                       (0660)
+#if defined(CONFIG_DEF_BLACKBOX_STORAGE_BY_PSTORE_BLK) || defined(CONFIG_DEF_BLACKBOX_STORAGE_BY_PSTORE_RAM)
+#define LOG_FILE_WAIT_TIME 1000 /* unit: ms */
+#define RETRY_MAX_COUNT 10
+#define PSTORE_MOUNT_POINT "/sys/fs/pstore/"
+#define FILE_LIMIT (0660)
 
 static bool is_pstore_part_ready(char *pstore_file)
 {
@@ -77,8 +77,9 @@ static bool is_pstore_part_ready(char *pstore_file)
     char *full_path = NULL;
     bool is_ready = false;
 
-    if (unlikely(!pstore_file))
+    if (unlikely(!pstore_file)) {
         return -EINVAL;
+    }
     memset(pstore_file, 0, sizeof(*pstore_file));
 
     filp = file_open(PSTORE_MOUNT_POINT, O_RDONLY, 0);
@@ -88,26 +89,29 @@ static bool is_pstore_part_ready(char *pstore_file)
     }
 
     full_path = vmalloc(PATH_MAX_LEN);
-    if (!full_path)
+    if (!full_path) {
         goto __out;
+    }
 
     root_dentry = filp->f_path.dentry;
-    list_for_each_entry(cur_dentry, &root_dentry->d_subdirs, d_child) {
+    list_for_each_entry(cur_dentry, &root_dentry->d_subdirs, d_child)
+    {
         cur_name = cur_dentry->d_name.name;
 
         memset(full_path, 0, PATH_MAX_LEN);
         snprintf(full_path, PATH_MAX_LEN - 1, "%s%s", PSTORE_MOUNT_POINT, cur_name);
 
-        if (S_ISREG(d_inode(cur_dentry)->i_mode) && !strncmp(cur_name, "blackbox",
-                                     strlen("blackbox"))) {
+        if (S_ISREG(d_inode(cur_dentry)->i_mode) && !strncmp(cur_name, "blackbox", strlen("blackbox"))) {
             is_ready = true;
-            if (strcmp(full_path, pstore_file) > 0)
+            if (strcmp(full_path, pstore_file) > 0) {
                 strncpy(pstore_file, full_path, strlen(full_path));
+            }
         }
     }
 
-    if (is_ready && strlen(pstore_file))
+    if (is_ready && strlen(pstore_file)) {
         bbox_print_info("get pstore file name %s successfully!\n", pstore_file);
+    }
 
 __out:
     file_close(filp);
@@ -131,15 +135,15 @@ static int get_log_by_pstore(void *in, unsigned int inlen)
     while (!is_pstore_part_ready((char *)&pstore_file)) {
         msleep(LOG_FILE_WAIT_TIME);
         retry++;
-        if (retry >= RETRY_MAX_COUNT)
+        if (retry >= RETRY_MAX_COUNT) {
             return -ENOENT;
+        }
     }
 
     if (likely(in)) {
         filp = file_open(pstore_file, O_RDONLY, FILE_LIMIT);
         if (IS_ERR(filp)) {
-            bbox_print_err("open %s failed! err is [%ld]\n", pstore_file,
-                       PTR_ERR(filp));
+            bbox_print_err("open %s failed! err is [%ld]\n", pstore_file, PTR_ERR(filp));
             return -EBADF;
         }
         memset(in, 0, inlen);
@@ -151,8 +155,7 @@ static int get_log_by_pstore(void *in, unsigned int inlen)
         ret = vfs_read(filp, pbuf, inlen, &pos);
         if (ret < 0) {
             pathname = getfullpath(filp);
-            bbox_print_err("read %s failed! err is [%d]\n", pathname ? pathname : "",
-                       ret);
+            bbox_print_err("read %s failed! err is [%d]\n", pathname ? pathname : "", ret);
             goto __error;
         }
 
@@ -198,6 +201,4 @@ const struct reboot_crashlog_storage storage_lastwords[] = {
         .material = "raw_partition",
     },
 #endif
-    { }
-};
-
+    {}};

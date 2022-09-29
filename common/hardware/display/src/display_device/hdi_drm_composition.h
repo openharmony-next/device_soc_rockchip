@@ -24,52 +24,61 @@
 #include "hdi_device_common.h"
 #include "hdi_drm_layer.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class AtomicReqPtr {
-public:
-    explicit AtomicReqPtr(drmModeAtomicReqPtr ptr) : mPtr(ptr) {}
-    virtual ~AtomicReqPtr()
+namespace OHOS
+{
+    namespace HDI
     {
-        if (mPtr != nullptr)
-            drmModeAtomicFree(mPtr);
-    }
-    drmModeAtomicReqPtr Get() const
-    {
-        return mPtr;
-    }
+        namespace DISPLAY
+        {
+            class AtomicReqPtr
+            {
+            public:
+                explicit AtomicReqPtr(drmModeAtomicReqPtr ptr) : mPtr(ptr)
+                {
+                }
+                virtual ~AtomicReqPtr()
+                {
+                    if (mPtr != nullptr) {
+                        drmModeAtomicFree(mPtr);
+                    }
+                }
+                drmModeAtomicReqPtr Get() const
+                {
+                    return mPtr;
+                }
 
-private:
-    drmModeAtomicReqPtr mPtr;
-};
+            private:
+                drmModeAtomicReqPtr mPtr;
+            };
 
-class HdiDrmComposition : public HdiComposition {
-public:
-    HdiDrmComposition(const std::shared_ptr<DrmConnector> &connector,
-                                      const std::shared_ptr<DrmCrtc> &crtc,
-                                      const std::shared_ptr<DrmDevice> &drmDevice);
-    ~HdiDrmComposition() override {}
-    int32_t Init() override;
-    int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer) override;
-    int32_t Apply(bool modeSet) override;
-    int32_t UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock);
+            class HdiDrmComposition : public HdiComposition
+            {
+            public:
+                HdiDrmComposition(const std::shared_ptr<DrmConnector> &connector, const std::shared_ptr<DrmCrtc> &crtc,
+                                  const std::shared_ptr<DrmDevice> &drmDevice);
+                ~HdiDrmComposition() override
+                {
+                }
+                int32_t Init() override;
+                int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer) override;
+                int32_t Apply(bool modeSet) override;
+                int32_t UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock);
 
-private:
-    int32_t ApplyPlane(HdiDrmLayer &layer, HdiLayer &hlayer, DrmPlane &drmPlane, drmModeAtomicReqPtr pset);
-    int32_t SetSrcProperty(DrmPlane &drmPlane, drmModeAtomicReqPtr pset, int32_t bufferW, int32_t bufferH);
-    int32_t SetCrtcProperty(DrmPlane &drmPlane, drmModeAtomicReqPtr pset, int32_t bufferW, int32_t bufferH);
-    int32_t RemoveUnusePlane(drmModeAtomicReqPtr pset);
-    int32_t FindPlaneAndApply(drmModeAtomicReqPtr pset);
-    std::shared_ptr<DrmDevice> mDrmDevice;
-    std::shared_ptr<DrmConnector> mConnector;
-    std::shared_ptr<DrmCrtc> mCrtc;
-    std::vector<std::shared_ptr<DrmPlane>> mPrimPlanes;
-    std::vector<std::shared_ptr<DrmPlane>> mOverlayPlanes;
-    std::vector<std::shared_ptr<DrmPlane>> mPlanes;
-};
-} // OHOS
-} // HDI
+            private:
+                int32_t ApplyPlane(HdiDrmLayer &layer, HdiLayer &hlayer, DrmPlane &drmPlane, drmModeAtomicReqPtr pset);
+                int32_t SetSrcProperty(DrmPlane &drmPlane, drmModeAtomicReqPtr pset, int32_t bufferW, int32_t bufferH);
+                int32_t SetCrtcProperty(DrmPlane &drmPlane, drmModeAtomicReqPtr pset, int32_t bufferW, int32_t bufferH);
+                int32_t RemoveUnusePlane(drmModeAtomicReqPtr pset);
+                int32_t FindPlaneAndApply(drmModeAtomicReqPtr pset);
+                std::shared_ptr<DrmDevice> mDrmDevice;
+                std::shared_ptr<DrmConnector> mConnector;
+                std::shared_ptr<DrmCrtc> mCrtc;
+                std::vector<std::shared_ptr<DrmPlane>> mPrimPlanes;
+                std::vector<std::shared_ptr<DrmPlane>> mOverlayPlanes;
+                std::vector<std::shared_ptr<DrmPlane>> mPlanes;
+            };
+        } // OHOS
+    }     // HDI
 } // DISPLAY
 
 #endif // HDI_DRM_COMPOSITION_H

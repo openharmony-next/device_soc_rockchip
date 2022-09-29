@@ -11,131 +11,131 @@
 #include <linux/v4l2-controls.h>
 #include <linux/rkisp21-config.h>
 
-#define ISP3X_MODULE_DPCC        ISP2X_MODULE_DPCC
-#define ISP3X_MODULE_BLS        ISP2X_MODULE_BLS
-#define ISP3X_MODULE_SDG        ISP2X_MODULE_SDG
-#define ISP3X_MODULE_LSC        ISP2X_MODULE_LSC
-#define ISP3X_MODULE_AWB_GAIN        ISP2X_MODULE_AWB_GAIN
-#define ISP3X_MODULE_BDM        ISP2X_MODULE_BDM
-#define ISP3X_MODULE_CCM        ISP2X_MODULE_CCM
-#define ISP3X_MODULE_GOC        ISP2X_MODULE_GOC
-#define ISP3X_MODULE_CPROC        ISP2X_MODULE_CPROC
-#define ISP3X_MODULE_IE            ISP2X_MODULE_IE
-#define ISP3X_MODULE_RAWAF        ISP2X_MODULE_RAWAF
-#define ISP3X_MODULE_RAWAE0        ISP2X_MODULE_RAWAE0
-#define ISP3X_MODULE_RAWAE1        ISP2X_MODULE_RAWAE1
-#define ISP3X_MODULE_RAWAE2        ISP2X_MODULE_RAWAE2
-#define ISP3X_MODULE_RAWAE3        ISP2X_MODULE_RAWAE3
-#define ISP3X_MODULE_RAWAWB        ISP2X_MODULE_RAWAWB
-#define ISP3X_MODULE_RAWHIST0        ISP2X_MODULE_RAWHIST0
-#define ISP3X_MODULE_RAWHIST1        ISP2X_MODULE_RAWHIST1
-#define ISP3X_MODULE_RAWHIST2        ISP2X_MODULE_RAWHIST2
-#define ISP3X_MODULE_RAWHIST3        ISP2X_MODULE_RAWHIST3
-#define ISP3X_MODULE_HDRMGE        ISP2X_MODULE_HDRMGE
-#define ISP3X_MODULE_RAWNR        ISP2X_MODULE_RAWNR
-#define ISP3X_MODULE_GIC        ISP2X_MODULE_GIC
-#define ISP3X_MODULE_DHAZ        ISP2X_MODULE_DHAZ
-#define ISP3X_MODULE_3DLUT        ISP2X_MODULE_3DLUT
-#define ISP3X_MODULE_LDCH        ISP2X_MODULE_LDCH
-#define ISP3X_MODULE_GAIN        ISP2X_MODULE_GAIN
-#define ISP3X_MODULE_DEBAYER        ISP2X_MODULE_DEBAYER
-#define ISP3X_MODULE_BAYNR        ISP2X_MODULE_BAYNR
-#define ISP3X_MODULE_BAY3D        ISP2X_MODULE_BAY3D
-#define ISP3X_MODULE_YNR        ISP2X_MODULE_YNR
-#define ISP3X_MODULE_CNR        ISP2X_MODULE_CNR
-#define ISP3X_MODULE_SHARP        ISP2X_MODULE_SHARP
-#define ISP3X_MODULE_DRC        ISP2X_MODULE_DRC
-#define ISP3X_MODULE_CAC        BIT_ULL(42)
-#define ISP3X_MODULE_CSM        ISP2X_MODULE_CSM
+#define ISP3X_MODULE_DPCC ISP2X_MODULE_DPCC
+#define ISP3X_MODULE_BLS ISP2X_MODULE_BLS
+#define ISP3X_MODULE_SDG ISP2X_MODULE_SDG
+#define ISP3X_MODULE_LSC ISP2X_MODULE_LSC
+#define ISP3X_MODULE_AWB_GAIN ISP2X_MODULE_AWB_GAIN
+#define ISP3X_MODULE_BDM ISP2X_MODULE_BDM
+#define ISP3X_MODULE_CCM ISP2X_MODULE_CCM
+#define ISP3X_MODULE_GOC ISP2X_MODULE_GOC
+#define ISP3X_MODULE_CPROC ISP2X_MODULE_CPROC
+#define ISP3X_MODULE_IE ISP2X_MODULE_IE
+#define ISP3X_MODULE_RAWAF ISP2X_MODULE_RAWAF
+#define ISP3X_MODULE_RAWAE0 ISP2X_MODULE_RAWAE0
+#define ISP3X_MODULE_RAWAE1 ISP2X_MODULE_RAWAE1
+#define ISP3X_MODULE_RAWAE2 ISP2X_MODULE_RAWAE2
+#define ISP3X_MODULE_RAWAE3 ISP2X_MODULE_RAWAE3
+#define ISP3X_MODULE_RAWAWB ISP2X_MODULE_RAWAWB
+#define ISP3X_MODULE_RAWHIST0 ISP2X_MODULE_RAWHIST0
+#define ISP3X_MODULE_RAWHIST1 ISP2X_MODULE_RAWHIST1
+#define ISP3X_MODULE_RAWHIST2 ISP2X_MODULE_RAWHIST2
+#define ISP3X_MODULE_RAWHIST3 ISP2X_MODULE_RAWHIST3
+#define ISP3X_MODULE_HDRMGE ISP2X_MODULE_HDRMGE
+#define ISP3X_MODULE_RAWNR ISP2X_MODULE_RAWNR
+#define ISP3X_MODULE_GIC ISP2X_MODULE_GIC
+#define ISP3X_MODULE_DHAZ ISP2X_MODULE_DHAZ
+#define ISP3X_MODULE_3DLUT ISP2X_MODULE_3DLUT
+#define ISP3X_MODULE_LDCH ISP2X_MODULE_LDCH
+#define ISP3X_MODULE_GAIN ISP2X_MODULE_GAIN
+#define ISP3X_MODULE_DEBAYER ISP2X_MODULE_DEBAYER
+#define ISP3X_MODULE_BAYNR ISP2X_MODULE_BAYNR
+#define ISP3X_MODULE_BAY3D ISP2X_MODULE_BAY3D
+#define ISP3X_MODULE_YNR ISP2X_MODULE_YNR
+#define ISP3X_MODULE_CNR ISP2X_MODULE_CNR
+#define ISP3X_MODULE_SHARP ISP2X_MODULE_SHARP
+#define ISP3X_MODULE_DRC ISP2X_MODULE_DRC
+#define ISP3X_MODULE_CAC BIT_ULL(42)
+#define ISP3X_MODULE_CSM ISP2X_MODULE_CSM
 
 /* Measurement types */
-#define ISP3X_STAT_RAWAWB        ISP2X_STAT_RAWAWB
-#define ISP3X_STAT_RAWAF        ISP2X_STAT_RAWAF
-#define ISP3X_STAT_RAWAE0        ISP2X_STAT_RAWAE0
-#define ISP3X_STAT_RAWAE1        ISP2X_STAT_RAWAE1
-#define ISP3X_STAT_RAWAE2        ISP2X_STAT_RAWAE2
-#define ISP3X_STAT_RAWAE3        ISP2X_STAT_RAWAE3
-#define ISP3X_STAT_RAWHST0        ISP2X_STAT_RAWHST0
-#define ISP3X_STAT_RAWHST1        ISP2X_STAT_RAWHST1
-#define ISP3X_STAT_RAWHST2        ISP2X_STAT_RAWHST2
-#define ISP3X_STAT_RAWHST3        ISP2X_STAT_RAWHST3
-#define ISP3X_STAT_BLS            ISP2X_STAT_BLS
-#define ISP3X_STAT_DHAZ            ISP2X_STAT_DHAZ
+#define ISP3X_STAT_RAWAWB ISP2X_STAT_RAWAWB
+#define ISP3X_STAT_RAWAF ISP2X_STAT_RAWAF
+#define ISP3X_STAT_RAWAE0 ISP2X_STAT_RAWAE0
+#define ISP3X_STAT_RAWAE1 ISP2X_STAT_RAWAE1
+#define ISP3X_STAT_RAWAE2 ISP2X_STAT_RAWAE2
+#define ISP3X_STAT_RAWAE3 ISP2X_STAT_RAWAE3
+#define ISP3X_STAT_RAWHST0 ISP2X_STAT_RAWHST0
+#define ISP3X_STAT_RAWHST1 ISP2X_STAT_RAWHST1
+#define ISP3X_STAT_RAWHST2 ISP2X_STAT_RAWHST2
+#define ISP3X_STAT_RAWHST3 ISP2X_STAT_RAWHST3
+#define ISP3X_STAT_BLS ISP2X_STAT_BLS
+#define ISP3X_STAT_DHAZ ISP2X_STAT_DHAZ
 
-#define ISP3X_MESH_BUF_NUM        ISP2X_MESH_BUF_NUM
+#define ISP3X_MESH_BUF_NUM ISP2X_MESH_BUF_NUM
 
-#define ISP3X_LSC_GRAD_TBL_SIZE        16
-#define ISP3X_LSC_SIZE_TBL_SIZE        16
-#define ISP3X_LSC_DATA_TBL_SIZE        ISP2X_LSC_DATA_TBL_SIZE
+#define ISP3X_LSC_GRAD_TBL_SIZE 16
+#define ISP3X_LSC_SIZE_TBL_SIZE 16
+#define ISP3X_LSC_DATA_TBL_SIZE ISP2X_LSC_DATA_TBL_SIZE
 
-#define ISP3X_DEGAMMA_CURVE_SIZE    ISP2X_DEGAMMA_CURVE_SIZE
+#define ISP3X_DEGAMMA_CURVE_SIZE ISP2X_DEGAMMA_CURVE_SIZE
 
-#define ISP3X_GAIN_IDX_NUM        ISP2X_GAIN_IDX_NUM
-#define ISP3X_GAIN_LUT_NUM        ISP2X_GAIN_LUT_NUM
+#define ISP3X_GAIN_IDX_NUM ISP2X_GAIN_IDX_NUM
+#define ISP3X_GAIN_LUT_NUM ISP2X_GAIN_LUT_NUM
 
-#define ISP3X_RAWAWB_MULWD_NUM        4
-#define ISP3X_RAWAWB_EXCL_STAT_NUM    4
-#define ISP3X_RAWAWB_HSTBIN_NUM        ISP21_RAWAWB_HSTBIN_NUM
-#define ISP3X_RAWAWB_WEIGHT_NUM        ISP21_RAWAWB_WEIGHT_NUM
-#define ISP3X_RAWAWB_SUM_NUM        ISP2X_RAWAWB_SUM_NUM
-#define ISP3X_RAWAWB_RAMDATA_NUM    ISP2X_RAWAWB_RAMDATA_NUM
+#define ISP3X_RAWAWB_MULWD_NUM 4
+#define ISP3X_RAWAWB_EXCL_STAT_NUM 4
+#define ISP3X_RAWAWB_HSTBIN_NUM ISP21_RAWAWB_HSTBIN_NUM
+#define ISP3X_RAWAWB_WEIGHT_NUM ISP21_RAWAWB_WEIGHT_NUM
+#define ISP3X_RAWAWB_SUM_NUM ISP2X_RAWAWB_SUM_NUM
+#define ISP3X_RAWAWB_RAMDATA_NUM ISP2X_RAWAWB_RAMDATA_NUM
 
-#define    ISP3X_RAWAEBIG_SUBWIN_NUM    ISP2X_RAWAEBIG_SUBWIN_NUM
-#define ISP3X_RAWAEBIG_MEAN_NUM        ISP2X_RAWAEBIG_MEAN_NUM
-#define ISP3X_RAWAELITE_MEAN_NUM    ISP2X_RAWAELITE_MEAN_NUM
+#define ISP3X_RAWAEBIG_SUBWIN_NUM ISP2X_RAWAEBIG_SUBWIN_NUM
+#define ISP3X_RAWAEBIG_MEAN_NUM ISP2X_RAWAEBIG_MEAN_NUM
+#define ISP3X_RAWAELITE_MEAN_NUM ISP2X_RAWAELITE_MEAN_NUM
 
-#define ISP3X_RAWHISTBIG_SUBWIN_NUM    ISP2X_RAWHISTBIG_SUBWIN_NUM
-#define ISP3X_RAWHISTLITE_SUBWIN_NUM    ISP2X_RAWHISTLITE_SUBWIN_NUM
-#define ISP3X_HIST_BIN_N_MAX        ISP2X_HIST_BIN_N_MAX
+#define ISP3X_RAWHISTBIG_SUBWIN_NUM ISP2X_RAWHISTBIG_SUBWIN_NUM
+#define ISP3X_RAWHISTLITE_SUBWIN_NUM ISP2X_RAWHISTLITE_SUBWIN_NUM
+#define ISP3X_HIST_BIN_N_MAX ISP2X_HIST_BIN_N_MAX
 
-#define ISP3X_RAWAF_CURVE_NUM        2
-#define ISP3X_RAWAF_HIIR_COE_NUM    6
-#define ISP3X_RAWAF_V1IIR_COE_NUM    9
-#define ISP3X_RAWAF_V2IIR_COE_NUM    3
-#define ISP3X_RAWAF_VFIR_COE_NUM    3
-#define ISP3X_RAWAF_WIN_NUM        ISP2X_RAWAF_WIN_NUM
-#define ISP3X_RAWAF_LINE_NUM        ISP2X_RAWAF_LINE_NUM
-#define ISP3X_RAWAF_GAMMA_NUM        ISP2X_RAWAF_GAMMA_NUM
-#define ISP3X_RAWAF_SUMDATA_NUM        ISP2X_RAWAF_SUMDATA_NUM
+#define ISP3X_RAWAF_CURVE_NUM 2
+#define ISP3X_RAWAF_HIIR_COE_NUM 6
+#define ISP3X_RAWAF_V1IIR_COE_NUM 9
+#define ISP3X_RAWAF_V2IIR_COE_NUM 3
+#define ISP3X_RAWAF_VFIR_COE_NUM 3
+#define ISP3X_RAWAF_WIN_NUM ISP2X_RAWAF_WIN_NUM
+#define ISP3X_RAWAF_LINE_NUM ISP2X_RAWAF_LINE_NUM
+#define ISP3X_RAWAF_GAMMA_NUM ISP2X_RAWAF_GAMMA_NUM
+#define ISP3X_RAWAF_SUMDATA_NUM ISP2X_RAWAF_SUMDATA_NUM
 
-#define ISP3X_DPCC_PDAF_POINT_NUM    ISP2X_DPCC_PDAF_POINT_NUM
+#define ISP3X_DPCC_PDAF_POINT_NUM ISP2X_DPCC_PDAF_POINT_NUM
 
-#define ISP3X_HDRMGE_L_CURVE_NUM    ISP2X_HDRMGE_L_CURVE_NUM
-#define ISP3X_HDRMGE_E_CURVE_NUM    ISP2X_HDRMGE_E_CURVE_NUM
+#define ISP3X_HDRMGE_L_CURVE_NUM ISP2X_HDRMGE_L_CURVE_NUM
+#define ISP3X_HDRMGE_E_CURVE_NUM ISP2X_HDRMGE_E_CURVE_NUM
 
-#define ISP3X_GIC_SIGMA_Y_NUM        ISP2X_GIC_SIGMA_Y_NUM
+#define ISP3X_GIC_SIGMA_Y_NUM ISP2X_GIC_SIGMA_Y_NUM
 
-#define ISP3X_CCM_CURVE_NUM        ISP2X_CCM_CURVE_NUM
+#define ISP3X_CCM_CURVE_NUM ISP2X_CCM_CURVE_NUM
 
-#define ISP3X_3DLUT_DATA_NUM        ISP2X_3DLUT_DATA_NUM
+#define ISP3X_3DLUT_DATA_NUM ISP2X_3DLUT_DATA_NUM
 
-#define ISP3X_LDCH_MESH_XY_NUM        ISP2X_LDCH_MESH_XY_NUM
+#define ISP3X_LDCH_MESH_XY_NUM ISP2X_LDCH_MESH_XY_NUM
 
-#define ISP3X_GAMMA_OUT_MAX_SAMPLES     49
+#define ISP3X_GAMMA_OUT_MAX_SAMPLES 49
 
-#define ISP3X_DHAZ_SIGMA_IDX_NUM    15
-#define ISP3X_DHAZ_SIGMA_LUT_NUM    17
-#define ISP3X_DHAZ_HIST_WR_NUM        64
-#define ISP3X_DHAZ_ENH_CURVE_NUM    ISP21_DHAZ_ENH_CURVE_NUM
-#define ISP3X_DHAZ_HIST_IIR_NUM        ISP21_DHAZ_HIST_IIR_NUM
+#define ISP3X_DHAZ_SIGMA_IDX_NUM 15
+#define ISP3X_DHAZ_SIGMA_LUT_NUM 17
+#define ISP3X_DHAZ_HIST_WR_NUM 64
+#define ISP3X_DHAZ_ENH_CURVE_NUM ISP21_DHAZ_ENH_CURVE_NUM
+#define ISP3X_DHAZ_HIST_IIR_NUM ISP21_DHAZ_HIST_IIR_NUM
 
-#define ISP3X_DRC_Y_NUM            ISP21_DRC_Y_NUM
+#define ISP3X_DRC_Y_NUM ISP21_DRC_Y_NUM
 
-#define ISP3X_CNR_SIGMA_Y_NUM        13
+#define ISP3X_CNR_SIGMA_Y_NUM 13
 
-#define ISP3X_YNR_XY_NUM        ISP21_YNR_XY_NUM
+#define ISP3X_YNR_XY_NUM ISP21_YNR_XY_NUM
 
-#define ISP3X_BAYNR_XY_NUM        ISP21_BAYNR_XY_NUM
+#define ISP3X_BAYNR_XY_NUM ISP21_BAYNR_XY_NUM
 
-#define ISP3X_BAY3D_XY_NUM        ISP21_BAY3D_XY_NUM
+#define ISP3X_BAY3D_XY_NUM ISP21_BAY3D_XY_NUM
 
-#define ISP3X_SHARP_X_NUM        ISP21_SHARP_X_NUM
-#define ISP3X_SHARP_Y_NUM        ISP21_SHARP_Y_NUM
-#define ISP3X_SHARP_GAUS_COEF_NUM    6
+#define ISP3X_SHARP_X_NUM ISP21_SHARP_X_NUM
+#define ISP3X_SHARP_Y_NUM ISP21_SHARP_Y_NUM
+#define ISP3X_SHARP_GAUS_COEF_NUM 6
 
-#define ISP3X_CAC_STRENGTH_NUM        22
+#define ISP3X_CAC_STRENGTH_NUM 22
 
-#define ISP3X_CSM_COEFF_NUM        ISP21_CSM_COEFF_NUM
+#define ISP3X_CSM_COEFF_NUM ISP21_CSM_COEFF_NUM
 
 enum isp3x_unite_id {
     ISP3_LEFT = 0,
@@ -148,7 +148,7 @@ struct isp3x_gammaout_cfg {
     u8 finalx4_dense_en;
     u16 offset;
     u16 gamma_y[ISP3X_GAMMA_OUT_MAX_SAMPLES];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_lsc_cfg {
     u8 sector_16x16;
@@ -163,7 +163,7 @@ struct isp3x_lsc_cfg {
 
     u16 x_size_tbl[ISP3X_LSC_SIZE_TBL_SIZE];
     u16 y_size_tbl[ISP3X_LSC_SIZE_TBL_SIZE];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_baynr_cfg {
     u8 lg2_mode;
@@ -193,7 +193,7 @@ struct isp3x_baynr_cfg {
     u16 lg2_off;
 
     u32 dat_max;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_bay3d_cfg {
     u8 bypass_en;
@@ -223,7 +223,7 @@ struct isp3x_bay3d_cfg {
     u16 sig1_y[ISP3X_BAY3D_XY_NUM];
     u16 sig2_x[ISP3X_BAY3D_XY_NUM];
     u16 sig2_y[ISP3X_BAY3D_XY_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_ynr_cfg {
     u8 rnr_en;
@@ -285,7 +285,7 @@ struct isp3x_ynr_cfg {
     u16 lsgm_y[ISP3X_YNR_XY_NUM];
     u16 hsgm_y[ISP3X_YNR_XY_NUM];
     u8 rnr_strength3[ISP3X_YNR_XY_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_cnr_cfg {
     u8 thumb_mix_cur_en;
@@ -325,7 +325,7 @@ struct isp3x_cnr_cfg {
     u16 lbf3_sigma;
 
     u8 sigma_y[ISP3X_CNR_SIGMA_Y_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_sharp_cfg {
     u8 bypass;
@@ -359,7 +359,7 @@ struct isp3x_sharp_cfg {
     u8 bf_coef0;
 
     u8 gaus_coef[ISP3X_SHARP_GAUS_COEF_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_dhaz_cfg {
     u8 round_en;
@@ -435,7 +435,7 @@ struct isp3x_dhaz_cfg {
     u16 adp_gratio_wr;
 
     u16 hist_wr[ISP3X_DHAZ_HIST_WR_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_dhaz_stat {
     u32 dhaz_pic_sumh;
@@ -447,7 +447,7 @@ struct isp3x_dhaz_stat {
     u16 dhaz_adp_tmax;
 
     u16 h_rgb_iir[ISP3X_DHAZ_HIST_IIR_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_drc_cfg {
     u8 bypass_en;
@@ -477,7 +477,7 @@ struct isp3x_drc_cfg {
     u16 wr_cycle;
     u16 iir_weight;
     u16 min_ogain;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_hdrmge_cfg {
     u8 s_base;
@@ -502,7 +502,7 @@ struct isp3x_hdrmge_cfg {
     u16 lm_scl;
     struct isp2x_hdrmge_curve curve;
     u16 e_y[ISP3X_HDRMGE_E_CURVE_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawawb_meas_cfg {
     u8 rawawb_sel;
@@ -874,7 +874,7 @@ struct isp3x_rawawb_meas_cfg {
     u32 sw_rawawb_islope12_6;
     u32 sw_rawawb_islope23_6;
     u32 sw_rawawb_islope30_6;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawawb_meas_stat {
     u16 ro_yhist_bin[ISP3X_RAWAWB_HSTBIN_NUM];
@@ -895,13 +895,13 @@ struct isp3x_rawawb_meas_stat {
     u32 ro_sum_b_exc[ISP3X_RAWAWB_EXCL_STAT_NUM];
     u32 ro_wp_nm_exc[ISP3X_RAWAWB_EXCL_STAT_NUM];
     struct isp2x_rawawb_ramdata ramdata[ISP3X_RAWAWB_RAMDATA_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawaf_curve {
     u8 ldg_lumth;
     u8 ldg_gain;
     u16 ldg_gslp;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawaf_meas_cfg {
     u8 rawaf_sel;
@@ -951,14 +951,14 @@ struct isp3x_rawaf_meas_cfg {
     s16 v1fir_coe[ISP3X_RAWAF_VFIR_COE_NUM];
     s16 v2fir_coe[ISP3X_RAWAF_VFIR_COE_NUM];
     u16 highlit_thresh;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawaf_ramdata {
     u32 v1;
     u32 v2;
     u32 h1;
     u32 h2;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_rawaf_stat {
     u32 int_state;
@@ -966,7 +966,7 @@ struct isp3x_rawaf_stat {
     u32 afm_lum_b;
     u32 highlit_cnt_winb;
     struct isp3x_rawaf_ramdata ramdata[ISP3X_RAWAF_SUMDATA_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_cac_cfg {
     u8 bypass_en;
@@ -983,13 +983,13 @@ struct isp3x_cac_cfg {
     u32 hsize;
     u32 vsize;
     s32 buf_fd;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_gain_cfg {
     u32 g0;
     u16 g1;
     u16 g2;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_isp_other_cfg {
     struct isp21_bls_cfg bls_cfg;
@@ -1016,7 +1016,7 @@ struct isp3x_isp_other_cfg {
     struct isp3x_cac_cfg cac_cfg;
     struct isp3x_gain_cfg gain_cfg;
     struct isp21_csm_cfg csm_cfg;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_isp_meas_cfg {
     struct isp3x_rawaf_meas_cfg rawaf;
@@ -1029,7 +1029,7 @@ struct isp3x_isp_meas_cfg {
     struct isp2x_rawhistbig_cfg rawhist1;
     struct isp2x_rawhistbig_cfg rawhist2;
     struct isp2x_rawhistbig_cfg rawhist3;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_isp_params_cfg {
     u64 module_en_update;
@@ -1039,7 +1039,7 @@ struct isp3x_isp_params_cfg {
     u32 frame_id;
     struct isp3x_isp_meas_cfg meas;
     struct isp3x_isp_other_cfg others;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp3x_stat {
     struct isp2x_rawaebig_stat rawae3;
@@ -1054,7 +1054,7 @@ struct isp3x_stat {
     struct isp3x_rawawb_meas_stat rawawb;
     struct isp3x_dhaz_stat dhaz;
     struct isp2x_bls_stat bls;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 /**
  * struct rkisp3x_isp_stat_buffer - Rockchip ISP3 Statistics Meta Data
@@ -1067,6 +1067,6 @@ struct rkisp3x_isp_stat_buffer {
     u32 meas_type;
     u32 frame_id;
     struct isp3x_stat params;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 #endif /* _UAPI_RKISP3_CONFIG_H */

@@ -15,10 +15,10 @@ struct isp_clk_info {
 };
 
 struct isp_match_data {
-    const char * const *clks;
+    const char *const *clks;
     int num_clks;
     enum rkisp_isp_ver isp_ver;
-    const struct isp_clk_info  *clk_rate_tbl;
+    const struct isp_clk_info *clk_rate_tbl;
     int num_clk_rate_tbl;
     struct isp_irqs_data *irqs;
     int num_irqs;
@@ -84,6 +84,7 @@ struct rkisp_hw_dev {
     bool is_unite;
 };
 
-int rkisp_register_irq(struct rkisp_hw_dev *dev);
+int rkisp_register_irq(struct rkisp_hw_dev *hw_dev);
+
 void rkisp_soft_reset(struct rkisp_hw_dev *dev, bool is_secure);
 #endif

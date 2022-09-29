@@ -20,13 +20,12 @@
  *
  */
 
-
 /*
  * HW access backend common APIs
  */
 
-#ifndef _KBASE_HWACCESS_BACKEND_H_
-#define _KBASE_HWACCESS_BACKEND_H_
+#ifndef KBASE_HWACCESS_BACKEND_H_
+#define KBASE_HWACCESS_BACKEND_H_
 
 /**
  * kbase_backend_devfreq_init - Perform backend devfreq related initialization.

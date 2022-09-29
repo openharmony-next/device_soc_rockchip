@@ -20,7 +20,7 @@
 #include "mpp_mem.h"
 #include "mpp_common.h"
 
-typedef void* MppMemPool;
+typedef void *MppMemPool;
 
 #ifdef __cplusplus
 extern "C" {

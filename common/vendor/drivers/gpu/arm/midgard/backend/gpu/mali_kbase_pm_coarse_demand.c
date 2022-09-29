@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * "Coarse Demand" power management policy
  */
@@ -26,18 +22,19 @@
 
 static u64 coarse_demand_get_core_mask(struct kbase_device *kbdev)
 {
-    if (kbdev->pm.active_count == 0)
+    if (kbdev->pm.active_count == 0) {
         return 0;
+    }
 
     return kbdev->gpu_props.props.raw_props.shader_present;
 }
 
 static bool coarse_demand_get_core_active(struct kbase_device *kbdev)
 {
-    if (0 == kbdev->pm.active_count && !(kbdev->shader_needed_bitmap |
-            kbdev->shader_inuse_bitmap) && !kbdev->tiler_needed_cnt
-            && !kbdev->tiler_inuse_cnt)
+    if (0 == kbdev->pm.active_count && !(kbdev->shader_needed_bitmap | kbdev->shader_inuse_bitmap) &&
+        !kbdev->tiler_needed_cnt && !kbdev->tiler_inuse_cnt) {
         return false;
+    }
 
     return true;
 }
@@ -58,13 +55,13 @@ static void coarse_demand_term(struct kbase_device *kbdev)
  * and name.
  */
 const struct kbase_pm_policy kbase_pm_coarse_demand_policy_ops = {
-    "coarse_demand",            /* name */
-    coarse_demand_init,            /* init */
-    coarse_demand_term,            /* term */
-    coarse_demand_get_core_mask,        /* get_core_mask */
-    coarse_demand_get_core_active,        /* get_core_active */
-    0u,                    /* flags */
-    KBASE_PM_POLICY_ID_COARSE_DEMAND,    /* id */
+    "coarse_demand",                  /* name */
+    coarse_demand_init,               /* init */
+    coarse_demand_term,               /* term */
+    coarse_demand_get_core_mask,      /* get_core_mask */
+    coarse_demand_get_core_active,    /* get_core_active */
+    0u,                               /* flags */
+    KBASE_PM_POLICY_ID_COARSE_DEMAND, /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_coarse_demand_policy_ops);

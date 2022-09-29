@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -11,7 +12,7 @@
 #ifndef __MALI_OSK_PROFILING_H__
 #define __MALI_OSK_PROFILING_H__
 
-#if defined(CONFIG_MALI400_PROFILING) && defined (CONFIG_TRACEPOINTS)
+#if defined(CONFIG_MALI400_PROFILING) && defined(CONFIG_TRACEPOINTS)
 
 #include "mali_linux_trace.h"
 #include "mali_profiling_events.h"
@@ -61,7 +62,7 @@ mali_osk_errcode_t _mali_osk_profiling_start(u32 *limit);
  * @param data3 Fourth data parameter, depending on event_id specified.
  * @param data4 Fifth data parameter, depending on event_id specified.
  */
-void    _mali_osk_profiling_add_event(u32 event_id, u32 data0, u32 data1, u32 data2, u32 data3, u32 data4);
+void _mali_osk_profiling_add_event(u32 event_id, u32 data0, u32 data1, u32 data2, u32 data3, u32 data4);
 
 /**
  * Report a hardware counter event.
@@ -142,5 +143,3 @@ mali_bool _mali_osk_profiling_have_recording(void);
 #endif /* defined(CONFIG_MALI400_PROFILING)  && defined(CONFIG_TRACEPOINTS) */
 
 #endif /* __MALI_OSK_PROFILING_H__ */
-
-

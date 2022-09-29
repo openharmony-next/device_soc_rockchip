@@ -36,10 +36,8 @@
  *  --------------------------------------------------------------------------------------------------------
  */
 
-
 #ifndef __PLATFORM_GRALLOC4_H__
 #define __PLATFORM_GRALLOC4_H__
-
 
 /* ---------------------------------------------------------------------------------------------------------
  *  Include Files
@@ -59,48 +57,47 @@
  * ---------------------------------------------------------------------------------------------------------
  */
 
+namespace gralloc4
+{
+    /* ---------------------------------------------------------------------------------------------------------
+     *  Types and Structures Definition
+     * ---------------------------------------------------------------------------------------------------------
+     */
 
-namespace gralloc4 {
-/* ---------------------------------------------------------------------------------------------------------
- *  Types and Structures Definition
- * ---------------------------------------------------------------------------------------------------------
- */
+    /* ---------------------------------------------------------------------------------------------------------
+     *  Global Functions' Prototype
+     * ---------------------------------------------------------------------------------------------------------
+     */
 
+    /*
+     * 获取 'handle' 引用的 graphic_buffer 的 internal_format.
+     */
+    uint64_t get_internal_format(buffer_handle_t handle);
 
-/* ---------------------------------------------------------------------------------------------------------
- *  Global Functions' Prototype
- * ---------------------------------------------------------------------------------------------------------
- */
+    int get_width(buffer_handle_t handle, uint64_t *width);
 
-/*
- * 获取 'handle' 引用的 graphic_buffer 的 internal_format.
- */
-uint64_t get_internal_format(buffer_handle_t handle);
+    int get_height(buffer_handle_t handle, uint64_t *height);
 
-int get_width(buffer_handle_t handle, uint64_t* width);
+    int get_pixel_stride(buffer_handle_t handle, int *pixel_stride);
 
-int get_height(buffer_handle_t handle, uint64_t* height);
+    int get_byte_stride(buffer_handle_t handle, int *byte_stride);
 
-int get_pixel_stride(buffer_handle_t handle, int* pixel_stride);
+    int get_format_requested(buffer_handle_t handle, int *format_requested);
 
-int get_byte_stride(buffer_handle_t handle, int* byte_stride);
+    int get_usage(buffer_handle_t handle, uint64_t *usage);
 
-int get_format_requested(buffer_handle_t handle, int* format_requested);
+    int get_allocation_size(buffer_handle_t handle, uint64_t *usage);
 
-int get_usage(buffer_handle_t handle, uint64_t* usage);
+    int get_share_fd(buffer_handle_t handle, int *share_fd);
 
-int get_allocation_size(buffer_handle_t handle, uint64_t* usage);
+    void unlock(buffer_handle_t bufferHandle);
 
-int get_share_fd(buffer_handle_t handle, int* share_fd);
+    void freeBuffer(buffer_handle_t handle);
 
-void unlock(buffer_handle_t bufferHandle);
-
-void freeBuffer(buffer_handle_t handle);
-
-/* ---------------------------------------------------------------------------------------------------------
- *  Inline Functions Implementation
- * ---------------------------------------------------------------------------------------------------------
- */
+    /* ---------------------------------------------------------------------------------------------------------
+     *  Inline Functions Implementation
+     * ---------------------------------------------------------------------------------------------------------
+     */
 }
 
 #endif /* __PLATFORM_GRALLOC4_H__ */

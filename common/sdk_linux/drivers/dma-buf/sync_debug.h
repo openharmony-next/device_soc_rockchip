@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef _LINUX_SYNC_H
-#define _LINUX_SYNC_H
+#ifndef LINUX_SYNC_H
+#define LINUX_SYNC_H
 
 #include <linux/list.h>
 #include <linux/rbtree.h>
@@ -31,18 +31,18 @@
  * @sync_timeline_list:    membership in global sync_timeline_list
  */
 struct sync_timeline {
-    struct kref        kref;
-    char            name[32];
+    struct kref kref;
+    char name[32];
 
     /* protected by lock */
-    u64            context;
-    int            value;
+    u64 context;
+    int value;
 
-    struct rb_root        pt_tree;
-    struct list_head    pt_list;
-    spinlock_t        lock;
+    struct rb_root pt_tree;
+    struct list_head pt_list;
+    spinlock_t lock;
 
-    struct list_head    sync_timeline_list;
+    struct list_head sync_timeline_list;
 };
 
 static inline struct sync_timeline *dma_fence_parent(struct dma_fence *fence)
@@ -70,10 +70,18 @@ void sync_timeline_debug_remove(struct sync_timeline *obj);
 void sync_file_debug_add(struct sync_file *fence);
 void sync_file_debug_remove(struct sync_file *fence);
 #else
-static inline void sync_timeline_debug_add(struct sync_timeline *obj) {}
-static inline void sync_timeline_debug_remove(struct sync_timeline *obj) {}
-static inline void sync_file_debug_add(struct sync_file *fence) {}
-static inline void sync_file_debug_remove(struct sync_file *fence) {}
+static inline void sync_timeline_debug_add(struct sync_timeline *obj)
+{
+}
+static inline void sync_timeline_debug_remove(struct sync_timeline *obj)
+{
+}
+static inline void sync_file_debug_add(struct sync_file *fence)
+{
+}
+static inline void sync_file_debug_remove(struct sync_file *fence)
+{
+}
 #endif
 
 #endif /* _LINUX_SYNC_H */

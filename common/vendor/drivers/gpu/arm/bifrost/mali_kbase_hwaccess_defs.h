@@ -20,7 +20,6 @@
  *
  */
 
-
 /**
  * @file mali_kbase_hwaccess_gpu_defs.h
  * HW access common definitions

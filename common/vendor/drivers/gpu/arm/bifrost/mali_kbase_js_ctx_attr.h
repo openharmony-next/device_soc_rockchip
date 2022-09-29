@@ -20,15 +20,13 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_js_ctx_attr.h
  * Job Scheduler Context Attribute APIs
  */
 
-#ifndef _KBASE_JS_CTX_ATTR_H_
-#define _KBASE_JS_CTX_ATTR_H_
+#ifndef KBASE_JS_CTX_ATTR_H_
+#define KBASE_JS_CTX_ATTR_H_
 
 /**
  * @addtogroup base_api
@@ -86,7 +84,8 @@ bool kbasep_js_ctx_attr_runpool_release_ctx(struct kbase_device *kbdev, struct k
  * - jsctx mutex
  * - If the context is scheduled, then runpool_irq spinlock must also be held
  */
-void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbase_jd_atom *katom);
+void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                        struct kbase_jd_atom *katom);
 
 /**
  * Release all attributes of an atom, given its retained state.
@@ -105,7 +104,8 @@ void kbasep_js_ctx_attr_ctx_retain_atom(struct kbase_device *kbdev, struct kbase
  * or similar is called sometime later.
  * @return false indicates no change in ctx attributes state of the runpool.
  */
-bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbasep_js_atom_retained_state *katom_retained_state);
+bool kbasep_js_ctx_attr_ctx_release_atom(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                         struct kbasep_js_atom_retained_state *katom_retained_state);
 
 /**
  * Requires:
@@ -129,7 +129,7 @@ static inline s8 kbasep_js_ctx_attr_count_on_runpool(struct kbase_device *kbdev,
 static inline bool kbasep_js_ctx_attr_is_attr_on_runpool(struct kbase_device *kbdev, enum kbasep_js_ctx_attr attribute)
 {
     /* In general, attributes are 'on' when they have a non-zero refcount (note: the refcount will never be < 0) */
-    return (bool) kbasep_js_ctx_attr_count_on_runpool(kbdev, attribute);
+    return (bool)kbasep_js_ctx_attr_count_on_runpool(kbdev, attribute);
 }
 
 /**
@@ -145,11 +145,11 @@ static inline bool kbasep_js_ctx_attr_is_attr_on_ctx(struct kbase_context *kctx,
     js_kctx_info = &kctx->jctx.sched_info;
 
     /* In general, attributes are 'on' when they have a refcount (which should never be < 0) */
-    return (bool) (js_kctx_info->ctx.ctx_attr_ref_count[attribute]);
+    return (bool)(js_kctx_info->ctx.ctx_attr_ref_count[attribute]);
 }
 
-      /** @} *//* end group kbase_js */
-      /** @} *//* end group base_kbase_api */
-      /** @} *//* end group base_api */
+/** @} */ /* end group kbase_js */
+/** @} */ /* end group base_kbase_api */
+/** @} */ /* end group base_api */
 
-#endif                /* _KBASE_JS_DEFS_H_ */
+#endif /* _KBASE_JS_DEFS_H_ */

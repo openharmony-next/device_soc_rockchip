@@ -63,9 +63,8 @@ EXPORT_SYMBOL(remove_wait_queue);
  * started to run but is not in state TASK_RUNNING. try_to_wake_up() returns
  * zero in this (rare) case, and we handle it by continuing to scan the queue.
  */
-static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode,
-            int nr_exclusive, int wake_flags, void *key,
-            wait_queue_entry_t *bookmark)
+static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode, int nr_exclusive, int wake_flags,
+                            void *key, wait_queue_entry_t *bookmark)
 {
     wait_queue_entry_t *curr, *next;
     int cnt = 0;
@@ -77,27 +76,32 @@ static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode,
 
         list_del(&bookmark->entry);
         bookmark->flags = 0;
-    } else
+    } else {
         curr = list_first_entry(&wq_head->head, wait_queue_entry_t, entry);
+    }
 
-    if (&curr->entry == &wq_head->head)
+    if (&curr->entry == &wq_head->head) {
         return nr_exclusive;
+    }
 
-    list_for_each_entry_safe_from(curr, next, &wq_head->head, entry) {
+    list_for_each_entry_safe_from(curr, next, &wq_head->head, entry)
+    {
         unsigned flags = curr->flags;
         int ret;
 
-        if (flags & WQ_FLAG_BOOKMARK)
+        if (flags & WQ_FLAG_BOOKMARK) {
             continue;
+        }
 
         ret = curr->func(curr, mode, wake_flags, key);
-        if (ret < 0)
+        if (ret < 0) {
             break;
-        if (ret && (flags & WQ_FLAG_EXCLUSIVE) && !--nr_exclusive)
+        }
+        if (ret && (flags & WQ_FLAG_EXCLUSIVE) && !--nr_exclusive) {
             break;
+        }
 
-        if (bookmark && (++cnt > WAITQUEUE_WALK_BREAK_CNT) &&
-                (&next->entry != &wq_head->head)) {
+        if (bookmark && (++cnt > WAITQUEUE_WALK_BREAK_CNT) && (&next->entry != &wq_head->head)) {
             bookmark->flags = WQ_FLAG_BOOKMARK;
             list_add_tail(&bookmark->entry, &next->entry);
             break;
@@ -107,8 +111,8 @@ static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode,
     return nr_exclusive;
 }
 
-static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int mode,
-            int nr_exclusive, int wake_flags, void *key)
+static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int mode, int nr_exclusive, int wake_flags,
+                                  void *key)
 {
     unsigned long flags;
     wait_queue_entry_t bookmark;
@@ -120,8 +124,7 @@ static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int 
 
     do {
         spin_lock_irqsave(&wq_head->lock, flags);
-        nr_exclusive = __wake_up_common(wq_head, mode, nr_exclusive,
-                        wake_flags, key, &bookmark);
+        nr_exclusive = __wake_up_common(wq_head, mode, nr_exclusive, wake_flags, key, &bookmark);
         spin_unlock_irqrestore(&wq_head->lock, flags);
     } while (bookmark.flags & WQ_FLAG_BOOKMARK);
 }
@@ -136,8 +139,7 @@ static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int 
  * If this function wakes up a task, it executes a full memory barrier before
  * accessing the task state.
  */
-void __wake_up(struct wait_queue_head *wq_head, unsigned int mode,
-            int nr_exclusive, void *key)
+void __wake_up(struct wait_queue_head *wq_head, unsigned int mode, int nr_exclusive, void *key)
 {
     __wake_up_common_lock(wq_head, mode, nr_exclusive, 0, key);
 }
@@ -158,8 +160,8 @@ void __wake_up_locked_key(struct wait_queue_head *wq_head, unsigned int mode, vo
 }
 EXPORT_SYMBOL_GPL(__wake_up_locked_key);
 
-void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head,
-        unsigned int mode, void *key, wait_queue_entry_t *bookmark)
+void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head, unsigned int mode, void *key,
+                                   wait_queue_entry_t *bookmark)
 {
     __wake_up_common(wq_head, mode, 1, 0, key, bookmark);
 }
@@ -181,11 +183,11 @@ EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
  * If this function wakes up a task, it executes a full memory barrier before
  * accessing the task state.
  */
-void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode,
-            void *key)
+void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode, void *key)
 {
-    if (unlikely(!wq_head))
+    if (unlikely(!wq_head)) {
         return;
+    }
 
     __wake_up_common_lock(wq_head, mode, 1, WF_SYNC, key);
 }
@@ -207,10 +209,9 @@ EXPORT_SYMBOL_GPL(__wake_up_sync_key);
  * If this function wakes up a task, it executes a full memory barrier before
  * accessing the task state.
  */
-void __wake_up_locked_sync_key(struct wait_queue_head *wq_head,
-                   unsigned int mode, void *key)
+void __wake_up_locked_sync_key(struct wait_queue_head *wq_head, unsigned int mode, void *key)
 {
-        __wake_up_common(wq_head, mode, 1, WF_SYNC, key, NULL);
+    __wake_up_common(wq_head, mode, 1, WF_SYNC, key, NULL);
 }
 EXPORT_SYMBOL_GPL(__wake_up_locked_sync_key);
 
@@ -221,7 +222,7 @@ void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode)
 {
     __wake_up_sync_key(wq_head, mode, NULL);
 }
-EXPORT_SYMBOL_GPL(__wake_up_sync);    /* For internal use only */
+EXPORT_SYMBOL_GPL(__wake_up_sync); /* For internal use only */
 
 void __wake_up_pollfree(struct wait_queue_head *wq_head)
 {
@@ -242,23 +243,22 @@ void __wake_up_pollfree(struct wait_queue_head *wq_head)
  * stops them from bleeding out - it would still allow subsequent
  * loads to move into the critical region).
  */
-void
-prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
+void prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
 {
     unsigned long flags;
 
     wq_entry->flags &= ~WQ_FLAG_EXCLUSIVE;
     spin_lock_irqsave(&wq_head->lock, flags);
-    if (list_empty(&wq_entry->entry))
+    if (list_empty(&wq_entry->entry)) {
         __add_wait_queue(wq_head, wq_entry);
+    }
     set_current_state(state);
     spin_unlock_irqrestore(&wq_head->lock, flags);
 }
 EXPORT_SYMBOL(prepare_to_wait);
 
 /* Returns true if we are the first waiter in the queue, false otherwise. */
-bool
-prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
+bool prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
 {
     unsigned long flags;
     bool was_empty = false;
@@ -307,10 +307,11 @@ long prepare_to_wait_event(struct wait_queue_head *wq_head, struct wait_queue_en
         ret = -ERESTARTSYS;
     } else {
         if (list_empty(&wq_entry->entry)) {
-            if (wq_entry->flags & WQ_FLAG_EXCLUSIVE)
+            if (wq_entry->flags & WQ_FLAG_EXCLUSIVE) {
                 __add_wait_queue_entry_tail(wq_head, wq_entry);
-            else
+            } else {
                 __add_wait_queue(wq_head, wq_entry);
+            }
         }
         set_current_state(state);
     }
@@ -329,12 +330,14 @@ EXPORT_SYMBOL(prepare_to_wait_event);
  */
 int do_wait_intr(wait_queue_head_t *wq, wait_queue_entry_t *wait)
 {
-    if (likely(list_empty(&wait->entry)))
+    if (likely(list_empty(&wait->entry))) {
         __add_wait_queue_entry_tail(wq, wait);
+    }
 
     set_current_state(TASK_INTERRUPTIBLE);
-    if (signal_pending(current))
+    if (signal_pending(current)) {
         return -ERESTARTSYS;
+    }
 
     spin_unlock(&wq->lock);
     schedule();
@@ -346,12 +349,14 @@ EXPORT_SYMBOL(do_wait_intr);
 
 int do_wait_intr_irq(wait_queue_head_t *wq, wait_queue_entry_t *wait)
 {
-    if (likely(list_empty(&wait->entry)))
+    if (likely(list_empty(&wait->entry))) {
         __add_wait_queue_entry_tail(wq, wait);
+    }
 
     set_current_state(TASK_INTERRUPTIBLE);
-    if (signal_pending(current))
+    if (signal_pending(current)) {
         return -ERESTARTSYS;
+    }
 
     spin_unlock_irq(&wq->lock);
     schedule();
@@ -396,13 +401,13 @@ void finish_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_en
 }
 EXPORT_SYMBOL(finish_wait);
 
-__sched int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode,
-                     int sync, void *key)
+__sched int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode, int sync, void *key)
 {
     int ret = default_wake_function(wq_entry, mode, sync, key);
 
-    if (ret)
+    if (ret) {
         list_del_init_careful(&wq_entry->entry);
+    }
 
     return ret;
 }
@@ -442,8 +447,9 @@ __sched long wait_woken(struct wait_queue_entry *wq_entry, unsigned int mode, lo
      * or woken_wake_function() sees our store to current->state.
      */
     set_current_state(mode); /* A */
-    if (!(wq_entry->flags & WQ_FLAG_WOKEN) && !is_kthread_should_stop())
+    if (!(wq_entry->flags & WQ_FLAG_WOKEN) && !is_kthread_should_stop()) {
         timeout = schedule_timeout(timeout);
+    }
     __set_current_state(TASK_RUNNING);
 
     /*
@@ -458,8 +464,7 @@ __sched long wait_woken(struct wait_queue_entry *wq_entry, unsigned int mode, lo
 }
 EXPORT_SYMBOL(wait_woken);
 
-__sched int woken_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode,
-                int sync, void *key)
+__sched int woken_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode, int sync, void *key)
 {
     /* Pairs with the smp_store_mb() in wait_woken(). */
     smp_mb(); /* C */

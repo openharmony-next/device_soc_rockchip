@@ -12,14 +12,16 @@
  * defines work_context type of platform_dependent_part.
  */
 
-#ifndef _MALI_KBASE_RK_H_
-#define _MALI_KBASE_RK_H_
+#ifndef H_MALI_KBASE_RK_H
+#define H_MALI_KBASE_RK_H
 
 #include <linux/wakelock.h>
 
 /*---------------------------------------------------------------------------*/
 
 #define DEFAULT_UTILISATION_PERIOD_IN_MS (100)
+
+void kbase_platform_rk_shutdown(struct kbase_device *kbdev);
 
 /*---------------------------------------------------------------------------*/
 
@@ -52,11 +54,9 @@ struct rk_context {
 
 /*---------------------------------------------------------------------------*/
 
-static inline struct rk_context *get_rk_context(
-        const struct kbase_device *kbdev)
+static inline struct rk_context *get_rk_context(const struct kbase_device *kbdev)
 {
     return (struct rk_context *)(kbdev->platform_context);
 }
 
-#endif                /* _MALI_KBASE_RK_H_ */
-
+#endif /* H_MALI_KBASE_RK_H */

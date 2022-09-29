@@ -22,15 +22,14 @@
 extern "C" {
 #endif
 
-RK_S32 mpp_eventfd_get(RK_U32 init);
-RK_S32 mpp_eventfd_put(RK_S32 fd);
+signed int mpp_eventfd_get(unsigned int init);
+signed int mpp_eventfd_put(signed int fd);
 
-RK_S32 mpp_eventfd_read(RK_S32 fd, RK_U64 *val, RK_S64 timeout);
-RK_S32 mpp_eventfd_write(RK_S32 fd, RK_U64 val);
+signed int mpp_eventfd_read(signed int fd, RK_U64 *val, RK_S64 timeout);
+signed int mpp_eventfd_write(signed int fd, RK_U64 val);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __MPP_EVENTFD_H__ */
-

@@ -14,10 +14,9 @@
 #include "rockchip_drm_fb.h"
 #include "rockchip_drm_fbdev.h"
 
-#define PREFERRED_BPP        32
+#define PREFERRED_BPP 32
 
-static int rockchip_fbdev_mmap(struct fb_info *info,
-                   struct vm_area_struct *vma)
+static int rockchip_fbdev_mmap(struct fb_info *info, struct vm_area_struct *vma)
 {
     struct drm_fb_helper *helper = info->par;
     struct rockchip_drm_private *private = helper->dev->dev_private;
@@ -26,19 +25,18 @@ static int rockchip_fbdev_mmap(struct fb_info *info,
 }
 
 static const struct fb_ops rockchip_drm_fbdev_ops = {
-    .owner        = THIS_MODULE,
+    .owner = THIS_MODULE,
     DRM_FB_HELPER_DEFAULT_OPS,
-    .fb_mmap    = rockchip_fbdev_mmap,
-    .fb_fillrect    = drm_fb_helper_cfb_fillrect,
-    .fb_copyarea    = drm_fb_helper_cfb_copyarea,
-    .fb_imageblit    = drm_fb_helper_cfb_imageblit,
+    .fb_mmap = rockchip_fbdev_mmap,
+    .fb_fillrect = drm_fb_helper_cfb_fillrect,
+    .fb_copyarea = drm_fb_helper_cfb_copyarea,
+    .fb_imageblit = drm_fb_helper_cfb_imageblit,
 };
 
-static int rockchip_drm_fbdev_create(struct drm_fb_helper *helper,
-                     struct drm_fb_helper_surface_size *sizes)
+static int rockchip_drm_fbdev_create(struct drm_fb_helper *helper, struct drm_fb_helper_surface_size *sizes)
 {
     struct rockchip_drm_private *private = helper->dev->dev_private;
-    struct drm_mode_fb_cmd2 mode_cmd = { 0 };
+    struct drm_mode_fb_cmd2 mode_cmd = {0};
     struct drm_device *dev = helper->dev;
     struct rockchip_gem_object *rk_obj;
     struct drm_framebuffer *fb;
@@ -48,19 +46,19 @@ static int rockchip_drm_fbdev_create(struct drm_fb_helper *helper,
     size_t size;
     int ret;
 
-    bytes_per_pixel = DIV_ROUND_UP(sizes->surface_bpp, 8);
+    bytes_per_pixel = DIV_ROUND_UP(sizes->surface_bpp, 0x8);
 
     mode_cmd.width = sizes->surface_width;
     mode_cmd.height = sizes->surface_height;
     mode_cmd.pitches[0] = sizes->surface_width * bytes_per_pixel;
-    mode_cmd.pixel_format = drm_mode_legacy_fb_format(sizes->surface_bpp,
-        sizes->surface_depth);
+    mode_cmd.pixel_format = drm_mode_legacy_fb_format(sizes->surface_bpp, sizes->surface_depth);
 
     size = mode_cmd.pitches[0] * mode_cmd.height;
 
     rk_obj = rockchip_gem_create_object(dev, size, true, 0);
-    if (IS_ERR(rk_obj))
+    if (IS_ERR(rk_obj)) {
         return -ENOMEM;
+    }
 
     private->fbdev_bo = &rk_obj->base;
 
@@ -71,11 +69,9 @@ static int rockchip_drm_fbdev_create(struct drm_fb_helper *helper,
         goto out;
     }
 
-    helper->fb = rockchip_drm_framebuffer_init(dev, &mode_cmd,
-                           private->fbdev_bo);
+    helper->fb = rockchip_drm_framebuffer_init(dev, &mode_cmd, private->fbdev_bo);
     if (IS_ERR(helper->fb)) {
-        DRM_DEV_ERROR(dev->dev,
-                  "Failed to allocate DRM framebuffer.\n");
+        DRM_DEV_ERROR(dev->dev, "Failed to allocate DRM framebuffer.\n");
         ret = PTR_ERR(helper->fb);
         goto out;
     }
@@ -93,10 +89,8 @@ static int rockchip_drm_fbdev_create(struct drm_fb_helper *helper,
     fbi->screen_size = rk_obj->base.size;
     fbi->fix.smem_len = rk_obj->base.size;
 
-    DRM_DEBUG_KMS("FB [%dx%d]-%d kvaddr=%p offset=%ld size=%zu\n",
-              fb->width, fb->height, fb->format->depth,
-              rk_obj->kvaddr,
-              offset, size);
+    DRM_DEBUG_KMS("FB [%dx%d]-%d kvaddr=%p offset=%ld size=%zu\n", fb->width, fb->height, fb->format->depth,
+                  rk_obj->kvaddr, offset, size);
 
     return 0;
 
@@ -115,29 +109,27 @@ int rockchip_drm_fbdev_init(struct drm_device *dev)
     struct drm_fb_helper *helper;
     int ret;
 
-    if (!dev->mode_config.num_crtc || !dev->mode_config.num_connector)
+    if (!dev->mode_config.num_crtc || !dev->mode_config.num_connector) {
         return -EINVAL;
+    }
 
     helper = devm_kzalloc(dev->dev, sizeof(*helper), GFP_KERNEL);
-    if (!helper)
+    if (!helper) {
         return -ENOMEM;
+    }
     private->fbdev_helper = helper;
 
     drm_fb_helper_prepare(dev, helper, &rockchip_drm_fb_helper_funcs);
 
     ret = drm_fb_helper_init(dev, helper);
     if (ret < 0) {
-        DRM_DEV_ERROR(dev->dev,
-                  "Failed to initialize drm fb helper - %d.\n",
-                  ret);
+        DRM_DEV_ERROR(dev->dev, "Failed to initialize drm fb helper - %d.\n", ret);
         return ret;
     }
 
     ret = drm_fb_helper_initial_config(helper, PREFERRED_BPP);
     if (ret < 0) {
-        DRM_DEV_ERROR(dev->dev,
-                  "Failed to set initial hw config - %d.\n",
-                  ret);
+        DRM_DEV_ERROR(dev->dev, "Failed to set initial hw config - %d.\n", ret);
         goto err_drm_fb_helper_fini;
     }
 
@@ -153,13 +145,15 @@ void rockchip_drm_fbdev_fini(struct drm_device *dev)
     struct rockchip_drm_private *private = dev->dev_private;
     struct drm_fb_helper *helper = private->fbdev_helper;
 
-    if (!helper)
+    if (!helper) {
         return;
+    }
 
     drm_fb_helper_unregister_fbi(helper);
 
-    if (helper->fb)
+    if (helper->fb) {
         drm_framebuffer_put(helper->fb);
+    }
 
     drm_fb_helper_fini(helper);
 }

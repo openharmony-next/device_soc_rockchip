@@ -86,8 +86,7 @@ struct v4l2_async_subdev {
             unsigned short address;
         } i2c;
         struct {
-            bool (*match)(struct device *dev,
-                      struct v4l2_async_subdev *sd);
+            bool (*match)(struct device *dev, struct v4l2_async_subdev *sd);
             void *priv;
         } custom;
     } match;
@@ -105,13 +104,9 @@ struct v4l2_async_subdev {
  * @unbind:    a subdevice is leaving
  */
 struct v4l2_async_notifier_operations {
-    int (*bound)(struct v4l2_async_notifier *notifier,
-             struct v4l2_subdev *subdev,
-             struct v4l2_async_subdev *asd);
+    int (*bound)(struct v4l2_async_notifier *notifier, struct v4l2_subdev *subdev, struct v4l2_async_subdev *asd);
     int (*complete)(struct v4l2_async_notifier *notifier);
-    void (*unbind)(struct v4l2_async_notifier *notifier,
-               struct v4l2_subdev *subdev,
-               struct v4l2_async_subdev *asd);
+    void (*unbind)(struct v4l2_async_notifier *notifier, struct v4l2_subdev *subdev, struct v4l2_async_subdev *asd);
 };
 
 /**
@@ -158,8 +153,7 @@ void v4l2_async_notifier_init(struct v4l2_async_notifier *notifier);
  * the notifiers master @asd_list. The @asd must be allocated with k*alloc() as
  * it will be freed by the framework when the notifier is destroyed.
  */
-int v4l2_async_notifier_add_subdev(struct v4l2_async_notifier *notifier,
-                   struct v4l2_async_subdev *asd);
+int v4l2_async_notifier_add_subdev(struct v4l2_async_notifier *notifier, struct v4l2_async_subdev *asd);
 
 /**
  * v4l2_async_notifier_add_fwnode_subdev - Allocate and add a fwnode async
@@ -177,10 +171,9 @@ int v4l2_async_notifier_add_subdev(struct v4l2_async_notifier *notifier,
  * notifiers @asd_list. The function also gets a reference of the fwnode which
  * is released later at notifier cleanup time.
  */
-struct v4l2_async_subdev *
-v4l2_async_notifier_add_fwnode_subdev(struct v4l2_async_notifier *notifier,
-                      struct fwnode_handle *fwnode,
-                      unsigned int asd_struct_size);
+struct v4l2_async_subdev *v4l2_async_notifier_add_fwnode_subdev(struct v4l2_async_notifier *notifier,
+                                                                struct fwnode_handle *fwnode,
+                                                                unsigned int asd_struct_size);
 
 /**
  * v4l2_async_notifier_add_fwnode_remote_subdev - Allocate and add a fwnode
@@ -203,10 +196,9 @@ v4l2_async_notifier_add_fwnode_subdev(struct v4l2_async_notifier *notifier,
  * This is just like @v4l2_async_notifier_add_fwnode_subdev, but with the
  * exception that the fwnode refers to a local endpoint, not the remote one.
  */
-struct v4l2_async_subdev *
-v4l2_async_notifier_add_fwnode_remote_subdev(struct v4l2_async_notifier *notif,
-                         struct fwnode_handle *endpoint,
-                         unsigned int asd_struct_size);
+struct v4l2_async_subdev *v4l2_async_notifier_add_fwnode_remote_subdev(struct v4l2_async_notifier *notif,
+                                                                       struct fwnode_handle *endpoint,
+                                                                       unsigned int asd_struct_size);
 
 /**
  * v4l2_async_notifier_add_i2c_subdev - Allocate and add an i2c async
@@ -223,10 +215,8 @@ v4l2_async_notifier_add_fwnode_remote_subdev(struct v4l2_async_notifier *notif,
  *
  * Same as above but for I2C matched sub-devices.
  */
-struct v4l2_async_subdev *
-v4l2_async_notifier_add_i2c_subdev(struct v4l2_async_notifier *notifier,
-                   int adapter_id, unsigned short address,
-                   unsigned int asd_struct_size);
+struct v4l2_async_subdev *v4l2_async_notifier_add_i2c_subdev(struct v4l2_async_notifier *notifier, int adapter_id,
+                                                             unsigned short address, unsigned int asd_struct_size);
 
 /**
  * v4l2_async_notifier_add_devname_subdev - Allocate and add a device-name
@@ -242,10 +232,8 @@ v4l2_async_notifier_add_i2c_subdev(struct v4l2_async_notifier *notifier,
  *
  * Same as above but for device-name matched sub-devices.
  */
-struct v4l2_async_subdev *
-v4l2_async_notifier_add_devname_subdev(struct v4l2_async_notifier *notifier,
-                       const char *device_name,
-                       unsigned int asd_struct_size);
+struct v4l2_async_subdev *v4l2_async_notifier_add_devname_subdev(struct v4l2_async_notifier *notifier,
+                                                                 const char *device_name, unsigned int asd_struct_size);
 
 /**
  * v4l2_async_notifier_register - registers a subdevice asynchronous notifier
@@ -253,8 +241,7 @@ v4l2_async_notifier_add_devname_subdev(struct v4l2_async_notifier *notifier,
  * @v4l2_dev: pointer to &struct v4l2_device
  * @notifier: pointer to &struct v4l2_async_notifier
  */
-int v4l2_async_notifier_register(struct v4l2_device *v4l2_dev,
-                 struct v4l2_async_notifier *notifier);
+int v4l2_async_notifier_register(struct v4l2_device *v4l2_dev, struct v4l2_async_notifier *notifier);
 
 /**
  * v4l2_async_subdev_notifier_register - registers a subdevice asynchronous
@@ -263,8 +250,7 @@ int v4l2_async_notifier_register(struct v4l2_device *v4l2_dev,
  * @sd: pointer to &struct v4l2_subdev
  * @notifier: pointer to &struct v4l2_async_notifier
  */
-int v4l2_async_subdev_notifier_register(struct v4l2_subdev *sd,
-                    struct v4l2_async_notifier *notifier);
+int v4l2_async_subdev_notifier_register(struct v4l2_subdev *sd, struct v4l2_async_notifier *notifier);
 
 /**
  * v4l2_async_notifier_clr_unready_dev - remove unready subdevice
@@ -274,8 +260,7 @@ int v4l2_async_subdev_notifier_register(struct v4l2_subdev *sd,
 #if IS_ENABLED(CONFIG_NO_GKI)
 int v4l2_async_notifier_clr_unready_dev(struct v4l2_async_notifier *notifier);
 #else
-static inline int
-v4l2_async_notifier_clr_unready_dev(struct v4l2_async_notifier *notifier)
+static inline int v4l2_async_notifier_clr_unready_dev(struct v4l2_async_notifier *notifier)
 {
     return 0;
 }
@@ -334,8 +319,7 @@ int v4l2_async_register_subdev(struct v4l2_subdev *sd);
  * An error is returned if the module is no longer loaded on any attempts
  * to register it.
  */
-int __must_check
-v4l2_async_register_subdev_sensor_common(struct v4l2_subdev *sd);
+int __must_check v4l2_async_register_subdev_sensor_common(struct v4l2_subdev *sd);
 
 /**
  * v4l2_async_unregister_subdev - unregisters a sub-device to the asynchronous

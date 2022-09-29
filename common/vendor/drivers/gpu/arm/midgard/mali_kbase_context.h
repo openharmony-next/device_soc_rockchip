@@ -13,13 +13,10 @@
  *
  */
 
-
-
-#ifndef _KBASE_CONTEXT_H_
-#define _KBASE_CONTEXT_H_
+#ifndef KBASE_CONTEXT_H_
+#define KBASE_CONTEXT_H_
 
 #include <linux/atomic.h>
-
 
 int kbase_context_set_create_flags(struct kbase_context *kctx, u32 flags);
 
@@ -30,8 +27,7 @@ int kbase_context_set_create_flags(struct kbase_context *kctx, u32 flags);
  *
  * Return: true if @flag is set on @kctx, false if not.
  */
-static inline bool kbase_ctx_flag(struct kbase_context *kctx,
-                      enum kbase_context_flags flag)
+static inline bool kbase_ctx_flag(struct kbase_context *kctx, enum kbase_context_flags flag)
 {
     return atomic_read(&kctx->flags) & flag;
 }
@@ -47,8 +43,7 @@ static inline bool kbase_ctx_flag(struct kbase_context *kctx,
  * Some flags have locking requirements, check the documentation for the
  * respective flags.
  */
-static inline void kbase_ctx_flag_clear(struct kbase_context *kctx,
-                    enum kbase_context_flags flag)
+static inline void kbase_ctx_flag_clear(struct kbase_context *kctx, enum kbase_context_flags flag)
 {
 #if KERNEL_VERSION(4, 3, 0) > LINUX_VERSION_CODE
     /*
@@ -82,8 +77,7 @@ static inline void kbase_ctx_flag_clear(struct kbase_context *kctx,
  * Some flags have locking requirements, check the documentation for the
  * respective flags.
  */
-static inline void kbase_ctx_flag_set(struct kbase_context *kctx,
-                      enum kbase_context_flags flag)
+static inline void kbase_ctx_flag_set(struct kbase_context *kctx, enum kbase_context_flags flag)
 {
     atomic_or(flag, &kctx->flags);
 }

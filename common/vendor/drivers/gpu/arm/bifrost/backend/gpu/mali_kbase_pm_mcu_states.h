@@ -19,7 +19,8 @@
  * SPDX-License-Identifier: GPL-2.0
  *
  */
-
+#ifndef BIFROST_BACKEND_GPU_MALI_KBASE_PM_MCU_STATES_H
+#define BIFROST_BACKEND_GPU_MALI_KBASE_PM_MCU_STATES_H
 /*
  * Backend-specific Power Manager MCU state definitions.
  * The function-like macro KBASEP_MCU_STATE() must be defined before including
@@ -37,3 +38,4 @@ KBASEP_MCU_STATE(ON_PEND_HALT)
 KBASEP_MCU_STATE(POWER_DOWN)
 KBASEP_MCU_STATE(PEND_OFF)
 KBASEP_MCU_STATE(RESET_WAIT)
+#endif

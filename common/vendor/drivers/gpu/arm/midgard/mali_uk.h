@@ -13,22 +13,18 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_uk.h
  * Types and definitions that are common across OSs for both the user
  * and kernel side of the User-Kernel interface.
  */
 
-#ifndef _UK_H_
-#define _UK_H_
+#ifndef UK_H_
+#define UK_H_
 
 #ifdef __cplusplus
 extern "C" {
-#endif                /* __cplusplus */
+#endif /* __cplusplus */
 
 /**
  * @addtogroup base_api
@@ -75,7 +71,7 @@ enum uk_client_id {
  * Numbers below UK_FUNC_ID are used for internal UK functions.
  */
 enum uk_func {
-    UKP_FUNC_ID_CHECK_VERSION,   /**< UKK Core internal function */
+    UKP_FUNC_ID_CHECK_VERSION, /**< UKK Core internal function */
     /**
      * Each UK client numbers the functions they provide starting from
      * number UK_FUNC_ID. This number is then eventually assigned to the
@@ -123,19 +119,19 @@ union uk_header {
  */
 struct uku_version_check_args {
     union uk_header header;
-          /**< UK call header */
+    /**< UK call header */
     u16 major;
-       /**< This field carries the user-side major version on input and the kernel-side major version on output */
+    /**< This field carries the user-side major version on input and the kernel-side major version on output */
     u16 minor;
-       /**< This field carries the user-side minor version on input and the kernel-side minor version on output. */
+    /**< This field carries the user-side minor version on input and the kernel-side minor version on output. */
     u8 padding[4];
 };
 
 /** @} end group uk_api */
 
-/** @} *//* end group base_api */
+/** @} */ /* end group base_api */
 
 #ifdef __cplusplus
 }
-#endif                /* __cplusplus */
-#endif                /* _UK_H_ */
+#endif /* __cplusplus */
+#endif /* _UK_H_ */

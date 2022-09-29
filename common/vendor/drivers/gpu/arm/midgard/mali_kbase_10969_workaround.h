@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_10969_WORKAROUND_
-#define _KBASE_10969_WORKAROUND_
+#ifndef KBASE_10969_WORKAROUND_
+#define KBASE_10969_WORKAROUND_
 
 int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom);
 

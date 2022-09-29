@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /**
  * @file
  * Interface file for accessing MMU hardware functionality
@@ -67,8 +65,7 @@ enum kbase_mmu_fault_type {
  * @param[in]  as             address space to configure.
  * @param[in]  kctx           kbase context to configure.
  */
-void kbase_mmu_hw_configure(struct kbase_device *kbdev,
-        struct kbase_as *as, struct kbase_context *kctx);
+void kbase_mmu_hw_configure(struct kbase_device *kbdev, struct kbase_as *as, struct kbase_context *kctx);
 
 /** @brief Issue an operation to the MMU.
  *
@@ -87,9 +84,8 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev,
  *
  * @return Zero if the operation was successful, non-zero otherwise.
  */
-int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
-        struct kbase_context *kctx, u64 vpfn, u32 nr, u32 type,
-        unsigned int handling_irq);
+int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as, struct kbase_context *kctx, u64 vpfn,
+                              u32 nr, u32 type, unsigned int handling_irq);
 
 /** @brief Clear a fault that has been previously reported by the MMU.
  *
@@ -100,8 +96,8 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
  * @param[in]  kctx          kbase context to clear the fault from or NULL.
  * @param[in]  type          The type of fault that needs to be cleared.
  */
-void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        struct kbase_context *kctx, enum kbase_mmu_fault_type type);
+void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as, struct kbase_context *kctx,
+                              enum kbase_mmu_fault_type type);
 
 /** @brief Enable fault that has been previously reported by the MMU.
  *
@@ -114,10 +110,10 @@ void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
  * @param[in]  kctx          kbase context to again enable the fault from.
  * @param[in]  type          The type of fault that needs to be enabled again.
  */
-void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        struct kbase_context *kctx, enum kbase_mmu_fault_type type);
+void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as, struct kbase_context *kctx,
+                               enum kbase_mmu_fault_type type);
 
-/** @} *//* end group mali_kbase_mmu_hw */
-/** @} *//* end group base_kbase_api */
+/** @} */ /* end group mali_kbase_mmu_hw */
+/** @} */ /* end group base_kbase_api */
 
-#endif    /* _MALI_KBASE_MMU_HW_H_ */
+#endif /* _MALI_KBASE_MMU_HW_H_ */

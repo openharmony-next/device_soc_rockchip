@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Base kernel context APIs
  */
@@ -36,8 +32,7 @@
  *
  * Return: new kbase context
  */
-struct kbase_context *
-kbase_create_context(struct kbase_device *kbdev, bool is_compat)
+struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_compat)
 {
     struct kbase_context *kctx;
     int err;
@@ -47,8 +42,9 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
     /* zero-inited as lot of code assume it's zero'ed out on create */
     kctx = vzalloc(sizeof(*kctx));
 
-    if (!kctx)
+    if (!kctx) {
         goto out;
+    }
 
     /* creating a context is considered a disjoint event */
     kbase_disjoint_event(kbdev);
@@ -56,8 +52,9 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
     kctx->kbdev = kbdev;
     kctx->as_nr = KBASEP_AS_NR_INVALID;
     atomic_set(&kctx->refcount, 0);
-    if (is_compat)
+    if (is_compat) {
         kbase_ctx_flag_set(kctx, KCTX_COMPAT);
+    }
 #ifdef CONFIG_MALI_TRACE_TIMELINE
     kctx->timeline.owner_tgid = task_tgid_nr(current);
 #endif
@@ -70,29 +67,32 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
     kctx->tgid = current->tgid;
     kctx->pid = current->pid;
 
-    err = kbase_mem_pool_init(&kctx->mem_pool,
-            kbdev->mem_pool_max_size_default,
-            kctx->kbdev, &kbdev->mem_pool);
-    if (err)
+    err = kbase_mem_pool_init(&kctx->mem_pool, kbdev->mem_pool_max_size_default, kctx->kbdev, &kbdev->mem_pool);
+    if (err) {
         goto free_kctx;
+    }
 
     err = kbase_mem_evictable_init(kctx);
-    if (err)
+    if (err) {
         goto free_pool;
+    }
 
     atomic_set(&kctx->used_pages, 0);
 
     err = kbase_jd_init(kctx);
-    if (err)
+    if (err) {
         goto deinit_evictable;
+    }
 
     err = kbasep_js_kctx_init(kctx);
-    if (err)
-        goto free_jd;    /* safe to call kbasep_js_kctx_term  in this case */
+    if (err) {
+        goto free_jd; /* safe to call kbasep_js_kctx_term  in this case */
+    }
 
     err = kbase_event_init(kctx);
-    if (err)
+    if (err) {
         goto free_jd;
+    }
 
     atomic_set(&kctx->drain_pending, 0);
 
@@ -104,18 +104,20 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
     INIT_LIST_HEAD(&kctx->waiting_kds_resource);
 #endif
     err = kbase_dma_fence_init(kctx);
-    if (err)
+    if (err) {
         goto free_event;
+    }
 
     err = kbase_mmu_init(kctx);
-    if (err)
+    if (err) {
         goto term_dma_fence;
+    }
 
     do {
-        err = kbase_mem_pool_grow(&kctx->mem_pool,
-                MIDGARD_MMU_BOTTOMLEVEL);
-        if (err)
+        err = kbase_mem_pool_grow(&kctx->mem_pool, MIDGARD_MMU_BOTTOMLEVEL);
+        if (err) {
             goto pgd_no_mem;
+        }
 
         mutex_lock(&kctx->mmu_lock);
         kctx->pgd = kbase_mmu_alloc_pgd(kctx);
@@ -123,8 +125,9 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
     } while (!kctx->pgd);
 
     kctx->aliasing_sink_page = kbase_mem_alloc_page(kctx->kbdev);
-    if (!kctx->aliasing_sink_page)
+    if (!kctx->aliasing_sink_page) {
         goto no_sink_page;
+    }
 
     init_waitqueue_head(&kctx->event_queue);
 
@@ -132,16 +135,19 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
 
     /* Make sure page 0 is not used... */
     err = kbase_region_tracker_init(kctx);
-    if (err)
+    if (err) {
         goto no_region_tracker;
+    }
 
     err = kbase_sticky_resource_init(kctx);
-    if (err)
+    if (err) {
         goto no_sticky;
+    }
 
     err = kbase_jit_init(kctx);
-    if (err)
+    if (err) {
         goto no_jit;
+    }
 #ifdef CONFIG_GPU_TRACEPOINTS
     atomic_set(&kctx->jctx.work_id, 0);
 #endif
@@ -153,9 +159,7 @@ kbase_create_context(struct kbase_device *kbdev, bool is_compat)
 
     mutex_init(&kctx->vinstr_cli_lock);
 
-    timer_setup(&kctx->soft_job_timeout,
-            kbasep_soft_job_timeout_worker,
-            0);
+    timer_setup(&kctx->soft_job_timeout, kbasep_soft_job_timeout_worker, 0);
 
     return kctx;
 
@@ -290,8 +294,9 @@ void kbase_destroy_context(struct kbase_context *kctx)
     kbase_mmu_term(kctx);
 
     pages = atomic_read(&kctx->used_pages);
-    if (pages != 0)
+    if (pages != 0) {
         dev_warn(kbdev->dev, "%s: %d pages in use!\n", __func__, pages);
+    }
 
     kbase_mem_evictable_deinit(kctx);
     kbase_mem_pool_term(&kctx->mem_pool);
@@ -328,15 +333,16 @@ int kbase_context_set_create_flags(struct kbase_context *kctx, u32 flags)
     spin_lock_irqsave(&kctx->kbdev->hwaccess_lock, irq_flags);
 
     /* Translate the flags */
-    if ((flags & BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED) == 0)
+    if ((flags & BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED) == 0) {
         kbase_ctx_flag_clear(kctx, KCTX_SUBMIT_DISABLED);
+    }
 
     /* Latch the initial attributes into the Job Scheduler */
     kbasep_js_ctx_attr_set_initial_attrs(kctx->kbdev, kctx);
 
     spin_unlock_irqrestore(&kctx->kbdev->hwaccess_lock, irq_flags);
     mutex_unlock(&js_kctx_info->ctx.jsctx_mutex);
- out:
+out:
     return err;
 }
 KBASE_EXPORT_SYMBOL(kbase_context_set_create_flags);

@@ -80,7 +80,7 @@ int kbase_sync_fence_stream_create(const char *name, int *const out_fd);
  *
  * return: Valid file descriptor to fence or < 0 on error
  */
-int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int stream_fd);
+int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int tl_fd);
 
 /**
  * kbase_sync_fence_in_from_fd() Assigns an existing fence to specified atom
@@ -116,8 +116,7 @@ int kbase_sync_fence_validate(int fd);
  *
  * return: The "next" event code for atom, typically JOB_CANCELLED or EVENT_DONE
  */
-enum base_jd_event_code
-kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result);
+enum base_jd_event_code kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result);
 
 /**
  * kbase_sync_fence_in_wait() - Wait for explicit input fence to be signaled
@@ -180,8 +179,7 @@ static inline void kbase_sync_fence_close_fd(int fd)
  *
  * return: 0 on success, < 0 on error
  */
-int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
-                 struct kbase_sync_fence_info *info);
+int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info);
 
 /**
  * kbase_sync_fence_out_info_get() - Retrieves information about output fence
@@ -190,17 +188,14 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
  *
  * return: 0 on success, < 0 on error
  */
-int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
-                  struct kbase_sync_fence_info *info);
+int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info);
 #endif /* !MALI_USE_CSF */
 
 #if defined(CONFIG_SYNC_FILE)
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
-void kbase_sync_fence_info_get(struct fence *fence,
-                   struct kbase_sync_fence_info *info);
+void kbase_sync_fence_info_get(struct fence *fence, struct kbase_sync_fence_info *info);
 #else
-void kbase_sync_fence_info_get(struct dma_fence *fence,
-                   struct kbase_sync_fence_info *info);
+void kbase_sync_fence_info_get(struct dma_fence *fence, struct kbase_sync_fence_info *info);
 #endif
 #endif
 
@@ -211,7 +206,6 @@ void kbase_sync_fence_info_get(struct dma_fence *fence,
  * return: Pointer to string describing @status.
  */
 const char *kbase_sync_status_string(int status);
-
 
 #if !MALI_USE_CSF
 /*

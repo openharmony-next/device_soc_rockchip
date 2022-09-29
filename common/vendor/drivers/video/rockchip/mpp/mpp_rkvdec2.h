@@ -31,83 +31,78 @@
 #include "mpp_common.h"
 #include "mpp_iommu.h"
 
-#define RKVDEC_DRIVER_NAME        "mpp_rkvdec2"
+#define RKVDEC_DRIVER_NAME "mpp_rkvdec2"
 
-#define    RKVDEC_SESSION_MAX_BUFFERS    40
+#define RKVDEC_SESSION_MAX_BUFFERS 40
 /* The maximum registers number of all the version */
-#define RKVDEC_REG_NUM            278
-#define RKVDEC_REG_HW_ID_INDEX        0
-#define RKVDEC_REG_START_INDEX        0
-#define RKVDEC_REG_END_INDEX        277
+#define RKVDEC_REG_NUM 278
+#define RKVDEC_REG_HW_ID_INDEX 0
+#define RKVDEC_REG_START_INDEX 0
+#define RKVDEC_REG_END_INDEX 277
 
-#define REVDEC_GET_PROD_NUM(x)        (((x) >> 16) & 0xffff)
-#define RKVDEC_REG_FORMAT_INDEX        9
-#define RKVDEC_GET_FORMAT(x)        ((x) & 0x3ff)
+#define REVDEC_GET_PROD_NUM(x) (((x) >> 16) & 0xffff)
+#define RKVDEC_REG_FORMAT_INDEX 9
+#define RKVDEC_GET_FORMAT(x) ((x)&0x3ff)
 
-#define RKVDEC_REG_START_EN_BASE       0x28
+#define RKVDEC_REG_START_EN_BASE 0x28
 
-#define RKVDEC_REG_START_EN_INDEX      10
+#define RKVDEC_REG_START_EN_INDEX 10
 
-#define RKVDEC_START_EN            BIT(0)
+#define RKVDEC_START_EN BIT(0)
 
-#define RKVDEC_REG_YSTRIDE_INDEX    20
-#define RKVDEC_REG_CORE_CTRL_INDEX    28
-#define RKVDEC_REG_FILM_IDX_MASK    (0x3ff0000)
+#define RKVDEC_REG_YSTRIDE_INDEX 20
+#define RKVDEC_REG_CORE_CTRL_INDEX 28
+#define RKVDEC_REG_FILM_IDX_MASK (0x3ff0000)
 
-#define RKVDEC_REG_RLC_BASE        0x200
-#define RKVDEC_REG_RLC_BASE_INDEX    (128)
+#define RKVDEC_REG_RLC_BASE 0x200
+#define RKVDEC_REG_RLC_BASE_INDEX (128)
 
-#define RKVDEC_REG_INT_EN        0x380
-#define RKVDEC_REG_INT_EN_INDEX        (224)
-#define RKVDEC_SOFT_RESET_READY        BIT(9)
-#define RKVDEC_CABAC_END_STA        BIT(8)
-#define RKVDEC_COLMV_REF_ERR_STA    BIT(7)
-#define RKVDEC_BUF_EMPTY_STA        BIT(6)
-#define RKVDEC_TIMEOUT_STA        BIT(5)
-#define RKVDEC_ERROR_STA        BIT(4)
-#define RKVDEC_BUS_STA            BIT(3)
-#define RKVDEC_READY_STA        BIT(2)
-#define RKVDEC_IRQ_RAW            BIT(1)
-#define RKVDEC_IRQ            BIT(0)
-#define RKVDEC_INT_ERROR_MASK        (RKVDEC_COLMV_REF_ERR_STA |\
-                    RKVDEC_BUF_EMPTY_STA |\
-                    RKVDEC_TIMEOUT_STA |\
-                    RKVDEC_ERROR_STA)
+#define RKVDEC_REG_INT_EN 0x380
+#define RKVDEC_REG_INT_EN_INDEX (224)
+#define RKVDEC_SOFT_RESET_READY BIT(9)
+#define RKVDEC_CABAC_END_STA BIT(8)
+#define RKVDEC_COLMV_REF_ERR_STA BIT(7)
+#define RKVDEC_BUF_EMPTY_STA BIT(6)
+#define RKVDEC_TIMEOUT_STA BIT(5)
+#define RKVDEC_ERROR_STA BIT(4)
+#define RKVDEC_BUS_STA BIT(3)
+#define RKVDEC_READY_STA BIT(2)
+#define RKVDEC_IRQ_RAW BIT(1)
+#define RKVDEC_IRQ BIT(0)
+#define RKVDEC_INT_ERROR_MASK (RKVDEC_COLMV_REF_ERR_STA | RKVDEC_BUF_EMPTY_STA | RKVDEC_TIMEOUT_STA | RKVDEC_ERROR_STA)
 
 /* perf sel reference register */
-#define RKVDEC_PERF_SEL_OFFSET        0x20000
-#define RKVDEC_PERF_SEL_NUM        64
-#define RKVDEC_PERF_SEL_BASE        0x424
-#define RKVDEC_SEL_VAL0_BASE        0x428
-#define RKVDEC_SEL_VAL1_BASE        0x42c
-#define RKVDEC_SEL_VAL2_BASE        0x430
-#define RKVDEC_SET_PERF_SEL(a, b, c)    ((a) | ((b) << 8) | ((c) << 16))
+#define RKVDEC_PERF_SEL_OFFSET 0x20000
+#define RKVDEC_PERF_SEL_NUM 64
+#define RKVDEC_PERF_SEL_BASE 0x424
+#define RKVDEC_SEL_VAL0_BASE 0x428
+#define RKVDEC_SEL_VAL1_BASE 0x42c
+#define RKVDEC_SEL_VAL2_BASE 0x430
+#define RKVDEC_SET_PERF_SEL(a, b, c) ((a) | ((b) << 8) | ((c) << 16))
 
 /* cache reference register */
-#define RKVDEC_REG_CACHE0_SIZE_BASE    0x51c
-#define RKVDEC_REG_CACHE1_SIZE_BASE    0x55c
-#define RKVDEC_REG_CACHE2_SIZE_BASE    0x59c
-#define RKVDEC_REG_CLR_CACHE0_BASE    0x510
-#define RKVDEC_REG_CLR_CACHE1_BASE    0x550
-#define RKVDEC_REG_CLR_CACHE2_BASE    0x590
+#define RKVDEC_REG_CACHE0_SIZE_BASE 0x51c
+#define RKVDEC_REG_CACHE1_SIZE_BASE 0x55c
+#define RKVDEC_REG_CACHE2_SIZE_BASE 0x59c
+#define RKVDEC_REG_CLR_CACHE0_BASE 0x510
+#define RKVDEC_REG_CLR_CACHE1_BASE 0x550
+#define RKVDEC_REG_CLR_CACHE2_BASE 0x590
 
-#define RKVDEC_CACHE_PERMIT_CACHEABLE_ACCESS    BIT(0)
-#define RKVDEC_CACHE_PERMIT_READ_ALLOCATE    BIT(1)
-#define RKVDEC_CACHE_LINE_SIZE_64_BYTES        BIT(4)
+#define RKVDEC_CACHE_PERMIT_CACHEABLE_ACCESS BIT(0)
+#define RKVDEC_CACHE_PERMIT_READ_ALLOCATE BIT(1)
+#define RKVDEC_CACHE_LINE_SIZE_64_BYTES BIT(4)
 
-#define to_rkvdec2_task(task)        \
-        container_of(task, struct rkvdec2_task, mpp_task)
-#define to_rkvdec2_dev(dev)        \
-        container_of(dev, struct rkvdec2_dev, mpp)
+#define to_rkvdec2_task(task) container_of(task, struct rkvdec2_task, mpp_task)
+#define to_rkvdec2_dev(dev) container_of(dev, struct rkvdec2_dev, mpp)
 
 enum RKVDEC_FMT {
-    RKVDEC_FMT_H265D    = 0,
-    RKVDEC_FMT_H264D    = 1,
-    RKVDEC_FMT_VP9D        = 2,
-    RKVDEC_FMT_AVS2        = 3,
+    RKVDEC_FMT_H265D = 0,
+    RKVDEC_FMT_H264D = 1,
+    RKVDEC_FMT_VP9D = 2,
+    RKVDEC_FMT_AVS2 = 3,
 };
 
-#define RKVDEC_MAX_RCB_NUM        (16)
+#define RKVDEC_MAX_RCB_NUM (16)
 
 struct rcb_info_elem {
     u32 index;
@@ -203,18 +198,15 @@ struct rkvdec2_dev {
     u32 task_index;
 };
 
-int mpp_set_rcbbuf(struct mpp_dev *mpp, struct mpp_session *session,
-           struct mpp_task *task);
-int rkvdec2_task_init(struct mpp_dev *mpp, struct mpp_session *session,
-              struct rkvdec2_task *task, struct mpp_task_msgs *msgs);
-void *rkvdec2_alloc_task(struct mpp_session *session,
-             struct mpp_task_msgs *msgs);
+int mpp_set_rcbbuf(struct mpp_dev *mpp, struct mpp_session *session, struct mpp_task *task);
+int rkvdec2_task_init(struct mpp_dev *mpp, struct mpp_session *session, struct rkvdec2_task *task,
+                      struct mpp_task_msgs *msgs);
+void *rkvdec2_alloc_task(struct mpp_session *session, struct mpp_task_msgs *msgs);
 int rkvdec2_free_task(struct mpp_session *session, struct mpp_task *mpp_task);
 
 int rkvdec2_free_session(struct mpp_session *session);
 
-int rkvdec2_result(struct mpp_dev *mpp, struct mpp_task *mpp_task,
-           struct mpp_task_msgs *msgs);
+int rkvdec2_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct mpp_task_msgs *msgs);
 int rkvdec2_reset(struct mpp_dev *mpp);
 
 #endif

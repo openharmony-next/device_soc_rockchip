@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 #include <mali_kbase.h>
 #include <mali_kbase_jm.h>
 #include <mali_kbase_hwaccess_jm.h>
@@ -48,17 +44,21 @@ struct kbase_trace_timeline_desc {
 };
 
 static struct kbase_trace_timeline_desc kbase_trace_timeline_desc_table[] = {
-    #define KBASE_TIMELINE_TRACE_CODE(enum_val, desc, format, format_desc) { #enum_val, desc, format, format_desc }
-    #include "mali_kbase_trace_timeline_defs.h"
-    #undef KBASE_TIMELINE_TRACE_CODE
+#define KBASE_TIMELINE_TRACE_CODE(enum_val, desc, format, format_desc)                                                 \
+    {                                                                                                                  \
+#enum_val, desc, format, format_desc                                                                           \
+    }
+#include "mali_kbase_trace_timeline_defs.h"
+#undef KBASE_TIMELINE_TRACE_CODE
 };
 
 #define KBASE_NR_TRACE_CODES ARRAY_SIZE(kbase_trace_timeline_desc_table)
 
 static void *kbasep_trace_timeline_seq_start(struct seq_file *s, loff_t *pos)
 {
-    if (*pos >= KBASE_NR_TRACE_CODES)
+    if (*pos >= KBASE_NR_TRACE_CODES) {
         return NULL;
+    }
 
     return &kbase_trace_timeline_desc_table[*pos];
 }
@@ -71,8 +71,9 @@ static void *kbasep_trace_timeline_seq_next(struct seq_file *s, void *data, loff
 {
     (*pos)++;
 
-    if (*pos == KBASE_NR_TRACE_CODES)
+    if (*pos == KBASE_NR_TRACE_CODES) {
         return NULL;
+    }
 
     return &kbase_trace_timeline_desc_table[*pos];
 }
@@ -84,7 +85,6 @@ static int kbasep_trace_timeline_seq_show(struct seq_file *s, void *data)
     seq_printf(s, "%s#%s#%s#%s\n", trace_desc->enum_str, trace_desc->desc, trace_desc->format, trace_desc->format_desc);
     return 0;
 }
-
 
 static const struct seq_operations kbasep_trace_timeline_seq_ops = {
     .start = kbasep_trace_timeline_seq_start,
@@ -109,15 +109,14 @@ static const struct file_operations kbasep_trace_timeline_debugfs_fops = {
 
 void kbasep_trace_timeline_debugfs_init(struct kbase_device *kbdev)
 {
-    debugfs_create_file("mali_timeline_defs",
-            S_IRUGO, kbdev->mali_debugfs_directory, NULL,
-            &kbasep_trace_timeline_debugfs_fops);
+    debugfs_create_file("mali_timeline_defs", S_IRUGO, kbdev->mali_debugfs_directory, NULL,
+                        &kbasep_trace_timeline_debugfs_fops);
 }
 
 #endif /* CONFIG_DEBUG_FS */
 
-void kbase_timeline_job_slot_submit(struct kbase_device *kbdev, struct kbase_context *kctx,
-        struct kbase_jd_atom *katom, int js)
+void kbase_timeline_job_slot_submit(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbase_jd_atom *katom,
+                                    int js)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
@@ -134,9 +133,8 @@ void kbase_timeline_job_slot_submit(struct kbase_device *kbdev, struct kbase_con
     KBASE_TIMELINE_ATOMS_SUBMITTED(kctx, js, kbdev->timeline.slot_atoms_submitted[js]);
 }
 
-void kbase_timeline_job_slot_done(struct kbase_device *kbdev, struct kbase_context *kctx,
-        struct kbase_jd_atom *katom, int js,
-        kbasep_js_atom_done_code done_code)
+void kbase_timeline_job_slot_done(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbase_jd_atom *katom,
+                                  int js, kbasep_js_atom_done_code done_code)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
@@ -180,13 +178,15 @@ void kbase_timeline_pm_send_event(struct kbase_device *kbdev, enum kbase_timelin
     old_uid = uid;
 
     /* Get a new non-zero UID if we don't have one yet */
-    while (!uid)
+    while (!uid) {
         uid = atomic_inc_return(&kbdev->timeline.pm_event_uid_counter);
+    }
 
     /* Try to use this UID */
-    if (old_uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event_sent], old_uid, uid))
+    if (old_uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event_sent], old_uid, uid)) {
         /* If it changed, raced with another producer: we've lost this UID */
         uid = 0;
+    }
 
     KBASE_TIMELINE_PM_SEND_EVENT(kbdev, event_sent, uid);
 }
@@ -196,9 +196,10 @@ void kbase_timeline_pm_check_handle_event(struct kbase_device *kbdev, enum kbase
     int uid = atomic_read(&kbdev->timeline.pm_event_uid[event]);
 
     if (uid != 0) {
-        if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0))
+        if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0)) {
             /* If it changed, raced with another consumer: we've lost this UID */
             uid = 0;
+        }
 
         KBASE_TIMELINE_PM_HANDLE_EVENT(kbdev, event, uid);
     }
@@ -208,9 +209,10 @@ void kbase_timeline_pm_handle_event(struct kbase_device *kbdev, enum kbase_timel
 {
     int uid = atomic_read(&kbdev->timeline.pm_event_uid[event]);
 
-    if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0))
+    if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0)) {
         /* If it changed, raced with another consumer: we've lost this UID */
         uid = 0;
+    }
 
     KBASE_TIMELINE_PM_HANDLE_EVENT(kbdev, event, uid);
 }

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010, 2012-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -13,14 +14,14 @@
 
 #include "mali_osk.h"
 
-#define MALI_KERNEL_LEVEL_ERROR           0
-#define MALI_KERNEL_LEVEL_WRANING       1
-#define MALI_KERNEL_LEVEL_INFORMATOIN  2
-#define MALI_KERNEL_LEVEL_MESSAGE      3
-#define MALI_KERNEL_LEVEL_CODE         4
-#define MALI_KERNEL_LEVEL_DATA         5
-#define MALI_KERNEL_LEVEL_ENABLE_ALL   7
-
+#define MALI_KERNEL_LEVEL_ERROR 0
+#define MALI_KERNEL_LEVEL_WRANING 1
+#define MALI_KERNEL_LEVEL_INFORMATOIN 2
+#define MALI_KERNEL_LEVEL_MESSAGE 3
+#define MALI_KERNEL_LEVEL_CODE 4
+#define MALI_KERNEL_LEVEL_DATA 5
+#define MALI_KERNEL_LEVEL_MATE 6
+#define MALI_KERNEL_LEVEL_ENABLE_ALL 7
 
 /* Make sure debug is defined when it should be */
 #ifndef DEBUG
@@ -48,14 +49,14 @@
  */
 
 /**
-*  Fundamental error macro. Reports an error code. This is abstracted to allow us to
-*  easily switch to a different error reporting method if we want, and also to allow
-*  us to search for error returns easily.
-*
-*  Note no closing semicolon - this is supplied in typical usage:
-*
-*  MALI_ERROR(MALI_ERROR_OUT_OF_MEMORY);
-*/
+ *  Fundamental error macro. Reports an error code. This is abstracted to allow us to
+ *  easily switch to a different error reporting method if we want, and also to allow
+ *  us to search for error returns easily.
+ *
+ *  Note no closing semicolon - this is supplied in typical usage:
+ *
+ *  MALI_ERROR(MALI_ERROR_OUT_OF_MEMORY);
+ */
 #define MALI_ERROR(error_code) return (error_code)
 
 /**
@@ -76,7 +77,11 @@
  *
  *  MALI_CHECK((p!=NULL), ERROR_NO_OBJECT);
  */
-#define MALI_CHECK(condition, error_code) do { if(!(condition)) MALI_ERROR(error_code); } while(0)
+#define MALI_CHECK(condition, error_code)                                                                              \
+    do {                                                                                                               \
+        if (!(condition))                                                                                              \
+            MALI_ERROR(error_code);                                                                                    \
+    } while (0)
 
 /**
  *  Error propagation macro. If the expression given is anything other than
@@ -88,16 +93,17 @@
  *  this error will be returned without evaluating the expression in
  *  MALI_CHECK_NO_ERROR
  */
-#define MALI_CHECK_NO_ERROR(expression) \
-    do { mali_osk_errcode_t _check_no_error_result=(expression); \
-        if(_check_no_error_result != MALI_OSK_ERR_OK) \
-            MALI_ERROR(_check_no_error_result); \
-    } while(0)
+#define MALI_CHECK_NO_ERROR(expression)                                                                                \
+    do {                                                                                                               \
+        mali_osk_errcode_t _check_no_error_result = (expression);                                                      \
+        if (_check_no_error_result != MALI_OSK_ERR_OK)                                                                 \
+            MALI_ERROR(_check_no_error_result);                                                                        \
+    } while (0)
 
 /**
  *  Pointer check macro. Checks non-null pointer.
  */
-#define MALI_CHECK_NON_NULL(pointer, error_code) MALI_CHECK( ((pointer)!=NULL), (error_code) )
+#define MALI_CHECK_NON_NULL(pointer, error_code) MALI_CHECK(((pointer) != NULL), (error_code))
 
 /**
  *  Error macro with goto. This checks whether the given condition is true, and if not jumps
@@ -108,13 +114,17 @@
  *  Like the other macros, this is a macro to allow us to override the condition if we wish,
  *  e.g. to force an error during stress testing.
  */
-#define MALI_CHECK_GOTO(condition, label) do { if(!(condition)) goto label; } while(0)
+#define MALI_CHECK_GOTO(condition, label)                                                                              \
+    do {                                                                                                               \
+        if (!(condition))                                                                                              \
+            goto(label);                                                                                               \
+    } while (0)
 
 /**
  *  Explicitly ignore a parameter passed into a function, to suppress compiler warnings.
  *  Should only be used with parameter names.
  */
-#define MALI_IGNORE(x) x=x
+#define MALI_IGNORE(x) (x) = (x)
 
 #if defined(CONFIG_MALI_QUIET)
 #define MALI_PRINTF(args)
@@ -122,16 +132,18 @@
 #define MALI_PRINTF(args) _mali_osk_dbgmsg args;
 #endif
 
-#define MALI_PRINT_ERROR(args) do{ \
-        MALI_PRINTF(("Mali: ERR: %s\n" ,__FILE__)); \
-        MALI_PRINTF(("           %s()%4d\n           ", __FUNCTION__, __LINE__)) ; \
-        MALI_PRINTF(args); \
-        MALI_PRINTF(("\n")); \
-    } while(0)
+#define MALI_PRINT_ERROR(args)                                                                                         \
+    do {                                                                                                               \
+        MALI_PRINTF(("Mali: ERR: %s\n", __FILE__));                                                                    \
+        MALI_PRINTF(("           %s()%4d\n           ", __FUNCTION__, __LINE__));                                      \
+        MALI_PRINTF(args);                                                                                             \
+        MALI_PRINTF(("\n"));                                                                                           \
+    } while (0)
 
-#define MALI_PRINT(args) do{ \
-        MALI_PRINTF(("Mali: ")); \
-        MALI_PRINTF(args); \
+#define MALI_PRINT(args)                                                                                               \
+    do {                                                                                                               \
+        MALI_PRINTF(("Mali: "));                                                                                       \
+        MALI_PRINTF(args);                                                                                             \
     } while (0)
 
 #ifdef DEBUG
@@ -140,40 +152,80 @@ extern int mali_debug_level;
 #endif
 
 #define MALI_DEBUG_CODE(code) code
-#define MALI_DEBUG_PRINT(level, args)  do { \
-        if((level) <=  mali_debug_level)\
-        {MALI_PRINTF(("Mali<" #level ">: ")); MALI_PRINTF(args); } \
+#define MALI_DEBUG_PRINT(level, args)                                                                                  \
+    do {                                                                                                               \
+        if ((level) <= mali_debug_level) {                                                                             \
+            MALI_PRINTF(("Mali<" #level ">: "));                                                                       \
+            MALI_PRINTF(args);                                                                                         \
+        }                                                                                                              \
     } while (0)
 
 #define MALI_DEBUG_PRINT_ERROR(args) MALI_PRINT_ERROR(args)
 
-#define MALI_DEBUG_PRINT_IF(level,condition,args)  \
-    if((condition)&&((level) <=  mali_debug_level))\
-    {MALI_PRINTF(("Mali<" #level ">: ")); MALI_PRINTF(args); }
+#define MALI_DEBUG_PRINT_IF(level, condition, args)                                                                    \
+    if ((condition) && ((level) <= mali_debug_level)) {                                                                \
+        MALI_PRINTF(("Mali<" #level ">: "));                                                                           \
+        MALI_PRINTF(args);                                                                                             \
+    }
 
-#define MALI_DEBUG_PRINT_ELSE(level, args)\
-    else if((level) <=  mali_debug_level)\
-    { MALI_PRINTF(("Mali<" #level ">: ")); MALI_PRINTF(args); }
+#define MALI_DEBUG_PRINT_ELSE(level, args)                                                                             \
+    else if ((level) <= mali_debug_level)                                                                              \
+    {                                                                                                                  \
+        MALI_PRINTF(("Mali<" #level ">: "));                                                                           \
+        MALI_PRINTF(args);                                                                                             \
+    }
 
 /**
  * @note these variants of DEBUG ASSERTS will cause a debugger breakpoint
  * to be entered (see _mali_osk_break() ). An alternative would be to call
  * _mali_osk_abort(), on OSs that support it.
  */
-#define MALI_DEBUG_PRINT_ASSERT(condition, args) do  {if( !(condition)) { MALI_PRINT_ERROR(args); _mali_osk_break(); } } while(0)
-#define MALI_DEBUG_ASSERT_POINTER(pointer) do  {if( (pointer)== NULL) {MALI_PRINT_ERROR(("NULL pointer " #pointer)); _mali_osk_break();} } while(0)
-#define MALI_DEBUG_ASSERT(condition) do  {if( !(condition)) {MALI_PRINT_ERROR(("ASSERT failed: " #condition )); _mali_osk_break();} } while(0)
+#define MALI_DEBUG_PRINT_ASSERT(condition, args)                                                                       \
+    do {                                                                                                               \
+        if (!(condition)) {                                                                                            \
+            MALI_PRINT_ERROR(args);                                                                                    \
+            _mali_osk_break();                                                                                         \
+        }                                                                                                              \
+    } while (0)
+#define MALI_DEBUG_ASSERT_POINTER(pointer)                                                                             \
+    do {                                                                                                               \
+        if ((pointer) == NULL) {                                                                                       \
+            MALI_PRINT_ERROR(("NULL pointer " #pointer));                                                              \
+            _mali_osk_break();                                                                                         \
+        }                                                                                                              \
+    } while (0)
+#define MALI_DEBUG_ASSERT(condition)                                                                                   \
+    do {                                                                                                               \
+        if (!(condition)) {                                                                                            \
+            MALI_PRINT_ERROR(("ASSERT failed: " #condition));                                                          \
+            _mali_osk_break();                                                                                         \
+        }                                                                                                              \
+    } while (0)
 
 #else /* DEBUG */
 
 #define MALI_DEBUG_CODE(code)
-#define MALI_DEBUG_PRINT(string,args) do {} while(0)
-#define MALI_DEBUG_PRINT_ERROR(args) do {} while(0)
-#define MALI_DEBUG_PRINT_IF(level,condition,args) do {} while(0)
-#define MALI_DEBUG_PRINT_ELSE(level,condition,args) do {} while(0)
-#define MALI_DEBUG_PRINT_ASSERT(condition,args) do {} while(0)
-#define MALI_DEBUG_ASSERT_POINTER(pointer) do {} while(0)
-#define MALI_DEBUG_ASSERT(condition) do {} while(0)
+#define MALI_DEBUG_PRINT(string, args)                                                                                 \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_PRINT_ERROR(args)                                                                                   \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_PRINT_IF(level, condition, args)                                                                    \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_PRINT_ELSE(level, condition, args)                                                                  \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_PRINT_ASSERT(condition, args)                                                                       \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_ASSERT_POINTER(pointer)                                                                             \
+    do {                                                                                                               \
+    } while (0)
+#define MALI_DEBUG_ASSERT(condition)                                                                                   \
+    do {                                                                                                               \
+    } while (0)
 
 #endif /* DEBUG */
 

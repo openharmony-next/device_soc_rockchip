@@ -24,114 +24,96 @@ struct power_supply_attr {
     const char *prop_name;
     char attr_name[MAX_PROP_NAME_LEN + 1];
     struct device_attribute dev_attr;
-    const char * const *text_values;
+    const char *const *text_values;
     int text_values_len;
 };
 
-#define _POWER_SUPPLY_ATTR(_name, _text, _len)    \
-[POWER_SUPPLY_PROP_ ## _name] =            \
-{                        \
-    .prop_name = #_name,            \
-    .attr_name = #_name "\0",        \
-    .text_values = _text,            \
-    .text_values_len = _len,        \
-}
+#define _POWER_SUPPLY_ATTR(_name, _text, _len)                                                                         \
+    [POWER_SUPPLY_PROP_##_name] = {                                                                                    \
+        .prop_name = #_name,                                                                                           \
+        .attr_name = #_name "\0",                                                                                      \
+        .text_values = (_text),                                                                                        \
+        .text_values_len = (_len),                                                                                     \
+    }
 
 #define POWER_SUPPLY_ATTR(_name) _POWER_SUPPLY_ATTR(_name, NULL, 0)
-#define _POWER_SUPPLY_ENUM_ATTR(_name, _text)    \
-    _POWER_SUPPLY_ATTR(_name, _text, ARRAY_SIZE(_text))
-#define POWER_SUPPLY_ENUM_ATTR(_name)    \
-    _POWER_SUPPLY_ENUM_ATTR(_name, POWER_SUPPLY_ ## _name ## _TEXT)
+#define _POWER_SUPPLY_ENUM_ATTR(_name, _text) _POWER_SUPPLY_ATTR(_name, _text, ARRAY_SIZE(_text))
+#define POWER_SUPPLY_ENUM_ATTR(_name) _POWER_SUPPLY_ENUM_ATTR(_name, POWER_SUPPLY_##_name##_TEXT)
 
-static const char * const POWER_SUPPLY_TYPE_TEXT[] = {
-    [POWER_SUPPLY_TYPE_UNKNOWN]        = "Unknown",
-    [POWER_SUPPLY_TYPE_BATTERY]        = "Battery",
-    [POWER_SUPPLY_TYPE_UPS]            = "UPS",
-    [POWER_SUPPLY_TYPE_MAINS]        = "Mains",
-    [POWER_SUPPLY_TYPE_USB]            = "USB",
-    [POWER_SUPPLY_TYPE_USB_DCP]        = "USB_DCP",
-    [POWER_SUPPLY_TYPE_USB_CDP]        = "USB_CDP",
-    [POWER_SUPPLY_TYPE_USB_ACA]        = "USB_ACA",
-    [POWER_SUPPLY_TYPE_USB_TYPE_C]        = "USB_C",
-    [POWER_SUPPLY_TYPE_USB_PD]        = "USB_PD",
-    [POWER_SUPPLY_TYPE_USB_PD_DRP]        = "USB_PD_DRP",
-    [POWER_SUPPLY_TYPE_APPLE_BRICK_ID]    = "BrickID",
-    [POWER_SUPPLY_TYPE_WIRELESS]        = "Wireless",
+static const char *const POWER_SUPPLY_TYPE_TEXT[] = {
+    [POWER_SUPPLY_TYPE_UNKNOWN] = "Unknown",
+    [POWER_SUPPLY_TYPE_BATTERY] = "Battery",
+    [POWER_SUPPLY_TYPE_UPS] = "UPS",
+    [POWER_SUPPLY_TYPE_MAINS] = "Mains",
+    [POWER_SUPPLY_TYPE_USB] = "USB",
+    [POWER_SUPPLY_TYPE_USB_DCP] = "USB_DCP",
+    [POWER_SUPPLY_TYPE_USB_CDP] = "USB_CDP",
+    [POWER_SUPPLY_TYPE_USB_ACA] = "USB_ACA",
+    [POWER_SUPPLY_TYPE_USB_TYPE_C] = "USB_C",
+    [POWER_SUPPLY_TYPE_USB_PD] = "USB_PD",
+    [POWER_SUPPLY_TYPE_USB_PD_DRP] = "USB_PD_DRP",
+    [POWER_SUPPLY_TYPE_APPLE_BRICK_ID] = "BrickID",
+    [POWER_SUPPLY_TYPE_WIRELESS] = "Wireless",
 };
 
-static const char * const POWER_SUPPLY_USB_TYPE_TEXT[] = {
-    [POWER_SUPPLY_USB_TYPE_UNKNOWN]        = "Unknown",
-    [POWER_SUPPLY_USB_TYPE_SDP]        = "SDP",
-    [POWER_SUPPLY_USB_TYPE_DCP]        = "DCP",
-    [POWER_SUPPLY_USB_TYPE_CDP]        = "CDP",
-    [POWER_SUPPLY_USB_TYPE_ACA]        = "ACA",
-    [POWER_SUPPLY_USB_TYPE_C]        = "C",
-    [POWER_SUPPLY_USB_TYPE_PD]        = "PD",
-    [POWER_SUPPLY_USB_TYPE_PD_DRP]        = "PD_DRP",
-    [POWER_SUPPLY_USB_TYPE_PD_PPS]        = "PD_PPS",
-    [POWER_SUPPLY_USB_TYPE_APPLE_BRICK_ID]    = "BrickID",
+static const char *const POWER_SUPPLY_USB_TYPE_TEXT[] = {
+    [POWER_SUPPLY_USB_TYPE_UNKNOWN] = "Unknown", [POWER_SUPPLY_USB_TYPE_SDP] = "SDP",
+    [POWER_SUPPLY_USB_TYPE_DCP] = "DCP",         [POWER_SUPPLY_USB_TYPE_CDP] = "CDP",
+    [POWER_SUPPLY_USB_TYPE_ACA] = "ACA",         [POWER_SUPPLY_USB_TYPE_C] = "C",
+    [POWER_SUPPLY_USB_TYPE_PD] = "PD",           [POWER_SUPPLY_USB_TYPE_PD_DRP] = "PD_DRP",
+    [POWER_SUPPLY_USB_TYPE_PD_PPS] = "PD_PPS",   [POWER_SUPPLY_USB_TYPE_APPLE_BRICK_ID] = "BrickID",
 };
 
-static const char * const POWER_SUPPLY_STATUS_TEXT[] = {
-    [POWER_SUPPLY_STATUS_UNKNOWN]        = "Unknown",
-    [POWER_SUPPLY_STATUS_CHARGING]        = "Charging",
-    [POWER_SUPPLY_STATUS_DISCHARGING]    = "Discharging",
-    [POWER_SUPPLY_STATUS_NOT_CHARGING]    = "Not charging",
-    [POWER_SUPPLY_STATUS_FULL]        = "Full",
+static const char *const POWER_SUPPLY_STATUS_TEXT[] = {
+    [POWER_SUPPLY_STATUS_UNKNOWN] = "Unknown",
+    [POWER_SUPPLY_STATUS_CHARGING] = "Charging",
+    [POWER_SUPPLY_STATUS_DISCHARGING] = "Discharging",
+    [POWER_SUPPLY_STATUS_NOT_CHARGING] = "Not charging",
+    [POWER_SUPPLY_STATUS_FULL] = "Full",
 };
 
-static const char * const POWER_SUPPLY_CHARGE_TYPE_TEXT[] = {
-    [POWER_SUPPLY_CHARGE_TYPE_UNKNOWN]    = "Unknown",
-    [POWER_SUPPLY_CHARGE_TYPE_NONE]        = "N/A",
-    [POWER_SUPPLY_CHARGE_TYPE_TRICKLE]    = "Trickle",
-    [POWER_SUPPLY_CHARGE_TYPE_FAST]        = "Fast",
-    [POWER_SUPPLY_CHARGE_TYPE_STANDARD]    = "Standard",
-    [POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE]    = "Adaptive",
-    [POWER_SUPPLY_CHARGE_TYPE_CUSTOM]    = "Custom",
-    [POWER_SUPPLY_CHARGE_TYPE_LONGLIFE]    = "Long Life",
-    [POWER_SUPPLY_CHARGE_TYPE_TAPER]    = "Taper",
+static const char *const POWER_SUPPLY_CHARGE_TYPE_TEXT[] = {
+    [POWER_SUPPLY_CHARGE_TYPE_UNKNOWN] = "Unknown",   [POWER_SUPPLY_CHARGE_TYPE_NONE] = "N/A",
+    [POWER_SUPPLY_CHARGE_TYPE_TRICKLE] = "Trickle",   [POWER_SUPPLY_CHARGE_TYPE_FAST] = "Fast",
+    [POWER_SUPPLY_CHARGE_TYPE_STANDARD] = "Standard", [POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE] = "Adaptive",
+    [POWER_SUPPLY_CHARGE_TYPE_CUSTOM] = "Custom",     [POWER_SUPPLY_CHARGE_TYPE_LONGLIFE] = "Long Life",
+    [POWER_SUPPLY_CHARGE_TYPE_TAPER] = "Taper",
 };
 
-static const char * const POWER_SUPPLY_HEALTH_TEXT[] = {
-    [POWER_SUPPLY_HEALTH_UNKNOWN]            = "Unknown",
-    [POWER_SUPPLY_HEALTH_GOOD]            = "Good",
-    [POWER_SUPPLY_HEALTH_OVERHEAT]            = "Overheat",
-    [POWER_SUPPLY_HEALTH_DEAD]            = "Dead",
-    [POWER_SUPPLY_HEALTH_OVERVOLTAGE]        = "Over voltage",
-    [POWER_SUPPLY_HEALTH_UNSPEC_FAILURE]        = "Unspecified failure",
-    [POWER_SUPPLY_HEALTH_COLD]            = "Cold",
+static const char *const POWER_SUPPLY_HEALTH_TEXT[] = {
+    [POWER_SUPPLY_HEALTH_UNKNOWN] = "Unknown",
+    [POWER_SUPPLY_HEALTH_GOOD] = "Good",
+    [POWER_SUPPLY_HEALTH_OVERHEAT] = "Overheat",
+    [POWER_SUPPLY_HEALTH_DEAD] = "Dead",
+    [POWER_SUPPLY_HEALTH_OVERVOLTAGE] = "Over voltage",
+    [POWER_SUPPLY_HEALTH_UNSPEC_FAILURE] = "Unspecified failure",
+    [POWER_SUPPLY_HEALTH_COLD] = "Cold",
     [POWER_SUPPLY_HEALTH_WATCHDOG_TIMER_EXPIRE] = "Watchdog timer expire",
-    [POWER_SUPPLY_HEALTH_SAFETY_TIMER_EXPIRE]   = "Safety timer expire",
-    [POWER_SUPPLY_HEALTH_OVERCURRENT]        = "Over current",
-    [POWER_SUPPLY_HEALTH_CALIBRATION_REQUIRED]  = "Calibration required",
-    [POWER_SUPPLY_HEALTH_WARM]            = "Warm",
-    [POWER_SUPPLY_HEALTH_COOL]            = "Cool",
-    [POWER_SUPPLY_HEALTH_HOT]            = "Hot",
+    [POWER_SUPPLY_HEALTH_SAFETY_TIMER_EXPIRE] = "Safety timer expire",
+    [POWER_SUPPLY_HEALTH_OVERCURRENT] = "Over current",
+    [POWER_SUPPLY_HEALTH_CALIBRATION_REQUIRED] = "Calibration required",
+    [POWER_SUPPLY_HEALTH_WARM] = "Warm",
+    [POWER_SUPPLY_HEALTH_COOL] = "Cool",
+    [POWER_SUPPLY_HEALTH_HOT] = "Hot",
 };
 
-static const char * const POWER_SUPPLY_TECHNOLOGY_TEXT[] = {
-    [POWER_SUPPLY_TECHNOLOGY_UNKNOWN]    = "Unknown",
-    [POWER_SUPPLY_TECHNOLOGY_NiMH]        = "NiMH",
-    [POWER_SUPPLY_TECHNOLOGY_LION]        = "Li-ion",
-    [POWER_SUPPLY_TECHNOLOGY_LIPO]        = "Li-poly",
-    [POWER_SUPPLY_TECHNOLOGY_LiFe]        = "LiFe",
-    [POWER_SUPPLY_TECHNOLOGY_NiCd]        = "NiCd",
-    [POWER_SUPPLY_TECHNOLOGY_LiMn]        = "LiMn",
+static const char *const POWER_SUPPLY_TECHNOLOGY_TEXT[] = {
+    [POWER_SUPPLY_TECHNOLOGY_UNKNOWN] = "Unknown", [POWER_SUPPLY_TECHNOLOGY_NiMH] = "NiMH",
+    [POWER_SUPPLY_TECHNOLOGY_LION] = "Li-ion",     [POWER_SUPPLY_TECHNOLOGY_LIPO] = "Li-poly",
+    [POWER_SUPPLY_TECHNOLOGY_LiFe] = "LiFe",       [POWER_SUPPLY_TECHNOLOGY_NiCd] = "NiCd",
+    [POWER_SUPPLY_TECHNOLOGY_LiMn] = "LiMn",
 };
 
-static const char * const POWER_SUPPLY_CAPACITY_LEVEL_TEXT[] = {
-    [POWER_SUPPLY_CAPACITY_LEVEL_UNKNOWN]    = "Unknown",
-    [POWER_SUPPLY_CAPACITY_LEVEL_CRITICAL]    = "Critical",
-    [POWER_SUPPLY_CAPACITY_LEVEL_LOW]    = "Low",
-    [POWER_SUPPLY_CAPACITY_LEVEL_NORMAL]    = "Normal",
-    [POWER_SUPPLY_CAPACITY_LEVEL_HIGH]    = "High",
-    [POWER_SUPPLY_CAPACITY_LEVEL_FULL]    = "Full",
+static const char *const POWER_SUPPLY_CAPACITY_LEVEL_TEXT[] = {
+    [POWER_SUPPLY_CAPACITY_LEVEL_UNKNOWN] = "Unknown", [POWER_SUPPLY_CAPACITY_LEVEL_CRITICAL] = "Critical",
+    [POWER_SUPPLY_CAPACITY_LEVEL_LOW] = "Low",         [POWER_SUPPLY_CAPACITY_LEVEL_NORMAL] = "Normal",
+    [POWER_SUPPLY_CAPACITY_LEVEL_HIGH] = "High",       [POWER_SUPPLY_CAPACITY_LEVEL_FULL] = "Full",
 };
 
-static const char * const POWER_SUPPLY_SCOPE_TEXT[] = {
-    [POWER_SUPPLY_SCOPE_UNKNOWN]    = "Unknown",
-    [POWER_SUPPLY_SCOPE_SYSTEM]    = "System",
-    [POWER_SUPPLY_SCOPE_DEVICE]    = "Device",
+static const char *const POWER_SUPPLY_SCOPE_TEXT[] = {
+    [POWER_SUPPLY_SCOPE_UNKNOWN] = "Unknown",
+    [POWER_SUPPLY_SCOPE_SYSTEM] = "System",
+    [POWER_SUPPLY_SCOPE_DEVICE] = "Device",
 };
 
 static struct power_supply_attr power_supply_attrs[] = {
@@ -214,8 +196,7 @@ static struct power_supply_attr power_supply_attrs[] = {
     POWER_SUPPLY_ATTR(SERIAL_NUMBER),
 };
 
-static struct attribute *
-__power_supply_attrs[ARRAY_SIZE(power_supply_attrs) + 1];
+static struct attribute *__power_supply_attrs[ARRAY_SIZE(power_supply_attrs) + 1];
 
 static struct power_supply_attr *to_ps_attr(struct device_attribute *attr)
 {
@@ -224,13 +205,11 @@ static struct power_supply_attr *to_ps_attr(struct device_attribute *attr)
 
 static enum power_supply_property dev_attr_psp(struct device_attribute *attr)
 {
-    return  to_ps_attr(attr) - power_supply_attrs;
+    return to_ps_attr(attr) - power_supply_attrs;
 }
 
-static ssize_t power_supply_show_usb_type(struct device *dev,
-                      const struct power_supply_desc *desc,
-                      union power_supply_propval *value,
-                      char *buf)
+static ssize_t power_supply_show_usb_type(struct device *dev, const struct power_supply_desc *desc,
+                                          union power_supply_propval *value, char *buf)
 {
     enum power_supply_usb_type usb_type;
     ssize_t count = 0;
@@ -241,12 +220,10 @@ static ssize_t power_supply_show_usb_type(struct device *dev,
         usb_type = desc->usb_types[i];
 
         if (value->intval == usb_type) {
-            count += sprintf(buf + count, "[%s] ",
-                     POWER_SUPPLY_USB_TYPE_TEXT[usb_type]);
+            count += sprintf(buf + count, "[%s] ", POWER_SUPPLY_USB_TYPE_TEXT[usb_type]);
             match = true;
         } else {
-            count += sprintf(buf + count, "%s ",
-                     POWER_SUPPLY_USB_TYPE_TEXT[usb_type]);
+            count += sprintf(buf + count, "%s ", POWER_SUPPLY_USB_TYPE_TEXT[usb_type]);
         }
     }
 
@@ -255,15 +232,15 @@ static ssize_t power_supply_show_usb_type(struct device *dev,
         return -EINVAL;
     }
 
-    if (count)
+    if (count) {
         buf[count - 1] = '\n';
+    }
 
     return count;
 }
 
-static ssize_t power_supply_show_property(struct device *dev,
-                      struct device_attribute *attr,
-                      char *buf) {
+static ssize_t power_supply_show_property(struct device *dev, struct device_attribute *attr, char *buf)
+{
     ssize_t ret;
     struct power_supply *psy = dev_get_drvdata(dev);
     struct power_supply_attr *ps_attr = to_ps_attr(attr);
@@ -276,40 +253,36 @@ static ssize_t power_supply_show_property(struct device *dev,
         ret = power_supply_get_property(psy, psp, &value);
 
         if (ret < 0) {
-            if (ret == -ENODATA)
-                dev_dbg(dev, "driver has no data for `%s' property\n",
-                    attr->attr.name);
-            else if (ret != -ENODEV && ret != -EAGAIN)
-                dev_err_ratelimited(dev,
-                    "driver failed to report `%s' property: %zd\n",
-                    attr->attr.name, ret);
+            if (ret == -ENODATA) {
+                dev_dbg(dev, "driver has no data for `%s' property\n", attr->attr.name);
+            } else if (ret != -ENODEV && ret != -EAGAIN) {
+                dev_err_ratelimited(dev, "driver failed to report `%s' property: %zd\n", attr->attr.name, ret);
+            }
             return ret;
         }
     }
 
-    if (ps_attr->text_values_len > 0 &&
-        value.intval < ps_attr->text_values_len && value.intval >= 0) {
+    if (ps_attr->text_values_len > 0 && value.intval < ps_attr->text_values_len && value.intval >= 0) {
         return sprintf(buf, "%s\n", ps_attr->text_values[value.intval]);
     }
 
     switch (psp) {
-    case POWER_SUPPLY_PROP_USB_TYPE:
-        ret = power_supply_show_usb_type(dev, psy->desc,
-                        &value, buf);
-        break;
-    case POWER_SUPPLY_PROP_MODEL_NAME ... POWER_SUPPLY_PROP_SERIAL_NUMBER:
-        ret = sprintf(buf, "%s\n", value.strval);
-        break;
-    default:
-        ret = sprintf(buf, "%d\n", value.intval);
+        case POWER_SUPPLY_PROP_USB_TYPE:
+            ret = power_supply_show_usb_type(dev, psy->desc, &value, buf);
+            break;
+        case POWER_SUPPLY_PROP_MODEL_NAME ... POWER_SUPPLY_PROP_SERIAL_NUMBER:
+            ret = sprintf(buf, "%s\n", value.strval);
+            break;
+        default:
+            ret = sprintf(buf, "%d\n", value.intval);
     }
 
     return ret;
 }
 
-static ssize_t power_supply_store_property(struct device *dev,
-                       struct device_attribute *attr,
-                       const char *buf, size_t count) {
+static ssize_t power_supply_store_property(struct device *dev, struct device_attribute *attr, const char *buf,
+                                           size_t count)
+{
     ssize_t ret;
     struct power_supply *psy = dev_get_drvdata(dev);
     struct power_supply_attr *ps_attr = to_ps_attr(attr);
@@ -318,8 +291,7 @@ static ssize_t power_supply_store_property(struct device *dev,
 
     ret = -EINVAL;
     if (ps_attr->text_values_len > 0) {
-        ret = __sysfs_match_string(ps_attr->text_values,
-                       ps_attr->text_values_len, buf);
+        ret = __sysfs_match_string(ps_attr->text_values, ps_attr->text_values_len, buf);
     }
 
     /*
@@ -330,8 +302,9 @@ static ssize_t power_supply_store_property(struct device *dev,
         long long_val;
 
         ret = kstrtol(buf, 10, &long_val);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
 
         ret = long_val;
     }
@@ -339,34 +312,35 @@ static ssize_t power_supply_store_property(struct device *dev,
     value.intval = ret;
 
     ret = power_supply_set_property(psy, psp, &value);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     return count;
 }
 
-static umode_t power_supply_attr_is_visible(struct kobject *kobj,
-                       struct attribute *attr,
-                       int attrno)
+static umode_t power_supply_attr_is_visible(struct kobject *kobj, struct attribute *attr, int attrno)
 {
     struct device *dev = kobj_to_dev(kobj);
     struct power_supply *psy = dev_get_drvdata(dev);
     umode_t mode = S_IRUSR | S_IRGRP | S_IROTH;
     int i;
 
-    if (!power_supply_attrs[attrno].prop_name)
+    if (!power_supply_attrs[attrno].prop_name) {
         return 0;
+    }
 
-    if (attrno == POWER_SUPPLY_PROP_TYPE)
+    if (attrno == POWER_SUPPLY_PROP_TYPE) {
         return mode;
+    }
 
     for (i = 0; i < psy->desc->num_properties; i++) {
         int property = psy->desc->properties[i];
 
         if (property == attrno) {
-            if (psy->desc->property_is_writeable &&
-                psy->desc->property_is_writeable(psy, property) > 0)
+            if (psy->desc->property_is_writeable && psy->desc->property_is_writeable(psy, property) > 0) {
                 mode |= S_IWUSR;
+            }
 
             return mode;
         }
@@ -403,8 +377,7 @@ void power_supply_init_attrs(struct device_type *dev_type)
         struct device_attribute *attr;
 
         if (!power_supply_attrs[i].prop_name) {
-            pr_warn("%s: Property %d skipped because is is missing from power_supply_attrs\n",
-                __func__, i);
+            pr_warn("%s: Property %d skipped because is is missing from power_supply_attrs\n", __func__, i);
             sprintf(power_supply_attrs[i].attr_name, "_err_%d", i);
         } else {
             str_to_lower(power_supply_attrs[i].attr_name);
@@ -419,8 +392,8 @@ void power_supply_init_attrs(struct device_type *dev_type)
     }
 }
 
-static int add_prop_uevent(struct device *dev, struct kobj_uevent_env *env,
-               enum power_supply_property prop, char *prop_buf)
+static int add_prop_uevent(struct device *dev, struct kobj_uevent_env *env, enum power_supply_property prop,
+                           char *prop_buf)
 {
     int ret = 0;
     struct power_supply_attr *pwr_attr;
@@ -439,15 +412,16 @@ static int add_prop_uevent(struct device *dev, struct kobj_uevent_env *env,
         return 0;
     }
 
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     line = strchr(prop_buf, '\n');
-    if (line)
+    if (line) {
         *line = 0;
+    }
 
-    return add_uevent_var(env, "POWER_SUPPLY_%s=%s",
-                  pwr_attr->prop_name, prop_buf);
+    return add_uevent_var(env, "POWER_SUPPLY_%s=%s", pwr_attr->prop_name, prop_buf);
 }
 
 int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
@@ -462,22 +436,25 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
     }
 
     ret = add_uevent_var(env, "POWER_SUPPLY_NAME=%s", psy->desc->name);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     prop_buf = (char *)get_zeroed_page(GFP_KERNEL);
-    if (!prop_buf)
+    if (!prop_buf) {
         return -ENOMEM;
+    }
 
     ret = add_prop_uevent(dev, env, POWER_SUPPLY_PROP_TYPE, prop_buf);
-    if (ret)
+    if (ret) {
         goto out;
+    }
 
     for (j = 0; j < psy->desc->num_properties; j++) {
-        ret = add_prop_uevent(dev, env, psy->desc->properties[j],
-                      prop_buf);
-        if (ret)
+        ret = add_prop_uevent(dev, env, psy->desc->properties[j], prop_buf);
+        if (ret) {
             goto out;
+        }
     }
 
 out:

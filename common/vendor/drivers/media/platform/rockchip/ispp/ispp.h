@@ -1,20 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_ISPP_H
-#define _RKISPP_ISPP_H
+#ifndef H_RKISPP_ISPP_H
+#define H_RKISPP_ISPP_H
 
 #include "common.h"
 
-#define GRP_ID_ISPP        BIT(0)
+#define GRP_ID_ISPP BIT(0)
 
-enum rkispp_pad {
-    RKISPP_PAD_SINK,
-    RKISPP_PAD_SINK_PARAMS,
-    RKISPP_PAD_SOURCE,
-    RKISPP_PAD_SOURCE_STATS,
-    RKISPP_PAD_MAX
-};
+enum rkispp_pad { RKISPP_PAD_SINK, RKISPP_PAD_SINK_PARAMS, RKISPP_PAD_SOURCE, RKISPP_PAD_SOURCE_STATS, RKISPP_PAD_MAX };
 
 enum rkispp_state {
     ISPP_STOP = 0,
@@ -44,7 +38,6 @@ struct rkispp_subdev {
 
 u32 cal_fec_mesh(u32 width, u32 height, u32 mode);
 
-int rkispp_register_subdev(struct rkispp_device *dev,
-               struct v4l2_device *v4l2_dev);
+int rkispp_register_subdev(struct rkispp_device *dev, struct v4l2_device *v4l2_dev);
 void rkispp_unregister_subdev(struct rkispp_device *dev);
 #endif

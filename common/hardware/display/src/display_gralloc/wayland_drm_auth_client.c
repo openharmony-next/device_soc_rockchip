@@ -38,10 +38,10 @@ static void AuthenticationStatus(void *data, struct wl_drm_auth *wlDrmAuth, uint
     display->authStatus = status;
 }
 
-static const struct wl_drm_auth_listener g_drmAuthListener = { AuthenticationStatus };
+static const struct wl_drm_auth_listener g_drmAuthListener = {AuthenticationStatus};
 
 static void RegistryHandleGlobal(void *data, struct wl_registry *registry, uint32_t id, const char *interface,
-    uint32_t version)
+                                 uint32_t version)
 {
     WaylandDisplay *display = data;
     DISPLAY_DEBUGLOG("interface global : %{public}s", interface);
@@ -56,7 +56,7 @@ static void RegistryHandleGlobalRemove(void *data, struct wl_registry *registry,
     DISPLAY_DEBUGLOG("RegistryHandleGlobalRemove  %{publuc}d name ", name);
 }
 
-static const struct wl_registry_listener g_registrListener = { RegistryHandleGlobal, RegistryHandleGlobalRemove };
+static const struct wl_registry_listener g_registrListener = {RegistryHandleGlobal, RegistryHandleGlobalRemove};
 
 void DeInitWaylandClient(WaylandDisplay *display)
 {
@@ -81,10 +81,9 @@ WaylandDisplay *InitWaylandClient(void)
     DISPLAY_CHK_RETURN((dsp == NULL), NULL, DISPLAY_LOGE("can not alloc memory errno : %{public}d", errno));
     dsp->display = wl_display_connect(NULL);
     DISPLAY_CHK_RETURN((dsp->display == NULL), NULL, DISPLAY_LOGE("display connect failed, errno: %{public}d", errno);
-        DeInitWaylandClient(dsp));
+                       DeInitWaylandClient(dsp));
     dsp->registry = wl_display_get_registry(dsp->display);
-    DISPLAY_CHK_RETURN((dsp->registry == NULL), NULL, DISPLAY_LOGE("can not get registry");
-        DeInitWaylandClient(dsp));
+    DISPLAY_CHK_RETURN((dsp->registry == NULL), NULL, DISPLAY_LOGE("can not get registry"); DeInitWaylandClient(dsp));
     ret = wl_registry_add_listener(dsp->registry, &g_registrListener, dsp);
     DISPLAY_CHK_RETURN((ret < 0), NULL, DISPLAY_LOGE("add listener failed"));
     wl_display_roundtrip(dsp->display); // for get registry

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -50,10 +51,9 @@ void mali_free_empty_page(mali_dma_addr address, mali_io_address virt_addr)
     }
 }
 
-mali_osk_errcode_t mali_create_fault_flush_pages(mali_dma_addr *page_directory,
-        mali_io_address *page_directory_mapping,
-        mali_dma_addr *page_table, mali_io_address *page_table_mapping,
-        mali_dma_addr *data_page, mali_io_address *data_page_mapping)
+mali_osk_errcode_t mali_create_fault_flush_pages(mali_dma_addr *page_directory, mali_io_address *page_directory_mapping,
+                                                 mali_dma_addr *page_table, mali_io_address *page_table_mapping,
+                                                 mali_dma_addr *data_page, mali_io_address *data_page_mapping)
 {
     mali_osk_errcode_t err;
 
@@ -77,10 +77,9 @@ mali_osk_errcode_t mali_create_fault_flush_pages(mali_dma_addr *page_directory,
     return err;
 }
 
-void mali_destroy_fault_flush_pages(
-    mali_dma_addr *page_directory, mali_io_address *page_directory_mapping,
-    mali_dma_addr *page_table, mali_io_address *page_table_mapping,
-    mali_dma_addr *data_page, mali_io_address *data_page_mapping)
+void mali_destroy_fault_flush_pages(mali_dma_addr *page_directory, mali_io_address *page_directory_mapping,
+                                    mali_dma_addr *page_table, mali_io_address *page_table_mapping,
+                                    mali_dma_addr *data_page, mali_io_address *data_page_mapping)
 {
     if (MALI_INVALID_PAGE != *page_directory) {
         mali_mmu_release_table_page(*page_directory, *page_directory_mapping);
@@ -106,7 +105,7 @@ static mali_osk_errcode_t fill_page(mali_io_address mapping, u32 data)
     int i;
     MALI_DEBUG_ASSERT_POINTER(mapping);
 
-    for (i = 0; i < MALI_MMU_PAGE_SIZE / 4; i++) {
+    for (i = 0; i < MALI_MMU_PAGE_SIZE / 0x4; i++) {
         _mali_osk_mem_iowrite32_relaxed(mapping, i * sizeof(u32), data);
     }
     _mali_osk_mem_barrier();
@@ -122,12 +121,12 @@ mali_osk_errcode_t mali_mmu_pagedir_map(struct mali_page_directory *pagedir, u32
     mali_dma_addr pde_phys;
     int i, page_count;
     u32 start_address;
-    if (last_pde < first_pde)
+    if (last_pde < first_pde) {
         return MALI_OSK_ERR_INVALID_ARGS;
+    }
 
     for (i = first_pde; i <= last_pde; i++) {
-        if (0 == (_mali_osk_mem_ioread32(pagedir->page_directory_mapped,
-                         i * sizeof(u32)) & MALI_MMU_FLAGS_PRESENT)) {
+        if (0 == (_mali_osk_mem_ioread32(pagedir->page_directory_mapped, i * sizeof(u32)) & MALI_MMU_FLAGS_PRESENT)) {
             /* Page table not present */
             MALI_DEBUG_ASSERT(0 == pagedir->page_entries_usage_count[i]);
             MALI_DEBUG_ASSERT(NULL == pagedir->page_entries_mapped[i]);
@@ -141,7 +140,7 @@ mali_osk_errcode_t mali_mmu_pagedir_map(struct mali_page_directory *pagedir, u32
 
             /* Update PDE, mark as present */
             _mali_osk_mem_iowrite32_relaxed(pagedir->page_directory_mapped, i * sizeof(u32),
-                            pde_phys | MALI_MMU_FLAGS_PRESENT);
+                                            pde_phys | MALI_MMU_FLAGS_PRESENT);
 
             MALI_DEBUG_ASSERT(0 == pagedir->page_entries_usage_count[i]);
         }
@@ -157,7 +156,7 @@ mali_osk_errcode_t mali_mmu_pagedir_map(struct mali_page_directory *pagedir, u32
             page_count = (mali_address + size - start_address) / MALI_MMU_PAGE_SIZE;
             pagedir->page_entries_usage_count[i] += page_count;
         } else {
-            pagedir->page_entries_usage_count[i] = 1024;
+            pagedir->page_entries_usage_count[i] = 0x400;
         }
     }
     _mali_osk_write_mem_barrier();
@@ -178,10 +177,8 @@ MALI_STATIC_INLINE void mali_mmu_zero_pte(mali_io_address page_table, u32 mali_a
 
 static u32 mali_page_directory_get_phys_address(struct mali_page_directory *pagedir, u32 index)
 {
-    return (_mali_osk_mem_ioread32(pagedir->page_directory_mapped,
-                       index * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK);
+    return (_mali_osk_mem_ioread32(pagedir->page_directory_mapped, index * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK);
 }
-
 
 mali_osk_errcode_t mali_mmu_pagedir_unmap(struct mali_page_directory *pagedir, u32 mali_address, u32 size)
 {
@@ -226,8 +223,8 @@ mali_osk_errcode_t mali_mmu_pagedir_unmap(struct mali_page_directory *pagedir, u
             mali_mmu_release_table_page(page_phys, page_virt);
             pd_changed = MALI_TRUE;
         } else {
-            MALI_DEBUG_ASSERT(num_pages_inv < 2);
-            if (num_pages_inv < 2) {
+            MALI_DEBUG_ASSERT(num_pages_inv < 0x2);
+            if (num_pages_inv < 0x2) {
                 pages_to_invalidate[num_pages_inv] = mali_page_directory_get_phys_address(pagedir, i);
                 num_pages_inv++;
             } else {
@@ -245,8 +242,8 @@ mali_osk_errcode_t mali_mmu_pagedir_unmap(struct mali_page_directory *pagedir, u
 
     /* L2 pages invalidation */
     if (MALI_TRUE == pd_changed) {
-        MALI_DEBUG_ASSERT(num_pages_inv < 3);
-        if (num_pages_inv < 3) {
+        MALI_DEBUG_ASSERT(num_pages_inv < 0x3);
+        if (num_pages_inv < 0x3) {
             pages_to_invalidate[num_pages_inv] = pagedir->page_directory;
             num_pages_inv++;
         } else {
@@ -295,11 +292,10 @@ void mali_mmu_pagedir_free(struct mali_page_directory *pagedir)
 
     /* Free referenced page tables and zero PDEs. */
     for (i = 0; i < num_page_table_entries; i++) {
-        if (pagedir->page_directory_mapped && (_mali_osk_mem_ioread32(
-                pagedir->page_directory_mapped,
-                sizeof(u32)*i) & MALI_MMU_FLAGS_PRESENT)) {
-            mali_dma_addr phys = _mali_osk_mem_ioread32(pagedir->page_directory_mapped,
-                         i * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK;
+        if (pagedir->page_directory_mapped &&
+            (_mali_osk_mem_ioread32(pagedir->page_directory_mapped, sizeof(u32) * i) & MALI_MMU_FLAGS_PRESENT)) {
+            mali_dma_addr phys =
+                _mali_osk_mem_ioread32(pagedir->page_directory_mapped, i * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK;
             _mali_osk_mem_iowrite32_relaxed(pagedir->page_directory_mapped, i * sizeof(u32), 0);
             mali_mmu_release_table_page(phys, pagedir->page_entries_mapped[i]);
         }
@@ -312,9 +308,8 @@ void mali_mmu_pagedir_free(struct mali_page_directory *pagedir)
     _mali_osk_free(pagedir);
 }
 
-
-void mali_mmu_pagedir_update(struct mali_page_directory *pagedir, u32 mali_address,
-                 mali_dma_addr phys_address, u32 size, u32 permission_bits)
+void mali_mmu_pagedir_update(struct mali_page_directory *pagedir, u32 mali_address, mali_dma_addr phys_address,
+                             u32 size, u32 permission_bits)
 {
     u32 end_address = mali_address + size;
     u32 mali_phys = (u32)phys_address;
@@ -323,8 +318,7 @@ void mali_mmu_pagedir_update(struct mali_page_directory *pagedir, u32 mali_addre
     for (; mali_address < end_address; mali_address += MALI_MMU_PAGE_SIZE, mali_phys += MALI_MMU_PAGE_SIZE) {
         MALI_DEBUG_ASSERT_POINTER(pagedir->page_entries_mapped[MALI_MMU_PDE_ENTRY(mali_address)]);
         _mali_osk_mem_iowrite32_relaxed(pagedir->page_entries_mapped[MALI_MMU_PDE_ENTRY(mali_address)],
-                        MALI_MMU_PTE_ENTRY(mali_address) * sizeof(u32),
-                        mali_phys | permission_bits);
+                                        MALI_MMU_PTE_ENTRY(mali_address) * sizeof(u32), mali_phys | permission_bits);
     }
 }
 
@@ -337,25 +331,20 @@ void mali_mmu_pagedir_diag(struct mali_page_directory *pagedir, u32 fault_addr)
     pde_index = MALI_MMU_PDE_ENTRY(fault_addr);
     pte_index = MALI_MMU_PTE_ENTRY(fault_addr);
 
-
-    pde = _mali_osk_mem_ioread32(pagedir->page_directory_mapped,
-                     pde_index * sizeof(u32));
-
+    pde = _mali_osk_mem_ioread32(pagedir->page_directory_mapped, pde_index * sizeof(u32));
 
     if (pde & MALI_MMU_FLAGS_PRESENT) {
         u32 pte_addr = MALI_MMU_ENTRY_ADDRESS(pde);
 
-        pte = _mali_osk_mem_ioread32(pagedir->page_entries_mapped[pde_index],
-                         pte_index * sizeof(u32));
+        pte = _mali_osk_mem_ioread32(pagedir->page_entries_mapped[pde_index], pte_index * sizeof(u32));
 
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("\tMMU: %08x: Page table present: %08x\n"
-                     "\t\tPTE: %08x, page %08x is %s\n",
-                     fault_addr, pte_addr, pte,
-                     MALI_MMU_ENTRY_ADDRESS(pte),
-                     pte & MALI_MMU_FLAGS_DEFAULT ? "rw" : "not present"));
+                                                         "\t\tPTE: %08x, page %08x is %s\n",
+                                                         fault_addr, pte_addr, pte, MALI_MMU_ENTRY_ADDRESS(pte),
+                                                         pte & MALI_MMU_FLAGS_DEFAULT ? "rw" : "not present"));
     } else {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("\tMMU: %08x: Page table not present: %08x\n",
-                     fault_addr, pde));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
+                         ("\tMMU: %08x: Page table not present: %08x\n", fault_addr, pde));
     }
 #else
     MALI_IGNORE(pagedir);
@@ -374,11 +363,13 @@ struct dump_info {
 static mali_osk_errcode_t writereg(u32 where, u32 what, const char *comment, struct dump_info *info)
 {
     if (NULL != info) {
-        info->register_writes_size += sizeof(u32) * 2; /* two 32-bit words */
+        info->register_writes_size += sizeof(u32) * 0x2; /* two 32-bit words */
 
         if (NULL != info->buffer) {
             /* check that we have enough space */
-            if (info->buffer_left < sizeof(u32) * 2) MALI_ERROR(MALI_OSK_ERR_NOMEM);
+            if (info->buffer_left < sizeof(u32) * 0x2) {
+                MALI_ERROR(MALI_OSK_ERR_NOMEM);
+            }
 
             *info->buffer = where;
             info->buffer++;
@@ -386,7 +377,7 @@ static mali_osk_errcode_t writereg(u32 where, u32 what, const char *comment, str
             *info->buffer = what;
             info->buffer++;
 
-            info->buffer_left -= sizeof(u32) * 2;
+            info->buffer_left -= sizeof(u32) * 0x2;
         }
     }
 
@@ -397,14 +388,16 @@ static mali_osk_errcode_t mali_mmu_dump_page(mali_io_address page, u32 phys_addr
 {
     if (NULL != info) {
         /* 4096 for the page and 4 bytes for the address */
-        const u32 page_size_in_elements = MALI_MMU_PAGE_SIZE / 4;
+        const u32 page_size_in_elements = MALI_MMU_PAGE_SIZE / 0x4;
         const u32 page_size_in_bytes = MALI_MMU_PAGE_SIZE;
-        const u32 dump_size_in_bytes = MALI_MMU_PAGE_SIZE + 4;
+        const u32 dump_size_in_bytes = MALI_MMU_PAGE_SIZE + 0x4;
 
         info->page_table_dump_size += dump_size_in_bytes;
 
         if (NULL != info->buffer) {
-            if (info->buffer_left < dump_size_in_bytes) MALI_ERROR(MALI_OSK_ERR_NOMEM);
+            if (info->buffer_left < dump_size_in_bytes) {
+                MALI_ERROR(MALI_OSK_ERR_NOMEM);
+            }
 
             *info->buffer = phys_addr;
             info->buffer++;
@@ -427,17 +420,14 @@ static mali_osk_errcode_t dump_mmu_page_table(struct mali_page_directory *pagedi
     if (NULL != pagedir->page_directory_mapped) {
         int i;
 
-        MALI_CHECK_NO_ERROR(
-            mali_mmu_dump_page(pagedir->page_directory_mapped, pagedir->page_directory, info)
-        );
+        MALI_CHECK_NO_ERROR(mali_mmu_dump_page(pagedir->page_directory_mapped, pagedir->page_directory, info));
 
         for (i = 0; i < MALI_MMU_PAGE_UNIT; i++) {
             if (NULL != pagedir->page_entries_mapped[i]) {
-                MALI_CHECK_NO_ERROR(
-                    mali_mmu_dump_page(pagedir->page_entries_mapped[i],
-                               _mali_osk_mem_ioread32(pagedir->page_directory_mapped,
-                                       i * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK, info)
-                );
+                MALI_CHECK_NO_ERROR(mali_mmu_dump_page(
+                    pagedir->page_entries_mapped[i],
+                    _mali_osk_mem_ioread32(pagedir->page_directory_mapped, i * sizeof(u32)) & ~MALI_MMU_FLAGS_MASK,
+                    info));
             }
         }
     }
@@ -447,8 +437,8 @@ static mali_osk_errcode_t dump_mmu_page_table(struct mali_page_directory *pagedi
 
 static mali_osk_errcode_t dump_mmu_registers(struct mali_page_directory *pagedir, struct dump_info *info)
 {
-    MALI_CHECK_NO_ERROR(writereg(MALI_MMU_ADDRESS_PAGE, pagedir->page_directory,
-                     "set the page directory address", info));
+    MALI_CHECK_NO_ERROR(
+        writereg(MALI_MMU_ADDRESS_PAGE, pagedir->page_directory, "set the page directory address", info));
     MALI_CHECK_NO_ERROR(writereg(MALI_MMU_ADDRESS_INFO, MALI_MMU_INFO_ZAP, "zap???", info));
     MALI_CHECK_NO_ERROR(writereg(MALI_MMU_ADDRESS_INFO, 0, "enable paging", info));
     MALI_SUCCESS;
@@ -456,7 +446,7 @@ static mali_osk_errcode_t dump_mmu_registers(struct mali_page_directory *pagedir
 
 mali_osk_errcode_t _mali_ukk_query_mmu_page_table_dump_size(mali_uk_query_mmu_page_table_dump_size_s *args)
 {
-    struct dump_info info = { 0, 0, 0, NULL };
+    struct dump_info info = {0, 0, 0, NULL};
     struct mali_session_data *session_data;
 
     session_data = (struct mali_session_data *)(uintptr_t)(args->ctx);
@@ -471,7 +461,7 @@ mali_osk_errcode_t _mali_ukk_query_mmu_page_table_dump_size(mali_uk_query_mmu_pa
 
 mali_osk_errcode_t _mali_ukk_dump_mmu_page_table(mali_uk_dump_mmu_page_table_s *args)
 {
-    struct dump_info info = { 0, 0, 0, NULL };
+    struct dump_info info = {0, 0, 0, NULL};
     struct mali_session_data *session_data;
 
     MALI_DEBUG_ASSERT_POINTER(args);

@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Base kernel affinity manager APIs
  */
@@ -48,18 +44,18 @@ bool kbase_js_can_run_job_on_slot_no_lock(struct kbase_device *kbdev, int js)
      *  able to run on slot 2 could also block jobs that can only run on
      *  slot 1 (tiler jobs)
      */
-    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8987))
+    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8987)) {
         return true;
+    }
 
-    if (js != JS_VALUE)
+    if (js != JS_VALUE) {
         return true;
+    }
 
     /* Only deal with js==2 now: */
     if (kbdev->gpu_props.num_core_groups > 1) {
         /* Only use slot 2 in the 2+ coregroup case */
-        if (kbasep_js_ctx_attr_is_attr_on_runpool(kbdev,
-                    KBASEP_JS_CTX_ATTR_COMPUTE_ALL_CORES) ==
-                                false) {
+        if (kbasep_js_ctx_attr_is_attr_on_runpool(kbdev, KBASEP_JS_CTX_ATTR_COMPUTE_ALL_CORES) == false) {
             /* ...But only when we *don't* have atoms that run on
              * all cores */
 
@@ -88,10 +84,8 @@ bool kbase_js_can_run_job_on_slot_no_lock(struct kbase_device *kbdev, int js)
  * - This function is frequently called and can be optimized,
  *   (see notes in loops), but as the functionallity will likely
  *   be modified, optimization has not been addressed.
-*/
-bool kbase_js_choose_affinity(u64 * const affinity,
-                    struct kbase_device *kbdev,
-                    struct kbase_jd_atom *katom, int js)
+ */
+bool kbase_js_choose_affinity(u64 *const affinity, struct kbase_device *kbdev, struct kbase_jd_atom *katom, int js)
 {
     base_jd_core_req core_req = katom->core_req;
     unsigned int num_core_groups = kbdev->gpu_props.num_core_groups;
@@ -112,59 +106,49 @@ bool kbase_js_choose_affinity(u64 * const affinity,
 
     KBASE_DEBUG_ASSERT(js >= 0);
 
-    if ((core_req & (BASE_JD_REQ_FS | BASE_JD_REQ_CS | BASE_JD_REQ_T)) ==
-                                BASE_JD_REQ_T) {
-         /* If the hardware supports XAFFINITY then we'll only enable
-          * the tiler (which is the default so this is a no-op),
-          * otherwise enable shader core 0. */
-        if (!kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_XAFFINITY))
+    if ((core_req & (BASE_JD_REQ_FS | BASE_JD_REQ_CS | BASE_JD_REQ_T)) == BASE_JD_REQ_T) {
+        /* If the hardware supports XAFFINITY then we'll only enable
+         * the tiler (which is the default so this is a no-op),
+         * otherwise enable shader core 0. */
+        if (!kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_XAFFINITY)) {
             *affinity = 1;
-        else
+        } else {
             *affinity = 0;
+        }
 
         return true;
     }
 
     if (1 == kbdev->gpu_props.num_cores) {
         /* trivial case only one core, nothing to do */
-        *affinity = core_availability_mask &
-                kbdev->pm.debug_core_mask[js];
+        *affinity = core_availability_mask & kbdev->pm.debug_core_mask[js];
     } else {
-        if ((core_req & (BASE_JD_REQ_COHERENT_GROUP |
-                    BASE_JD_REQ_SPECIFIC_COHERENT_GROUP))) {
+        if ((core_req & (BASE_JD_REQ_COHERENT_GROUP | BASE_JD_REQ_SPECIFIC_COHERENT_GROUP))) {
             if (js == 0 || num_core_groups == 1) {
                 /* js[0] and single-core-group systems just get
                  * the first core group */
-                *affinity =
-                kbdev->gpu_props.props.coherency_info.group[0].core_mask
-                        & core_availability_mask &
-                        kbdev->pm.debug_core_mask[js];
+                *affinity = kbdev->gpu_props.props.coherency_info.group[0].core_mask & core_availability_mask &
+                            kbdev->pm.debug_core_mask[js];
             } else {
                 /* js[1], js[2] use core groups 0, 1 for
                  * dual-core-group systems */
-                u32 core_group_idx = ((u32) js) - 1;
+                u32 core_group_idx = ((u32)js) - 1;
 
-                KBASE_DEBUG_ASSERT(core_group_idx <
-                            num_core_groups);
-                *affinity =
-                kbdev->gpu_props.props.coherency_info.group[core_group_idx].core_mask
-                        & core_availability_mask &
-                        kbdev->pm.debug_core_mask[js];
+                KBASE_DEBUG_ASSERT(core_group_idx < num_core_groups);
+                *affinity = kbdev->gpu_props.props.coherency_info.group[core_group_idx].core_mask &
+                            core_availability_mask & kbdev->pm.debug_core_mask[js];
 
                 /* If the job is specifically targeting core
                  * group 1 and the core availability policy is
                  * keeping that core group off, then fail */
-                if (*affinity == 0 && core_group_idx == 1 &&
-                        kbdev->pm.backend.cg1_disabled
-                                == true)
-                    katom->event_code =
-                            BASE_JD_EVENT_PM_EVENT;
+                if (*affinity == 0 && core_group_idx == 1 && kbdev->pm.backend.cg1_disabled == true) {
+                    katom->event_code = BASE_JD_EVENT_PM_EVENT;
+                }
             }
         } else {
             /* All cores are available when no core split is
              * required */
-            *affinity = core_availability_mask &
-                    kbdev->pm.debug_core_mask[js];
+            *affinity = core_availability_mask & kbdev->pm.debug_core_mask[js];
         }
     }
 
@@ -172,22 +156,22 @@ bool kbase_js_choose_affinity(u64 * const affinity,
      * If no cores are currently available in the desired core group(s)
      * (core availability policy is transitioning) then fail.
      */
-    if (*affinity == 0)
+    if (*affinity == 0) {
         return false;
+    }
 
     /* Enable core 0 if tiler required for hardware without XAFFINITY
      * support (notes above) */
     if (core_req & BASE_JD_REQ_T) {
-        if (!kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_XAFFINITY))
+        if (!kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_XAFFINITY)) {
             *affinity = *affinity | 1;
+        }
     }
 
     return true;
 }
 
-static inline bool kbase_js_affinity_is_violating(
-                        struct kbase_device *kbdev,
-                                u64 *affinities)
+static inline bool kbase_js_affinity_is_violating(struct kbase_device *kbdev, u64 *affinities)
 {
     /* This implementation checks whether the two slots involved in Generic
      * thread creation have intersecting affinity. This is due to micro-
@@ -209,11 +193,10 @@ static inline bool kbase_js_affinity_is_violating(
      * right_set */
     intersection = affinity_set_left & affinity_set_right;
 
-    return (bool) (intersection != (u64) 0u);
+    return (bool)(intersection != (u64)0u);
 }
 
-bool kbase_js_affinity_would_violate(struct kbase_device *kbdev, int js,
-                                u64 affinity)
+bool kbase_js_affinity_would_violate(struct kbase_device *kbdev, int js, u64 affinity)
 {
     struct kbasep_js_device_data *js_devdata;
     u64 new_affinities[BASE_JM_MAX_NR_SLOTS];
@@ -222,16 +205,14 @@ bool kbase_js_affinity_would_violate(struct kbase_device *kbdev, int js,
     KBASE_DEBUG_ASSERT(js < BASE_JM_MAX_NR_SLOTS);
     js_devdata = &kbdev->js_data;
 
-    memcpy(new_affinities, js_devdata->runpool_irq.slot_affinities,
-            sizeof(js_devdata->runpool_irq.slot_affinities));
+    memcpy(new_affinities, js_devdata->runpool_irq.slot_affinities, sizeof(js_devdata->runpool_irq.slot_affinities));
 
     new_affinities[js] |= affinity;
 
     return kbase_js_affinity_is_violating(kbdev, new_affinities);
 }
 
-void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js,
-                                u64 affinity)
+void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js, u64 affinity)
 {
     struct kbasep_js_device_data *js_devdata;
     u64 cores;
@@ -240,8 +221,7 @@ void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js,
     KBASE_DEBUG_ASSERT(js < BASE_JM_MAX_NR_SLOTS);
     js_devdata = &kbdev->js_data;
 
-    KBASE_DEBUG_ASSERT(kbase_js_affinity_would_violate(kbdev, js, affinity)
-                                == false);
+    KBASE_DEBUG_ASSERT(kbase_js_affinity_would_violate(kbdev, js, affinity) == false);
 
     cores = affinity;
     while (cores) {
@@ -249,18 +229,17 @@ void kbase_js_affinity_retain_slot_cores(struct kbase_device *kbdev, int js,
         u64 bit = 1ULL << bitnum;
         s8 cnt;
 
-        cnt =
-        ++(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum]);
+        cnt = ++(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum]);
 
-        if (cnt == 1)
+        if (cnt == 1) {
             js_devdata->runpool_irq.slot_affinities[js] |= bit;
+        }
 
         cores &= ~bit;
     }
 }
 
-void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js,
-                                u64 affinity)
+void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js, u64 affinity)
 {
     struct kbasep_js_device_data *js_devdata;
     u64 cores;
@@ -275,14 +254,13 @@ void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js,
         u64 bit = 1ULL << bitnum;
         s8 cnt;
 
-        KBASE_DEBUG_ASSERT(
-        js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum] > 0);
+        KBASE_DEBUG_ASSERT(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum] > 0);
 
-        cnt =
-        --(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum]);
+        cnt = --(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum]);
 
-        if (0 == cnt)
+        if (0 == cnt) {
             js_devdata->runpool_irq.slot_affinities[js] &= ~bit;
+        }
 
         cores &= ~bit;
     }
@@ -297,9 +275,9 @@ void kbase_js_debug_log_current_affinities(struct kbase_device *kbdev)
     KBASE_DEBUG_ASSERT(kbdev != NULL);
     js_devdata = &kbdev->js_data;
 
-    for (slot_nr = 0; slot_nr < 3; ++slot_nr)
-        KBASE_TRACE_ADD_SLOT_INFO(kbdev, JS_AFFINITY_CURRENT, NULL,
-                            NULL, 0u, slot_nr,
-            (u32) js_devdata->runpool_irq.slot_affinities[slot_nr]);
+    for (slot_nr = 0; slot_nr < 3; ++slot_nr) {
+        KBASE_TRACE_ADD_SLOT_INFO(kbdev, JS_AFFINITY_CURRENT, NULL, NULL, 0u, slot_nr,
+                                  (u32)js_devdata->runpool_irq.slot_affinities[slot_nr]);
+    }
 }
-#endif                /* KBASE_TRACE_ENABLE  */
+#endif /* KBASE_TRACE_ENABLE  */

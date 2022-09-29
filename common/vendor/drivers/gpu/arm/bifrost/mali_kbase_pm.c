@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_pm.c
  * Base kernel power management APIs
@@ -53,23 +51,19 @@ void kbase_pm_halt(struct kbase_device *kbdev)
 
 void kbase_pm_context_active(struct kbase_device *kbdev)
 {
-    (void)kbase_pm_context_active_handle_suspend(kbdev,
-        KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE);
+    (void)kbase_pm_context_active_handle_suspend(kbdev, KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE);
 }
 
-int kbase_pm_context_active_handle_suspend(struct kbase_device *kbdev,
-    enum kbase_pm_suspend_handler suspend_handler)
+int kbase_pm_context_active_handle_suspend(struct kbase_device *kbdev, enum kbase_pm_suspend_handler suspend_handler)
 {
     int c;
 
     KBASE_DEBUG_ASSERT(kbdev != NULL);
-    dev_dbg(kbdev->dev, "%s - reason = %d, pid = %d\n", __func__,
-        suspend_handler, current->pid);
+    dev_dbg(kbdev->dev, "%s - reason = %d, pid = %d\n", __func__, suspend_handler, current->pid);
     kbase_pm_lock(kbdev);
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbase_arbiter_pm_ctx_active_handle_suspend(kbdev,
-            suspend_handler)) {
+    if (kbase_arbiter_pm_ctx_active_handle_suspend(kbdev, suspend_handler)) {
         kbase_pm_unlock(kbdev);
         return 1;
     }
@@ -77,19 +71,20 @@ int kbase_pm_context_active_handle_suspend(struct kbase_device *kbdev,
 
     if (kbase_pm_is_suspending(kbdev)) {
         switch (suspend_handler) {
-        case KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE:
-            if (kbdev->pm.active_count != 0)
-                break;
-            /* FALLTHROUGH */
-        case KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE:
-            kbase_pm_unlock(kbdev);
-            return 1;
+            case KBASE_PM_SUSPEND_HANDLER_DONT_REACTIVATE:
+                if (kbdev->pm.active_count != 0) {
+                    break;
+                }
+                /* FALLTHROUGH */
+            case KBASE_PM_SUSPEND_HANDLER_DONT_INCREASE:
+                kbase_pm_unlock(kbdev);
+                return 1;
 
-        case KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE:
-            /* FALLTHROUGH */
-        default:
-            KBASE_DEBUG_ASSERT_MSG(false, "unreachable");
-            break;
+            case KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE:
+                /* FALLTHROUGH */
+            default:
+                KBASE_DEBUG_ASSERT_MSG(false, "unreachable");
+                break;
         }
     }
     c = ++kbdev->pm.active_count;
@@ -120,7 +115,6 @@ void kbase_pm_context_idle(struct kbase_device *kbdev)
 
     KBASE_DEBUG_ASSERT(kbdev != NULL);
 
-
     kbase_pm_lock(kbdev);
 
     c = --kbdev->pm.active_count;
@@ -141,8 +135,7 @@ void kbase_pm_context_idle(struct kbase_device *kbdev)
     }
 
     kbase_pm_unlock(kbdev);
-    dev_dbg(kbdev->dev, "%s %d (pid = %d)\n", __func__,
-        kbdev->pm.active_count, current->pid);
+    dev_dbg(kbdev->dev, "%s %d (pid = %d)\n", __func__, kbdev->pm.active_count, current->pid);
 }
 
 KBASE_EXPORT_TEST_API(kbase_pm_context_idle);
@@ -177,8 +170,9 @@ void kbase_pm_driver_suspend(struct kbase_device *kbdev)
         spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
         kbdev->js_data.runpool_irq.submit_allowed = 0;
         kbase_disjoint_state_up(kbdev);
-        for (i = 0; i < kbdev->gpu_props.num_job_slots; i++)
+        for (i = 0; i < kbdev->gpu_props.num_job_slots; i++) {
             kbase_job_slot_softstop(kbdev, i, NULL);
+        }
         spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
     }
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
@@ -201,10 +195,8 @@ void kbase_pm_driver_suspend(struct kbase_device *kbdev)
      * waiting for a power down, since not all policies power down when this
      * reaches zero.
      */
-    dev_dbg(kbdev->dev, ">wait_event - waiting for active_count == 0 (pid = %d)\n",
-        current->pid);
-    wait_event(kbdev->pm.zero_active_count_wait,
-        kbdev->pm.active_count == 0);
+    dev_dbg(kbdev->dev, ">wait_event - waiting for active_count == 0 (pid = %d)\n", current->pid);
+    wait_event(kbdev->pm.zero_active_count_wait, kbdev->pm.active_count == 0);
     dev_dbg(kbdev->dev, ">wait_event - waiting done\n");
 
     /* NOTE: We synchronize with anything that was just finishing a
@@ -230,11 +222,10 @@ void kbase_pm_driver_resume(struct kbase_device *kbdev, bool arb_gpu_start)
 
     /* Initial active call, to power on the GPU/cores if needed */
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbase_pm_context_active_handle_suspend(kbdev,
-            (arb_gpu_start ?
-                KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED :
-                KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE)))
+    if (kbase_pm_context_active_handle_suspend(
+            kbdev, (arb_gpu_start ? KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED : KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE))) {
         return;
+    }
 #else
     kbase_pm_context_active(kbdev);
 #endif
@@ -270,10 +261,11 @@ void kbase_pm_driver_resume(struct kbase_device *kbdev, bool arb_gpu_start)
 void kbase_pm_suspend(struct kbase_device *kbdev)
 {
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbdev->arb.arb_if)
+    if (kbdev->arb.arb_if) {
         kbase_arbiter_pm_vm_event(kbdev, KBASE_VM_OS_SUSPEND_EVENT);
-    else
+    } else {
         kbase_pm_driver_suspend(kbdev);
+    }
 #else
     kbase_pm_driver_suspend(kbdev);
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */
@@ -282,10 +274,11 @@ void kbase_pm_suspend(struct kbase_device *kbdev)
 void kbase_pm_resume(struct kbase_device *kbdev)
 {
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbdev->arb.arb_if)
+    if (kbdev->arb.arb_if) {
         kbase_arbiter_pm_vm_event(kbdev, KBASE_VM_OS_RESUME_EVENT);
-    else
+    } else {
         kbase_pm_driver_resume(kbdev, false);
+    }
 #else
     kbase_pm_driver_resume(kbdev, false);
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */

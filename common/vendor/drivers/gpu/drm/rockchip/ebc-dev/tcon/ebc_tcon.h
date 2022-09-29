@@ -10,15 +10,15 @@
 
 #include "../ebc_panel.h"
 
-//update mode define
-#define NORMAL_UPDATE    0
-#define DIFF_UPDATE    1
+// update mode define
+#define NORMAL_UPDATE 0
+#define DIFF_UPDATE 1
 
-//display mode define
-#define DIRECT_MODE    0
-#define LUT_MODE    1
-#define THREE_WIN_MODE    1
-#define EINK_MODE    1
+// display mode define
+#define DIRECT_MODE 0
+#define LUT_MODE 1
+#define THREE_WIN_MODE 1
+#define EINK_MODE 1
 
 struct ebc_tcon {
     struct device *dev;
@@ -51,8 +51,8 @@ static inline void ebc_tcon_disable(struct ebc_tcon *tcon)
     tcon->disable(tcon);
 }
 
-static inline void ebc_tcon_dsp_mode_set(struct ebc_tcon *tcon, int update_mode,
-                     int display_mode, int three_win_mode, int eink_mode)
+static inline void ebc_tcon_dsp_mode_set(struct ebc_tcon *tcon, int update_mode, int display_mode, int three_win_mode,
+                                         int eink_mode)
 {
     return tcon->dsp_mode_set(tcon, update_mode, display_mode, three_win_mode, eink_mode);
 }
@@ -89,8 +89,8 @@ struct eink_tcon {
 
     int (*enable)(struct eink_tcon *tcon, struct ebc_panel *panel);
     void (*disable)(struct eink_tcon *tcon);
-    void (*image_addr_set)(struct eink_tcon *tcon, u32 pre_image_buf_addr,
-                   u32 cur_image_buf_addr, u32 image_process_buf_addr);
+    void (*image_addr_set)(struct eink_tcon *tcon, u32 pre_image_buf_addr, u32 cur_image_buf_addr,
+                           u32 image_process_buf_addr);
     void (*frame_start)(struct eink_tcon *tcon);
 
     void (*dsp_end_callback)(void);
@@ -106,8 +106,8 @@ static inline void eink_tcon_disable(struct eink_tcon *tcon)
     tcon->disable(tcon);
 }
 
-static inline void eink_tcon_image_addr_set(struct eink_tcon *tcon, u32 pre_image_buf_addr,
-                        u32 cur_image_buf_addr, u32 image_process_buf_addr)
+static inline void eink_tcon_image_addr_set(struct eink_tcon *tcon, u32 pre_image_buf_addr, u32 cur_image_buf_addr,
+                                            u32 image_process_buf_addr)
 {
     tcon->image_addr_set(tcon, pre_image_buf_addr, cur_image_buf_addr, image_process_buf_addr);
 }

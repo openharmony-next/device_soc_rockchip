@@ -22,73 +22,78 @@
 #include "hdi_device_common.h"
 #include "hdi_display.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-const std::string PROP_ACTIVE = "ACTIVE";
-const std::string PROP_MODEID = "MODE_ID";
-const std::string PROP_OUTFENCE = "OUT_FENCE_PTR";
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            const std::string PROP_ACTIVE = "ACTIVE";
+            const std::string PROP_MODEID = "MODE_ID";
+            const std::string PROP_OUTFENCE = "OUT_FENCE_PTR";
 
-class DrmDevice;
+            class DrmDevice;
 
-class DrmCrtc {
-public:
-    DrmCrtc(drmModeCrtcPtr c, uint32_t pipe);
-    virtual ~DrmCrtc() {};
-    int32_t BindToDisplay(uint32_t id);
-    void UnBindDisplay(uint32_t id);
-    bool CanBind();
-    uint32_t GetId() const
-    {
-        return mId;
-    }
-    uint32_t GetModePropId() const
-    {
-        return mModePropId;
-    }
-    uint32_t GetOutFencePropId() const
-    {
-        return mOutFencePropId;
-    }
-    uint32_t GetActivePropId() const
-    {
-        return mActivePropId;
-    }
-    uint32_t GetPipe() const
-    {
-        return mPipe;
-    }
-    int32_t Init(DrmDevice &drmDevice);
-    int32_t SetActivieMode(int32_t id);
-    int32_t GetActiveModeId() const
-    {
-        return mActiveModeId;
-    }
-    bool NeedModeSet()
-    {
-        return mNeedModeSet;
-    }
-    void ClearModeSet()
-    {
-        mNeedModeSet = false;
-    }
-    uint32_t GetPlaneMask()
-    {
-        return mPlaneMask;
-    }
-private:
-    uint32_t mId = 0;
-    uint32_t mModePropId = 0;
-    uint32_t mOutFencePropId = 0;
-    uint32_t mActivePropId = 0;
-    uint32_t mDisplayId = INVALIDE_DISPLAY_ID;
-    uint32_t mPipe = 0;
-    int32_t mActiveModeId = INVALID_MODE_ID;
-    bool mNeedModeSet = false;
-    uint32_t mPlaneMask = 0;
-};
-} // namespace OHOS
-} // namespace HDI
+            class DrmCrtc
+            {
+            public:
+                DrmCrtc(drmModeCrtcPtr c, uint32_t pipe);
+                virtual ~DrmCrtc(){};
+                int32_t BindToDisplay(uint32_t id);
+                void UnBindDisplay(uint32_t id);
+                bool CanBind();
+                uint32_t GetId() const
+                {
+                    return mId;
+                }
+                uint32_t GetModePropId() const
+                {
+                    return mModePropId;
+                }
+                uint32_t GetOutFencePropId() const
+                {
+                    return mOutFencePropId;
+                }
+                uint32_t GetActivePropId() const
+                {
+                    return mActivePropId;
+                }
+                uint32_t GetPipe() const
+                {
+                    return mPipe;
+                }
+                int32_t Init(DrmDevice &drmDevice);
+                int32_t SetActivieMode(int32_t id);
+                int32_t GetActiveModeId() const
+                {
+                    return mActiveModeId;
+                }
+                bool NeedModeSet()
+                {
+                    return mNeedModeSet;
+                }
+                void ClearModeSet()
+                {
+                    mNeedModeSet = false;
+                }
+                uint32_t GetPlaneMask()
+                {
+                    return mPlaneMask;
+                }
+
+            private:
+                uint32_t mId = 0;
+                uint32_t mModePropId = 0;
+                uint32_t mOutFencePropId = 0;
+                uint32_t mActivePropId = 0;
+                uint32_t mDisplayId = INVALIDE_DISPLAY_ID;
+                uint32_t mPipe = 0;
+                int32_t mActiveModeId = INVALID_MODE_ID;
+                bool mNeedModeSet = false;
+                uint32_t mPlaneMask = 0;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // DRM_CRTC_H

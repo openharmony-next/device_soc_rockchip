@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -22,9 +23,6 @@
 #include "mali_osk_profiling.h"
 #include "mali_session.h"
 #include "mali_osk_mali.h"
-
-/*Add for voltage scan function*/
-extern u32 mali_group_error;
 
 /*
  * If dma_buf with map on demand is used, we defer job deletion and job queue
@@ -112,7 +110,7 @@ static _mali_osk_wait_queue_t *executor_working_wait_queue = NULL;
 static u32 pause_count = 0;
 
 /* PP cores haven't been enabled because of some pp cores haven't been disabled. */
-static int core_scaling_delay_up_mask[MALI_MAX_NUMBER_OF_DOMAINS] = { 0 };
+static int core_scaling_delay_up_mask[MALI_MAX_NUMBER_OF_DOMAINS] = {0};
 
 /* Variables used to implement notify pp core changes to userspace when core scaling
  * is finished in mali_executor_complete_group() function. */
@@ -131,17 +129,11 @@ static mali_bool mali_executor_virtual_group_is_usable(void);
 static void mali_executor_schedule(void);
 static void mali_executor_wq_schedule(void *arg);
 static void mali_executor_send_gp_oom_to_user(struct mali_gp_job *job);
-static void mali_executor_complete_group(struct mali_group *group,
-        mali_bool success,
-        struct mali_gp_job **gp_job_done,
-        struct mali_pp_job **pp_job_done);
-static void mali_executor_change_state_pp_physical(struct mali_group *group,
-        _mali_osk_list_t *old_list,
-        u32 *old_count,
-        _mali_osk_list_t *new_list,
-        u32 *new_count);
-static mali_bool mali_executor_group_is_in_state(struct mali_group *group,
-        enum mali_executor_state_t state);
+static void mali_executor_complete_group(struct mali_group *group, mali_bool success, struct mali_gp_job **gp_job_done,
+                                         struct mali_pp_job **pp_job_done);
+static void mali_executor_change_state_pp_physical(struct mali_group *group, _mali_osk_list_t *old_list, u32 *old_count,
+                                                   _mali_osk_list_t *new_list, u32 *new_count);
+static mali_bool mali_executor_group_is_in_state(struct mali_group *group, enum mali_executor_state_t state);
 
 static void mali_executor_group_enable_internal(struct mali_group *group);
 static void mali_executor_group_disable_internal(struct mali_group *group);
@@ -151,9 +143,7 @@ static void mali_executor_notify_core_change(u32 num_cores);
 static void mali_executor_wq_notify_core_change(void *arg);
 static void mali_executor_change_group_status_disabled(struct mali_group *group);
 static mali_bool mali_executor_deactivate_list_idle(mali_bool deactivate_idle_group);
-static void mali_executor_set_state_pp_physical(struct mali_group *group,
-        _mali_osk_list_t *new_list,
-        u32 *new_count);
+static void mali_executor_set_state_pp_physical(struct mali_group *group, _mali_osk_list_t *new_list, u32 *new_count);
 
 /*
  * ---------- Actual implementation ----------
@@ -276,7 +266,6 @@ void mali_executor_populate(void)
                     gp_group = group;
                     gp_group_state = EXEC_STATE_INACTIVE;
                 }
-
             }
         }
     }
@@ -305,15 +294,18 @@ void mali_executor_depopulate(void)
 
     MALI_DEBUG_ASSERT(_mali_osk_list_empty(&group_list_working));
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+    {
         mali_group_delete(group);
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list)
+    {
         mali_group_delete(group);
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list)
+    {
         mali_group_delete(group);
     }
 }
@@ -327,8 +319,7 @@ void mali_executor_suspend(void)
 
     mali_executor_unlock();
 
-    _mali_osk_wait_queue_wait_event(executor_working_wait_queue,
-                    mali_executor_is_suspended, NULL);
+    _mali_osk_wait_queue_wait_event(executor_working_wait_queue, mali_executor_is_suspended, NULL);
 
     /*
      * mali_executor_complete_XX() leaves jobs in idle state.
@@ -351,8 +342,7 @@ void mali_executor_suspend(void)
     }
 
     if (mali_executor_has_virtual_group()) {
-        if (MALI_GROUP_STATE_INACTIVE
-            != mali_group_get_state(virtual_group)) {
+        if (MALI_GROUP_STATE_INACTIVE != mali_group_get_state(virtual_group)) {
             virtual_group_state = EXEC_STATE_INACTIVE;
             mali_group_deactivate(virtual_group);
         }
@@ -362,11 +352,9 @@ void mali_executor_suspend(void)
         struct mali_group *group;
         struct mali_group *temp;
 
-        MALI_OSK_LIST_FOREACHENTRY(group, temp,
-                        &group_list_inactive,
-                        struct mali_group, executor_list) {
-            if (MALI_GROUP_STATE_ACTIVATION_PENDING
-                == mali_group_get_state(group)) {
+        MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list)
+        {
+            if (MALI_GROUP_STATE_ACTIVATION_PENDING == mali_group_get_state(group)) {
                 mali_group_deactivate(group);
             }
 
@@ -452,8 +440,7 @@ void mali_executor_zap_all_active(struct mali_session_data *session)
         MALI_DEBUG_ASSERT_POINTER(gp_job);
 
         /* GP job completed, make sure it is freed */
-        mali_scheduler_complete_gp_job(gp_job, MALI_FALSE,
-                           MALI_TRUE, MALI_TRUE);
+        mali_scheduler_complete_gp_job(gp_job, MALI_FALSE, MALI_TRUE, MALI_TRUE);
     }
 
     if (mali_executor_has_virtual_group()) {
@@ -465,14 +452,13 @@ void mali_executor_zap_all_active(struct mali_session_data *session)
 
             if (NULL != pp_job) {
                 /* PP job completed, make sure it is freed */
-                mali_scheduler_complete_pp_job(pp_job, 0,
-                                   MALI_FALSE, MALI_TRUE);
+                mali_scheduler_complete_pp_job(pp_job, 0, MALI_FALSE, MALI_TRUE);
             }
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working,
-                    struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working, struct mali_group, executor_list)
+    {
         ret = mali_group_zap_session(group, session);
         if (MALI_FALSE == ret) {
             ret = mali_group_zap_session(group, session);
@@ -483,9 +469,7 @@ void mali_executor_zap_all_active(struct mali_session_data *session)
 
                 if (NULL != pp_job) {
                     /* PP job completed, free it */
-                    mali_scheduler_complete_pp_job(pp_job,
-                                       0, MALI_FALSE,
-                                       MALI_TRUE);
+                    mali_scheduler_complete_pp_job(pp_job, 0, MALI_FALSE, MALI_TRUE);
                 }
             }
         }
@@ -508,15 +492,13 @@ void mali_executor_schedule_from_mask(mali_scheduler_mask mask, mali_bool deferr
     }
 }
 
-mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group,
-        mali_bool in_upper_half)
+mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group, mali_bool in_upper_half)
 {
     enum mali_interrupt_result int_result;
     mali_bool time_out = MALI_FALSE;
 
-    MALI_DEBUG_PRINT(4, ("Executor: GP interrupt from %s in %s half\n",
-                 mali_group_core_description(group),
-                 in_upper_half ? "upper" : "bottom"));
+    MALI_DEBUG_PRINT(4, ("Executor: GP interrupt from %s in %s half\n", mali_group_core_description(group),
+                         in_upper_half ? "upper" : "bottom"));
 
     mali_executor_lock();
     if (!mali_group_is_working(group)) {
@@ -531,9 +513,8 @@ mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group,
     if (mali_group_has_timed_out(group)) {
         int_result = MALI_INTERRUPT_RESULT_ERROR;
         time_out = MALI_TRUE;
-        MALI_PRINT(("Executor GP: Job %d Timeout on %s\n",
-                mali_gp_job_get_id(group->gp_running_job),
-                mali_group_core_description(group)));
+        MALI_PRINT(("Executor GP: Job %d Timeout on %s\n", mali_gp_job_get_id(group->gp_running_job),
+                    mali_group_core_description(group)));
     } else {
         int_result = mali_group_get_interrupt_result_gp(group);
         if (MALI_INTERRUPT_RESULT_NONE == int_result) {
@@ -597,15 +578,14 @@ mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group,
     }
 
     /*Add for voltage scan function*/
-    if (MALI_INTERRUPT_RESULT_ERROR == int_result)
+    if (MALI_INTERRUPT_RESULT_ERROR == int_result) {
         mali_group_error++;
+    }
 
     /* We should now have a real interrupt to handle */
 
-    MALI_DEBUG_PRINT(4, ("Executor: Group %s completed with %s\n",
-                 mali_group_core_description(group),
-                 (MALI_INTERRUPT_RESULT_ERROR == int_result) ?
-                 "ERROR" : "success"));
+    MALI_DEBUG_PRINT(4, ("Executor: Group %s completed with %s\n", mali_group_core_description(group),
+                         (MALI_INTERRUPT_RESULT_ERROR == int_result) ? "ERROR" : "success"));
 
     if (in_upper_half && MALI_INTERRUPT_RESULT_ERROR == int_result) {
         /* Don't bother to do processing of errors in upper half */
@@ -618,14 +598,7 @@ mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group,
         struct mali_gp_job *job;
         mali_bool success;
 
-        /*
-        if (MALI_TRUE == time_out) {
-            mali_group_dump_status(group);
-        }
-        */
-
-        success = (int_result != MALI_INTERRUPT_RESULT_ERROR) ?
-              MALI_TRUE : MALI_FALSE;
+        success = (int_result != MALI_INTERRUPT_RESULT_ERROR) ? MALI_TRUE : MALI_FALSE;
 
         mali_executor_complete_group(group, success, &job, NULL);
 
@@ -635,22 +608,19 @@ mali_osk_errcode_t mali_executor_interrupt_gp(struct mali_group *group,
         MALI_DEBUG_ASSERT(NULL != job);
 
         /* This will notify user space and close the job object */
-        mali_scheduler_complete_gp_job(job, success,
-                           MALI_TRUE, MALI_TRUE);
+        mali_scheduler_complete_gp_job(job, success, MALI_TRUE, MALI_TRUE);
     }
 
     return MALI_OSK_ERR_OK;
 }
 
-mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group,
-        mali_bool in_upper_half)
+mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group, mali_bool in_upper_half)
 {
     enum mali_interrupt_result int_result;
     mali_bool time_out = MALI_FALSE;
 
-    MALI_DEBUG_PRINT(4, ("Executor: PP interrupt from %s in %s half\n",
-                 mali_group_core_description(group),
-                 in_upper_half ? "upper" : "bottom"));
+    MALI_DEBUG_PRINT(4, ("Executor: PP interrupt from %s in %s half\n", mali_group_core_description(group),
+                         in_upper_half ? "upper" : "bottom"));
 
     mali_executor_lock();
 
@@ -675,9 +645,8 @@ mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group,
     if (mali_group_has_timed_out(group)) {
         int_result = MALI_INTERRUPT_RESULT_ERROR;
         time_out = MALI_TRUE;
-        MALI_PRINT(("Executor PP: Job %d Timeout on %s\n",
-                mali_pp_job_get_id(group->pp_running_job),
-                mali_group_core_description(group)));
+        MALI_PRINT(("Executor PP: Job %d Timeout on %s\n", mali_pp_job_get_id(group->pp_running_job),
+                    mali_group_core_description(group)));
     } else {
         int_result = mali_group_get_interrupt_result_pp(group);
         if (MALI_INTERRUPT_RESULT_NONE == int_result) {
@@ -704,15 +673,14 @@ mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group,
 
     /*Add voltage scan function*/
 
-    if (MALI_INTERRUPT_RESULT_ERROR == int_result)
+    if (MALI_INTERRUPT_RESULT_ERROR == int_result) {
         mali_group_error++;
+    }
 
     /* We should now have a real interrupt to handle */
 
-    MALI_DEBUG_PRINT(4, ("Executor: Group %s completed with %s\n",
-                 mali_group_core_description(group),
-                 (MALI_INTERRUPT_RESULT_ERROR == int_result) ?
-                 "ERROR" : "success"));
+    MALI_DEBUG_PRINT(4, ("Executor: Group %s completed with %s\n", mali_group_core_description(group),
+                         (MALI_INTERRUPT_RESULT_ERROR == int_result) ? "ERROR" : "success"));
 
     if (in_upper_half && MALI_INTERRUPT_RESULT_ERROR == int_result) {
         /* Don't bother to do processing of errors in upper half */
@@ -730,8 +698,7 @@ mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group,
             mali_group_dump_status(group);
         }
 
-        success = (int_result == MALI_INTERRUPT_RESULT_SUCCESS) ?
-              MALI_TRUE : MALI_FALSE;
+        success = (int_result == MALI_INTERRUPT_RESULT_SUCCESS) ? MALI_TRUE : MALI_FALSE;
 
         mali_executor_complete_group(group, success, NULL, &job);
 
@@ -739,23 +706,19 @@ mali_osk_errcode_t mali_executor_interrupt_pp(struct mali_group *group,
 
         if (NULL != job) {
             /* Notify user space and close the job object */
-            mali_scheduler_complete_pp_job(job,
-                               num_physical_pp_cores_total,
-                               MALI_TRUE, MALI_TRUE);
+            mali_scheduler_complete_pp_job(job, num_physical_pp_cores_total, MALI_TRUE, MALI_TRUE);
         }
     }
 
     return MALI_OSK_ERR_OK;
 }
 
-mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group,
-        mali_bool in_upper_half)
+mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group, mali_bool in_upper_half)
 {
     enum mali_interrupt_result int_result;
 
-    MALI_DEBUG_PRINT(4, ("Executor: MMU interrupt from %s in %s half\n",
-                 mali_group_core_description(group),
-                 in_upper_half ? "upper" : "bottom"));
+    MALI_DEBUG_PRINT(4, ("Executor: MMU interrupt from %s in %s half\n", mali_group_core_description(group),
+                         in_upper_half ? "upper" : "bottom"));
 
     mali_executor_lock();
     if (!mali_group_is_working(group)) {
@@ -809,12 +772,10 @@ mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group,
         u32 fault_address = mali_mmu_get_page_fault_addr(group->mmu);
         u32 status = mali_mmu_get_status(group->mmu);
         MALI_DEBUG_PRINT(2, ("Executor: Mali page fault detected at 0x%x from bus id %d of type %s on %s\n",
-                     (void *)(uintptr_t)fault_address,
-                     (status >> 6) & 0x1F,
-                     (status & 32) ? "write" : "read",
-                     group->mmu->hw_core.description));
-        MALI_DEBUG_PRINT(3, ("Executor: MMU rawstat = 0x%08X, MMU status = 0x%08X\n",
-                     mali_mmu_get_rawstat(group->mmu), status));
+                             (void *)(uintptr_t)fault_address, (status >> 6) & 0x1F, (status & 32) ? "write" : "read",
+                             group->mmu->hw_core.description));
+        MALI_DEBUG_PRINT(
+            3, ("Executor: MMU rawstat = 0x%08X, MMU status = 0x%08X\n", mali_mmu_get_rawstat(group->mmu), status));
         mali_mmu_pagedir_diag(mali_session_get_page_directory(group->session), fault_address);
 #endif
 
@@ -826,15 +787,12 @@ mali_osk_errcode_t mali_executor_interrupt_mmu(struct mali_group *group,
             MALI_DEBUG_ASSERT(NULL == pp_job);
 
             /* Notify user space and close the job object */
-            mali_scheduler_complete_gp_job(gp_job, MALI_FALSE,
-                               MALI_TRUE, MALI_TRUE);
+            mali_scheduler_complete_gp_job(gp_job, MALI_FALSE, MALI_TRUE, MALI_TRUE);
         } else if (NULL != pp_job) {
             MALI_DEBUG_ASSERT(NULL == gp_job);
 
             /* Notify user space and close the job object */
-            mali_scheduler_complete_pp_job(pp_job,
-                               num_physical_pp_cores_total,
-                               MALI_TRUE, MALI_TRUE);
+            mali_scheduler_complete_pp_job(pp_job, num_physical_pp_cores_total, MALI_TRUE, MALI_TRUE);
         }
     }
 
@@ -858,8 +816,7 @@ void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups)
     MALI_DEBUG_PRINT(3, ("Executor: powering up %u groups\n", num_groups));
 
     for (i = 0; i < num_groups; i++) {
-        MALI_DEBUG_PRINT(3, ("Executor: powering up group %s\n",
-                     mali_group_core_description(groups[i])));
+        MALI_DEBUG_PRINT(3, ("Executor: powering up group %s\n", mali_group_core_description(groups[i])));
 
         mali_group_power_up(groups[i]);
 
@@ -869,8 +826,7 @@ void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups)
             continue;
         }
 
-        MALI_DEBUG_PRINT(3, ("Executor: activating group %s\n",
-                     mali_group_core_description(groups[i])));
+        MALI_DEBUG_PRINT(3, ("Executor: activating group %s\n", mali_group_core_description(groups[i])));
 
 #if defined(DEBUG)
         num_activated++;
@@ -888,28 +844,21 @@ void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups)
 
         /* Move group from inactive to idle list */
         if (groups[i] == gp_group) {
-            MALI_DEBUG_ASSERT(EXEC_STATE_INACTIVE ==
-                      gp_group_state);
+            MALI_DEBUG_ASSERT(EXEC_STATE_INACTIVE == gp_group_state);
             gp_group_state = EXEC_STATE_IDLE;
-        } else if (MALI_FALSE == mali_group_is_in_virtual(groups[i])
-               && MALI_FALSE == mali_group_is_virtual(groups[i])) {
-            MALI_DEBUG_ASSERT(MALI_TRUE == mali_executor_group_is_in_state(groups[i],
-                      EXEC_STATE_INACTIVE));
+        } else if (MALI_FALSE == mali_group_is_in_virtual(groups[i]) &&
+                   MALI_FALSE == mali_group_is_virtual(groups[i])) {
+            MALI_DEBUG_ASSERT(MALI_TRUE == mali_executor_group_is_in_state(groups[i], EXEC_STATE_INACTIVE));
 
-            mali_executor_change_state_pp_physical(groups[i],
-                                   &group_list_inactive,
-                                   &group_list_inactive_count,
-                                   &group_list_idle,
-                                   &group_list_idle_count);
+            mali_executor_change_state_pp_physical(groups[i], &group_list_inactive, &group_list_inactive_count,
+                                                   &group_list_idle, &group_list_idle_count);
         }
 
         do_schedule = MALI_TRUE;
     }
 
-    if (mali_executor_has_virtual_group() &&
-        MALI_TRUE == child_groups_activated &&
-        MALI_GROUP_STATE_ACTIVATION_PENDING ==
-        mali_group_get_state(virtual_group)) {
+    if (mali_executor_has_virtual_group() && MALI_TRUE == child_groups_activated &&
+        MALI_GROUP_STATE_ACTIVATION_PENDING == mali_group_get_state(virtual_group)) {
         /*
          * Try to active virtual group while it may be not sucessful every time,
          * because there is one situation that not all of child groups are powered on
@@ -917,16 +866,19 @@ void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups)
          */
         if (mali_group_set_active(virtual_group)) {
             /* Move group from inactive to idle */
-            MALI_DEBUG_ASSERT(EXEC_STATE_INACTIVE ==
-                      virtual_group_state);
+            MALI_DEBUG_ASSERT(EXEC_STATE_INACTIVE == virtual_group_state);
             virtual_group_state = EXEC_STATE_IDLE;
 
-            MALI_DEBUG_PRINT(3, ("Executor: powering up %u groups completed, %u  physical activated, 1 virtual activated.\n", num_groups, num_activated));
+            MALI_DEBUG_PRINT(
+                3, ("Executor: powering up %u groups completed, %u  physical activated, 1 virtual activated.\n",
+                    num_groups, num_activated));
         } else {
-            MALI_DEBUG_PRINT(3, ("Executor: powering up %u groups completed, %u physical activated\n", num_groups, num_activated));
+            MALI_DEBUG_PRINT(
+                3, ("Executor: powering up %u groups completed, %u physical activated\n", num_groups, num_activated));
         }
     } else {
-        MALI_DEBUG_PRINT(3, ("Executor: powering up %u groups completed, %u physical activated\n", num_groups, num_activated));
+        MALI_DEBUG_PRINT(
+            3, ("Executor: powering up %u groups completed, %u physical activated\n", num_groups, num_activated));
     }
 
     if (MALI_TRUE == do_schedule) {
@@ -937,8 +889,7 @@ void mali_executor_group_power_up(struct mali_group *groups[], u32 num_groups)
     mali_executor_unlock();
 }
 
-void mali_executor_group_power_down(struct mali_group *groups[],
-                    u32 num_groups)
+void mali_executor_group_power_down(struct mali_group *groups[], u32 num_groups)
 {
     u32 i;
 
@@ -958,15 +909,11 @@ void mali_executor_group_power_down(struct mali_group *groups[],
          * powered down an empty virtual group. Those physical groups will be powered
          * up in following pm_runtime_resume callback function.
          */
-        MALI_DEBUG_ASSERT(mali_executor_group_is_in_state(groups[i],
-                  EXEC_STATE_DISABLED) ||
-                  mali_executor_group_is_in_state(groups[i],
-                          EXEC_STATE_INACTIVE) ||
-                  mali_executor_group_is_in_state(groups[i],
-                          EXEC_STATE_EMPTY));
+        MALI_DEBUG_ASSERT(mali_executor_group_is_in_state(groups[i], EXEC_STATE_DISABLED) ||
+                          mali_executor_group_is_in_state(groups[i], EXEC_STATE_INACTIVE) ||
+                          mali_executor_group_is_in_state(groups[i], EXEC_STATE_EMPTY));
 
-        MALI_DEBUG_PRINT(3, ("Executor: powering down group %s\n",
-                     mali_group_core_description(groups[i])));
+        MALI_DEBUG_PRINT(3, ("Executor: powering down group %s\n", mali_group_core_description(groups[i])));
 
         mali_group_power_down(groups[i]);
     }
@@ -984,9 +931,7 @@ void mali_executor_abort_session(struct mali_session_data *session)
     MALI_DEBUG_ASSERT_POINTER(session);
     MALI_DEBUG_ASSERT(session->is_aborting);
 
-    MALI_DEBUG_PRINT(3,
-             ("Executor: Aborting all jobs from session 0x%08X.\n",
-              session));
+    MALI_DEBUG_PRINT(3, ("Executor: Aborting all jobs from session 0x%08X.\n", session));
 
     mali_executor_lock();
 
@@ -999,8 +944,7 @@ void mali_executor_abort_session(struct mali_session_data *session)
             MALI_DEBUG_ASSERT_POINTER(gp_job);
 
             /* GP job completed, make sure it is freed */
-            mali_scheduler_complete_gp_job(gp_job, MALI_FALSE,
-                               MALI_FALSE, MALI_TRUE);
+            mali_scheduler_complete_gp_job(gp_job, MALI_FALSE, MALI_FALSE, MALI_TRUE);
         } else {
             /* Same session, but not working, so just clear it */
             mali_group_clear_session(gp_group);
@@ -1008,22 +952,20 @@ void mali_executor_abort_session(struct mali_session_data *session)
     }
 
     if (mali_executor_has_virtual_group()) {
-        if (EXEC_STATE_WORKING == virtual_group_state
-            && mali_group_get_session(virtual_group) == session) {
+        if (EXEC_STATE_WORKING == virtual_group_state && mali_group_get_session(virtual_group) == session) {
             struct mali_pp_job *pp_job = NULL;
 
             mali_executor_complete_group(virtual_group, MALI_FALSE, NULL, &pp_job);
 
             if (NULL != pp_job) {
                 /* PP job completed, make sure it is freed */
-                mali_scheduler_complete_pp_job(pp_job, 0,
-                                   MALI_FALSE, MALI_TRUE);
+                mali_scheduler_complete_pp_job(pp_job, 0, MALI_FALSE, MALI_TRUE);
             }
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_working,
-                    struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_working, struct mali_group, executor_list)
+    {
         if (mali_group_get_session(group) == session) {
             struct mali_pp_job *pp_job = NULL;
 
@@ -1031,27 +973,28 @@ void mali_executor_abort_session(struct mali_session_data *session)
 
             if (NULL != pp_job) {
                 /* PP job completed, make sure it is freed */
-                mali_scheduler_complete_pp_job(pp_job, 0,
-                                   MALI_FALSE, MALI_TRUE);
+                mali_scheduler_complete_pp_job(pp_job, 0, MALI_FALSE, MALI_TRUE);
             }
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_idle, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_idle, struct mali_group, executor_list)
+    {
         mali_group_clear_session(group);
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_inactive, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_inactive, struct mali_group, executor_list)
+    {
         mali_group_clear_session(group);
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_disabled, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_disabled, struct mali_group, executor_list)
+    {
         mali_group_clear_session(group);
     }
 
     mali_executor_unlock();
 }
-
 
 void mali_executor_core_scaling_enable(void)
 {
@@ -1075,8 +1018,8 @@ void mali_executor_group_enable(struct mali_group *group)
 
     mali_executor_lock();
 
-    if ((NULL != mali_group_get_gp_core(group) || NULL != mali_group_get_pp_core(group))
-        && (mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED))) {
+    if ((NULL != mali_group_get_gp_core(group) || NULL != mali_group_get_pp_core(group)) &&
+        (mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED))) {
         mali_executor_group_enable_internal(group);
     }
 
@@ -1096,8 +1039,8 @@ void mali_executor_group_disable(struct mali_group *group)
 
     mali_executor_lock();
 
-    if ((NULL != mali_group_get_gp_core(group) || NULL != mali_group_get_pp_core(group))
-        && (!mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED))) {
+    if ((NULL != mali_group_get_gp_core(group) || NULL != mali_group_get_pp_core(group)) &&
+        (!mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED))) {
         mali_executor_group_disable_internal(group);
     }
 
@@ -1124,10 +1067,18 @@ mali_bool mali_executor_group_is_disabled(struct mali_group *group)
 
 int mali_executor_set_perf_level(unsigned int target_core_nr, mali_bool override)
 {
-    if (target_core_nr == num_physical_pp_cores_enabled) return 0;
-    if (MALI_FALSE == core_scaling_enabled && MALI_FALSE == override) return -EPERM;
-    if (target_core_nr > num_physical_pp_cores_total) return -EINVAL;
-    if (0 == target_core_nr) return -EINVAL;
+    if (target_core_nr == num_physical_pp_cores_enabled) {
+        return 0;
+    }
+    if (MALI_FALSE == core_scaling_enabled && MALI_FALSE == override) {
+        return -EPERM;
+    }
+    if (target_core_nr > num_physical_pp_cores_total) {
+        return -EINVAL;
+    }
+    if (0 == target_core_nr) {
+        return -EINVAL;
+    }
 
     mali_executor_core_scale(target_core_nr);
 
@@ -1146,82 +1097,72 @@ u32 mali_executor_dump_state(char *buf, u32 size)
     mali_executor_lock();
 
     switch (gp_group_state) {
-    case EXEC_STATE_INACTIVE:
-        n += mali_osk_snprintf(buf + n, size - n,
-                    "GP group is in state INACTIVE\n");
-        break;
-    case EXEC_STATE_IDLE:
-        n += mali_osk_snprintf(buf + n, size - n,
-                    "GP group is in state IDLE\n");
-        break;
-    case EXEC_STATE_WORKING:
-        n += mali_osk_snprintf(buf + n, size - n,
-                    "GP group is in state WORKING\n");
-        break;
-    default:
-        n += mali_osk_snprintf(buf + n, size - n,
-                    "GP group is in unknown/illegal state %u\n",
-                    gp_group_state);
-        break;
+        case EXEC_STATE_INACTIVE:
+            n += mali_osk_snprintf(buf + n, size - n, "GP group is in state INACTIVE\n");
+            break;
+        case EXEC_STATE_IDLE:
+            n += mali_osk_snprintf(buf + n, size - n, "GP group is in state IDLE\n");
+            break;
+        case EXEC_STATE_WORKING:
+            n += mali_osk_snprintf(buf + n, size - n, "GP group is in state WORKING\n");
+            break;
+        default:
+            n += mali_osk_snprintf(buf + n, size - n, "GP group is in unknown/illegal state %u\n", gp_group_state);
+            break;
     }
 
     n += mali_group_dump_state(gp_group, buf + n, size - n);
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "Physical PP groups in WORKING state (count = %u):\n",
-                group_list_working_count);
+    n += mali_osk_snprintf(buf + n, size - n, "Physical PP groups in WORKING state (count = %u):\n",
+                           group_list_working_count);
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working, struct mali_group, executor_list)
+    {
         n += mali_group_dump_state(group, buf + n, size - n);
     }
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "Physical PP groups in IDLE state (count = %u):\n",
-                group_list_idle_count);
+    n +=
+        mali_osk_snprintf(buf + n, size - n, "Physical PP groups in IDLE state (count = %u):\n", group_list_idle_count);
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+    {
         n += mali_group_dump_state(group, buf + n, size - n);
     }
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "Physical PP groups in INACTIVE state (count = %u):\n",
-                group_list_inactive_count);
+    n += mali_osk_snprintf(buf + n, size - n, "Physical PP groups in INACTIVE state (count = %u):\n",
+                           group_list_inactive_count);
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list)
+    {
         n += mali_group_dump_state(group, buf + n, size - n);
     }
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "Physical PP groups in DISABLED state (count = %u):\n",
-                group_list_disabled_count);
+    n += mali_osk_snprintf(buf + n, size - n, "Physical PP groups in DISABLED state (count = %u):\n",
+                           group_list_disabled_count);
 
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list)
+    {
         n += mali_group_dump_state(group, buf + n, size - n);
     }
 
     if (mali_executor_has_virtual_group()) {
         switch (virtual_group_state) {
-        case EXEC_STATE_EMPTY:
-            n += mali_osk_snprintf(buf + n, size - n,
-                        "Virtual PP group is in state EMPTY\n");
-            break;
-        case EXEC_STATE_INACTIVE:
-            n += mali_osk_snprintf(buf + n, size - n,
-                        "Virtual PP group is in state INACTIVE\n");
-            break;
-        case EXEC_STATE_IDLE:
-            n += mali_osk_snprintf(buf + n, size - n,
-                        "Virtual PP group is in state IDLE\n");
-            break;
-        case EXEC_STATE_WORKING:
-            n += mali_osk_snprintf(buf + n, size - n,
-                        "Virtual PP group is in state WORKING\n");
-            break;
-        default:
-            n += mali_osk_snprintf(buf + n, size - n,
-                        "Virtual PP group is in unknown/illegal state %u\n",
-                        virtual_group_state);
-            break;
+            case EXEC_STATE_EMPTY:
+                n += mali_osk_snprintf(buf + n, size - n, "Virtual PP group is in state EMPTY\n");
+                break;
+            case EXEC_STATE_INACTIVE:
+                n += mali_osk_snprintf(buf + n, size - n, "Virtual PP group is in state INACTIVE\n");
+                break;
+            case EXEC_STATE_IDLE:
+                n += mali_osk_snprintf(buf + n, size - n, "Virtual PP group is in state IDLE\n");
+                break;
+            case EXEC_STATE_WORKING:
+                n += mali_osk_snprintf(buf + n, size - n, "Virtual PP group is in state WORKING\n");
+                break;
+            default:
+                n += mali_osk_snprintf(buf + n, size - n, "Virtual PP group is in unknown/illegal state %u\n",
+                                       virtual_group_state);
+                break;
         }
 
         n += mali_group_dump_state(virtual_group, buf + n, size - n);
@@ -1281,38 +1222,32 @@ mali_osk_errcode_t _mali_ukk_gp_suspend_response(mali_uk_gp_suspend_response_s *
     if (MALIGP_JOB_RESUME_WITH_NEW_HEAP == args->code) {
         _mali_osk_notification_t *new_notification = NULL;
 
-        new_notification = _mali_osk_notification_create(
-                       MALI_NOTIFICATION_GP_STALLED,
-                       sizeof(mali_uk_gp_job_suspended_s));
+        new_notification =
+            _mali_osk_notification_create(MALI_NOTIFICATION_GP_STALLED, sizeof(mali_uk_gp_job_suspended_s));
 
         if (NULL != new_notification) {
-            MALI_DEBUG_PRINT(3, ("Executor: Resuming job %u with new heap; 0x%08X - 0x%08X\n",
-                         args->cookie, args->arguments[0], args->arguments[1]));
+            MALI_DEBUG_PRINT(3, ("Executor: Resuming job %u with new heap; 0x%08X - 0x%08X\n", args->cookie,
+                                 args->arguments[0], args->arguments[1]));
 
             mali_executor_lock();
 
             /* Resume the job in question if it is still running */
             job = mali_group_get_running_gp_job(gp_group);
-            if (NULL != job &&
-                args->cookie == mali_gp_job_get_id(job) &&
-                session == mali_gp_job_get_session(job)) {
+            if (NULL != job && args->cookie == mali_gp_job_get_id(job) && session == mali_gp_job_get_session(job)) {
                 /*
                  * Correct job is running, resume with new heap
                  */
 
-                mali_gp_job_set_oom_notification(job,
-                                 new_notification);
+                mali_gp_job_set_oom_notification(job, new_notification);
 
                 /* This will also re-enable interrupts */
-                mali_group_resume_gp_with_new_heap(gp_group,
-                                   args->cookie,
-                                   args->arguments[0],
-                                   args->arguments[1]);
+                mali_group_resume_gp_with_new_heap(gp_group, args->cookie, args->arguments[0], args->arguments[1]);
 
                 mali_executor_unlock();
                 return MALI_OSK_ERR_OK;
             } else {
-                MALI_DEBUG_PRINT(2, ("Executor: Unable to resume  gp job becasue gp time out or any other unexpected reason!\n"));
+                MALI_DEBUG_PRINT(
+                    2, ("Executor: Unable to resume  gp job becasue gp time out or any other unexpected reason!\n"));
 
                 _mali_osk_notification_delete(new_notification);
 
@@ -1330,9 +1265,7 @@ mali_osk_errcode_t _mali_ukk_gp_suspend_response(mali_uk_gp_suspend_response_s *
 
     /* Abort the job in question if it is still running */
     job = mali_group_get_running_gp_job(gp_group);
-    if (NULL != job &&
-        args->cookie == mali_gp_job_get_id(job) &&
-        session == mali_gp_job_get_session(job)) {
+    if (NULL != job && args->cookie == mali_gp_job_get_id(job) && session == mali_gp_job_get_session(job)) {
         /* Correct job is still running */
         struct mali_gp_job *job_done = NULL;
 
@@ -1342,14 +1275,12 @@ mali_osk_errcode_t _mali_ukk_gp_suspend_response(mali_uk_gp_suspend_response_s *
         MALI_DEBUG_ASSERT(job_done == job);
 
         /* GP job completed, make sure it is freed */
-        mali_scheduler_complete_gp_job(job_done, MALI_FALSE,
-                           MALI_TRUE, MALI_TRUE);
+        mali_scheduler_complete_gp_job(job_done, MALI_FALSE, MALI_TRUE, MALI_TRUE);
     }
 
     mali_executor_unlock();
     return MALI_OSK_ERR_FAULT;
 }
-
 
 /*
  * ---------- Implementation of static functions ----------
@@ -1383,13 +1314,12 @@ static mali_bool mali_executor_is_suspended(void *data)
     return ret;
 }
 
-static mali_bool mali_executor_is_working()
+static mali_bool mali_executor_is_working(void)
 {
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
 
-    return (0 != group_list_working_count ||
-        EXEC_STATE_WORKING == gp_group_state ||
-        EXEC_STATE_WORKING == virtual_group_state);
+    return (0 != group_list_working_count || EXEC_STATE_WORKING == gp_group_state ||
+            EXEC_STATE_WORKING == virtual_group_state);
 }
 
 static void mali_executor_disable_empty_virtual(void)
@@ -1409,8 +1339,7 @@ static mali_bool mali_executor_physical_rejoin_virtual(struct mali_group *group)
 
     MALI_DEBUG_ASSERT_POINTER(group);
     /* Only rejoining after job has completed (still active) */
-    MALI_DEBUG_ASSERT(MALI_GROUP_STATE_ACTIVE ==
-              mali_group_get_state(group));
+    MALI_DEBUG_ASSERT(MALI_GROUP_STATE_ACTIVE == mali_group_get_state(group));
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
     MALI_DEBUG_ASSERT(MALI_TRUE == mali_executor_has_virtual_group());
     MALI_DEBUG_ASSERT(MALI_FALSE == mali_group_is_virtual(group));
@@ -1425,8 +1354,7 @@ static mali_bool mali_executor_physical_rejoin_virtual(struct mali_group *group)
         if (virtual_group_state == EXEC_STATE_EMPTY) {
             virtual_group_state = EXEC_STATE_INACTIVE;
         }
-    } else if (MALI_GROUP_STATE_ACTIVATION_PENDING ==
-           mali_group_get_state(virtual_group)) {
+    } else if (MALI_GROUP_STATE_ACTIVATION_PENDING == mali_group_get_state(virtual_group)) {
         /*
          * Activation is pending for virtual group, leave
          * this child group as active.
@@ -1435,8 +1363,7 @@ static mali_bool mali_executor_physical_rejoin_virtual(struct mali_group *group)
             virtual_group_state = EXEC_STATE_INACTIVE;
         }
     } else {
-        MALI_DEBUG_ASSERT(MALI_GROUP_STATE_ACTIVE ==
-                  mali_group_get_state(virtual_group));
+        MALI_DEBUG_ASSERT(MALI_GROUP_STATE_ACTIVE == mali_group_get_state(virtual_group));
 
         if (virtual_group_state == EXEC_STATE_EMPTY) {
             virtual_group_state = EXEC_STATE_IDLE;
@@ -1444,8 +1371,7 @@ static mali_bool mali_executor_physical_rejoin_virtual(struct mali_group *group)
     }
 
     /* Remove group from idle list */
-    MALI_DEBUG_ASSERT(mali_executor_group_is_in_state(group,
-              EXEC_STATE_IDLE));
+    MALI_DEBUG_ASSERT(mali_executor_group_is_in_state(group, EXEC_STATE_IDLE));
     mali_osk_list_delinit(&group->executor_list);
     group_list_idle_count--;
 
@@ -1472,9 +1398,10 @@ static mali_bool mali_executor_virtual_group_is_usable(void)
 {
 #if (defined(CONFIG_MALI450) || defined(CONFIG_MALI470))
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
-    return ((EXEC_STATE_INACTIVE == virtual_group_state ||
-         EXEC_STATE_IDLE == virtual_group_state) && (virtual_group->state != MALI_GROUP_STATE_ACTIVATION_PENDING)) ?
-           MALI_TRUE : MALI_FALSE;
+    return ((EXEC_STATE_INACTIVE == virtual_group_state || EXEC_STATE_IDLE == virtual_group_state) &&
+            (virtual_group->state != MALI_GROUP_STATE_ACTIVATION_PENDING))
+               ? MALI_TRUE
+               : MALI_FALSE;
 #else
     return MALI_FALSE;
 #endif /* (defined(CONFIG_MALI450) || defined(CONFIG_MALI470)) */
@@ -1489,8 +1416,7 @@ static mali_bool mali_executor_tackle_gp_bound(void)
     job = mali_scheduler_job_pp_physical_peek();
 
     if (NULL != job && MALI_TRUE == mali_is_mali400()) {
-        if (0 < group_list_working_count &&
-            mali_pp_job_is_large_and_unstarted(job)) {
+        if (0 < group_list_working_count && mali_pp_job_is_large_and_unstarted(job)) {
             return MALI_TRUE;
         }
     }
@@ -1523,8 +1449,8 @@ static mali_bool mali_executor_schedule_is_early_out(mali_bool *gpu_secure_mode_
     next_pp_job_to_start = mali_scheduler_job_pp_next();
 
     /* Check current pp physical/virtual running job is protected job or not if exist.*/
-    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_working,
-                    struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, tmp_group, &group_list_working, struct mali_group, executor_list)
+    {
         physical_pp_job_working = group->pp_running_job;
         break;
     }
@@ -1552,12 +1478,12 @@ static mali_bool mali_executor_schedule_is_early_out(mali_bool *gpu_secure_mode_
     /* If the next pp job is the protected pp job.*/
     if ((NULL != next_pp_job_to_start) && MALI_TRUE == mali_pp_job_is_protected_job(next_pp_job_to_start)) {
         /* if gp is working or any non-protected pp job is working now, unable to schedule protected pp job. */
-        if (MALI_TRUE == gpu_working_in_non_protected_mode)
+        if (MALI_TRUE == gpu_working_in_non_protected_mode) {
             return MALI_TRUE;
+        }
 
         *gpu_secure_mode_is_needed = MALI_TRUE;
         return MALI_FALSE;
-
     }
 
     if (MALI_TRUE == gpu_working_in_protected_mode) {
@@ -1608,12 +1534,10 @@ static void mali_executor_schedule(void)
     }
 
     /* 2. Activate gp firstly if have gp job queued. */
-    if ((EXEC_STATE_INACTIVE == gp_group_state)
-        && (0 < mali_scheduler_job_gp_count())
-        && (gpu_secure_mode_is_needed == MALI_FALSE)) {
+    if ((EXEC_STATE_INACTIVE == gp_group_state) && (0 < mali_scheduler_job_gp_count()) &&
+        (gpu_secure_mode_is_needed == MALI_FALSE)) {
 
-        enum mali_group_state state =
-            mali_group_activate(gp_group);
+        enum mali_group_state state = mali_group_activate(gp_group);
         if (MALI_GROUP_STATE_ACTIVE == state) {
             /* Set GP group state to idle */
             gp_group_state = EXEC_STATE_IDLE;
@@ -1646,17 +1570,13 @@ static void mali_executor_schedule(void)
             struct mali_group *group;
             struct mali_group *temp;
 
-            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive,
-                            struct mali_group, executor_list) {
-                enum mali_group_state state =
-                    mali_group_activate(group);
+            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list)
+            {
+                enum mali_group_state state = mali_group_activate(group);
                 if (MALI_GROUP_STATE_ACTIVE == state) {
                     /* Move from inactive to idle */
-                    mali_executor_change_state_pp_physical(group,
-                                           &group_list_inactive,
-                                           &group_list_inactive_count,
-                                           &group_list_idle,
-                                           &group_list_idle_count);
+                    mali_executor_change_state_pp_physical(group, &group_list_inactive, &group_list_inactive_count,
+                                                           &group_list_idle, &group_list_idle_count);
                     num_physical_to_process++;
                 } else {
                     trigger_pm_update = MALI_TRUE;
@@ -1688,9 +1608,7 @@ static void mali_executor_schedule(void)
                     state = mali_group_activate(group);
                     if (MALI_GROUP_STATE_ACTIVE == state) {
                         /* Group is ready, add to idle list */
-                        _mali_osk_list_add(
-                            &group->executor_list,
-                            &group_list_idle);
+                        _mali_osk_list_add(&group->executor_list, &group_list_idle);
                         group_list_idle_count++;
                         num_physical_to_process++;
                     } else {
@@ -1698,9 +1616,7 @@ static void mali_executor_schedule(void)
                          * Group is not ready yet,
                          * add to inactive list
                          */
-                        _mali_osk_list_add(
-                            &group->executor_list,
-                            &group_list_inactive);
+                        _mali_osk_list_add(&group->executor_list, &group_list_inactive);
                         group_list_inactive_count++;
 
                         trigger_pm_update = MALI_TRUE;
@@ -1722,32 +1638,29 @@ static void mali_executor_schedule(void)
             struct mali_group *group;
             struct mali_group *temp;
 
-            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle,
-                            struct mali_group, executor_list) {
+            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+            {
                 struct mali_pp_job *job = NULL;
                 u32 sub_job = MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS;
 
-                MALI_DEBUG_ASSERT(num_jobs_to_start <
-                          MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS);
+                MALI_DEBUG_ASSERT(num_jobs_to_start < MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS);
 
-                MALI_DEBUG_ASSERT(0 <
-                          mali_scheduler_job_physical_head_count(gpu_secure_mode_is_needed));
+                MALI_DEBUG_ASSERT(0 < mali_scheduler_job_physical_head_count(gpu_secure_mode_is_needed));
 
                 /* If the next pp job is non-protected, check if gp bound now. */
-                if ((MALI_FALSE == gpu_secure_mode_is_needed)
-                    && (mali_executor_hint_is_enabled(MALI_EXECUTOR_HINT_GP_BOUND))
-                    && (MALI_TRUE == mali_executor_tackle_gp_bound())) {
+                if ((MALI_FALSE == gpu_secure_mode_is_needed) &&
+                    (mali_executor_hint_is_enabled(MALI_EXECUTOR_HINT_GP_BOUND)) &&
+                    (MALI_TRUE == mali_executor_tackle_gp_bound())) {
                     /*
-                    * We're gp bound,
-                    * don't start this right now.
-                    */
+                     * We're gp bound,
+                     * don't start this right now.
+                     */
                     deactivate_idle_group = MALI_FALSE;
                     num_physical_to_process = 0;
                     break;
                 }
 
-                job = mali_scheduler_job_pp_physical_get(
-                          &sub_job);
+                job = mali_scheduler_job_pp_physical_get(&sub_job);
 
                 if (MALI_FALSE == gpu_secure_mode_is_needed) {
                     MALI_DEBUG_ASSERT(MALI_FALSE == mali_pp_job_is_protected_job(job));
@@ -1766,11 +1679,8 @@ static void mali_executor_schedule(void)
                 num_jobs_to_start++;
 
                 /* Move group from idle to working */
-                mali_executor_change_state_pp_physical(group,
-                                       &group_list_idle,
-                                       &group_list_idle_count,
-                                       &group_list_working,
-                                       &group_list_working_count);
+                mali_executor_change_state_pp_physical(group, &group_list_idle, &group_list_idle_count,
+                                                       &group_list_working, &group_list_working_count);
 
                 num_physical_to_process--;
                 if (0 == num_physical_to_process) {
@@ -1788,19 +1698,17 @@ static void mali_executor_schedule(void)
      *    we will do nothing in schedule cause executor schedule stop
      */
 
-    if (MALI_TRUE == mali_executor_deactivate_list_idle(deactivate_idle_group
-            && (!mali_timeline_has_physical_pp_job()))) {
+    if (MALI_TRUE ==
+        mali_executor_deactivate_list_idle(deactivate_idle_group && (!mali_timeline_has_physical_pp_job()))) {
         trigger_pm_update = MALI_TRUE;
     }
 
     /* 5. Activate virtual group, if needed */
-    if (EXEC_STATE_INACTIVE == virtual_group_state &&
-        MALI_TRUE ==  mali_scheduler_job_next_is_virtual()) {
+    if (EXEC_STATE_INACTIVE == virtual_group_state && MALI_TRUE == mali_scheduler_job_next_is_virtual()) {
         struct mali_pp_job *virtual_job = mali_scheduler_job_pp_virtual_peek();
-        if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == mali_pp_job_is_protected_job(virtual_job))
-            || (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == mali_pp_job_is_protected_job(virtual_job))) {
-            enum mali_group_state state =
-                mali_group_activate(virtual_group);
+        if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == mali_pp_job_is_protected_job(virtual_job)) ||
+            (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == mali_pp_job_is_protected_job(virtual_job))) {
+            enum mali_group_state state = mali_group_activate(virtual_group);
             if (MALI_GROUP_STATE_ACTIVE == state) {
                 /* Set virtual group state to idle */
                 virtual_group_state = EXEC_STATE_IDLE;
@@ -1814,8 +1722,8 @@ static void mali_executor_schedule(void)
 
     is_gpu_secure_mode = mali_osk_gpu_secure_mode_is_enabled();
 
-    if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == is_gpu_secure_mode)
-        || (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == is_gpu_secure_mode)) {
+    if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == is_gpu_secure_mode) ||
+        (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == is_gpu_secure_mode)) {
         if (MALI_TRUE == trigger_pm_update) {
             trigger_pm_update = MALI_FALSE;
             mali_pm_update_async();
@@ -1827,10 +1735,9 @@ static void mali_executor_schedule(void)
     if (EXEC_STATE_IDLE == virtual_group_state) {
         if (MALI_TRUE == mali_scheduler_job_next_is_virtual()) {
             struct mali_pp_job *virtual_job = mali_scheduler_job_pp_virtual_peek();
-            if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == mali_pp_job_is_protected_job(virtual_job))
-                || (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == mali_pp_job_is_protected_job(virtual_job))) {
-                virtual_job_to_start =
-                    mali_scheduler_job_pp_virtual_get();
+            if ((MALI_FALSE == gpu_secure_mode_is_needed && MALI_FALSE == mali_pp_job_is_protected_job(virtual_job)) ||
+                (MALI_TRUE == gpu_secure_mode_is_needed && MALI_TRUE == mali_pp_job_is_protected_job(virtual_job))) {
+                virtual_job_to_start = mali_scheduler_job_pp_virtual_get();
                 virtual_group_state = EXEC_STATE_WORKING;
             }
         } else if (!mali_timeline_has_virtual_pp_job()) {
@@ -1863,16 +1770,12 @@ static void mali_executor_schedule(void)
     /* 10. start jobs */
     if (NULL != virtual_job_to_start) {
         MALI_DEBUG_ASSERT(!mali_group_pp_is_active(virtual_group));
-        mali_group_start_pp_job(virtual_group,
-                    virtual_job_to_start, 0, is_gpu_secure_mode);
+        mali_group_start_pp_job(virtual_group, virtual_job_to_start, 0, is_gpu_secure_mode);
     }
 
     for (i = 0; i < num_jobs_to_start; i++) {
-        MALI_DEBUG_ASSERT(!mali_group_pp_is_active(
-                      groups_to_start[i]));
-        mali_group_start_pp_job(groups_to_start[i],
-                    jobs_to_start[i],
-                    sub_jobs_to_start[i], is_gpu_secure_mode);
+        MALI_DEBUG_ASSERT(!mali_group_pp_is_active(groups_to_start[i]));
+        mali_group_start_pp_job(groups_to_start[i], jobs_to_start[i], sub_jobs_to_start[i], is_gpu_secure_mode);
     }
 
     MALI_DEBUG_ASSERT_POINTER(gp_group);
@@ -1914,11 +1817,9 @@ static void mali_executor_send_gp_oom_to_user(struct mali_gp_job *job)
     jobres->user_job_ptr = mali_gp_job_get_user_id(job);
     jobres->cookie = gp_returned_cookie;
 
-    mali_session_send_notification(mali_gp_job_get_session(job),
-                       notification);
+    mali_session_send_notification(mali_gp_job_get_session(job), notification);
 }
-static struct mali_gp_job *mali_executor_complete_gp(struct mali_group *group,
-        mali_bool success)
+static struct mali_gp_job *mali_executor_complete_gp(struct mali_group *group, mali_bool success)
 {
     struct mali_gp_job *job;
 
@@ -1941,8 +1842,7 @@ static struct mali_gp_job *mali_executor_complete_gp(struct mali_group *group,
     return job;
 }
 
-static struct mali_pp_job *mali_executor_complete_pp(struct mali_group *group,
-        mali_bool success)
+static struct mali_pp_job *mali_executor_complete_pp(struct mali_group *group, mali_bool success)
 {
     struct mali_pp_job *job;
     u32 sub_job;
@@ -1960,11 +1860,8 @@ static struct mali_pp_job *mali_executor_complete_pp(struct mali_group *group,
         virtual_group_state = EXEC_STATE_IDLE;
     } else {
         /* Move from working to idle state */
-        mali_executor_change_state_pp_physical(group,
-                               &group_list_working,
-                               &group_list_working_count,
-                               &group_list_idle,
-                               &group_list_idle_count);
+        mali_executor_change_state_pp_physical(group, &group_list_working, &group_list_working_count, &group_list_idle,
+                                               &group_list_idle_count);
     }
 
     /* It is the executor module which owns the jobs themselves by now */
@@ -1979,10 +1876,8 @@ static struct mali_pp_job *mali_executor_complete_pp(struct mali_group *group,
     return job;
 }
 
-static void mali_executor_complete_group(struct mali_group *group,
-        mali_bool success,
-        struct mali_gp_job **gp_job_done,
-        struct mali_pp_job **pp_job_done)
+static void mali_executor_complete_group(struct mali_group *group, mali_bool success, struct mali_gp_job **gp_job_done,
+                                         struct mali_pp_job **pp_job_done)
 {
     struct mali_gp_core *gp_core = mali_group_get_gp_core(group);
     struct mali_pp_core *pp_core = mali_group_get_pp_core(group);
@@ -2005,8 +1900,7 @@ static void mali_executor_complete_group(struct mali_group *group,
 
         if (!mali_executor_is_working()) {
             /* Last job completed, wake up sleepers */
-            _mali_osk_wait_queue_wake_up(
-                executor_working_wait_queue);
+            _mali_osk_wait_queue_wake_up(executor_working_wait_queue);
         }
     } else if (MALI_TRUE == mali_group_disable_requested(group)) {
         mali_executor_core_scale_in_group_complete(group);
@@ -2027,11 +1921,8 @@ static void mali_executor_complete_group(struct mali_group *group,
     }
 }
 
-static void mali_executor_change_state_pp_physical(struct mali_group *group,
-        _mali_osk_list_t *old_list,
-        u32 *old_count,
-        _mali_osk_list_t *new_list,
-        u32 *new_count)
+static void mali_executor_change_state_pp_physical(struct mali_group *group, _mali_osk_list_t *old_list, u32 *old_count,
+                                                   _mali_osk_list_t *new_list, u32 *new_count)
 {
     /*
      * It's a bit more complicated to change the state for the physical PP
@@ -2055,16 +1946,16 @@ static void mali_executor_change_state_pp_physical(struct mali_group *group,
      * and that the count is correct
      */
 
-    MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, old_list,
-                    struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, old_list, struct mali_group, executor_list)
+    {
         old_counted++;
         if (group == group_iter) {
             found = MALI_TRUE;
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, new_list,
-                    struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, new_list, struct mali_group, executor_list)
+    {
         new_counted++;
     }
 
@@ -2101,16 +1992,13 @@ static void mali_executor_change_state_pp_physical(struct mali_group *group,
     (*new_count)++;
 }
 
-static void mali_executor_set_state_pp_physical(struct mali_group *group,
-        _mali_osk_list_t *new_list,
-        u32 *new_count)
+static void mali_executor_set_state_pp_physical(struct mali_group *group, _mali_osk_list_t *new_list, u32 *new_count)
 {
     _mali_osk_list_add(&group->executor_list, new_list);
     (*new_count)++;
 }
 
-static mali_bool mali_executor_group_is_in_state(struct mali_group *group,
-        enum mali_executor_state_t state)
+static mali_bool mali_executor_group_is_in_state(struct mali_group *group, enum mali_executor_state_t state)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
@@ -2140,8 +2028,8 @@ static mali_bool mali_executor_group_is_in_state(struct mali_group *group,
             list = &group_list_working;
         }
 
-        MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, list,
-                        struct mali_group, executor_list) {
+        MALI_OSK_LIST_FOREACHENTRY(group_iter, temp, list, struct mali_group, executor_list)
+        {
             if (group_iter == group) {
                 return MALI_TRUE;
             }
@@ -2163,11 +2051,8 @@ static void mali_executor_group_enable_internal(struct mali_group *group)
         MALI_DEBUG_ASSERT(EXEC_STATE_DISABLED == gp_group_state);
         gp_group_state = EXEC_STATE_INACTIVE;
     } else {
-        mali_executor_change_state_pp_physical(group,
-                               &group_list_disabled,
-                               &group_list_disabled_count,
-                               &group_list_inactive,
-                               &group_list_inactive_count);
+        mali_executor_change_state_pp_physical(group, &group_list_disabled, &group_list_disabled_count,
+                                               &group_list_inactive, &group_list_inactive_count);
 
         ++num_physical_pp_cores_enabled;
         MALI_DEBUG_PRINT(4, ("Enabling group id %d \n", group->pp_core->core_id));
@@ -2180,11 +2065,8 @@ static void mali_executor_group_enable_internal(struct mali_group *group)
         if (group == gp_group) {
             gp_group_state = EXEC_STATE_IDLE;
         } else {
-            mali_executor_change_state_pp_physical(group,
-                                   &group_list_inactive,
-                                   &group_list_inactive_count,
-                                   &group_list_idle,
-                                   &group_list_idle_count);
+            mali_executor_change_state_pp_physical(group, &group_list_inactive, &group_list_inactive_count,
+                                                   &group_list_idle, &group_list_idle_count);
 
             if (mali_executor_has_virtual_group()) {
                 if (mali_executor_physical_rejoin_virtual(group)) {
@@ -2223,9 +2105,7 @@ static void mali_executor_group_disable_internal(struct mali_group *group)
             /* A child group of virtual group. move the specific group from virtual group */
             MALI_DEBUG_ASSERT(EXEC_STATE_WORKING != virtual_group_state);
 
-            mali_executor_set_state_pp_physical(group,
-                                &group_list_disabled,
-                                &group_list_disabled_count);
+            mali_executor_set_state_pp_physical(group, &group_list_disabled, &group_list_disabled_count);
 
             mali_group_remove_group(virtual_group, group);
             mali_executor_disable_empty_virtual();
@@ -2263,7 +2143,8 @@ static void mali_executor_notify_core_change(u32 num_cores)
         u32 used_notification_objects = 0;
         _mali_osk_notification_t **notobjs;
 
-        /* Pre allocate the number of notifications objects we need right now (might change after lock has been taken) */
+        /* Pre allocate the number of notifications objects we need right now (might change after lock has been taken)
+         */
         num_sessions_alloc = mali_session_get_count();
         if (0 == num_sessions_alloc) {
             /* No sessions to report to */
@@ -2273,17 +2154,20 @@ static void mali_executor_notify_core_change(u32 num_cores)
         notobjs = (_mali_osk_notification_t **)mali_osk_malloc(sizeof(_mali_osk_notification_t *) * num_sessions_alloc);
         if (NULL == notobjs) {
             MALI_PRINT_ERROR(("Failed to notify user space session about num PP core change (alloc failure)\n"));
-            /* there is probably no point in trying again, system must be really low on memory and probably unusable now anyway */
+            /* there is probably no point in trying again, system must be really low on memory and probably unusable now
+             * anyway */
             return;
         }
 
         for (i = 0; i < num_sessions_alloc; i++) {
-            notobjs[i] = _mali_osk_notification_create(MALI_NOTIFICATION_PP_NUM_CORE_CHANGE, sizeof(mali_uk_pp_num_cores_changed_s));
+            notobjs[i] = _mali_osk_notification_create(MALI_NOTIFICATION_PP_NUM_CORE_CHANGE,
+                                                       sizeof(mali_uk_pp_num_cores_changed_s));
             if (NULL != notobjs[i]) {
                 mali_uk_pp_num_cores_changed_s *data = notobjs[i]->result_buffer;
                 data->number_of_enabled_cores = num_cores;
             } else {
-                MALI_PRINT_ERROR(("Failed to notify user space session about num PP core change (alloc failure %u)\n", i));
+                MALI_PRINT_ERROR(
+                    ("Failed to notify user space session about num PP core change (alloc failure %u)\n", i));
             }
         }
 
@@ -2295,7 +2179,8 @@ static void mali_executor_notify_core_change(u32 num_cores)
         if (num_sessions_alloc >= num_sessions_with_lock) {
             /* We have allocated enough notification objects for all the sessions atm */
             struct mali_session_data *session, *tmp;
-            MALI_SESSION_FOREACH(session, tmp, link) {
+            MALI_SESSION_FOREACH(session, tmp, link)
+            {
                 MALI_DEBUG_ASSERT(used_notification_objects < num_sessions_alloc);
                 if (NULL != notobjs[used_notification_objects]) {
                     mali_session_send_notification(session, notobjs[used_notification_objects]);
@@ -2354,8 +2239,7 @@ static void mali_executor_wq_notify_core_change(void *arg)
         return;
     }
 
-    _mali_osk_wait_queue_wait_event(executor_notify_core_change_wait_queue,
-                    mali_executor_core_scaling_is_done, NULL);
+    _mali_osk_wait_queue_wait_event(executor_notify_core_change_wait_queue, mali_executor_core_scaling_is_done, NULL);
 
     mali_executor_notify_core_change(num_physical_pp_cores_enabled);
 }
@@ -2387,8 +2271,8 @@ static void mali_executor_core_scaling_reset(void)
 
 static void mali_executor_core_scale(unsigned int target_core_nr)
 {
-    int current_core_scaling_mask[MALI_MAX_NUMBER_OF_DOMAINS] = { 0 };
-    int target_core_scaling_mask[MALI_MAX_NUMBER_OF_DOMAINS] = { 0 };
+    int current_core_scaling_mask[MALI_MAX_NUMBER_OF_DOMAINS] = {0};
+    int target_core_scaling_mask[MALI_MAX_NUMBER_OF_DOMAINS] = {0};
     int i;
 
     MALI_DEBUG_ASSERT(0 < target_core_nr);
@@ -2397,9 +2281,11 @@ static void mali_executor_core_scale(unsigned int target_core_nr)
     mali_executor_lock();
 
     if (target_core_nr < num_physical_pp_cores_enabled) {
-        MALI_DEBUG_PRINT(2, ("Requesting %d cores: disabling %d cores\n", target_core_nr, num_physical_pp_cores_enabled - target_core_nr));
+        MALI_DEBUG_PRINT(2, ("Requesting %d cores: disabling %d cores\n", target_core_nr,
+                             num_physical_pp_cores_enabled - target_core_nr));
     } else {
-        MALI_DEBUG_PRINT(2, ("Requesting %d cores: enabling %d cores\n", target_core_nr, target_core_nr - num_physical_pp_cores_enabled));
+        MALI_DEBUG_PRINT(2, ("Requesting %d cores: enabling %d cores\n", target_core_nr,
+                             target_core_nr - num_physical_pp_cores_enabled));
     }
 
     /* When a new core scaling request is comming,  we should remove the un-doing
@@ -2426,15 +2312,16 @@ static void mali_executor_core_scale(unsigned int target_core_nr)
                 struct mali_group *group;
                 struct mali_group *temp;
 
-                MALI_OSK_LIST_FOREACHENTRY(group, temp, &domain->group_list, struct mali_group, pm_domain_list) {
-                    if (NULL != mali_group_get_pp_core(group) && (!mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED))
-                        && (!mali_group_is_virtual(group))) {
+                MALI_OSK_LIST_FOREACHENTRY(group, temp, &domain->group_list, struct mali_group, pm_domain_list)
+                {
+                    if (NULL != mali_group_get_pp_core(group) &&
+                        (!mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED)) &&
+                        (!mali_group_is_virtual(group))) {
                         mali_executor_group_disable_internal(group);
                         target_core_scaling_mask[i]++;
                         if ((0 == target_core_scaling_mask[i])) {
                             break;
                         }
-
                     }
                 }
             }
@@ -2461,9 +2348,11 @@ static void mali_executor_core_scale(unsigned int target_core_nr)
                 struct mali_group *group;
                 struct mali_group *temp;
 
-                MALI_OSK_LIST_FOREACHENTRY(group, temp, &domain->group_list, struct mali_group, pm_domain_list) {
-                    if (NULL != mali_group_get_pp_core(group) && mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED)
-                        && (!mali_group_is_virtual(group))) {
+                MALI_OSK_LIST_FOREACHENTRY(group, temp, &domain->group_list, struct mali_group, pm_domain_list)
+                {
+                    if (NULL != mali_group_get_pp_core(group) &&
+                        mali_executor_group_is_in_state(group, EXEC_STATE_DISABLED) &&
+                        (!mali_group_is_virtual(group))) {
                         mali_executor_group_enable_internal(group);
                         target_core_scaling_mask[i]--;
 
@@ -2504,7 +2393,8 @@ static void mali_executor_core_scale_in_group_complete(struct mali_group *group)
         struct mali_group *child;
         struct mali_group *temp;
 
-        MALI_OSK_LIST_FOREACHENTRY(child, temp, &group->group_list, struct mali_group, group_list) {
+        MALI_OSK_LIST_FOREACHENTRY(child, temp, &group->group_list, struct mali_group, group_list)
+        {
             if (MALI_TRUE == mali_group_disable_requested(child)) {
                 mali_group_set_disable_request(child, MALI_FALSE);
                 mali_executor_group_disable_internal(child);
@@ -2537,8 +2427,10 @@ static void mali_executor_core_scale_in_group_complete(struct mali_group *group)
                 struct mali_group *disabled_group;
                 struct mali_group *temp;
 
-                MALI_OSK_LIST_FOREACHENTRY(disabled_group, temp, &domain->group_list, struct mali_group, pm_domain_list) {
-                    if (NULL != mali_group_get_pp_core(disabled_group) && mali_executor_group_is_in_state(disabled_group, EXEC_STATE_DISABLED)) {
+                MALI_OSK_LIST_FOREACHENTRY(disabled_group, temp, &domain->group_list, struct mali_group, pm_domain_list)
+                {
+                    if (NULL != mali_group_get_pp_core(disabled_group) &&
+                        mali_executor_group_is_in_state(disabled_group, EXEC_STATE_DISABLED)) {
                         mali_executor_group_enable_internal(disabled_group);
                         core_scaling_delay_up_mask[i]--;
                         num_pp_cores_to_enable--;
@@ -2564,17 +2456,11 @@ static void mali_executor_change_group_status_disabled(struct mali_group *group)
 
     idle = mali_executor_group_is_in_state(group, EXEC_STATE_IDLE);
     if (MALI_TRUE == idle) {
-        mali_executor_change_state_pp_physical(group,
-                               &group_list_idle,
-                               &group_list_idle_count,
-                               &group_list_disabled,
-                               &group_list_disabled_count);
+        mali_executor_change_state_pp_physical(group, &group_list_idle, &group_list_idle_count, &group_list_disabled,
+                                               &group_list_disabled_count);
     } else {
-        mali_executor_change_state_pp_physical(group,
-                               &group_list_inactive,
-                               &group_list_inactive_count,
-                               &group_list_disabled,
-                               &group_list_disabled_count);
+        mali_executor_change_state_pp_physical(group, &group_list_inactive, &group_list_inactive_count,
+                                               &group_list_disabled, &group_list_disabled_count);
     }
 }
 
@@ -2590,11 +2476,9 @@ static mali_bool mali_executor_deactivate_list_idle(mali_bool deactivate_idle_gr
             struct mali_group *group;
             struct mali_group *temp;
 
-            MALI_OSK_LIST_FOREACHENTRY(group, temp,
-                            &group_list_idle,
-                            struct mali_group, executor_list) {
-                if (mali_executor_physical_rejoin_virtual(
-                        group)) {
+            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+            {
+                if (mali_executor_physical_rejoin_virtual(group)) {
                     trigger_pm_update = MALI_TRUE;
                 }
             }
@@ -2604,19 +2488,15 @@ static mali_bool mali_executor_deactivate_list_idle(mali_bool deactivate_idle_gr
 
             /* Deactivate group on Mali-300/400 */
 
-            MALI_OSK_LIST_FOREACHENTRY(group, temp,
-                            &group_list_idle,
-                            struct mali_group, executor_list) {
+            MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+            {
                 if (mali_group_deactivate(group)) {
                     trigger_pm_update = MALI_TRUE;
                 }
 
                 /* Move from idle to inactive */
-                mali_executor_change_state_pp_physical(group,
-                                       &group_list_idle,
-                                       &group_list_idle_count,
-                                       &group_list_inactive,
-                                       &group_list_inactive_count);
+                mali_executor_change_state_pp_physical(group, &group_list_idle, &group_list_idle_count,
+                                                       &group_list_inactive, &group_list_inactive_count);
             }
         }
     }
@@ -2634,22 +2514,26 @@ void mali_executor_running_status_print(void)
         mali_group_dump_status(gp_group);
     }
     MALI_PRINT(("Physical PP groups in WORKING state (count = %u):\n", group_list_working_count));
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_working, struct mali_group, executor_list)
+    {
         MALI_PRINT(("PP running job: %p, subjob %d \n", group->pp_running_job, group->pp_running_sub_job));
         mali_group_dump_status(group);
     }
     MALI_PRINT(("Physical PP groups in INACTIVE state (count = %u):\n", group_list_inactive_count));
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_inactive, struct mali_group, executor_list)
+    {
         MALI_PRINT(("\tPP status %d, SW power: %s\n", group->state, group->power_is_on ? "On" : "Off"));
         MALI_PRINT(("\tPP #%d: %s\n", group->pp_core->core_id, group->pp_core->hw_core.description));
     }
     MALI_PRINT(("Physical PP groups in IDLE state (count = %u):\n", group_list_idle_count));
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_idle, struct mali_group, executor_list)
+    {
         MALI_PRINT(("\tPP status %d, SW power: %s\n", group->state, group->power_is_on ? "On" : "Off"));
         MALI_PRINT(("\tPP #%d: %s\n", group->pp_core->core_id, group->pp_core->hw_core.description));
     }
     MALI_PRINT(("Physical PP groups in DISABLED state (count = %u):\n", group_list_disabled_count));
-    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list) {
+    MALI_OSK_LIST_FOREACHENTRY(group, temp, &group_list_disabled, struct mali_group, executor_list)
+    {
         MALI_PRINT(("\tPP status %d, SW power: %s\n", group->state, group->power_is_on ? "On" : "Off"));
         MALI_PRINT(("\tPP #%d: %s\n", group->pp_core->core_id, group->pp_core->hw_core.description));
     }
@@ -2659,31 +2543,38 @@ void mali_executor_running_status_print(void)
         MALI_PRINT(("Virtual group status: %d\n", virtual_group_state));
         MALI_PRINT(("Virtual group->status: %d\n", virtual_group->state));
         MALI_PRINT(("\tSW power: %s\n", virtual_group->power_is_on ? "On" : "Off"));
-        MALI_OSK_LIST_FOREACHENTRY(group, temp, &virtual_group->group_list,
-                        struct mali_group, group_list) {
+        MALI_OSK_LIST_FOREACHENTRY(group, temp, &virtual_group->group_list, struct mali_group, group_list)
+        {
             int i = 0;
-            MALI_PRINT(("\tchild group(%s) running job: %p\n", group->pp_core->hw_core.description, group->pp_running_job));
+            MALI_PRINT(
+                ("\tchild group(%s) running job: %p\n", group->pp_core->hw_core.description, group->pp_running_job));
             MALI_PRINT(("\tchild group(%s)->status: %d\n", group->pp_core->hw_core.description, group->state));
-            MALI_PRINT(("\tchild group(%s) SW power: %s\n", group->pp_core->hw_core.description, group->power_is_on ? "On" : "Off"));
+            MALI_PRINT(("\tchild group(%s) SW power: %s\n", group->pp_core->hw_core.description,
+                        group->power_is_on ? "On" : "Off"));
             if (group->pm_domain) {
                 MALI_PRINT(("\tPower domain: id %u\n", mali_pm_domain_get_id(group->pm_domain)));
                 MALI_PRINT(("\tMask:0x%04x \n", mali_pm_domain_get_mask(group->pm_domain)));
                 MALI_PRINT(("\tUse-count:%u \n", mali_pm_domain_get_use_count(group->pm_domain)));
-                MALI_PRINT(("\tCurrent power status:%s \n", (mali_pm_domain_get_mask(group->pm_domain)& mali_pm_get_current_mask()) ? "On" : "Off"));
-                MALI_PRINT(("\tWanted  power status:%s \n", (mali_pm_domain_get_mask(group->pm_domain)& mali_pm_get_wanted_mask()) ? "On" : "Off"));
+                MALI_PRINT(("\tCurrent power status:%s \n",
+                            (mali_pm_domain_get_mask(group->pm_domain) & mali_pm_get_current_mask()) ? "On" : "Off"));
+                MALI_PRINT(("\tWanted  power status:%s \n",
+                            (mali_pm_domain_get_mask(group->pm_domain) & mali_pm_get_wanted_mask()) ? "On" : "Off"));
             }
 
             for (i = 0; i < 2; i++) {
                 if (NULL != group->l2_cache_core[i]) {
                     struct mali_pm_domain *domain;
                     domain = mali_l2_cache_get_pm_domain(group->l2_cache_core[i]);
-                    MALI_PRINT(("\t L2(index %d) group SW power: %s\n", i, group->l2_cache_core[i]->power_is_on ? "On" : "Off"));
+                    MALI_PRINT(("\t L2(index %d) group SW power: %s\n", i,
+                                group->l2_cache_core[i]->power_is_on ? "On" : "Off"));
                     if (domain) {
                         MALI_PRINT(("\tL2 Power domain: id %u\n", mali_pm_domain_get_id(domain)));
                         MALI_PRINT(("\tL2 Mask:0x%04x \n", mali_pm_domain_get_mask(domain)));
                         MALI_PRINT(("\tL2 Use-count:%u \n", mali_pm_domain_get_use_count(domain)));
-                        MALI_PRINT(("\tL2 Current power status:%s \n", (mali_pm_domain_get_mask(domain) & mali_pm_get_current_mask()) ? "On" : "Off"));
-                        MALI_PRINT(("\tL2 Wanted  power status:%s \n", (mali_pm_domain_get_mask(domain) & mali_pm_get_wanted_mask()) ? "On" : "Off"));
+                        MALI_PRINT(("\tL2 Current power status:%s \n",
+                                    (mali_pm_domain_get_mask(domain) & mali_pm_get_current_mask()) ? "On" : "Off"));
+                        MALI_PRINT(("\tL2 Wanted  power status:%s \n",
+                                    (mali_pm_domain_get_mask(domain) & mali_pm_get_wanted_mask()) ? "On" : "Off"));
                     }
                 }
             }

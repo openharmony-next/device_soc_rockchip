@@ -40,10 +40,11 @@ u32 rkisp_read(struct rkisp_device *dev, u32 reg, bool is_direct)
 {
     u32 val;
 
-    if (dev->hw_dev->is_single || is_direct)
+    if (dev->hw_dev->is_single || is_direct) {
         val = readl(dev->hw_dev->base_addr + reg);
-    else
+    } else {
         val = *(u32 *)(dev->sw_base_addr + reg);
+    }
     return val;
 }
 
@@ -51,10 +52,11 @@ u32 rkisp_next_read(struct rkisp_device *dev, u32 reg, bool is_direct)
 {
     u32 val;
 
-    if (dev->hw_dev->is_single || is_direct)
+    if (dev->hw_dev->is_single || is_direct) {
         val = readl(dev->hw_dev->base_next_addr + reg);
-    else
+    } else {
         val = *(u32 *)(dev->sw_base_addr + RKISP_ISP_SW_MAX_SIZE + reg);
+    }
     return val;
 }
 
@@ -109,17 +111,17 @@ void rkisp_update_regs(struct rkisp_device *dev, u32 start, u32 end)
         u32 *val = dev->sw_base_addr + i;
         u32 *flag = dev->sw_base_addr + i + RKISP_ISP_SW_REG_SIZE;
 
-        if (*flag == SW_REG_CACHE)
+        if (*flag == SW_REG_CACHE) {
             writel(*val, base + i);
+        }
     }
 }
 
-int rkisp_alloc_buffer(struct rkisp_device *dev,
-               struct rkisp_dummy_buffer *buf)
+int rkisp_alloc_buffer(struct rkisp_device *dev, struct rkisp_dummy_buffer *buf)
 {
     unsigned long attrs = buf->is_need_vaddr ? 0 : DMA_ATTR_NO_KERNEL_MAPPING;
     const struct vb2_mem_ops *g_ops = dev->hw_dev->mem_ops;
-    struct sg_table     *sg_tbl;
+    struct sg_table *sg_tbl;
     void *mem_priv;
     int ret = 0;
 
@@ -128,11 +130,11 @@ int rkisp_alloc_buffer(struct rkisp_device *dev,
         goto err;
     }
 
-    if (dev->hw_dev->is_dma_contig)
+    if (dev->hw_dev->is_dma_contig) {
         attrs |= DMA_ATTR_FORCE_CONTIGUOUS;
+    }
     buf->size = PAGE_ALIGN(buf->size);
-    mem_priv = g_ops->alloc(dev->hw_dev->dev, attrs, buf->size,
-                DMA_BIDIRECTIONAL, GFP_KERNEL | GFP_DMA32);
+    mem_priv = g_ops->alloc(dev->hw_dev->dev, attrs, buf->size, DMA_BIDIRECTIONAL, GFP_KERNEL | GFP_DMA32);
     if (IS_ERR_OR_NULL(mem_priv)) {
         ret = -ENOMEM;
         goto err;
@@ -146,8 +148,9 @@ int rkisp_alloc_buffer(struct rkisp_device *dev,
     } else {
         buf->dma_addr = *((dma_addr_t *)g_ops->cookie(mem_priv));
     }
-    if (buf->is_need_vaddr)
+    if (buf->is_need_vaddr) {
         buf->vaddr = g_ops->vaddr(mem_priv);
+    }
     if (buf->is_need_dbuf) {
         buf->dbuf = g_ops->get_dmabuf(mem_priv, O_RDWR);
         if (buf->is_need_dmafd) {
@@ -160,26 +163,24 @@ int rkisp_alloc_buffer(struct rkisp_device *dev,
             get_dma_buf(buf->dbuf);
         }
     }
-    v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev,
-         "%s buf:0x%x~0x%x size:%d\n", __func__,
-         (u32)buf->dma_addr, (u32)buf->dma_addr + buf->size, buf->size);
+    v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s buf:0x%x~0x%x size:%d\n", __func__, (u32)buf->dma_addr,
+             (u32)buf->dma_addr + buf->size, buf->size);
     return ret;
 err:
     dev_err(dev->dev, "%s failed ret:%d\n", __func__, ret);
     return ret;
 }
 
-void rkisp_free_buffer(struct rkisp_device *dev,
-            struct rkisp_dummy_buffer *buf)
+void rkisp_free_buffer(struct rkisp_device *dev, struct rkisp_dummy_buffer *buf)
 {
     const struct vb2_mem_ops *g_ops = dev->hw_dev->mem_ops;
 
     if (buf && buf->mem_priv) {
-        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev,
-             "%s buf:0x%x~0x%x\n", __func__,
-             (u32)buf->dma_addr, (u32)buf->dma_addr + buf->size);
-        if (buf->dbuf)
+        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s buf:0x%x~0x%x\n", __func__, (u32)buf->dma_addr,
+                 (u32)buf->dma_addr + buf->size);
+        if (buf->dbuf) {
             dma_buf_put(buf->dbuf);
+        }
         g_ops->put(buf->mem_priv);
         buf->size = 0;
         buf->dbuf = NULL;
@@ -191,22 +192,22 @@ void rkisp_free_buffer(struct rkisp_device *dev,
     }
 }
 
-void rkisp_prepare_buffer(struct rkisp_device *dev,
-            struct rkisp_dummy_buffer *buf)
+void rkisp_prepare_buffer(struct rkisp_device *dev, struct rkisp_dummy_buffer *buf)
 {
     const struct vb2_mem_ops *g_ops = dev->hw_dev->mem_ops;
 
-    if (buf && buf->mem_priv)
+    if (buf && buf->mem_priv) {
         g_ops->prepare(buf->mem_priv);
+    }
 }
 
-void rkisp_finish_buffer(struct rkisp_device *dev,
-            struct rkisp_dummy_buffer *buf)
+void rkisp_finish_buffer(struct rkisp_device *dev, struct rkisp_dummy_buffer *buf)
 {
     const struct vb2_mem_ops *g_ops = dev->hw_dev->mem_ops;
 
-    if (buf && buf->mem_priv)
+    if (buf && buf->mem_priv) {
         g_ops->finish(buf->mem_priv);
+    }
 }
 
 int rkisp_attach_hw(struct rkisp_device *isp)
@@ -234,8 +235,9 @@ int rkisp_attach_hw(struct rkisp_device *isp)
         return -EINVAL;
     }
 
-    if (hw->dev_num)
+    if (hw->dev_num) {
         hw->is_single = false;
+    }
     isp->dev_id = hw->dev_num;
     hw->isp[hw->dev_num] = isp;
     hw->dev_num++;
@@ -256,30 +258,33 @@ static int rkisp_alloc_page_dummy_buf(struct rkisp_device *dev, u32 size)
     int ret = -ENOMEM;
 
     page = alloc_pages(GFP_KERNEL | GFP_DMA32, 0);
-    if (!page)
+    if (!page) {
         goto err;
+    }
 
     pages = kvmalloc_array(n_pages, sizeof(struct page *), GFP_KERNEL);
-    if (!pages)
+    if (!pages) {
         goto free_page;
-    for (i = 0; i < n_pages; i++)
+    }
+    for (i = 0; i < n_pages; i++) {
         pages[i] = page;
+    }
 
     sg = kmalloc(sizeof(struct sg_table), GFP_KERNEL);
-    if (!sg)
+    if (!sg) {
         goto free_pages;
-    ret = sg_alloc_table_from_pages(sg, pages, n_pages, 0,
-                    n_pages << PAGE_SHIFT, GFP_KERNEL);
-    if (ret)
+    }
+    ret = sg_alloc_table_from_pages(sg, pages, n_pages, 0, n_pages << PAGE_SHIFT, GFP_KERNEL);
+    if (ret) {
         goto free_sg;
+    }
 
     ret = dma_map_sg(hw->dev, sg->sgl, sg->nents, DMA_BIDIRECTIONAL);
     dummy_buf->dma_addr = sg_dma_address(sg->sgl);
     dummy_buf->mem_priv = sg;
     dummy_buf->pages = pages;
-    v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev,
-         "%s buf:0x%x map cnt:%d size:%d\n", __func__,
-         (u32)dummy_buf->dma_addr, ret, size);
+    v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s buf:0x%x map cnt:%d size:%d\n", __func__, (u32)dummy_buf->dma_addr,
+             ret, size);
     return 0;
 free_sg:
     kfree(sg);
@@ -296,8 +301,9 @@ static void rkisp_free_page_dummy_buf(struct rkisp_device *dev)
     struct rkisp_dummy_buffer *dummy_buf = &dev->hw_dev->dummy_buf;
     struct sg_table *sg = dummy_buf->mem_priv;
 
-    if (!sg)
+    if (!sg) {
         return;
+    }
     dma_unmap_sg(dev->hw_dev->dev, sg->sgl, sg->nents, DMA_BIDIRECTIONAL);
     sg_free_table(sg);
     kfree(sg);
@@ -316,26 +322,29 @@ int rkisp_alloc_common_dummy_buf(struct rkisp_device *dev)
     u32 i, j, val, size = 0;
     int ret = 0;
 
-    if (dummy_buf->mem_priv)
+    if (dummy_buf->mem_priv) {
         goto end;
+    }
 
-    if (hw->max_in.w && hw->max_in.h)
+    if (hw->max_in.w && hw->max_in.h) {
         size = hw->max_in.w * hw->max_in.h * RKISP_MAX_SENSOR;
+    }
     for (i = 0; i < hw->dev_num; i++) {
         isp = hw->isp[i];
         for (j = 0; j < RKISP_MAX_STREAM; j++) {
             stream = &isp->cap_dev.stream[j];
-            if (!stream->linked)
+            if (!stream->linked) {
                 continue;
-            val = stream->out_isp_fmt.fmt_type == FMT_FBC ?
-                stream->out_fmt.plane_fmt[1].sizeimage :
-                stream->out_fmt.plane_fmt[0].bytesperline *
-                stream->out_fmt.height;
+            }
+            val = stream->out_isp_fmt.fmt_type == FMT_FBC
+                      ? stream->out_fmt.plane_fmt[1].sizeimage
+                      : stream->out_fmt.plane_fmt[0].bytesperline * stream->out_fmt.height;
             size = max(size, val);
         }
     }
-    if (size == 0)
+    if (size == 0) {
         goto end;
+    }
 
     if (hw->is_mmu) {
         ret = rkisp_alloc_page_dummy_buf(dev, size);
@@ -344,13 +353,14 @@ int rkisp_alloc_common_dummy_buf(struct rkisp_device *dev)
 
     dummy_buf->size = size;
     ret = rkisp_alloc_buffer(dev, dummy_buf);
-    if (!ret)
-        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev,
-             "%s buf:0x%x size:%d\n", __func__,
-             (u32)dummy_buf->dma_addr, dummy_buf->size);
+    if (!ret) {
+        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s buf:0x%x size:%d\n", __func__, (u32)dummy_buf->dma_addr,
+                 dummy_buf->size);
+    }
 end:
-    if (ret < 0)
+    if (ret < 0) {
         v4l2_err(&dev->v4l2_dev, "%s failed:%d\n", __func__, ret);
+    }
     return ret;
 }
 
@@ -358,12 +368,13 @@ void rkisp_free_common_dummy_buf(struct rkisp_device *dev)
 {
     struct rkisp_hw_dev *hw = dev->hw_dev;
 
-    if (atomic_read(&hw->refcnt) ||
-        atomic_read(&dev->cap_dev.refcnt) > 1)
+    if (atomic_read(&hw->refcnt) || atomic_read(&dev->cap_dev.refcnt) > 1) {
         return;
+    }
 
-    if (hw->is_mmu)
+    if (hw->is_mmu) {
         rkisp_free_page_dummy_buf(dev);
-    else
+    } else {
         rkisp_free_buffer(dev, &hw->dummy_buf);
+    }
 }

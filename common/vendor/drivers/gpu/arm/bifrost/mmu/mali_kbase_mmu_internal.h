@@ -20,11 +20,10 @@
  *
  */
 
-#ifndef _KBASE_MMU_INTERNAL_H_
-#define _KBASE_MMU_INTERNAL_H_
+#ifndef KBASE_MMU_INTERNAL_H_
+#define KBASE_MMU_INTERNAL_H_
 
-void kbase_mmu_get_as_setup(struct kbase_mmu_table *mmut,
-        struct kbase_mmu_setup * const setup);
+void kbase_mmu_get_as_setup(struct kbase_mmu_table *mmut, struct kbase_mmu_setup *const setup);
 
 /**
  * kbase_mmu_report_mcu_as_fault_and_reset - Report page fault for all
@@ -32,15 +31,12 @@ void kbase_mmu_get_as_setup(struct kbase_mmu_table *mmut,
  * @kbdev:   The kbase_device the fault happened on
  * @fault:   Data relating to the fault
  */
-void kbase_mmu_report_mcu_as_fault_and_reset(struct kbase_device *kbdev,
-        struct kbase_fault *fault);
+void kbase_mmu_report_mcu_as_fault_and_reset(struct kbase_device *kbdev, struct kbase_fault *fault);
 
-void kbase_gpu_report_bus_fault_and_kill(struct kbase_context *kctx,
-        struct kbase_as *as, struct kbase_fault *fault);
+void kbase_gpu_report_bus_fault_and_kill(struct kbase_context *kctx, struct kbase_as *as, struct kbase_fault *fault);
 
-void kbase_mmu_report_fault_and_kill(struct kbase_context *kctx,
-        struct kbase_as *as, const char *reason_str,
-        struct kbase_fault *fault);
+void kbase_mmu_report_fault_and_kill(struct kbase_context *kctx, struct kbase_as *as, const char *reason_str,
+                                     struct kbase_fault *fault);
 
 /**
  * kbase_mmu_switch_to_ir() - Switch to incremental rendering if possible
@@ -53,8 +49,7 @@ void kbase_mmu_report_fault_and_kill(struct kbase_context *kctx,
  *
  * Return 0 if successful, otherwise a negative error code.
  */
-int kbase_mmu_switch_to_ir(struct kbase_context *kctx,
-    struct kbase_va_region *reg);
+int kbase_mmu_switch_to_ir(struct kbase_context *kctx, struct kbase_va_region *reg);
 
 /**
  * kbase_mmu_page_fault_worker() - Process a page fault.

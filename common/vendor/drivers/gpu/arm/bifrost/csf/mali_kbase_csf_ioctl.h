@@ -46,12 +46,9 @@ struct kbase_ioctl_version_check {
     __u16 minor;
 };
 
-#define KBASE_IOCTL_VERSION_CHECK \
-    _IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
+#define KBASE_IOCTL_VERSION_CHECK _IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
 
-#define KBASE_IOCTL_VERSION_CHECK_RESERVED \
-    _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
-
+#define KBASE_IOCTL_VERSION_CHECK_RESERVED _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
 
 /**
  * struct kbase_ioctl_cs_queue_register - Register a GPU command queue with the
@@ -69,8 +66,7 @@ struct kbase_ioctl_cs_queue_register {
     __u8 padding[3];
 };
 
-#define KBASE_IOCTL_CS_QUEUE_REGISTER \
-    _IOW(KBASE_IOCTL_TYPE, 36, struct kbase_ioctl_cs_queue_register)
+#define KBASE_IOCTL_CS_QUEUE_REGISTER _IOW(KBASE_IOCTL_TYPE, 36, struct kbase_ioctl_cs_queue_register)
 
 /**
  * struct kbase_ioctl_cs_queue_kick - Kick the GPU command queue group scheduler
@@ -82,8 +78,7 @@ struct kbase_ioctl_cs_queue_kick {
     __u64 buffer_gpu_addr;
 };
 
-#define KBASE_IOCTL_CS_QUEUE_KICK \
-    _IOW(KBASE_IOCTL_TYPE, 37, struct kbase_ioctl_cs_queue_kick)
+#define KBASE_IOCTL_CS_QUEUE_KICK _IOW(KBASE_IOCTL_TYPE, 37, struct kbase_ioctl_cs_queue_kick)
 
 /**
  * union kbase_ioctl_cs_queue_bind - Bind a GPU command queue to a group
@@ -111,8 +106,7 @@ union kbase_ioctl_cs_queue_bind {
     } out;
 };
 
-#define KBASE_IOCTL_CS_QUEUE_BIND \
-    _IOWR(KBASE_IOCTL_TYPE, 39, union kbase_ioctl_cs_queue_bind)
+#define KBASE_IOCTL_CS_QUEUE_BIND _IOWR(KBASE_IOCTL_TYPE, 39, union kbase_ioctl_cs_queue_bind)
 
 /* ioctl 40 is free to use */
 
@@ -125,8 +119,7 @@ struct kbase_ioctl_cs_queue_terminate {
     __u64 buffer_gpu_addr;
 };
 
-#define KBASE_IOCTL_CS_QUEUE_TERMINATE \
-    _IOW(KBASE_IOCTL_TYPE, 41, struct kbase_ioctl_cs_queue_terminate)
+#define KBASE_IOCTL_CS_QUEUE_TERMINATE _IOW(KBASE_IOCTL_TYPE, 41, struct kbase_ioctl_cs_queue_terminate)
 
 /**
  * union kbase_ioctl_cs_queue_group_create - Create a GPU command queue group
@@ -168,8 +161,7 @@ union kbase_ioctl_cs_queue_group_create {
     } out;
 };
 
-#define KBASE_IOCTL_CS_QUEUE_GROUP_CREATE \
-    _IOWR(KBASE_IOCTL_TYPE, 42, union kbase_ioctl_cs_queue_group_create)
+#define KBASE_IOCTL_CS_QUEUE_GROUP_CREATE _IOWR(KBASE_IOCTL_TYPE, 42, union kbase_ioctl_cs_queue_group_create)
 
 /**
  * struct kbase_ioctl_cs_queue_group_term - Terminate a GPU command queue group
@@ -182,11 +174,9 @@ struct kbase_ioctl_cs_queue_group_term {
     __u8 padding[7];
 };
 
-#define KBASE_IOCTL_CS_QUEUE_GROUP_TERMINATE \
-    _IOW(KBASE_IOCTL_TYPE, 43, struct kbase_ioctl_cs_queue_group_term)
+#define KBASE_IOCTL_CS_QUEUE_GROUP_TERMINATE _IOW(KBASE_IOCTL_TYPE, 43, struct kbase_ioctl_cs_queue_group_term)
 
-#define KBASE_IOCTL_CS_EVENT_SIGNAL \
-    _IO(KBASE_IOCTL_TYPE, 44)
+#define KBASE_IOCTL_CS_EVENT_SIGNAL _IO(KBASE_IOCTL_TYPE, 44)
 
 typedef __u8 base_kcpu_queue_id; /* We support up to 256 active KCPU queues */
 
@@ -201,8 +191,7 @@ struct kbase_ioctl_kcpu_queue_new {
     __u8 padding[7];
 };
 
-#define KBASE_IOCTL_KCPU_QUEUE_CREATE \
-    _IOR(KBASE_IOCTL_TYPE, 45, struct kbase_ioctl_kcpu_queue_new)
+#define KBASE_IOCTL_KCPU_QUEUE_CREATE _IOR(KBASE_IOCTL_TYPE, 45, struct kbase_ioctl_kcpu_queue_new)
 
 /**
  * struct kbase_ioctl_kcpu_queue_delete - Destroy a KCPU command queue
@@ -215,8 +204,7 @@ struct kbase_ioctl_kcpu_queue_delete {
     __u8 padding[7];
 };
 
-#define KBASE_IOCTL_KCPU_QUEUE_DELETE \
-    _IOW(KBASE_IOCTL_TYPE, 46, struct kbase_ioctl_kcpu_queue_delete)
+#define KBASE_IOCTL_KCPU_QUEUE_DELETE _IOW(KBASE_IOCTL_TYPE, 46, struct kbase_ioctl_kcpu_queue_delete)
 
 /**
  * struct kbase_ioctl_kcpu_queue_enqueue - Enqueue commands into the KCPU queue
@@ -233,8 +221,7 @@ struct kbase_ioctl_kcpu_queue_enqueue {
     __u8 padding[3];
 };
 
-#define KBASE_IOCTL_KCPU_QUEUE_ENQUEUE \
-    _IOW(KBASE_IOCTL_TYPE, 47, struct kbase_ioctl_kcpu_queue_enqueue)
+#define KBASE_IOCTL_KCPU_QUEUE_ENQUEUE _IOW(KBASE_IOCTL_TYPE, 47, struct kbase_ioctl_kcpu_queue_enqueue)
 
 /**
  * union kbase_ioctl_cs_tiler_heap_init - Initialize chunked tiler memory heap
@@ -271,8 +258,7 @@ union kbase_ioctl_cs_tiler_heap_init {
     } out;
 };
 
-#define KBASE_IOCTL_CS_TILER_HEAP_INIT \
-    _IOWR(KBASE_IOCTL_TYPE, 48, union kbase_ioctl_cs_tiler_heap_init)
+#define KBASE_IOCTL_CS_TILER_HEAP_INIT _IOWR(KBASE_IOCTL_TYPE, 48, union kbase_ioctl_cs_tiler_heap_init)
 
 /**
  * struct kbase_ioctl_cs_tiler_heap_term - Terminate a chunked tiler heap
@@ -284,8 +270,7 @@ struct kbase_ioctl_cs_tiler_heap_term {
     __u64 gpu_heap_va;
 };
 
-#define KBASE_IOCTL_CS_TILER_HEAP_TERM \
-    _IOW(KBASE_IOCTL_TYPE, 49, struct kbase_ioctl_cs_tiler_heap_term)
+#define KBASE_IOCTL_CS_TILER_HEAP_TERM _IOW(KBASE_IOCTL_TYPE, 49, struct kbase_ioctl_cs_tiler_heap_term)
 
 /**
  * union kbase_ioctl_cs_get_glb_iface - Request the global control block
@@ -332,8 +317,7 @@ union kbase_ioctl_cs_get_glb_iface {
     } out;
 };
 
-#define KBASE_IOCTL_CS_GET_GLB_IFACE \
-    _IOWR(KBASE_IOCTL_TYPE, 51, union kbase_ioctl_cs_get_glb_iface)
+#define KBASE_IOCTL_CS_GET_GLB_IFACE _IOWR(KBASE_IOCTL_TYPE, 51, union kbase_ioctl_cs_get_glb_iface)
 
 /***************
  * test ioctls *

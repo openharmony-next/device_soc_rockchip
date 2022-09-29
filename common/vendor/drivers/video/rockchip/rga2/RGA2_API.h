@@ -10,17 +10,17 @@
 #include "rga2.h"
 
 /* Driver information */
-#define DRIVER_DESC            "RGA2 Device Driver"
-#define DRIVER_NAME            "rga2"
-#define DRIVER_VERSION        "2.1.0"
+#define DRIVER_DESC "RGA2 Device Driver"
+#define DRIVER_NAME "rga2"
+#define DRIVER_VERSION "2.1.0"
 
 /* Logging */
 #define RGA_DEBUG 1
 #if RGA_DEBUG
-#define DBG(format, args...) printk(KERN_DEBUG "%s: " format, DRIVER_NAME, ## args)
-#define ERR(format, args...) printk(KERN_ERR "%s: " format, DRIVER_NAME, ## args)
-#define WARNING(format, args...) printk(KERN_WARN "%s: " format, DRIVER_NAME, ## args)
-#define INFO(format, args...) printk(KERN_INFO "%s: " format, DRIVER_NAME, ## args)
+#define DBG(format, args...) printk(KERN_DEBUG "%s: " format, DRIVER_NAME, ##args)
+#define ERR(format, args...) printk(KERN_ERR "%s: " format, DRIVER_NAME, ##args)
+#define WARNING(format, args...) printk(KERN_WARN "%s: " format, DRIVER_NAME, ##args)
+#define INFO(format, args...) printk(KERN_INFO "%s: " format, DRIVER_NAME, ##args)
 #else
 #define DBG(format, args...)
 #define ERR(format, args...)
@@ -51,9 +51,7 @@ struct rga2_drvdata_t {
 #endif
 };
 
-#define ENABLE      1
-#define DISABLE     0
-
-
+#define ENABLE 1
+#define DISABLE 0
 
 #endif

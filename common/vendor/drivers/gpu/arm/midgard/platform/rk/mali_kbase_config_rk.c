@@ -8,7 +8,6 @@
  * of such GNU licence.
  */
 
-
 #include "custom_log.h"
 
 #include <mali_kbase.h>
@@ -73,8 +72,7 @@ static void kbase_platform_rk_remove_sysfs_files(struct device *dev);
 
 static void rk_pm_power_off_delay_work(struct work_struct *work)
 {
-    struct rk_context *platform =
-        container_of(to_delayed_work(work), struct rk_context, work);
+    struct rk_context *platform = container_of(to_delayed_work(work), struct rk_context, work);
     struct kbase_device *kbdev = platform->kbdev;
 
     if (!platform->is_powered) {
@@ -108,10 +106,10 @@ static int kbase_platform_rk_init(struct kbase_device *kbdev)
     platform->is_powered = false;
     platform->kbdev = kbdev;
 
-    platform->delay_ms = 200;
-    if (of_property_read_u32(kbdev->dev->of_node, "power-off-delay-ms",
-                 &platform->delay_ms))
+    platform->delay_ms = 0xC8;
+    if (of_property_read_u32(kbdev->dev->of_node, "power-off-delay-ms", &platform->delay_ms)) {
         W("power-off-delay-ms not available.");
+    }
 
     platform->power_off_wq = create_freezable_workqueue("gpu_power_off_wq");
     if (!platform->power_off_wq) {
@@ -145,8 +143,7 @@ err_wq:
 
 static void kbase_platform_rk_term(struct kbase_device *kbdev)
 {
-    struct rk_context *platform =
-        (struct rk_context *)kbdev->platform_context;
+    struct rk_context *platform = (struct rk_context *)kbdev->platform_context;
 
     pm_runtime_disable(kbdev->dev);
     kbdev->platform_context = NULL;
@@ -232,8 +229,7 @@ static void rk_pm_callback_power_off(struct kbase_device *kbdev)
     struct rk_context *platform = get_rk_context(kbdev);
 
     rk_pm_disable_clk(kbdev);
-    queue_delayed_work(platform->power_off_wq, &platform->work,
-               msecs_to_jiffies(platform->delay_ms));
+    queue_delayed_work(platform->power_off_wq, &platform->work, msecs_to_jiffies(platform->delay_ms));
 }
 
 int rk_kbase_device_runtime_init(struct kbase_device *kbdev)
@@ -253,12 +249,12 @@ struct kbase_pm_callback_conf pm_callbacks = {
     .power_runtime_term_callback = rk_kbase_device_runtime_disable,
     .power_runtime_on_callback = rk_pm_callback_runtime_on,
     .power_runtime_off_callback = rk_pm_callback_runtime_off,
-#else                /* CONFIG_PM */
+#else  /* CONFIG_PM */
     .power_runtime_init_callback = NULL,
     .power_runtime_term_callback = NULL,
     .power_runtime_on_callback = NULL,
     .power_runtime_off_callback = NULL,
-#endif                /* CONFIG_PM */
+#endif /* CONFIG_PM */
 };
 
 int kbase_platform_early_init(void)
@@ -319,8 +315,9 @@ static int rk_pm_enable_clk(struct kbase_device *kbdev)
     } else {
         D("to enable clk.");
         err = clk_enable(kbdev->clock);
-        if (err)
+        if (err) {
             E("failed to enable clk: %d.", err);
+        }
     }
 
     return err;
@@ -338,9 +335,7 @@ static void rk_pm_disable_clk(struct kbase_device *kbdev)
 
 /*---------------------------------------------------------------------------*/
 
-static ssize_t utilisation_period_show(struct device *dev,
-                       struct device_attribute *attr,
-                       char *buf)
+static ssize_t utilisation_period_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
@@ -351,10 +346,8 @@ static ssize_t utilisation_period_show(struct device *dev,
     return ret;
 }
 
-static ssize_t utilisation_period_store(struct device *dev,
-                    struct device_attribute *attr,
-                    const char *buf,
-                    size_t count)
+static ssize_t utilisation_period_store(struct device *dev, struct device_attribute *attr, const char *buf,
+                                        size_t count)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
@@ -370,20 +363,18 @@ static ssize_t utilisation_period_store(struct device *dev,
     return count;
 }
 
-static ssize_t utilisation_show(struct device *dev,
-                struct device_attribute *attr,
-                char *buf)
+static ssize_t utilisation_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
     ssize_t ret = 0;
-    unsigned long period_in_us = platform->utilisation_period * 1000;
+    unsigned long period_in_us = platform->utilisation_period * 0x3E8;
     unsigned long total_time;
     unsigned long busy_time;
     unsigned long utilisation;
 
     kbase_pm_reset_dvfs_utilisation(kbdev);
-    usleep_range(period_in_us, period_in_us + 100);
+    usleep_range(period_in_us, period_in_us + 0x64);
     kbase_pm_get_dvfs_utilisation(kbdev, &total_time, &busy_time);
     /* 'devfreq_dev_profile' instance registered to devfreq
      * also uses kbase_pm_reset_dvfs_utilisation
@@ -392,7 +383,7 @@ static ssize_t utilisation_show(struct device *dev,
      */
     D("total_time : %lu, busy_time : %lu.", total_time, busy_time);
 
-    utilisation = busy_time * 100 / total_time;
+    utilisation = busy_time * 0x64 / total_time;
     ret += snprintf(buf, PAGE_SIZE, "%ld\n", utilisation);
 
     return ret;
@@ -431,37 +422,40 @@ static void kbase_platform_rk_remove_sysfs_files(struct device *dev)
     device_remove_file(dev, &dev_attr_utilisation);
 }
 
-static int rk3288_get_soc_info(struct device *dev, struct device_node *np,
-                   int *bin, int *process)
+static int rk3288_get_soc_info(struct device *dev, struct device_node *np, int *bin, int *process)
 {
     int ret = -EINVAL;
     u8 value = 0;
     char *name;
 
-    if (!bin)
+    if (!bin) {
         goto out;
+    }
 
-    if (soc_is_rk3288w())
+    if (soc_is_rk3288w()) {
         name = "performance-w";
-    else
+    } else {
         name = "performance";
+    }
     if (of_property_match_string(np, "nvmem-cell-names", name) >= 0) {
         ret = rockchip_nvmem_cell_read_u8(np, name, &value);
         if (ret) {
             dev_err(dev, "Failed to get soc performance value\n");
             goto out;
         }
-        if (value & 0x2)
-            *bin = 3;
-        else if (value & 0x01)
-            *bin = 2;
-        else
+        if (value & 0x2) {
+            *bin = 0x3;
+        } else if (value & 0x01) {
+            *bin = 0x2;
+        } else {
             *bin = 0;
+        }
     } else {
         dev_err(dev, "Failed to get bin config\n");
     }
-    if (*bin >= 0)
+    if (*bin >= 0) {
         dev_info(dev, "bin=%d\n", *bin);
+    }
 
 out:
     return ret;
@@ -487,6 +481,5 @@ int kbase_platform_rk_init_opp_table(struct kbase_device *kbdev)
 {
     rockchip_get_opp_data(rockchip_mali_of_match, &kbdev->opp_info);
 
-    return rockchip_init_opp_table(kbdev->dev, &kbdev->opp_info,
-                       "gpu_leakage", "mali");
+    return rockchip_init_opp_table(kbdev->dev, &kbdev->opp_info, "gpu_leakage", "mali");
 }

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_PROTECTED_MEMORY_H_
-#define _KBASE_CSF_PROTECTED_MEMORY_H_
+#ifndef KBASE_CSF_PROTECTED_MEMORY_H_
+#define KBASE_CSF_PROTECTED_MEMORY_H_
 
 #include "mali_kbase.h"
 /**
@@ -51,11 +51,8 @@ void kbase_csf_protected_memory_term(struct kbase_device *const kbdev);
  * Return: Pointer to an array of protected memory allocations on success,
  *        or NULL on failure.
  */
-struct protected_memory_allocation **
-    kbase_csf_protected_memory_alloc(
-        struct kbase_device *const kbdev,
-        struct tagged_addr *phys,
-        size_t num_pages);
+struct protected_memory_allocation **kbase_csf_protected_memory_alloc(struct kbase_device *const kbdev,
+                                                                      struct tagged_addr *phys, size_t num_pages);
 
 /**
  * kbase_csf_protected_memory_free - Free the allocated
@@ -65,8 +62,6 @@ struct protected_memory_allocation **
  * @pma:    Array of pointer to protected memory allocations.
  * @num_pages:    Number of pages to be freed.
  */
-void kbase_csf_protected_memory_free(
-        struct kbase_device *const kbdev,
-        struct protected_memory_allocation **pma,
-        size_t num_pages);
+void kbase_csf_protected_memory_free(struct kbase_device *const kbdev, struct protected_memory_allocation **pma,
+                                     size_t num_pages);
 #endif

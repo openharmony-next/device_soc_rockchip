@@ -1,16 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_STATS_H
-#define _RKISPP_STATS_H
+#ifndef H_RKISPP_STATS_H
+#define H_RKISPP_STATS_H
 
 #include <linux/rkispp-config.h>
 #include <linux/interrupt.h>
 #include <linux/kfifo.h>
 #include "common.h"
 
-#define RKISPP_STATS_READOUT_WORK_SIZE    \
-    (9 * sizeof(struct rkispp_stats_readout_work))
+#define RKISPP_STATS_READOUT_WORK_SIZE (9 * sizeof(struct rkispp_stats_readout_work))
 
 struct rkispp_stats_vdev;
 

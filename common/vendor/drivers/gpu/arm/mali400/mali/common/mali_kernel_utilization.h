@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -54,7 +55,8 @@ void mali_utilization_pp_end(void);
 /**
  * Should be called to calcution the GPU utilization
  */
-struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u64 *time_period, mali_bool *need_add_timer);
+struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u64 *time_period,
+                                                             mali_bool *need_add_timer);
 
 _mali_osk_spinlock_irq_t *mali_utilization_get_lock(void);
 
@@ -67,6 +69,5 @@ void mali_utilization_data_unlock(void);
 void mali_utilization_data_assert_locked(void);
 
 void mali_utilization_reset(void);
-
 
 #endif /* __MALI_KERNEL_UTILIZATION_H__ */

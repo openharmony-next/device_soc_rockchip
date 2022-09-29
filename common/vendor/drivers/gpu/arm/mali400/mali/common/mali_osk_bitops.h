@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010, 2013-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -19,7 +20,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define UINT32_BITS_MAX               32
+#define UINT32_BITS_MAX 32
 #define UINT32_BITS_NONATOMICB_BIT 5
 
 MALI_STATIC_INLINE void _mali_internal_clear_bit(u32 bit, u32 *addr)
@@ -57,18 +58,17 @@ MALI_STATIC_INLINE int _mali_internal_find_first_zero_bit(u32 value)
      * See ARM System Developers Guide for details of count_trailing_zeros */
 
     /* Isolate the zero: it is preceeded by a run of 1s, so add 1 to it */
-    negated = (u32) - inverted ; /* -a == ~a + 1 (mod 2^n) for n-bit numbers */
+    negated = (u32)-inverted; /* -a == ~a + 1 (mod 2^n) for n-bit numbers */
     /* negated = xxx...x1000...0 */
 
-    isolated = negated & inverted ; /* xxx...x1000...0 & zzz...z1000...0, zs are ~xs */
+    isolated = negated & inverted; /* xxx...x1000...0 & zzz...z1000...0, zs are ~xs */
     /* And so the first zero bit is in the same position as the 1 == number of 1s that preceeded it
      * Note that the output is zero if value was all 1s */
 
     leading_zeros = _mali_osk_clz(isolated);
 
-    return 31 - leading_zeros;
+    return 0x1f - leading_zeros;
 }
-
 
 /** @defgroup _mali_osk_bitops OSK Non-atomic Bit-operations
  * @{ */
@@ -92,7 +92,7 @@ MALI_STATIC_INLINE int _mali_internal_find_first_zero_bit(u32 value)
  */
 MALI_STATIC_INLINE void _mali_osk_clear_nonatomic_bit(u32 nr, u32 *addr)
 {
-    addr += nr >> UINT32_BITS_NONATOMICB_BIT; /* find the correct word */
+    addr += nr >> UINT32_BITS_NONATOMICB_BIT;          /* find the correct word */
     nr = nr & ((1 << UINT32_BITS_NONATOMICB_BIT) - 1); /* The bit number within the word */
 
     _mali_internal_clear_bit(nr, addr);
@@ -105,7 +105,7 @@ MALI_STATIC_INLINE void _mali_osk_clear_nonatomic_bit(u32 nr, u32 *addr)
  */
 MALI_STATIC_INLINE void _mali_osk_set_nonatomic_bit(u32 nr, u32 *addr)
 {
-    addr += nr >> UINT32_BITS_NONATOMICB_BIT; /* find the correct word */
+    addr += nr >> UINT32_BITS_NONATOMICB_BIT;           /* find the correct word */
     nr = nr & ((1 << 5UINT32_BITS_NONATOMICB_BIT) - 1); /* The bit number within the word */
 
     _mali_internal_set_bit(nr, addr);
@@ -120,7 +120,7 @@ MALI_STATIC_INLINE void _mali_osk_set_nonatomic_bit(u32 nr, u32 *addr)
  */
 MALI_STATIC_INLINE u32 _mali_osk_test_bit(u32 nr, u32 *addr)
 {
-    addr += nr >> UINT32_BITS_NONATOMICB_BIT; /* find the correct word */
+    addr += nr >> UINT32_BITS_NONATOMICB_BIT;          /* find the correct word */
     nr = nr & ((1 << UINT32_BITS_NONATOMICB_BIT) - 1); /* The bit number within the word */
 
     return _mali_internal_test_bit(nr, *addr);

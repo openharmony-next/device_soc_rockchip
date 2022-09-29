@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -21,15 +22,15 @@
 
 struct mali_sync_pt {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-    struct sync_pt         sync_pt;
+    struct sync_pt sync_pt;
 #else
-    struct mali_internal_sync_point         sync_pt;
+    struct mali_internal_sync_point sync_pt;
 #endif
     struct mali_sync_flag *flag;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-    struct sync_timeline *sync_tl;  /**< Sync timeline this pt is connected to. */
+    struct sync_timeline *sync_tl; /**< Sync timeline this pt is connected to. */
 #else
-    struct mali_internal_sync_timeline *sync_tl;  /**< Sync timeline this pt is connected to. */
+    struct mali_internal_sync_timeline *sync_tl; /**< Sync timeline this pt is connected to. */
 #endif
 };
 
@@ -39,13 +40,13 @@ struct mali_sync_pt {
  */
 struct mali_sync_flag {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
-    struct sync_timeline *sync_tl;  /**< Sync timeline this flag is connected to. */
+    struct sync_timeline *sync_tl; /**< Sync timeline this flag is connected to. */
 #else
-    struct mali_internal_sync_timeline *sync_tl;  /**< Sync timeline this flag is connected to. */
+    struct mali_internal_sync_timeline *sync_tl; /**< Sync timeline this flag is connected to. */
 #endif
-    u32                   point;    /**< Point on timeline. */
-    int                   status;   /**< 0 if unsignaled, 1 if signaled without error or negative if signaled with error. */
-    struct kref           refcount; /**< Reference count. */
+    u32 point;            /**< Point on timeline. */
+    int status;           /**< 0 if unsignaled, 1 if signaled without error or negative if signaled with error. */
+    struct kref refcount; /**< Reference count. */
 };
 
 /**
@@ -73,7 +74,8 @@ MALI_STATIC_INLINE struct mali_sync_pt *to_mali_sync_pt(struct mali_internal_syn
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
 MALI_STATIC_INLINE struct mali_sync_timeline_container *to_mali_sync_tl_container(struct sync_timeline *sync_tl)
 #else
-MALI_STATIC_INLINE struct mali_sync_timeline_container *to_mali_sync_tl_container(struct mali_internal_sync_timeline *sync_tl)
+MALI_STATIC_INLINE struct mali_sync_timeline_container *
+to_mali_sync_tl_container(struct mali_internal_sync_timeline *sync_tl)
 #endif
 {
     return container_of(sync_tl, struct mali_sync_timeline_container, sync_timeline);
@@ -146,7 +148,9 @@ static struct sync_pt *timeline_dup(struct sync_pt *pt)
     mpt = to_mali_sync_pt(pt);
 
     new_pt = sync_pt_create(mpt->sync_tl, sizeof(struct mali_sync_pt));
-    if (NULL == new_pt) return NULL;
+    if (NULL == new_pt) {
+        return NULL;
+    }
 
     new_mpt = to_mali_sync_pt(new_pt);
 
@@ -174,7 +178,9 @@ static int timeline_compare(struct sync_pt *pta, struct sync_pt *ptb)
     a = mpta->flag->point;
     b = mptb->flag->point;
 
-    if (a == b) return 0;
+    if (a == b) {
+        return 0;
+    }
 
     return ((b - a) < (a - b) ? -1 : 1);
 }
@@ -192,7 +198,7 @@ static void timeline_print_pt(struct seq_file *s, struct sync_pt *sync_pt)
 
     /* It is possible this sync point is just under construct,
      * make sure the flag is valid before accessing it
-    */
+     */
     if (mpt->flag) {
         seq_printf(s, "%u", mpt->flag->point);
     } else {
@@ -248,7 +254,7 @@ static void timeline_pt_value_str(struct sync_pt *pt, char *str, int size)
 
     /* It is possible this sync point is just under construct,
      * make sure the flag is valid before accessing it
-    */
+     */
     if (mpt->flag) {
         mali_osk_snprintf(str, size, "%u", mpt->flag->point);
     } else {
@@ -302,24 +308,24 @@ static void timeline_print_sync_pt(struct mali_internal_sync_point *sync_pt)
     mpt = to_mali_sync_pt(sync_pt);
 
     if (mpt->flag) {
-        MALI_DEBUG_PRINT(2, ("mali_internal_sync_pt: %u\n", mpt->flag->point));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali_internal_sync_pt: %u\n", mpt->flag->point));
     } else {
-        MALI_DEBUG_PRINT(2, ("uninitialized\n", mpt->flag->point));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("uninitialized\n", mpt->flag->point));
     }
 }
 #endif
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
 static struct sync_timeline_ops mali_timeline_ops = {
-    .driver_name    = "Mali",
-    .dup            = timeline_dup,
-    .has_signaled   = timeline_has_signaled,
-    .compare        = timeline_compare,
-    .free_pt        = timeline_free_pt,
-    .release_obj    = timeline_release,
+    .driver_name = "Mali",
+    .dup = timeline_dup,
+    .has_signaled = timeline_has_signaled,
+    .compare = timeline_compare,
+    .free_pt = timeline_free_pt,
+    .release_obj = timeline_release,
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
-    .print_pt       = timeline_print_pt,
-    .print_obj      = timeline_print_obj,
+    .print_pt = timeline_print_pt,
+    .print_obj = timeline_print_obj,
 #else
     .pt_value_str = timeline_pt_value_str,
     .timeline_value_str = timeline_value_str,
@@ -332,7 +338,9 @@ struct sync_timeline *mali_sync_timeline_create(struct mali_timeline *timeline, 
     struct mali_sync_timeline_container *mali_sync_tl;
 
     sync_tl = sync_timeline_create(&mali_timeline_ops, sizeof(struct mali_sync_timeline_container), name);
-    if (NULL == sync_tl) return NULL;
+    if (NULL == sync_tl) {
+        return NULL;
+    }
 
     mali_sync_tl = to_mali_sync_tl_container(sync_tl);
     mali_sync_tl->timeline = timeline;
@@ -388,7 +396,9 @@ struct sync_fence *mali_sync_timeline_create_signaled_fence(struct sync_timeline
     MALI_DEBUG_ASSERT_POINTER(sync_tl);
 
     flag = mali_sync_flag_create(sync_tl, 0);
-    if (NULL == flag) return NULL;
+    if (NULL == flag) {
+        return NULL;
+    }
 
     sync_fence = mali_sync_flag_create_fence(flag);
 
@@ -402,10 +412,14 @@ struct mali_sync_flag *mali_sync_flag_create(struct sync_timeline *sync_tl, mali
 {
     struct mali_sync_flag *flag;
 
-    if (NULL == sync_tl) return NULL;
+    if (NULL == sync_tl) {
+        return NULL;
+    }
 
     flag = mali_osk_calloc(1, sizeof(*flag));
-    if (NULL == flag) return NULL;
+    if (NULL == flag) {
+        return NULL;
+    }
 
     flag->sync_tl = sync_tl;
     flag->point = point;
@@ -433,7 +447,9 @@ static struct sync_pt *mali_sync_flag_create_pt(struct mali_sync_flag *flag)
     MALI_DEBUG_ASSERT_POINTER(flag->sync_tl);
 
     pt = sync_pt_create(flag->sync_tl, sizeof(struct mali_sync_pt));
-    if (NULL == pt) return NULL;
+    if (NULL == pt) {
+        return NULL;
+    }
 
     mali_sync_flag_get(flag);
 
@@ -446,14 +462,16 @@ static struct sync_pt *mali_sync_flag_create_pt(struct mali_sync_flag *flag)
 
 struct sync_fence *mali_sync_flag_create_fence(struct mali_sync_flag *flag)
 {
-    struct sync_pt    *sync_pt;
+    struct sync_pt *sync_pt;
     struct sync_fence *sync_fence;
 
     MALI_DEBUG_ASSERT_POINTER(flag);
     MALI_DEBUG_ASSERT_POINTER(flag->sync_tl);
 
     sync_pt = mali_sync_flag_create_pt(flag);
-    if (NULL == sync_pt) return NULL;
+    if (NULL == sync_pt) {
+        return NULL;
+    }
 
     sync_fence = sync_fence_create("mali_flag_fence", sync_pt);
     if (NULL == sync_fence) {
@@ -465,10 +483,10 @@ struct sync_fence *mali_sync_flag_create_fence(struct mali_sync_flag *flag)
 }
 #else
 static struct mali_internal_sync_timeline_ops mali_timeline_ops = {
-    .driver_name    = "Mali",
-    .has_signaled   = timeline_has_signaled,
-    .free_pt        = timeline_free_pt,
-    .release_obj    = timeline_release,
+    .driver_name = "Mali",
+    .has_signaled = timeline_has_signaled,
+    .free_pt = timeline_free_pt,
+    .release_obj = timeline_release,
     .print_sync_pt = timeline_print_sync_pt,
 };
 
@@ -478,7 +496,9 @@ struct mali_internal_sync_timeline *mali_sync_timeline_create(struct mali_timeli
     struct mali_sync_timeline_container *mali_sync_tl;
 
     sync_tl = mali_internal_sync_timeline_create(&mali_timeline_ops, sizeof(struct mali_sync_timeline_container), name);
-    if (NULL == sync_tl) return NULL;
+    if (NULL == sync_tl) {
+        return NULL;
+    }
 
     mali_sync_tl = to_mali_sync_tl_container(sync_tl);
     mali_sync_tl->timeline = timeline;
@@ -507,7 +527,8 @@ s32 mali_sync_fence_fd_alloc(struct mali_internal_sync_fence *sync_fence)
     return fd;
 }
 
-struct mali_internal_sync_fence *mali_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1, struct mali_internal_sync_fence *sync_fence2)
+struct mali_internal_sync_fence *mali_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
+                                                       struct mali_internal_sync_fence *sync_fence2)
 {
     struct mali_internal_sync_fence *sync_fence;
 
@@ -529,7 +550,9 @@ struct mali_internal_sync_fence *mali_sync_timeline_create_signaled_fence(struct
     MALI_DEBUG_ASSERT_POINTER(sync_tl);
 
     flag = mali_sync_flag_create(sync_tl, 0);
-    if (NULL == flag) return NULL;
+    if (NULL == flag) {
+        return NULL;
+    }
 
     sync_fence = mali_sync_flag_create_fence(flag);
 
@@ -543,10 +566,14 @@ struct mali_sync_flag *mali_sync_flag_create(struct mali_internal_sync_timeline 
 {
     struct mali_sync_flag *flag;
 
-    if (NULL == sync_tl) return NULL;
+    if (NULL == sync_tl) {
+        return NULL;
+    }
 
     flag = mali_osk_calloc(1, sizeof(*flag));
-    if (NULL == flag) return NULL;
+    if (NULL == flag) {
+        return NULL;
+    }
 
     flag->sync_tl = sync_tl;
     flag->point = point;
@@ -590,7 +617,7 @@ static struct mali_internal_sync_point *mali_sync_flag_create_pt(struct mali_syn
 
 struct mali_internal_sync_fence *mali_sync_flag_create_fence(struct mali_sync_flag *flag)
 {
-    struct mali_internal_sync_point    *sync_pt;
+    struct mali_internal_sync_point *sync_pt;
     struct mali_internal_sync_fence *sync_fence;
 
     MALI_DEBUG_ASSERT_POINTER(flag);
@@ -655,11 +682,9 @@ void mali_sync_flag_signal(struct mali_sync_flag *flag, int error)
     flag->status = (0 > error) ? error : 1;
 
     _mali_osk_write_mem_barrier();
-#if  LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
     sync_timeline_signal(flag->sync_tl);
 #else
     mali_internal_sync_timeline_signal(flag->sync_tl);
 #endif
 }
-
-

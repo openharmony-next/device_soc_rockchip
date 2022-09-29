@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /**
  * Base kernel property query backend APIs
  */
@@ -29,8 +26,7 @@
  * @kbdev:    Device pointer
  * @regdump:    Pointer to struct kbase_gpuprops_regdump structure
  */
-void kbase_backend_gpuprops_get(struct kbase_device *kbdev,
-                    struct kbase_gpuprops_regdump *regdump);
+void kbase_backend_gpuprops_get(struct kbase_device *kbdev, struct kbase_gpuprops_regdump *regdump);
 
 /**
  * kbase_backend_gpuprops_get - Fill @regdump with GPU properties read from GPU
@@ -40,8 +36,6 @@ void kbase_backend_gpuprops_get(struct kbase_device *kbdev,
  * This function reads GPU properties that are dependent on the hardware
  * features bitmask
  */
-void kbase_backend_gpuprops_get_features(struct kbase_device *kbdev,
-                    struct kbase_gpuprops_regdump *regdump);
-
+void kbase_backend_gpuprops_get_features(struct kbase_device *kbdev, struct kbase_gpuprops_regdump *regdump);
 
 #endif /* _KBASE_HWACCESS_GPUPROPS_H_ */

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef _LIBS_RGA_SINGLETON_H
 #define _LIBS_RGA_SINGLETON_H
 
@@ -26,13 +26,13 @@
 #pragma clang diagnostic ignored "-Wundefined-var-template"
 #endif
 
-template <typename TYPE>
-class RgaSingleton {
+template <typename TYPE> class RgaSingleton
+{
 public:
-    static TYPE& getInstance()
+    static TYPE &getInstance()
     {
         Mutex::Autolock _l(sLock);
-        TYPE* instance = sInstance;
+        TYPE *instance = sInstance;
         if (instance == nullptr) {
             instance = new TYPE();
             sInstance = instance;
@@ -46,25 +46,29 @@ public:
     }
 
 protected:
-    ~RgaSingleton() { }
-    RgaSingleton() { }
+    ~RgaSingleton()
+    {
+    }
+    RgaSingleton()
+    {
+    }
 
 private:
-    RgaSingleton(const RgaSingleton&);
-    RgaSingleton& operator = (const RgaSingleton&);
+    RgaSingleton(const RgaSingleton &);
+    RgaSingleton &operator=(const RgaSingleton &);
     static Mutex sLock;
-    static TYPE* sInstance;
+    static TYPE *sInstance;
 };
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 
-#define RGA_SINGLETON_STATIC_INSTANCE(TYPE) do { \
-    template<> ::RgaMutex  \
-        (::RgaSingleton< TYPE >::sLock)(::RgaMutex::PRIVATE);  \
-    template<> TYPE* ::RgaSingleton< TYPE >::sInstance(nullptr);  /* NOLINT */ \
-    template class ::RgaSingleton< TYPE >; \
-} while (0)
+#define RGA_SINGLETON_STATIC_INSTANCE(TYPE)                                                                            \
+    do {                                                                                                               \
+        template <>::RgaMutex(::RgaSingleton<TYPE>::sLock)(::RgaMutex::PRIVATE);                                       \
+        template <> TYPE * ::RgaSingleton<TYPE>::sInstance(nullptr); /* NOLINT */                                      \
+        template class ::RgaSingleton<TYPE>;                                                                           \
+    } while (0)
 
 #endif // _LIBS_RGA_SINGLETON_H

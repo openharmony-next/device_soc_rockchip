@@ -4,8 +4,8 @@
  * Author: Cerf Yu <cerf.yu@rock-chips.com>
  */
 
-#ifndef _RGA_DEBUGGER_H_
-#define _RGA_DEBUGGER_H_
+#ifndef H_RGA2_DEBUGGER_H
+#define H_RGA2_DEBUGGER_H
 
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
 extern int RGA2_TEST_REG;
@@ -117,4 +117,3 @@ static inline int rga2_procfs_init(void)
 #endif /* #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER */
 
 #endif /* #ifndef _RGA_DEBUGGER_H_ */
-

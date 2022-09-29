@@ -52,14 +52,15 @@ static struct v4l2_subdev *get_remote_sensor(struct v4l2_subdev *sd)
     return media_entity_to_v4l2_subdev(sensor_me);
 }
 
-static struct csi2_sensor *sd_to_sensor(struct csi2_dphy *dphy,
-                       struct v4l2_subdev *sd)
+static struct csi2_sensor *sd_to_sensor(struct csi2_dphy *dphy, struct v4l2_subdev *sd)
 {
     int i;
 
-    for (i = 0; i < dphy->num_sensors; ++i)
-        if (dphy->sensors[i].sd == sd)
+    for (i = 0; i < dphy->num_sensors; ++i) {
+        if (dphy->sensors[i].sd == sd) {
             return &dphy->sensors[i];
+        }
+    }
 
     return NULL;
 }
@@ -69,7 +70,9 @@ static int csi2_dphy_get_sensor_data_rate(struct v4l2_subdev *sd)
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct v4l2_subdev *sensor_sd = get_remote_sensor(sd);
     struct v4l2_ctrl *link_freq;
-    struct v4l2_querymenu qm = { .id = V4L2_CID_LINK_FREQ, };
+    struct v4l2_querymenu qm = {
+        .id = V4L2_CID_LINK_FREQ,
+    };
     int ret;
 
     link_freq = v4l2_ctrl_find(sensor_sd->ctrl_handler, V4L2_CID_LINK_FREQ);
@@ -91,8 +94,7 @@ static int csi2_dphy_get_sensor_data_rate(struct v4l2_subdev *sd)
     }
     dphy->data_rate_mbps = qm.value * 2;
     do_div(dphy->data_rate_mbps, 1000 * 1000);
-    v4l2_info(sd, "dphy%d, data_rate_mbps %lld\n",
-          dphy->phy_index, dphy->data_rate_mbps);
+    v4l2_info(sd, "dphy%d, data_rate_mbps %lld\n", dphy->phy_index, dphy->data_rate_mbps);
     return 0;
 }
 
@@ -105,25 +107,26 @@ static int csi2_dphy_update_sensor_mbus(struct v4l2_subdev *sd)
     int ret;
 
     ret = v4l2_subdev_call(sensor_sd, pad, get_mbus_config, 0, &mbus);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     sensor->mbus = mbus;
     switch (mbus.flags & V4L2_MBUS_CSI2_LANES) {
-    case V4L2_MBUS_CSI2_1_LANE:
-        sensor->lanes = 1;
-        break;
-    case V4L2_MBUS_CSI2_2_LANE:
-        sensor->lanes = 2;
-        break;
-    case V4L2_MBUS_CSI2_3_LANE:
-        sensor->lanes = 3;
-        break;
-    case V4L2_MBUS_CSI2_4_LANE:
-        sensor->lanes = 4;
-        break;
-    default:
-        return -EINVAL;
+        case V4L2_MBUS_CSI2_1_LANE:
+            sensor->lanes = 1;
+            break;
+        case V4L2_MBUS_CSI2_2_LANE:
+            sensor->lanes = 2;
+            break;
+        case V4L2_MBUS_CSI2_3_LANE:
+            sensor->lanes = 3;
+            break;
+        case V4L2_MBUS_CSI2_4_LANE:
+            sensor->lanes = 4;
+            break;
+        default:
+            return -EINVAL;
     }
 
     return 0;
@@ -133,19 +136,22 @@ static int csi2_dphy_s_stream_start(struct v4l2_subdev *sd)
 {
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct csi2_dphy_hw *hw = dphy->dphy_hw;
-    int  ret = 0;
+    int ret = 0;
 
-    if (dphy->is_streaming)
+    if (dphy->is_streaming) {
         return 0;
+    }
 
     ret = csi2_dphy_get_sensor_data_rate(sd);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     csi2_dphy_update_sensor_mbus(sd);
 
-    if (hw->stream_on)
+    if (hw->stream_on) {
         hw->stream_on(dphy, sd);
+    }
 
     dphy->is_streaming = true;
 
@@ -157,16 +163,17 @@ static int csi2_dphy_s_stream_stop(struct v4l2_subdev *sd)
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct csi2_dphy_hw *hw = dphy->dphy_hw;
 
-    if (!dphy->is_streaming)
+    if (!dphy->is_streaming) {
         return 0;
+    }
 
-    if (hw->stream_off)
+    if (hw->stream_off) {
         hw->stream_off(dphy, sd);
+    }
 
     dphy->is_streaming = false;
 
-    dev_info(dphy->dev, "%s stream stop, dphy%d\n",
-         __func__, dphy->phy_index);
+    dev_info(dphy->dev, "%s stream stop, dphy%d\n", __func__, dphy->phy_index);
 
     return 0;
 }
@@ -177,39 +184,38 @@ static int csi2_dphy_s_stream(struct v4l2_subdev *sd, int on)
     int ret = 0;
 
     mutex_lock(&dphy->mutex);
-    if (on)
+    if (on) {
         ret = csi2_dphy_s_stream_start(sd);
-    else
+    } else {
         ret = csi2_dphy_s_stream_stop(sd);
+    }
     mutex_unlock(&dphy->mutex);
 
-    dev_info(dphy->dev, "%s stream on:%d, dphy%d\n",
-         __func__, on, dphy->phy_index);
+    dev_info(dphy->dev, "%s stream on:%d, dphy%d\n", __func__, on, dphy->phy_index);
 
     return ret;
 }
 
-static int csi2_dphy_g_frame_interval(struct v4l2_subdev *sd,
-                        struct v4l2_subdev_frame_interval *fi)
+static int csi2_dphy_g_frame_interval(struct v4l2_subdev *sd, struct v4l2_subdev_frame_interval *fi)
 {
     struct v4l2_subdev *sensor = get_remote_sensor(sd);
 
-    if (sensor)
+    if (sensor) {
         return v4l2_subdev_call(sensor, video, g_frame_interval, fi);
+    }
 
     return -EINVAL;
 }
 
-static int csi2_dphy_g_mbus_config(struct v4l2_subdev *sd,
-                   unsigned int pad_id,
-                   struct v4l2_mbus_config *config)
+static int csi2_dphy_g_mbus_config(struct v4l2_subdev *sd, unsigned int pad_id, struct v4l2_mbus_config *config)
 {
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct v4l2_subdev *sensor_sd = get_remote_sensor(sd);
     struct csi2_sensor *sensor;
 
-    if (!sensor_sd)
+    if (!sensor_sd) {
         return -ENODEV;
+    }
     sensor = sd_to_sensor(dphy, sensor_sd);
     csi2_dphy_update_sensor_mbus(sd);
     *config = sensor->mbus;
@@ -221,10 +227,11 @@ static int csi2_dphy_s_power(struct v4l2_subdev *sd, int on)
 {
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
 
-    if (on)
+    if (on) {
         return pm_runtime_get_sync(dphy->dev);
-    else
+    } else {
         return pm_runtime_put(dphy->dev);
+    }
 }
 
 static __maybe_unused int csi2_dphy_runtime_suspend(struct device *dev)
@@ -234,8 +241,9 @@ static __maybe_unused int csi2_dphy_runtime_suspend(struct device *dev)
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct csi2_dphy_hw *hw = dphy->dphy_hw;
 
-    if (hw)
+    if (hw) {
         clk_bulk_disable_unprepare(hw->num_clks, hw->clks_bulk);
+    }
 
     return 0;
 }
@@ -260,9 +268,8 @@ static __maybe_unused int csi2_dphy_runtime_resume(struct device *dev)
 }
 
 /* dphy accepts all fmt/size from sensor */
-static int csi2_dphy_get_set_fmt(struct v4l2_subdev *sd,
-                struct v4l2_subdev_pad_config *cfg,
-                struct v4l2_subdev_format *fmt)
+static int csi2_dphy_get_set_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_pad_config *cfg,
+                                 struct v4l2_subdev_format *fmt)
 {
     struct csi2_dphy *dphy = to_csi2_dphy(sd);
     struct v4l2_subdev *sensor_sd = get_remote_sensor(sd);
@@ -272,17 +279,18 @@ static int csi2_dphy_get_set_fmt(struct v4l2_subdev *sd,
      * Do not allow format changes and just relay whatever
      * set currently in the sensor.
      */
-    if (!sensor_sd)
+    if (!sensor_sd) {
         return -ENODEV;
+    }
     ret = v4l2_subdev_call(sensor_sd, pad, get_fmt, NULL, fmt);
-    if (!ret && fmt->pad == 0)
+    if (!ret && fmt->pad == 0) {
         sensor->format = fmt->format;
+    }
     return ret;
 }
 
-static int csi2_dphy_get_selection(struct v4l2_subdev *sd,
-                  struct v4l2_subdev_pad_config *cfg,
-                  struct v4l2_subdev_selection *sel)
+static int csi2_dphy_get_selection(struct v4l2_subdev *sd, struct v4l2_subdev_pad_config *cfg,
+                                   struct v4l2_subdev_selection *sel)
 {
     struct v4l2_subdev *sensor = get_remote_sensor(sd);
 
@@ -312,50 +320,41 @@ static const struct v4l2_subdev_ops csi2_dphy_subdev_ops = {
 };
 
 /* The .bound() notifier callback when a match is found */
-static int
-rockchip_csi2_dphy_notifier_bound(struct v4l2_async_notifier *notifier,
-                       struct v4l2_subdev *sd,
-                       struct v4l2_async_subdev *asd)
+static int rockchip_csi2_dphy_notifier_bound(struct v4l2_async_notifier *notifier, struct v4l2_subdev *sd,
+                                             struct v4l2_async_subdev *asd)
 {
-    struct csi2_dphy *dphy = container_of(notifier,
-                          struct csi2_dphy,
-                          notifier);
-    struct sensor_async_subdev *s_asd = container_of(asd,
-                    struct sensor_async_subdev, asd);
+    struct csi2_dphy *dphy = container_of(notifier, struct csi2_dphy, notifier);
+    struct sensor_async_subdev *s_asd = container_of(asd, struct sensor_async_subdev, asd);
     struct csi2_sensor *sensor;
     unsigned int pad, ret;
 
-    if (dphy->num_sensors == ARRAY_SIZE(dphy->sensors))
+    if (dphy->num_sensors == ARRAY_SIZE(dphy->sensors)) {
         return -EBUSY;
+    }
 
     sensor = &dphy->sensors[dphy->num_sensors++];
     sensor->lanes = s_asd->lanes;
     sensor->mbus = s_asd->mbus;
     sensor->sd = sd;
 
-    dev_info(dphy->dev, "dphy%d matches %s:bus type %d\n",
-         dphy->phy_index, sd->name, s_asd->mbus.type);
+    dev_info(dphy->dev, "dphy%d matches %s:bus type %d\n", dphy->phy_index, sd->name, s_asd->mbus.type);
 
-    for (pad = 0; pad < sensor->sd->entity.num_pads; pad++)
-        if (sensor->sd->entity.pads[pad].flags & MEDIA_PAD_FL_SOURCE)
+    for (pad = 0; pad < sensor->sd->entity.num_pads; pad++) {
+        if (sensor->sd->entity.pads[pad].flags & MEDIA_PAD_FL_SOURCE) {
             break;
+        }
+    }
 
     if (pad == sensor->sd->entity.num_pads) {
-        dev_err(dphy->dev,
-            "failed to find src pad for %s\n",
-            sensor->sd->name);
+        dev_err(dphy->dev, "failed to find src pad for %s\n", sensor->sd->name);
 
         return -ENXIO;
     }
 
-    ret = media_create_pad_link(
-            &sensor->sd->entity, pad,
-            &dphy->sd.entity, CSI2_DPHY_RX_PAD_SINK,
-            dphy->num_sensors != 1 ? 0 : MEDIA_LNK_FL_ENABLED);
+    ret = media_create_pad_link(&sensor->sd->entity, pad, &dphy->sd.entity, CSI2_DPHY_RX_PAD_SINK,
+                                dphy->num_sensors != 1 ? 0 : MEDIA_LNK_FL_ENABLED);
     if (ret) {
-        dev_err(dphy->dev,
-            "failed to create link for %s\n",
-            sensor->sd->name);
+        dev_err(dphy->dev, "failed to create link for %s\n", sensor->sd->name);
         return ret;
     }
 
@@ -363,31 +362,24 @@ rockchip_csi2_dphy_notifier_bound(struct v4l2_async_notifier *notifier,
 }
 
 /* The .unbind callback */
-static void
-rockchip_csi2_dphy_notifier_unbind(struct v4l2_async_notifier *notifier,
-                  struct v4l2_subdev *sd,
-                  struct v4l2_async_subdev *asd)
+static void rockchip_csi2_dphy_notifier_unbind(struct v4l2_async_notifier *notifier, struct v4l2_subdev *sd,
+                                               struct v4l2_async_subdev *asd)
 {
-    struct csi2_dphy *dphy = container_of(notifier,
-                          struct csi2_dphy,
-                          notifier);
+    struct csi2_dphy *dphy = container_of(notifier, struct csi2_dphy, notifier);
     struct csi2_sensor *sensor = sd_to_sensor(dphy, sd);
 
     sensor->sd = NULL;
 }
 
-static const struct
-v4l2_async_notifier_operations rockchip_csi2_dphy_async_ops = {
+static const struct v4l2_async_notifier_operations rockchip_csi2_dphy_async_ops = {
     .bound = rockchip_csi2_dphy_notifier_bound,
     .unbind = rockchip_csi2_dphy_notifier_unbind,
 };
 
-static int rockchip_csi2_dphy_fwnode_parse(struct device *dev,
-                      struct v4l2_fwnode_endpoint *vep,
-                      struct v4l2_async_subdev *asd)
+static int rockchip_csi2_dphy_fwnode_parse(struct device *dev, struct v4l2_fwnode_endpoint *vep,
+                                           struct v4l2_async_subdev *asd)
 {
-    struct sensor_async_subdev *s_asd =
-            container_of(asd, struct sensor_async_subdev, asd);
+    struct sensor_async_subdev *s_asd = container_of(asd, struct sensor_async_subdev, asd);
     struct v4l2_mbus_config *config = &s_asd->mbus;
 
     if (vep->base.port != 0) {
@@ -405,20 +397,20 @@ static int rockchip_csi2_dphy_fwnode_parse(struct device *dev,
     }
 
     switch (s_asd->lanes) {
-    case 1:
-        config->flags |= V4L2_MBUS_CSI2_1_LANE;
-        break;
-    case 2:
-        config->flags |= V4L2_MBUS_CSI2_2_LANE;
-        break;
-    case 3:
-        config->flags |= V4L2_MBUS_CSI2_3_LANE;
-        break;
-    case 4:
-        config->flags |= V4L2_MBUS_CSI2_4_LANE;
-        break;
-    default:
-        return -EINVAL;
+        case 1:
+            config->flags |= V4L2_MBUS_CSI2_1_LANE;
+            break;
+        case 2:
+            config->flags |= V4L2_MBUS_CSI2_2_LANE;
+            break;
+        case 3:
+            config->flags |= V4L2_MBUS_CSI2_3_LANE;
+            break;
+        case 4:
+            config->flags |= V4L2_MBUS_CSI2_4_LANE;
+            break;
+        default:
+            return -EINVAL;
     }
 
     return 0;
@@ -428,31 +420,27 @@ static int rockchip_csi2dphy_media_init(struct csi2_dphy *dphy)
 {
     int ret;
 
-    dphy->pads[CSI2_DPHY_RX_PAD_SOURCE].flags =
-        MEDIA_PAD_FL_SOURCE | MEDIA_PAD_FL_MUST_CONNECT;
-    dphy->pads[CSI2_DPHY_RX_PAD_SINK].flags =
-        MEDIA_PAD_FL_SINK | MEDIA_PAD_FL_MUST_CONNECT;
+    dphy->pads[CSI2_DPHY_RX_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE | MEDIA_PAD_FL_MUST_CONNECT;
+    dphy->pads[CSI2_DPHY_RX_PAD_SINK].flags = MEDIA_PAD_FL_SINK | MEDIA_PAD_FL_MUST_CONNECT;
     dphy->sd.entity.function = MEDIA_ENT_F_VID_IF_BRIDGE;
-    ret = media_entity_pads_init(&dphy->sd.entity,
-                CSI2_DPHY_RX_PADS_NUM, dphy->pads);
-    if (ret < 0)
+    ret = media_entity_pads_init(&dphy->sd.entity, CSI2_DPHY_RX_PADS_NUM, dphy->pads);
+    if (ret < 0) {
         return ret;
+    }
 
     v4l2_async_notifier_init(&dphy->notifier);
 
     ret = v4l2_async_notifier_parse_fwnode_endpoints_by_port(
-        dphy->dev, &dphy->notifier,
-        sizeof(struct sensor_async_subdev), 0,
-        rockchip_csi2_dphy_fwnode_parse);
-    if (ret < 0)
+        dphy->dev, &dphy->notifier, sizeof(struct sensor_async_subdev), 0, rockchip_csi2_dphy_fwnode_parse);
+    if (ret < 0) {
         return ret;
+    }
 
     dphy->sd.subdev_notifier = &dphy->notifier;
     dphy->notifier.ops = &rockchip_csi2_dphy_async_ops;
     ret = v4l2_async_subdev_notifier_register(&dphy->sd, &dphy->notifier);
     if (ret) {
-        dev_err(dphy->dev,
-            "failed to register async notifier : %d\n", ret);
+        dev_err(dphy->dev, "failed to register async notifier : %d\n", ret);
         v4l2_async_notifier_cleanup(&dphy->notifier);
         return ret;
     }
@@ -469,32 +457,28 @@ static int rockchip_csi2_dphy_attach_hw(struct csi2_dphy *dphy)
     enum csi2_dphy_lane_mode target_mode;
     int i;
 
-    if (dphy->phy_index % 3 == 0)
+    if (dphy->phy_index % 3 == 0) {
         target_mode = LANE_MODE_FULL;
-    else
+    } else {
         target_mode = LANE_MODE_SPLIT;
+    }
 
     np = of_parse_phandle(dev->of_node, "rockchip,hw", 0);
     if (!np || !of_device_is_available(np)) {
-        dev_err(dphy->dev,
-            "failed to get dphy%d hw node\n", dphy->phy_index);
+        dev_err(dphy->dev, "failed to get dphy%d hw node\n", dphy->phy_index);
         return -ENODEV;
     }
 
     plat_dev = of_find_device_by_node(np);
     of_node_put(np);
     if (!plat_dev) {
-        dev_err(dphy->dev,
-            "failed to get dphy%d hw from node\n",
-            dphy->phy_index);
+        dev_err(dphy->dev, "failed to get dphy%d hw from node\n", dphy->phy_index);
         return -ENODEV;
     }
 
     dphy_hw = platform_get_drvdata(plat_dev);
     if (!dphy_hw) {
-        dev_err(dphy->dev,
-            "failed attach dphy%d hw\n",
-            dphy->phy_index);
+        dev_err(dphy->dev, "failed attach dphy%d hw\n", dphy->phy_index);
         return -EINVAL;
     }
 
@@ -511,11 +495,9 @@ static int rockchip_csi2_dphy_attach_hw(struct csi2_dphy *dphy)
         }
 
         if (target_mode != dphy_hw->lane_mode) {
-            dev_err(dphy->dev,
-                "Err:csi2 dphy hw has been set as %s mode by phy%d, target mode is:%s\n",
-                dphy_hw->lane_mode == LANE_MODE_FULL ? "full" : "split",
-                phy->phy_index,
-                target_mode == LANE_MODE_FULL ? "full" : "split");
+            dev_err(dphy->dev, "Err:csi2 dphy hw has been set as %s mode by phy%d, target mode is:%s\n",
+                    dphy_hw->lane_mode == LANE_MODE_FULL ? "full" : "split", phy->phy_index,
+                    target_mode == LANE_MODE_FULL ? "full" : "split");
             return -ENODEV;
         }
     }
@@ -535,8 +517,7 @@ static int rockchip_csi2_dphy_detach_hw(struct csi2_dphy *dphy)
 
     for (i = 0; i < dphy_hw->dphy_dev_num; i++) {
         csi2_dphy = dphy_hw->dphy_dev[i];
-        if (csi2_dphy &&
-            csi2_dphy->phy_index == dphy->phy_index) {
+        if (csi2_dphy && csi2_dphy->phy_index == dphy->phy_index) {
             dphy_hw->dphy_dev[i] = NULL;
             dphy_hw->dphy_dev_num--;
             break;
@@ -554,17 +535,15 @@ static struct dphy_drv_data r3588_dcphy_drv_data = {
     .dev_name = "csi2dcphy",
 };
 
-static const struct of_device_id rockchip_csi2_dphy_match_id[] = {
-    {
-        .compatible = "rockchip,rk3568-csi2-dphy",
-        .data = &r3568_dphy_drv_data,
-    },
-    {
-        .compatible = "rockchip,rk3588-csi2-dcphy",
-        .data = &r3588_dcphy_drv_data,
-    },
-    {}
-};
+static const struct of_device_id rockchip_csi2_dphy_match_id[] = {{
+                                                                      .compatible = "rockchip,rk3568-csi2-dphy",
+                                                                      .data = &r3568_dphy_drv_data,
+                                                                  },
+                                                                  {
+                                                                      .compatible = "rockchip,rk3588-csi2-dcphy",
+                                                                      .data = &r3588_dcphy_drv_data,
+                                                                  },
+                                                                  {}};
 MODULE_DEVICE_TABLE(of, rockchip_csi2_dphy_match_id);
 
 static int rockchip_csi2_dphy_probe(struct platform_device *pdev)
@@ -577,23 +556,24 @@ static int rockchip_csi2_dphy_probe(struct platform_device *pdev)
     int ret;
 
     csi2dphy = devm_kzalloc(dev, sizeof(*csi2dphy), GFP_KERNEL);
-    if (!csi2dphy)
+    if (!csi2dphy) {
         return -ENOMEM;
+    }
     csi2dphy->dev = dev;
 
     of_id = of_match_device(rockchip_csi2_dphy_match_id, dev);
-    if (!of_id)
+    if (!of_id) {
         return -EINVAL;
+    }
     drv_data = of_id->data;
     csi2dphy->drv_data = drv_data;
     csi2dphy->phy_index = of_alias_get_id(dev->of_node, drv_data->dev_name);
-    if (csi2dphy->phy_index < 0 || csi2dphy->phy_index >= PHY_MAX)
+    if (csi2dphy->phy_index < 0 || csi2dphy->phy_index >= PHY_MAX) {
         csi2dphy->phy_index = 0;
+    }
     ret = rockchip_csi2_dphy_attach_hw(csi2dphy);
     if (ret) {
-        dev_err(dev,
-            "csi2 dphy hw can't be attached, register dphy%d failed!\n",
-            csi2dphy->phy_index);
+        dev_err(dev, "csi2 dphy hw can't be attached, register dphy%d failed!\n", csi2dphy->phy_index);
         return -ENODEV;
     }
 
@@ -601,15 +581,15 @@ static int rockchip_csi2_dphy_probe(struct platform_device *pdev)
     mutex_init(&csi2dphy->mutex);
     v4l2_subdev_init(sd, &csi2_dphy_subdev_ops);
     sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
-    snprintf(sd->name, sizeof(sd->name),
-         "rockchip-csi2-dphy%d", csi2dphy->phy_index);
+    snprintf(sd->name, sizeof(sd->name), "rockchip-csi2-dphy%d", csi2dphy->phy_index);
     sd->dev = dev;
 
     platform_set_drvdata(pdev, &sd->entity);
 
     ret = rockchip_csi2dphy_media_init(csi2dphy);
-    if (ret < 0)
+    if (ret < 0) {
         goto detach_hw;
+    }
 
     pm_runtime_enable(&pdev->dev);
 
@@ -638,18 +618,17 @@ static int rockchip_csi2_dphy_remove(struct platform_device *pdev)
 }
 
 static const struct dev_pm_ops rockchip_csi2_dphy_pm_ops = {
-    SET_RUNTIME_PM_OPS(csi2_dphy_runtime_suspend,
-               csi2_dphy_runtime_resume, NULL)
-};
+    SET_RUNTIME_PM_OPS(csi2_dphy_runtime_suspend, csi2_dphy_runtime_resume, NULL)};
 
 struct platform_driver rockchip_csi2_dphy_driver = {
     .probe = rockchip_csi2_dphy_probe,
     .remove = rockchip_csi2_dphy_remove,
-    .driver = {
-        .name = "rockchip-csi2-dphy",
-        .pm = &rockchip_csi2_dphy_pm_ops,
-        .of_match_table = rockchip_csi2_dphy_match_id,
-    },
+    .driver =
+        {
+            .name = "rockchip-csi2-dphy",
+            .pm = &rockchip_csi2_dphy_pm_ops,
+            .of_match_table = rockchip_csi2_dphy_match_id,
+        },
 };
 module_platform_driver(rockchip_csi2_dphy_driver);
 

@@ -1,14 +1,15 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <linux/fs.h>       /* file system operations */
-#include <linux/uaccess.h>  /* user space access */
+#include <linux/fs.h>      /* file system operations */
+#include <linux/uaccess.h> /* user space access */
 
 #include "mali_ukk.h"
 #include "mali_osk.h"
@@ -112,7 +113,6 @@ int mem_unbind_wrapper(struct mali_session_data *session_data, mali_uk_unbind_me
     return 0;
 }
 
-
 int mem_cow_wrapper(struct mali_session_data *session_data, mali_uk_cow_mem_s __user *uargs)
 {
     mali_uk_cow_mem_s kargs;
@@ -164,7 +164,6 @@ int mem_cow_modify_range_wrapper(struct mali_session_data *session_data, mali_uk
     return 0;
 }
 
-
 int mem_resize_mem_wrapper(struct mali_session_data *session_data, mali_uk_mem_resize_s __user *uargs)
 {
     mali_uk_mem_resize_s kargs;
@@ -208,8 +207,7 @@ int mem_write_safe_wrapper(struct mali_session_data *session_data, mali_uk_mem_w
     }
 
     /* Check if size wraps */
-    if ((kargs.size + kargs.dest) <= kargs.dest
-        || (kargs.size + kargs.src) <= kargs.src) {
+    if ((kargs.size + kargs.dest) <= kargs.dest || (kargs.size + kargs.src) <= kargs.src) {
         return -EINVAL;
     }
 
@@ -225,9 +223,8 @@ int mem_write_safe_wrapper(struct mali_session_data *session_data, mali_uk_mem_w
     return 0;
 }
 
-
-
-int mem_query_mmu_page_table_dump_size_wrapper(struct mali_session_data *session_data, mali_uk_query_mmu_page_table_dump_size_s __user *uargs)
+int mem_query_mmu_page_table_dump_size_wrapper(struct mali_session_data *session_data,
+                                               mali_uk_query_mmu_page_table_dump_size_s __user *uargs)
 {
     mali_uk_query_mmu_page_table_dump_size_s kargs;
     mali_osk_errcode_t err;
@@ -238,9 +235,13 @@ int mem_query_mmu_page_table_dump_size_wrapper(struct mali_session_data *session
     kargs.ctx = (uintptr_t)session_data;
 
     err = _mali_ukk_query_mmu_page_table_dump_size(&kargs);
-    if (MALI_OSK_ERR_OK != err) return map_errcode(err);
+    if (MALI_OSK_ERR_OK != err) {
+        return map_errcode(err);
+    }
 
-    if (0 != put_user(kargs.size, &uargs->size)) return -EFAULT;
+    if (0 != put_user(kargs.size, &uargs->size)) {
+        return -EFAULT;
+    }
 
     return 0;
 }
@@ -257,20 +258,24 @@ int mem_dump_mmu_page_table_wrapper(struct mali_session_data *session_data, mali
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
     /* the session_data pointer was validated by caller */
 
-    if (0 != copy_from_user(&kargs, uargs, sizeof(mali_uk_dump_mmu_page_table_s)))
+    if (0 != copy_from_user(&kargs, uargs, sizeof(mali_uk_dump_mmu_page_table_s))) {
         goto err_exit;
+    }
 
     user_buffer = (void __user *)(uintptr_t)kargs.buffer;
-    if (!access_ok(user_buffer, kargs.size))
+    if (!access_ok(user_buffer, kargs.size)) {
         goto err_exit;
+    }
 
     /* allocate temporary buffer (kernel side) to store mmu page table info */
-    if (kargs.size <= 0)
+    if (kargs.size <= 0) {
         return -EINVAL;
+    }
     /* Allow at most 8MiB buffers, this is more than enough to dump a fully
      * populated page table. */
-    if (kargs.size > SZ_8M)
+    if (kargs.size > SZ_8M) {
         return -EINVAL;
+    }
 
     buffer = (void *)(uintptr_t)_mali_osk_valloc(kargs.size);
     if (NULL == buffer) {
@@ -287,21 +292,23 @@ int mem_dump_mmu_page_table_wrapper(struct mali_session_data *session_data, mali
     }
 
     /* copy mmu page table info back to user space and update pointers */
-    if (0 != copy_to_user(user_buffer, buffer, kargs.size))
+    if (0 != copy_to_user(user_buffer, buffer, kargs.size)) {
         goto err_exit;
+    }
 
-    kargs.register_writes = kargs.register_writes -
-                (uintptr_t)buffer + (uintptr_t)user_buffer;
-    kargs.page_table_dump = kargs.page_table_dump -
-                (uintptr_t)buffer + (uintptr_t)user_buffer;
+    kargs.register_writes = kargs.register_writes - (uintptr_t)buffer + (uintptr_t)user_buffer;
+    kargs.page_table_dump = kargs.page_table_dump - (uintptr_t)buffer + (uintptr_t)user_buffer;
 
-    if (0 != copy_to_user(uargs, &kargs, sizeof(kargs)))
+    if (0 != copy_to_user(uargs, &kargs, sizeof(kargs))) {
         goto err_exit;
+    }
 
     rc = 0;
 
 err_exit:
-    if (buffer) _mali_osk_vfree(buffer);
+    if (buffer) {
+        _mali_osk_vfree(buffer);
+    }
     return rc;
 }
 
@@ -330,4 +337,3 @@ int mem_usage_get_wrapper(struct mali_session_data *session_data, mali_uk_profil
 
     return 0;
 }
-

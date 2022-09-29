@@ -20,20 +20,18 @@
  *
  */
 
-
-
 /**
  * @file mali_uk.h
  * Types and definitions that are common across OSs for both the user
  * and kernel side of the User-Kernel interface.
  */
 
-#ifndef _UK_H_
-#define _UK_H_
+#ifndef H_UK_H_
+#define H_UK_H_
 
 #ifdef __cplusplus
 extern "C" {
-#endif                /* __cplusplus */
+#endif /* __cplusplus */
 
 /**
  * @addtogroup base_api
@@ -76,9 +74,9 @@ enum uk_client_id {
 
 /** @} end group uk_api */
 
-/** @} *//* end group base_api */
+/** @} */ /* end group base_api */
 
 #ifdef __cplusplus
 }
-#endif                /* __cplusplus */
-#endif                /* _UK_H_ */
+#endif /* __cplusplus */
+#endif /* _UK_H_ */

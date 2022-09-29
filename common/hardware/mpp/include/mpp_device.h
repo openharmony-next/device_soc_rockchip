@@ -39,62 +39,62 @@ typedef enum MppDevIoctlCmd_e {
 
 /* for MPP_DEV_REG_WR */
 typedef struct MppDevRegWrCfg_t {
-    void    *reg;
-    RK_U32  size;
-    RK_U32  offset;
+    void *reg;
+    unsigned int size;
+    unsigned int offset;
 } MppDevRegWrCfg;
 
 /* for MPP_DEV_REG_RD */
 typedef struct MppDevRegRdCfg_t {
-    void    *reg;
-    RK_U32  size;
-    RK_U32  offset;
+    void *reg;
+    unsigned int size;
+    unsigned int offset;
 } MppDevRegRdCfg;
 
 /* for MPP_DEV_REG_OFFSET */
 typedef struct MppDevRegOffsetCfg_t {
-    RK_U32  reg_idx;
-    RK_U32  offset;
+    unsigned int reg_idx;
+    unsigned int offset;
 } MppDevRegOffsetCfg;
 
 /* for MPP_DEV_RCB_INFO */
 typedef struct MppDevRcbInfoCfg_t {
-    RK_U32  reg_idx;
-    RK_U32  size;
+    unsigned int reg_idx;
+    unsigned int size;
 } MppDevRcbInfoCfg;
 
 /* for MPP_DEV_SET_INFO */
 typedef struct MppDevSetInfoCfg_t {
-    RK_U32  type;
-    RK_U32  flag;
-    RK_U64  data;
+    unsigned int type;
+    unsigned int flag;
+    RK_U64 data;
 } MppDevInfoCfg;
 
 typedef struct MppDevApi_t {
-    const char  *name;
-    RK_U32      ctx_size;
-    MPP_RET     (*init)(void *ctx, MppClientType type);
-    MPP_RET     (*deinit)(void *ctx);
+    const char *name;
+    unsigned int ctx_size;
+    MPP_RET (*init)(void *ctx, MppClientType type);
+    MPP_RET (*deinit)(void *ctx);
 
     /* bat mode function */
-    MPP_RET     (*attach)(void *ctx);
-    MPP_RET     (*detach)(void *ctx);
+    MPP_RET (*attach)(void *ctx);
+    MPP_RET (*detach)(void *ctx);
 
     /* config the cmd on preparing */
-    MPP_RET     (*reg_wr)(void *ctx, MppDevRegWrCfg *cfg);
-    MPP_RET     (*reg_rd)(void *ctx, MppDevRegRdCfg *cfg);
-    MPP_RET     (*reg_offset)(void *ctx, MppDevRegOffsetCfg *cfg);
-    MPP_RET     (*rcb_info)(void *ctx, MppDevRcbInfoCfg *cfg);
-    MPP_RET     (*set_info)(void *ctx, MppDevInfoCfg *cfg);
+    MPP_RET (*reg_wr)(void *ctx, MppDevRegWrCfg *cfg);
+    MPP_RET (*reg_rd)(void *ctx, MppDevRegRdCfg *cfg);
+    MPP_RET (*reg_offset)(void *ctx, MppDevRegOffsetCfg *cfg);
+    MPP_RET (*rcb_info)(void *ctx, MppDevRcbInfoCfg *cfg);
+    MPP_RET (*set_info)(void *ctx, MppDevInfoCfg *cfg);
 
     /* send cmd to hardware */
-    MPP_RET     (*cmd_send)(void *ctx);
+    MPP_RET (*cmd_send)(void *ctx);
 
     /* poll cmd from hardware */
-    MPP_RET     (*cmd_poll)(void *ctx);
+    MPP_RET (*cmd_poll)(void *ctx);
 } MppDevApi;
 
-typedef void* MppDev;
+typedef void *MppDev;
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,10 +103,10 @@ extern "C" {
 MPP_RET mpp_dev_init(MppDev *ctx, MppClientType type);
 MPP_RET mpp_dev_deinit(MppDev ctx);
 
-MPP_RET mpp_dev_ioctl(MppDev ctx, RK_S32 cmd, void *param);
+MPP_RET mpp_dev_ioctl(MppDev ctx, signed int cmd, void *param);
 
 /* special helper function for large address offset config */
-MPP_RET mpp_dev_set_reg_offset(MppDev dev, RK_S32 index, RK_U32 offset);
+MPP_RET mpp_dev_set_reg_offset(MppDev dev, signed int index, unsigned int offset);
 
 #ifdef __cplusplus
 }

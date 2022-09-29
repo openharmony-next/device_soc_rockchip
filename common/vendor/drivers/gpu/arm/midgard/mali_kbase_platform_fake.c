@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #ifdef CONFIG_MALI_PLATFORM_FAKE
 
 #include <linux/errno.h>
@@ -22,7 +20,6 @@
 #include <linux/ioport.h>
 #include <linux/platform_device.h>
 #include <linux/string.h>
-
 
 /*
  * This file is included only for type definitions and functions belonging to
@@ -32,10 +29,10 @@
 #include <mali_kbase_config.h>
 
 #define PLATFORM_CONFIG_RESOURCE_COUNT 4
-#define PLATFORM_CONFIG_IRQ_RES_COUNT  3
-#define PLATFORM_CONFIG_IRQ_NUMBER_COUNT  2
-#define PLATFORM_CONFIG_IRQ_ACTION_COUNT  1
-#define PLATFORM_CONFIG_IRQ_START_COUNT   0
+#define PLATFORM_CONFIG_IRQ_RES_COUNT 3
+#define PLATFORM_CONFIG_IRQ_NUMBER_COUNT 2
+#define PLATFORM_CONFIG_IRQ_ACTION_COUNT 1
+#define PLATFORM_CONFIG_IRQ_START_COUNT 0
 
 static struct platform_device *mali_device;
 
@@ -43,14 +40,15 @@ static struct platform_device *mali_device;
 /**
  * @brief Convert data in struct kbase_io_resources struct to Linux-specific resources
  *
- * Function converts data in struct kbase_io_resources struct to an array of Linux resource structures. Note that function
- * assumes that size of linux_resource array is at least PLATFORM_CONFIG_RESOURCE_COUNT.
- * Resources are put in fixed order: I/O memory region, job IRQ, MMU IRQ, GPU IRQ.
+ * Function converts data in struct kbase_io_resources struct to an array of Linux resource structures. Note that
+ * function assumes that size of linux_resource array is at least PLATFORM_CONFIG_RESOURCE_COUNT. Resources are put in
+ * fixed order: I/O memory region, job IRQ, MMU IRQ, GPU IRQ.
  *
  * @param[in]  io_resource      Input IO resource data
  * @param[out] linux_resources  Pointer to output array of Linux resource structures
  */
-static void kbasep_config_parse_io_resources(const struct kbase_io_resources *io_resources, struct resource *const linux_resources)
+static void kbasep_config_parse_io_resources(const struct kbase_io_resources *io_resources,
+                                             struct resource *const linux_resources)
 {
     if (!io_resources || !linux_resources) {
         pr_err("%s: couldn't find proper resources\n", __func__);
@@ -60,19 +58,19 @@ static void kbasep_config_parse_io_resources(const struct kbase_io_resources *io
     memset(linux_resources, 0, PLATFORM_CONFIG_RESOURCE_COUNT * sizeof(struct resource));
 
     linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].start = io_resources->io_memory_region.start;
-    linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].end   = io_resources->io_memory_region.end;
+    linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].end = io_resources->io_memory_region.end;
     linux_resources[PLATFORM_CONFIG_IRQ_START_COUNT].flags = IORESOURCE_MEM;
 
     linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].start = io_resources->job_irq_number;
-    linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].end   = io_resources->job_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].end = io_resources->job_irq_number;
     linux_resources[PLATFORM_CONFIG_IRQ_ACTION_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 
     linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].start = io_resources->mmu_irq_number;
-    linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].end   = io_resources->mmu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].end = io_resources->mmu_irq_number;
     linux_resources[PLATFORM_CONFIG_IRQ_NUMBER_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 
     linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].start = io_resources->gpu_irq_number;
-    linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].end   = io_resources->gpu_irq_number;
+    linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].end = io_resources->gpu_irq_number;
     linux_resources[PLATFORM_CONFIG_IRQ_RES_COUNT].flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL;
 }
 #endif /* CONFIG_OF */
@@ -92,8 +90,9 @@ int kbase_platform_fake_register(void)
     }
 
     mali_device = platform_device_alloc("mali", 0);
-    if (mali_device == NULL)
+    if (mali_device == NULL) {
         return -ENOMEM;
+    }
 
 #ifndef CONFIG_OF
     kbasep_config_parse_io_resources(config->io_resources, resources);
@@ -118,10 +117,10 @@ EXPORT_SYMBOL(kbase_platform_fake_register);
 
 void kbase_platform_fake_unregister(void)
 {
-    if (mali_device)
+    if (mali_device) {
         platform_device_unregister(mali_device);
+    }
 }
 EXPORT_SYMBOL(kbase_platform_fake_unregister);
 
 #endif /* CONFIG_MALI_PLATFORM_FAKE */
-

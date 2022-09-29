@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _BASE_DEVFREQ_H_
-#define _BASE_DEVFREQ_H_
+#ifndef BASE_DEVFREQ_H_
+#define BASE_DEVFREQ_H_
 
 int kbase_devfreq_init(struct kbase_device *kbdev);
 void kbase_devfreq_term(struct kbase_device *kbdev);

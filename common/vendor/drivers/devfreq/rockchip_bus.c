@@ -19,14 +19,12 @@
 #include <linux/string.h>
 #include <soc/rockchip/rockchip_opp_select.h>
 
-#define CLUSTER0    0
-#define CLUSTER1    1
-#define MAX_CLUSTERS    2
+#define CLUSTER0 0
+#define CLUSTER1 1
+#define MAX_CLUSTERS 2
 
-#define to_rockchip_bus_clk_nb(nb) \
-    container_of(nb, struct rockchip_bus, clk_nb)
-#define to_rockchip_bus_cpufreq_nb(nb) \
-    container_of(nb, struct rockchip_bus, cpufreq_nb)
+#define to_rockchip_bus_clk_nb(nb) container_of(nb, struct rockchip_bus, clk_nb)
+#define to_rockchip_bus_cpufreq_nb(nb) container_of(nb, struct rockchip_bus, cpufreq_nb)
 
 struct busfreq_table {
     unsigned long freq;
@@ -75,14 +73,14 @@ static int rockchip_bus_smc_config(struct rockchip_bus *bus)
     unsigned int enable_msk, bus_id, cfg;
     int ret;
 
-    for_each_available_child_of_node(np, child) {
-        ret = of_property_read_u32_index(child, "bus-id", 0,
-                         &bus_id);
-        if (ret)
+    for_each_available_child_of_node(np, child)
+    {
+        ret = of_property_read_u32_index(child, "bus-id", 0, &bus_id);
+        if (ret) {
             continue;
+        }
 
-        ret = of_property_read_u32_index(child, "cfg-val", 0,
-                         &cfg);
+        ret = of_property_read_u32_index(child, "cfg-val", 0, &cfg);
         if (ret) {
             dev_info(dev, "get cfg-val error\n");
             continue;
@@ -93,15 +91,13 @@ static int rockchip_bus_smc_config(struct rockchip_bus *bus)
             continue;
         }
 
-        ret = of_property_read_u32_index(child, "enable-msk", 0,
-                         &enable_msk);
+        ret = of_property_read_u32_index(child, "enable-msk", 0, &enable_msk);
         if (ret) {
             dev_info(dev, "get enable_msk error\n");
             continue;
         }
 
-        ret = rockchip_sip_bus_smc_config(bus_id, cfg,
-                          enable_msk);
+        ret = rockchip_sip_bus_smc_config(bus_id, cfg, enable_msk);
         if (ret) {
             dev_info(dev, "bus smc config error: %x!\n", ret);
             break;
@@ -119,14 +115,12 @@ static int rockchip_bus_set_freq_table(struct rockchip_bus *bus)
     int i, count;
 
     count = dev_pm_opp_get_opp_count(dev);
-    if (count <= 0)
+    if (count <= 0) {
         return -EINVAL;
+    }
 
     bus->max_state = count;
-    bus->freq_table = devm_kcalloc(dev,
-                       bus->max_state,
-                       sizeof(*bus->freq_table),
-                       GFP_KERNEL);
+    bus->freq_table = devm_kcalloc(dev, bus->max_state, sizeof(*bus->freq_table), GFP_KERNEL);
     if (!bus->freq_table) {
         bus->max_state = 0;
         return -ENOMEM;
@@ -194,10 +188,8 @@ static int rockchip_bus_clkfreq_target(struct device *dev, unsigned long freq)
 
     if (bus->cur_volt != target_volt) {
         dev_dbg(bus->dev, "target_volt: %lu\n", target_volt);
-        if (regulator_set_voltage(bus->regulator, target_volt,
-                      INT_MAX)) {
-            dev_err(dev, "failed to set voltage %lu uV\n",
-                target_volt);
+        if (regulator_set_voltage(bus->regulator, target_volt, INT_MAX)) {
+            dev_err(dev, "failed to set voltage %lu uV\n", target_volt);
             return -EINVAL;
         }
         bus->cur_volt = target_volt;
@@ -206,34 +198,32 @@ static int rockchip_bus_clkfreq_target(struct device *dev, unsigned long freq)
     return 0;
 }
 
-static int rockchip_bus_clk_notifier(struct notifier_block *nb,
-                     unsigned long event, void *data)
+static int rockchip_bus_clk_notifier(struct notifier_block *nb, unsigned long event, void *data)
 {
     struct clk_notifier_data *ndata = data;
     struct rockchip_bus *bus = to_rockchip_bus_clk_nb(nb);
     int ret = 0;
 
-    dev_dbg(bus->dev, "event %lu, old_rate %lu, new_rate: %lu\n",
-        event, ndata->old_rate, ndata->new_rate);
+    dev_dbg(bus->dev, "event %lu, old_rate %lu, new_rate: %lu\n", event, ndata->old_rate, ndata->new_rate);
 
     switch (event) {
-    case PRE_RATE_CHANGE:
-        if (ndata->new_rate > ndata->old_rate)
-            ret = rockchip_bus_clkfreq_target(bus->dev,
-                              ndata->new_rate);
-        break;
-    case POST_RATE_CHANGE:
-        if (ndata->new_rate < ndata->old_rate)
-            ret = rockchip_bus_clkfreq_target(bus->dev,
-                              ndata->new_rate);
-        break;
-    case ABORT_RATE_CHANGE:
-        if (ndata->new_rate > ndata->old_rate)
-            ret = rockchip_bus_clkfreq_target(bus->dev,
-                              ndata->old_rate);
-        break;
-    default:
-        break;
+        case PRE_RATE_CHANGE:
+            if (ndata->new_rate > ndata->old_rate) {
+                ret = rockchip_bus_clkfreq_target(bus->dev, ndata->new_rate);
+            }
+            break;
+        case POST_RATE_CHANGE:
+            if (ndata->new_rate < ndata->old_rate) {
+                ret = rockchip_bus_clkfreq_target(bus->dev, ndata->new_rate);
+            }
+            break;
+        case ABORT_RATE_CHANGE:
+            if (ndata->new_rate > ndata->old_rate) {
+                ret = rockchip_bus_clkfreq_target(bus->dev, ndata->old_rate);
+            }
+            break;
+        default:
+            break;
     }
 
     return notifier_from_errno(ret);
@@ -253,8 +243,9 @@ static int rockchip_bus_clkfreq(struct rockchip_bus *bus)
 
     init_rate = clk_get_rate(bus->clk);
     ret = rockchip_bus_clkfreq_target(dev, init_rate);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     bus->clk_nb.notifier_call = rockchip_bus_clk_notifier;
     ret = clk_notifier_register(bus->clk, &bus->clk_nb);
@@ -266,8 +257,7 @@ static int rockchip_bus_clkfreq(struct rockchip_bus *bus)
     return 0;
 }
 
-static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq,
-                       u32 flags)
+static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq, u32 flags)
 {
     struct rockchip_bus *bus = dev_get_drvdata(dev);
     struct dev_pm_opp *opp;
@@ -277,11 +267,11 @@ static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq,
     if (!bus->regulator) {
         dev_dbg(dev, "%luHz -> %luHz\n", bus->cur_rate, target_rate);
         ret = clk_set_rate(bus->clk, target_rate);
-        if (ret)
-            dev_err(bus->dev, "failed to set bus rate %lu\n",
-                target_rate);
-        else
+        if (ret) {
+            dev_err(bus->dev, "failed to set bus rate %lu\n", target_rate);
+        } else {
             bus->cur_rate = target_rate;
+        }
         return ret;
     }
 
@@ -294,13 +284,12 @@ static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq,
     dev_pm_opp_put(opp);
 
     if (bus->cur_rate == target_rate) {
-        if (bus->cur_volt == target_volt)
+        if (bus->cur_volt == target_volt) {
             return 0;
-        ret = regulator_set_voltage(bus->regulator, target_volt,
-                        INT_MAX);
+        }
+        ret = regulator_set_voltage(bus->regulator, target_volt, INT_MAX);
         if (ret) {
-            dev_err(dev, "failed to set voltage %lu\n",
-                target_volt);
+            dev_err(dev, "failed to set voltage %lu\n", target_volt);
             return ret;
         }
         bus->cur_volt = target_volt;
@@ -310,11 +299,9 @@ static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq,
     }
 
     if (bus->cur_rate < target_rate) {
-        ret = regulator_set_voltage(bus->regulator, target_volt,
-                        INT_MAX);
+        ret = regulator_set_voltage(bus->regulator, target_volt, INT_MAX);
         if (ret) {
-            dev_err(dev, "failed to set voltage %lu\n",
-                target_volt);
+            dev_err(dev, "failed to set voltage %lu\n", target_volt);
             return ret;
         }
     }
@@ -326,65 +313,55 @@ static int rockchip_bus_cpufreq_target(struct device *dev, unsigned long freq,
     }
 
     if (bus->cur_rate > target_rate) {
-        ret = regulator_set_voltage(bus->regulator, target_volt,
-                        INT_MAX);
+        ret = regulator_set_voltage(bus->regulator, target_volt, INT_MAX);
         if (ret) {
-            dev_err(dev, "failed to set voltage %lu\n",
-                target_volt);
+            dev_err(dev, "failed to set voltage %lu\n", target_volt);
             return ret;
         }
     }
 
-    dev_dbg(dev, "%luHz %luuV -> %luHz %luuV\n", bus->cur_rate,
-        bus->cur_volt, target_rate, target_volt);
+    dev_dbg(dev, "%luHz %luuV -> %luHz %luuV\n", bus->cur_rate, bus->cur_volt, target_rate, target_volt);
     bus->cur_rate = target_rate;
     bus->cur_volt = target_volt;
 
     return ret;
 }
 
-static int rockchip_bus_cpufreq_notifier(struct notifier_block *nb,
-                     unsigned long event, void *data)
+static int rockchip_bus_cpufreq_notifier(struct notifier_block *nb, unsigned long event, void *data)
 {
     struct rockchip_bus *bus = to_rockchip_bus_cpufreq_nb(nb);
     struct cpufreq_freqs *freqs = data;
     int id = topology_physical_package_id(freqs->policy->cpu);
 
-    if (id < 0 || id >= MAX_CLUSTERS)
+    if (id < 0 || id >= MAX_CLUSTERS) {
         return NOTIFY_DONE;
+    }
 
     bus->cpu_freq[id] = freqs->new;
 
-    if (!bus->cpu_freq[CLUSTER0] || !bus->cpu_freq[CLUSTER1])
+    if (!bus->cpu_freq[CLUSTER0] || !bus->cpu_freq[CLUSTER1]) {
         return NOTIFY_DONE;
+    }
 
     switch (event) {
-    case CPUFREQ_PRECHANGE:
-        if ((bus->cpu_freq[CLUSTER0] > bus->cpu_high_freq ||
-             bus->cpu_freq[CLUSTER1] > bus->cpu_high_freq) &&
-             bus->cur_rate != bus->high_rate) {
-            dev_dbg(bus->dev, "cpu%d freq=%d %d, up cci rate to %lu\n",
-                freqs->policy->cpu,
-                bus->cpu_freq[CLUSTER0],
-                bus->cpu_freq[CLUSTER1],
-                bus->high_rate);
-            rockchip_bus_cpufreq_target(bus->dev, bus->high_rate,
-                            0);
-        }
-        break;
-    case CPUFREQ_POSTCHANGE:
-        if (bus->cpu_freq[CLUSTER0] <= bus->cpu_high_freq &&
-            bus->cpu_freq[CLUSTER1] <= bus->cpu_high_freq &&
-            bus->cur_rate != bus->low_rate) {
-            dev_dbg(bus->dev, "cpu%d freq=%d %d, down cci rate to %lu\n",
-                freqs->policy->cpu,
-                bus->cpu_freq[CLUSTER0],
-                bus->cpu_freq[CLUSTER1],
-                bus->low_rate);
-            rockchip_bus_cpufreq_target(bus->dev, bus->low_rate,
-                            0);
-        }
-        break;
+        case CPUFREQ_PRECHANGE:
+            if ((bus->cpu_freq[CLUSTER0] > bus->cpu_high_freq || bus->cpu_freq[CLUSTER1] > bus->cpu_high_freq) &&
+                bus->cur_rate != bus->high_rate) {
+                dev_dbg(bus->dev, "cpu%d freq=%d %d, up cci rate to %lu\n", freqs->policy->cpu, bus->cpu_freq[CLUSTER0],
+                        bus->cpu_freq[CLUSTER1], bus->high_rate);
+                rockchip_bus_cpufreq_target(bus->dev, bus->high_rate, 0);
+            }
+            break;
+        case CPUFREQ_POSTCHANGE:
+            if (bus->cpu_freq[CLUSTER0] <= bus->cpu_high_freq && bus->cpu_freq[CLUSTER1] <= bus->cpu_high_freq &&
+                bus->cur_rate != bus->low_rate) {
+                dev_dbg(bus->dev, "cpu%d freq=%d %d, down cci rate to %lu\n", freqs->policy->cpu,
+                        bus->cpu_freq[CLUSTER0], bus->cpu_freq[CLUSTER1], bus->low_rate);
+                rockchip_bus_cpufreq_target(bus->dev, bus->low_rate, 0);
+            }
+            break;
+        default:
+            break;
     }
 
     return NOTIFY_OK;
@@ -422,17 +399,16 @@ static int rockchip_bus_cpufreq(struct rockchip_bus *bus)
         dev_err(dev, "failed to get cci-high-freq\n");
         return ret;
     }
-    bus->high_rate = freq * 1000;
+    bus->high_rate = freq * 0x3e8;
     ret = of_property_read_u32(np, "cci-low-freq", &freq);
     if (ret) {
         dev_err(dev, "failed to get cci-low-freq\n");
         return ret;
     }
-    bus->low_rate = freq * 1000;
+    bus->low_rate = freq * 0x3e8;
 
     bus->cpufreq_nb.notifier_call = rockchip_bus_cpufreq_notifier;
-    ret = cpufreq_register_notifier(&bus->cpufreq_nb,
-                    CPUFREQ_TRANSITION_NOTIFIER);
+    ret = cpufreq_register_notifier(&bus->cpufreq_nb, CPUFREQ_TRANSITION_NOTIFIER);
     if (ret) {
         dev_err(dev, "failed to register cpufreq notifier\n");
         return ret;
@@ -442,14 +418,28 @@ static int rockchip_bus_cpufreq(struct rockchip_bus *bus)
 }
 
 static const struct of_device_id rockchip_busfreq_of_match[] = {
-    { .compatible = "rockchip,px30-bus", },
-    { .compatible = "rockchip,rk1808-bus", },
-    { .compatible = "rockchip,rk3288-bus", },
-    { .compatible = "rockchip,rk3368-bus", },
-    { .compatible = "rockchip,rk3399-bus", },
-    { .compatible = "rockchip,rk3568-bus", },
-    { .compatible = "rockchip,rv1126-bus", },
-    { },
+    {
+        .compatible = "rockchip,px30-bus",
+    },
+    {
+        .compatible = "rockchip,rk1808-bus",
+    },
+    {
+        .compatible = "rockchip,rk3288-bus",
+    },
+    {
+        .compatible = "rockchip,rk3368-bus",
+    },
+    {
+        .compatible = "rockchip,rk3399-bus",
+    },
+    {
+        .compatible = "rockchip,rk3568-bus",
+    },
+    {
+        .compatible = "rockchip,rv1126-bus",
+    },
+    {},
 };
 
 MODULE_DEVICE_TABLE(of, rockchip_busfreq_of_match);
@@ -463,34 +453,36 @@ static int rockchip_busfreq_probe(struct platform_device *pdev)
     int ret = 0;
 
     bus = devm_kzalloc(dev, sizeof(*bus), GFP_KERNEL);
-    if (!bus)
+    if (!bus) {
         return -ENOMEM;
+    }
     bus->dev = dev;
     platform_set_drvdata(pdev, bus);
 
-    ret = of_property_read_string(np, "rockchip,busfreq-policy",
-                      &policy_name);
+    ret = of_property_read_string(np, "rockchip,busfreq-policy", &policy_name);
     if (ret) {
         dev_info(dev, "failed to get busfreq policy\n");
         return ret;
     }
 
-    if (!strcmp(policy_name, "smc"))
+    if (!strcmp(policy_name, "smc")) {
         ret = rockchip_bus_smc_config(bus);
-    else if (!strcmp(policy_name, "clkfreq"))
+    } else if (!strcmp(policy_name, "clkfreq")) {
         ret = rockchip_bus_clkfreq(bus);
-    else if (!strcmp(policy_name, "cpufreq"))
+    } else if (!strcmp(policy_name, "cpufreq")) {
         ret = rockchip_bus_cpufreq(bus);
+    }
 
     return ret;
 }
 
 static struct platform_driver rockchip_busfreq_driver = {
-    .probe    = rockchip_busfreq_probe,
-    .driver = {
-        .name    = "rockchip,bus",
-        .of_match_table = rockchip_busfreq_of_match,
-    },
+    .probe = rockchip_busfreq_probe,
+    .driver =
+        {
+            .name = "rockchip,bus",
+            .of_match_table = rockchip_busfreq_of_match,
+        },
 };
 
 module_platform_driver(rockchip_busfreq_driver);

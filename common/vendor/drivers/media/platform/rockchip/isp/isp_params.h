@@ -10,12 +10,9 @@
 #include <linux/rk-preisp.h>
 #include "common.h"
 
-#define ISP_PACK_4BYTE(a, b, c, d)    \
-    (((a) & 0xFF) << 0 | ((b) & 0xFF) << 8 | \
-     ((c) & 0xFF) << 16 | ((d) & 0xFF) << 24)
+#define ISP_PACK_4BYTE(a, b, c, d) (((a)&0xFF) << 0 | ((b)&0xFF) << 8 | ((c)&0xFF) << 16 | ((d)&0xFF) << 24)
 
-#define ISP_PACK_2SHORT(a, b)    \
-    (((a) & 0xFFFF) << 0 | ((b) & 0xFFFF) << 16)
+#define ISP_PACK_2SHORT(a, b) (((a)&0xFFFF) << 0 | ((b)&0xFFFF) << 16)
 
 enum rkisp_params_type {
     RKISP_PARAMS_ALL,
@@ -31,13 +28,10 @@ struct rkisp_isp_params_ops {
     void (*first_cfg)(struct rkisp_isp_params_vdev *params_vdev);
     void (*disable_isp)(struct rkisp_isp_params_vdev *params_vdev);
     void (*isr_hdl)(struct rkisp_isp_params_vdev *params_vdev, u32 isp_mis);
-    void (*param_cfg)(struct rkisp_isp_params_vdev *params_vdev, u32 frame_id,
-              enum rkisp_params_type type);
+    void (*param_cfg)(struct rkisp_isp_params_vdev *params_vdev, u32 frame_id, enum rkisp_params_type type);
     void (*param_cfgsram)(struct rkisp_isp_params_vdev *params_vdev);
-    void (*get_meshbuf_inf)(struct rkisp_isp_params_vdev *params_vdev,
-                void *meshbuf);
-    void (*set_meshbuf_size)(struct rkisp_isp_params_vdev *params_vdev,
-                 void *meshsize);
+    void (*get_meshbuf_inf)(struct rkisp_isp_params_vdev *params_vdev, void *meshbuf);
+    void (*set_meshbuf_size)(struct rkisp_isp_params_vdev *params_vdev, void *meshsize);
     void (*stream_stop)(struct rkisp_isp_params_vdev *params_vdev);
     void (*fop_release)(struct rkisp_isp_params_vdev *params_vdev);
 };
@@ -87,23 +81,17 @@ struct rkisp_isp_params_vdev {
     bool is_first_cfg;
 };
 
-static inline void
-rkisp_iowrite32(struct rkisp_isp_params_vdev *params_vdev,
-        u32 value, u32 addr)
+static inline void rkisp_iowrite32(struct rkisp_isp_params_vdev *params_vdev, u32 value, u32 addr)
 {
     rkisp_write(params_vdev->dev, addr, value, false);
 }
 
-static inline u32
-rkisp_ioread32(struct rkisp_isp_params_vdev *params_vdev,
-           u32 addr)
+static inline u32 rkisp_ioread32(struct rkisp_isp_params_vdev *params_vdev, u32 addr)
 {
     return rkisp_read(params_vdev->dev, addr, false);
 }
 
-static inline void
-isp_param_set_bits(struct rkisp_isp_params_vdev *params_vdev,
-           u32 reg, u32 bit_mask)
+static inline void isp_param_set_bits(struct rkisp_isp_params_vdev *params_vdev, u32 reg, u32 bit_mask)
 {
     u32 val;
 
@@ -111,9 +99,7 @@ isp_param_set_bits(struct rkisp_isp_params_vdev *params_vdev,
     rkisp_iowrite32(params_vdev, val | bit_mask, reg);
 }
 
-static inline void
-isp_param_clear_bits(struct rkisp_isp_params_vdev *params_vdev,
-             u32 reg, u32 bit_mask)
+static inline void isp_param_clear_bits(struct rkisp_isp_params_vdev *params_vdev, u32 reg, u32 bit_mask)
 {
     u32 val;
 
@@ -122,14 +108,12 @@ isp_param_clear_bits(struct rkisp_isp_params_vdev *params_vdev,
 }
 
 /* config params before ISP streaming */
-void rkisp_params_first_cfg(struct rkisp_isp_params_vdev *params_vdev,
-                struct ispsd_in_fmt *in_fmt,
-                enum v4l2_quantization quantization);
+void rkisp_params_first_cfg(struct rkisp_isp_params_vdev *params_vdev, struct ispsd_in_fmt *in_fmt,
+                            enum v4l2_quantization quantization);
 void rkisp_params_disable_isp(struct rkisp_isp_params_vdev *params_vdev);
 
-int rkisp_register_params_vdev(struct rkisp_isp_params_vdev *params_vdev,
-                   struct v4l2_device *v4l2_dev,
-                   struct rkisp_device *dev);
+int rkisp_register_params_vdev(struct rkisp_isp_params_vdev *params_vdev, struct v4l2_device *v4l2_dev,
+                               struct rkisp_device *dev);
 
 void rkisp_unregister_params_vdev(struct rkisp_isp_params_vdev *params_vdev);
 
@@ -138,10 +122,8 @@ void rkisp_params_isr(struct rkisp_isp_params_vdev *params_vdev, u32 isp_mis);
 void rkisp_params_cfg(struct rkisp_isp_params_vdev *params_vdev, u32 frame_id);
 
 void rkisp_params_cfgsram(struct rkisp_isp_params_vdev *params_vdev);
-void rkisp_params_get_meshbuf_inf(struct rkisp_isp_params_vdev *params_vdev,
-                  void *meshbuf);
-void rkisp_params_set_meshbuf_size(struct rkisp_isp_params_vdev *params_vdev,
-                   void *meshsize);
+void rkisp_params_get_meshbuf_inf(struct rkisp_isp_params_vdev *params_vdev, void *meshbuf);
+void rkisp_params_set_meshbuf_size(struct rkisp_isp_params_vdev *params_vdev, void *meshsize);
 void rkisp_params_stream_stop(struct rkisp_isp_params_vdev *params_vdev);
 
 #endif /* _RKISP_ISP_PARAM_H */

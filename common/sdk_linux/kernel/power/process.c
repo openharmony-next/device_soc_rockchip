@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * drivers/power/process.c - Functions for starting/stopping processes on 
+ * drivers/power/process.c - Functions for starting/stopping processes on
  *                           suspend transitions.
  *
  * Originally from swsusp.
  */
-
 
 #undef DEBUG
 
@@ -23,10 +22,10 @@
 #include <trace/events/power.h>
 #include <linux/cpuset.h>
 
-#define PROCESS_TWO                        2
-#define PROCESS_EIGHT                      8
-#define PROCESS_TWENTY                     20
-#define PROCESS_ONETHOUSAND                1000
+#define PROCESS_TWO 2
+#define PROCESS_EIGHT 8
+#define PROCESS_TWENTY 20
+#define PROCESS_ONETHOUSAND 1000
 
 /*
  * Timeout for stopping processes
@@ -48,18 +47,22 @@ static int try_to_freeze_tasks(bool user_only)
 
     end_time = jiffies + msecs_to_jiffies(freeze_timeout_msecs);
 
-    if (!user_only)
+    if (!user_only) {
         freeze_workqueues_begin();
+    }
 
     while (true) {
         todo = 0;
         read_lock(&tasklist_lock);
-        for_each_process_thread(g, p) {
-            if (p == current || !freeze_task(p))
+        for_each_process_thread(g, p)
+        {
+            if (p == current || !freeze_task(p)) {
                 continue;
+            }
 
-            if (!freezer_should_skip(p))
+            if (!freezer_should_skip(p)) {
                 todo++;
+            }
         }
         read_unlock(&tasklist_lock);
 
@@ -68,8 +71,9 @@ static int try_to_freeze_tasks(bool user_only)
             todo += wq_busy;
         }
 
-        if (!todo || time_after(jiffies, end_time))
+        if (!todo || time_after(jiffies, end_time)) {
             break;
+        }
 
         if (pm_wakeup_pending()) {
             wakeup = true;
@@ -82,8 +86,9 @@ static int try_to_freeze_tasks(bool user_only)
          * 1 ms sleep followed by exponential backoff until 8 ms.
          */
         usleep_range(sleep_usecs / PROCESS_TWO, sleep_usecs);
-        if (sleep_usecs < PROCESS_EIGHT * USEC_PER_MSEC)
+        if (sleep_usecs < PROCESS_EIGHT * USEC_PER_MSEC) {
             sleep_usecs *= PROCESS_TWO;
+        }
     }
 
     end = ktime_get_boottime();
@@ -92,30 +97,30 @@ static int try_to_freeze_tasks(bool user_only)
 
     if (wakeup) {
         pr_cont("\n");
-        pr_err("Freezing of tasks aborted after %d.%03d seconds",
-               elapsed_msecs / PROCESS_ONETHOUSAND, elapsed_msecs % PROCESS_ONETHOUSAND);
+        pr_err("Freezing of tasks aborted after %d.%03d seconds", elapsed_msecs / PROCESS_ONETHOUSAND,
+               elapsed_msecs % PROCESS_ONETHOUSAND);
     } else if (todo) {
         pr_cont("\n");
         pr_err("Freezing of tasks failed after %d.%03d seconds"
                " (%d tasks refusing to freeze, wq_busy=%d):\n",
-               elapsed_msecs / PROCESS_ONETHOUSAND, elapsed_msecs % PROCESS_ONETHOUSAND,
-               todo - wq_busy, wq_busy);
+               elapsed_msecs / PROCESS_ONETHOUSAND, elapsed_msecs % PROCESS_ONETHOUSAND, todo - wq_busy, wq_busy);
 
-        if (wq_busy)
+        if (wq_busy) {
             show_workqueue_state();
+        }
 
         if (pm_debug_messages_on) {
             read_lock(&tasklist_lock);
-            for_each_process_thread(g, p) {
-                if (p != current && !freezer_should_skip(p)
-                    && freezing(p) && !frozen(p))
+            for_each_process_thread(g, p)
+            {
+                if (p != current && !freezer_should_skip(p) && freezing(p) && !frozen(p)) {
                     sched_show_task(p);
+                }
             }
             read_unlock(&tasklist_lock);
         }
     } else {
-        pr_cont("(elapsed %d.%03d seconds) ", elapsed_msecs / PROCESS_ONETHOUSAND,
-            elapsed_msecs % PROCESS_ONETHOUSAND);
+        pr_cont("(elapsed %d.%03d seconds) ", elapsed_msecs / PROCESS_ONETHOUSAND, elapsed_msecs % PROCESS_ONETHOUSAND);
     }
 
     return todo ? -EBUSY : 0;
@@ -133,14 +138,16 @@ int freeze_processes(void)
     int error;
 
     error = __usermodehelper_disable(UMH_FREEZING);
-    if (error)
+    if (error) {
         return error;
+    }
 
     /* Make sure this task doesn't get frozen */
     current->flags |= PF_SUSPEND_TASK;
 
-    if (!pm_freezing)
+    if (!pm_freezing) {
         atomic_inc(&system_freezing_cnt);
+    }
 
     pm_wakeup_clear(true);
     pr_info("Freezing user space processes ... ");
@@ -159,11 +166,13 @@ int freeze_processes(void)
      * killable tasks. There is no guarantee oom victims will
      * ever reach a point they go away we have to wait with a timeout.
      */
-    if (!error && !oom_killer_disable(msecs_to_jiffies(freeze_timeout_msecs)))
+    if (!error && !oom_killer_disable(msecs_to_jiffies(freeze_timeout_msecs))) {
         error = -EBUSY;
+    }
 
-    if (error)
+    if (error) {
         thaw_processes();
+    }
     return error;
 }
 
@@ -183,14 +192,16 @@ int freeze_kernel_threads(void)
 
     pm_nosig_freezing = true;
     error = try_to_freeze_tasks(false);
-    if (!error)
+    if (!error) {
         pr_cont("done.");
+    }
 
     pr_cont("\n");
     BUG_ON(in_atomic());
 
-    if (error)
+    if (error) {
         thaw_kernel_threads();
+    }
     return error;
 }
 
@@ -200,8 +211,9 @@ void thaw_processes(void)
     struct task_struct *curr = current;
 
     trace_suspend_resume(TPS("thaw_processes"), 0, true);
-    if (pm_freezing)
+    if (pm_freezing) {
         atomic_dec(&system_freezing_cnt);
+    }
     pm_freezing = false;
     pm_nosig_freezing = false;
 
@@ -215,7 +227,8 @@ void thaw_processes(void)
     cpuset_wait_for_hotplug();
 
     read_lock(&tasklist_lock);
-    for_each_process_thread(g, p) {
+    for_each_process_thread(g, p)
+    {
         /* No other threads should have PF_SUSPEND_TASK set */
         WARN_ON((p != curr) && (p->flags & PF_SUSPEND_TASK));
         __thaw_task(p);
@@ -242,9 +255,11 @@ void thaw_kernel_threads(void)
     thaw_workqueues();
 
     read_lock(&tasklist_lock);
-    for_each_process_thread(g, p) {
-        if (p->flags & (PF_KTHREAD | PF_WQ_WORKER))
+    for_each_process_thread(g, p)
+    {
+        if (p->flags & (PF_KTHREAD | PF_WQ_WORKER)) {
             __thaw_task(p);
+        }
     }
     read_unlock(&tasklist_lock);
 

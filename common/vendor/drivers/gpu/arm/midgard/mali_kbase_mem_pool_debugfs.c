@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 
@@ -40,10 +38,8 @@ static int kbase_mem_pool_debugfs_size_set(void *data, u64 val)
     return 0;
 }
 
-DEFINE_SIMPLE_ATTRIBUTE(kbase_mem_pool_debugfs_size_fops,
-        kbase_mem_pool_debugfs_size_get,
-        kbase_mem_pool_debugfs_size_set,
-        "%llu\n");
+DEFINE_SIMPLE_ATTRIBUTE(kbase_mem_pool_debugfs_size_fops, kbase_mem_pool_debugfs_size_get,
+                        kbase_mem_pool_debugfs_size_set, "%llu\n");
 
 static int kbase_mem_pool_debugfs_max_size_get(void *data, u64 *val)
 {
@@ -63,19 +59,14 @@ static int kbase_mem_pool_debugfs_max_size_set(void *data, u64 val)
     return 0;
 }
 
-DEFINE_SIMPLE_ATTRIBUTE(kbase_mem_pool_debugfs_max_size_fops,
-        kbase_mem_pool_debugfs_max_size_get,
-        kbase_mem_pool_debugfs_max_size_set,
-        "%llu\n");
+DEFINE_SIMPLE_ATTRIBUTE(kbase_mem_pool_debugfs_max_size_fops, kbase_mem_pool_debugfs_max_size_get,
+                        kbase_mem_pool_debugfs_max_size_set, "%llu\n");
 
-void kbase_mem_pool_debugfs_init(struct dentry *parent,
-        struct kbase_mem_pool *pool)
+void kbase_mem_pool_debugfs_init(struct dentry *parent, struct kbase_mem_pool *pool)
 {
-    debugfs_create_file("mem_pool_size", S_IRUGO | S_IWUSR, parent,
-            pool, &kbase_mem_pool_debugfs_size_fops);
+    debugfs_create_file("mem_pool_size", S_IRUGO | S_IWUSR, parent, pool, &kbase_mem_pool_debugfs_size_fops);
 
-    debugfs_create_file("mem_pool_max_size", S_IRUGO | S_IWUSR, parent,
-            pool, &kbase_mem_pool_debugfs_max_size_fops);
+    debugfs_create_file("mem_pool_max_size", S_IRUGO | S_IWUSR, parent, pool, &kbase_mem_pool_debugfs_max_size_fops);
 }
 
 #endif /* CONFIG_DEBUG_FS */

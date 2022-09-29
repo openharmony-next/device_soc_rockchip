@@ -48,14 +48,10 @@
 
 /* Bitmask of valid chunk sizes. This is also the maximum chunk size, in bytes.
  */
-#define CHUNK_SIZE_MASK \
-    ((CHUNK_HDR_NEXT_SIZE_MASK >> CHUNK_HDR_NEXT_SIZE_POS) << \
-     CHUNK_HDR_NEXT_SIZE_ENCODE_SHIFT)
+#define CHUNK_SIZE_MASK ((CHUNK_HDR_NEXT_SIZE_MASK >> CHUNK_HDR_NEXT_SIZE_POS) << CHUNK_HDR_NEXT_SIZE_ENCODE_SHIFT)
 
 /* Bitmask of valid chunk addresses. This is also the highest address. */
-#define CHUNK_ADDR_MASK \
-    ((CHUNK_HDR_NEXT_ADDR_MASK >> CHUNK_HDR_NEXT_ADDR_POS) << \
-     CHUNK_HDR_NEXT_ADDR_ENCODE_SHIFT)
+#define CHUNK_ADDR_MASK ((CHUNK_HDR_NEXT_ADDR_MASK >> CHUNK_HDR_NEXT_ADDR_POS) << CHUNK_HDR_NEXT_ADDR_ENCODE_SHIFT)
 
 /**
  * struct kbase_csf_tiler_heap_chunk - A tiler heap chunk managed by the kernel

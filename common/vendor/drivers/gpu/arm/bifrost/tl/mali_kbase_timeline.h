@@ -38,8 +38,7 @@ struct kbase_timeline;
  *                  while timeline instance is valid.
  * Return: zero on success, negative number on error
  */
-int kbase_timeline_init(struct kbase_timeline **timeline,
-    atomic_t *timeline_flags);
+int kbase_timeline_init(struct kbase_timeline **timeline, atomic_t *timeline_flags);
 
 /**
  * kbase_timeline_term - terminate timeline infrastructure in kernel
@@ -102,12 +101,8 @@ void kbase_timeline_streams_body_reset(struct kbase_timeline *timeline);
  * between generating another set of messages. This call blocks until all
  * writers finish.
  */
-void kbase_timeline_test(
-    struct kbase_device *kbdev,
-    unsigned int tpw_count,
-    unsigned int msg_delay,
-    unsigned int msg_count,
-    int          aux_msg);
+void kbase_timeline_test(struct kbase_device *kbdev, unsigned int tpw_count, unsigned int msg_delay,
+                         unsigned int msg_count, int aux_msg);
 
 /**
  * kbase_timeline_stats - read timeline stream statistics

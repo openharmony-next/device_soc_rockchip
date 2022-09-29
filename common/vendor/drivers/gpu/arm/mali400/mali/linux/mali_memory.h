@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -20,6 +21,8 @@
 #include "mali_memory_types.h"
 #include "mali_memory_os_alloc.h"
 
+extern unsigned int mali_dedicated_mem_size;
+extern unsigned int mali_shared_mem_size;
 mali_osk_errcode_t mali_memory_initialize(void);
 void mali_memory_terminate(void);
 
@@ -32,8 +35,7 @@ void mali_memory_terminate(void);
  * @param table_page GPU pointer to the allocated page
  * @param mapping CPU pointer to the mapping of the allocated page
  */
-MALI_STATIC_INLINE mali_osk_errcode_t
-mali_mmu_get_table_page(mali_dma_addr *table_page, mali_io_address *mapping)
+MALI_STATIC_INLINE mali_osk_errcode_t mali_mmu_get_table_page(mali_dma_addr *table_page, mali_io_address *mapping)
 {
     return mali_mem_os_get_table_page(table_page, mapping);
 }
@@ -44,8 +46,7 @@ mali_mmu_get_table_page(mali_dma_addr *table_page, mali_io_address *mapping)
  *
  * @param pa the GPU address of the page to release
  */
-MALI_STATIC_INLINE void
-mali_mmu_release_table_page(mali_dma_addr phys, void *virt)
+MALI_STATIC_INLINE void mali_mmu_release_table_page(mali_dma_addr phys, void *virt)
 {
     mali_mem_os_release_table_page(phys, virt);
 }
@@ -124,7 +125,6 @@ mali_osk_errcode_t mali_memory_core_resource_os_memory(u32 size);
  * @return MALI_OSK_ERR_OK on success, otherwise failure.
  */
 mali_osk_errcode_t mali_memory_core_resource_dedicated_memory(u32 start, u32 size);
-
 
 struct mali_page_node *_mali_page_node_allocate(mali_page_node_type type);
 

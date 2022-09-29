@@ -3,7 +3,6 @@
 #ifndef RK_LED_FLASH_H
 #define RK_LED_FLASH_H
 
-#define RK_VIDIOC_FLASH_TIMEINFO \
-    _IOR('V', BASE_VIDIOC_PRIVATE + 0, struct timeval)
+#define RK_VIDIOC_FLASH_TIMEINFO _IOR('V', BASE_VIDIOC_PRIVATE + 0, struct timeval)
 
 #endif

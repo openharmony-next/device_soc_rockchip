@@ -23,8 +23,8 @@ struct rockchip_gem_object {
     enum rockchip_gem_buf_type buf_type;
 
     void *kvaddr;
-    dma_addr_t dma_addr;    /* iova if iommu enable, otherwise physical address */
-    dma_addr_t dma_handle;    /* physical address */
+    dma_addr_t dma_addr;   /* iova if iommu enable, otherwise physical address */
+    dma_addr_t dma_handle; /* physical address */
     /* Used when IOMMU is disabled */
     unsigned long dma_attrs;
 
@@ -37,10 +37,8 @@ struct rockchip_gem_object {
 };
 
 struct sg_table *rockchip_gem_prime_get_sg_table(struct drm_gem_object *obj);
-struct drm_gem_object *
-rockchip_gem_prime_import_sg_table(struct drm_device *dev,
-                   struct dma_buf_attachment *attach,
-                   struct sg_table *sg);
+struct drm_gem_object *rockchip_gem_prime_import_sg_table(struct drm_device *dev, struct dma_buf_attachment *attach,
+                                                          struct sg_table *sg);
 void *rockchip_gem_prime_vmap(struct drm_gem_object *obj);
 void rockchip_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
 
@@ -48,47 +46,34 @@ void rockchip_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
 int rockchip_gem_mmap(struct file *filp, struct vm_area_struct *vma);
 
 /* mmap a gem object to userspace. */
-int rockchip_gem_mmap_buf(struct drm_gem_object *obj,
-              struct vm_area_struct *vma);
+int rockchip_gem_mmap_buf(struct drm_gem_object *obj, struct vm_area_struct *vma);
 
-struct rockchip_gem_object *
-rockchip_gem_create_object(struct drm_device *drm, unsigned int size,
-               bool alloc_kmap, unsigned int flags);
+struct rockchip_gem_object *rockchip_gem_create_object(struct drm_device *drm, unsigned int size, bool alloc_kmap,
+                                                       unsigned int flags);
 
 void rockchip_gem_free_object(struct drm_gem_object *obj);
 
-int rockchip_gem_dumb_create(struct drm_file *file_priv,
-                 struct drm_device *dev,
-                 struct drm_mode_create_dumb *args);
+int rockchip_gem_dumb_create(struct drm_file *file_priv, struct drm_device *dev, struct drm_mode_create_dumb *args);
 /*
  * request gem object creation and buffer allocation as the size
  * that it is calculated with framebuffer information such as width,
  * height and bpp.
  */
-int rockchip_gem_create_ioctl(struct drm_device *dev, void *data,
-                  struct drm_file *file_priv);
+int rockchip_gem_create_ioctl(struct drm_device *dev, void *data, struct drm_file *file_priv);
 
 /* get buffer offset to map to user space. */
-int rockchip_gem_map_offset_ioctl(struct drm_device *dev, void *data,
-                  struct drm_file *file_priv);
+int rockchip_gem_map_offset_ioctl(struct drm_device *dev, void *data, struct drm_file *file_priv);
 
-int rockchip_gem_get_phys_ioctl(struct drm_device *dev, void *data,
-                struct drm_file *file_priv);
+int rockchip_gem_get_phys_ioctl(struct drm_device *dev, void *data, struct drm_file *file_priv);
 
-int rockchip_gem_prime_begin_cpu_access(struct drm_gem_object *obj,
-                    enum dma_data_direction dir);
+int rockchip_gem_prime_begin_cpu_access(struct drm_gem_object *obj, enum dma_data_direction dir);
 
-int rockchip_gem_prime_end_cpu_access(struct drm_gem_object *obj,
-                      enum dma_data_direction dir);
+int rockchip_gem_prime_end_cpu_access(struct drm_gem_object *obj, enum dma_data_direction dir);
 
-int rockchip_gem_prime_begin_cpu_access_partial(struct drm_gem_object *obj,
-                        enum dma_data_direction dir,
-                        unsigned int offset,
-                        unsigned int len);
+int rockchip_gem_prime_begin_cpu_access_partial(struct drm_gem_object *obj, enum dma_data_direction dir,
+                                                unsigned int offset, unsigned int len);
 
-int rockchip_gem_prime_end_cpu_access_partial(struct drm_gem_object *obj,
-                          enum dma_data_direction dir,
-                          unsigned int offset,
-                          unsigned int len);
+int rockchip_gem_prime_end_cpu_access_partial(struct drm_gem_object *obj, enum dma_data_direction dir,
+                                              unsigned int offset, unsigned int len);
 void rockchip_gem_get_ddr_info(void);
 #endif /* _ROCKCHIP_DRM_GEM_H */

@@ -20,36 +20,32 @@
  *
  */
 
+#ifndef KBASE_UTILITY_H
+#define KBASE_UTILITY_H
 
-
-#ifndef _KBASE_UTILITY_H
-#define _KBASE_UTILITY_H
-
-#ifndef _KBASE_H_
+#ifndef KBASE_H_
 #error "Don't include this file directly, use mali_kbase.h instead"
 #endif
 
-static inline void kbase_timer_setup(struct timer_list *timer,
-                     void (*callback)(struct timer_list *timer))
+static inline void kbase_timer_setup(struct timer_list *timer, void (*callback)(struct timer_list *timer))
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
-    setup_timer(timer, (void (*)(unsigned long)) callback,
-            (unsigned long) timer);
+    setup_timer(timer, (void (*)(unsigned long))callback, (unsigned long)timer);
 #else
     timer_setup(timer, callback, 0);
 #endif
 }
 
 #ifndef WRITE_ONCE
-    #ifdef ASSIGN_ONCE
-        #define WRITE_ONCE(x, val) ASSIGN_ONCE(val, x)
-    #else
-        #define WRITE_ONCE(x, val) (ACCESS_ONCE(x) = (val))
-    #endif
+#ifdef ASSIGN_ONCE
+#define WRITE_ONCE(x, val) ASSIGN_ONCE(val, x)
+#else
+#define WRITE_ONCE(x, val) (ACCESS_ONCE(x) = (val))
+#endif
 #endif
 
 #ifndef READ_ONCE
-    #define READ_ONCE(x) ACCESS_ONCE(x)
+#define READ_ONCE(x) ACCESS_ONCE(x)
 #endif
 
-#endif                /* _KBASE_UTILITY_H */
+#endif /* _KBASE_UTILITY_H */

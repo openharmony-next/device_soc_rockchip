@@ -20,21 +20,18 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_js.h
  * Job Scheduler APIs.
  */
 
-#ifndef _KBASE_JS_H_
-#define _KBASE_JS_H_
+#ifndef KBASE_JS_H_
+#define KBASE_JS_H_
 
 #include "context/mali_kbase_context.h"
 #include "mali_kbase_defs.h"
 #include "mali_kbase_debug.h"
-#include <mali_kbase_ctx_sched.h>
 #include "jm/mali_kbase_jm_js.h"
 #include "jm/mali_kbase_js_defs.h"
 
-#endif    /* _KBASE_JS_H_ */
+#endif /* _KBASE_JS_H_ */

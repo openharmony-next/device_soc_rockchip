@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -28,9 +29,7 @@ mali_osk_errcode_t mali_session_initialize(void)
     /* init wait queue for big varying job */
     init_waitqueue_head(&pending_queue);
 
-    mali_sessions_lock = mali_osk_spinlock_irq_init(
-                     _MALI_OSK_LOCKFLAG_ORDERED,
-                     _MALI_OSK_LOCK_ORDER_SESSIONS);
+    mali_sessions_lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SESSIONS);
     if (NULL == mali_sessions_lock) {
         return MALI_OSK_ERR_NOMEM;
     }
@@ -72,7 +71,7 @@ mali_bool mali_session_pp_job_is_empty(void *data)
     struct mali_session_data *session = (struct mali_session_data *)data;
     MALI_DEBUG_ASSERT_POINTER(session);
 
-    if ( 0 == mali_osk_atomic_read(&session->number_of_pp_jobs)) {
+    if (0 == mali_osk_atomic_read(&session->number_of_pp_jobs)) {
         return MALI_TRUE;
     }
     return MALI_FALSE;
@@ -96,9 +95,9 @@ u32 mali_session_max_window_num(void)
 
     mali_session_lock();
 
-    MALI_SESSION_FOREACH(session, tmp, link) {
-        tmp_number = mali_osk_atomic_xchg(
-                     &session->number_of_window_jobs, 0);
+    MALI_SESSION_FOREACH(session, tmp, link)
+    {
+        tmp_number = mali_osk_atomic_xchg(&session->number_of_window_jobs, 0);
         if (max_window_num < tmp_number) {
             max_window_num = tmp_number;
         }
@@ -122,34 +121,34 @@ void mali_session_memory_tracking(_mali_osk_print_ctx *print_ctx)
 
     MALI_DEBUG_ASSERT_POINTER(print_ctx);
     mali_session_lock();
-    MALI_SESSION_FOREACH(session, tmp, link) {
+    MALI_SESSION_FOREACH(session, tmp, link)
+    {
 #ifdef MALI_MEM_SWAP_TRACKING
-        _mali_osk_ctxprintf(print_ctx, "  %-25s  %-10u  %-10u  %-15u  %-15u  %-10u  %-10u  %-10u\n",
-                    session->comm, session->pid,
-                    (atomic_read(&session->mali_mem_allocated_pages)) * MALI_OSK_MALI_PAGE_SIZE,
-                    (unsigned int)session->max_mali_mem_allocated_size,
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_EXTERNAL])) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_UMP])) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_DMA_BUF])) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_SWAP])) * MALI_OSK_MALI_PAGE_SIZE)
-                   );
+        _mali_osk_ctxprintf(
+            print_ctx, "  %-25s  %-10u  %-10u  %-15u  %-15u  %-10u  %-10u  %-10u\n", session->comm, session->pid,
+            (atomic_read(&session->mali_mem_allocated_pages)) * MALI_OSK_MALI_PAGE_SIZE,
+            (unsigned int)session->max_mali_mem_allocated_size,
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_EXTERNAL])) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_UMP])) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_DMA_BUF])) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_SWAP])) * MALI_OSK_MALI_PAGE_SIZE));
 #else
-        _mali_osk_ctxprintf(print_ctx, "  %-25s  %-10u  %-10u  %-15u  %-15u  %-10u  %-10u  \n",
-                    session->comm, session->pid,
-                    (unsigned int)((atomic_read(&session->mali_mem_allocated_pages)) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)session->max_mali_mem_allocated_size,
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_EXTERNAL])) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_UMP])) * MALI_OSK_MALI_PAGE_SIZE),
-                    (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_DMA_BUF])) * MALI_OSK_MALI_PAGE_SIZE)
-                   );
+        _mali_osk_ctxprintf(
+            print_ctx, "  %-25s  %-10u  %-10u  %-15u  %-15u  %-10u  %-10u  \n", session->comm, session->pid,
+            (unsigned int)((atomic_read(&session->mali_mem_allocated_pages)) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)session->max_mali_mem_allocated_size,
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_EXTERNAL])) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_UMP])) * MALI_OSK_MALI_PAGE_SIZE),
+            (unsigned int)((atomic_read(&session->mali_mem_array[MALI_MEM_DMA_BUF])) * MALI_OSK_MALI_PAGE_SIZE));
 #endif
     }
     mali_session_unlock();
-    mali_mem_usage  = _mali_ukk_report_memory_usage();
+    mali_mem_usage = _mali_ukk_report_memory_usage();
     total_mali_mem_size = _mali_ukk_report_total_memory_size();
     _mali_osk_ctxprintf(print_ctx, "Mali mem usage: %u\nMali mem limit: %u\n", mali_mem_usage, total_mali_mem_size);
 #ifdef MALI_MEM_SWAP_TRACKING
     mali_mem_swap_tracking(&swap_pool_size, &swap_unlock_size);
-    _mali_osk_ctxprintf(print_ctx, "Mali swap mem pool : %u\nMali swap mem unlock: %u\n", swap_pool_size, swap_unlock_size);
+    _mali_osk_ctxprintf(print_ctx, "Mali swap mem pool : %u\nMali swap mem unlock: %u\n", swap_pool_size,
+                        swap_unlock_size);
 #endif
 }

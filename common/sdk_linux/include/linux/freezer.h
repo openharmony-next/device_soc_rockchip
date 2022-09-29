@@ -10,9 +10,9 @@
 #include <linux/atomic.h>
 
 #ifdef CONFIG_FREEZER
-extern atomic_t system_freezing_cnt;    /* nr of freezing conds in effect */
-extern bool pm_freezing;        /* PM freezing in effect */
-extern bool pm_nosig_freezing;        /* PM nosig freezing in effect */
+extern atomic_t system_freezing_cnt; /* nr of freezing conds in effect */
+extern bool pm_freezing;             /* PM freezing in effect */
+extern bool pm_nosig_freezing;       /* PM nosig freezing in effect */
 
 /*
  * Timeout for stopping processes
@@ -39,8 +39,9 @@ extern bool freezing_slow_path(struct task_struct *p);
  */
 static inline bool freezing(struct task_struct *p)
 {
-    if (likely(!atomic_read(&system_freezing_cnt)))
+    if (likely(!atomic_read(&system_freezing_cnt))) {
         return false;
+    }
     return freezing_slow_path(p);
 }
 
@@ -60,15 +61,17 @@ extern void thaw_kernel_threads(void);
 static inline bool try_to_freeze_unsafe(void)
 {
     might_sleep();
-    if (likely(!freezing(current)))
+    if (likely(!freezing(current))) {
         return false;
+    }
     return __refrigerator(false);
 }
 
 static inline bool try_to_freeze(void)
 {
-    if (!(current->flags & PF_NOFREEZE))
+    if (!(current->flags & PF_NOFREEZE)) {
         debug_check_no_locks_held();
+    }
     return try_to_freeze_unsafe();
 }
 
@@ -77,7 +80,7 @@ extern bool set_freezable(void);
 
 #ifdef CONFIG_CGROUP_FREEZER
 extern bool cgroup_freezing(struct task_struct *task);
-#else /* !CONFIG_CGROUP_FREEZER */
+#else  /* !CONFIG_CGROUP_FREEZER */
 static inline bool cgroup_freezing(struct task_struct *task)
 {
     return false;
@@ -96,7 +99,6 @@ static inline bool cgroup_freezing(struct task_struct *task)
  * (the child) does a little before exec/exit and it can't be frozen before
  * waking up the parent.
  */
-
 
 /**
  * freezer_do_not_count - tell freezer to ignore %current
@@ -247,8 +249,7 @@ static inline long freezable_schedule_timeout_killable_unsafe(long timeout)
  * Like schedule_hrtimeout_range(), but should not block the freezer.  Do not
  * call this with locks held.
  */
-static inline int freezable_schedule_hrtimeout_range(ktime_t *expires,
-        u64 delta, const enum hrtimer_mode mode)
+static inline int freezable_schedule_hrtimeout_range(ktime_t *expires, u64 delta, const enum hrtimer_mode mode)
 {
     int __retval;
     freezer_do_not_count();
@@ -264,59 +265,92 @@ static inline int freezable_schedule_hrtimeout_range(ktime_t *expires,
  */
 
 /* DO NOT ADD ANY NEW CALLERS OF THIS FUNCTION */
-#define wait_event_freezekillable_unsafe(wq, condition)            \
-({                                    \
-    int __retval;                            \
-    freezer_do_not_count();                        \
-    __retval = wait_event_killable(wq, (condition));        \
-    freezer_count_unsafe();                        \
-    __retval;                            \
-})
+#define wait_event_freezekillable_unsafe(wq, condition)                                                                \
+    ({                                                                                                                 \
+        int __retval;                                                                                                  \
+        freezer_do_not_count();                                                                                        \
+        __retval = wait_event_killable(wq, (condition));                                                               \
+        freezer_count_unsafe();                                                                                        \
+        __retval;                                                                                                      \
+    })
 
 #else /* !CONFIG_FREEZER */
-static inline bool frozen(struct task_struct *p) { return false; }
-static inline bool frozen_or_skipped(struct task_struct *p) { return false; }
-static inline bool freezing(struct task_struct *p) { return false; }
-static inline void __thaw_task(struct task_struct *t) {}
+static inline bool frozen(struct task_struct *p)
+{
+    return false;
+}
+static inline bool frozen_or_skipped(struct task_struct *p)
+{
+    return false;
+}
+static inline bool freezing(struct task_struct *p)
+{
+    return false;
+}
+static inline void __thaw_task(struct task_struct *t)
+{
+}
 
-static inline bool __refrigerator(bool check_kthr_stop) { return false; }
-static inline int freeze_processes(void) { return -ENOSYS; }
-static inline int freeze_kernel_threads(void) { return -ENOSYS; }
-static inline void thaw_processes(void) {}
-static inline void thaw_kernel_threads(void) {}
+static inline bool __refrigerator(bool check_kthr_stop)
+{
+    return false;
+}
+static inline int freeze_processes(void)
+{
+    return -ENOSYS;
+}
+static inline int freeze_kernel_threads(void)
+{
+    return -ENOSYS;
+}
+static inline void thaw_processes(void)
+{
+}
+static inline void thaw_kernel_threads(void)
+{
+}
 
-static inline bool try_to_freeze_nowarn(void) { return false; }
-static inline bool try_to_freeze(void) { return false; }
+static inline bool try_to_freeze_nowarn(void)
+{
+    return false;
+}
+static inline bool try_to_freeze(void)
+{
+    return false;
+}
 
-static inline void freezer_do_not_count(void) {}
-static inline void freezer_count(void) {}
-static inline int freezer_should_skip(struct task_struct *p) { return 0; }
-static inline void set_freezable(void) {}
+static inline void freezer_do_not_count(void)
+{
+}
+static inline void freezer_count(void)
+{
+}
+static inline int freezer_should_skip(struct task_struct *p)
+{
+    return 0;
+}
+static inline void set_freezable(void)
+{
+}
 
-#define freezable_schedule()  schedule()
+#define freezable_schedule() schedule()
 
-#define freezable_schedule_unsafe()  schedule()
+#define freezable_schedule_unsafe() schedule()
 
-#define freezable_schedule_timeout(timeout)  schedule_timeout(timeout)
+#define freezable_schedule_timeout(timeout) schedule_timeout(timeout)
 
-#define freezable_schedule_timeout_interruptible(timeout)        \
-    schedule_timeout_interruptible(timeout)
+#define freezable_schedule_timeout_interruptible(timeout) schedule_timeout_interruptible(timeout)
 
-#define freezable_schedule_timeout_interruptible_unsafe(timeout)    \
-    schedule_timeout_interruptible(timeout)
+#define freezable_schedule_timeout_interruptible_unsafe(timeout) schedule_timeout_interruptible(timeout)
 
-#define freezable_schedule_timeout_killable(timeout)            \
-    schedule_timeout_killable(timeout)
+#define freezable_schedule_timeout_killable(timeout) schedule_timeout_killable(timeout)
 
-#define freezable_schedule_timeout_killable_unsafe(timeout)        \
-    schedule_timeout_killable(timeout)
+#define freezable_schedule_timeout_killable_unsafe(timeout) schedule_timeout_killable(timeout)
 
-#define freezable_schedule_hrtimeout_range(expires, delta, mode)    \
-    schedule_hrtimeout_range(expires, delta, mode)
+#define freezable_schedule_hrtimeout_range(expires, delta, mode) schedule_hrtimeout_range(expires, delta, mode)
 
-#define wait_event_freezekillable_unsafe(wq, condition)            \
-        wait_event_killable(wq, condition)
+#define wait_event_freezekillable_unsafe(wq, condition) wait_event_killable(wq, condition)
 
 #endif /* !CONFIG_FREEZER */
 
-#endif    /* FREEZER_H_INCLUDED */
+#endif /* FREEZER_H_INCLUDED */

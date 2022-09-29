@@ -13,29 +13,25 @@
  *
  */
 
-
-
-
-
 #include "mali_kbase_mmu_mode.h"
 
 #include "mali_kbase.h"
 #include "mali_midg_regmap.h"
 
-#define ENTRY_TYPE_MASK     3ULL
-#define ENTRY_IS_ATE        1ULL
-#define ENTRY_IS_INVAL      2ULL
-#define ENTRY_IS_PTE        3ULL
+#define ENTRY_TYPE_MASK 3ULL
+#define ENTRY_IS_ATE 1ULL
+#define ENTRY_IS_INVAL 2ULL
+#define ENTRY_IS_PTE 3ULL
 
-#define ENTRY_ATTR_BITS (7ULL << 2)    /* bits 4:2 */
+#define ENTRY_ATTR_BITS (7ULL << 2) /* bits 4:2 */
 #define ENTRY_RD_BIT (1ULL << 6)
 #define ENTRY_WR_BIT (1ULL << 7)
-#define ENTRY_SHARE_BITS (3ULL << 8)    /* bits 9:8 */
+#define ENTRY_SHARE_BITS (3ULL << 8) /* bits 9:8 */
 #define ENTRY_ACCESS_BIT (1ULL << 10)
 #define ENTRY_NX_BIT (1ULL << 54)
 
-#define ENTRY_FLAGS_MASK (ENTRY_ATTR_BITS | ENTRY_RD_BIT | ENTRY_WR_BIT | \
-        ENTRY_SHARE_BITS | ENTRY_ACCESS_BIT | ENTRY_NX_BIT)
+#define ENTRY_FLAGS_MASK                                                                                               \
+    (ENTRY_ATTR_BITS | ENTRY_RD_BIT | ENTRY_WR_BIT | ENTRY_SHARE_BITS | ENTRY_ACCESS_BIT | ENTRY_NX_BIT)
 
 /* Helper Function to perform assignment of page table entries, to
  * ensure the use of strd, which is required on LPAE systems.
@@ -59,46 +55,37 @@ static inline void page_table_entry_set(u64 *pte, u64 phy)
      * the 64 bit assignment to the page table entry.
      */
     asm volatile("ldrd r0, r1, [%[ptemp]]\n\t"
-            "strd r0, r1, [%[pte]]\n\t"
-            : "=m" (*pte)
-            : [ptemp] "r" (&phy), [pte] "r" (pte), "m" (phy)
-            : "r0", "r1");
+                 "strd r0, r1, [%[pte]]\n\t"
+                 : "=m"(*pte)
+                 : [ptemp] "r"(&phy), [pte] "r"(pte), "m"(phy)
+                 : "r0", "r1");
 #else
 #error "64-bit atomic write must be implemented for your architecture"
 #endif
 }
 
-static void mmu_get_as_setup(struct kbase_context *kctx,
-        struct kbase_mmu_setup * const setup)
+static void mmu_get_as_setup(struct kbase_context *kctx, struct kbase_mmu_setup *const setup)
 {
     /* Set up the required caching policies at the correct indices
      * in the memattr register. */
-    setup->memattr =
-        (AS_MEMATTR_LPAE_IMPL_DEF_CACHE_POLICY <<
-        (AS_MEMATTR_INDEX_IMPL_DEF_CACHE_POLICY * 8)) |
-        (AS_MEMATTR_LPAE_FORCE_TO_CACHE_ALL    <<
-        (AS_MEMATTR_INDEX_FORCE_TO_CACHE_ALL * 8))    |
-        (AS_MEMATTR_LPAE_WRITE_ALLOC           <<
-        (AS_MEMATTR_INDEX_WRITE_ALLOC * 8))           |
-        (AS_MEMATTR_LPAE_OUTER_IMPL_DEF        <<
-        (AS_MEMATTR_INDEX_OUTER_IMPL_DEF * 8))        |
-        (AS_MEMATTR_LPAE_OUTER_WA              <<
-        (AS_MEMATTR_INDEX_OUTER_WA * 8))              |
-        0; /* The other indices are unused for now */
+    setup->memattr = (AS_MEMATTR_LPAE_IMPL_DEF_CACHE_POLICY << (AS_MEMATTR_INDEX_IMPL_DEF_CACHE_POLICY * 8)) |
+                     (AS_MEMATTR_LPAE_FORCE_TO_CACHE_ALL << (AS_MEMATTR_INDEX_FORCE_TO_CACHE_ALL * 8)) |
+                     (AS_MEMATTR_LPAE_WRITE_ALLOC << (AS_MEMATTR_INDEX_WRITE_ALLOC * 8)) |
+                     (AS_MEMATTR_LPAE_OUTER_IMPL_DEF << (AS_MEMATTR_INDEX_OUTER_IMPL_DEF * 8)) |
+                     (AS_MEMATTR_LPAE_OUTER_WA << (AS_MEMATTR_INDEX_OUTER_WA * 8)) |
+                     0; /* The other indices are unused for now */
 
-    setup->transtab = ((u64)kctx->pgd &
-        ((0xFFFFFFFFULL << 32) | AS_TRANSTAB_LPAE_ADDR_SPACE_MASK)) |
-        AS_TRANSTAB_LPAE_ADRMODE_TABLE |
-        AS_TRANSTAB_LPAE_READ_INNER;
+    setup->transtab = ((u64)kctx->pgd & ((0xFFFFFFFFULL << 32) | AS_TRANSTAB_LPAE_ADDR_SPACE_MASK)) |
+                      AS_TRANSTAB_LPAE_ADRMODE_TABLE | AS_TRANSTAB_LPAE_READ_INNER;
 
     setup->transcfg = 0;
 }
 
 static void mmu_update(struct kbase_context *kctx)
 {
-    struct kbase_device * const kbdev = kctx->kbdev;
-    struct kbase_as * const as = &kbdev->as[kctx->as_nr];
-    struct kbase_mmu_setup * const current_setup = &as->current_setup;
+    struct kbase_device *const kbdev = kctx->kbdev;
+    struct kbase_as *const as = &kbdev->as[kctx->as_nr];
+    struct kbase_mmu_setup *const current_setup = &as->current_setup;
 
     mmu_get_as_setup(kctx, current_setup);
 
@@ -108,8 +95,8 @@ static void mmu_update(struct kbase_context *kctx)
 
 static void mmu_disable_as(struct kbase_device *kbdev, int as_nr)
 {
-    struct kbase_as * const as = &kbdev->as[as_nr];
-    struct kbase_mmu_setup * const current_setup = &as->current_setup;
+    struct kbase_as *const as = &kbdev->as[as_nr];
+    struct kbase_mmu_setup *const current_setup = &as->current_setup;
 
     current_setup->transtab = AS_TRANSTAB_LPAE_ADRMODE_UNMAPPED;
 
@@ -119,8 +106,9 @@ static void mmu_disable_as(struct kbase_device *kbdev, int as_nr)
 
 static phys_addr_t pte_to_phy_addr(u64 entry)
 {
-    if (!(entry & 1))
+    if (!(entry & 1)) {
         return 0;
+    }
 
     return entry & ~0xFFF;
 }
@@ -165,9 +153,7 @@ static u64 get_mmu_flags(unsigned long flags)
 
 static void entry_set_ate(u64 *entry, phys_addr_t phy, unsigned long flags)
 {
-    page_table_entry_set(entry, (phy & ~0xFFF) |
-        get_mmu_flags(flags) |
-        ENTRY_IS_ATE);
+    page_table_entry_set(entry, (phy & ~0xFFF) | get_mmu_flags(flags) | ENTRY_IS_ATE);
 }
 
 static void entry_set_pte(u64 *entry, phys_addr_t phy)
@@ -180,17 +166,15 @@ static void entry_invalidate(u64 *entry)
     page_table_entry_set(entry, ENTRY_IS_INVAL);
 }
 
-static struct kbase_mmu_mode const lpae_mode = {
-    .update = mmu_update,
-    .get_as_setup = mmu_get_as_setup,
-    .disable_as = mmu_disable_as,
-    .pte_to_phy_addr = pte_to_phy_addr,
-    .ate_is_valid = ate_is_valid,
-    .pte_is_valid = pte_is_valid,
-    .entry_set_ate = entry_set_ate,
-    .entry_set_pte = entry_set_pte,
-    .entry_invalidate = entry_invalidate
-};
+static struct kbase_mmu_mode const lpae_mode = {.update = mmu_update,
+                                                .get_as_setup = mmu_get_as_setup,
+                                                .disable_as = mmu_disable_as,
+                                                .pte_to_phy_addr = pte_to_phy_addr,
+                                                .ate_is_valid = ate_is_valid,
+                                                .pte_is_valid = pte_is_valid,
+                                                .entry_set_ate = entry_set_ate,
+                                                .entry_set_pte = entry_set_pte,
+                                                .entry_invalidate = entry_invalidate};
 
 struct kbase_mmu_mode const *kbase_mmu_mode_get_lpae(void)
 {

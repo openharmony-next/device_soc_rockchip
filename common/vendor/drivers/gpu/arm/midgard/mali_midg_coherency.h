@@ -13,14 +13,12 @@
  *
  */
 
-
-
-#ifndef _MIDG_COHERENCY_H_
-#define _MIDG_COHERENCY_H_
+#ifndef MIDG_COHERENCY_H_
+#define MIDG_COHERENCY_H_
 
 #define COHERENCY_ACE_LITE 0
-#define COHERENCY_ACE      1
-#define COHERENCY_NONE     31
+#define COHERENCY_ACE 1
+#define COHERENCY_NONE 31
 #define COHERENCY_FEATURE_BIT(x) (1 << (x))
 
 #endif /* _MIDG_COHERENCY_H_ */

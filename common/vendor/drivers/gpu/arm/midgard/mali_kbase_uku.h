@@ -13,12 +13,8 @@
  *
  */
 
-
-
-
-
-#ifndef _KBASE_UKU_H_
-#define _KBASE_UKU_H_
+#ifndef KBASE_UKU_H_
+#define KBASE_UKU_H_
 
 #include "mali_uk.h"
 #include "mali_base_kernel.h"
@@ -79,7 +75,7 @@ struct kbase_uk_mem_alloc {
     /* OUT */
     u64 gpu_va;
     u16 va_alignment;
-    u8  padding[6];
+    u8 padding[6];
 };
 
 struct kbase_uk_mem_free {
@@ -98,8 +94,8 @@ struct kbase_uk_mem_alias {
     u64 nents;
     union kbase_pointer ai;
     /* OUT */
-    u64         gpu_va;
-    u64         va_pages;
+    u64 gpu_va;
+    u64 va_pages;
 };
 
 struct kbase_uk_mem_import {
@@ -109,10 +105,10 @@ struct kbase_uk_mem_import {
     u32 type;
     u32 padding;
     /* IN/OUT */
-    u64         flags;
+    u64 flags;
     /* OUT */
     u64 gpu_va;
-    u64         va_pages;
+    u64 va_pages;
 };
 
 struct kbase_uk_mem_flags_change {
@@ -128,7 +124,7 @@ struct kbase_uk_job_submit {
     /* IN */
     union kbase_pointer addr;
     u32 nr_atoms;
-    u32 stride;        /* bytes between atoms, i.e. sizeof(base_jd_atom_v2) */
+    u32 stride; /* bytes between atoms, i.e. sizeof(base_jd_atom_v2) */
     /* OUT */
 };
 
@@ -223,19 +219,19 @@ struct kbase_uk_mem_query {
     union uk_header header;
     /* IN */
     u64 gpu_addr;
-#define KBASE_MEM_QUERY_COMMIT_SIZE  1
-#define KBASE_MEM_QUERY_VA_SIZE      2
-#define KBASE_MEM_QUERY_FLAGS        3
-    u64         query;
+#define KBASE_MEM_QUERY_COMMIT_SIZE 1
+#define KBASE_MEM_QUERY_VA_SIZE 2
+#define KBASE_MEM_QUERY_FLAGS 3
+    u64 query;
     /* OUT */
-    u64         value;
+    u64 value;
 };
 
 struct kbase_uk_mem_commit {
     union uk_header header;
     /* IN */
     u64 gpu_addr;
-    u64         pages;
+    u64 pages;
     /* OUT */
     u32 result_subcode;
     u32 padding;
@@ -279,10 +275,10 @@ struct kbase_uk_set_flags {
 #define TEST_ADDR_COUNT 4
 #define KBASE_TEST_BUFFER_SIZE 128
 struct kbase_exported_test_data {
-    u64 test_addr[TEST_ADDR_COUNT];        /**< memory address */
-    u32 test_addr_pages[TEST_ADDR_COUNT];        /**<  memory size in pages */
-    union kbase_pointer kctx;                /**<  base context created by process */
-    union kbase_pointer mm;                /**< pointer to process address space */
+    u64 test_addr[TEST_ADDR_COUNT];       /**< memory address */
+    u32 test_addr_pages[TEST_ADDR_COUNT]; /**<  memory size in pages */
+    union kbase_pointer kctx;             /**<  base context created by process */
+    union kbase_pointer mm;               /**< pointer to process address space */
     u8 buffer1[KBASE_TEST_BUFFER_SIZE];   /**<  unit test defined parameter */
     u8 buffer2[KBASE_TEST_BUFFER_SIZE];   /**<  unit test defined parameter */
 };
@@ -293,7 +289,7 @@ struct kbase_uk_set_test_data {
     struct kbase_exported_test_data test_data;
 };
 
-#endif                /* MALI_UNIT_TEST */
+#endif /* MALI_UNIT_TEST */
 
 #ifdef SUPPORT_MALI_ERROR_INJECT
 struct kbase_uk_error_params {
@@ -301,7 +297,7 @@ struct kbase_uk_error_params {
     /* IN */
     struct kbase_error_params params;
 };
-#endif                /* SUPPORT_MALI_ERROR_INJECT */
+#endif /* SUPPORT_MALI_ERROR_INJECT */
 
 #ifdef SUPPORT_MALI_NO_MALI
 struct kbase_uk_model_control_params {
@@ -309,13 +305,13 @@ struct kbase_uk_model_control_params {
     /* IN */
     struct kbase_model_control_params params;
 };
-#endif                /* SUPPORT_MALI_NO_MALI */
+#endif /* SUPPORT_MALI_NO_MALI */
 
 #ifdef BASE_LEGACY_UK8_SUPPORT
 struct kbase_uk_keep_gpu_powered {
     union uk_header header;
-    u32       enabled;
-    u32       padding;
+    u32 enabled;
+    u32 padding;
 };
 #endif /* BASE_LEGACY_UK8_SUPPORT */
 
@@ -351,7 +347,7 @@ struct kbase_uk_tlstream_acquire {
     /* IN */
     u32 flags;
     /* OUT */
-    s32  fd;
+    s32 fd;
 };
 
 /**
@@ -367,7 +363,7 @@ struct kbase_uk_tlstream_acquire_v10_4 {
     union uk_header header;
     /* IN */
     /* OUT */
-    s32  fd;
+    s32 fd;
 };
 
 /**
@@ -482,7 +478,7 @@ enum kbase_uk_function_id {
     KBASE_FUNC_JOB_SUBMIT_UK6 = (UK_FUNC_ID + 7),
 #endif /* BASE_LEGACY_UK6_SUPPORT */
 
-    KBASE_FUNC_SYNC  = (UK_FUNC_ID + 8),
+    KBASE_FUNC_SYNC = (UK_FUNC_ID + 8),
 
     KBASE_FUNC_POST_TERM = (UK_FUNC_ID + 9),
 
@@ -509,9 +505,9 @@ enum kbase_uk_function_id {
     KBASE_FUNC_STREAM_CREATE = (UK_FUNC_ID + 24),
     KBASE_FUNC_GET_PROFILING_CONTROLS = (UK_FUNC_ID + 25),
     KBASE_FUNC_SET_PROFILING_CONTROLS = (UK_FUNC_ID + 26),
-                        /* to be used only for testing
-                        * purposes, otherwise these controls
-                        * are set through gator API */
+    /* to be used only for testing
+     * purposes, otherwise these controls
+     * are set through gator API */
 
     KBASE_FUNC_DEBUGFS_MEM_PROFILE_ADD = (UK_FUNC_ID + 27),
     KBASE_FUNC_JOB_SUBMIT = (UK_FUNC_ID + 28),
@@ -541,5 +537,4 @@ enum kbase_uk_function_id {
     KBASE_FUNC_MAX
 };
 
-#endif                /* _KBASE_UKU_H_ */
-
+#endif /* _KBASE_UKU_H_ */

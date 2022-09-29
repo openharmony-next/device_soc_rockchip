@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /*
  * A power policy implementing fixed core availability
  */
@@ -37,4 +35,3 @@ struct kbasep_pm_ca_policy_fixed {
 extern const struct kbase_pm_ca_policy kbase_pm_ca_fixed_policy_ops;
 
 #endif /* MALI_KBASE_PM_CA_FIXED_H */
-

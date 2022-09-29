@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -12,9 +13,9 @@
 #include "mali_kernel_common.h"
 #include "mali_osk.h"
 
-#define MALI_BROADCAST_REGISTER_SIZE      0x1000
-#define MALI_BROADCAST_REG_BROADCAST_MASK    0x0
-#define MALI_BROADCAST_REG_INTERRUPT_MASK    0x4
+#define MALI_BROADCAST_REGISTER_SIZE 0x1000
+#define MALI_BROADCAST_REG_BROADCAST_MASK 0x0
+#define MALI_BROADCAST_REG_INTERRUPT_MASK 0x4
 
 struct mali_bcast_unit {
     struct mali_hw_core hw_core;
@@ -33,8 +34,7 @@ struct mali_bcast_unit *mali_bcast_unit_create(const _mali_osk_resource_t *resou
         return NULL;
     }
 
-    if (MALI_OSK_ERR_OK == mali_hw_core_create(&bcast_unit->hw_core,
-            resource, MALI_BROADCAST_REGISTER_SIZE)) {
+    if (MALI_OSK_ERR_OK == mali_hw_core_create(&bcast_unit->hw_core, resource, MALI_BROADCAST_REGISTER_SIZE)) {
         bcast_unit->current_mask = 0;
         mali_bcast_reset(bcast_unit);
 
@@ -59,8 +59,7 @@ void mali_bcast_unit_delete(struct mali_bcast_unit *bcast_unit)
  * Note: redundant calling this function with same @group
  * doesn't make any difference as calling it once
  */
-void mali_bcast_add_group(struct mali_bcast_unit *bcast_unit,
-              struct mali_group *group)
+void mali_bcast_add_group(struct mali_bcast_unit *bcast_unit, struct mali_group *group)
 {
     u32 bcast_id;
     u32 broadcast_mask;
@@ -72,7 +71,7 @@ void mali_bcast_add_group(struct mali_bcast_unit *bcast_unit,
 
     broadcast_mask = bcast_unit->current_mask;
 
-    broadcast_mask |= (bcast_id); /* add PP core to broadcast */
+    broadcast_mask |= (bcast_id);                                    /* add PP core to broadcast */
     broadcast_mask |= (bcast_id << MALI_PP_JOB_FB_LOOKUP_LIST_SIZE); /* add MMU to broadcast */
 
     /* store mask so we can restore on reset */
@@ -83,8 +82,7 @@ void mali_bcast_add_group(struct mali_bcast_unit *bcast_unit,
  * Note: redundant calling this function with same @group
  * doesn't make any difference as calling it once
  */
-void mali_bcast_remove_group(struct mali_bcast_unit *bcast_unit,
-                 struct mali_group *group)
+void mali_bcast_remove_group(struct mali_bcast_unit *bcast_unit, struct mali_group *group)
 {
     u32 bcast_id;
     u32 broadcast_mask;
@@ -106,16 +104,12 @@ void mali_bcast_reset(struct mali_bcast_unit *bcast_unit)
 {
     MALI_DEBUG_ASSERT_POINTER(bcast_unit);
 
-
     /* set broadcast mask */
-    mali_hw_core_register_write(&bcast_unit->hw_core,
-                    MALI_BROADCAST_REG_BROADCAST_MASK,
-                    bcast_unit->current_mask);
+    mali_hw_core_register_write(&bcast_unit->hw_core, MALI_BROADCAST_REG_BROADCAST_MASK, bcast_unit->current_mask);
 
     /* set IRQ override mask */
-    mali_hw_core_register_write(&bcast_unit->hw_core,
-                    MALI_BROADCAST_REG_INTERRUPT_MASK,
-                    bcast_unit->current_mask & 0xFF);
+    mali_hw_core_register_write(&bcast_unit->hw_core, MALI_BROADCAST_REG_INTERRUPT_MASK,
+                                bcast_unit->current_mask & 0xFF);
 }
 
 void mali_bcast_disable(struct mali_bcast_unit *bcast_unit)
@@ -123,12 +117,8 @@ void mali_bcast_disable(struct mali_bcast_unit *bcast_unit)
     MALI_DEBUG_ASSERT_POINTER(bcast_unit);
 
     /* set broadcast mask */
-    mali_hw_core_register_write(&bcast_unit->hw_core,
-                    MALI_BROADCAST_REG_BROADCAST_MASK,
-                    0x0);
+    mali_hw_core_register_write(&bcast_unit->hw_core, MALI_BROADCAST_REG_BROADCAST_MASK, 0x0);
 
     /* set IRQ override mask */
-    mali_hw_core_register_write(&bcast_unit->hw_core,
-                    MALI_BROADCAST_REG_INTERRUPT_MASK,
-                    0x0);
+    mali_hw_core_register_write(&bcast_unit->hw_core, MALI_BROADCAST_REG_INTERRUPT_MASK, 0x0);
 }

@@ -23,42 +23,42 @@
 #include <linux/irqreturn.h>
 #include <linux/poll.h>
 
-#define MHZ            (1000 * 1000)
+#define MHZ (1000 * 1000)
 
-#define MPP_MAX_MSG_NUM            (16)
-#define MPP_MAX_REG_TRANS_NUM        (60)
-#define MPP_MAX_TASK_CAPACITY        (16)
+#define MPP_MAX_MSG_NUM (16)
+#define MPP_MAX_REG_TRANS_NUM (60)
+#define MPP_MAX_TASK_CAPACITY (16)
 /* define flags for mpp_request */
-#define MPP_FLAGS_MULTI_MSG        (0x00000001)
-#define MPP_FLAGS_LAST_MSG        (0x00000002)
-#define MPP_FLAGS_REG_FD_NO_TRANS    (0x00000004)
-#define MPP_FLAGS_SCL_FD_NO_TRANS    (0x00000008)
-#define MPP_FLAGS_REG_NO_OFFSET        (0x00000010)
-#define MPP_FLAGS_SECURE_MODE        (0x00010000)
+#define MPP_FLAGS_MULTI_MSG (0x00000001)
+#define MPP_FLAGS_LAST_MSG (0x00000002)
+#define MPP_FLAGS_REG_FD_NO_TRANS (0x00000004)
+#define MPP_FLAGS_SCL_FD_NO_TRANS (0x00000008)
+#define MPP_FLAGS_REG_NO_OFFSET (0x00000010)
+#define MPP_FLAGS_SECURE_MODE (0x00010000)
 
 /* grf mask for get value */
-#define MPP_GRF_VAL_MASK        (0xFFFF)
+#define MPP_GRF_VAL_MASK (0xFFFF)
 
 /* max 4 cores supported */
-#define MPP_MAX_CORE_NUM        (4)
+#define MPP_MAX_CORE_NUM (4)
 
 /* define some value begin */
-#define FILE_PERMISSION_VALUE       (0644)
-#define STATE_BUS                   (2)
-#define THERMAL_DIV_VALUE           (4)
-#define DEVIATION_TWF               (12)
-#define TEMPERATURE_COEFFICIENT_TH  (1000)
-#define TEMPERATURE_COEFFICIENT_BL  (1000000)
-#define DEVIATION_TWY               (20)
-#define DEVIATION_TEN               (10)
-#define FMT_264D_CODING_PPS_COUNT   (256)
-#define FMT_264D_CODING_PPS_SIZE    (32)
-#define FMT_264D_ADDR_OFFSET        (23)
-#define FMT_265D_CODING_PPS_COUNT   (64)
-#define FMT_265D_CODING_PPS_SIZE    (80)
-#define FMT_265D_ADDR_OFFSET        (74)
-#define CLK_MODE_TW                 (200)
-#define CLK_MODE_THR                (300)
+#define FILE_PERMISSION_VALUE (0644)
+#define STATE_BUS (2)
+#define THERMAL_DIV_VALUE (4)
+#define DEVIATION_TWF (12)
+#define TEMPERATURE_COEFFICIENT_TH (1000)
+#define TEMPERATURE_COEFFICIENT_BL (1000000)
+#define DEVIATION_TWY (20)
+#define DEVIATION_TEN (10)
+#define FMT_264D_CODING_PPS_COUNT (256)
+#define FMT_264D_CODING_PPS_SIZE (32)
+#define FMT_264D_ADDR_OFFSET (23)
+#define FMT_265D_CODING_PPS_COUNT (64)
+#define FMT_265D_CODING_PPS_SIZE (80)
+#define FMT_265D_ADDR_OFFSET (74)
+#define CLK_MODE_TW (200)
+#define CLK_MODE_THR (300)
 #define MPP_USER __user
 enum TEMP_DIV {
     TEMP_ORIGIN = 0,
@@ -72,22 +72,22 @@ enum TEMP_DIV {
  * Device type: classified by hardware feature
  */
 enum MPP_DEVICE_TYPE {
-    MPP_DEVICE_VDPU1    = 0, /* 0x00000001 */
-    MPP_DEVICE_VDPU2    = 1, /* 0x00000002 */
-    MPP_DEVICE_VDPU1_PP    = 2, /* 0x00000004 */
-    MPP_DEVICE_VDPU2_PP     = 3, /* 0x00000008 */
+    MPP_DEVICE_VDPU1 = 0,    /* 0x00000001 */
+    MPP_DEVICE_VDPU2 = 1,    /* 0x00000002 */
+    MPP_DEVICE_VDPU1_PP = 2, /* 0x00000004 */
+    MPP_DEVICE_VDPU2_PP = 3, /* 0x00000008 */
 
-    MPP_DEVICE_HEVC_DEC    = 8, /* 0x00000100 */
-    MPP_DEVICE_RKVDEC    = 9, /* 0x00000200 */
-    MPP_DEVICE_AVSPLUS_DEC    = 12, /* 0x00001000 */
-    MPP_DEVICE_JPGDEC    = 13, /* 0x00002000 */
+    MPP_DEVICE_HEVC_DEC = 8,     /* 0x00000100 */
+    MPP_DEVICE_RKVDEC = 9,       /* 0x00000200 */
+    MPP_DEVICE_AVSPLUS_DEC = 12, /* 0x00001000 */
+    MPP_DEVICE_JPGDEC = 13,      /* 0x00002000 */
 
-    MPP_DEVICE_RKVENC    = 16, /* 0x00010000 */
-    MPP_DEVICE_VEPU1    = 17, /* 0x00020000 */
-    MPP_DEVICE_VEPU2    = 18, /* 0x00040000 */
-    MPP_DEVICE_VEPU22    = 24, /* 0x01000000 */
+    MPP_DEVICE_RKVENC = 16, /* 0x00010000 */
+    MPP_DEVICE_VEPU1 = 17,  /* 0x00020000 */
+    MPP_DEVICE_VEPU2 = 18,  /* 0x00040000 */
+    MPP_DEVICE_VEPU22 = 24, /* 0x01000000 */
 
-    MPP_DEVICE_IEP2        = 28, /* 0x10000000 */
+    MPP_DEVICE_IEP2 = 28, /* 0x10000000 */
     MPP_DEVICE_BUTT,
 };
 
@@ -115,42 +115,42 @@ enum MPP_DRIVER_TYPE {
  * Command type: keep the same as user space
  */
 enum MPP_DEV_COMMAND_TYPE {
-    MPP_CMD_QUERY_BASE        = 0,
-    MPP_CMD_QUERY_HW_SUPPORT    = MPP_CMD_QUERY_BASE + 0,
-    MPP_CMD_QUERY_HW_ID        = MPP_CMD_QUERY_BASE + 1,
-    MPP_CMD_QUERY_CMD_SUPPORT    = MPP_CMD_QUERY_BASE + 2,
+    MPP_CMD_QUERY_BASE = 0,
+    MPP_CMD_QUERY_HW_SUPPORT = MPP_CMD_QUERY_BASE + 0,
+    MPP_CMD_QUERY_HW_ID = MPP_CMD_QUERY_BASE + 1,
+    MPP_CMD_QUERY_CMD_SUPPORT = MPP_CMD_QUERY_BASE + 2,
     MPP_CMD_QUERY_BUTT,
 
-    MPP_CMD_INIT_BASE        = 0x100,
-    MPP_CMD_INIT_CLIENT_TYPE    = MPP_CMD_INIT_BASE + 0,
-    MPP_CMD_INIT_DRIVER_DATA    = MPP_CMD_INIT_BASE + 1,
-    MPP_CMD_INIT_TRANS_TABLE    = MPP_CMD_INIT_BASE + 2,
+    MPP_CMD_INIT_BASE = 0x100,
+    MPP_CMD_INIT_CLIENT_TYPE = MPP_CMD_INIT_BASE + 0,
+    MPP_CMD_INIT_DRIVER_DATA = MPP_CMD_INIT_BASE + 1,
+    MPP_CMD_INIT_TRANS_TABLE = MPP_CMD_INIT_BASE + 2,
     MPP_CMD_INIT_BUTT,
 
-    MPP_CMD_SEND_BASE        = 0x200,
-    MPP_CMD_SET_REG_WRITE        = MPP_CMD_SEND_BASE + 0,
-    MPP_CMD_SET_REG_READ        = MPP_CMD_SEND_BASE + 1,
-    MPP_CMD_SET_REG_ADDR_OFFSET    = MPP_CMD_SEND_BASE + 2,
-    MPP_CMD_SET_RCB_INFO        = MPP_CMD_SEND_BASE + 3,
+    MPP_CMD_SEND_BASE = 0x200,
+    MPP_CMD_SET_REG_WRITE = MPP_CMD_SEND_BASE + 0,
+    MPP_CMD_SET_REG_READ = MPP_CMD_SEND_BASE + 1,
+    MPP_CMD_SET_REG_ADDR_OFFSET = MPP_CMD_SEND_BASE + 2,
+    MPP_CMD_SET_RCB_INFO = MPP_CMD_SEND_BASE + 3,
     MPP_CMD_SEND_BUTT,
 
-    MPP_CMD_POLL_BASE        = 0x300,
-    MPP_CMD_POLL_HW_FINISH        = MPP_CMD_POLL_BASE + 0,
+    MPP_CMD_POLL_BASE = 0x300,
+    MPP_CMD_POLL_HW_FINISH = MPP_CMD_POLL_BASE + 0,
     MPP_CMD_POLL_BUTT,
 
-    MPP_CMD_CONTROL_BASE        = 0x400,
-    MPP_CMD_RESET_SESSION        = MPP_CMD_CONTROL_BASE + 0,
-    MPP_CMD_TRANS_FD_TO_IOVA    = MPP_CMD_CONTROL_BASE + 1,
-    MPP_CMD_RELEASE_FD        = MPP_CMD_CONTROL_BASE + 2,
-    MPP_CMD_SEND_CODEC_INFO        = MPP_CMD_CONTROL_BASE + 3,
+    MPP_CMD_CONTROL_BASE = 0x400,
+    MPP_CMD_RESET_SESSION = MPP_CMD_CONTROL_BASE + 0,
+    MPP_CMD_TRANS_FD_TO_IOVA = MPP_CMD_CONTROL_BASE + 1,
+    MPP_CMD_RELEASE_FD = MPP_CMD_CONTROL_BASE + 2,
+    MPP_CMD_SEND_CODEC_INFO = MPP_CMD_CONTROL_BASE + 3,
     MPP_CMD_CONTROL_BUTT,
 
     MPP_CMD_BUTT,
 };
 
 enum MPP_CLOCK_MODE {
-    CLK_MODE_BASE        = 0,
-    CLK_MODE_DEFAULT    = CLK_MODE_BASE,
+    CLK_MODE_BASE = 0,
+    CLK_MODE_DEFAULT = CLK_MODE_BASE,
     CLK_MODE_DEBUG,
     CLK_MODE_REDUCE,
     CLK_MODE_NORMAL,
@@ -159,8 +159,8 @@ enum MPP_CLOCK_MODE {
 };
 
 enum MPP_RESET_TYPE {
-    RST_TYPE_BASE        = 0,
-    RST_TYPE_A        = RST_TYPE_BASE,
+    RST_TYPE_BASE = 0,
+    RST_TYPE_A = RST_TYPE_BASE,
     RST_TYPE_H,
     RST_TYPE_NIU_A,
     RST_TYPE_NIU_H,
@@ -171,7 +171,7 @@ enum MPP_RESET_TYPE {
 };
 
 enum ENC_INFO_TYPE {
-    ENC_INFO_BASE        = 0,
+    ENC_INFO_BASE = 0,
     ENC_INFO_WIDTH,
     ENC_INFO_HEIGHT,
     ENC_INFO_FORMAT,
@@ -187,7 +187,7 @@ enum ENC_INFO_TYPE {
 };
 
 enum DEC_INFO_TYPE {
-    DEC_INFO_BASE        = 0,
+    DEC_INFO_BASE = 0,
     DEC_INFO_WIDTH,
     DEC_INFO_HEIGHT,
     DEC_INFO_FORMAT,
@@ -198,7 +198,7 @@ enum DEC_INFO_TYPE {
 };
 
 enum CODEC_INFO_FLAGS {
-    CODEC_INFO_FLAG_NULL    = 0,
+    CODEC_INFO_FLAG_NULL = 0,
     CODEC_INFO_FLAG_NUMBER,
     CODEC_INFO_FLAG_STRING,
 
@@ -248,7 +248,7 @@ struct mpp_hw_info {
 
 struct mpp_trans_info {
     const int count;
-    const u16 * const table;
+    const u16 *const table;
 };
 
 struct reg_offset_elem {
@@ -387,28 +387,26 @@ struct mpp_session {
      * wait_result  - handle messages of polling task
      * deinit    - handle session deinit
      */
-    int (*process_task)(struct mpp_session *session,
-                struct mpp_task_msgs *msgs);
-    int (*wait_result)(struct mpp_session *session,
-               struct mpp_task_msgs *msgs);
+    int (*process_task)(struct mpp_session *session, struct mpp_task_msgs *msgs);
+    int (*wait_result)(struct mpp_session *session, struct mpp_task_msgs *msgs);
     void (*deinit)(struct mpp_session *session);
 };
 
 /* task state in work thread */
 enum mpp_task_state {
-    TASK_STATE_PENDING    = 0,
-    TASK_STATE_RUNNING    = 1,
-    TASK_STATE_START    = 2,
-    TASK_STATE_HANDLE    = 3,
-    TASK_STATE_IRQ        = 4,
-    TASK_STATE_FINISH    = 5,
-    TASK_STATE_TIMEOUT    = 6,
-    TASK_STATE_DONE        = 7,
+    TASK_STATE_PENDING = 0,
+    TASK_STATE_RUNNING = 1,
+    TASK_STATE_START = 2,
+    TASK_STATE_HANDLE = 3,
+    TASK_STATE_IRQ = 4,
+    TASK_STATE_FINISH = 5,
+    TASK_STATE_TIMEOUT = 6,
+    TASK_STATE_DONE = 7,
 
-    TASK_STATE_PREPARE    = 8,
-    TASK_STATE_ABORT    = 9,
-    TASK_STATE_ABORT_READY    = 10,
-    TASK_STATE_PROC_DONE    = 11,
+    TASK_STATE_PREPARE = 8,
+    TASK_STATE_ABORT = 9,
+    TASK_STATE_ABORT_READY = 10,
+    TASK_STATE_PROC_DONE = 11,
 };
 
 /* The context for the a task */
@@ -542,10 +540,8 @@ struct mpp_hw_ops {
     int (*exit)(struct mpp_dev *mpp);
     int (*clk_on)(struct mpp_dev *mpp);
     int (*clk_off)(struct mpp_dev *mpp);
-    int (*get_freq)(struct mpp_dev *mpp,
-            struct mpp_task *mpp_task);
-    int (*set_freq)(struct mpp_dev *mpp,
-            struct mpp_task *mpp_task);
+    int (*get_freq)(struct mpp_dev *mpp, struct mpp_task *mpp_task);
+    int (*set_freq)(struct mpp_dev *mpp, struct mpp_task *mpp_task);
     int (*reduce_freq)(struct mpp_dev *mpp);
     int (*reset)(struct mpp_dev *mpp);
     int (*set_grf)(struct mpp_dev *mpp);
@@ -568,24 +564,19 @@ struct mpp_hw_ops {
  * @dump_dev    information dump for hardware device.
  */
 struct mpp_dev_ops {
-    int (*process_task)(struct mpp_session *session,
-                struct mpp_task_msgs *msgs);
-    int (*wait_result)(struct mpp_session *session,
-               struct mpp_task_msgs *msgs);
+    int (*process_task)(struct mpp_session *session, struct mpp_task_msgs *msgs);
+    int (*wait_result)(struct mpp_session *session, struct mpp_task_msgs *msgs);
     void (*deinit)(struct mpp_session *session);
     void (*task_worker)(struct kthread_work *work_s);
 
-    void *(*alloc_task)(struct mpp_session *session,
-                struct mpp_task_msgs *msgs);
+    void *(*alloc_task)(struct mpp_session *session, struct mpp_task_msgs *msgs);
     void *(*prepare)(struct mpp_dev *mpp, struct mpp_task *task);
     int (*run)(struct mpp_dev *mpp, struct mpp_task *task);
     int (*irq)(struct mpp_dev *mpp);
     int (*isr)(struct mpp_dev *mpp);
     int (*finish)(struct mpp_dev *mpp, struct mpp_task *task);
-    int (*result)(struct mpp_dev *mpp, struct mpp_task *task,
-              struct mpp_task_msgs *msgs);
-    int (*free_task)(struct mpp_session *session,
-             struct mpp_task *task);
+    int (*result)(struct mpp_dev *mpp, struct mpp_task *task, struct mpp_task_msgs *msgs);
+    int (*free_task)(struct mpp_session *session, struct mpp_task *task);
     int (*ioctl)(struct mpp_session *session, struct mpp_request *req);
     int (*init_session)(struct mpp_session *session);
     int (*free_session)(struct mpp_session *session);
@@ -595,39 +586,25 @@ struct mpp_dev_ops {
 
 struct mpp_taskqueue *mpp_taskqueue_init(struct device *dev);
 
-struct mpp_mem_region *
-mpp_task_attach_fd(struct mpp_task *task, int fd);
-int mpp_translate_reg_address(struct mpp_session *session,
-                  struct mpp_task *task, int fmt,
-                  u32 *reg, struct reg_offset_info *off_inf);
+struct mpp_mem_region *mpp_task_attach_fd(struct mpp_task *task, int fd);
+int mpp_translate_reg_address(struct mpp_session *session, struct mpp_task *task, int fmt, u32 *reg,
+                              struct reg_offset_info *off_inf);
 
-int mpp_check_req(struct mpp_request *req, int base,
-          int max_size, u32 off_s, u32 off_e);
-int mpp_extract_reg_offset_info(struct reg_offset_info *off_inf,
-                struct mpp_request *req);
-int mpp_query_reg_offset_info(struct reg_offset_info *off_inf,
-                  u32 index);
-int mpp_translate_reg_offset_info(struct mpp_task *task,
-                  struct reg_offset_info *off_inf,
-                  u32 *reg);
-int mpp_task_init(struct mpp_session *session,
-          struct mpp_task *task);
-int mpp_task_finish(struct mpp_session *session,
-            struct mpp_task *task);
-int mpp_task_finalize(struct mpp_session *session,
-              struct mpp_task *task);
-int mpp_task_dump_mem_region(struct mpp_dev *mpp,
-                 struct mpp_task *task);
-int mpp_task_dump_reg(struct mpp_dev *mpp,
-              struct mpp_task *task);
-int mpp_task_dump_hw_reg(struct mpp_dev *mpp,
-             struct mpp_task *task);
+int mpp_check_req(struct mpp_request *req, int base, int max_size, u32 off_s, u32 off_e);
+int mpp_extract_reg_offset_info(struct reg_offset_info *off_inf, struct mpp_request *req);
+int mpp_query_reg_offset_info(struct reg_offset_info *off_inf, u32 index);
+int mpp_translate_reg_offset_info(struct mpp_task *task, struct reg_offset_info *off_inf, u32 *reg);
+int mpp_task_init(struct mpp_session *session, struct mpp_task *task);
+int mpp_task_finish(struct mpp_session *session, struct mpp_task *task);
+int mpp_task_finalize(struct mpp_session *session, struct mpp_task *task);
+int mpp_task_dump_mem_region(struct mpp_dev *mpp, struct mpp_task *task);
+int mpp_task_dump_reg(struct mpp_dev *mpp, struct mpp_task *task);
+int mpp_task_dump_hw_reg(struct mpp_dev *mpp, struct mpp_task *task);
 void mpp_free_task(struct kref *ref);
 
 int mpp_session_deinit(struct mpp_session *session);
 
-int mpp_dev_probe(struct mpp_dev *mpp,
-          struct platform_device *pdev);
+int mpp_dev_probe(struct mpp_dev *mpp, struct platform_device *pdev);
 int mpp_dev_remove(struct mpp_dev *mpp);
 int mpp_dev_register_srv(struct mpp_dev *mpp, struct mpp_service *srv);
 
@@ -638,9 +615,7 @@ int mpp_dev_reset(struct mpp_dev *mpp);
 irqreturn_t mpp_dev_irq(int irq, void *param);
 irqreturn_t mpp_dev_isr_sched(int irq, void *param);
 
-struct reset_control *mpp_reset_control_get(struct mpp_dev *mpp,
-                        enum MPP_RESET_TYPE type,
-                        const char *name);
+struct reset_control *mpp_reset_control_get(struct mpp_dev *mpp, enum MPP_RESET_TYPE type, const char *name);
 
 u32 mpp_get_grf(struct mpp_grf_info *grf_info);
 bool mpp_grf_is_changed(struct mpp_grf_info *grf_info);
@@ -649,28 +624,19 @@ int mpp_set_grf(struct mpp_grf_info *grf_info);
 int mpp_time_record(struct mpp_task *task);
 int mpp_time_diff(struct mpp_task *task);
 
-int mpp_write_req(struct mpp_dev *mpp, u32 *regs,
-          u32 start_idx, u32 end_idx, u32 en_idx);
-int mpp_read_req(struct mpp_dev *mpp, u32 *regs,
-         u32 start_idx, u32 end_idx);
+int mpp_write_req(struct mpp_dev *mpp, u32 *regs, u32 start_idx, u32 end_idx, u32 en_idx);
+int mpp_read_req(struct mpp_dev *mpp, u32 *regs, u32 start_idx, u32 end_idx);
 
-int mpp_get_clk_info(struct mpp_dev *mpp,
-             struct mpp_clk_info *clk_info,
-             const char *name);
-int mpp_set_clk_info_rate_hz(struct mpp_clk_info *clk_info,
-                 enum MPP_CLOCK_MODE mode,
-                 unsigned long val);
-unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info,
-                       enum MPP_CLOCK_MODE mode);
-int mpp_clk_set_rate(struct mpp_clk_info *clk_info,
-             enum MPP_CLOCK_MODE mode);
+int mpp_get_clk_info(struct mpp_dev *mpp, struct mpp_clk_info *clk_info, const char *name);
+int mpp_set_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_CLOCK_MODE mode, unsigned long val);
+unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_CLOCK_MODE mode);
+int mpp_clk_set_rate(struct mpp_clk_info *clk_info, enum MPP_CLOCK_MODE mode);
 
 static inline int mpp_write(struct mpp_dev *mpp, u32 reg, u32 val)
 {
     int idx = reg / sizeof(u32);
 
-    mpp_debug(DEBUG_SET_REG,
-          "write reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
+    mpp_debug(DEBUG_SET_REG, "write reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
     writel(val, mpp->reg_base + reg);
 
     return 0;
@@ -680,8 +646,7 @@ static inline int mpp_write_relaxed(struct mpp_dev *mpp, u32 reg, u32 val)
 {
     int idx = reg / sizeof(u32);
 
-    mpp_debug(DEBUG_SET_REG,
-          "write reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
+    mpp_debug(DEBUG_SET_REG, "write reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
     writel_relaxed(val, mpp->reg_base + reg);
 
     return 0;
@@ -693,8 +658,7 @@ static inline u32 mpp_read(struct mpp_dev *mpp, u32 reg)
     int idx = reg / sizeof(u32);
 
     val = readl(mpp->reg_base + reg);
-    mpp_debug(DEBUG_GET_REG,
-          "read reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
+    mpp_debug(DEBUG_GET_REG, "read reg[%03d]: %04x: 0x%08x\n", idx, reg, val);
 
     return val;
 }
@@ -705,84 +669,88 @@ static inline u32 mpp_read_relaxed(struct mpp_dev *mpp, u32 reg)
     int idx = reg / sizeof(u32);
 
     val = readl_relaxed(mpp->reg_base + reg);
-    mpp_debug(DEBUG_GET_REG,
-          "read reg[%03d] %04x: 0x%08x\n", idx, reg, val);
+    mpp_debug(DEBUG_GET_REG, "read reg[%03d] %04x: 0x%08x\n", idx, reg, val);
 
     return val;
 }
 
 static inline int mpp_safe_reset(struct reset_control *rst)
 {
-    if (rst)
+    if (rst) {
         reset_control_assert(rst);
+    }
 
     return 0;
 }
 
 static inline int mpp_safe_unreset(struct reset_control *rst)
 {
-    if (rst)
+    if (rst) {
         reset_control_deassert(rst);
+    }
 
     return 0;
 }
 
 static inline int mpp_clk_safe_enable(struct clk *clk)
 {
-    if (clk)
+    if (clk) {
         clk_prepare_enable(clk);
+    }
 
     return 0;
 }
 
 static inline int mpp_clk_safe_disable(struct clk *clk)
 {
-    if (clk)
+    if (clk) {
         clk_disable_unprepare(clk);
+    }
 
     return 0;
 }
 
 static inline int mpp_reset_down_read(struct mpp_reset_group *group)
 {
-    if (group && group->rw_sem_on)
+    if (group && group->rw_sem_on) {
         down_read(&group->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_reset_up_read(struct mpp_reset_group *group)
 {
-    if (group && group->rw_sem_on)
+    if (group && group->rw_sem_on) {
         up_read(&group->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_reset_down_write(struct mpp_reset_group *group)
 {
-    if (group && group->rw_sem_on)
+    if (group && group->rw_sem_on) {
         down_write(&group->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_reset_up_write(struct mpp_reset_group *group)
 {
-    if (group && group->rw_sem_on)
+    if (group && group->rw_sem_on) {
         up_write(&group->rw_sem);
+    }
 
     return 0;
 }
 
 #ifdef CONFIG_ROCKCHIP_MPP_PROC_FS
-struct proc_dir_entry *
-mpp_procfs_create_u32(const char *name, umode_t mode,
-              struct proc_dir_entry *parent, void *data);
+struct proc_dir_entry *mpp_procfs_create_u32(const char *name, umode_t mode, struct proc_dir_entry *parent, void *data);
 #else
-static inline struct proc_dir_entry *
-mpp_procfs_create_u32(const char *name, umode_t mode,
-              struct proc_dir_entry *parent, void *data)
+static inline struct proc_dir_entry *mpp_procfs_create_u32(const char *name, umode_t mode,
+                                                           struct proc_dir_entry *parent, void *data)
 {
     return 0;
 }

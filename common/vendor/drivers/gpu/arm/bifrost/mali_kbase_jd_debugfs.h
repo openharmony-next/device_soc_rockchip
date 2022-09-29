@@ -25,8 +25,8 @@
  * Header file for job dispatcher-related entries in debugfs
  */
 
-#ifndef _KBASE_JD_DEBUGFS_H
-#define _KBASE_JD_DEBUGFS_H
+#ifndef KBASE_JD_DEBUGFS_H
+#define KBASE_JD_DEBUGFS_H
 
 #include <linux/debugfs.h>
 
@@ -42,4 +42,4 @@ struct kbase_context;
  */
 void kbasep_jd_debugfs_ctx_init(struct kbase_context *kctx);
 
-#endif  /*_KBASE_JD_DEBUGFS_H*/
+#endif /*_KBASE_JD_DEBUGFS_H*/

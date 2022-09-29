@@ -45,12 +45,14 @@ static int kbase_io_history_resize(struct kbase_io_history *h, u16 new_size)
     struct kbase_io_access *new_buf;
     unsigned long flags;
 
-    if (!new_size)
+    if (!new_size) {
         goto out_err; /* The new size must not be 0 */
+    }
 
     new_buf = vmalloc(new_size * sizeof(*h->buf));
-    if (!new_buf)
+    if (!new_buf) {
         goto out_err;
+    }
 
     spin_lock_irqsave(&h->lock, flags);
 
@@ -82,8 +84,9 @@ int kbase_io_history_init(struct kbase_io_history *h, u16 n)
     h->count = 0;
     h->size = 0;
     h->buf = NULL;
-    if (kbase_io_history_resize(h, n))
+    if (kbase_io_history_resize(h, n)) {
         return -1;
+    }
 
     return 0;
 }
@@ -94,8 +97,7 @@ void kbase_io_history_term(struct kbase_io_history *h)
     h->buf = NULL;
 }
 
-void kbase_io_history_add(struct kbase_io_history *h,
-        void __iomem const *addr, u32 value, u8 write)
+void kbase_io_history_add(struct kbase_io_history *h, void __iomem const *addr, u32 value, u8 write)
 {
     struct kbase_io_access *io;
     unsigned long flags;
@@ -109,8 +111,9 @@ void kbase_io_history_add(struct kbase_io_history *h,
     /* If count overflows, move the index by the buffer size so the entire
      * buffer will still be dumped later
      */
-    if (unlikely(!h->count))
+    if (unlikely(!h->count)) {
         h->count = h->size;
+    }
 
     spin_unlock_irqrestore(&h->lock, flags);
 }
@@ -122,22 +125,20 @@ void kbase_io_history_dump(struct kbase_device *kbdev)
     size_t iters;
     unsigned long flags;
 
-    if (!unlikely(h->enabled))
+    if (!unlikely(h->enabled)) {
         return;
+    }
 
     spin_lock_irqsave(&h->lock, flags);
 
     dev_err(kbdev->dev, "Register IO History:");
     iters = (h->size > h->count) ? h->count : h->size;
-    dev_err(kbdev->dev, "Last %zu register accesses of %zu total:\n", iters,
-            h->count);
+    dev_err(kbdev->dev, "Last %zu register accesses of %zu total:\n", iters, h->count);
     for (i = 0; i < iters; ++i) {
-        struct kbase_io_access *io =
-            &h->buf[(h->count - iters + i) % h->size];
+        struct kbase_io_access *io = &h->buf[(h->count - iters + i) % h->size];
         char const access = (io->addr & 1) ? 'w' : 'r';
 
-        dev_err(kbdev->dev, "%6i: %c: reg 0x%016lx val %08x\n", i,
-            access, (unsigned long)(io->addr & ~0x1), io->value);
+        dev_err(kbdev->dev, "%6i: %c: reg 0x%016lx val %08x\n", i, access, (unsigned long)(io->addr & ~0x1), io->value);
     }
 
     spin_unlock_irqrestore(&h->lock, flags);
@@ -159,12 +160,7 @@ static int regs_history_size_set(void *data, u64 val)
     return kbase_io_history_resize(h, (u16)val);
 }
 
-
-DEFINE_SIMPLE_ATTRIBUTE(regs_history_size_fops,
-        regs_history_size_get,
-        regs_history_size_set,
-        "%llu\n");
-
+DEFINE_SIMPLE_ATTRIBUTE(regs_history_size_fops, regs_history_size_get, regs_history_size_set, "%llu\n");
 
 /**
  * regs_history_show - show callback for the register access history file.
@@ -192,15 +188,12 @@ static int regs_history_show(struct seq_file *sfile, void *data)
     spin_lock_irqsave(&h->lock, flags);
 
     iters = (h->size > h->count) ? h->count : h->size;
-    seq_printf(sfile, "Last %zu register accesses of %zu total:\n", iters,
-            h->count);
+    seq_printf(sfile, "Last %zu register accesses of %zu total:\n", iters, h->count);
     for (i = 0; i < iters; ++i) {
-        struct kbase_io_access *io =
-            &h->buf[(h->count - iters + i) % h->size];
+        struct kbase_io_access *io = &h->buf[(h->count - iters + i) % h->size];
         char const access = (io->addr & 1) ? 'w' : 'r';
 
-        seq_printf(sfile, "%6i: %c: reg 0x%016lx val %08x\n", i, access,
-                (unsigned long)(io->addr & ~0x1), io->value);
+        seq_printf(sfile, "%6i: %c: reg 0x%016lx val %08x\n", i, access, (unsigned long)(io->addr & ~0x1), io->value);
     }
 
     spin_unlock_irqrestore(&h->lock, flags);
@@ -232,14 +225,10 @@ static const struct file_operations regs_history_fops = {
 
 void kbasep_regs_history_debugfs_init(struct kbase_device *kbdev)
 {
-    debugfs_create_bool("regs_history_enabled", S_IRUGO | S_IWUSR,
-            kbdev->mali_debugfs_directory,
-            &kbdev->io_history.enabled);
-    debugfs_create_file("regs_history_size", S_IRUGO | S_IWUSR,
-            kbdev->mali_debugfs_directory,
-            &kbdev->io_history, &regs_history_size_fops);
-    debugfs_create_file("regs_history", S_IRUGO,
-            kbdev->mali_debugfs_directory, &kbdev->io_history,
-            &regs_history_fops);
+    debugfs_create_bool("regs_history_enabled", S_IRUGO | S_IWUSR, kbdev->mali_debugfs_directory,
+                        &kbdev->io_history.enabled);
+    debugfs_create_file("regs_history_size", S_IRUGO | S_IWUSR, kbdev->mali_debugfs_directory, &kbdev->io_history,
+                        &regs_history_size_fops);
+    debugfs_create_file("regs_history", S_IRUGO, kbdev->mali_debugfs_directory, &kbdev->io_history, &regs_history_fops);
 }
 #endif /* defined(CONFIG_DEBUG_FS) && !defined(CONFIG_MALI_BIFROST_NO_MALI) */

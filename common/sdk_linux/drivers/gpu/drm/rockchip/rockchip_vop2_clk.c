@@ -9,11 +9,12 @@
 
 static int cru_debug;
 
-#define PLL_RATE_MIN    30000000
+#define PLL_RATE_MIN 30000000
 
-#define cru_dbg(format, ...) do {                \
-        if (cru_debug)                    \
-            pr_info("%s: " format, __func__, ## __VA_ARGS__); \
+#define cru_dbg(format, ...)                                                                                           \
+    do {                                                                                                               \
+        if (cru_debug)                                                                                                 \
+            pr_info("%s: " format, __func__, ##__VA_ARGS__);                                                           \
     } while (0)
 
 #define PNAME(x) static const char *const x[]
@@ -25,59 +26,47 @@ enum vop_clk_branch_type {
     branch_virtual,
 };
 
-#define VIR(cname)                        \
-    {                            \
-        .branch_type    = branch_virtual,        \
-        .name        = cname,            \
+#define VIR(cname)                                                                                                     \
+    {                                                                                                                  \
+        .branch_type = branch_virtual, .name = (cname),                                                                \
     }
 
-
-#define MUX(cname, pnames, f)            \
-    {                            \
-        .branch_type    = branch_mux,            \
-        .name        = cname,            \
-        .parent_names    = pnames,            \
-        .num_parents    = ARRAY_SIZE(pnames),        \
-        .flags        = f,                \
+#define MUX(cname, pnames, f)                                                                                          \
+    {                                                                                                                  \
+        .branch_type = branch_mux, .name = (cname), .parent_names = (pnames), .num_parents = ARRAY_SIZE(pnames),       \
+        .flags = (f),                                                                                                  \
     }
 
-#define FACTOR(cname, pname,  f)            \
-    {                            \
-        .branch_type    = branch_factor,        \
-        .name        = cname,            \
-        .parent_names    = (const char *[]){ pname },    \
-        .num_parents    = 1,                \
-        .flags        = f,                \
+#define FACTOR(cname, pname, f)                                                                                        \
+    {                                                                                                                  \
+        .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]){pname}, .num_parents = 1,      \
+        .flags = (f),                                                                                                  \
     }
 
-#define DIV(cname, pname, f, w)            \
-    {                            \
-        .branch_type    = branch_divider,        \
-        .name        = cname,            \
-        .parent_names    = (const char *[]){ pname },    \
-        .num_parents    = 1,                \
-        .flags        = f,                \
-        .div_width    = w,                \
+#define DIV(cname, pname, f, w)                                                                                        \
+    {                                                                                                                  \
+        .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]){pname}, .num_parents = 1,     \
+        .flags = (f), .div_width = (w),                                                                                \
     }
 
 struct vop2_clk_branch {
-    enum vop_clk_branch_type    branch_type;
-    const char            *name;
-    const char            *const *parent_names;
-    u8                num_parents;
-    unsigned long            flags;
-    u8                div_shift;
-    u8                div_width;
-    u8                div_flags;
+    enum vop_clk_branch_type branch_type;
+    const char *name;
+    const char *const *parent_names;
+    u8 num_parents;
+    unsigned long flags;
+    u8 div_shift;
+    u8 div_width;
+    u8 div_flags;
 };
 
-PNAME(mux_port0_dclk_src_p)        = { "dclk0", "dclk1" };
-PNAME(mux_port2_dclk_src_p)        = { "dclk2", "dclk1" };
-PNAME(mux_dp_pixclk_p)            = { "dclk_out0", "dclk_out1", "dclk_out2" };
-PNAME(mux_hdmi_edp_clk_src_p)        = { "dclk0", "dclk1", "dclk2" };
-PNAME(mux_mipi_clk_src_p)        = { "dclk_out1", "dclk_out2", "dclk_out3" };
-PNAME(mux_dsc_8k_clk_src_p)        = { "dclk0", "dclk1", "dclk2", "dclk3" };
-PNAME(mux_dsc_4k_clk_src_p)        = { "dclk0", "dclk1", "dclk2", "dclk3" };
+PNAME(mux_port0_dclk_src_p) = {"dclk0", "dclk1"};
+PNAME(mux_port2_dclk_src_p) = {"dclk2", "dclk1"};
+PNAME(mux_dp_pixclk_p) = {"dclk_out0", "dclk_out1", "dclk_out2"};
+PNAME(mux_hdmi_edp_clk_src_p) = {"dclk0", "dclk1", "dclk2"};
+PNAME(mux_mipi_clk_src_p) = {"dclk_out1", "dclk_out2", "dclk_out3"};
+PNAME(mux_dsc_8k_clk_src_p) = {"dclk0", "dclk1", "dclk2", "dclk3"};
+PNAME(mux_dsc_4k_clk_src_p) = {"dclk0", "dclk1", "dclk2", "dclk3"};
 
 /*
  * We only use this clk driver calculate the div
@@ -113,13 +102,11 @@ static struct vop2_clk_branch rk3588_vop_clk_branches[] = {
     MUX("dp0_pixclk", mux_dp_pixclk_p, CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
     MUX("dp1_pixclk", mux_dp_pixclk_p, CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
 
-    MUX("hdmi_edp0_clk_src", mux_hdmi_edp_clk_src_p,
-        CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
+    MUX("hdmi_edp0_clk_src", mux_hdmi_edp_clk_src_p, CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
     DIV("hdmi_edp0_dclk", "hdmi_edp0_clk_src", 0, 2),
     DIV("hdmi_edp0_pixclk", "hdmi_edp0_clk_src", CLK_SET_RATE_PARENT, 1),
 
-    MUX("hdmi_edp1_clk_src", mux_hdmi_edp_clk_src_p,
-        CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
+    MUX("hdmi_edp1_clk_src", mux_hdmi_edp_clk_src_p, CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT),
     DIV("hdmi_edp1_dclk", "hdmi_edp1_clk_src", 0, 2),
     DIV("hdmi_edp1_pixclk", "hdmi_edp1_clk_src", CLK_SET_RATE_PARENT, 1),
 
@@ -142,16 +129,14 @@ static struct vop2_clk_branch rk3588_vop_clk_branches[] = {
     DIV("dsc_4k_cds_clk", "dsc_4k_txp_clk_src", 0, 2),
 };
 
-static unsigned long clk_virtual_recalc_rate(struct clk_hw *hw,
-        unsigned long parent_rate)
+static unsigned long clk_virtual_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 {
     struct vop2_clk *vop2_clk = to_vop2_clk(hw);
 
     return (unsigned long)vop2_clk->rate;
 }
 
-static long clk_virtual_round_rate(struct clk_hw *hw, unsigned long rate,
-                unsigned long *prate)
+static long clk_virtual_round_rate(struct clk_hw *hw, unsigned long rate, unsigned long *prate)
 {
     struct vop2_clk *vop2_clk = to_vop2_clk(hw);
 
@@ -160,8 +145,7 @@ static long clk_virtual_round_rate(struct clk_hw *hw, unsigned long rate,
     return rate;
 }
 
-static int clk_virtual_set_rate(struct clk_hw *hw, unsigned long rate,
-                unsigned long parent_rate)
+static int clk_virtual_set_rate(struct clk_hw *hw, unsigned long rate, unsigned long parent_rate)
 {
     return 0;
 }
@@ -190,11 +174,9 @@ static int vop2_mux_set_parent(struct clk_hw *hw, u8 index)
     return 0;
 }
 
-static int vop2_clk_mux_determine_rate(struct clk_hw *hw,
-                 struct clk_rate_request *req)
+static int vop2_clk_mux_determine_rate(struct clk_hw *hw, struct clk_rate_request *req)
 {
-    cru_dbg("%s  %ld(min: %ld max: %ld)\n",
-           clk_hw_get_name(hw), req->rate, req->min_rate, req->max_rate);
+    cru_dbg("%s  %ld(min: %ld max: %ld)\n", clk_hw_get_name(hw), req->rate, req->min_rate, req->max_rate);
     return __clk_mux_determine_rate(hw, req);
 }
 
@@ -204,7 +186,7 @@ static const struct clk_ops vop2_mux_clk_ops = {
     .determine_rate = vop2_clk_mux_determine_rate,
 };
 
-#define div_mask(width)    ((1 << (width)) - 1)
+#define div_mask(width) ((1 << (width)) - 1)
 
 static int vop2_div_get_val(unsigned long rate, unsigned long parent_rate)
 {
@@ -217,14 +199,13 @@ static int vop2_div_get_val(unsigned long rate, unsigned long parent_rate)
     return value;
 }
 
-static unsigned long vop2_clk_div_recalc_rate(struct clk_hw *hw,
-                      unsigned long parent_rate)
+static unsigned long vop2_clk_div_recalc_rate(struct clk_hw *hw, unsigned long parent_rate)
 {
     struct vop2_clk *vop2_clk = to_vop2_clk(hw);
     unsigned long rate;
     unsigned int div;
 
-    div =  1 << vop2_clk->div_val;
+    div = 1 << vop2_clk->div_val;
     rate = parent_rate / div;
 
     cru_dbg("%s rate: %ld(prate: %ld)\n", clk_hw_get_name(hw), rate, parent_rate);
@@ -232,23 +213,26 @@ static unsigned long vop2_clk_div_recalc_rate(struct clk_hw *hw,
     return rate;
 }
 
-static long vop2_clk_div_round_rate(struct clk_hw *hw, unsigned long rate,
-                unsigned long *prate)
+static long vop2_clk_div_round_rate(struct clk_hw *hw, unsigned long rate, unsigned long *prate)
 {
     struct vop2_clk *vop2_clk = to_vop2_clk(hw);
 
     if (clk_hw_get_flags(hw) & CLK_SET_RATE_PARENT) {
-        if (*prate < rate)
+        if (*prate < rate) {
             *prate = rate;
-        if ((*prate >> vop2_clk->div.width) > rate)
+        }
+        if ((*prate >> vop2_clk->div.width) > rate) {
             *prate = rate;
+        }
 
-        if ((*prate % rate))
+        if ((*prate % rate)) {
             *prate = rate;
+        }
 
         /* SOC PLL can't output a too low pll freq */
-        if (*prate < PLL_RATE_MIN)
+        if (*prate < PLL_RATE_MIN) {
             *prate = rate << vop2_clk->div.width;
+        }
     }
 
     cru_dbg("%s rate: %ld(prate: %ld)\n", clk_hw_get_name(hw), rate, *prate);
@@ -264,8 +248,7 @@ static int vop2_clk_div_set_rate(struct clk_hw *hw, unsigned long rate, unsigned
     div_val = vop2_div_get_val(rate, parent_rate);
     vop2_clk->div_val = div_val;
 
-    cru_dbg("%s prate: %ld rate: %ld div_val: %d\n",
-           clk_hw_get_name(hw), parent_rate, rate, div_val);
+    cru_dbg("%s prate: %ld rate: %ld div_val: %d\n", clk_hw_get_name(hw), parent_rate, rate, div_val);
 
     return 0;
 }
@@ -283,8 +266,9 @@ static struct clk *vop2_clk_register(struct vop2 *vop2, struct vop2_clk_branch *
     struct clk *clk;
 
     vop2_clk = devm_kzalloc(vop2->dev, sizeof(*vop2_clk), GFP_KERNEL);
-    if (!vop2_clk)
+    if (!vop2_clk) {
         return ERR_PTR(-ENOMEM);
+    }
 
     vop2_clk->vop2 = vop2;
     vop2_clk->hw.init = &init;
@@ -306,10 +290,11 @@ static struct clk *vop2_clk_register(struct vop2 *vop2, struct vop2_clk_branch *
     }
 
     clk = devm_clk_register(vop2->dev, &vop2_clk->hw);
-    if (!IS_ERR(clk))
+    if (!IS_ERR(clk)) {
         list_add_tail(&vop2_clk->list, &vop2->clk_list_head);
-    else
+    } else {
         DRM_DEV_ERROR(vop2->dev, "Register %s failed\n", branch->name);
+    }
 
     return clk;
 }
@@ -323,15 +308,18 @@ static int vop2_clk_init(struct vop2 *vop2)
 
     INIT_LIST_HEAD(&vop2->clk_list_head);
 
-    if (vop2->version < VOP_VERSION_RK3588)
+    if (vop2->version < VOP_VERSION_RK3588) {
         return 0;
+    }
 
-    list_for_each_entry_safe(clk, n, &vop2->clk_list_head, list) {
+    list_for_each_entry_safe(clk, n, &vop2->clk_list_head, list)
+    {
         list_del(&clk->list);
     }
 
-    for (idx = 0; idx < nr_clk; idx++, branch++)
+    for (idx = 0; idx < nr_clk; idx++, branch++) {
         vop2_clk_register(vop2, branch);
+    }
 
     return 0;
 }

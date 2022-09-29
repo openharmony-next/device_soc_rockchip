@@ -19,6 +19,8 @@
  * SPDX-License-Identifier: GPL-2.0
  *
  */
+#ifndef BIFROST_DEVICE_MALI_KBASE_DEVICE_INTERNAL_H
+#define BIFROST_DEVICE_MALI_KBASE_DEVICE_INTERNAL_H
 
 #include <mali_kbase.h>
 
@@ -76,3 +78,4 @@ int kbase_device_early_init(struct kbase_device *kbdev);
  * @kbdev:    Device pointer
  */
 void kbase_device_early_term(struct kbase_device *kbdev);
+#endif

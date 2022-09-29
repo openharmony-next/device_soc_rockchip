@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2015, 2017-2018 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -56,14 +57,14 @@ struct mali_internal_sync_timeline_ops {
 };
 
 struct mali_internal_sync_timeline {
-    struct kref             kref_count;
-    const struct mali_internal_sync_timeline_ops  *ops;
-    char                    name[32];
-    bool                    destroyed;
-    int                     fence_context;
-    int                     value;
-    spinlock_t              sync_pt_list_lock;
-    struct list_head        sync_pt_list_head;
+    struct kref kref_count;
+    const struct mali_internal_sync_timeline_ops *ops;
+    char name[32];
+    bool destroyed;
+    int fence_context;
+    int value;
+    spinlock_t sync_pt_list_lock;
+    struct list_head sync_pt_list_head;
 };
 
 struct mali_internal_sync_point {
@@ -72,7 +73,7 @@ struct mali_internal_sync_point {
 #else
     struct fence base;
 #endif
-    struct list_head        sync_pt_list;
+    struct list_head sync_pt_list;
 };
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
@@ -84,24 +85,24 @@ struct mali_internal_sync_fence_cb {
 #endif
 
 struct mali_internal_sync_fence {
-    struct file             *file;
+    struct file *file;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 13, 0)
-    struct kref             kref;
+    struct kref kref;
 #endif
-    char            name[32];
+    char name[32];
 #ifdef CONFIG_DEBUG_FS
-    struct list_head        sync_file_list;
+    struct list_head sync_file_list;
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
     int num_fences;
 #endif
-    wait_queue_head_t       wq;
+    wait_queue_head_t wq;
 #if LINUX_VERSION_CODE > KERNEL_VERSION(4, 12, 0)
-    unsigned long        flags;
+    unsigned long flags;
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
-    atomic_t                status;
-    struct mali_internal_sync_fence_cb    cbs[];
+    atomic_t status;
+    struct mali_internal_sync_fence_cb cbs[];
 #elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
     struct fence *fence;
     struct fence_cb cb;
@@ -114,7 +115,7 @@ struct mali_internal_sync_fence {
 struct mali_internal_sync_fence_waiter;
 
 typedef void (*mali_internal_sync_callback_t)(struct mali_internal_sync_fence *sync_fence,
-        struct mali_internal_sync_fence_waiter *waiter);
+                                              struct mali_internal_sync_fence_waiter *waiter);
 
 struct mali_internal_sync_fence_waiter {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
@@ -139,8 +140,8 @@ struct mali_internal_sync_fence_waiter {
  * @param name The sync_timeline name
  * @return The new mali internal sync timeline if successful, NULL if not.
  */
-struct mali_internal_sync_timeline *mali_internal_sync_timeline_create(const struct mali_internal_sync_timeline_ops *ops,
-        int size, const char *name);
+struct mali_internal_sync_timeline *
+mali_internal_sync_timeline_create(const struct mali_internal_sync_timeline_ops *ops, int size, const char *name);
 
 /**
  * Destroy one mali internal sync timeline.
@@ -157,9 +158,10 @@ void mali_internal_sync_timeline_signal(struct mali_internal_sync_timeline *sync
 /**
  * Create one mali internal sync point.
  * @param sync_timeline The mali internal sync timeline to add this mali internal sync point.
-  * @return the new mali internal sync point if successful, NULL if not.
+ * @return the new mali internal sync point if successful, NULL if not.
  */
-struct mali_internal_sync_point *mali_internal_sync_point_create(struct mali_internal_sync_timeline *sync_timeline, int size);
+struct mali_internal_sync_point *mali_internal_sync_point_create(struct mali_internal_sync_timeline *sync_timeline,
+                                                                 int size);
 
 /**
  * Merge mali internal sync fences
@@ -168,7 +170,7 @@ struct mali_internal_sync_point *mali_internal_sync_point_create(struct mali_int
  * @return the new mali internal sync fence if successful, NULL if not.
  */
 struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
-        struct mali_internal_sync_fence *sync_fence2);
+                                                                struct mali_internal_sync_fence *sync_fence2);
 
 /**
  * Get the mali internal sync fence from sync fd
@@ -177,15 +179,14 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
  */
 struct mali_internal_sync_fence *mali_internal_sync_fence_fdget(int fd);
 
-
 void mali_internal_sync_fence_waiter_init(struct mali_internal_sync_fence_waiter *waiter,
-        mali_internal_sync_callback_t callback);
+                                          mali_internal_sync_callback_t callback);
 
 int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fence,
-                    struct mali_internal_sync_fence_waiter *waiter);
+                                        struct mali_internal_sync_fence_waiter *waiter);
 
 int mali_internal_sync_fence_cancel_async(struct mali_internal_sync_fence *sync_fence,
-        struct mali_internal_sync_fence_waiter *waiter);
+                                          struct mali_internal_sync_fence_waiter *waiter);
 
 #endif /*LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0)*/
 #endif /* _MALI_INTERNAL_SYNC_H */

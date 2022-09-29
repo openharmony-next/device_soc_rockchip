@@ -43,20 +43,20 @@ static int __init set_pelt(char *str)
     }
 
     switch (num) {
-    case PELT8_LOAD_AVG_PERIOD:
-        pelt_load_avg_period = PELT8_LOAD_AVG_PERIOD;
-        pelt_load_avg_max = PELT8_LOAD_AVG_MAX;
-        pelt_runnable_avg_yN_inv = pelt8_runnable_avg_yN_inv;
-        pr_info("PELT half life is set to %dms\n", num);
-        break;
-    case PELT32_LOAD_AVG_PERIOD:
-        pelt_load_avg_period = PELT32_LOAD_AVG_PERIOD;
-        pelt_load_avg_max = PELT32_LOAD_AVG_MAX;
-        pelt_runnable_avg_yN_inv = pelt32_runnable_avg_yN_inv;
-        pr_info("PELT half life is set to %dms\n", num);
-        break;
-    default:
-        pr_err("Default PELT half life is 32ms\n");
+        case PELT8_LOAD_AVG_PERIOD:
+            pelt_load_avg_period = PELT8_LOAD_AVG_PERIOD;
+            pelt_load_avg_max = PELT8_LOAD_AVG_MAX;
+            pelt_runnable_avg_yN_inv = pelt8_runnable_avg_yN_inv;
+            pr_info("PELT half life is set to %dms\n", num);
+            break;
+        case PELT32_LOAD_AVG_PERIOD:
+            pelt_load_avg_period = PELT32_LOAD_AVG_PERIOD;
+            pelt_load_avg_max = PELT32_LOAD_AVG_MAX;
+            pelt_runnable_avg_yN_inv = pelt32_runnable_avg_yN_inv;
+            pr_info("PELT half life is set to %dms\n", num);
+            break;
+        default:
+            pr_err("Default PELT half life is 32ms\n");
     }
 
     return 0;
@@ -72,8 +72,9 @@ static u64 decay_load(u64 val, u64 n)
 {
     unsigned int local_n;
 
-    if (unlikely(n > LOAD_AVG_PERIOD * 63))
+    if (unlikely(n > LOAD_AVG_PERIOD * 0x3f)) {
         return 0;
+    }
 
     /* after bounds checking we can collapse to 32-bit */
     local_n = n;
@@ -90,7 +91,7 @@ static u64 decay_load(u64 val, u64 n)
         local_n %= LOAD_AVG_PERIOD;
     }
 
-    val = mul_u64_u32_shr(val, pelt_runnable_avg_yN_inv[local_n], 32);
+    val = mul_u64_u32_shr(val, pelt_runnable_avg_yN_inv[local_n], 0x20);
     return val;
 }
 
@@ -112,7 +113,7 @@ static u32 __accumulate_pelt_segments(u64 periods, u32 d1, u32 d3)
      *    = 1024 ( \Sum y^n - \Sum y^n - y^0 )
      *              n=0        n=p
      */
-    c2 = LOAD_AVG_MAX - decay_load(LOAD_AVG_MAX, periods) - 1024;
+    c2 = LOAD_AVG_MAX - decay_load(LOAD_AVG_MAX, periods) - 0x400;
 
     return c1 + c2 + c3;
 }
@@ -138,29 +139,27 @@ static u32 __accumulate_pelt_segments(u64 periods, u32 d1, u32 d3)
  *      d1 y^p + 1024 \Sum y^n + d3 y^0        (Step 2)
  *                     n=1
  */
-static __always_inline u32
-accumulate_sum(u64 delta, struct sched_avg *sa,
-           unsigned long load, unsigned long runnable, int running)
+static __always_inline u32 accumulate_sum(u64 delta, struct sched_avg *sa, unsigned long load, unsigned long runnable,
+                                          int running)
 {
     u32 contrib = (u32)delta; /* p == 0 -> delta < 1024 */
     u64 periods;
 
     delta += sa->period_contrib;
-    periods = delta / 1024; /* A period is 1024us (~1ms) */
+    periods = delta / 0x400; /* A period is 1024us (~1ms) */
 
     /*
      * Step 1: decay old *_sum if we crossed period boundaries.
      */
     if (periods) {
         sa->load_sum = decay_load(sa->load_sum, periods);
-        sa->runnable_sum =
-            decay_load(sa->runnable_sum, periods);
+        sa->runnable_sum = decay_load(sa->runnable_sum, periods);
         sa->util_sum = decay_load((u64)(sa->util_sum), periods);
 
         /*
          * Step 2
          */
-        delta %= 1024;
+        delta %= 0x400;
         if (load) {
             /*
              * This relies on the:
@@ -172,18 +171,20 @@ accumulate_sum(u64 delta, struct sched_avg *sa,
              * the below usage of @contrib to dissapear entirely,
              * so no point in calculating it.
              */
-            contrib = __accumulate_pelt_segments(periods,
-                    1024 - sa->period_contrib, delta);
+            contrib = __accumulate_pelt_segments(periods, 0x400 - sa->period_contrib, delta);
         }
     }
     sa->period_contrib = delta;
 
-    if (load)
+    if (load) {
         sa->load_sum += load * contrib;
-    if (runnable)
+    }
+    if (runnable) {
         sa->runnable_sum += runnable * contrib << SCHED_CAPACITY_SHIFT;
-    if (running)
+    }
+    if (running) {
         sa->util_sum += contrib << SCHED_CAPACITY_SHIFT;
+    }
 
     return periods;
 }
@@ -216,9 +217,8 @@ accumulate_sum(u64 delta, struct sched_avg *sa,
  *   load_avg = u_0` + y*(u_0 + u_1*y + u_2*y^2 + ... )
  *            = u_0 + u_1*y + u_2*y^2 + ... [re-labeling u_i --> u_{i+1}]
  */
-static __always_inline int
-___update_load_sum(u64 now, struct sched_avg *sa,
-          unsigned long load, unsigned long runnable, int running)
+static __always_inline int ___update_load_sum(u64 now, struct sched_avg *sa, unsigned long load, unsigned long runnable,
+                                              int running)
 {
     u64 delta;
 
@@ -236,11 +236,12 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
      * Use 1024ns as the unit of measurement since it's a reasonable
      * approximation of 1us and fast to compute.
      */
-    delta >>= 10;
-    if (!delta)
+    delta >>= 0xa;
+    if (!delta) {
         return 0;
+    }
 
-    sa->last_update_time += delta << 10;
+    sa->last_update_time += delta << 0xa;
 
     /*
      * running is a subset of runnable (weight) so running can't be set if
@@ -253,8 +254,9 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
      *
      * Also see the comment in accumulate_sum().
      */
-    if (!load)
+    if (!load) {
         runnable = running = 0;
+    }
 
     /*
      * Now we know we crossed measurement unit boundaries. The *_avg
@@ -263,8 +265,9 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
      * Step 1: accumulate *_sum since last_update_time. If we haven't
      * crossed period boundaries, finish.
      */
-    if (!accumulate_sum(delta, sa, load, runnable, running))
+    if (!accumulate_sum(delta, sa, load, runnable, running)) {
         return 0;
+    }
 
     return 1;
 }
@@ -293,8 +296,7 @@ ___update_load_sum(u64 now, struct sched_avg *sa,
  * the period_contrib of cfs_rq when updating the sched_avg of a sched_entity
  * if it's more convenient.
  */
-static __always_inline void
-___update_load_avg(struct sched_avg *sa, unsigned long load)
+static __always_inline void ___update_load_avg(struct sched_avg *sa, unsigned long load)
 {
     u32 divider = get_pelt_divider(sa);
 
@@ -345,8 +347,7 @@ int __update_load_avg_blocked_se(u64 now, struct sched_entity *se)
 
 int __update_load_avg_se(u64 now, struct cfs_rq *cfs_rq, struct sched_entity *se)
 {
-    if (___update_load_sum(now, &se->avg, !!se->on_rq, se_runnable(se),
-                cfs_rq->curr == se)) {
+    if (___update_load_sum(now, &se->avg, !!se->on_rq, se_runnable(se), cfs_rq->curr == se)) {
 
         ___update_load_avg(&se->avg, se_weight(se));
         cfs_se_util_change(&se->avg);
@@ -359,10 +360,8 @@ int __update_load_avg_se(u64 now, struct cfs_rq *cfs_rq, struct sched_entity *se
 
 int __update_load_avg_cfs_rq(u64 now, struct cfs_rq *cfs_rq)
 {
-    if (___update_load_sum(now, &cfs_rq->avg,
-                scale_load_down(cfs_rq->load.weight),
-                cfs_rq->h_nr_running,
-                cfs_rq->curr != NULL)) {
+    if (___update_load_sum(now, &cfs_rq->avg, scale_load_down(cfs_rq->load.weight), cfs_rq->h_nr_running,
+                           cfs_rq->curr != NULL)) {
 
         ___update_load_avg(&cfs_rq->avg, 1);
         trace_pelt_cfs_tp(cfs_rq);
@@ -385,10 +384,7 @@ int __update_load_avg_cfs_rq(u64 now, struct cfs_rq *cfs_rq)
 
 int update_rt_rq_load_avg(u64 now, struct rq *rq, int running)
 {
-    if (___update_load_sum(now, &rq->avg_rt,
-                running,
-                running,
-                running)) {
+    if (___update_load_sum(now, &rq->avg_rt, running, running, running)) {
 
         ___update_load_avg(&rq->avg_rt, 1);
         trace_pelt_rt_tp(rq);
@@ -411,10 +407,7 @@ int update_rt_rq_load_avg(u64 now, struct rq *rq, int running)
 
 int update_dl_rq_load_avg(u64 now, struct rq *rq, int running)
 {
-    if (___update_load_sum(now, &rq->avg_dl,
-                running,
-                running,
-                running)) {
+    if (___update_load_sum(now, &rq->avg_dl, running, running, running)) {
 
         ___update_load_avg(&rq->avg_dl, 1);
         trace_pelt_dl_tp(rq);
@@ -442,10 +435,7 @@ int update_dl_rq_load_avg(u64 now, struct rq *rq, int running)
 
 int update_thermal_load_avg(u64 now, struct rq *rq, u64 capacity)
 {
-    if (___update_load_sum(now, &rq->avg_thermal,
-                   capacity,
-                   capacity,
-                   capacity)) {
+    if (___update_load_sum(now, &rq->avg_thermal, capacity, capacity, capacity)) {
         ___update_load_avg(&rq->avg_thermal, 1);
         trace_pelt_thermal_tp(rq);
         return 1;
@@ -490,14 +480,8 @@ int update_irq_load_avg(struct rq *rq, u64 running)
      * We can safely remove running from rq->clock because
      * rq->clock += delta with delta >= running
      */
-    ret = ___update_load_sum(rq->clock - running, &rq->avg_irq,
-                0,
-                0,
-                0);
-    ret += ___update_load_sum(rq->clock, &rq->avg_irq,
-                1,
-                1,
-                1);
+    ret = ___update_load_sum(rq->clock - running, &rq->avg_irq, 0, 0, 0);
+    ret += ___update_load_sum(rq->clock, &rq->avg_irq, 1, 1, 1);
 
     if (ret) {
         ___update_load_avg(&rq->avg_irq, 1);

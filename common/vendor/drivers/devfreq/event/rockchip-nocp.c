@@ -19,21 +19,21 @@
 #include <linux/of.h>
 #include <linux/platform_device.h>
 
-#define EVENT_BYTE        0x08
-#define EVENT_CHAIN        0x10
+#define EVENT_BYTE 0x08
+#define EVENT_CHAIN 0x10
 
-#define START_EN        BIT(3)
-#define GLOBAL_EN        BIT(0)
-#define START_GO        BIT(0)
+#define START_EN BIT(3)
+#define GLOBAL_EN BIT(0)
+#define START_GO BIT(0)
 
-#define PROBE_MAINCTL        0x0008
-#define PROBE_CFGCTL        0x000c
-#define PROBE_STATPERIOD    0x0024
-#define PROBE_STATGO        0x0028
-#define PROBE_COUNTERS_0_SRC    0x0138
-#define PROBE_COUNTERS_0_VAL    0x013c
-#define PROBE_COUNTERS_1_SRC    0x014c
-#define PROBE_COUNTERS_1_VAL    0x0150
+#define PROBE_MAINCTL 0x0008
+#define PROBE_CFGCTL 0x000c
+#define PROBE_STATPERIOD 0x0024
+#define PROBE_STATGO 0x0028
+#define PROBE_COUNTERS_0_SRC 0x0138
+#define PROBE_COUNTERS_0_VAL 0x013c
+#define PROBE_COUNTERS_1_SRC 0x014c
+#define PROBE_COUNTERS_1_VAL 0x0150
 
 struct rockchip_nocp {
     void __iomem *reg_base;
@@ -74,8 +74,7 @@ static int rockchip_nocp_disable(struct devfreq_event_dev *edev)
     return 0;
 }
 
-static int rockchip_nocp_get_event(struct devfreq_event_dev *edev,
-                   struct devfreq_event_data *edata)
+static int rockchip_nocp_get_event(struct devfreq_event_dev *edev, struct devfreq_event_data *edata)
 {
     struct rockchip_nocp *nocp = devfreq_event_get_drvdata(edev);
     void __iomem *reg_base = nocp->reg_base;
@@ -86,10 +85,11 @@ static int rockchip_nocp_get_event(struct devfreq_event_dev *edev,
 
     counter0 = readl_relaxed(reg_base + PROBE_COUNTERS_0_VAL);
     counter1 = readl_relaxed(reg_base + PROBE_COUNTERS_1_VAL);
-    counter = (counter0 & 0xffff) | ((counter1 & 0xffff) << 16);
-    counter = counter / 1000000;
-    if (time_ms > 0)
-        edata->load_count = (counter * 1000) / time_ms;
+    counter = (counter0 & 0xffff) | ((counter1 & 0xffff) << 0x10);
+    counter = counter / 0xf4240;
+    if (time_ms > 0) {
+        edata->load_count = (counter * 0x3e8) / time_ms;
+    }
 
     writel_relaxed(START_GO, reg_base + PROBE_STATGO);
     nocp->time = ktime_get();
@@ -110,10 +110,10 @@ static const struct devfreq_event_ops rockchip_nocp_ops = {
 };
 
 static const struct of_device_id rockchip_nocp_id_match[] = {
-    { .compatible = "rockchip,rk3288-nocp" },
-    { .compatible = "rockchip,rk3368-nocp" },
-    { .compatible = "rockchip,rk3399-nocp" },
-    { },
+    {.compatible = "rockchip,rk3288-nocp"},
+    {.compatible = "rockchip,rk3368-nocp"},
+    {.compatible = "rockchip,rk3399-nocp"},
+    {},
 };
 
 static int rockchip_nocp_probe(struct platform_device *pdev)
@@ -124,17 +124,20 @@ static int rockchip_nocp_probe(struct platform_device *pdev)
     struct device_node *np = pdev->dev.of_node;
 
     nocp = devm_kzalloc(&pdev->dev, sizeof(*nocp), GFP_KERNEL);
-    if (!nocp)
+    if (!nocp) {
         return -ENOMEM;
+    }
 
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
     nocp->reg_base = devm_ioremap_resource(&pdev->dev, res);
-    if (IS_ERR(nocp->reg_base))
+    if (IS_ERR(nocp->reg_base)) {
         return PTR_ERR(nocp->reg_base);
+    }
 
     desc = devm_kzalloc(&pdev->dev, sizeof(*desc), GFP_KERNEL);
-    if (!desc)
+    if (!desc) {
         return -ENOMEM;
+    }
 
     desc->ops = &rockchip_nocp_ops;
     desc->driver_data = nocp;
@@ -154,10 +157,11 @@ static int rockchip_nocp_probe(struct platform_device *pdev)
 
 static struct platform_driver rockchip_nocp_driver = {
     .probe = rockchip_nocp_probe,
-    .driver = {
-        .name = "rockchip-nocp",
-        .of_match_table = rockchip_nocp_id_match,
-    },
+    .driver =
+        {
+            .name = "rockchip-nocp",
+            .of_match_table = rockchip_nocp_id_match,
+        },
 };
 module_platform_driver(rockchip_nocp_driver);
 

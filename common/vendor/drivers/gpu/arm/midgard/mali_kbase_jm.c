@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /*
  * HW access job manager common APIs
  */
@@ -33,22 +30,23 @@
  *
  * Return: true if slot can still be submitted on, false if slot is now full.
  */
-static bool kbase_jm_next_job(struct kbase_device *kbdev, int js,
-                int nr_jobs_to_submit)
+static bool kbase_jm_next_job(struct kbase_device *kbdev, int js, int nr_jobs_to_submit)
 {
     struct kbase_context *kctx;
     int i;
 
     kctx = kbdev->hwaccess.active_kctx;
 
-    if (!kctx)
+    if (!kctx) {
         return true;
+    }
 
     for (i = 0; i < nr_jobs_to_submit; i++) {
         struct kbase_jd_atom *katom = kbase_js_pull(kctx, js);
 
-        if (!katom)
+        if (!katom) {
             return true; /* Context has no jobs on this slot */
+        }
 
         kbase_backend_run_atom(kbdev, katom);
     }
@@ -66,8 +64,9 @@ u32 kbase_jm_kick(struct kbase_device *kbdev, u32 js_mask)
         int js = ffs(js_mask) - 1;
         int nr_jobs_to_submit = kbase_backend_slot_free(kbdev, js);
 
-        if (kbase_jm_next_job(kbdev, js, nr_jobs_to_submit))
+        if (kbase_jm_next_job(kbdev, js, nr_jobs_to_submit)) {
             ret_mask |= (1 << js);
+        }
 
         js_mask &= ~(1 << js);
     }
@@ -103,17 +102,16 @@ void kbase_jm_idle_ctx(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
-    if (kbdev->hwaccess.active_kctx == kctx)
+    if (kbdev->hwaccess.active_kctx == kctx) {
         kbdev->hwaccess.active_kctx = NULL;
+    }
 }
 
-struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev,
-                struct kbase_jd_atom *katom)
+struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev, struct kbase_jd_atom *katom)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
-    if (katom->event_code != BASE_JD_EVENT_STOPPED &&
-            katom->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT) {
+    if (katom->event_code != BASE_JD_EVENT_STOPPED && katom->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT) {
         return kbase_js_complete_atom(katom, NULL);
     } else {
         kbase_js_unpull(katom->kctx, katom);
@@ -121,11 +119,9 @@ struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev,
     }
 }
 
-struct kbase_jd_atom *kbase_jm_complete(struct kbase_device *kbdev,
-        struct kbase_jd_atom *katom, ktime_t *end_timestamp)
+struct kbase_jd_atom *kbase_jm_complete(struct kbase_device *kbdev, struct kbase_jd_atom *katom, ktime_t *end_timestamp)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     return kbase_js_complete_atom(katom, end_timestamp);
 }
-

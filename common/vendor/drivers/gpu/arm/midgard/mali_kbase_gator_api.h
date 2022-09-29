@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_GATOR_API_H_
-#define _KBASE_GATOR_API_H_
+#ifndef KBASE_GATOR_API_H_
+#define KBASE_GATOR_API_H_
 
 #include "mali_kbase_gator_hwcnt_names_tmix.h"
 #include "mali_kbase_gator_hwcnt_names_thex.h"
@@ -116,13 +114,7 @@
 
 #define MALI_DDK_GATOR_API_VERSION 3
 
-enum hwc_type {
-    JM_BLOCK = 0,
-    TILER_BLOCK,
-    SHADER_BLOCK,
-    MMU_L2_BLOCK,
-    RESERVED_BLOCK
-};
+enum hwc_type { JM_BLOCK = 0, TILER_BLOCK, SHADER_BLOCK, MMU_L2_BLOCK, RESERVED_BLOCK };
 
 struct kbase_gator_hwcnt_info {
     /* Passed from Gator to kbase */
@@ -181,7 +173,8 @@ extern struct kbase_gator_hwcnt_handles *kbase_gator_hwcnt_init(struct kbase_gat
  *                          Mali specific information that will be returned to Gator.
  * @param opaque_handles    A wrapper structure for kbase structures.
  */
-extern void kbase_gator_hwcnt_term(struct kbase_gator_hwcnt_info *in_out_info, struct kbase_gator_hwcnt_handles *opaque_handles);
+extern void kbase_gator_hwcnt_term(struct kbase_gator_hwcnt_info *in_out_info,
+                                   struct kbase_gator_hwcnt_handles *opaque_handles);
 
 /**
  * @brief Poll whether a counter dump is successful.
@@ -193,7 +186,8 @@ extern void kbase_gator_hwcnt_term(struct kbase_gator_hwcnt_info *in_out_info, s
  *                          completed dump may not have dumped succesfully, so the caller must test for both
  *                          a completed and successful dump before processing counters.
  */
-extern uint32_t kbase_gator_instr_hwcnt_dump_complete(struct kbase_gator_hwcnt_handles *opaque_handles, uint32_t * const success);
+extern uint32_t kbase_gator_instr_hwcnt_dump_complete(struct kbase_gator_hwcnt_handles *opaque_handles,
+                                                      uint32_t *const success);
 
 /**
  * @brief Request the generation of a new counter dump.
@@ -211,7 +205,7 @@ extern uint32_t kbase_gator_instr_hwcnt_dump_irq(struct kbase_gator_hwcnt_handle
  *
  * @return                    Pointer to an array of strings of length *total_counters.
  */
-extern const char * const *kbase_gator_hwcnt_init_names(uint32_t *total_counters);
+extern const char *const *kbase_gator_hwcnt_init_names(uint32_t *total_counters);
 
 /**
  * @brief This function is used to terminate the use of the names table.

@@ -19,8 +19,6 @@
 #include <linux/rockchip/rockchip_sip.h>
 #include "rockchip_pwm_remotectl.h"
 
-
-
 /*
  * sys/module/rk_pwm_remotectl/parameters,
  * modify code_print to change the value
@@ -28,22 +26,21 @@
 
 static int rk_remote_print_code;
 module_param_named(code_print, rk_remote_print_code, int, 0644);
-#define DBG_CODE(args...) \
-    do { \
-        if (rk_remote_print_code) { \
-            pr_info(args); \
-        } \
+#define DBG_CODE(args...)                                                                                              \
+    do {                                                                                                               \
+        if (rk_remote_print_code) {                                                                                    \
+            pr_info(args);                                                                                             \
+        }                                                                                                              \
     } while (0)
 
 static int rk_remote_pwm_dbg_level;
 module_param_named(dbg_level, rk_remote_pwm_dbg_level, int, 0644);
-#define DBG(args...) \
-    do { \
-        if (rk_remote_pwm_dbg_level) { \
-            pr_info(args); \
-        } \
+#define DBG(args...)                                                                                                   \
+    do {                                                                                                               \
+        if (rk_remote_pwm_dbg_level) {                                                                                 \
+            pr_info(args);                                                                                             \
+        }                                                                                                              \
     } while (0)
-
 
 struct rkxx_remote_key_table {
     int scancode;
@@ -92,7 +89,7 @@ static int remotectl_keybd_num_lookup(struct rkxx_remotectl_drvdata *ddata)
 
     num = ddata->maxkeybdnum;
     for (i = 0; i < num; i++) {
-        if (remotectl_button[i].usercode == (ddata->scandata&0xFFFF)) {
+        if (remotectl_button[i].usercode == (ddata->scandata & 0xFFFF)) {
             ddata->keynum = i;
             return 1;
         }
@@ -100,17 +97,14 @@ static int remotectl_keybd_num_lookup(struct rkxx_remotectl_drvdata *ddata)
     return 0;
 }
 
-
 static int remotectl_keycode_lookup(struct rkxx_remotectl_drvdata *ddata)
 {
     int i;
     unsigned char keydata = (unsigned char)((ddata->scandata >> 8) & 0xff);
 
     for (i = 0; i < remotectl_button[ddata->keynum].nbuttons; i++) {
-        if (remotectl_button[ddata->keynum].key_table[i].scancode ==
-            keydata) {
-            ddata->keycode =
-            remotectl_button[ddata->keynum].key_table[i].keycode;
+        if (remotectl_button[ddata->keynum].key_table[i].scancode == keydata) {
+            ddata->keycode = remotectl_button[ddata->keynum].key_table[i].keycode;
             return 1;
         }
     }
@@ -125,9 +119,9 @@ static int rk_remotectl_get_irkeybd_count(struct platform_device *pdev)
     int temp_usercode;
 
     boardnum = 0;
-    for_each_child_of_node(node, child_node) {
-        if (of_property_read_u32(child_node, "rockchip,usercode",
-            &temp_usercode)) {
+    for_each_child_of_node(node, child_node)
+    {
+        if (of_property_read_u32(child_node, "rockchip,usercode", &temp_usercode)) {
             DBG("get keybd num error.\n");
         } else {
             boardnum++;
@@ -136,7 +130,6 @@ static int rk_remotectl_get_irkeybd_count(struct platform_device *pdev)
     DBG("get keybd num = 0x%x.\n", boardnum);
     return boardnum;
 }
-
 
 static int rk_remotectl_parse_ir_keys(struct platform_device *pdev)
 {
@@ -149,138 +142,123 @@ static int rk_remotectl_parse_ir_keys(struct platform_device *pdev)
     int boardnum;
 
     boardnum = 0;
-    for_each_child_of_node(node, child_node) {
-        if (of_property_read_u32(child_node, "rockchip,usercode",
-             &remotectl_button[boardnum].usercode)) {
+    for_each_child_of_node(node, child_node)
+    {
+        if (of_property_read_u32(child_node, "rockchip,usercode", &remotectl_button[boardnum].usercode)) {
             dev_err(&pdev->dev, "Missing usercode in the DTS.\n");
             ret = -1;
             return ret;
         }
-        DBG("remotectl_button[0].usercode=0x%x\n",
-                remotectl_button[boardnum].usercode);
+        DBG("remotectl_button[0].usercode=0x%x\n", remotectl_button[boardnum].usercode);
         of_get_property(child_node, "rockchip,key_table", &len);
         len /= sizeof(u32);
         DBG("len=0x%x\n", len);
-        remotectl_button[boardnum].nbuttons = len/2;
-        if (of_property_read_u32_array(child_node, "rockchip,key_table",
-             (u32 *)remotectl_button[boardnum].key_table, len)) {
+        remotectl_button[boardnum].nbuttons = len / 2;
+        if (of_property_read_u32_array(child_node, "rockchip,key_table", (u32 *)remotectl_button[boardnum].key_table,
+                                       len)) {
             dev_err(&pdev->dev, "Missing key_table in the DTS.\n");
             ret = -1;
             return ret;
         }
-        for (loop = 0; loop < (len/2); loop++) {
-            DBG("board[%d].scanCode[%d]=0x%x\n", boardnum, loop,
-                 remotectl_button[boardnum].key_table[loop].scancode);
-            DBG("board[%d].keyCode[%d]=%d\n", boardnum, loop,
-                 remotectl_button[boardnum].key_table[loop].keycode);
+        for (loop = 0; loop < (len / 2); loop++) {
+            DBG("board[%d].scanCode[%d]=0x%x\n", boardnum, loop, remotectl_button[boardnum].key_table[loop].scancode);
+            DBG("board[%d].keyCode[%d]=%d\n", boardnum, loop, remotectl_button[boardnum].key_table[loop].keycode);
         }
         boardnum++;
-        if (boardnum > ddata->maxkeybdnum)
+        if (boardnum > ddata->maxkeybdnum) {
             break;
+        }
     }
     DBG("keybdNum=0x%x\n", boardnum);
     return 0;
 }
 
-
-
-static void rk_pwm_remotectl_do_something(unsigned long  data)
+static void rk_pwm_remotectl_do_something(unsigned long data)
 {
     struct rkxx_remotectl_drvdata *ddata;
 
     ddata = (struct rkxx_remotectl_drvdata *)data;
     switch (ddata->state) {
-    case RMC_IDLE: {
-        ;
-        break;
-    }
-    case RMC_PRELOAD: {
-        mod_timer(&ddata->timer, jiffies + msecs_to_jiffies(140));
-        if ((ddata->period > RK_PWM_TIME_PRE_MIN) &&
-            (ddata->period < RK_PWM_TIME_PRE_MAX)) {
-            ddata->scandata = 0;
-            ddata->count = 0;
-            ddata->state = RMC_USERCODE;
-        } else {
-            ddata->state = RMC_PRELOAD;
+        case RMC_IDLE: {
+            ;
+            break;
         }
-        break;
-    }
-    case RMC_USERCODE: {
-        if ((ddata->period > RK_PWM_TIME_BIT1_MIN) &&
-            (ddata->period < RK_PWM_TIME_BIT1_MAX))
-            ddata->scandata |= (0x01 << ddata->count);
-        ddata->count++;
-        if (ddata->count == 0x10) {
-            DBG_CODE("USERCODE=0x%x\n", ddata->scandata);
-            if (remotectl_keybd_num_lookup(ddata)) {
-                ddata->state = RMC_GETDATA;
+        case RMC_PRELOAD: {
+            mod_timer(&ddata->timer, jiffies + msecs_to_jiffies(140));
+            if ((ddata->period > RK_PWM_TIME_PRE_MIN) && (ddata->period < RK_PWM_TIME_PRE_MAX)) {
                 ddata->scandata = 0;
                 ddata->count = 0;
-            } else {
-                if (rk_remote_print_code) {
-                    ddata->state = RMC_GETDATA;
-                    ddata->scandata = 0;
-                    ddata->count = 0;
-                } else
-                    ddata->state = RMC_PRELOAD;
-            }
-        }
-    }
-    break;
-    case RMC_GETDATA: {
-        if ((ddata->period > RK_PWM_TIME_BIT1_MIN) &&
-            (ddata->period < RK_PWM_TIME_BIT1_MAX))
-            ddata->scandata |= (0x01<<ddata->count);
-        ddata->count++;
-        if (ddata->count < 0x10)
-            return;
-        DBG_CODE("RMC_GETDATA=%x\n", (ddata->scandata>>8));
-        if ((ddata->scandata&0x0ff) ==
-            ((~ddata->scandata >> 8) & 0x0ff)) {
-            if (remotectl_keycode_lookup(ddata)) {
-                ddata->press = 1;
-                input_event(ddata->input, EV_KEY,
-                        ddata->keycode, 1);
-                input_sync(ddata->input);
-                ddata->state = RMC_SEQUENCE;
+                ddata->state = RMC_USERCODE;
             } else {
                 ddata->state = RMC_PRELOAD;
             }
-        } else {
-            ddata->state = RMC_PRELOAD;
+            break;
         }
-    }
-    break;
-    case RMC_SEQUENCE:{
-        DBG("S=%ld\n", ddata->period);
-        if ((ddata->period > RK_PWM_TIME_RPT_MIN) &&
-            (ddata->period < RK_PWM_TIME_RPT_MAX)) {
-            DBG("S1\n");
-            mod_timer(&ddata->timer, jiffies
-                  + msecs_to_jiffies(130));
-        } else if ((ddata->period > RK_PWM_TIME_SEQ1_MIN) &&
-               (ddata->period < RK_PWM_TIME_SEQ1_MAX)) {
-            DBG("S2\n");
-            mod_timer(&ddata->timer, jiffies
-                  + msecs_to_jiffies(130));
-        } else if ((ddata->period > RK_PWM_TIME_SEQ2_MIN) &&
-               (ddata->period < RK_PWM_TIME_SEQ2_MAX)) {
-            DBG("S3\n");
-            mod_timer(&ddata->timer, jiffies
-                  + msecs_to_jiffies(130));
-        } else {
-            DBG("S4\n");
-            input_event(ddata->input, EV_KEY,
-                    ddata->keycode, 0);
-            input_sync(ddata->input);
-            ddata->state = RMC_PRELOAD;
-            ddata->press = 0;
-        }
-    }
-    break;
-    default:
-    break;
+        case RMC_USERCODE: {
+            if ((ddata->period > RK_PWM_TIME_BIT1_MIN) && (ddata->period < RK_PWM_TIME_BIT1_MAX)) {
+                ddata->scandata |= (0x01 << ddata->count);
+            }
+            ddata->count++;
+            if (ddata->count == 0x10) {
+                DBG_CODE("USERCODE=0x%x\n", ddata->scandata);
+                if (remotectl_keybd_num_lookup(ddata)) {
+                    ddata->state = RMC_GETDATA;
+                    ddata->scandata = 0;
+                    ddata->count = 0;
+                } else {
+                    if (rk_remote_print_code) {
+                        ddata->state = RMC_GETDATA;
+                        ddata->scandata = 0;
+                        ddata->count = 0;
+                    } else {
+                        ddata->state = RMC_PRELOAD;
+                    }
+                }
+            }
+        } break;
+        case RMC_GETDATA: {
+            if ((ddata->period > RK_PWM_TIME_BIT1_MIN) && (ddata->period < RK_PWM_TIME_BIT1_MAX)) {
+                ddata->scandata |= (0x01 << ddata->count);
+            }
+            ddata->count++;
+            if (ddata->count < 0x10) {
+                return;
+            }
+            DBG_CODE("RMC_GETDATA=%x\n", (ddata->scandata >> 8));
+            if ((ddata->scandata & 0x0ff) == ((~ddata->scandata >> 8) & 0x0ff)) {
+                if (remotectl_keycode_lookup(ddata)) {
+                    ddata->press = 1;
+                    input_event(ddata->input, EV_KEY, ddata->keycode, 1);
+                    input_sync(ddata->input);
+                    ddata->state = RMC_SEQUENCE;
+                } else {
+                    ddata->state = RMC_PRELOAD;
+                }
+            } else {
+                ddata->state = RMC_PRELOAD;
+            }
+        } break;
+        case RMC_SEQUENCE: {
+            DBG("S=%ld\n", ddata->period);
+            if ((ddata->period > RK_PWM_TIME_RPT_MIN) && (ddata->period < RK_PWM_TIME_RPT_MAX)) {
+                DBG("S1\n");
+                mod_timer(&ddata->timer, jiffies + msecs_to_jiffies(130));
+            } else if ((ddata->period > RK_PWM_TIME_SEQ1_MIN) && (ddata->period < RK_PWM_TIME_SEQ1_MAX)) {
+                DBG("S2\n");
+                mod_timer(&ddata->timer, jiffies + msecs_to_jiffies(130));
+            } else if ((ddata->period > RK_PWM_TIME_SEQ2_MIN) && (ddata->period < RK_PWM_TIME_SEQ2_MAX)) {
+                DBG("S3\n");
+                mod_timer(&ddata->timer, jiffies + msecs_to_jiffies(130));
+            } else {
+                DBG("S4\n");
+                input_event(ddata->input, EV_KEY, ddata->keycode, 0);
+                input_sync(ddata->input);
+                ddata->state = RMC_PRELOAD;
+                ddata->press = 0;
+            }
+        } break;
+        default:
+            break;
     }
 }
 
@@ -303,8 +281,9 @@ static irqreturn_t rockchip_pwm_pwrirq(int irq, void *dev_id)
     int val;
     unsigned int id = ddata->remote_pwm_id;
 
-    if (id > 3)
+    if (id > 3) {
         return IRQ_NONE;
+    }
 
     val = readl_relaxed(ddata->base + PWM_REG_INTSTS(id));
 
@@ -327,12 +306,14 @@ static irqreturn_t rockchip_pwm_irq(int irq, void *dev_id)
     int temp_period;
     unsigned int id = ddata->remote_pwm_id;
 
-    if (id > 3)
+    if (id > 3) {
         return IRQ_NONE;
+    }
     val = readl_relaxed(ddata->base + PWM_REG_INTSTS(id));
 
-    if ((val & PWM_CH_INT(id)) == 0)
+    if ((val & PWM_CH_INT(id)) == 0) {
         return IRQ_NONE;
+    }
     if ((val & PWM_CH_POL(id)) == 0) {
         temp_hpr = readl_relaxed(ddata->base + PWM_REG_HPR);
         DBG("hpr=%d\n", temp_hpr);
@@ -340,19 +321,18 @@ static irqreturn_t rockchip_pwm_irq(int irq, void *dev_id)
         DBG("lpr=%d\n", temp_lpr);
         temp_period = ddata->pwm_freq_nstime * temp_lpr / 1000;
         if (temp_period > RK_PWM_TIME_BIT0_MIN) {
-            ddata->period = ddata->temp_period
-                + ddata->pwm_freq_nstime * temp_hpr / 1000;
+            ddata->period = ddata->temp_period + ddata->pwm_freq_nstime * temp_hpr / 1000;
             tasklet_hi_schedule(&ddata->remote_tasklet);
             ddata->temp_period = 0;
             DBG("period+ =%ld\n", ddata->period);
         } else {
-            ddata->temp_period += ddata->pwm_freq_nstime
-                * (temp_hpr + temp_lpr) / 1000;
+            ddata->temp_period += ddata->pwm_freq_nstime * (temp_hpr + temp_lpr) / 1000;
         }
     }
     writel_relaxed(PWM_CH_INT(id), ddata->base + PWM_REG_INTSTS(id));
-    if (ddata->state == RMC_PRELOAD)
+    if (ddata->state == RMC_PRELOAD) {
         wake_lock_timeout(&ddata->remotectl_wake_lock, HZ);
+    }
     return IRQ_HANDLED;
 }
 
@@ -379,8 +359,7 @@ static int rk_pwm_pwrkey_wakeup_init(struct platform_device *pdev)
         dev_err(&pdev->dev, "cannot find PWR IRQ\n");
         goto end;
     }
-    ret = devm_request_irq(&pdev->dev, pwr_irq, rockchip_pwm_pwrirq,
-                   IRQF_NO_SUSPEND, "rk_pwm_pwr_irq", ddata);
+    ret = devm_request_irq(&pdev->dev, pwr_irq, rockchip_pwm_pwrirq, IRQF_NO_SUSPEND, "rk_pwm_pwr_irq", ddata);
     if (ret) {
         dev_err(&pdev->dev, "cannot claim PWR_IRQ!!!\n");
         goto end;
@@ -389,31 +368,31 @@ static int rk_pwm_pwrkey_wakeup_init(struct platform_device *pdev)
     val = (val & 0xFFFFFFFE) | PWM_DISABLE;
     writel_relaxed(val, ddata->base + PWM_REG_CTRL);
 
-    //preloader low min:8000us, max:10000us
+    // preloader low min:8000us, max:10000us
     min_temp = RK_PWM_TIME_PRE_MIN_LOW * 1000 / ddata->pwm_freq_nstime;
     max_temp = RK_PWM_TIME_PRE_MAX_LOW * 1000 / ddata->pwm_freq_nstime;
     val = (max_temp & 0xffff) << 16 | (min_temp & 0xffff);
     writel_relaxed(val, ddata->base + PWM_REG_PWRMATCH_LPRE(pwm_id));
 
-    //preloader higt min:4000us, max:5000us
+    // preloader higt min:4000us, max:5000us
     min_temp = RK_PWM_TIME_PRE_MIN * 1000 / ddata->pwm_freq_nstime;
     max_temp = RK_PWM_TIME_PRE_MAX * 1000 / ddata->pwm_freq_nstime;
     val = (max_temp & 0xffff) << 16 | (min_temp & 0xffff);
     writel_relaxed(val, ddata->base + PWM_REG_PWRMATCH_HPRE(pwm_id));
 
-    //logic 0/1 low min:480us, max 700us
+    // logic 0/1 low min:480us, max 700us
     min_temp = RK_PWM_TIME_BIT_MIN_LOW * 1000 / ddata->pwm_freq_nstime;
     max_temp = RK_PWM_TIME_BIT_MAX_LOW * 1000 / ddata->pwm_freq_nstime;
     val = (max_temp & 0xffff) << 16 | (min_temp & 0xffff);
     writel_relaxed(val, ddata->base + PWM_REG_PWRMATCH_LD(pwm_id));
 
-    //logic 0 higt min:480us, max 700us
+    // logic 0 higt min:480us, max 700us
     min_temp = RK_PWM_TIME_BIT0_MIN * 1000 / ddata->pwm_freq_nstime;
     max_temp = RK_PWM_TIME_BIT0_MAX * 1000 / ddata->pwm_freq_nstime;
     val = (max_temp & 0xffff) << 16 | (min_temp & 0xffff);
     writel_relaxed(val, ddata->base + PWM_REG_PWRMATCH_HD_ZERO(pwm_id));
 
-    //logic 1 higt min:1300us, max 2000us
+    // logic 1 higt min:1300us, max 2000us
     min_temp = RK_PWM_TIME_BIT1_MIN * 1000 / ddata->pwm_freq_nstime;
     max_temp = RK_PWM_TIME_BIT1_MAX * 1000 / ddata->pwm_freq_nstime;
     val = (max_temp & 0xffff) << 16 | (min_temp & 0xffff);
@@ -423,19 +402,20 @@ static int rk_pwm_pwrkey_wakeup_init(struct platform_device *pdev)
         for (i = 0; i < remotectl_button[j].nbuttons; i++) {
             int scancode, usercode, pwrkey;
 
-            if (remotectl_button[j].key_table[i].keycode != KEY_POWER)
+            if (remotectl_button[j].key_table[i].keycode != KEY_POWER) {
                 continue;
+            }
             usercode = remotectl_button[j].usercode & 0xffff;
             scancode = remotectl_button[j].key_table[i].scancode & 0xff;
             DBG("usercode=%x, key=%x\n", usercode, scancode);
-            pwrkey  = usercode;
+            pwrkey = usercode;
             pwrkey |= (scancode << 24) | ((~scancode & 0xff) << 16);
             DBG("pwrkey = %x\n", pwrkey);
-            writel_relaxed(pwrkey, ddata->base
-                    + PWM_PWRMATCH_VALUE(pwm_id) + num * 4);
+            writel_relaxed(pwrkey, ddata->base + PWM_PWRMATCH_VALUE(pwm_id) + num * 4);
             num++;
-            if (num >= PWM_PWR_KEY_CAPURURE_MAX)
+            if (num >= PWM_PWR_KEY_CAPURURE_MAX) {
                 break;
+            }
         }
     }
 
@@ -458,8 +438,9 @@ static void rk_pwm_int_ctrl(void __iomem *pwm_base, uint pwm_id, int ctrl)
 {
     int val;
 
-    if (pwm_id > 3)
+    if (pwm_id > 3) {
         return;
+    }
     val = readl_relaxed(pwm_base + PWM_REG_INT_EN(pwm_id));
     if (ctrl) {
         val |= PWM_CH_INT_ENABLE(pwm_id);
@@ -476,23 +457,24 @@ static int rk_pwm_remotectl_hw_init(void __iomem *pwm_base, uint pwm_id)
 {
     int val;
 
-    if (pwm_id > 3)
+    if (pwm_id > 3) {
         return -1;
-    //1. disabled pwm
+    }
+    // 1. disabled pwm
     val = readl_relaxed(pwm_base + PWM_REG_CTRL);
     val = (val & 0xFFFFFFFE) | PWM_DISABLE;
     writel_relaxed(val, pwm_base + PWM_REG_CTRL);
-    //2. capture mode
+    // 2. capture mode
     val = readl_relaxed(pwm_base + PWM_REG_CTRL);
     val = (val & 0xFFFFFFF9) | PWM_MODE_CAPTURE;
     writel_relaxed(val, pwm_base + PWM_REG_CTRL);
-    //set clk div, clk div to 64
+    // set clk div, clk div to 64
     val = readl_relaxed(pwm_base + PWM_REG_CTRL);
     val = (val & 0xFF0001FF) | PWM_DIV64;
     writel_relaxed(val, pwm_base + PWM_REG_CTRL);
-    //4. enabled pwm int
+    // 4. enabled pwm int
     rk_pwm_int_ctrl(pwm_base, pwm_id, PWM_INT_ENABLE);
-    //5. enabled pwm
+    // 5. enabled pwm
     val = readl_relaxed(pwm_base + PWM_REG_CTRL);
     val = (val & 0xFFFFFFFE) | PWM_ENABLE;
     writel_relaxed(val, pwm_base + PWM_REG_CTRL);
@@ -517,12 +499,14 @@ static int rk_pwm_sip_wakeup_init(struct platform_device *pdev)
         goto end;
     }
     DBG("support_psci=0x%x\n", support_psci);
-    if (!support_psci)
+    if (!support_psci) {
         goto end;
+    }
     irq = ddata->irq;
     desc = irq_to_desc(irq);
-    if (!desc || !desc->irq_data.domain)
+    if (!desc || !desc->irq_data.domain) {
         goto end;
+    }
     hwirq = desc->irq_data.hwirq;
     ret = sip_smc_remotectl_config(REMOTECTL_SET_IRQ, hwirq);
     if (ret) {
@@ -540,17 +524,15 @@ static int rk_pwm_sip_wakeup_init(struct platform_device *pdev)
         for (i = 0; i < remotectl_button[j].nbuttons; i++) {
             int scancode, pwrkey;
 
-            if (remotectl_button[j].key_table[i].keycode
-                != KEY_POWER)
+            if (remotectl_button[j].key_table[i].keycode != KEY_POWER) {
                 continue;
+            }
             scancode = remotectl_button[j].key_table[i].scancode;
-            DBG("usercode=%x, key=%x\n",
-                remotectl_button[j].usercode, scancode);
+            DBG("usercode=%x, key=%x\n", remotectl_button[j].usercode, scancode);
             pwrkey = (remotectl_button[j].usercode & 0xffff) << 16;
             pwrkey |= (scancode & 0xff) << 8;
             DBG("deliver: key=%x\n", pwrkey);
-            sip_smc_remotectl_config(REMOTECTL_SET_PWRKEY,
-                            pwrkey);
+            sip_smc_remotectl_config(REMOTECTL_SET_PWRKEY, pwrkey);
         }
     }
     sip_smc_remotectl_config(REMOTECTL_ENABLE, 1);
@@ -594,8 +576,7 @@ static int rk_pwm_probe(struct platform_device *pdev)
         dev_err(&pdev->dev, "no memory resources defined\n");
         return -ENODEV;
     }
-    ddata = devm_kzalloc(&pdev->dev, sizeof(struct rkxx_remotectl_drvdata),
-                 GFP_KERNEL);
+    ddata = devm_kzalloc(&pdev->dev, sizeof(struct rkxx_remotectl_drvdata), GFP_KERNEL);
     if (!ddata) {
         dev_err(&pdev->dev, "failed to allocate memory\n");
         return -ENOMEM;
@@ -603,8 +584,9 @@ static int rk_pwm_probe(struct platform_device *pdev)
     ddata->state = RMC_PRELOAD;
     ddata->temp_period = 0;
     ddata->base = devm_ioremap_resource(&pdev->dev, r);
-    if (IS_ERR(ddata->base))
+    if (IS_ERR(ddata->base)) {
         return PTR_ERR(ddata->base);
+    }
     count = of_property_count_strings(np, "clock-names");
     if (count == 2) {
         clk = devm_clk_get(&pdev->dev, "pwm");
@@ -615,14 +597,16 @@ static int rk_pwm_probe(struct platform_device *pdev)
     }
     if (IS_ERR(clk)) {
         ret = PTR_ERR(clk);
-        if (ret != -EPROBE_DEFER)
+        if (ret != -EPROBE_DEFER) {
             dev_err(&pdev->dev, "Can't get bus clk: %d\n", ret);
+        }
         return ret;
     }
     if (IS_ERR(p_clk)) {
         ret = PTR_ERR(p_clk);
-        if (ret != -EPROBE_DEFER)
+        if (ret != -EPROBE_DEFER) {
             dev_err(&pdev->dev, "Can't get periph clk: %d\n", ret);
+        }
         return ret;
     }
     ret = clk_prepare_enable(clk);
@@ -643,9 +627,7 @@ static int rk_pwm_probe(struct platform_device *pdev)
         goto error_pclk;
     }
     ddata->maxkeybdnum = num;
-    remotectl_button = devm_kzalloc(&pdev->dev,
-                    num * sizeof(struct rkxx_remotectl_button),
-                    GFP_KERNEL);
+    remotectl_button = devm_kzalloc(&pdev->dev, num * sizeof(struct rkxx_remotectl_button), GFP_KERNEL);
     if (!remotectl_button) {
         pr_err("failed to malloc remote button memory\n");
         ret = -ENOMEM;
@@ -684,8 +666,7 @@ static int rk_pwm_probe(struct platform_device *pdev)
     ddata->handle_cpu_id = cpu_id;
     DBG("remotectl: handle cpu id=0x%x\n", cpu_id);
     rk_remotectl_parse_ir_keys(pdev);
-    tasklet_init(&ddata->remote_tasklet, rk_pwm_remotectl_do_something,
-             (unsigned long)ddata);
+    tasklet_init(&ddata->remote_tasklet, rk_pwm_remotectl_do_something, (unsigned long)ddata);
     for (j = 0; j < num; j++) {
         DBG("remotectl probe j = 0x%x\n", j);
         for (i = 0; i < remotectl_button[j].nbuttons; i++) {
@@ -696,19 +677,18 @@ static int rk_pwm_probe(struct platform_device *pdev)
         }
     }
     ret = input_register_device(input);
-    if (ret)
+    if (ret) {
         dev_err(&pdev->dev, "register input device err, ret=%d\n", ret);
+    }
     input_set_capability(input, EV_KEY, KEY_WAKEUP);
     device_init_wakeup(&pdev->dev, 1);
     enable_irq_wake(irq);
     timer_setup(&ddata->timer, rk_pwm_remotectl_timer, 0);
-    wake_lock_init(&ddata->remotectl_wake_lock,
-               WAKE_LOCK_SUSPEND, "rockchip_pwm_remote");
+    wake_lock_init(&ddata->remotectl_wake_lock, WAKE_LOCK_SUSPEND, "rockchip_pwm_remote");
     cpumask_clear(&cpumask);
     cpumask_set_cpu(cpu_id, &cpumask);
     irq_set_affinity_hint(irq, &cpumask);
-    ret = devm_request_irq(&pdev->dev, irq, rockchip_pwm_irq,
-                   IRQF_NO_SUSPEND, "rk_pwm_irq", ddata);
+    ret = devm_request_irq(&pdev->dev, irq, rockchip_pwm_irq, IRQF_NO_SUSPEND, "rk_pwm_irq", ddata);
     if (ret) {
         dev_err(&pdev->dev, "cannot claim IRQ %d\n", irq);
         goto error_irq;
@@ -725,10 +705,11 @@ static int rk_pwm_probe(struct platform_device *pdev)
     }
 
     ret = rk_pwm_sip_wakeup_init(pdev);
-    if (ret)
+    if (ret) {
         dev_info(&pdev->dev, "Donot support ATF Wakeup\n");
-    else
+    } else {
         dev_info(&pdev->dev, "Support ATF Wakeup\n");
+    }
 
     DBG("rk pwm remotectl init end!\n");
 end:
@@ -767,7 +748,6 @@ static int remotectl_suspend(struct device *dev)
     return 0;
 }
 
-
 static int remotectl_resume(struct device *dev)
 {
     struct cpumask cpumask;
@@ -783,15 +763,16 @@ static int remotectl_resume(struct device *dev)
         /*
          * loop wakeup state
          */
-        state = sip_smc_remotectl_config(
-                    REMOTECTL_GET_WAKEUP_STATE, 0);
-        if (state == REMOTECTL_PWRKEY_WAKEUP)
+        state = sip_smc_remotectl_config(REMOTECTL_GET_WAKEUP_STATE, 0);
+        if (state == REMOTECTL_PWRKEY_WAKEUP) {
             rk_pwm_wakeup(ddata->input);
-    }  else if (ddata->pwm_pwrkey_capture) {
+        }
+    } else if (ddata->pwm_pwrkey_capture) {
         pwm_id = ddata->remote_pwm_id;
         rk_pwm_int_ctrl(ddata->base, pwm_id, PWM_INT_ENABLE);
-        if (ddata->pwrkey_wakeup == 0)
+        if (ddata->pwrkey_wakeup == 0) {
             return 0;
+        }
         ddata->pwrkey_wakeup = 0;
         rk_pwm_wakeup(ddata->input);
     }
@@ -805,21 +786,19 @@ static const struct dev_pm_ops remotectl_pm_ops = {
 };
 #endif
 
-static const struct of_device_id rk_pwm_of_match[] = {
-    { .compatible =  "rockchip,remotectl-pwm"},
-    { }
-};
+static const struct of_device_id rk_pwm_of_match[] = {{.compatible = "rockchip,remotectl-pwm"}, {}};
 
 MODULE_DEVICE_TABLE(of, rk_pwm_of_match);
 
 static struct platform_driver rk_pwm_driver = {
-    .driver = {
-        .name = "remotectl-pwm",
-        .of_match_table = rk_pwm_of_match,
+    .driver =
+        {
+            .name = "remotectl-pwm",
+            .of_match_table = rk_pwm_of_match,
 #ifdef CONFIG_PM
-        .pm = &remotectl_pm_ops,
+            .pm = &remotectl_pm_ops,
 #endif
-    },
+        },
     .remove = rk_pwm_remove,
 };
 

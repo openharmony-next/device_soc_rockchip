@@ -13,20 +13,14 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_ukk_os.h
  * Types and definitions that are common for Linux OSs for the kernel side of the
  * User-Kernel interface.
  */
 
-#ifndef _UKK_OS_H_ /* Linux version */
-#define _UKK_OS_H_
-
-#include <linux/fs.h>
+#ifndef H_MALI_UKK_OS_H /* Linux version */
+#define H_MALI_UKK_OS_H
 
 /**
  * @addtogroup uk_api User-Kernel Interface API
@@ -43,11 +37,11 @@
  * of a ukk_session object.
  */
 typedef struct ukkp_session {
-    int dummy;     /**< No internal OS specific data at this time */
+    int dummy; /**< No internal OS specific data at this time */
 } ukkp_session;
 
 /** @} end group uk_api_kernel */
 
 /** @} end group uk_api */
 
-#endif /* _UKK_OS_H__ */
+#endif /* H_MALI_UKK_OS_H */

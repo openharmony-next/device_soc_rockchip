@@ -1,11 +1,15 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
  * 
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
+ * This program is free software and is provided to you
+ * under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation, and any
+ * use by you of this program is subject to the terms of such GNU licence.
  * 
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is included with
+ * the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 
 #include <linux/list.h>
@@ -24,12 +28,10 @@
 #include "mali_memory_manager.h"
 #include "mali_memory_virtual.h"
 
-
 /**
-*internal helper to link node into the rb-tree
-*/
-static inline void _mali_vma_offset_add_rb(struct mali_allocation_manager *mgr,
-        struct mali_vma_node *node)
+ *internal helper to link node into the rb-tree
+ */
+static inline void _mali_vma_offset_add_rb(struct mali_allocation_manager *mgr, struct mali_vma_node *node)
 {
     struct rb_node **iter = &mgr->allocation_mgr_rb.rb_node;
     struct rb_node *parent = NULL;
@@ -39,12 +41,13 @@ static inline void _mali_vma_offset_add_rb(struct mali_allocation_manager *mgr,
         parent = *iter;
         iter_node = rb_entry(*iter, struct mali_vma_node, vm_rb);
 
-        if (node->vm_node.start < iter_node->vm_node.start)
+        if (node->vm_node.start < iter_node->vm_node.start) {
             iter = &(*iter)->rb_left;
-        else if (node->vm_node.start > iter_node->vm_node.start)
+        } else if (node->vm_node.start > iter_node->vm_node.start) {
             iter = &(*iter)->rb_right;
-        else
+        } else {
             MALI_DEBUG_ASSERT(0);
+        }
     }
 
     rb_link_node(&node->vm_rb, parent, iter);
@@ -54,8 +57,7 @@ static inline void _mali_vma_offset_add_rb(struct mali_allocation_manager *mgr,
 /**
  * mali_vma_offset_add() - Add offset node to RB Tree
  */
-int mali_vma_offset_add(struct mali_allocation_manager *mgr,
-            struct mali_vma_node *node)
+int mali_vma_offset_add(struct mali_allocation_manager *mgr, struct mali_vma_node *node)
 {
     int ret = 0;
     write_lock(&mgr->vm_lock);
@@ -76,8 +78,7 @@ out:
 /**
  * mali_vma_offset_remove() - Remove offset node from RB tree
  */
-void mali_vma_offset_remove(struct mali_allocation_manager *mgr,
-                struct mali_vma_node *node)
+void mali_vma_offset_remove(struct mali_allocation_manager *mgr, struct mali_vma_node *node)
 {
     write_lock(&mgr->vm_lock);
 
@@ -89,10 +90,10 @@ void mali_vma_offset_remove(struct mali_allocation_manager *mgr,
 }
 
 /**
-* mali_vma_offset_search - Search the node in RB tree
-*/
-struct mali_vma_node *mali_vma_offset_search(struct mali_allocation_manager *mgr,
-        unsigned long start, unsigned long pages)
+ * mali_vma_offset_search - Search the node in RB tree
+ */
+struct mali_vma_node *mali_vma_offset_search(struct mali_allocation_manager *mgr, unsigned long start,
+                                             unsigned long pages)
 {
     struct mali_vma_node *node, *best;
     struct rb_node *iter;
@@ -108,8 +109,9 @@ struct mali_vma_node *mali_vma_offset_search(struct mali_allocation_manager *mgr
         if (start >= offset) {
             iter = iter->rb_right;
             best = node;
-            if (start == offset)
+            if (start == offset) {
                 break;
+            }
         } else {
             iter = iter->rb_left;
         }
@@ -117,11 +119,11 @@ struct mali_vma_node *mali_vma_offset_search(struct mali_allocation_manager *mgr
 
     if (best) {
         offset = best->vm_node.start + best->vm_node.size;
-        if (offset <= start + pages)
+        if (offset <= start + pages) {
             best = NULL;
+        }
     }
     read_unlock(&mgr->vm_lock);
 
     return best;
 }
-

@@ -22,21 +22,21 @@
 extern "C" {
 #endif
 
-#define VPU_SUCCESS                     (0)
-#define VPU_FAILURE                     (-1)
+#define VPU_SUCCESS (0)
+#define VPU_FAILURE (-1)
 
-#define VPU_HW_WAIT_OK                  VPU_SUCCESS
-#define VPU_HW_WAIT_ERROR               VPU_FAILURE
-#define VPU_HW_WAIT_TIMEOUT             1
+#define VPU_HW_WAIT_OK VPU_SUCCESS
+#define VPU_HW_WAIT_ERROR VPU_FAILURE
+#define VPU_HW_WAIT_TIMEOUT 1
 
 // vpu decoder 60 registers, size 240B
-#define VPU_REG_NUM_DEC                 (60)
+#define VPU_REG_NUM_DEC (60)
 // vpu post processor 41 registers, size 164B
-#define VPU_REG_NUM_PP                  (41)
+#define VPU_REG_NUM_PP (41)
 // vpu decoder + post processor 101 registers, size 404B
-#define VPU_REG_NUM_DEC_PP              (VPU_REG_NUM_DEC+VPU_REG_NUM_PP)
+#define VPU_REG_NUM_DEC_PP (VPU_REG_NUM_DEC + VPU_REG_NUM_PP)
 // vpu encoder 96 registers, size 384B
-#define VPU_REG_NUM_ENC                 (96)
+#define VPU_REG_NUM_ENC (96)
 
 typedef enum {
     VPU_ENC = 0x0,
@@ -54,38 +54,38 @@ typedef enum {
 /* Hardware decoder configuration description */
 
 typedef struct VPUHwDecConfig {
-    RK_U32 maxDecPicWidth;         /* Maximum video decoding width supported  */
-    RK_U32 maxPpOutPicWidth;       /* Maximum output width of Post-Processor */
-    RK_U32 h264Support;            /* HW supports h.264 */
-    RK_U32 jpegSupport;            /* HW supports JPEG */
-    RK_U32 mpeg4Support;           /* HW supports MPEG-4 */
-    RK_U32 customMpeg4Support;     /* HW supports custom MPEG-4 features */
-    RK_U32 vc1Support;             /* HW supports VC-1 Simple */
-    RK_U32 mpeg2Support;           /* HW supports MPEG-2 */
-    RK_U32 ppSupport;              /* HW supports post-processor */
-    RK_U32 ppConfig;               /* HW post-processor functions bitmask */
-    RK_U32 sorensonSparkSupport;   /* HW supports Sorenson Spark */
-    RK_U32 refBufSupport;          /* HW supports reference picture buffering */
-    RK_U32 vp6Support;             /* HW supports VP6 */
-    RK_U32 vp7Support;             /* HW supports VP7 */
-    RK_U32 vp8Support;             /* HW supports VP8 */
-    RK_U32 avsSupport;             /* HW supports AVS */
-    RK_U32 jpegESupport;           /* HW supports JPEG extensions */
-    RK_U32 rvSupport;              /* HW supports REAL */
-    RK_U32 mvcSupport;             /* HW supports H264 MVC extension */
+    unsigned int maxDecPicWidth;       /* Maximum video decoding width supported  */
+    unsigned int maxPpOutPicWidth;     /* Maximum output width of Post-Processor */
+    unsigned int h264Support;          /* HW supports h.264 */
+    unsigned int jpegSupport;          /* HW supports JPEG */
+    unsigned int mpeg4Support;         /* HW supports MPEG-4 */
+    unsigned int customMpeg4Support;   /* HW supports custom MPEG-4 features */
+    unsigned int vc1Support;           /* HW supports VC-1 Simple */
+    unsigned int mpeg2Support;         /* HW supports MPEG-2 */
+    unsigned int ppSupport;            /* HW supports post-processor */
+    unsigned int ppConfig;             /* HW post-processor functions bitmask */
+    unsigned int sorensonSparkSupport; /* HW supports Sorenson Spark */
+    unsigned int refBufSupport;        /* HW supports reference picture buffering */
+    unsigned int vp6Support;           /* HW supports VP6 */
+    unsigned int vp7Support;           /* HW supports VP7 */
+    unsigned int vp8Support;           /* HW supports VP8 */
+    unsigned int avsSupport;           /* HW supports AVS */
+    unsigned int jpegESupport;         /* HW supports JPEG extensions */
+    unsigned int rvSupport;            /* HW supports REAL */
+    unsigned int mvcSupport;           /* HW supports H264 MVC extension */
 } VPUHwDecConfig_t;
 
 /* Hardware encoder configuration description */
 
 typedef struct VPUHwEndConfig {
-    RK_U32 maxEncodedWidth;        /* Maximum supported width for video encoding (not JPEG) */
-    RK_U32 h264Enabled;            /* HW supports H.264 */
-    RK_U32 jpegEnabled;            /* HW supports JPEG */
-    RK_U32 mpeg4Enabled;           /* HW supports MPEG-4 */
-    RK_U32 vsEnabled;              /* HW supports video stabilization */
-    RK_U32 rgbEnabled;             /* HW supports RGB input */
-    RK_U32 reg_size;                /* HW bus type in use */
-    RK_U32 reserv[2];
+    unsigned int maxEncodedWidth; /* Maximum supported width for video encoding (not JPEG) */
+    unsigned int h264Enabled;     /* HW supports H.264 */
+    unsigned int jpegEnabled;     /* HW supports JPEG */
+    unsigned int mpeg4Enabled;    /* HW supports MPEG-4 */
+    unsigned int vsEnabled;       /* HW supports video stabilization */
+    unsigned int rgbEnabled;      /* HW supports RGB input */
+    unsigned int reg_size;        /* HW bus type in use */
+    unsigned int reserv[2];
 } VPUHwEncConfig_t;
 
 typedef enum {
@@ -107,13 +107,13 @@ typedef enum {
 } VPU_CMD_TYPE;
 
 int VPUClientInit(VPU_CLIENT_TYPE type);
-RK_S32 VPUClientRelease(int socket);
-RK_S32 VPUClientSendReg(int socket, RK_U32 *regs, RK_U32 nregs);
-RK_S32 VPUClientSendReg2(RK_S32 socket, RK_S32 offset, RK_S32 size, void *param);
-RK_S32 VPUClientWaitResult(int socket, RK_U32 *regs, RK_U32 nregs, VPU_CMD_TYPE *cmd, RK_S32 *len);
-RK_S32 VPUClientGetHwCfg(int socket, RK_U32 *cfg, RK_U32 cfg_size);
-RK_S32 VPUClientGetIOMMUStatus(void);
-RK_U32 VPUCheckSupportWidth(void);
+signed int VPUClientRelease(int socket);
+signed int VPUClientSendReg(int socket, unsigned int *regs, unsigned int nregs);
+signed int VPUClientSendReg2(signed int socket, signed int offset, signed int size, void *param);
+signed int VPUClientWaitResult(int socket, unsigned int *regs, unsigned int nregs, VPU_CMD_TYPE *cmd, signed int *len);
+signed int VPUClientGetHwCfg(int socket, unsigned int *cfg, unsigned int cfg_size);
+signed int VPUClientGetIOMMUStatus(void);
+unsigned int VPUCheckSupportWidth(void);
 
 #ifdef __cplusplus
 }

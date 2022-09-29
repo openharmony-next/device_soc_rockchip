@@ -26,8 +26,7 @@ static void fec_enable(struct rkispp_params_vdev *params_vdev, bool en)
     rkispp_set_bits(params_vdev->dev, RKISPP_FEC_CORE_CTRL, SW_FEC_EN, en);
 }
 
-static void fec_config(struct rkispp_params_vdev *params_vdev,
-               struct fec_config *arg)
+static void fec_config(struct rkispp_params_vdev *params_vdev, struct fec_config *arg)
 {
     struct rkispp_device *dev = params_vdev->dev;
     struct rkispp_fec_head *fec_data;
@@ -39,15 +38,14 @@ static void fec_config(struct rkispp_params_vdev *params_vdev,
     height = dev->ispp_sdev.out_fmt.height;
     mesh_size = cal_fec_mesh(width, height, 1);
     if (arg->mesh_size > mesh_size) {
-        v4l2_err(&dev->v4l2_dev,
-             "Input mesh size too large. mesh size 0x%x, 0x%x\n",
-             arg->mesh_size, mesh_size);
+        v4l2_err(&dev->v4l2_dev, "Input mesh size too large. mesh size 0x%x, 0x%x\n", arg->mesh_size, mesh_size);
         return;
     }
 
     for (i = 0; i < FEC_MESH_BUF_NUM; i++) {
-        if (arg->buf_fd == params_vdev->buf_fec[i].dma_fd)
+        if (arg->buf_fd == params_vdev->buf_fec[i].dma_fd) {
             break;
+        }
     }
     if (i == FEC_MESH_BUF_NUM) {
         dev_err(dev->dev, "cannot find fec buf fd(%d)\n", arg->buf_fd);
@@ -81,8 +79,9 @@ static void fec_config(struct rkispp_params_vdev *params_vdev,
     rkispp_write(params_vdev->dev, RKISPP_FEC_MESH_YINT_BASE, val);
 
     val = 0;
-    if (arg->mesh_density)
+    if (arg->mesh_density) {
         val = SW_MESH_DENSITY;
+    }
     rkispp_set_bits(params_vdev->dev, RKISPP_FEC_CORE_CTRL, SW_MESH_DENSITY, val);
 
     rkispp_write(params_vdev->dev, RKISPP_FEC_MESH_SIZE, arg->mesh_size);
@@ -97,8 +96,7 @@ static void fec_config(struct rkispp_params_vdev *params_vdev,
     rkispp_set_bits(params_vdev->dev, RKISPP_FEC_CORE_CTRL, SW_BIC_MODE, val);
 }
 
-static void fec_data_abandon(struct rkispp_params_vdev *vdev,
-                 struct fec_params_cfg *params)
+static void fec_data_abandon(struct rkispp_params_vdev *vdev, struct fec_params_cfg *params)
 {
     struct rkispp_fec_head *data;
     int i;
@@ -106,8 +104,9 @@ static void fec_data_abandon(struct rkispp_params_vdev *vdev,
     for (i = 0; i < FEC_MESH_BUF_NUM; i++) {
         if (params->fec_cfg.buf_fd == vdev->buf_fec[i].dma_fd) {
             data = (struct rkispp_fec_head *)vdev->buf_fec[i].vaddr;
-            if (data)
+            if (data) {
                 data->stat = FEC_BUF_INIT;
+            }
             break;
         }
     }
@@ -126,13 +125,13 @@ static void rkispp_params_cfg(struct rkispp_params_vdev *params_vdev, u32 frame_
 
     /* get buffer by frame_id */
     while (!list_empty(&params_vdev->params) && !params_vdev->cur_buf) {
-        params_vdev->cur_buf = list_first_entry(&params_vdev->params,
-                struct rkispp_buffer, queue);
+        params_vdev->cur_buf = list_first_entry(&params_vdev->params, struct rkispp_buffer, queue);
 
         new_params = (struct fec_params_cfg *)(params_vdev->cur_buf->vaddr[0]);
         if (new_params->frame_id < frame_id) {
-            if (new_params->module_cfg_update & ISPP_MODULE_FEC)
+            if (new_params->module_cfg_update & ISPP_MODULE_FEC) {
                 fec_data_abandon(params_vdev, new_params);
+            }
             list_del(&params_vdev->cur_buf->queue);
             vb2_buffer_done(&params_vdev->cur_buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
             params_vdev->cur_buf = NULL;
@@ -161,16 +160,14 @@ static void rkispp_params_cfg(struct rkispp_params_vdev *params_vdev, u32 frame_
         module_ens &= ~ISPP_MODULE_FEC;
     }
 
+    if (module_cfg_update & ISPP_MODULE_FEC) {
+        fec_config(params_vdev, &new_params->fec_cfg);
+    }
+    if (module_en_update & ISPP_MODULE_FEC) {
+        fec_enable(params_vdev, !!(module_ens & ISPP_MODULE_FEC));
+    }
 
-    if (module_cfg_update & ISPP_MODULE_FEC)
-        fec_config(params_vdev,
-               &new_params->fec_cfg);
-    if (module_en_update & ISPP_MODULE_FEC)
-        fec_enable(params_vdev,
-               !!(module_ens & ISPP_MODULE_FEC));
-
-    vb2_buffer_done(&params_vdev->cur_buf->vb.vb2_buf,
-                VB2_BUF_STATE_DONE);
+    vb2_buffer_done(&params_vdev->cur_buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
     params_vdev->cur_buf = NULL;
 
     spin_unlock(&params_vdev->config_lock);

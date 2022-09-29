@@ -19,21 +19,24 @@
 #include <unordered_map>
 #include "display_type.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-const int32_t INVALID_MODE_ID = -1;
-const uint32_t DRM_INVALID_ID = 0xFFFFFFFF;
-template<typename T> using IdMapPtr = std::unordered_map<uint32_t, std::shared_ptr<T>>;
-class DrmEncoder;
-class DrmCrtc;
-class DrmPlane;
-class DrmDevice;
-class DrmConnector;
-class VsyncCallBack;
-class DrmVsyncWorker;
-} // namespace OHOS
-} // namespace HDI
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            const int32_t INVALID_MODE_ID = -1;
+            const uint32_t DRM_INVALID_ID = 0xFFFFFFFF;
+            template <typename T> using IdMapPtr = std::unordered_map<uint32_t, std::shared_ptr<T>>;
+            class DrmEncoder;
+            class DrmCrtc;
+            class DrmPlane;
+            class DrmDevice;
+            class DrmConnector;
+            class VsyncCallBack;
+            class DrmVsyncWorker;
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_DEVICE_COMMON_H

@@ -18,7 +18,7 @@
 
 #include "mpp_device.h"
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -28,7 +28,7 @@ MPP_RET mpp_server_detach(MppDev ctx);
 MPP_RET mpp_server_send_task(MppDev ctx);
 MPP_RET mpp_server_wait_task(MppDev ctx, RK_S64 timeout);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

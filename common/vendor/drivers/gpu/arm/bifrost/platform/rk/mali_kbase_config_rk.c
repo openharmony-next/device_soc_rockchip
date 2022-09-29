@@ -7,7 +7,6 @@
  * of such GNU licence.
  */
 
-
 #include "custom_log.h"
 
 #include <mali_kbase.h>
@@ -72,8 +71,7 @@ static void kbase_platform_rk_remove_sysfs_files(struct device *dev);
 
 static void rk_pm_power_off_delay_work(struct work_struct *work)
 {
-    struct rk_context *platform =
-        container_of(to_delayed_work(work), struct rk_context, work);
+    struct rk_context *platform = container_of(to_delayed_work(work), struct rk_context, work);
     struct kbase_device *kbdev = platform->kbdev;
 
     if (!platform->is_powered) {
@@ -106,10 +104,10 @@ static int kbase_platform_rk_init(struct kbase_device *kbdev)
     platform->is_powered = false;
     platform->kbdev = kbdev;
 
-    platform->delay_ms = 200;
-    if (of_property_read_u32(kbdev->dev->of_node, "power-off-delay-ms",
-                 &platform->delay_ms))
+    platform->delay_ms = 0xc8;
+    if (of_property_read_u32(kbdev->dev->of_node, "power-off-delay-ms", &platform->delay_ms)) {
         W("power-off-delay-ms not available.");
+    }
 
     platform->power_off_wq = create_freezable_workqueue("gpu_power_off_wq");
     if (!platform->power_off_wq) {
@@ -143,8 +141,7 @@ err_wq:
 
 static void kbase_platform_rk_term(struct kbase_device *kbdev)
 {
-    struct rk_context *platform =
-        (struct rk_context *)kbdev->platform_context;
+    struct rk_context *platform = (struct rk_context *)kbdev->platform_context;
 
     pm_runtime_disable(kbdev->dev);
     kbdev->platform_context = NULL;
@@ -229,8 +226,7 @@ static void rk_pm_callback_power_off(struct kbase_device *kbdev)
     struct rk_context *platform = get_rk_context(kbdev);
 
     rk_pm_disable_clk(kbdev);
-    queue_delayed_work(platform->power_off_wq, &platform->work,
-               msecs_to_jiffies(platform->delay_ms));
+    queue_delayed_work(platform->power_off_wq, &platform->work, msecs_to_jiffies(platform->delay_ms));
 }
 
 int rk_kbase_device_runtime_init(struct kbase_device *kbdev)
@@ -250,12 +246,12 @@ struct kbase_pm_callback_conf pm_callbacks = {
     .power_runtime_term_callback = rk_kbase_device_runtime_disable,
     .power_runtime_on_callback = rk_pm_callback_runtime_on,
     .power_runtime_off_callback = rk_pm_callback_runtime_off,
-#else                /* CONFIG_PM */
+#else  /* CONFIG_PM */
     .power_runtime_init_callback = NULL,
     .power_runtime_term_callback = NULL,
     .power_runtime_on_callback = NULL,
     .power_runtime_off_callback = NULL,
-#endif                /* CONFIG_PM */
+#endif /* CONFIG_PM */
 };
 
 int kbase_platform_early_init(void)
@@ -330,8 +326,9 @@ static int rk_pm_enable_clk(struct kbase_device *kbdev)
         } else {
             D("to enable clk.");
             err = clk_enable(clock);
-            if (err)
+            if (err) {
                 E("failed to enable clk: %d.", err);
+            }
         }
     }
 
@@ -356,9 +353,7 @@ static void rk_pm_disable_clk(struct kbase_device *kbdev)
 
 /*---------------------------------------------------------------------------*/
 
-static ssize_t utilisation_period_show(struct device *dev,
-                       struct device_attribute *attr,
-                       char *buf)
+static ssize_t utilisation_period_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
@@ -369,10 +364,8 @@ static ssize_t utilisation_period_show(struct device *dev,
     return ret;
 }
 
-static ssize_t utilisation_period_store(struct device *dev,
-                    struct device_attribute *attr,
-                    const char *buf,
-                    size_t count)
+static ssize_t utilisation_period_store(struct device *dev, struct device_attribute *attr, const char *buf,
+                                        size_t count)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
@@ -388,14 +381,12 @@ static ssize_t utilisation_period_store(struct device *dev,
     return count;
 }
 
-static ssize_t utilisation_show(struct device *dev,
-                struct device_attribute *attr,
-                char *buf)
+static ssize_t utilisation_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
     struct kbase_device *kbdev = dev_get_drvdata(dev);
     struct rk_context *platform = get_rk_context(kbdev);
     ssize_t ret = 0;
-    unsigned long period_in_us = platform->utilisation_period * 1000;
+    unsigned long period_in_us = platform->utilisation_period * 0x3e8;
     u32 utilisation;
     struct kbasep_pm_metrics metrics_when_start;
     struct kbasep_pm_metrics metrics_diff; /* between start and end. */
@@ -405,7 +396,7 @@ static ssize_t utilisation_show(struct device *dev,
     /* get current metrics data. */
     kbase_pm_get_dvfs_metrics(kbdev, &metrics_when_start, &metrics_diff);
     /* sleep for 'period_in_us'. */
-    usleep_range(period_in_us, period_in_us + 100);
+    usleep_range(period_in_us, period_in_us + 0x64);
     /* get metrics data between start and end. */
     kbase_pm_get_dvfs_metrics(kbdev, &metrics_when_start, &metrics_diff);
 
@@ -413,7 +404,7 @@ static ssize_t utilisation_show(struct device *dev,
     busy_time = metrics_diff.time_busy;
     D("total_time : %u, busy_time : %u.", total_time, busy_time);
 
-    utilisation = busy_time * 100 / total_time;
+    utilisation = busy_time * 0x64 / total_time;
     ret += snprintf(buf, PAGE_SIZE, "%d\n", utilisation);
 
     return ret;
@@ -454,6 +445,5 @@ static void kbase_platform_rk_remove_sysfs_files(struct device *dev)
 
 int kbase_platform_rk_init_opp_table(struct kbase_device *kbdev)
 {
-    return rockchip_init_opp_table(kbdev->dev, NULL,
-                       "gpu_leakage", "mali");
+    return rockchip_init_opp_table(kbdev->dev, NULL, "gpu_leakage", "mali");
 }

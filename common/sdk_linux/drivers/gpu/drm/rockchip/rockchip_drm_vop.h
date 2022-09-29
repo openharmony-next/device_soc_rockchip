@@ -14,43 +14,42 @@
  * major: IP major version, used for IP structure
  * minor: big feature change under same structure
  */
-#define VOP_VERSION(major, minor)    ((major) << 8 | (minor))
-#define VOP_MAJOR(version)        ((version) >> 8)
-#define VOP_MINOR(version)        ((version) & 0xff)
+#define VOP_VERSION(major, minor) ((major) << 8 | (minor))
+#define VOP_MAJOR(version) ((version) >> 8)
+#define VOP_MINOR(version) ((version)&0xff)
 
-#define VOP_VERSION_RK3568    VOP_VERSION(0x40, 0x15)
-#define VOP_VERSION_RK3588    VOP_VERSION(0x40, 0x17)
+#define VOP_VERSION_RK3568 VOP_VERSION(0x40, 0x15)
+#define VOP_VERSION_RK3588 VOP_VERSION(0x40, 0x17)
 
-#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE    BIT(0)
-#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE    BIT(1)
-#define ROCKCHIP_OUTPUT_DATA_SWAP            BIT(2)
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE BIT(0)
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE BIT(1)
+#define ROCKCHIP_OUTPUT_DATA_SWAP BIT(2)
 /* MIPI DSI DataStream(cmd) mode on rk3588 */
-#define ROCKCHIP_OUTPUT_MIPI_DS_MODE            BIT(3)
+#define ROCKCHIP_OUTPUT_MIPI_DS_MODE BIT(3)
 
-#define AFBDC_FMT_RGB565    0x0
-#define AFBDC_FMT_U8U8U8U8    0x5
-#define AFBDC_FMT_U8U8U8    0x4
+#define AFBDC_FMT_RGB565 0x0
+#define AFBDC_FMT_U8U8U8U8 0x5
+#define AFBDC_FMT_U8U8U8 0x4
 
-#define VOP_FEATURE_OUTPUT_RGB10    BIT(0)
-#define VOP_FEATURE_INTERNAL_RGB    BIT(1)
-#define VOP_FEATURE_ALPHA_SCALE        BIT(2)
-#define VOP_FEATURE_HDR10        BIT(3)
-#define VOP_FEATURE_NEXT_HDR        BIT(4)
+#define VOP_FEATURE_OUTPUT_RGB10 BIT(0)
+#define VOP_FEATURE_INTERNAL_RGB BIT(1)
+#define VOP_FEATURE_ALPHA_SCALE BIT(2)
+#define VOP_FEATURE_HDR10 BIT(3)
+#define VOP_FEATURE_NEXT_HDR BIT(4)
 /* a feature to splice two windows and two vps to support resolution > 4096 */
-#define VOP_FEATURE_SPLICE        BIT(5)
-#define VOP_FEATURE_OVERSCAN        BIT(6)
+#define VOP_FEATURE_SPLICE BIT(5)
+#define VOP_FEATURE_OVERSCAN BIT(6)
 
-#define VOP_FEATURE_OUTPUT_10BIT    VOP_FEATURE_OUTPUT_RGB10
+#define VOP_FEATURE_OUTPUT_10BIT VOP_FEATURE_OUTPUT_RGB10
 
-
-#define WIN_FEATURE_HDR2SDR        BIT(0)
-#define WIN_FEATURE_SDR2HDR        BIT(1)
-#define WIN_FEATURE_PRE_OVERLAY        BIT(2)
-#define WIN_FEATURE_AFBDC        BIT(3)
-#define WIN_FEATURE_CLUSTER_MAIN    BIT(4)
-#define WIN_FEATURE_CLUSTER_SUB        BIT(5)
+#define WIN_FEATURE_HDR2SDR BIT(0)
+#define WIN_FEATURE_SDR2HDR BIT(1)
+#define WIN_FEATURE_PRE_OVERLAY BIT(2)
+#define WIN_FEATURE_AFBDC BIT(3)
+#define WIN_FEATURE_CLUSTER_MAIN BIT(4)
+#define WIN_FEATURE_CLUSTER_SUB BIT(5)
 /* Left win in splice mode */
-#define WIN_FEATURE_SPLICE_LEFT        BIT(6)
+#define WIN_FEATURE_SPLICE_LEFT BIT(6)
 /* a mirror win can only get fb address
  * from source win:
  * Cluster1---->Cluster0
@@ -58,13 +57,12 @@
  * Smart1  ---->Smart0
  * This is a feather on rk3566
  */
-#define WIN_FEATURE_MIRROR        BIT(6)
-#define WIN_FEATURE_MULTI_AREA        BIT(7)
+#define WIN_FEATURE_MIRROR BIT(6)
+#define WIN_FEATURE_MULTI_AREA BIT(7)
 
+#define VOP2_SOC_VARIANT 4
 
-#define VOP2_SOC_VARIANT        4
-
-#define ROCKCHIP_DSC_PPS_SIZE_BYTE    88
+#define ROCKCHIP_DSC_PPS_SIZE_BYTE 88
 
 enum vop_win_phy_id {
     ROCKCHIP_VOP_WIN0 = 0,
@@ -81,11 +79,7 @@ enum bcsh_out_mode {
     BCSH_OUT_MODE_NORMAL_VIDEO,
 };
 
-enum cabc_stage_mode {
-    LAST_FRAME_PWM_VAL    = 0x0,
-    CUR_FRAME_PWM_VAL    = 0x1,
-    STAGE_BY_STAGE        = 0x2
-};
+enum cabc_stage_mode { LAST_FRAME_PWM_VAL = 0x0, CUR_FRAME_PWM_VAL = 0x1, STAGE_BY_STAGE = 0x2 };
 
 enum cabc_stage_up_mode {
     MUL_MODE,
@@ -96,9 +90,9 @@ enum cabc_stage_up_mode {
  *  the delay number of a window in different mode.
  */
 enum vop2_win_dly_mode {
-    VOP2_DLY_MODE_DEFAULT,   /**< default mode */
-    VOP2_DLY_MODE_HISO_S,    /** HDR in SDR out mode, as a SDR window */
-    VOP2_DLY_MODE_HIHO_H,    /** HDR in HDR out mode, as a HDR window */
+    VOP2_DLY_MODE_DEFAULT, /**< default mode */
+    VOP2_DLY_MODE_HISO_S,  /** HDR in SDR out mode, as a SDR window */
+    VOP2_DLY_MODE_HIHO_H,  /** HDR in HDR out mode, as a HDR window */
     VOP2_DLY_MODE_MAX,
 };
 
@@ -107,32 +101,32 @@ enum vop2_win_dly_mode {
  * should be all none zero, 0 will be
  * treat as invalid;
  */
-#define VOP2_PD_CLUSTER0    BIT(0)
-#define VOP2_PD_CLUSTER1    BIT(1)
-#define VOP2_PD_CLUSTER2    BIT(2)
-#define VOP2_PD_CLUSTER3    BIT(3)
-#define VOP2_PD_DSC_8K        BIT(5)
-#define VOP2_PD_DSC_4K        BIT(6)
-#define VOP2_PD_ESMART0        BIT(7)
+#define VOP2_PD_CLUSTER0 BIT(0)
+#define VOP2_PD_CLUSTER1 BIT(1)
+#define VOP2_PD_CLUSTER2 BIT(2)
+#define VOP2_PD_CLUSTER3 BIT(3)
+#define VOP2_PD_DSC_8K BIT(5)
+#define VOP2_PD_DSC_4K BIT(6)
+#define VOP2_PD_ESMART0 BIT(7)
 
 /*
  * vop2 submem power gate,
  * should be all none zero, 0 will be
  * treat as invalid;
  */
-#define VOP2_MEM_PG_VP0        BIT(0)
-#define VOP2_MEM_PG_VP1        BIT(1)
-#define VOP2_MEM_PG_VP2        BIT(2)
-#define VOP2_MEM_PG_VP3        BIT(3)
-#define VOP2_MEM_PG_DB0        BIT(4)
-#define VOP2_MEM_PG_DB1        BIT(5)
-#define VOP2_MEM_PG_DB2        BIT(6)
-#define VOP2_MEM_PG_WB        BIT(7)
+#define VOP2_MEM_PG_VP0 BIT(0)
+#define VOP2_MEM_PG_VP1 BIT(1)
+#define VOP2_MEM_PG_VP2 BIT(2)
+#define VOP2_MEM_PG_VP3 BIT(3)
+#define VOP2_MEM_PG_DB0 BIT(4)
+#define VOP2_MEM_PG_DB1 BIT(5)
+#define VOP2_MEM_PG_DB2 BIT(6)
+#define VOP2_MEM_PG_WB BIT(7)
 
-#define DSP_BG_SWAP        0x1
-#define DSP_RB_SWAP        0x2
-#define DSP_RG_SWAP        0x4
-#define DSP_DELTA_SWAP        0x8
+#define DSP_BG_SWAP 0x1
+#define DSP_RB_SWAP 0x2
+#define DSP_RG_SWAP 0x4
+#define DSP_DELTA_SWAP 0x8
 
 enum vop_csc_format {
     CSC_BT601L,
@@ -170,13 +164,13 @@ struct vop_reg_data {
 
 struct vop_reg {
     uint32_t mask;
-    uint32_t offset:17;
-    uint32_t shift:5;
-    uint32_t begin_minor:4;
-    uint32_t end_minor:4;
-    uint32_t reserved:2;
-    uint32_t major:3;
-    uint32_t write_mask:1;
+    uint32_t offset : 17;
+    uint32_t shift : 5;
+    uint32_t begin_minor : 4;
+    uint32_t end_minor : 4;
+    uint32_t reserved : 2;
+    uint32_t major : 3;
+    uint32_t write_mask : 1;
 };
 
 struct vop_csc {
@@ -473,10 +467,7 @@ enum {
     VOP_CSC_R2R_BT709_TO_2020,
 };
 
-enum _vop_overlay_mode {
-    VOP_RGB_DOMAIN,
-    VOP_YUV_DOMAIN
-};
+enum _vop_overlay_mode { VOP_RGB_DOMAIN, VOP_YUV_DOMAIN };
 
 enum _vop_sdr2hdr_func {
     SDR2HDR_FOR_BT2020,
@@ -838,8 +829,8 @@ struct vop2_dsc_data {
     uint8_t id;
     uint8_t pd_id;
     uint8_t max_slice_num;
-    uint8_t max_linebuf_depth;    /* used to generate the bitstream */
-    uint8_t min_bits_per_pixel;    /* bit num after encoder compress */
+    uint8_t max_linebuf_depth;  /* used to generate the bitstream */
+    uint8_t min_bits_per_pixel; /* bit num after encoder compress */
     const char *dsc_txp_clk_src_name;
     const char *dsc_txp_clk_name;
     const char *dsc_pxl_clk_name;
@@ -1086,85 +1077,80 @@ struct vop2_data {
     unsigned int win_size;
 };
 
-#define CVBS_PAL_VDISPLAY        288
+#define CVBS_PAL_VDISPLAY 288
 
 /* interrupt define */
-#define DSP_HOLD_VALID_INTR        BIT(0)
-#define FS_INTR                BIT(1)
-#define LINE_FLAG_INTR            BIT(2)
-#define BUS_ERROR_INTR            BIT(3)
-#define FS_NEW_INTR            BIT(4)
-#define ADDR_SAME_INTR            BIT(5)
-#define LINE_FLAG1_INTR            BIT(6)
-#define WIN0_EMPTY_INTR            BIT(7)
-#define WIN1_EMPTY_INTR            BIT(8)
-#define WIN2_EMPTY_INTR            BIT(9)
-#define WIN3_EMPTY_INTR            BIT(10)
-#define HWC_EMPTY_INTR            BIT(11)
-#define POST_BUF_EMPTY_INTR        BIT(12)
-#define PWM_GEN_INTR            BIT(13)
-#define DMA_FINISH_INTR            BIT(14)
-#define FS_FIELD_INTR            BIT(15)
-#define FE_INTR                BIT(16)
-#define WB_UV_FIFO_FULL_INTR        BIT(17)
-#define WB_YRGB_FIFO_FULL_INTR        BIT(18)
-#define WB_COMPLETE_INTR        BIT(19)
+#define DSP_HOLD_VALID_INTR BIT(0)
+#define FS_INTR BIT(1)
+#define LINE_FLAG_INTR BIT(2)
+#define BUS_ERROR_INTR BIT(3)
+#define FS_NEW_INTR BIT(4)
+#define ADDR_SAME_INTR BIT(5)
+#define LINE_FLAG1_INTR BIT(6)
+#define WIN0_EMPTY_INTR BIT(7)
+#define WIN1_EMPTY_INTR BIT(8)
+#define WIN2_EMPTY_INTR BIT(9)
+#define WIN3_EMPTY_INTR BIT(10)
+#define HWC_EMPTY_INTR BIT(11)
+#define POST_BUF_EMPTY_INTR BIT(12)
+#define PWM_GEN_INTR BIT(13)
+#define DMA_FINISH_INTR BIT(14)
+#define FS_FIELD_INTR BIT(15)
+#define FE_INTR BIT(16)
+#define WB_UV_FIFO_FULL_INTR BIT(17)
+#define WB_YRGB_FIFO_FULL_INTR BIT(18)
+#define WB_COMPLETE_INTR BIT(19)
 
-#define INTR_MASK            (DSP_HOLD_VALID_INTR | FS_INTR | \
-                     LINE_FLAG_INTR | BUS_ERROR_INTR | \
-                     FS_NEW_INTR | LINE_FLAG1_INTR | \
-                     WIN0_EMPTY_INTR | WIN1_EMPTY_INTR | \
-                     WIN2_EMPTY_INTR | WIN3_EMPTY_INTR | \
-                     HWC_EMPTY_INTR | \
-                     POST_BUF_EMPTY_INTR | \
-                     DMA_FINISH_INTR | FS_FIELD_INTR | \
-                     FE_INTR)
-#define DSP_HOLD_VALID_INTR_EN(x)    ((x) << 4)
-#define FS_INTR_EN(x)            ((x) << 5)
-#define LINE_FLAG_INTR_EN(x)        ((x) << 6)
-#define BUS_ERROR_INTR_EN(x)        ((x) << 7)
-#define DSP_HOLD_VALID_INTR_MASK    (1 << 4)
-#define FS_INTR_MASK            (1 << 5)
-#define LINE_FLAG_INTR_MASK        (1 << 6)
-#define BUS_ERROR_INTR_MASK        (1 << 7)
+#define INTR_MASK                                                                                                      \
+    (DSP_HOLD_VALID_INTR | FS_INTR | LINE_FLAG_INTR | BUS_ERROR_INTR | FS_NEW_INTR | LINE_FLAG1_INTR |                 \
+     WIN0_EMPTY_INTR | WIN1_EMPTY_INTR | WIN2_EMPTY_INTR | WIN3_EMPTY_INTR | HWC_EMPTY_INTR | POST_BUF_EMPTY_INTR |    \
+     DMA_FINISH_INTR | FS_FIELD_INTR | FE_INTR)
+#define DSP_HOLD_VALID_INTR_EN(x) ((x) << 4)
+#define FS_INTR_EN(x) ((x) << 5)
+#define LINE_FLAG_INTR_EN(x) ((x) << 6)
+#define BUS_ERROR_INTR_EN(x) ((x) << 7)
+#define DSP_HOLD_VALID_INTR_MASK (1 << 4)
+#define FS_INTR_MASK (1 << 5)
+#define LINE_FLAG_INTR_MASK (1 << 6)
+#define BUS_ERROR_INTR_MASK (1 << 7)
 
-#define INTR_CLR_SHIFT            8
-#define DSP_HOLD_VALID_INTR_CLR        (1 << (INTR_CLR_SHIFT + 0))
-#define FS_INTR_CLR            (1 << (INTR_CLR_SHIFT + 1))
-#define LINE_FLAG_INTR_CLR        (1 << (INTR_CLR_SHIFT + 2))
-#define BUS_ERROR_INTR_CLR        (1 << (INTR_CLR_SHIFT + 3))
+#define INTR_CLR_SHIFT 8
+#define DSP_HOLD_VALID_INTR_CLR (1 << (INTR_CLR_SHIFT + 0))
+#define FS_INTR_CLR (1 << (INTR_CLR_SHIFT + 1))
+#define LINE_FLAG_INTR_CLR (1 << (INTR_CLR_SHIFT + 2))
+#define BUS_ERROR_INTR_CLR (1 << (INTR_CLR_SHIFT + 3))
 
-#define DSP_LINE_NUM(x)            (((x) & 0x1fff) << 12)
-#define DSP_LINE_NUM_MASK        (0x1fff << 12)
+#define DSP_LINE_NUM(x) (((x)&0x1fff) << 12)
+#define DSP_LINE_NUM_MASK (0x1fff << 12)
 
 /* src alpha ctrl define */
-#define SRC_FADING_VALUE(x)        (((x) & 0xff) << 24)
-#define SRC_GLOBAL_ALPHA(x)        (((x) & 0xff) << 16)
-#define SRC_FACTOR_M0(x)        (((x) & 0x7) << 6)
-#define SRC_ALPHA_CAL_M0(x)        (((x) & 0x1) << 5)
-#define SRC_BLEND_M0(x)            (((x) & 0x3) << 3)
-#define SRC_ALPHA_M0(x)            (((x) & 0x1) << 2)
-#define SRC_COLOR_M0(x)            (((x) & 0x1) << 1)
-#define SRC_ALPHA_EN(x)            (((x) & 0x1) << 0)
+#define SRC_FADING_VALUE(x) (((x)&0xff) << 24)
+#define SRC_GLOBAL_ALPHA(x) (((x)&0xff) << 16)
+#define SRC_FACTOR_M0(x) (((x)&0x7) << 6)
+#define SRC_ALPHA_CAL_M0(x) (((x)&0x1) << 5)
+#define SRC_BLEND_M0(x) (((x)&0x3) << 3)
+#define SRC_ALPHA_M0(x) (((x)&0x1) << 2)
+#define SRC_COLOR_M0(x) (((x)&0x1) << 1)
+#define SRC_ALPHA_EN(x) (((x)&0x1) << 0)
 /* dst alpha ctrl define */
-#define DST_FACTOR_M0(x)        (((x) & 0x7) << 6)
+#define DST_FACTOR_M0(x) (((x)&0x7) << 6)
 
 /*
  * display output interface supported by rockchip lcdc
  */
-#define ROCKCHIP_OUT_MODE_P888        0
-#define ROCKCHIP_OUT_MODE_BT1120    0
-#define ROCKCHIP_OUT_MODE_P666        1
-#define ROCKCHIP_OUT_MODE_P565        2
-#define ROCKCHIP_OUT_MODE_BT656        5
-#define ROCKCHIP_OUT_MODE_S888        8
-#define ROCKCHIP_OUT_MODE_S888_DUMMY    12
-#define ROCKCHIP_OUT_MODE_YUV420    14
+#define ROCKCHIP_OUT_MODE_P888 0
+#define ROCKCHIP_OUT_MODE_BT1120 0
+#define ROCKCHIP_OUT_MODE_P666 1
+#define ROCKCHIP_OUT_MODE_P565 2
+#define ROCKCHIP_OUT_MODE_BT656 5
+#define ROCKCHIP_OUT_MODE_S888 8
+#define ROCKCHIP_OUT_MODE_S888_DUMMY 12
+#define ROCKCHIP_OUT_MODE_YUV420 14
 /* for use special outface */
-#define ROCKCHIP_OUT_MODE_AAAA        15
+#define ROCKCHIP_OUT_MODE_AAAA 15
 
-#define ROCKCHIP_OUT_MODE_TYPE(x)    ((x) >> 16)
-#define ROCKCHIP_OUT_MODE(x)        ((x) & 0xffff)
+#define ROCKCHIP_OUT_MODE_TYPE(x) ((x) >> 16)
+#define ROCKCHIP_OUT_MODE(x) ((x)&0xffff)
 
 enum alpha_mode {
     ALPHA_STRAIGHT,
@@ -1214,11 +1200,7 @@ enum dst_factor_mode {
     DST_FAC_ALPHA_DST_GLOBAL,
 };
 
-enum scale_mode {
-    SCALE_NONE = 0x0,
-    SCALE_UP   = 0x1,
-    SCALE_DOWN = 0x2
-};
+enum scale_mode { SCALE_NONE = 0x0, SCALE_UP = 0x1, SCALE_DOWN = 0x2 };
 
 enum lb_mode {
     LB_YUV_3840X5 = 0x0,
@@ -1229,15 +1211,9 @@ enum lb_mode {
     LB_RGB_1280X8 = 0x5
 };
 
-enum sacle_up_mode {
-    SCALE_UP_BIL = 0x0,
-    SCALE_UP_BIC = 0x1
-};
+enum sacle_up_mode { SCALE_UP_BIL = 0x0, SCALE_UP_BIC = 0x1 };
 
-enum scale_down_mode {
-    SCALE_DOWN_BIL = 0x0,
-    SCALE_DOWN_AVG = 0x1
-};
+enum scale_down_mode { SCALE_DOWN_BIL = 0x0, SCALE_DOWN_AVG = 0x1 };
 
 enum vop2_scale_up_mode {
     VOP2_SCALE_UP_NRST_NBOR,
@@ -1251,62 +1227,51 @@ enum vop2_scale_down_mode {
     VOP2_SCALE_DOWN_AVG,
 };
 
-enum dither_down_mode {
-    RGB888_TO_RGB565 = 0x0,
-    RGB888_TO_RGB666 = 0x1
-};
+enum dither_down_mode { RGB888_TO_RGB565 = 0x0, RGB888_TO_RGB666 = 0x1 };
 
-enum dither_down_mode_sel {
-    DITHER_DOWN_ALLEGRO = 0x0,
-    DITHER_DOWN_FRC = 0x1
-};
+enum dither_down_mode_sel { DITHER_DOWN_ALLEGRO = 0x0, DITHER_DOWN_FRC = 0x1 };
 
-enum vop_pol {
-    HSYNC_POSITIVE = 0,
-    VSYNC_POSITIVE = 1,
-    DEN_NEGATIVE   = 2,
-    DCLK_INVERT    = 3
-};
+enum vop_pol { HSYNC_POSITIVE = 0, VSYNC_POSITIVE = 1, DEN_NEGATIVE = 2, DCLK_INVERT = 3 };
 
-
-#define FRAC_16_16(mult, div)    (((mult) << 16) / (div))
-#define SCL_FT_DEFAULT_FIXPOINT_SHIFT    12
-#define SCL_MAX_VSKIPLINES        4
-#define MIN_SCL_FT_AFTER_VSKIP        1
+#define FRAC_16_16(mult, div) (((mult) << 16) / (div))
+#define SCL_FT_DEFAULT_FIXPOINT_SHIFT 12
+#define SCL_MAX_VSKIPLINES 4
+#define MIN_SCL_FT_AFTER_VSKIP 1
 
 static inline uint16_t scl_cal_scale(int src, int dst, int shift)
 {
-    return ((src * 2 - 3) << (shift - 1)) / (dst - 1);
+    return ((src * 0x2 - 0x3) << (shift - 1)) / (dst - 1);
 }
 
 static inline uint16_t scl_cal_scale2(int src, int dst)
 {
-    return ((src - 1) << 12) / (dst - 1);
+    return ((src - 1) << 0xc) / (dst - 1);
 }
 
-#define GET_SCL_FT_BILI_DN(src, dst)    scl_cal_scale(src, dst, 12)
-#define GET_SCL_FT_BILI_UP(src, dst)    scl_cal_scale(src, dst, 16)
-#define GET_SCL_FT_BIC(src, dst)    scl_cal_scale(src, dst, 16)
+#define GET_SCL_FT_BILI_DN(src, dst) scl_cal_scale(src, dst, 0xc)
+#define GET_SCL_FT_BILI_UP(src, dst) scl_cal_scale(src, dst, 0x10)
+#define GET_SCL_FT_BIC(src, dst) scl_cal_scale(src, dst, 0x10)
 
-static inline uint16_t scl_get_bili_dn_vskip(int src_h, int dst_h,
-                         int vskiplines)
+static inline uint16_t scl_get_bili_dn_vskip(int src_h, int dst_h, int vskiplines)
 {
     int act_height;
 
     act_height = (src_h + vskiplines - 1) / vskiplines;
 
-    if (act_height == dst_h)
+    if (act_height == dst_h) {
         return GET_SCL_FT_BILI_DN(src_h, dst_h) / vskiplines;
+    }
 
     return GET_SCL_FT_BILI_DN(act_height, dst_h);
 }
 
 static inline enum scale_mode scl_get_scl_mode(int src, int dst)
 {
-    if (src < dst)
+    if (src < dst) {
         return SCALE_UP;
-    else if (src > dst)
+    } else if (src > dst) {
         return SCALE_DOWN;
+    }
 
     return SCALE_NONE;
 }
@@ -1315,9 +1280,11 @@ static inline int scl_get_vskiplines(uint32_t srch, uint32_t dsth)
 {
     uint32_t vskiplines;
 
-    for (vskiplines = SCL_MAX_VSKIPLINES; vskiplines > 1; vskiplines /= 2)
-        if (srch >= vskiplines * dsth * MIN_SCL_FT_AFTER_VSKIP)
+    for (vskiplines = SCL_MAX_VSKIPLINES; vskiplines > 1; vskiplines /= 0x2) {
+        if (srch >= vskiplines * dsth * MIN_SCL_FT_AFTER_VSKIP) {
             break;
+        }
+    }
 
     return vskiplines;
 }
@@ -1327,17 +1294,19 @@ static inline int scl_vop_cal_lb_mode(int width, bool is_yuv)
     int lb_mode;
 
     if (is_yuv) {
-        if (width > 1280)
+        if (width > 0x500) {
             lb_mode = LB_YUV_3840X5;
-        else
+        } else {
             lb_mode = LB_YUV_2560X8;
+        }
     } else {
-        if (width > 2560)
+        if (width > 0xa00) {
             lb_mode = LB_RGB_3840X2;
-        else if (width > 1920)
+        } else if (width > 0x780) {
             lb_mode = LB_RGB_2560X4;
-        else
+        } else {
             lb_mode = LB_RGB_1920X5;
+        }
     }
 
     return lb_mode;
@@ -1345,7 +1314,7 @@ static inline int scl_vop_cal_lb_mode(int width, bool is_yuv)
 
 static inline int us_to_vertical_line(struct drm_display_mode *mode, int us)
 {
-    return us * mode->clock / mode->htotal / 1000;
+    return us * mode->clock / mode->htotal / 0x3e8;
 }
 
 static inline int interpolate(int x1, int y1, int x2, int y2, int x)

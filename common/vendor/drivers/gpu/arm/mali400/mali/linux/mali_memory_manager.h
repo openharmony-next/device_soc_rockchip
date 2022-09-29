@@ -1,11 +1,15 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
  * 
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
+ * This program is free software and is provided to you
+ * under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation, and any
+ * use by you of this program is subject to the terms of such GNU licence.
  * 
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is included with
+ * the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 
 #ifndef __MALI_MEMORY_MANAGER_H__
@@ -35,7 +39,7 @@ extern struct mutex mali_idr_mutex;
 int mali_memory_manager_init(struct mali_allocation_manager *mgr);
 void mali_memory_manager_uninit(struct mali_allocation_manager *mgr);
 
-void  mali_mem_allocation_struct_destory(mali_mem_allocation *alloc);
+void mali_mem_allocation_struct_destory(mali_mem_allocation *alloc);
 mali_osk_errcode_t mali_mem_add_mem_size(struct mali_session_data *session, u32 mali_addr, u32 add_size);
 mali_mem_backend *mali_mem_backend_struct_search(struct mali_session_data *session, u32 mali_address);
 mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args);
@@ -48,4 +52,3 @@ mali_osk_errcode_t _mali_ukk_mem_usage_get(mali_uk_profiling_memory_usage_get_s 
 mali_osk_errcode_t _mali_ukk_mem_resize(mali_uk_mem_resize_s *args);
 
 #endif
-

@@ -30,7 +30,7 @@ struct DrmHisiliconPhyaddr {
     __s32 fd;
 };
 
-#define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR \
+#define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR                                                                          \
     DRM_IOWR(DRM_COMMAND_BASE + DRM_HISILICON_GEM_FD_TO_PHYADDR, struct DrmHisiliconPhyaddr)
 
 #if defined(__cplusplus)

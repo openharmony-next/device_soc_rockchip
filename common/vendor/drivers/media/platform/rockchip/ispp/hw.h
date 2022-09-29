@@ -1,11 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (C) 2020 Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_HW_H
-#define _RKISPP_HW_H
+#ifndef H_RKISPP_HW_H
+#define H_RKISPP_HW_H
 
 #include "common.h"
-#include "fec.h"
 #include "../isp/isp_ispp.h"
 
 #define ISPP_MAX_BUS_CLK 4
@@ -17,12 +16,20 @@ struct ispp_clk_info {
 
 struct ispp_match_data {
     int clks_num;
-    const char * const *clks;
+    const char *const *clks;
     int clk_rate_tbl_num;
     const struct ispp_clk_info *clk_rate_tbl;
     enum rkispp_ver ispp_ver;
     struct irqs_data *irqs;
     int num_irqs;
+};
+
+struct rkispp_fec_dev {
+    struct rkispp_hw_dev *hw;
+    struct v4l2_device v4l2_dev;
+    struct video_device vfd;
+    struct mutex apilock;
+    struct completion cmpl;
 };
 
 struct rkispp_hw_dev {
@@ -44,7 +51,7 @@ struct rkispp_hw_dev {
     int cur_dev_id;
     unsigned long core_clk_min;
     unsigned long core_clk_max;
-    enum rkispp_ver    ispp_ver;
+    enum rkispp_ver ispp_ver;
     /* lock for irq */
     spinlock_t irq_lock;
     /* lock for multi dev */
@@ -63,5 +70,23 @@ struct rkispp_hw_dev {
     bool is_first;
 };
 
-void rkispp_soft_reset(struct rkispp_hw_dev *hw_dev);
+void rkispp_soft_reset(struct rkispp_hw_dev *hw);
+
+#if IS_ENABLED(CONFIG_VIDEO_ROCKCHIP_ISPP_FEC)
+int rkispp_register_fec(struct rkispp_hw_dev *hw);
+void rkispp_unregister_fec(struct rkispp_hw_dev *hw);
+void rkispp_fec_irq(struct rkispp_hw_dev *hw);
+#else
+static inline int rkispp_register_fec(struct rkispp_hw_dev *hw)
+{
+    return 0;
+}
+static inline void rkispp_unregister_fec(struct rkispp_hw_dev *hw)
+{
+}
+static inline void rkispp_fec_irq(struct rkispp_hw_dev *hw)
+{
+}
+#endif
+
 #endif

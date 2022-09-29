@@ -40,102 +40,100 @@ DEFINE_PER_CPU(struct cpuinfo_arm64, cpu_data);
 static struct cpuinfo_arm64 boot_cpu_data;
 
 static const char *icache_policy_str[] = {
-    [ICACHE_POLICY_VPIPT]        = "VPIPT",
-    [ICACHE_POLICY_RESERVED]    = "RESERVED/UNKNOWN",
-    [ICACHE_POLICY_VIPT]        = "VIPT",
-    [ICACHE_POLICY_PIPT]        = "PIPT",
+    [ICACHE_POLICY_VPIPT] = "VPIPT",
+    [ICACHE_POLICY_RESERVED] = "RESERVED/UNKNOWN",
+    [ICACHE_POLICY_VIPT] = "VIPT",
+    [ICACHE_POLICY_PIPT] = "PIPT",
 };
 
 unsigned long __icache_flags;
 
 static const char *const hwcap_str[] = {
-    [KERNEL_HWCAP_FP]        = "fp",
-    [KERNEL_HWCAP_ASIMD]        = "asimd",
-    [KERNEL_HWCAP_EVTSTRM]        = "evtstrm",
-    [KERNEL_HWCAP_AES]        = "aes",
-    [KERNEL_HWCAP_PMULL]        = "pmull",
-    [KERNEL_HWCAP_SHA1]        = "sha1",
-    [KERNEL_HWCAP_SHA2]        = "sha2",
-    [KERNEL_HWCAP_CRC32]        = "crc32",
-    [KERNEL_HWCAP_ATOMICS]        = "atomics",
-    [KERNEL_HWCAP_FPHP]        = "fphp",
-    [KERNEL_HWCAP_ASIMDHP]        = "asimdhp",
-    [KERNEL_HWCAP_CPUID]        = "cpuid",
-    [KERNEL_HWCAP_ASIMDRDM]        = "asimdrdm",
-    [KERNEL_HWCAP_JSCVT]        = "jscvt",
-    [KERNEL_HWCAP_FCMA]        = "fcma",
-    [KERNEL_HWCAP_LRCPC]        = "lrcpc",
-    [KERNEL_HWCAP_DCPOP]        = "dcpop",
-    [KERNEL_HWCAP_SHA3]        = "sha3",
-    [KERNEL_HWCAP_SM3]        = "sm3",
-    [KERNEL_HWCAP_SM4]        = "sm4",
-    [KERNEL_HWCAP_ASIMDDP]        = "asimddp",
-    [KERNEL_HWCAP_SHA512]        = "sha512",
-    [KERNEL_HWCAP_SVE]        = "sve",
-    [KERNEL_HWCAP_ASIMDFHM]        = "asimdfhm",
-    [KERNEL_HWCAP_DIT]        = "dit",
-    [KERNEL_HWCAP_USCAT]        = "uscat",
-    [KERNEL_HWCAP_ILRCPC]        = "ilrcpc",
-    [KERNEL_HWCAP_FLAGM]        = "flagm",
-    [KERNEL_HWCAP_SSBS]        = "ssbs",
-    [KERNEL_HWCAP_SB]        = "sb",
-    [KERNEL_HWCAP_PACA]        = "paca",
-    [KERNEL_HWCAP_PACG]        = "pacg",
-    [KERNEL_HWCAP_DCPODP]        = "dcpodp",
-    [KERNEL_HWCAP_SVE2]        = "sve2",
-    [KERNEL_HWCAP_SVEAES]        = "sveaes",
-    [KERNEL_HWCAP_SVEPMULL]        = "svepmull",
-    [KERNEL_HWCAP_SVEBITPERM]    = "svebitperm",
-    [KERNEL_HWCAP_SVESHA3]        = "svesha3",
-    [KERNEL_HWCAP_SVESM4]        = "svesm4",
-    [KERNEL_HWCAP_FLAGM2]        = "flagm2",
-    [KERNEL_HWCAP_FRINT]        = "frint",
-    [KERNEL_HWCAP_SVEI8MM]        = "svei8mm",
-    [KERNEL_HWCAP_SVEF32MM]        = "svef32mm",
-    [KERNEL_HWCAP_SVEF64MM]        = "svef64mm",
-    [KERNEL_HWCAP_SVEBF16]        = "svebf16",
-    [KERNEL_HWCAP_I8MM]        = "i8mm",
-    [KERNEL_HWCAP_BF16]        = "bf16",
-    [KERNEL_HWCAP_DGH]        = "dgh",
-    [KERNEL_HWCAP_RNG]        = "rng",
-    [KERNEL_HWCAP_BTI]        = "bti",
-    [KERNEL_HWCAP_MTE]        = "mte",
+    [KERNEL_HWCAP_FP] = "fp",
+    [KERNEL_HWCAP_ASIMD] = "asimd",
+    [KERNEL_HWCAP_EVTSTRM] = "evtstrm",
+    [KERNEL_HWCAP_AES] = "aes",
+    [KERNEL_HWCAP_PMULL] = "pmull",
+    [KERNEL_HWCAP_SHA1] = "sha1",
+    [KERNEL_HWCAP_SHA2] = "sha2",
+    [KERNEL_HWCAP_CRC32] = "crc32",
+    [KERNEL_HWCAP_ATOMICS] = "atomics",
+    [KERNEL_HWCAP_FPHP] = "fphp",
+    [KERNEL_HWCAP_ASIMDHP] = "asimdhp",
+    [KERNEL_HWCAP_CPUID] = "cpuid",
+    [KERNEL_HWCAP_ASIMDRDM] = "asimdrdm",
+    [KERNEL_HWCAP_JSCVT] = "jscvt",
+    [KERNEL_HWCAP_FCMA] = "fcma",
+    [KERNEL_HWCAP_LRCPC] = "lrcpc",
+    [KERNEL_HWCAP_DCPOP] = "dcpop",
+    [KERNEL_HWCAP_SHA3] = "sha3",
+    [KERNEL_HWCAP_SM3] = "sm3",
+    [KERNEL_HWCAP_SM4] = "sm4",
+    [KERNEL_HWCAP_ASIMDDP] = "asimddp",
+    [KERNEL_HWCAP_SHA512] = "sha512",
+    [KERNEL_HWCAP_SVE] = "sve",
+    [KERNEL_HWCAP_ASIMDFHM] = "asimdfhm",
+    [KERNEL_HWCAP_DIT] = "dit",
+    [KERNEL_HWCAP_USCAT] = "uscat",
+    [KERNEL_HWCAP_ILRCPC] = "ilrcpc",
+    [KERNEL_HWCAP_FLAGM] = "flagm",
+    [KERNEL_HWCAP_SSBS] = "ssbs",
+    [KERNEL_HWCAP_SB] = "sb",
+    [KERNEL_HWCAP_PACA] = "paca",
+    [KERNEL_HWCAP_PACG] = "pacg",
+    [KERNEL_HWCAP_DCPODP] = "dcpodp",
+    [KERNEL_HWCAP_SVE2] = "sve2",
+    [KERNEL_HWCAP_SVEAES] = "sveaes",
+    [KERNEL_HWCAP_SVEPMULL] = "svepmull",
+    [KERNEL_HWCAP_SVEBITPERM] = "svebitperm",
+    [KERNEL_HWCAP_SVESHA3] = "svesha3",
+    [KERNEL_HWCAP_SVESM4] = "svesm4",
+    [KERNEL_HWCAP_FLAGM2] = "flagm2",
+    [KERNEL_HWCAP_FRINT] = "frint",
+    [KERNEL_HWCAP_SVEI8MM] = "svei8mm",
+    [KERNEL_HWCAP_SVEF32MM] = "svef32mm",
+    [KERNEL_HWCAP_SVEF64MM] = "svef64mm",
+    [KERNEL_HWCAP_SVEBF16] = "svebf16",
+    [KERNEL_HWCAP_I8MM] = "i8mm",
+    [KERNEL_HWCAP_BF16] = "bf16",
+    [KERNEL_HWCAP_DGH] = "dgh",
+    [KERNEL_HWCAP_RNG] = "rng",
+    [KERNEL_HWCAP_BTI] = "bti",
+    [KERNEL_HWCAP_MTE] = "mte",
 };
 
 #ifdef CONFIG_COMPAT
-#define COMPAT_KERNEL_HWCAP(x)    const_ilog2(COMPAT_HWCAP_ ## x)
+#define COMPAT_KERNEL_HWCAP(x) const_ilog2(COMPAT_HWCAP_##x)
 static const char *const compat_hwcap_str[] = {
-    [COMPAT_KERNEL_HWCAP(SWP)]    = "swp",
-    [COMPAT_KERNEL_HWCAP(HALF)]    = "half",
-    [COMPAT_KERNEL_HWCAP(THUMB)]    = "thumb",
-    [COMPAT_KERNEL_HWCAP(26BIT)]    = NULL,    /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(SWP)] = "swp",
+    [COMPAT_KERNEL_HWCAP(HALF)] = "half",
+    [COMPAT_KERNEL_HWCAP(THUMB)] = "thumb",
+    [COMPAT_KERNEL_HWCAP(26BIT)] = NULL, /* Not possible on arm64 */
     [COMPAT_KERNEL_HWCAP(FAST_MULT)] = "fastmult",
-    [COMPAT_KERNEL_HWCAP(FPA)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(VFP)]    = "vfp",
-    [COMPAT_KERNEL_HWCAP(EDSP)]    = "edsp",
-    [COMPAT_KERNEL_HWCAP(JAVA)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(IWMMXT)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(CRUNCH)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(THUMBEE)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(NEON)]    = "neon",
-    [COMPAT_KERNEL_HWCAP(VFPv3)]    = "vfpv3",
-    [COMPAT_KERNEL_HWCAP(VFPV3D16)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(TLS)]    = "tls",
-    [COMPAT_KERNEL_HWCAP(VFPv4)]    = "vfpv4",
-    [COMPAT_KERNEL_HWCAP(IDIVA)]    = "idiva",
-    [COMPAT_KERNEL_HWCAP(IDIVT)]    = "idivt",
-    [COMPAT_KERNEL_HWCAP(VFPD32)]    = NULL,    /* Not possible on arm64 */
-    [COMPAT_KERNEL_HWCAP(LPAE)]    = "lpae",
-    [COMPAT_KERNEL_HWCAP(EVTSTRM)]    = "evtstrm",
+    [COMPAT_KERNEL_HWCAP(FPA)] = NULL, /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(VFP)] = "vfp",
+    [COMPAT_KERNEL_HWCAP(EDSP)] = "edsp",
+    [COMPAT_KERNEL_HWCAP(JAVA)] = NULL,    /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(IWMMXT)] = NULL,  /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(CRUNCH)] = NULL,  /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(THUMBEE)] = NULL, /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(NEON)] = "neon",
+    [COMPAT_KERNEL_HWCAP(VFPv3)] = "vfpv3",
+    [COMPAT_KERNEL_HWCAP(VFPV3D16)] = NULL, /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(TLS)] = "tls",
+    [COMPAT_KERNEL_HWCAP(VFPv4)] = "vfpv4",
+    [COMPAT_KERNEL_HWCAP(IDIVA)] = "idiva",
+    [COMPAT_KERNEL_HWCAP(IDIVT)] = "idivt",
+    [COMPAT_KERNEL_HWCAP(VFPD32)] = NULL, /* Not possible on arm64 */
+    [COMPAT_KERNEL_HWCAP(LPAE)] = "lpae",
+    [COMPAT_KERNEL_HWCAP(EVTSTRM)] = "evtstrm",
 };
 
-#define COMPAT_KERNEL_HWCAP2(x)    const_ilog2(COMPAT_HWCAP2_ ## x)
+#define COMPAT_KERNEL_HWCAP2(x) const_ilog2(COMPAT_HWCAP2_##x)
 static const char *const compat_hwcap2_str[] = {
-    [COMPAT_KERNEL_HWCAP2(AES)]    = "aes",
-    [COMPAT_KERNEL_HWCAP2(PMULL)]    = "pmull",
-    [COMPAT_KERNEL_HWCAP2(SHA1)]    = "sha1",
-    [COMPAT_KERNEL_HWCAP2(SHA2)]    = "sha2",
-    [COMPAT_KERNEL_HWCAP2(CRC32)]    = "crc32",
+    [COMPAT_KERNEL_HWCAP2(AES)] = "aes",     [COMPAT_KERNEL_HWCAP2(PMULL)] = "pmull",
+    [COMPAT_KERNEL_HWCAP2(SHA1)] = "sha1",   [COMPAT_KERNEL_HWCAP2(SHA2)] = "sha2",
+    [COMPAT_KERNEL_HWCAP2(CRC32)] = "crc32",
 };
 #endif /* CONFIG_COMPAT */
 
@@ -144,7 +142,8 @@ static int c_show(struct seq_file *m, void *v)
     int i, j;
     bool compat = personality(current->personality) == PER_LINUX32;
 
-    for_each_online_cpu(i) {
+    for_each_online_cpu(i)
+    {
         struct cpuinfo_arm64 *cpuinfo = &per_cpu(cpu_data, i);
         u32 midr = cpuinfo->reg_midr;
 
@@ -154,13 +153,12 @@ static int c_show(struct seq_file *m, void *v)
          * "processor".  Give glibc what it expects.
          */
         seq_printf(m, "processor\t: %d\n", i);
-        if (compat)
-            seq_printf(m, "model name\t: ARMv8 Processor rev %d (%s)\n",
-                   MIDR_REVISION(midr), COMPAT_ELF_PLATFORM);
+        if (compat) {
+            seq_printf(m, "model name\t: ARMv8 Processor rev %d (%s)\n", MIDR_REVISION(midr), COMPAT_ELF_PLATFORM);
+        }
 
-        seq_printf(m, "BogoMIPS\t: %lu.%02lu\n",
-               loops_per_jiffy / (500000UL/HZ),
-               loops_per_jiffy / (5000UL/HZ) % 100);
+        seq_printf(m, "BogoMIPS\t: %lu.%02lu\n", loops_per_jiffy / (500000UL / HZ),
+                   loops_per_jiffy / (5000UL / HZ) % 0x64);
 
         /*
          * Dump out the common processor features in a single line.
@@ -177,26 +175,30 @@ static int c_show(struct seq_file *m, void *v)
                      * Warn once if any feature should not
                      * have been present on arm64 platform.
                      */
-                    if (WARN_ON_ONCE(!compat_hwcap_str[j]))
+                    if (WARN_ON_ONCE(!compat_hwcap_str[j])) {
                         continue;
+                    }
 
                     seq_printf(m, " %s", compat_hwcap_str[j]);
                 }
             }
 
-            for (j = 0; j < ARRAY_SIZE(compat_hwcap2_str); j++)
-                if (compat_elf_hwcap2 & (1 << j))
+            for (j = 0; j < ARRAY_SIZE(compat_hwcap2_str); j++) {
+                if (compat_elf_hwcap2 & (1 << j)) {
                     seq_printf(m, " %s", compat_hwcap2_str[j]);
+                }
+            }
 #endif /* CONFIG_COMPAT */
         } else {
-            for (j = 0; j < ARRAY_SIZE(hwcap_str); j++)
-                if (cpu_have_feature(j))
+            for (j = 0; j < ARRAY_SIZE(hwcap_str); j++) {
+                if (cpu_have_feature(j)) {
                     seq_printf(m, " %s", hwcap_str[j]);
+                }
+            }
         }
         seq_puts(m, "\n");
 
-        seq_printf(m, "CPU implementer\t: 0x%02x\n",
-               MIDR_IMPLEMENTOR(midr));
+        seq_printf(m, "CPU implementer\t: 0x%02x\n", MIDR_IMPLEMENTOR(midr));
         seq_printf(m, "CPU architecture: 8\n");
         seq_printf(m, "CPU variant\t: 0x%x\n", MIDR_VARIANT(midr));
         seq_printf(m, "CPU part\t: 0x%03x\n", MIDR_PARTNUM(midr));
@@ -221,13 +223,7 @@ static void c_stop(struct seq_file *m, void *v)
 {
 }
 
-const struct seq_operations cpuinfo_op = {
-    .start    = c_start,
-    .next    = c_next,
-    .stop    = c_stop,
-    .show    = c_show
-};
-
+const struct seq_operations cpuinfo_op = {.start = c_start, .next = c_next, .stop = c_stop, .show = c_show};
 
 static struct kobj_type cpuregs_kobj_type = {
     .sysfs_ops = &kobj_sysfs_ops,
@@ -244,33 +240,25 @@ static struct kobj_type cpuregs_kobj_type = {
  * registers, we expose them both as 64 bit values to cater for possible
  * future expansion without an ABI break.
  */
-#define kobj_to_cpuinfo(kobj)    container_of(kobj, struct cpuinfo_arm64, kobj)
-#define CPUREGS_ATTR_RO(_name, _field)                        \
-    static ssize_t _name##_show(struct kobject *kobj,            \
-            struct kobj_attribute *attr, char *buf)            \
-    {                                    \
-        struct cpuinfo_arm64 *info = kobj_to_cpuinfo(kobj);        \
-                                        \
-        if (info->reg_midr)                        \
-            return sprintf(buf, "0x%016x\n", info->reg_##_field);    \
-        else                                \
-            return 0;                        \
-    }                                    \
+#define kobj_to_cpuinfo(kobj) container_of(kobj, struct cpuinfo_arm64, kobj)
+#define CPUREGS_ATTR_RO(_name, _field)                                                                                 \
+    static ssize_t _name##_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)                          \
+    {                                                                                                                  \
+        struct cpuinfo_arm64 *info = kobj_to_cpuinfo(kobj);                                                            \
+                                                                                                                       \
+        if (info->reg_midr)                                                                                            \
+            return sprintf(buf, "0x%016x\n", info->reg_##_field);                                                      \
+        else                                                                                                           \
+            return 0;                                                                                                  \
+    }                                                                                                                  \
     static struct kobj_attribute cpuregs_attr_##_name = __ATTR_RO(_name)
 
 CPUREGS_ATTR_RO(midr_el1, midr);
 CPUREGS_ATTR_RO(revidr_el1, revidr);
 
-static struct attribute *cpuregs_id_attrs[] = {
-    &cpuregs_attr_midr_el1.attr,
-    &cpuregs_attr_revidr_el1.attr,
-    NULL
-};
+static struct attribute *cpuregs_id_attrs[] = {&cpuregs_attr_midr_el1.attr, &cpuregs_attr_revidr_el1.attr, NULL};
 
-static const struct attribute_group cpuregs_attr_group = {
-    .attrs = cpuregs_id_attrs,
-    .name = "identification"
-};
+static const struct attribute_group cpuregs_attr_group = {.attrs = cpuregs_id_attrs, .name = "identification"};
 
 static int cpuid_cpu_online(unsigned int cpu)
 {
@@ -284,11 +272,13 @@ static int cpuid_cpu_online(unsigned int cpu)
         goto out;
     }
     rc = kobject_add(&info->kobj, &dev->kobj, "regs");
-    if (rc)
+    if (rc) {
         goto out;
+    }
     rc = sysfs_create_group(&info->kobj, &cpuregs_attr_group);
-    if (rc)
+    if (rc) {
         kobject_del(&info->kobj);
+    }
 out:
     return rc;
 }
@@ -299,8 +289,9 @@ static int cpuid_cpu_offline(unsigned int cpu)
     struct cpuinfo_arm64 *info = &per_cpu(cpu_data, cpu);
 
     dev = get_cpu_device(cpu);
-    if (!dev)
+    if (!dev) {
         return -ENODEV;
+    }
     if (info->kobj.parent) {
         sysfs_remove_group(&info->kobj, &cpuregs_attr_group);
         kobject_del(&info->kobj);
@@ -313,14 +304,14 @@ static int __init cpuinfo_regs_init(void)
 {
     int cpu, ret;
 
-    for_each_possible_cpu(cpu) {
+    for_each_possible_cpu(cpu)
+    {
         struct cpuinfo_arm64 *info = &per_cpu(cpu_data, cpu);
 
         kobject_init(&info->kobj, &cpuregs_kobj_type);
     }
 
-    ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "arm64/cpuinfo:online",
-                cpuid_cpu_online, cpuid_cpu_offline);
+    ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "arm64/cpuinfo:online", cpuid_cpu_online, cpuid_cpu_offline);
     if (ret < 0) {
         pr_err("cpuinfo: failed to register hotplug callbacks.\n");
         return ret;
@@ -335,16 +326,16 @@ static void cpuinfo_detect_icache_policy(struct cpuinfo_arm64 *info)
     u32 l1ip = CTR_L1IP(info->reg_ctr);
 
     switch (l1ip) {
-    case ICACHE_POLICY_PIPT:
-        break;
-    case ICACHE_POLICY_VPIPT:
-        set_bit(ICACHEF_VPIPT, &__icache_flags);
-        break;
-    case ICACHE_POLICY_RESERVED:
-    case ICACHE_POLICY_VIPT:
-        /* Assume aliasing */
-        set_bit(ICACHEF_ALIASING, &__icache_flags);
-        break;
+        case ICACHE_POLICY_PIPT:
+            break;
+        case ICACHE_POLICY_VPIPT:
+            set_bit(ICACHEF_VPIPT, &__icache_flags);
+            break;
+        case ICACHE_POLICY_RESERVED:
+        case ICACHE_POLICY_VIPT:
+            /* Assume aliasing */
+            set_bit(ICACHEF_ALIASING, &__icache_flags);
+            break;
     }
 
     pr_info("Detected %s I-cache on CPU%d\n", icache_policy_str[l1ip], cpu);
@@ -404,9 +395,9 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
         info->reg_mvfr2 = read_cpuid(MVFR2_EL1);
     }
 
-    if (IS_ENABLED(CONFIG_ARM64_SVE) &&
-        id_aa64pfr0_sve(info->reg_id_aa64pfr0))
+    if (IS_ENABLED(CONFIG_ARM64_SVE) && id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
         info->reg_zcr = read_zcr_features();
+    }
 
     cpuinfo_detect_icache_policy(info);
 }

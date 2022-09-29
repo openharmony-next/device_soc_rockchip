@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * "Coarse Demand" power management policy
  */

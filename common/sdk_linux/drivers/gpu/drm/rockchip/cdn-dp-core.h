@@ -13,7 +13,7 @@
 
 #include "rockchip_drm_drv.h"
 
-#define MAX_PHY        2
+#define MAX_PHY 2
 
 enum audio_format {
     AFMT_I2S = 0,
@@ -45,10 +45,10 @@ struct video_info {
 };
 
 struct cdn_firmware_header {
-    u32 size_bytes; /* size of the entire header+image(s) in bytes */
+    u32 size_bytes;  /* size of the entire header+image(s) in bytes */
     u32 header_size; /* size of just the header in bytes */
-    u32 iram_size; /* size of iram */
-    u32 dram_size; /* size of dram */
+    u32 iram_size;   /* size of iram */
+    u32 dram_size;   /* size of dram */
 };
 
 struct cdn_dp_port {
@@ -75,8 +75,8 @@ struct cdn_dp_device {
     bool active;
     bool suspended;
 
-    const struct firmware *fw;    /* cdn dp firmware */
-    unsigned int fw_version;    /* cdn fw version */
+    const struct firmware *fw; /* cdn dp firmware */
+    unsigned int fw_version;   /* cdn fw version */
     bool fw_loaded;
 
     void __iomem *regs;
@@ -101,4 +101,4 @@ struct cdn_dp_device {
     u8 dpcd[DP_RECEIVER_CAP_SIZE];
     bool sink_has_audio;
 };
-#endif  /* _CDN_DP_CORE_H */
+#endif /* _CDN_DP_CORE_H */

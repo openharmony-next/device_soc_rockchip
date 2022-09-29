@@ -32,13 +32,11 @@ void iommu_setup_dma_ops(struct device *dev, u64 dma_base, u64 size);
 int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
 
 /* Update the MSI message if required. */
-void iommu_dma_compose_msi_msg(struct msi_desc *desc,
-                   struct msi_msg *msg);
+void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg);
 
 void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list);
 
-int iommu_dma_reserve_iova(struct device *dev, dma_addr_t base,
-               u64 size);
+int iommu_dma_reserve_iova(struct device *dev, dma_addr_t base, u64 size);
 
 int iommu_dma_enable_best_fit_algo(struct device *dev);
 
@@ -49,8 +47,7 @@ struct msi_desc;
 struct msi_msg;
 struct device;
 
-static inline void iommu_setup_dma_ops(struct device *dev, u64 dma_base,
-        u64 size)
+static inline void iommu_setup_dma_ops(struct device *dev, u64 dma_base, u64 size)
 {
 }
 
@@ -68,14 +65,12 @@ static inline void iommu_put_dma_cookie(struct iommu_domain *domain)
 {
 }
 
-static inline int iommu_dma_prepare_msi(struct msi_desc *desc,
-                    phys_addr_t msi_addr)
+static inline int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
 {
     return 0;
 }
 
-static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc,
-                         struct msi_msg *msg)
+static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
 {
 }
 
@@ -83,8 +78,7 @@ static inline void iommu_dma_get_resv_regions(struct device *dev, struct list_he
 {
 }
 
-static inline int iommu_dma_reserve_iova(struct device *dev, dma_addr_t base,
-                     u64 size)
+static inline int iommu_dma_reserve_iova(struct device *dev, dma_addr_t base, u64 size)
 {
     return -ENODEV;
 }
@@ -94,5 +88,5 @@ static inline int iommu_dma_enable_best_fit_algo(struct device *dev)
     return -ENODEV;
 }
 
-#endif    /* CONFIG_IOMMU_DMA */
-#endif    /* __DMA_IOMMU_H */
+#endif /* CONFIG_IOMMU_DMA */
+#endif /* __DMA_IOMMU_H */

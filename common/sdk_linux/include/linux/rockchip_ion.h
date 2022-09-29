@@ -31,8 +31,7 @@ struct ion_phys_data {
 #define ION_IOC_ROCKCHIP_MAGIC 'R'
 
 /* Get phys addr of the handle specified. */
-#define ION_IOC_GET_PHYS    _IOWR(ION_IOC_ROCKCHIP_MAGIC, 0, \
-                        struct ion_phys_data)
+#define ION_IOC_GET_PHYS _IOWR(ION_IOC_ROCKCHIP_MAGIC, 0, struct ion_phys_data)
 
 extern struct ion_device *rockchip_ion_dev;
 

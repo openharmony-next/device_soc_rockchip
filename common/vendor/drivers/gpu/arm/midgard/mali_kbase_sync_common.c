@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /*
  * @file mali_kbase_sync_common.c
  *
@@ -34,10 +32,11 @@ void kbase_sync_fence_wait_worker(struct work_struct *data)
 
 const char *kbase_sync_status_string(int status)
 {
-    if (status == 0)
+    if (status == 0) {
         return "signaled";
-    else if (status > 0)
+    } else if (status > 0) {
         return "active";
-    else
+    } else {
         return "error";
+    }
 }

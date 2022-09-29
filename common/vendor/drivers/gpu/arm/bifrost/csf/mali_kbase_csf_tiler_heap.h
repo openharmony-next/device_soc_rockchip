@@ -67,10 +67,8 @@ void kbase_csf_tiler_heap_context_term(struct kbase_context *kctx);
  *
  * Return: 0 if successful or a negative error code on failure.
  */
-int kbase_csf_tiler_heap_init(struct kbase_context *kctx,
-    u32 chunk_size, u32 initial_chunks, u32 max_chunks,
-    u16 target_in_flight, u64 *gpu_heap_va,
-    u64 *first_chunk_va);
+int kbase_csf_tiler_heap_init(struct kbase_context *kctx, u32 chunk_size, u32 initial_chunks, u32 max_chunks,
+                              u16 target_in_flight, u64 *gpu_heap_va, u64 *first_chunk_va);
 
 /**
  * kbasep_cs_tiler_heap_term - Terminate a chunked tiler memory heap.
@@ -108,6 +106,6 @@ int kbase_csf_tiler_heap_term(struct kbase_context *kctx, u64 gpu_heap_va);
  *         available upon completion of a render pass and -EINVAL when
  *         invalid value was passed for one of the argument).
  */
-int kbase_csf_tiler_heap_alloc_new_chunk(struct kbase_context *kctx,
-    u64 gpu_heap_va, u32 nr_in_flight, u64 *new_chunk_ptr);
+int kbase_csf_tiler_heap_alloc_new_chunk(struct kbase_context *kctx, u64 gpu_heap_va, u32 nr_in_flight,
+                                         u64 *new_chunk_ptr);
 #endif

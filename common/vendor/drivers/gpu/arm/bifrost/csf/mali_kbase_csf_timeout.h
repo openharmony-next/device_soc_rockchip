@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_TIMEOUT_H_
-#define _KBASE_CSF_TIMEOUT_H_
+#ifndef KBASE_CSF_TIMEOUT_H_
+#define KBASE_CSF_TIMEOUT_H_
 
 struct kbase_device;
 

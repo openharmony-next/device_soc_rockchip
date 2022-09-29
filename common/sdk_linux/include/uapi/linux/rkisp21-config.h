@@ -11,25 +11,25 @@
 #include <linux/v4l2-controls.h>
 #include <linux/rkisp2-config.h>
 
-#define ISP2X_MODULE_BAYNR            BIT_ULL(36)
-#define ISP2X_MODULE_BAY3D            BIT_ULL(37)
-#define ISP2X_MODULE_YNR            BIT_ULL(38)
-#define ISP2X_MODULE_CNR            BIT_ULL(39)
-#define ISP2X_MODULE_SHARP            BIT_ULL(40)
-#define ISP2X_MODULE_DRC            BIT_ULL(41)
-#define ISP2X_MODULE_CSM            BIT_ULL(43)
+#define ISP2X_MODULE_BAYNR BIT_ULL(36)
+#define ISP2X_MODULE_BAY3D BIT_ULL(37)
+#define ISP2X_MODULE_YNR BIT_ULL(38)
+#define ISP2X_MODULE_CNR BIT_ULL(39)
+#define ISP2X_MODULE_SHARP BIT_ULL(40)
+#define ISP2X_MODULE_DRC BIT_ULL(41)
+#define ISP2X_MODULE_CSM BIT_ULL(43)
 
-#define ISP21_DHAZ_ENH_CURVE_NUM        17
-#define ISP21_DHAZ_HIST_IIR_NUM            64
-#define ISP21_RAWAWB_HSTBIN_NUM            8
-#define ISP21_RAWAWB_WEIGHT_NUM            225
-#define ISP21_DRC_Y_NUM                17
-#define ISP21_YNR_XY_NUM            17
-#define ISP21_BAYNR_XY_NUM            16
-#define ISP21_BAY3D_XY_NUM            16
-#define ISP21_SHARP_X_NUM            7
-#define ISP21_SHARP_Y_NUM            8
-#define ISP21_CSM_COEFF_NUM            9
+#define ISP21_DHAZ_ENH_CURVE_NUM 17
+#define ISP21_DHAZ_HIST_IIR_NUM 64
+#define ISP21_RAWAWB_HSTBIN_NUM 8
+#define ISP21_RAWAWB_WEIGHT_NUM 225
+#define ISP21_DRC_Y_NUM 17
+#define ISP21_YNR_XY_NUM 17
+#define ISP21_BAYNR_XY_NUM 16
+#define ISP21_BAY3D_XY_NUM 16
+#define ISP21_SHARP_X_NUM 7
+#define ISP21_SHARP_Y_NUM 8
+#define ISP21_CSM_COEFF_NUM 9
 
 struct isp21_csm_cfg {
     u8 csm_full_range;
@@ -37,7 +37,7 @@ struct isp21_csm_cfg {
     u16 csm_c_offset;
 
     u32 csm_coeff[ISP21_CSM_COEFF_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_bls_cfg {
     u8 enable_auto;
@@ -48,7 +48,7 @@ struct isp21_bls_cfg {
     u8 bls_samples;
     struct isp2x_bls_fixed_val fixed_val;
     struct isp2x_bls_fixed_val bls1_val;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_awb_gain_cfg {
     u16 gain0_red;
@@ -63,7 +63,7 @@ struct isp21_awb_gain_cfg {
     u16 gain2_green_r;
     u16 gain2_blue;
     u16 gain2_green_b;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_gic_cfg {
     u16 regmingradthrdark2;
@@ -92,7 +92,7 @@ struct isp21_gic_cfg {
     u16 diff_clip;
 
     u16 sigma_y[ISP2X_GIC_SIGMA_Y_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_baynr_cfg {
     u8 sw_baynr_gauss_en;
@@ -110,7 +110,7 @@ struct isp21_baynr_cfg {
     u16 weit_d2;
     u16 weit_d1;
     u16 weit_d0;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_bay3d_cfg {
     u8 sw_bay3d_exp_sel;
@@ -125,7 +125,7 @@ struct isp21_bay3d_cfg {
     u16 sw_bay3d_wgtlmt_l;
     u16 sw_bay3d_sig_x[ISP21_BAY3D_XY_NUM];
     u16 sw_bay3d_sig_y[ISP21_BAY3D_XY_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_ynr_cfg {
     u8 sw_ynr_thumb_mix_cur_en;
@@ -177,7 +177,7 @@ struct isp21_ynr_cfg {
     u16 sw_ynr_lsgm_y[ISP21_YNR_XY_NUM];
     u16 sw_ynr_hsgm_y[ISP21_YNR_XY_NUM];
     u8 sw_ynr_rnr_strength3[ISP21_YNR_XY_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_cnr_cfg {
     u8 sw_cnr_thumb_mix_cur_en;
@@ -204,7 +204,7 @@ struct isp21_cnr_cfg {
     u16 sw_cnr_hbf5_sigma;
     u16 sw_cnr_lbf5_weit_src;
     u16 sw_cnr_lbf3_sigma;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_sharp_cfg {
     u8 sw_sharp_bypass;
@@ -228,7 +228,7 @@ struct isp21_sharp_cfg {
     u8 sw_sharp_gaus_coef_2;
     u8 sw_sharp_gaus_coef_1;
     u8 sw_sharp_gaus_coef_0;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_ccm_cfg {
     u8 highy_adjust_dis;
@@ -254,7 +254,7 @@ struct isp21_ccm_cfg {
     u16 coeff2_y;
 
     u16 alp_y[ISP21_DHAZ_ENH_CURVE_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_dhaz_cfg {
     u8 enhance_en;
@@ -317,7 +317,7 @@ struct isp21_dhaz_cfg {
     u8 gaus_h2;
     u8 gaus_h1;
     u8 gaus_h0;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_dhaz_stat {
     u16 dhaz_adp_air_base;
@@ -327,7 +327,7 @@ struct isp21_dhaz_stat {
     u16 dhaz_adp_tmax;
 
     u16 h_rgb_iir[ISP21_DHAZ_HIST_IIR_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_drc_cfg {
     u8 sw_drc_offset_pow2;
@@ -352,7 +352,7 @@ struct isp21_drc_cfg {
     u16 sw_drc_scale_y[ISP21_DRC_Y_NUM];
     u16 sw_drc_iir_weight;
     u16 sw_drc_min_ogain;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_rawawb_meas_cfg {
     u8 rawawb_sel;
@@ -703,7 +703,7 @@ struct isp21_rawawb_meas_cfg {
     u32 sw_rawawb_islope12_6;
     u32 sw_rawawb_islope23_6;
     u32 sw_rawawb_islope30_6;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_isp_other_cfg {
     struct isp21_bls_cfg bls_cfg;
@@ -728,7 +728,7 @@ struct isp21_isp_other_cfg {
     struct isp21_cnr_cfg cnr_cfg;
     struct isp21_sharp_cfg sharp_cfg;
     struct isp21_csm_cfg csm_cfg;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_isp_meas_cfg {
     struct isp2x_siawb_meas_cfg siawb;
@@ -745,7 +745,7 @@ struct isp21_isp_meas_cfg {
     struct isp2x_rawhistbig_cfg rawhist2;
     struct isp2x_rawhistbig_cfg rawhist3;
     struct isp2x_sihst_cfg sihst;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_isp_params_cfg {
     u64 module_en_update;
@@ -755,7 +755,7 @@ struct isp21_isp_params_cfg {
     u32 frame_id;
     struct isp21_isp_meas_cfg meas;
     struct isp21_isp_other_cfg others;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_rawawb_meas_stat {
     u16 ro_yhist_bin[ISP21_RAWAWB_HSTBIN_NUM];
@@ -766,7 +766,7 @@ struct isp21_rawawb_meas_stat {
     u32 ro_rawawb_sum_bgain_big[ISP2X_RAWAWB_SUM_NUM];
     u32 ro_rawawb_wp_num_big[ISP2X_RAWAWB_SUM_NUM];
     struct isp2x_rawawb_ramdata ramdata[ISP2X_RAWAWB_RAMDATA_NUM];
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct isp21_stat {
     struct isp2x_siawb_stat siawb;
@@ -786,7 +786,7 @@ struct isp21_stat {
 
     struct isp2x_bls_stat bls;
     struct isp21_dhaz_stat dhaz;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 /**
  * struct rkisp_isp21_stat_buffer - Rockchip ISP2 Statistics Meta Data
@@ -799,6 +799,6 @@ struct rkisp_isp21_stat_buffer {
     unsigned int meas_type;
     unsigned int frame_id;
     struct isp21_stat params;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 #endif /* _UAPI_RKISP21_CONFIG_H */

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_VERSION_H
-#define _RKISPP_VERSION_H
+#ifndef H_RKISPP_VERSION_H
+#define H_RKISPP_VERSION_H
 #include <linux/version.h>
 #include <linux/rkispp-config.h>
 

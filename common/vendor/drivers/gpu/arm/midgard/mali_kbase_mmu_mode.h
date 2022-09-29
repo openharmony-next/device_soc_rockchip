@@ -13,12 +13,8 @@
  *
  */
 
-
-
-
-
-#ifndef _MALI_KBASE_MMU_MODE_
-#define _MALI_KBASE_MMU_MODE_
+#ifndef MALI_KBASE_MMU_MODE_
+#define MALI_KBASE_MMU_MODE_
 
 #include <linux/types.h>
 
@@ -30,8 +26,7 @@ struct kbase_mmu_setup;
 
 struct kbase_mmu_mode {
     void (*update)(struct kbase_context *kctx);
-    void (*get_as_setup)(struct kbase_context *kctx,
-            struct kbase_mmu_setup * const setup);
+    void (*get_as_setup)(struct kbase_context *kctx, struct kbase_mmu_setup *const setup);
     void (*disable_as)(struct kbase_device *kbdev, int as_nr);
     phys_addr_t (*pte_to_phy_addr)(u64 entry);
     int (*ate_is_valid)(u64 ate);

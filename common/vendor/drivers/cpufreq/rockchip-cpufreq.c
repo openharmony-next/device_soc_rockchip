@@ -45,17 +45,16 @@ struct cluster_info {
 };
 static LIST_HEAD(cluster_info_list);
 
-static int px30_get_soc_info(struct device *dev, struct device_node *np,
-                 int *bin, int *process)
+static int px30_get_soc_info(struct device *dev, struct device_node *np, int *bin, int *process)
 {
     int ret = 0;
     u8 value = 0;
 
-    if (!bin)
+    if (!bin) {
         return 0;
+    }
 
-    if (of_property_match_string(np, "nvmem-cell-names",
-                     "performance") >= 0) {
+    if (of_property_match_string(np, "nvmem-cell-names", "performance") >= 0) {
         ret = rockchip_nvmem_cell_read_u8(np, "performance", &value);
         if (ret) {
             dev_err(dev, "Failed to get soc performance value\n");
@@ -63,37 +62,40 @@ static int px30_get_soc_info(struct device *dev, struct device_node *np,
         }
         *bin = value;
     }
-    if (*bin >= ROCKCHIP_SOC_INFO_ZERO)
+    if (*bin >= ROCKCHIP_SOC_INFO_ZERO) {
         dev_info(dev, "bin=%d\n", *bin);
+    }
 
     return ret;
 }
 
-static int rk3288_get_soc_info(struct device *dev, struct device_node *np,
-                   int *bin, int *process)
+static int rk3288_get_soc_info(struct device *dev, struct device_node *np, int *bin, int *process)
 {
     int ret = 0;
     u8 value = 0;
     char *name;
 
-    if (!bin)
+    if (!bin) {
         goto next;
+    }
     if (of_property_match_string(np, "nvmem-cell-names", "special") >= 0) {
         ret = rockchip_nvmem_cell_read_u8(np, "special", &value);
         if (ret) {
             dev_err(dev, "Failed to get soc special value\n");
             goto out;
         }
-        if (value == 0xc)
+        if (value == 0xc) {
             *bin = ROCKCHIP_SOC_INFO_ZERO;
-        else
+        } else {
             *bin = ROCKCHIP_SOC_INFO_ONE;
+        }
     }
 
-    if (soc_is_rk3288w())
+    if (soc_is_rk3288w()) {
         name = "performance-w";
-    else
+    } else {
         name = "performance";
+    }
 
     if (of_property_match_string(np, "nvmem-cell-names", name) >= 0) {
         ret = rockchip_nvmem_cell_read_u8(np, name, &value);
@@ -101,70 +103,68 @@ static int rk3288_get_soc_info(struct device *dev, struct device_node *np,
             dev_err(dev, "Failed to get soc performance value\n");
             goto out;
         }
-        if (value & 0x2)
+        if (value & 0x2) {
             *bin = ROCKCHIP_SOC_INFO_THREE;
-        else if (value & 0x01)
+        } else if (value & 0x01) {
             *bin = ROCKCHIP_SOC_INFO_TWO;
+        }
     }
-    if (*bin >= ROCKCHIP_SOC_INFO_ZERO)
+    if (*bin >= ROCKCHIP_SOC_INFO_ZERO) {
         dev_info(dev, "bin=%d\n", *bin);
+    }
 
 next:
-    if (!process)
+    if (!process) {
         goto out;
-    if (of_property_match_string(np, "nvmem-cell-names",
-                     "process") >= 0) {
+    }
+    if (of_property_match_string(np, "nvmem-cell-names", "process") >= 0) {
         ret = rockchip_nvmem_cell_read_u8(np, "process", &value);
         if (ret) {
             dev_err(dev, "Failed to get soc process version\n");
             goto out;
         }
-        if (soc_is_rk3288() && (value == 0 || value == 1))
+        if (soc_is_rk3288() && (value == 0 || value == 1)) {
             *process = 0;
+        }
     }
-    if (*process >= 0)
+    if (*process >= 0) {
         dev_info(dev, "process=%d\n", *process);
+    }
 
 out:
     return ret;
 }
 
-static int rk3399_get_soc_info(struct device *dev, struct device_node *np,
-                   int *bin, int *process)
+static int rk3399_get_soc_info(struct device *dev, struct device_node *np, int *bin, int *process)
 {
     int ret = 0;
     u8 value = 0;
 
-    if (!bin)
+    if (!bin) {
         return 0;
+    }
 
-    if (of_property_match_string(np, "nvmem-cell-names",
-                     "specification_serial_number") >= 0) {
-        ret = rockchip_nvmem_cell_read_u8(np,
-                          "specification_serial_number",
-                          &value);
+    if (of_property_match_string(np, "nvmem-cell-names", "specification_serial_number") >= 0) {
+        ret = rockchip_nvmem_cell_read_u8(np, "specification_serial_number", &value);
         if (ret) {
-            dev_err(dev,
-                "Failed to get specification_serial_number\n");
+            dev_err(dev, "Failed to get specification_serial_number\n");
             goto out;
         }
 
         if (value == 0xb) {
             *bin = ROCKCHIP_SOC_INFO_ZERO;
         } else if (value == 0x1) {
-            if (of_property_match_string(np, "nvmem-cell-names",
-                             "customer_demand") >= 0) {
-                ret = rockchip_nvmem_cell_read_u8(np,
-                                  "customer_demand",
-                                  &value);
+            if (of_property_match_string(np, "nvmem-cell-names", "customer_demand") >= 0) {
+                ret = rockchip_nvmem_cell_read_u8(np, "customer_demand", &value);
                 if (ret) {
                     dev_err(dev, "Failed to get customer_demand\n");
                     goto out;
                 }
-                if (value == 0x0)
+                if (value == 0x0) {
                     *bin = ROCKCHIP_SOC_INFO_ZERO;
-                else
+                } else {
                     *bin = ROCKCHIP_SOC_INFO_ONE;
+                }
             }
         } else if (value == 0x10) {
             *bin = ROCKCHIP_SOC_INFO_ONE;
@@ -172,22 +172,22 @@ static int rk3399_get_soc_info(struct device *dev, struct device_node *np,
     }
 
 out:
-    if (*bin >= ROCKCHIP_SOC_INFO_ZERO)
+    if (*bin >= ROCKCHIP_SOC_INFO_ZERO) {
         dev_info(dev, "bin=%d\n", *bin);
+    }
 
     return ret;
 }
 
-static int rk3588_cpu_set_read_margin(struct device *dev,
-                      struct rockchip_opp_info *opp_info,
-                      unsigned long volt)
+static int rk3588_cpu_set_read_margin(struct device *dev, struct rockchip_opp_info *opp_info, unsigned long volt)
 {
     bool is_found = false;
     u32 rm;
     int i;
 
-    if (!opp_info->grf || !opp_info->volt_rm_tbl)
+    if (!opp_info->grf || !opp_info->volt_rm_tbl) {
         return 0;
+    }
 
     for (i = 0; opp_info->volt_rm_tbl[i].rm != VOLT_RM_TABLE_END; i++) {
         if (volt >= opp_info->volt_rm_tbl[i].volt) {
@@ -197,15 +197,17 @@ static int rk3588_cpu_set_read_margin(struct device *dev,
         }
     }
 
-    if (!is_found)
+    if (!is_found) {
         return 0;
-    if (rm == opp_info->current_rm)
+    }
+    if (rm == opp_info->current_rm) {
         return 0;
+    }
 
     dev_dbg(dev, "set rm to %d\n", rm);
-    regmap_write(opp_info->grf, 0x20, 0x001c0000 | (rm << 2));
-    regmap_write(opp_info->grf, 0x28, 0x003c0000 | (rm << 2));
-    regmap_write(opp_info->grf, 0x2c, 0x003c0000 | (rm << 2));
+    regmap_write(opp_info->grf, 0x20, 0x001c0000 | (rm << 0x2));
+    regmap_write(opp_info->grf, 0x28, 0x003c0000 | (rm << 0x2));
+    regmap_write(opp_info->grf, 0x2c, 0x003c0000 | (rm << 0x2));
     regmap_write(opp_info->grf, 0x30, 0x00200020);
     udelay(1);
     regmap_write(opp_info->grf, 0x30, 0x00200000);
@@ -215,8 +217,7 @@ static int rk3588_cpu_set_read_margin(struct device *dev,
     return 0;
 }
 
-static int rv1126_get_soc_info(struct device *dev, struct device_node *np,
-                   int *bin, int *process)
+static int rv1126_get_soc_info(struct device *dev, struct device_node *np, int *bin, int *process)
 {
     int ret = 0;
     u8 value = 0;
@@ -227,13 +228,15 @@ static int rv1126_get_soc_info(struct device *dev, struct device_node *np,
             dev_err(dev, "Failed to get soc performance value\n");
             return ret;
         }
-        if (value == 0x1)
+        if (value == 0x1) {
             *bin = ROCKCHIP_SOC_INFO_ONE;
-        else
+        } else {
             *bin = ROCKCHIP_SOC_INFO_ZERO;
+        }
     }
-    if (*bin >= ROCKCHIP_SOC_INFO_ZERO)
+    if (*bin >= ROCKCHIP_SOC_INFO_ZERO) {
         dev_info(dev, "bin=%d\n", *bin);
+    }
 
     return ret;
 }
@@ -298,30 +301,29 @@ static struct cluster_info *rockchip_cluster_info_lookup(int cpu)
 {
     struct cluster_info *cluster;
 
-    list_for_each_entry(cluster, &cluster_info_list, list_head) {
-        if (cpumask_test_cpu(cpu, &cluster->cpus))
+    list_for_each_entry(cluster, &cluster_info_list, list_head)
+    {
+        if (cpumask_test_cpu(cpu, &cluster->cpus)) {
             return cluster;
+        }
     }
 
     return NULL;
 }
 
-static int rockchip_cpufreq_set_volt(struct device *dev,
-                     struct regulator *reg,
-                     struct dev_pm_opp_supply *supply,
-                     char *reg_name)
+static int rockchip_cpufreq_set_volt(struct device *dev, struct regulator *reg, struct dev_pm_opp_supply *supply,
+                                     char *reg_name)
 {
     int ret;
 
-    dev_dbg(dev, "%s: %s voltages (uV): %lu %lu %lu\n", __func__, reg_name,
-        supply->u_volt_min, supply->u_volt, supply->u_volt_max);
+    dev_dbg(dev, "%s: %s voltages (uV): %lu %lu %lu\n", __func__, reg_name, supply->u_volt_min, supply->u_volt,
+            supply->u_volt_max);
 
-    ret = regulator_set_voltage_triplet(reg, supply->u_volt_min,
-                        supply->u_volt, supply->u_volt_max);
-    if (ret)
-        dev_err(dev, "%s: failed to set voltage (%lu %lu %lu uV): %d\n",
-            __func__, supply->u_volt_min, supply->u_volt,
-            supply->u_volt_max, ret);
+    ret = regulator_set_voltage_triplet(reg, supply->u_volt_min, supply->u_volt, supply->u_volt_max);
+    if (ret) {
+        dev_err(dev, "%s: failed to set voltage (%lu %lu %lu uV): %d\n", __func__, supply->u_volt_min, supply->u_volt,
+                supply->u_volt_max, ret);
+    }
 
     return ret;
 }
@@ -343,28 +345,28 @@ static int cpu_opp_helper(struct dev_pm_set_opp_data *data)
     int ret = 0;
 
     cluster = rockchip_cluster_info_lookup(dev->id);
-    if (!cluster)
+    if (!cluster) {
         return -EINVAL;
+    }
     opp_info = &cluster->opp_info;
 
     /* Scaling up? Scale voltage before frequency */
     if (new_freq >= old_freq) {
-        ret = rockchip_cpufreq_set_volt(dev, mem_reg, new_supply_mem,
-                        "mem");
-        if (ret)
+        ret = rockchip_cpufreq_set_volt(dev, mem_reg, new_supply_mem, "mem");
+        if (ret) {
             goto restore_voltage;
-        ret = rockchip_cpufreq_set_volt(dev, vdd_reg, new_supply_vdd,
-                        "vdd");
-        if (ret)
+        }
+        ret = rockchip_cpufreq_set_volt(dev, vdd_reg, new_supply_vdd, "vdd");
+        if (ret) {
             goto restore_voltage;
-        if (opp_info->data->set_read_margin)
-            opp_info->data->set_read_margin(dev, opp_info,
-                            new_supply_vdd->u_volt);
+        }
+        if (opp_info->data->set_read_margin) {
+            opp_info->data->set_read_margin(dev, opp_info, new_supply_vdd->u_volt);
+        }
     }
 
     /* Change frequency */
-    dev_dbg(dev, "%s: switching OPP: %lu Hz --> %lu Hz\n", __func__,
-        old_freq, new_freq);
+    dev_dbg(dev, "%s: switching OPP: %lu Hz --> %lu Hz\n", __func__, old_freq, new_freq);
     ret = clk_set_rate(clk, new_freq);
     if (ret) {
         dev_err(dev, "%s: failed to set clk rate: %d\n", __func__, ret);
@@ -373,29 +375,29 @@ static int cpu_opp_helper(struct dev_pm_set_opp_data *data)
 
     /* Scaling down? Scale voltage after frequency */
     if (new_freq < old_freq) {
-        if (opp_info->data->set_read_margin)
-            opp_info->data->set_read_margin(dev, opp_info,
-                            new_supply_vdd->u_volt);
-        ret = rockchip_cpufreq_set_volt(dev, vdd_reg, new_supply_vdd,
-                        "vdd");
-        if (ret)
+        if (opp_info->data->set_read_margin) {
+            opp_info->data->set_read_margin(dev, opp_info, new_supply_vdd->u_volt);
+        }
+        ret = rockchip_cpufreq_set_volt(dev, vdd_reg, new_supply_vdd, "vdd");
+        if (ret) {
             goto restore_freq;
-        ret = rockchip_cpufreq_set_volt(dev, mem_reg, new_supply_mem,
-                        "mem");
-        if (ret)
+        }
+        ret = rockchip_cpufreq_set_volt(dev, mem_reg, new_supply_mem, "mem");
+        if (ret) {
             goto restore_freq;
+        }
     }
 
     return 0;
 
 restore_freq:
-    if (clk_set_rate(clk, old_freq))
-        dev_err(dev, "%s: failed to restore old-freq (%lu Hz)\n",
-            __func__, old_freq);
+    if (clk_set_rate(clk, old_freq)) {
+        dev_err(dev, "%s: failed to restore old-freq (%lu Hz)\n", __func__, old_freq);
+    }
 restore_rm:
-    if (opp_info->data->set_read_margin)
-        opp_info->data->set_read_margin(dev, opp_info,
-                        old_supply_vdd->u_volt);
+    if (opp_info->data->set_read_margin) {
+        opp_info->data->set_read_margin(dev, opp_info, old_supply_vdd->u_volt);
+    }
 restore_voltage:
     rockchip_cpufreq_set_volt(dev, mem_reg, old_supply_mem, "mem");
     rockchip_cpufreq_set_volt(dev, vdd_reg, old_supply_vdd, "vdd");
@@ -411,7 +413,7 @@ static int rockchip_cpufreq_cluster_init(int cpu, struct cluster_info *cluster)
     struct opp_table *opp_table;
     struct device_node *np;
     struct device *dev;
-    const char * const reg_names[] = {"cpu", "mem"};
+    const char *const reg_names[] = {"cpu", "mem"};
     char *reg_name = NULL;
     int bin = -EINVAL;
     int process = -EINVAL;
@@ -419,15 +421,17 @@ static int rockchip_cpufreq_cluster_init(int cpu, struct cluster_info *cluster)
     int ret = 0;
 
     dev = get_cpu_device(cpu);
-    if (!dev)
+    if (!dev) {
         return -ENODEV;
+    }
 
-    if (of_find_property(dev->of_node, "cpu-supply", NULL))
+    if (of_find_property(dev->of_node, "cpu-supply", NULL)) {
         reg_name = "cpu";
-    else if (of_find_property(dev->of_node, "cpu0-supply", NULL))
+    } else if (of_find_property(dev->of_node, "cpu0-supply", NULL)) {
         reg_name = "cpu0";
-    else
+    } else {
         return -ENOENT;
+    }
 
     np = of_parse_phandle(dev->of_node, "operating-points-v2", 0);
     if (!np) {
@@ -444,33 +448,29 @@ static int rockchip_cpufreq_cluster_init(int cpu, struct cluster_info *cluster)
     rockchip_get_opp_data(rockchip_cpufreq_of_match, opp_info);
     if (opp_info->data && opp_info->data->set_read_margin) {
         opp_info->current_rm = UINT_MAX;
-        opp_info->grf = syscon_regmap_lookup_by_phandle(np,
-                                "rockchip,grf");
-        if (IS_ERR(opp_info->grf))
+        opp_info->grf = syscon_regmap_lookup_by_phandle(np, "rockchip,grf");
+        if (IS_ERR(opp_info->grf)) {
             opp_info->grf = NULL;
-        rockchip_get_volt_rm_table(dev, np, "volt-mem-read-margin",
-                       &opp_info->volt_rm_tbl);
+        }
+        rockchip_get_volt_rm_table(dev, np, "volt-mem-read-margin", &opp_info->volt_rm_tbl);
     }
-    if (opp_info->data && opp_info->data->get_soc_info)
+    if (opp_info->data && opp_info->data->get_soc_info) {
         opp_info->data->get_soc_info(dev, np, &bin, &process);
-    rockchip_get_scale_volt_sel(dev, "cpu_leakage", reg_name, bin, process,
-                    &cluster->scale, &volt_sel);
+    }
+    rockchip_get_scale_volt_sel(dev, "cpu_leakage", reg_name, bin, process, &cluster->scale, &volt_sel);
     pname_table = rockchip_set_opp_prop_name(dev, process, volt_sel);
     if (IS_ERR(pname_table)) {
         ret = PTR_ERR(pname_table);
         goto np_err;
     }
 
-    if (of_find_property(dev->of_node, "cpu-supply", NULL) &&
-        of_find_property(dev->of_node, "mem-supply", NULL)) {
-        reg_table = dev_pm_opp_set_regulators(dev, reg_names,
-                              ARRAY_SIZE(reg_names));
+    if (of_find_property(dev->of_node, "cpu-supply", NULL) && of_find_property(dev->of_node, "mem-supply", NULL)) {
+        reg_table = dev_pm_opp_set_regulators(dev, reg_names, ARRAY_SIZE(reg_names));
         if (IS_ERR(reg_table)) {
             ret = PTR_ERR(reg_table);
             goto pname_opp_table;
         }
-        opp_table = dev_pm_opp_register_set_opp_helper(dev,
-                                   cpu_opp_helper);
+        opp_table = dev_pm_opp_register_set_opp_helper(dev, cpu_opp_helper);
         if (IS_ERR(opp_table)) {
             ret = PTR_ERR(opp_table);
             goto reg_opp_table;
@@ -482,11 +482,13 @@ static int rockchip_cpufreq_cluster_init(int cpu, struct cluster_info *cluster)
     return 0;
 
 reg_opp_table:
-    if (reg_table)
+    if (reg_table) {
         dev_pm_opp_put_regulators(reg_table);
+    }
 pname_opp_table:
-    if (pname_table)
+    if (pname_table) {
         dev_pm_opp_put_prop_name(pname_table);
+    }
 np_err:
     of_node_put(np);
 
@@ -498,8 +500,9 @@ int rockchip_cpufreq_adjust_power_scale(struct device *dev)
     struct cluster_info *cluster;
 
     cluster = rockchip_cluster_info_lookup(dev->id);
-    if (!cluster)
+    if (!cluster) {
         return -EINVAL;
+    }
     rockchip_adjust_power_scale(dev, cluster->scale);
 
     return 0;
@@ -512,8 +515,9 @@ int rockchip_cpufreq_opp_set_rate(struct device *dev, unsigned long target_freq)
     int ret = 0;
 
     cluster = rockchip_cluster_info_lookup(dev->id);
-    if (!cluster)
+    if (!cluster) {
         return -EINVAL;
+    }
 
     rockchip_monitor_volt_adjust_lock(cluster->mdev_info);
     ret = dev_pm_opp_set_rate(dev, target_freq);
@@ -528,14 +532,14 @@ static int rockchip_cpufreq_suspend(struct cpufreq_policy *policy)
     int ret = 0;
 
     ret = cpufreq_generic_suspend(policy);
-    if (!ret)
+    if (!ret) {
         rockchip_monitor_suspend_low_temp_adjust(policy->cpu);
+    }
 
     return ret;
 }
 
-static int rockchip_cpufreq_notifier(struct notifier_block *nb,
-                     unsigned long event, void *data)
+static int rockchip_cpufreq_notifier(struct notifier_block *nb, unsigned long event, void *data)
 {
     struct device *dev;
     struct cpufreq_policy *policy = data;
@@ -544,17 +548,20 @@ static int rockchip_cpufreq_notifier(struct notifier_block *nb,
     struct monitor_dev_info *mdev_info = NULL;
 
     dev = get_cpu_device(policy->cpu);
-    if (!dev)
+    if (!dev) {
         return NOTIFY_BAD;
+    }
 
     cluster = rockchip_cluster_info_lookup(policy->cpu);
-    if (!cluster)
+    if (!cluster) {
         return NOTIFY_BAD;
+    }
 
     if (event == CPUFREQ_CREATE_POLICY) {
         mdevp = kzalloc(sizeof(*mdevp), GFP_KERNEL);
-        if (!mdevp)
+        if (!mdevp) {
             return NOTIFY_BAD;
+        }
         mdevp->type = MONITOR_TPYE_CPU;
         mdevp->low_temp_adjust = rockchip_monitor_cpu_low_temp_adjust;
         mdevp->high_temp_adjust = rockchip_monitor_cpu_high_temp_adjust;
@@ -591,10 +598,12 @@ static int __init rockchip_cpufreq_driver_init(void)
     struct cpufreq_dt_platform_data pdata = {0};
     int cpu, ret;
 
-    for_each_possible_cpu(cpu) {
+    for_each_possible_cpu(cpu)
+    {
         cluster = rockchip_cluster_info_lookup(cpu);
-        if (cluster)
+        if (cluster) {
             continue;
+        }
 
         cluster = kzalloc(sizeof(*cluster), GFP_KERNEL);
         if (!cluster) {
@@ -613,19 +622,18 @@ static int __init rockchip_cpufreq_driver_init(void)
     pdata.have_governor_per_policy = true;
     pdata.suspend = rockchip_cpufreq_suspend;
 
-    ret = cpufreq_register_notifier(&rockchip_cpufreq_notifier_block,
-                    CPUFREQ_POLICY_NOTIFIER);
+    ret = cpufreq_register_notifier(&rockchip_cpufreq_notifier_block, CPUFREQ_POLICY_NOTIFIER);
     if (ret) {
         pr_err("failed to register cpufreq notifier\n");
         goto release_cluster_info;
     }
 
-    return PTR_ERR_OR_ZERO(platform_device_register_data(NULL, "cpufreq-dt",
-                   -1, (void *)&pdata,
-                   sizeof(struct cpufreq_dt_platform_data)));
+    return PTR_ERR_OR_ZERO(
+        platform_device_register_data(NULL, "cpufreq-dt", -1, (void *)&pdata, sizeof(struct cpufreq_dt_platform_data)));
 
 release_cluster_info:
-    list_for_each_entry_safe(cluster, pos, &cluster_info_list, list_head) {
+    list_for_each_entry_safe(cluster, pos, &cluster_info_list, list_head)
+    {
         list_del(&cluster->list_head);
         kfree(cluster);
     }

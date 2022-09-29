@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_COMMON_H
-#define _RKISPP_COMMON_H
+#ifndef H_RKISPP_COMMON_H
+#define H_RKISPP_COMMON_H
 
 #include <linux/clk.h>
 #include <linux/mutex.h>
@@ -14,22 +14,22 @@
 
 #include "../isp/isp_ispp.h"
 
-#define RKISPP_PLANE_Y        0
-#define RKISPP_PLANE_UV        1
+#define RKISPP_PLANE_Y 0
+#define RKISPP_PLANE_UV 1
 
-#define RKISPP_MAX_WIDTH_V10    4416
-#define RKISPP_MAX_HEIGHT_V10    3312
-#define RKISPP_MIN_WIDTH_V10    66
-#define RKISPP_MIN_HEIGHT_V10    258
+#define RKISPP_MAX_WIDTH_V10 4416
+#define RKISPP_MAX_HEIGHT_V10 3312
+#define RKISPP_MIN_WIDTH_V10 66
+#define RKISPP_MIN_HEIGHT_V10 258
 
-#define RKISPP_MAX_WIDTH_V20    8188
-#define RKISPP_MAX_HEIGHT_V20    8188
-#define RKISPP_MIN_WIDTH_V20    128
-#define RKISPP_MIN_HEIGHT_V20    128
+#define RKISPP_MAX_WIDTH_V20 8188
+#define RKISPP_MAX_HEIGHT_V20 8188
+#define RKISPP_MIN_WIDTH_V20 128
+#define RKISPP_MIN_HEIGHT_V20 128
 
-#define RKISPP_VIDEO_NAME_LEN    16
+#define RKISPP_VIDEO_NAME_LEN 16
 
-#define RKISPP_BUF_POOL_MAX    RKISP_ISPP_BUF_MAX
+#define RKISPP_BUF_POOL_MAX RKISP_ISPP_BUF_MAX
 
 struct rkispp_device;
 
@@ -122,21 +122,16 @@ void rkispp_set_bits(struct rkispp_device *dev, u32 reg, u32 mask, u32 val);
 u32 rkispp_read(struct rkispp_device *dev, u32 reg);
 void rkispp_clear_bits(struct rkispp_device *dev, u32 reg, u32 mask);
 void rkispp_update_regs(struct rkispp_device *dev, u32 start, u32 end);
-int rkispp_allow_buffer(struct rkispp_device *dev,
-            struct rkispp_dummy_buffer *buf);
-void rkispp_free_buffer(struct rkispp_device *dev,
-            struct rkispp_dummy_buffer *buf);
-void rkispp_prepare_buffer(struct rkispp_device *dev,
-            struct rkispp_dummy_buffer *buf);
-void rkispp_finish_buffer(struct rkispp_device *dev,
-            struct rkispp_dummy_buffer *buf);
+int rkispp_allow_buffer(struct rkispp_device *dev, struct rkispp_dummy_buffer *buf);
+void rkispp_free_buffer(struct rkispp_device *dev, struct rkispp_dummy_buffer *buf);
+void rkispp_prepare_buffer(struct rkispp_device *dev, struct rkispp_dummy_buffer *buf);
+void rkispp_finish_buffer(struct rkispp_device *dev, struct rkispp_dummy_buffer *buf);
 
 int rkispp_attach_hw(struct rkispp_device *ispp);
 int rkispp_event_handle(struct rkispp_device *ispp, u32 cmd, void *arg);
 int rkispp_alloc_common_dummy_buf(struct rkispp_device *dev);
 void rkispp_free_common_dummy_buf(struct rkispp_device *dev);
-int rkispp_find_regbuf_by_id(struct rkispp_device *ispp, struct rkisp_ispp_reg **free_buf,
-                 u32 dev_id, u32 frame_id);
+int rkispp_find_regbuf_by_id(struct rkispp_device *ispp, struct rkisp_ispp_reg **free_buf, u32 dev_id, u32 frame_id);
 void rkispp_release_regbuf(struct rkispp_device *ispp, struct rkisp_ispp_reg *freebuf);
 void rkispp_request_regbuf(struct rkispp_device *dev, struct rkisp_ispp_reg **free_buf);
 bool rkispp_is_reg_withstream_global(void);

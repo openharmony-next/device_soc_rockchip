@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -48,7 +49,6 @@
 #endif
 #endif
 
-
 /*
  * ---------- global variables (exported due to inline functions) ----------
  */
@@ -82,16 +82,14 @@ static MALI_OSK_LIST_HEAD_STATIC_INIT(scheduler_pp_job_queue_list);
  * ---------- Forward declaration of static functions ----------
  */
 
-static mali_timeline_point mali_scheduler_submit_gp_job(
-    struct mali_session_data *session, struct mali_gp_job *job);
-static mali_osk_errcode_t mali_scheduler_submit_pp_job(
-    struct mali_session_data *session, struct mali_pp_job *job, mali_timeline_point *point);
+static mali_timeline_point mali_scheduler_submit_gp_job(struct mali_session_data *session, struct mali_gp_job *job);
+static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data *session, struct mali_pp_job *job,
+                                                       mali_timeline_point *point);
 
 static mali_bool mali_scheduler_queue_gp_job(struct mali_gp_job *job);
 static mali_bool mali_scheduler_queue_pp_job(struct mali_pp_job *job);
 
-static void mali_scheduler_return_gp_job_to_user(struct mali_gp_job *job,
-        mali_bool success);
+static void mali_scheduler_return_gp_job_to_user(struct mali_gp_job *job, mali_bool success);
 
 static void mali_scheduler_deferred_pp_job_delete(struct mali_pp_job *job);
 void mali_scheduler_do_pp_job_delete(void *arg);
@@ -120,39 +118,33 @@ mali_osk_errcode_t mali_scheduler_initialize(void)
     job_queue_pp.depth = 0;
     job_queue_pp.big_job_num = 0;
 
-    mali_scheduler_lock_obj = mali_osk_spinlock_irq_init(
-                      _MALI_OSK_LOCKFLAG_ORDERED,
-                      _MALI_OSK_LOCK_ORDER_SCHEDULER);
+    mali_scheduler_lock_obj = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER);
     if (NULL == mali_scheduler_lock_obj) {
         mali_scheduler_terminate();
     }
 
-    scheduler_wq_pp_job_delete = mali_osk_wq_create_work(
-                         mali_scheduler_do_pp_job_delete, NULL);
+    scheduler_wq_pp_job_delete = mali_osk_wq_create_work(mali_scheduler_do_pp_job_delete, NULL);
     if (NULL == scheduler_wq_pp_job_delete) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
-    scheduler_pp_job_delete_lock = mali_osk_spinlock_irq_init(
-                           _MALI_OSK_LOCKFLAG_ORDERED,
-                           _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
+    scheduler_pp_job_delete_lock =
+        mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
     if (NULL == scheduler_pp_job_delete_lock) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
 #if defined(MALI_SCHEDULER_USE_DEFERRED_PP_JOB_QUEUE)
-    scheduler_wq_pp_job_queue = mali_osk_wq_create_work(
-                        mali_scheduler_do_pp_job_queue, NULL);
+    scheduler_wq_pp_job_queue = mali_osk_wq_create_work(mali_scheduler_do_pp_job_queue, NULL);
     if (NULL == scheduler_wq_pp_job_queue) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
-    scheduler_pp_job_queue_lock = mali_osk_spinlock_irq_init(
-                          _MALI_OSK_LOCKFLAG_ORDERED,
-                          _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
+    scheduler_pp_job_queue_lock =
+        mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
     if (NULL == scheduler_pp_job_queue_lock) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
@@ -210,8 +202,7 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
         MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-        job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next,
-                       struct mali_pp_job, list);
+        job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
         MALI_DEBUG_ASSERT_POINTER(job);
 
@@ -220,8 +211,8 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
              * Remember; virtual jobs can't be queued and started
              * at the same time, so this must be a physical job
              */
-            if ((MALI_FALSE  == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job))
-                || (MALI_TRUE  == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job))) {
+            if ((MALI_FALSE == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job)) ||
+                (MALI_TRUE == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job))) {
 
                 count += mali_pp_job_unstarted_sub_job_count(job);
                 if (MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS <= count) {
@@ -231,11 +222,11 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.high_pri,
-                    struct mali_pp_job, list) {
-        if ((MALI_FALSE == mali_pp_job_is_virtual(job))
-            && ((MALI_FALSE  == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job))
-            || (MALI_TRUE  == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job)))) {
+    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.high_pri, struct mali_pp_job, list)
+    {
+        if ((MALI_FALSE == mali_pp_job_is_virtual(job)) &&
+            ((MALI_FALSE == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job)) ||
+             (MALI_TRUE == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job)))) {
 
             count += mali_pp_job_unstarted_sub_job_count(job);
             if (MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS <= count) {
@@ -247,12 +238,11 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.normal_pri,
-                    struct mali_pp_job, list) {
-        if ((MALI_FALSE == mali_pp_job_is_virtual(job))
-            && (MALI_FALSE == mali_pp_job_has_started_sub_jobs(job))
-            && ((MALI_FALSE  == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job))
-            || (MALI_TRUE  == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job)))) {
+    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.normal_pri, struct mali_pp_job, list)
+    {
+        if ((MALI_FALSE == mali_pp_job_is_virtual(job)) && (MALI_FALSE == mali_pp_job_has_started_sub_jobs(job)) &&
+            ((MALI_FALSE == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job)) ||
+             (MALI_TRUE == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job)))) {
 
             count += mali_pp_job_unstarted_sub_job_count(job);
             if (MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS <= count) {
@@ -277,8 +267,7 @@ struct mali_pp_job *mali_scheduler_job_pp_next(void)
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
         MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-        job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next,
-                       struct mali_pp_job, list);
+        job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
         MALI_DEBUG_ASSERT_POINTER(job);
 
@@ -287,13 +276,13 @@ struct mali_pp_job *mali_scheduler_job_pp_next(void)
         }
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.high_pri,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.high_pri, struct mali_pp_job, list)
+    {
         return job;
     }
 
-    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.normal_pri,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, temp, &job_queue_pp.normal_pri, struct mali_pp_job, list)
+    {
         return job;
     }
 
@@ -337,7 +326,7 @@ struct mali_gp_job *mali_scheduler_job_gp_get(void)
     mali_gp_job_list_remove(job);
     job_queue_gp.depth--;
     if (job->big_job) {
-        job_queue_gp.big_job_num --;
+        job_queue_gp.big_job_num--;
         if (job_queue_gp.big_job_num < MALI_MAX_PENDING_BIG_JOB) {
             /* wake up process */
             wait_queue_head_t *queue = mali_session_get_wait_queue();
@@ -362,8 +351,7 @@ struct mali_pp_job *mali_scheduler_job_pp_physical_peek(void)
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
         MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-        tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next,
-                           struct mali_pp_job, list);
+        tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
         MALI_DEBUG_ASSERT(NULL != tmp_job);
 
         if (MALI_FALSE == mali_pp_job_is_virtual(tmp_job)) {
@@ -371,8 +359,7 @@ struct mali_pp_job *mali_scheduler_job_pp_physical_peek(void)
         }
     }
 
-    if (NULL == job ||
-        MALI_FALSE == mali_pp_job_has_started_sub_jobs(job)) {
+    if (NULL == job || MALI_FALSE == mali_pp_job_has_started_sub_jobs(job)) {
         /*
          * There isn't a partially started job in normal queue, so
          * look in high priority queue.
@@ -380,8 +367,7 @@ struct mali_pp_job *mali_scheduler_job_pp_physical_peek(void)
         if (!_mali_osk_list_empty(&job_queue_pp.high_pri)) {
             MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-            tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next,
-                               struct mali_pp_job, list);
+            tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next, struct mali_pp_job, list);
             MALI_DEBUG_ASSERT(NULL != tmp_job);
 
             if (MALI_FALSE == mali_pp_job_is_virtual(tmp_job)) {
@@ -403,8 +389,7 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_peek(void)
     if (!_mali_osk_list_empty(&job_queue_pp.high_pri)) {
         MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-        tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next,
-                           struct mali_pp_job, list);
+        tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next, struct mali_pp_job, list);
 
         if (MALI_TRUE == mali_pp_job_is_virtual(tmp_job)) {
             job = tmp_job;
@@ -415,8 +400,7 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_peek(void)
         if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
             MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
 
-            tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next,
-                               struct mali_pp_job, list);
+            tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
             if (MALI_TRUE == mali_pp_job_is_virtual(tmp_job)) {
                 job = tmp_job;
@@ -461,10 +445,8 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_get(void)
     MALI_DEBUG_ASSERT(MALI_TRUE == mali_pp_job_is_virtual(job));
 
     if (NULL != job) {
-        MALI_DEBUG_ASSERT(0 ==
-                  mali_pp_job_get_first_unstarted_sub_job(job));
-        MALI_DEBUG_ASSERT(1 ==
-                  mali_pp_job_get_sub_job_count(job));
+        MALI_DEBUG_ASSERT(0 == mali_pp_job_get_first_unstarted_sub_job(job));
+        MALI_DEBUG_ASSERT(1 == mali_pp_job_get_sub_job_count(job));
 
         mali_pp_job_mark_sub_job_started(job, 0);
 
@@ -486,8 +468,8 @@ mali_scheduler_mask mali_scheduler_activate_gp_job(struct mali_gp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali GP scheduler: Timeline activation for job %u (0x%08X).\n",
-                 mali_gp_job_get_id(job), job));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE,
+                     ("Mali GP scheduler: Timeline activation for job %u (0x%08X).\n", mali_gp_job_get_id(job), job));
 
     mali_scheduler_lock();
 
@@ -500,8 +482,7 @@ mali_scheduler_mask mali_scheduler_activate_gp_job(struct mali_gp_job *job)
         mali_gp_job_signal_pp_tracker(job, MALI_FALSE);
 
         /* This will notify user space and close the job object */
-        mali_scheduler_complete_gp_job(job, MALI_FALSE,
-                           MALI_TRUE, MALI_FALSE);
+        mali_scheduler_complete_gp_job(job, MALI_FALSE, MALI_TRUE, MALI_FALSE);
 
         return MALI_SCHEDULER_MASK_EMPTY;
     }
@@ -515,13 +496,13 @@ mali_scheduler_mask mali_scheduler_activate_pp_job(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali PP scheduler: Timeline activation for job %u (0x%08X).\n",
-                 mali_pp_job_get_id(job), job));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE,
+                     ("Mali PP scheduler: Timeline activation for job %u (0x%08X).\n", mali_pp_job_get_id(job), job));
 
-    if (MALI_TRUE == mali_timeline_tracker_activation_error(
-            mali_pp_job_get_tracker(job))) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali PP scheduler: Job %u (0x%08X) activated with error, aborting.\n",
-                     mali_pp_job_get_id(job), job));
+    if (MALI_TRUE == mali_timeline_tracker_activation_error(mali_pp_job_get_tracker(job))) {
+        MALI_DEBUG_PRINT(
+            MALI_KERNEL_LEVEL_MESSAGE,
+            ("Mali PP scheduler: Job %u (0x%08X) activated with error, aborting.\n", mali_pp_job_get_id(job), job));
 
         mali_scheduler_lock();
         mali_pp_job_fb_lookup_remove(job);
@@ -563,10 +544,8 @@ mali_scheduler_mask mali_scheduler_activate_pp_job(struct mali_pp_job *job)
     return MALI_SCHEDULER_MASK_PP;
 }
 
-void mali_scheduler_complete_gp_job(struct mali_gp_job *job,
-                    mali_bool success,
-                    mali_bool user_notification,
-                    mali_bool dequeued)
+void mali_scheduler_complete_gp_job(struct mali_gp_job *job, mali_bool success, mali_bool user_notification,
+                                    mali_bool dequeued)
 {
     if (user_notification) {
         mali_scheduler_return_gp_job_to_user(job, success);
@@ -584,17 +563,16 @@ void mali_scheduler_complete_gp_job(struct mali_gp_job *job,
     mali_gp_job_delete(job);
 }
 
-void mali_scheduler_complete_pp_job(struct mali_pp_job *job,
-                    u32 num_cores_in_virtual,
-                    mali_bool user_notification,
-                    mali_bool dequeued)
+void mali_scheduler_complete_pp_job(struct mali_pp_job *job, u32 num_cores_in_virtual, mali_bool user_notification,
+                                    mali_bool dequeued)
 {
     job->user_notification = user_notification;
     job->num_pp_cores_in_virtual = num_cores_in_virtual;
 
 #if defined(CONFIG_MALI_DMA_BUF_FENCE)
-    if (NULL != job->rendered_dma_fence)
+    if (NULL != job->rendered_dma_fence) {
         mali_dma_fence_signal_and_put(&job->rendered_dma_fence);
+    }
 #endif
 
     if (dequeued) {
@@ -629,14 +607,14 @@ void mali_scheduler_abort_session(struct mali_session_data *session)
     MALI_DEBUG_ASSERT_POINTER(session);
     MALI_DEBUG_ASSERT(session->is_aborting);
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali scheduler: Aborting all queued jobs from session 0x%08X.\n",
-                 session));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE,
+                     ("Mali scheduler: Aborting all queued jobs from session 0x%08X.\n", session));
 
     mali_scheduler_lock();
 
     /* Remove from GP normal priority queue */
-    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &job_queue_gp.normal_pri,
-                    struct mali_gp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &job_queue_gp.normal_pri, struct mali_gp_job, list)
+    {
         if (mali_gp_job_get_session(gp_job) == session) {
             mali_gp_job_list_move(gp_job, &removed_jobs_gp);
             job_queue_gp.depth--;
@@ -645,8 +623,8 @@ void mali_scheduler_abort_session(struct mali_session_data *session)
     }
 
     /* Remove from GP high priority queue */
-    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &job_queue_gp.high_pri,
-                    struct mali_gp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &job_queue_gp.high_pri, struct mali_gp_job, list)
+    {
         if (mali_gp_job_get_session(gp_job) == session) {
             mali_gp_job_list_move(gp_job, &removed_jobs_gp);
             job_queue_gp.depth--;
@@ -655,21 +633,17 @@ void mali_scheduler_abort_session(struct mali_session_data *session)
     }
 
     /* Remove from PP normal priority queue */
-    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp,
-                    &job_queue_pp.normal_pri,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp, &job_queue_pp.normal_pri, struct mali_pp_job, list)
+    {
         if (mali_pp_job_get_session(pp_job) == session) {
             mali_pp_job_fb_lookup_remove(pp_job);
 
-            job_queue_pp.depth -=
-                mali_pp_job_unstarted_sub_job_count(
-                    pp_job);
+            job_queue_pp.depth -= mali_pp_job_unstarted_sub_job_count(pp_job);
             mali_pp_job_mark_unstarted_failed(pp_job);
 
             if (MALI_FALSE == mali_pp_job_has_unstarted_sub_jobs(pp_job)) {
                 if (mali_pp_job_is_complete(pp_job)) {
-                    mali_pp_job_list_move(pp_job,
-                                  &removed_jobs_pp);
+                    mali_pp_job_list_move(pp_job, &removed_jobs_pp);
                 } else {
                     mali_pp_job_list_remove(pp_job);
                 }
@@ -678,21 +652,17 @@ void mali_scheduler_abort_session(struct mali_session_data *session)
     }
 
     /* Remove from PP high priority queue */
-    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp,
-                    &job_queue_pp.high_pri,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp, &job_queue_pp.high_pri, struct mali_pp_job, list)
+    {
         if (mali_pp_job_get_session(pp_job) == session) {
             mali_pp_job_fb_lookup_remove(pp_job);
 
-            job_queue_pp.depth -=
-                mali_pp_job_unstarted_sub_job_count(
-                    pp_job);
+            job_queue_pp.depth -= mali_pp_job_unstarted_sub_job_count(pp_job);
             mali_pp_job_mark_unstarted_failed(pp_job);
 
             if (MALI_FALSE == mali_pp_job_has_unstarted_sub_jobs(pp_job)) {
                 if (mali_pp_job_is_complete(pp_job)) {
-                    mali_pp_job_list_move(pp_job,
-                                  &removed_jobs_pp);
+                    mali_pp_job_list_move(pp_job, &removed_jobs_pp);
                 } else {
                     mali_pp_job_list_remove(pp_job);
                 }
@@ -707,27 +677,24 @@ void mali_scheduler_abort_session(struct mali_session_data *session)
     mali_scheduler_unlock();
 
     /* Release and complete all (non-running) found GP jobs  */
-    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &removed_jobs_gp,
-                    struct mali_gp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(gp_job, gp_tmp, &removed_jobs_gp, struct mali_gp_job, list)
+    {
         mali_timeline_tracker_release(mali_gp_job_get_tracker(gp_job));
         mali_gp_job_signal_pp_tracker(gp_job, MALI_FALSE);
         mali_osk_list_delinit(&gp_job->list);
-        mali_scheduler_complete_gp_job(gp_job,
-                           MALI_FALSE, MALI_FALSE, MALI_TRUE);
+        mali_scheduler_complete_gp_job(gp_job, MALI_FALSE, MALI_FALSE, MALI_TRUE);
     }
 
     /* Release and complete non-running PP jobs */
-    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp, &removed_jobs_pp,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(pp_job, pp_tmp, &removed_jobs_pp, struct mali_pp_job, list)
+    {
         mali_timeline_tracker_release(mali_pp_job_get_tracker(pp_job));
         mali_osk_list_delinit(&pp_job->list);
-        mali_scheduler_complete_pp_job(pp_job, 0,
-                           MALI_FALSE, MALI_TRUE);
+        mali_scheduler_complete_pp_job(pp_job, 0, MALI_FALSE, MALI_TRUE);
     }
 }
 
-mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx,
-        mali_uk_gp_start_job_s *uargs)
+mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx, mali_uk_gp_start_job_s *uargs)
 {
     struct mali_session_data *session;
     struct mali_gp_job *job;
@@ -739,8 +706,7 @@ mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx,
 
     session = (struct mali_session_data *)(uintptr_t)ctx;
 
-    job = mali_gp_job_create(session, uargs, mali_scheduler_get_new_id(),
-                 NULL);
+    job = mali_gp_job_create(session, uargs, mali_scheduler_get_new_id(), NULL);
     if (NULL == job) {
         MALI_PRINT_ERROR(("Failed to create GP job.\n"));
         return MALI_OSK_ERR_NOMEM;
@@ -750,7 +716,7 @@ mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx,
 
     point = mali_scheduler_submit_gp_job(session, job);
 
-    if (0 != _mali_osk_put_user(((u32) point), point_ptr)) {
+    if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
         /*
          * Let user space know that something failed
          * after the job was started.
@@ -761,8 +727,7 @@ mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx,
     return MALI_OSK_ERR_OK;
 }
 
-mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx,
-        mali_uk_pp_start_job_s *uargs)
+mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx, mali_uk_pp_start_job_s *uargs)
 {
     mali_osk_errcode_t ret;
     struct mali_session_data *session;
@@ -788,11 +753,11 @@ mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx,
     job = NULL;
 
     if (MALI_OSK_ERR_OK == ret) {
-        if (0 != _mali_osk_put_user(((u32) point), point_ptr)) {
+        if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
             /*
-            * Let user space know that something failed
-            * after the jobs were started.
-            */
+             * Let user space know that something failed
+             * after the jobs were started.
+             */
             return MALI_OSK_ERR_ITEM_NOT_FOUND;
         }
     }
@@ -800,8 +765,7 @@ mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx,
     return ret;
 }
 
-mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx,
-        mali_uk_pp_and_gp_start_job_s *uargs)
+mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx, mali_uk_pp_and_gp_start_job_s *uargs)
 {
     mali_osk_errcode_t ret;
     struct mali_session_data *session;
@@ -816,26 +780,22 @@ mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx,
     MALI_DEBUG_ASSERT_POINTER(ctx);
     MALI_DEBUG_ASSERT_POINTER(uargs);
 
-    session = (struct mali_session_data *) ctx;
+    session = (struct mali_session_data *)ctx;
 
-    if (0 != _mali_osk_copy_from_user(&kargs, uargs,
-                      sizeof(mali_uk_pp_and_gp_start_job_s))) {
+    if (0 != _mali_osk_copy_from_user(&kargs, uargs, sizeof(mali_uk_pp_and_gp_start_job_s))) {
         return MALI_OSK_ERR_NOMEM;
     }
 
     pp_args = (mali_uk_pp_start_job_s __user *)(uintptr_t)kargs.pp_args;
     gp_args = (mali_uk_gp_start_job_s __user *)(uintptr_t)kargs.gp_args;
 
-    pp_job = mali_pp_job_create(session, pp_args,
-                    mali_scheduler_get_new_id());
+    pp_job = mali_pp_job_create(session, pp_args, mali_scheduler_get_new_id());
     if (NULL == pp_job) {
         MALI_PRINT_ERROR(("Failed to create PP job.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
 
-    gp_job = mali_gp_job_create(session, gp_args,
-                    mali_scheduler_get_new_id(),
-                    mali_pp_job_get_tracker(pp_job));
+    gp_job = mali_gp_job_create(session, gp_args, mali_scheduler_get_new_id(), mali_pp_job_get_tracker(pp_job));
     if (NULL == gp_job) {
         MALI_PRINT_ERROR(("Failed to create GP job.\n"));
         mali_pp_job_delete(pp_job);
@@ -853,11 +813,11 @@ mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx,
     pp_job = NULL;
 
     if (MALI_OSK_ERR_OK == ret) {
-        if (0 != _mali_osk_put_user(((u32) point), point_ptr)) {
+        if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
             /*
-            * Let user space know that something failed
-            * after the jobs were started.
-            */
+             * Let user space know that something failed
+             * after the jobs were started.
+             */
             return MALI_OSK_ERR_ITEM_NOT_FOUND;
         }
     }
@@ -882,13 +842,12 @@ void _mali_ukk_pp_job_disable_wb(mali_uk_pp_disable_wb_s *args)
     mali_scheduler_lock();
 
     /* Iterate over all jobs for given frame builder_id. */
-    MALI_OSK_LIST_FOREACHENTRY(job, tmp,
-                    &session->pp_job_fb_lookup_list[fb_lookup_id],
-                    struct mali_pp_job, session_fb_lookup_list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &session->pp_job_fb_lookup_list[fb_lookup_id], struct mali_pp_job,
+                               session_fb_lookup_list)
+    {
         MALI_DEBUG_CODE(u32 disable_mask = 0);
 
-        if (mali_pp_job_get_frame_builder_id(job) !=
-            (u32) args->fb_id) {
+        if (mali_pp_job_get_frame_builder_id(job) != (u32)args->fb_id) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali PP scheduler: Disable WB mismatching FB.\n"));
             continue;
         }
@@ -909,8 +868,7 @@ void _mali_ukk_pp_job_disable_wb(mali_uk_pp_disable_wb_s *args)
             MALI_DEBUG_CODE(disable_mask |= 0x3 << (4 * 3));
             mali_pp_job_disable_wb2(job);
         }
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali PP scheduler: Disable WB: 0x%X.\n",
-                     disable_mask));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali PP scheduler: Disable WB: 0x%X.\n", disable_mask));
     }
 
     mali_scheduler_unlock();
@@ -922,29 +880,18 @@ u32 mali_scheduler_dump_state(char *buf, u32 size)
     int n = 0;
 
     n += mali_osk_snprintf(buf + n, size - n, "GP queues\n");
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tQueue depth: %u\n", job_queue_gp.depth);
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tNormal priority queue is %s\n",
-                _mali_osk_list_empty(&job_queue_gp.normal_pri) ?
-                "empty" : "not empty");
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tHigh priority queue is %s\n",
-                _mali_osk_list_empty(&job_queue_gp.high_pri) ?
-                "empty" : "not empty");
+    n += mali_osk_snprintf(buf + n, size - n, "\tQueue depth: %u\n", job_queue_gp.depth);
+    n += mali_osk_snprintf(buf + n, size - n, "\tNormal priority queue is %s\n",
+                           _mali_osk_list_empty(&job_queue_gp.normal_pri) ? "empty" : "not empty");
+    n += mali_osk_snprintf(buf + n, size - n, "\tHigh priority queue is %s\n",
+                           _mali_osk_list_empty(&job_queue_gp.high_pri) ? "empty" : "not empty");
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "PP queues\n");
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tQueue depth: %u\n", job_queue_pp.depth);
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tNormal priority queue is %s\n",
-                _mali_osk_list_empty(&job_queue_pp.normal_pri)
-                ? "empty" : "not empty");
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tHigh priority queue is %s\n",
-                _mali_osk_list_empty(&job_queue_pp.high_pri)
-                ? "empty" : "not empty");
+    n += mali_osk_snprintf(buf + n, size - n, "PP queues\n");
+    n += mali_osk_snprintf(buf + n, size - n, "\tQueue depth: %u\n", job_queue_pp.depth);
+    n += mali_osk_snprintf(buf + n, size - n, "\tNormal priority queue is %s\n",
+                           _mali_osk_list_empty(&job_queue_pp.normal_pri) ? "empty" : "not empty");
+    n += mali_osk_snprintf(buf + n, size - n, "\tHigh priority queue is %s\n",
+                           _mali_osk_list_empty(&job_queue_pp.high_pri) ? "empty" : "not empty");
 
     n += mali_osk_snprintf(buf + n, size - n, "\n");
 
@@ -956,8 +903,7 @@ u32 mali_scheduler_dump_state(char *buf, u32 size)
  * ---------- Implementation of static functions ----------
  */
 
-static mali_timeline_point mali_scheduler_submit_gp_job(
-    struct mali_session_data *session, struct mali_gp_job *job)
+static mali_timeline_point mali_scheduler_submit_gp_job(struct mali_session_data *session, struct mali_gp_job *job)
 {
     mali_timeline_point point;
 
@@ -965,14 +911,13 @@ static mali_timeline_point mali_scheduler_submit_gp_job(
     MALI_DEBUG_ASSERT_POINTER(job);
 
     /* Add job to Timeline system. */
-    point = mali_timeline_system_add_tracker(session->timeline_system,
-            mali_gp_job_get_tracker(job), MALI_TIMELINE_GP);
+    point = mali_timeline_system_add_tracker(session->timeline_system, mali_gp_job_get_tracker(job), MALI_TIMELINE_GP);
 
     return point;
 }
 
-static mali_osk_errcode_t mali_scheduler_submit_pp_job(
-    struct mali_session_data *session, struct mali_pp_job *job, mali_timeline_point *point)
+static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data *session, struct mali_pp_job *job,
+                                                       mali_timeline_point *point)
 
 {
     mali_osk_errcode_t ret = MALI_OSK_ERR_OK;
@@ -1013,7 +958,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
     for (i = 0; i < num_memory_cookies; i++) {
         mali_mem_backend *mem_backend = NULL;
         struct reservation_object *tmp_reservation_object = NULL;
-        u32 mali_addr  = mali_pp_job_get_memory_cookie(job, i);
+        u32 mali_addr = mali_pp_job_get_memory_cookie(job, i);
 
         mem_backend = mali_mem_backend_struct_search(session, mali_addr);
 
@@ -1024,14 +969,15 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
             goto failed_to_find_mem_backend;
         }
 
-        if (MALI_MEM_DMA_BUF != mem_backend->type)
+        if (MALI_MEM_DMA_BUF != mem_backend->type) {
             continue;
+        }
 
         tmp_reservation_object = mem_backend->dma_buf.attachment->buf->resv;
 
         if (NULL != tmp_reservation_object) {
-            mali_dma_fence_add_reservation_object_list(tmp_reservation_object,
-                    reservation_object_list, &num_reservation_object);
+            mali_dma_fence_add_reservation_object_list(tmp_reservation_object, reservation_object_list,
+                                                       &num_reservation_object);
         }
     }
 
@@ -1044,8 +990,8 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
         int error;
         int num_dma_fence_waiter = 0;
         /* Create one new dma fence.*/
-        job->rendered_dma_fence = mali_dma_fence_new(job->session->fence_context,
-                      mali_osk_atomic_inc_return(&job->session->fence_seqno));
+        job->rendered_dma_fence =
+            mali_dma_fence_new(job->session->fence_context, mali_osk_atomic_inc_return(&job->session->fence_seqno));
 
         if (NULL == job->rendered_dma_fence) {
             MALI_PRINT_ERROR(("Failed to creat one new dma fence.\n"));
@@ -1055,8 +1001,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
 
         /* In order to avoid deadlock, wait/wound mutex lock to lock all dma buffers*/
 
-        error = mali_dma_fence_lock_reservation_object_list(reservation_object_list,
-                num_reservation_object, &ww_actx);
+        error = mali_dma_fence_lock_reservation_object_list(reservation_object_list, num_reservation_object, &ww_actx);
 
         if (0 != error) {
             MALI_PRINT_ERROR(("Failed to lock all reservation objects.\n"));
@@ -1064,8 +1009,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
             goto failed_to_lock_reservation_object_list;
         }
 
-        mali_dma_fence_context_init(&job->dma_fence_context,
-                        mali_timeline_dma_fence_callback, (void *)job);
+        mali_dma_fence_context_init(&job->dma_fence_context, mali_timeline_dma_fence_callback, (void *)job);
 
         /* Add dma fence waiters and dma fence callback. */
         for (i = 0; i < num_reservation_object; i++) {
@@ -1083,41 +1027,40 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(
         num_dma_fence_waiter = job->dma_fence_context.num_dma_fence_waiter;
 
         /* Add job to Timeline system. */
-        (*point) = mali_timeline_system_add_tracker(session->timeline_system,
-                mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
+        (*point) =
+            mali_timeline_system_add_tracker(session->timeline_system, mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
 
         if (0 != num_dma_fence_waiter) {
             mali_dma_fence_context_dec_count(&job->dma_fence_context);
         }
 
         /* Unlock all wait/wound mutex lock. */
-        mali_dma_fence_unlock_reservation_object_list(reservation_object_list,
-                num_reservation_object, &ww_actx);
+        mali_dma_fence_unlock_reservation_object_list(reservation_object_list, num_reservation_object, &ww_actx);
     } else {
         /* Add job to Timeline system. */
-        (*point) = mali_timeline_system_add_tracker(session->timeline_system,
-                mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
+        (*point) =
+            mali_timeline_system_add_tracker(session->timeline_system, mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
     }
 
     kfree(reservation_object_list);
     return ret;
 #else
     /* Add job to Timeline system. */
-    (*point) = mali_timeline_system_add_tracker(session->timeline_system,
-            mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
+    (*point) =
+        mali_timeline_system_add_tracker(session->timeline_system, mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
 #endif
 
 #if defined(CONFIG_MALI_DMA_BUF_FENCE)
 failed_to_add_dma_fence_waiter:
     mali_dma_fence_context_term(&job->dma_fence_context);
-    mali_dma_fence_unlock_reservation_object_list(reservation_object_list,
-            num_reservation_object, &ww_actx);
+    mali_dma_fence_unlock_reservation_object_list(reservation_object_list, num_reservation_object, &ww_actx);
 failed_to_lock_reservation_object_list:
     mali_dma_fence_signal_and_put(&job->rendered_dma_fence);
 failed_to_create_dma_fence:
 failed_to_find_mem_backend:
-    if (NULL != reservation_object_list)
+    if (NULL != reservation_object_list) {
         kfree(reservation_object_list);
+    }
 failed_to_alloc_reservation_object_list:
     mali_pp_job_fb_lookup_remove(job);
 #endif
@@ -1136,8 +1079,9 @@ static mali_bool mali_scheduler_queue_gp_job(struct mali_gp_job *job)
     MALI_DEBUG_ASSERT_POINTER(session);
 
     if (unlikely(session->is_aborting)) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali GP scheduler: Job %u (0x%08X) queued while session is aborting.\n",
-                     mali_gp_job_get_id(job), job));
+        MALI_DEBUG_PRINT(
+            MALI_KERNEL_LEVEL_CODE,
+            ("Mali GP scheduler: Job %u (0x%08X) queued while session is aborting.\n", mali_gp_job_get_id(job), job));
         return MALI_FALSE; /* job not queued */
     }
 
@@ -1177,23 +1121,17 @@ static mali_bool mali_scheduler_queue_gp_job(struct mali_gp_job *job)
     mali_pm_record_gpu_active(MALI_TRUE);
 
     /* Add profiling events for job enqueued */
-    _mali_osk_profiling_add_event(
-        MALI_PROFILING_EVENT_TYPE_SINGLE |
-        MALI_PROFILING_EVENT_CHANNEL_SOFTWARE |
-        MALI_PROFILING_EVENT_REASON_SINGLE_SW_GP_ENQUEUE,
-        mali_gp_job_get_pid(job),
-        mali_gp_job_get_tid(job),
-        mali_gp_job_get_frame_builder_id(job),
-        mali_gp_job_get_flush_id(job),
-        0);
+    _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_SOFTWARE |
+                                      MALI_PROFILING_EVENT_REASON_SINGLE_SW_GP_ENQUEUE,
+                                  mali_gp_job_get_pid(job), mali_gp_job_get_tid(job),
+                                  mali_gp_job_get_frame_builder_id(job), mali_gp_job_get_flush_id(job), 0);
 
 #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
-    trace_gpu_job_enqueue(mali_gp_job_get_tid(job),
-                  mali_gp_job_get_id(job), "GP");
+    trace_gpu_job_enqueue(mali_gp_job_get_tid(job), mali_gp_job_get_id(job), "GP");
 #endif
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali GP scheduler: Job %u (0x%08X) queued\n",
-                 mali_gp_job_get_id(job), job));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE,
+                     ("Mali GP scheduler: Job %u (0x%08X) queued\n", mali_gp_job_get_id(job), job));
 
     return MALI_TRUE; /* job queued */
 }
@@ -1210,12 +1148,14 @@ static mali_bool mali_scheduler_queue_pp_job(struct mali_pp_job *job)
     MALI_DEBUG_ASSERT_POINTER(session);
 
     if (unlikely(session->is_aborting)) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali PP scheduler: Job %u (0x%08X) queued while session is aborting.\n",
-                     mali_pp_job_get_id(job), job));
+        MALI_DEBUG_PRINT(
+            MALI_KERNEL_LEVEL_INFORMATOIN,
+            ("Mali PP scheduler: Job %u (0x%08X) queued while session is aborting.\n", mali_pp_job_get_id(job), job));
         return MALI_FALSE; /* job not queued */
     } else if (unlikely(MALI_SWAP_IN_FAIL == job->swap_status)) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali PP scheduler: Job %u (0x%08X) queued while swap in failed.\n",
-                     mali_pp_job_get_id(job), job));
+        MALI_DEBUG_PRINT(
+            MALI_KERNEL_LEVEL_INFORMATOIN,
+            ("Mali PP scheduler: Job %u (0x%08X) queued while swap in failed.\n", mali_pp_job_get_id(job), job));
         return MALI_FALSE;
     }
 
@@ -1227,8 +1167,7 @@ static mali_bool mali_scheduler_queue_pp_job(struct mali_pp_job *job)
         queue = &job_queue_pp.normal_pri;
     }
 
-    job_queue_pp.depth +=
-        mali_pp_job_get_sub_job_count(job);
+    job_queue_pp.depth += mali_pp_job_get_sub_job_count(job);
 
     /* Add job to queue (mali_gp_job_queue_add find correct place). */
     mali_pp_job_list_add(job, queue);
@@ -1254,32 +1193,23 @@ static mali_bool mali_scheduler_queue_pp_job(struct mali_pp_job *job)
     mali_pm_record_gpu_active(MALI_FALSE);
 
     /* Add profiling events for job enqueued */
-    _mali_osk_profiling_add_event(
-        MALI_PROFILING_EVENT_TYPE_SINGLE |
-        MALI_PROFILING_EVENT_CHANNEL_SOFTWARE |
-        MALI_PROFILING_EVENT_REASON_SINGLE_SW_PP_ENQUEUE,
-        mali_pp_job_get_pid(job),
-        mali_pp_job_get_tid(job),
-        mali_pp_job_get_frame_builder_id(job),
-        mali_pp_job_get_flush_id(job),
-        0);
+    _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_SOFTWARE |
+                                      MALI_PROFILING_EVENT_REASON_SINGLE_SW_PP_ENQUEUE,
+                                  mali_pp_job_get_pid(job), mali_pp_job_get_tid(job),
+                                  mali_pp_job_get_frame_builder_id(job), mali_pp_job_get_flush_id(job), 0);
 
 #if defined(CONFIG_GPU_TRACEPOINTS) && defined(CONFIG_TRACEPOINTS)
-    trace_gpu_job_enqueue(mali_pp_job_get_tid(job),
-                  mali_pp_job_get_id(job), "PP");
+    trace_gpu_job_enqueue(mali_pp_job_get_tid(job), mali_pp_job_get_id(job), "PP");
 #endif
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali PP scheduler: %s job %u (0x%08X) with %u parts queued.\n",
-                 mali_pp_job_is_virtual(job)
-                 ? "Virtual" : "Physical",
-                 mali_pp_job_get_id(job), job,
-                 mali_pp_job_get_sub_job_count(job)));
+                                                 mali_pp_job_is_virtual(job) ? "Virtual" : "Physical",
+                                                 mali_pp_job_get_id(job), job, mali_pp_job_get_sub_job_count(job)));
 
     return MALI_TRUE; /* job queued */
 }
 
-static void mali_scheduler_return_gp_job_to_user(struct mali_gp_job *job,
-        mali_bool success)
+static void mali_scheduler_return_gp_job_to_user(struct mali_gp_job *job, mali_bool success)
 {
     mali_uk_gp_job_finished_s *jobres;
     struct mali_session_data *session;
@@ -1311,8 +1241,7 @@ static void mali_scheduler_return_gp_job_to_user(struct mali_gp_job *job,
     mali_session_send_notification(session, notification);
 }
 
-void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job,
-        u32 num_cores_in_virtual)
+void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job, u32 num_cores_in_virtual)
 {
     u32 i;
     u32 num_counters_to_copy;
@@ -1349,14 +1278,10 @@ void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job,
     }
 
     for (i = 0; i < num_counters_to_copy; i++) {
-        jobres->perf_counter0[i] =
-            mali_pp_job_get_perf_counter_value0(job, i);
-        jobres->perf_counter1[i] =
-            mali_pp_job_get_perf_counter_value1(job, i);
-        jobres->perf_counter_src0 =
-            mali_pp_job_get_pp_counter_global_src0();
-        jobres->perf_counter_src1 =
-            mali_pp_job_get_pp_counter_global_src1();
+        jobres->perf_counter0[i] = mali_pp_job_get_perf_counter_value0(job, i);
+        jobres->perf_counter1[i] = mali_pp_job_get_perf_counter_value1(job, i);
+        jobres->perf_counter_src0 = mali_pp_job_get_pp_counter_global_src0();
+        jobres->perf_counter_src1 = mali_pp_job_get_pp_counter_global_src1();
     }
 
     mali_session_send_notification(session, notification);
@@ -1390,8 +1315,8 @@ void mali_scheduler_do_pp_job_delete(void *arg)
     mali_osk_list_move_list(&scheduler_pp_job_deletion_queue, &list);
     mali_osk_spinlock_irq_unlock(scheduler_pp_job_delete_lock);
 
-    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list, struct mali_pp_job, list)
+    {
         mali_osk_list_delinit(&job->list);
 
 #if defined(CONFIG_MALI_DMA_BUF_FENCE)
@@ -1434,8 +1359,8 @@ static void mali_scheduler_do_pp_job_queue(void *arg)
     mali_osk_spinlock_irq_unlock(scheduler_pp_job_queue_lock);
 
     /* First loop through all jobs and do the pre-work (no locks needed) */
-    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list, struct mali_pp_job, list)
+    {
         if (mali_pp_job_needs_dma_buf_mapping(job)) {
             /*
              * This operation could fail, but we continue anyway,
@@ -1449,8 +1374,8 @@ static void mali_scheduler_do_pp_job_queue(void *arg)
     mali_scheduler_lock();
 
     /* Then loop through all jobs again to queue them (lock needed) */
-    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list,
-                    struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list, struct mali_pp_job, list)
+    {
 
         /* Remove from scheduler_pp_job_queue_list before queueing */
         mali_pp_job_list_remove(job);
@@ -1466,12 +1391,10 @@ static void mali_scheduler_do_pp_job_queue(void *arg)
             /* unlock scheduler in this uncommon case */
             mali_scheduler_unlock();
 
-            schedule_mask |= mali_timeline_tracker_release(
-                         mali_pp_job_get_tracker(job));
+            schedule_mask |= mali_timeline_tracker_release(mali_pp_job_get_tracker(job));
 
             /* Notify user space and close the job object */
-            mali_scheduler_complete_pp_job(job, 0, MALI_TRUE,
-                               MALI_FALSE);
+            mali_scheduler_complete_pp_job(job, 0, MALI_TRUE, MALI_FALSE);
 
             mali_scheduler_lock();
         }
@@ -1504,16 +1427,18 @@ void mali_scheduler_gp_pp_job_queue_print(void)
     MALI_PRINT(("Total (%d) GP job in the job queue.\n", job_queue_gp.depth));
     if (job_queue_gp.depth > 0) {
         if (!_mali_osk_list_empty(&job_queue_gp.high_pri)) {
-            MALI_OSK_LIST_FOREACHENTRY(gp_job, tmp_gp_job, &job_queue_gp.high_pri,
-                            struct mali_gp_job, list) {
-                MALI_PRINT(("GP job(%p) id = %d tid = %d pid = %d in the gp job high_pri queue\n", gp_job, gp_job->id, gp_job->tid, gp_job->pid));
+            MALI_OSK_LIST_FOREACHENTRY(gp_job, tmp_gp_job, &job_queue_gp.high_pri, struct mali_gp_job, list)
+            {
+                MALI_PRINT(("GP job(%p) id = %d tid = %d pid = %d in the gp job high_pri queue\n", gp_job, gp_job->id,
+                            gp_job->tid, gp_job->pid));
             }
         }
 
         if (!_mali_osk_list_empty(&job_queue_gp.normal_pri)) {
-            MALI_OSK_LIST_FOREACHENTRY(gp_job, tmp_gp_job, &job_queue_gp.normal_pri,
-                            struct mali_gp_job, list) {
-                MALI_PRINT(("GP job(%p) id = %d tid = %d pid = %d in the gp job normal_pri queue\n", gp_job, gp_job->id, gp_job->tid, gp_job->pid));
+            MALI_OSK_LIST_FOREACHENTRY(gp_job, tmp_gp_job, &job_queue_gp.normal_pri, struct mali_gp_job, list)
+            {
+                MALI_PRINT(("GP job(%p) id = %d tid = %d pid = %d in the gp job normal_pri queue\n", gp_job, gp_job->id,
+                            gp_job->tid, gp_job->pid));
             }
         }
     }
@@ -1521,23 +1446,27 @@ void mali_scheduler_gp_pp_job_queue_print(void)
     MALI_PRINT(("Total (%d) PP job in the job queue.\n", job_queue_pp.depth));
     if (job_queue_pp.depth > 0) {
         if (!_mali_osk_list_empty(&job_queue_pp.high_pri)) {
-            MALI_OSK_LIST_FOREACHENTRY(pp_job, tmp_pp_job, &job_queue_pp.high_pri,
-                            struct mali_pp_job, list) {
+            MALI_OSK_LIST_FOREACHENTRY(pp_job, tmp_pp_job, &job_queue_pp.high_pri, struct mali_pp_job, list)
+            {
                 if (mali_pp_job_is_virtual(pp_job)) {
-                    MALI_PRINT(("PP Virtual job(%p) id = %d tid = %d pid = %d in the pp job high_pri queue\n", pp_job, pp_job->id, pp_job->tid, pp_job->pid));
+                    MALI_PRINT(("PP Virtual job(%p) id = %d tid = %d pid = %d in the pp job high_pri queue\n", pp_job,
+                                pp_job->id, pp_job->tid, pp_job->pid));
                 } else {
-                    MALI_PRINT(("PP Physical job(%p) id = %d tid = %d pid = %d in the pp job high_pri queue\n", pp_job, pp_job->id, pp_job->tid, pp_job->pid));
+                    MALI_PRINT(("PP Physical job(%p) id = %d tid = %d pid = %d in the pp job high_pri queue\n", pp_job,
+                                pp_job->id, pp_job->tid, pp_job->pid));
                 }
             }
         }
 
         if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
-            MALI_OSK_LIST_FOREACHENTRY(pp_job, tmp_pp_job, &job_queue_pp.normal_pri,
-                            struct mali_pp_job, list) {
+            MALI_OSK_LIST_FOREACHENTRY(pp_job, tmp_pp_job, &job_queue_pp.normal_pri, struct mali_pp_job, list)
+            {
                 if (mali_pp_job_is_virtual(pp_job)) {
-                    MALI_PRINT(("PP Virtual job(%p) id = %d tid = %d pid = %d in the pp job normal_pri queue\n", pp_job, pp_job->id, pp_job->tid, pp_job->pid));
+                    MALI_PRINT(("PP Virtual job(%p) id = %d tid = %d pid = %d in the pp job normal_pri queue\n", pp_job,
+                                pp_job->id, pp_job->tid, pp_job->pid));
                 } else {
-                    MALI_PRINT(("PP Physical job(%p) id = %d tid = %d pid = %d in the pp job normal_pri queue\n", pp_job, pp_job->id, pp_job->tid, pp_job->pid));
+                    MALI_PRINT(("PP Physical job(%p) id = %d tid = %d pid = %d in the pp job normal_pri queue\n",
+                                pp_job, pp_job->id, pp_job->tid, pp_job->pid));
                 }
             }
         }

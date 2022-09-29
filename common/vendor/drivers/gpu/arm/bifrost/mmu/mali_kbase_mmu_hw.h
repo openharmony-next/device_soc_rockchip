@@ -56,8 +56,7 @@ enum kbase_mmu_fault_type {
  * Configure the MMU using the address space details setup in the
  * kbase_context structure.
  */
-void kbase_mmu_hw_configure(struct kbase_device *kbdev,
-        struct kbase_as *as);
+void kbase_mmu_hw_configure(struct kbase_device *kbdev, struct kbase_as *as);
 
 /**
  * kbase_mmu_hw_do_operation - Issue an operation to the MMU.
@@ -74,9 +73,8 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev,
  *
  * Return: Zero if the operation was successful, non-zero otherwise.
  */
-int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
-        u64 vpfn, u32 nr, u32 type,
-        unsigned int handling_irq);
+int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as, u64 vpfn, u32 nr, u32 type,
+                              unsigned int handling_irq);
 
 /**
  * kbase_mmu_hw_clear_fault - Clear a fault that has been previously reported by
@@ -87,8 +85,7 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
  *
  * Clear a bus error or page fault that has been reported by the MMU.
  */
-void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        enum kbase_mmu_fault_type type);
+void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as, enum kbase_mmu_fault_type type);
 
 /**
  * kbase_mmu_hw_enable_fault - Enable fault that has been previously reported by
@@ -101,7 +98,6 @@ void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
  * will be disabled. After these are handled this function needs to be
  * called to enable the page fault or bus error fault again.
  */
-void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        enum kbase_mmu_fault_type type);
+void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as, enum kbase_mmu_fault_type type);
 
-#endif    /* _KBASE_MMU_HW_H_ */
+#endif /* _KBASE_MMU_HW_H_ */

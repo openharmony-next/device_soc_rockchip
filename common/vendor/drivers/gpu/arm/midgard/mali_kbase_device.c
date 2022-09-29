@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Base kernel device APIs
  */
@@ -44,11 +40,11 @@
 
 #if KBASE_TRACE_ENABLE
 static const char *kbasep_trace_code_string[] = {
-    /* IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
-     * THIS MUST BE USED AT THE START OF THE ARRAY */
-#define KBASE_TRACE_CODE_MAKE_CODE(X) # X
+/* IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
+ * THIS MUST BE USED AT THE START OF THE ARRAY */
+#define KBASE_TRACE_CODE_MAKE_CODE(X) #X
 #include "mali_kbase_trace_defs.h"
-#undef  KBASE_TRACE_CODE_MAKE_CODE
+#undef KBASE_TRACE_CODE_MAKE_CODE
 };
 #endif
 
@@ -70,8 +66,9 @@ static int kbase_device_as_init(struct kbase_device *kbdev, int i)
     const char poke_format[] = "mali_mmu%d_poker";
     char poke_name[sizeof(poke_format)];
 
-    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8316))
+    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8316)) {
         snprintf(poke_name, sizeof(poke_name), poke_format, i);
+    }
 
     snprintf(name, sizeof(name), format, i);
 
@@ -79,8 +76,9 @@ static int kbase_device_as_init(struct kbase_device *kbdev, int i)
     kbdev->as[i].fault_addr = 0ULL;
 
     kbdev->as[i].pf_wq = alloc_workqueue(name, 0, 1);
-    if (!kbdev->as[i].pf_wq)
+    if (!kbdev->as[i].pf_wq) {
         return -EINVAL;
+    }
 
     INIT_WORK(&kbdev->as[i].work_pagefault, page_fault_worker);
     INIT_WORK(&kbdev->as[i].work_busfault, bus_fault_worker);
@@ -111,8 +109,9 @@ static int kbase_device_as_init(struct kbase_device *kbdev, int i)
 static void kbase_device_as_term(struct kbase_device *kbdev, int i)
 {
     destroy_workqueue(kbdev->as[i].pf_wq);
-    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8316))
+    if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_8316)) {
         destroy_workqueue(kbdev->as[i].poke_wq);
+    }
 }
 
 static int kbase_device_all_as_init(struct kbase_device *kbdev)
@@ -121,15 +120,17 @@ static int kbase_device_all_as_init(struct kbase_device *kbdev)
 
     for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
         err = kbase_device_as_init(kbdev, i);
-        if (err)
+        if (err) {
             goto free_workqs;
+        }
     }
 
     return 0;
 
 free_workqs:
-    for (; i > 0; i--)
+    for (; i > 0; i--) {
         kbase_device_as_term(kbdev, i);
+    }
 
     return err;
 }
@@ -138,11 +139,12 @@ static void kbase_device_all_as_term(struct kbase_device *kbdev)
 {
     int i;
 
-    for (i = 0; i < kbdev->nr_hw_address_spaces; i++)
+    for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
         kbase_device_as_term(kbdev, i);
+    }
 }
 
-int kbase_device_init(struct kbase_device * const kbdev)
+int kbase_device_init(struct kbase_device *const kbdev)
 {
     int i, err;
 #ifdef CONFIG_ARM64
@@ -155,17 +157,15 @@ int kbase_device_init(struct kbase_device * const kbdev)
     kbdev->cci_snoop_enabled = false;
     np = kbdev->dev->of_node;
     if (np != NULL) {
-        if (of_property_read_u32(np, "snoop_enable_smc",
-                    &kbdev->snoop_enable_smc))
+        if (of_property_read_u32(np, "snoop_enable_smc", &kbdev->snoop_enable_smc)) {
             kbdev->snoop_enable_smc = 0;
-        if (of_property_read_u32(np, "snoop_disable_smc",
-                    &kbdev->snoop_disable_smc))
+        }
+        if (of_property_read_u32(np, "snoop_disable_smc", &kbdev->snoop_disable_smc)) {
             kbdev->snoop_disable_smc = 0;
+        }
         /* Either both or none of the calls should be provided. */
-        if (!((kbdev->snoop_disable_smc == 0
-            && kbdev->snoop_enable_smc == 0)
-            || (kbdev->snoop_disable_smc != 0
-            && kbdev->snoop_enable_smc != 0))) {
+        if (!((kbdev->snoop_disable_smc == 0 && kbdev->snoop_enable_smc == 0) ||
+              (kbdev->snoop_disable_smc != 0 && kbdev->snoop_enable_smc != 0))) {
             WARN_ON(1);
             err = -EINVAL;
             goto fail;
@@ -176,8 +176,9 @@ int kbase_device_init(struct kbase_device * const kbdev)
      * (identified by the GPU_ID register)
      */
     err = kbase_hw_set_issues_mask(kbdev);
-    if (err)
+    if (err) {
         goto fail;
+    }
 
     /* Set the list of features available on the current HW
      * (identified by the GPU_ID register)
@@ -194,61 +195,69 @@ int kbase_device_init(struct kbase_device * const kbdev)
     /* Workaround a pre-3.13 Linux issue, where dma_mask is NULL when our
      * device structure was created by device-tree
      */
-    if (!kbdev->dev->dma_mask)
+    if (!kbdev->dev->dma_mask) {
         kbdev->dev->dma_mask = &kbdev->dev->coherent_dma_mask;
+    }
 
-    err = dma_set_mask(kbdev->dev,
-            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-    if (err)
+    err = dma_set_mask(kbdev->dev, DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err) {
         goto dma_set_mask_failed;
+    }
 
-    err = dma_set_coherent_mask(kbdev->dev,
-            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-    if (err)
+    err = dma_set_coherent_mask(kbdev->dev, DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err) {
         goto dma_set_mask_failed;
+    }
 
     kbdev->nr_hw_address_spaces = kbdev->gpu_props.num_address_spaces;
 
     err = kbase_device_all_as_init(kbdev);
-    if (err)
+    if (err) {
         goto as_init_failed;
+    }
 
     spin_lock_init(&kbdev->hwcnt.lock);
 
     err = kbasep_trace_init(kbdev);
-    if (err)
+    if (err) {
         goto term_as;
+    }
 
     mutex_init(&kbdev->cacheclean_lock);
 
 #ifdef CONFIG_MALI_TRACE_TIMELINE
-    for (i = 0; i < BASE_JM_MAX_NR_SLOTS; ++i)
+    for (i = 0; i < BASE_JM_MAX_NR_SLOTS; ++i) {
         kbdev->timeline.slot_atoms_submitted[i] = 0;
+    }
 
-    for (i = 0; i <= KBASEP_TIMELINE_PM_EVENT_LAST; ++i)
+    for (i = 0; i <= KBASEP_TIMELINE_PM_EVENT_LAST; ++i) {
         atomic_set(&kbdev->timeline.pm_event_uid[i], 0);
+    }
 #endif /* CONFIG_MALI_TRACE_TIMELINE */
 
     /* fbdump profiling controls set to 0 - fbdump not enabled until changed by gator */
-    for (i = 0; i < FBDUMP_CONTROL_MAX; i++)
+    for (i = 0; i < FBDUMP_CONTROL_MAX; i++) {
         kbdev->kbase_profiling_controls[i] = 0;
+    }
 
     kbase_debug_assert_register_hook(&kbasep_trace_hook_wrapper, kbdev);
 
     atomic_set(&kbdev->ctx_num, 0);
 
     err = kbase_instr_backend_init(kbdev);
-    if (err)
+    if (err) {
         goto term_trace;
+    }
 
     kbdev->pm.dvfs_period = DEFAULT_PM_DVFS_PERIOD;
 
     kbdev->reset_timeout_ms = DEFAULT_RESET_TIMEOUT_MS;
 
-    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU))
+    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU)) {
         kbdev->mmu_mode = kbase_mmu_mode_get_aarch64();
-    else
+    } else {
         kbdev->mmu_mode = kbase_mmu_mode_get_lpae();
+    }
 
 #ifdef CONFIG_MALI_DEBUG
     init_waitqueue_head(&kbdev->driver_inactive_wait);
@@ -285,8 +294,7 @@ void kbase_device_free(struct kbase_device *kbdev)
     kfree(kbdev);
 }
 
-int kbase_device_trace_buffer_install(
-        struct kbase_context *kctx, u32 *tb, size_t size)
+int kbase_device_trace_buffer_install(struct kbase_context *kctx, u32 *tb, size_t size)
 {
     unsigned long flags;
 
@@ -296,8 +304,9 @@ int kbase_device_trace_buffer_install(
     /* Interface uses 16-bit value to track last accessed entry. Each entry
      * is composed of two 32-bit words.
      * This limits the size that can be handled without an overflow. */
-    if (0xFFFF * (2 * sizeof(u32)) < size)
+    if (0xFFFF * (0x2 * sizeof(u32)) < size) {
         return -EINVAL;
+    }
 
     /* set up the header */
     /* magic number in the first 4 bytes */
@@ -310,7 +319,7 @@ int kbase_device_trace_buffer_install(
 
     /* install trace buffer */
     spin_lock_irqsave(&kctx->jctx.tb_lock, flags);
-    kctx->jctx.tb_wrap_offset = size / 8;
+    kctx->jctx.tb_wrap_offset = size / 0x8;
     kctx->jctx.tb = tb;
     spin_unlock_irqrestore(&kctx->jctx.tb_lock, flags);
 
@@ -328,7 +337,8 @@ void kbase_device_trace_buffer_uninstall(struct kbase_context *kctx)
     spin_unlock_irqrestore(&kctx->jctx.tb_lock, flags);
 }
 
-void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_reg_access_type type, u16 reg_offset, u32 reg_value)
+void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_reg_access_type type, u16 reg_offset,
+                                        u32 reg_value)
 {
     unsigned long flags;
 
@@ -343,7 +353,7 @@ void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_r
         KBASE_DEBUG_ASSERT(0 == (header_word & 0x1));
 
         wrap_count = (header_word >> 1) & 0x7FFF;
-        write_offset = (header_word >> 16) & 0xFFFF;
+        write_offset = (header_word >> 0x10) & 0xFFFF;
 
         /* mark as transaction in progress */
         tb[1] |= 0x1;
@@ -355,16 +365,16 @@ void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_r
             /* wrap */
             write_offset = 1;
             wrap_count++;
-            wrap_count &= 0x7FFF;    /* 15bit wrap counter */
+            wrap_count &= 0x7FFF; /* 15bit wrap counter */
         }
 
         /* store the trace entry at the selected offset */
-        tb[write_offset * 2 + 0] = (reg_offset & ~0x3) | ((type == REG_WRITE) ? 0x1 : 0x0);
-        tb[write_offset * 2 + 1] = reg_value;
+        tb[write_offset * 0x2 + 0] = (reg_offset & ~0x3) | ((type == REG_WRITE) ? 0x1 : 0x0);
+        tb[write_offset * 0x2 + 1] = reg_value;
         mb();
 
         /* new header word */
-        header_word = (write_offset << 16) | (wrap_count << 1) | 0x0;    /* transaction complete */
+        header_word = (write_offset << 0x10) | (wrap_count << 1) | 0x0; /* transaction complete */
         tb[1] = header_word;
     }
     spin_unlock_irqrestore(&kctx->jctx.tb_lock, flags);
@@ -381,8 +391,9 @@ static int kbasep_trace_init(struct kbase_device *kbdev)
 
     rbuf = kmalloc_array(KBASE_TRACE_SIZE, sizeof(*rbuf), GFP_KERNEL);
 
-    if (!rbuf)
+    if (!rbuf) {
         return -EINVAL;
+    }
 
     kbdev->trace_rbuf = rbuf;
     spin_lock_init(&kbdev->trace_lock);
@@ -399,23 +410,32 @@ static void kbasep_trace_format_msg(struct kbase_trace *trace_msg, char *buffer,
     s32 written = 0;
 
     /* Initial part of message */
-    written += MAX(snprintf(buffer + written, MAX(len - written, 0), "%d.%.6d,%d,%d,%s,%p,", (int)trace_msg->timestamp.tv_sec, (int)(trace_msg->timestamp.tv_nsec / 1000), trace_msg->thread_id, trace_msg->cpu, kbasep_trace_code_string[trace_msg->code], trace_msg->ctx), 0);
+    written +=
+        MAX(snprintf(buffer + written, MAX(len - written, 0), "%d.%.6d,%d,%d,%s,%p,", (int)trace_msg->timestamp.tv_sec,
+                     (int)(trace_msg->timestamp.tv_nsec / 0x3E8), trace_msg->thread_id, trace_msg->cpu,
+                     kbasep_trace_code_string[trace_msg->code], trace_msg->ctx),
+            0);
 
-    if (trace_msg->katom)
-        written += MAX(snprintf(buffer + written, MAX(len - written, 0), "atom %d (ud: 0x%llx 0x%llx)", trace_msg->atom_number, trace_msg->atom_udata[0], trace_msg->atom_udata[1]), 0);
+    if (trace_msg->katom) {
+        written += MAX(snprintf(buffer + written, MAX(len - written, 0), "atom %d (ud: 0x%llx 0x%llx)",
+                                trace_msg->atom_number, trace_msg->atom_udata[0], trace_msg->atom_udata[1]),
+                       0);
+    }
 
     written += MAX(snprintf(buffer + written, MAX(len - written, 0), ",%.8llx,", trace_msg->gpu_addr), 0);
 
     /* NOTE: Could add function callbacks to handle different message types */
     /* Jobslot present */
-    if (trace_msg->flags & KBASE_TRACE_FLAG_JOBSLOT)
+    if (trace_msg->flags & KBASE_TRACE_FLAG_JOBSLOT) {
         written += MAX(snprintf(buffer + written, MAX(len - written, 0), "%d", trace_msg->jobslot), 0);
+    }
 
     written += MAX(snprintf(buffer + written, MAX(len - written, 0), ","), 0);
 
     /* Refcount present */
-    if (trace_msg->flags & KBASE_TRACE_FLAG_REFCOUNT)
+    if (trace_msg->flags & KBASE_TRACE_FLAG_REFCOUNT) {
         written += MAX(snprintf(buffer + written, MAX(len - written, 0), "%d", trace_msg->refcount), 0);
+    }
 
     written += MAX(snprintf(buffer + written, MAX(len - written, 0), ","), 0);
 
@@ -431,7 +451,8 @@ static void kbasep_trace_dump_msg(struct kbase_device *kbdev, struct kbase_trace
     dev_dbg(kbdev->dev, "%s", buffer);
 }
 
-void kbasep_trace_add(struct kbase_device *kbdev, enum kbase_trace_code code, void *ctx, struct kbase_jd_atom *katom, u64 gpu_addr, u8 flags, int refcount, int jobslot, unsigned long info_val)
+void kbasep_trace_add(struct kbase_device *kbdev, enum kbase_trace_code code, void *ctx, struct kbase_jd_atom *katom,
+                      u64 gpu_addr, u8 flags, int refcount, int jobslot, unsigned long info_val)
 {
     unsigned long irqflags;
     struct kbase_trace *trace_msg;
@@ -466,8 +487,9 @@ void kbasep_trace_add(struct kbase_device *kbdev, enum kbase_trace_code code, vo
 
     /* Update the ringbuffer indices */
     kbdev->trace_next_in = (kbdev->trace_next_in + 1) & KBASE_TRACE_MASK;
-    if (kbdev->trace_next_in == kbdev->trace_first_out)
+    if (kbdev->trace_next_in == kbdev->trace_first_out) {
         kbdev->trace_first_out = (kbdev->trace_first_out + 1) & KBASE_TRACE_MASK;
+    }
 
     /* Done */
 
@@ -527,12 +549,13 @@ static void *kbasep_trace_seq_start(struct seq_file *s, loff_t *pos)
     struct trace_seq_state *state = s->private;
     int i;
 
-    if (*pos > KBASE_TRACE_SIZE)
+    if (*pos > KBASE_TRACE_SIZE) {
         return NULL;
+    }
     i = state->start + *pos;
-    if ((state->end >= state->start && i >= state->end) ||
-            i >= state->end + KBASE_TRACE_SIZE)
+    if ((state->end >= state->start && i >= state->end) || i >= state->end + KBASE_TRACE_SIZE) {
         return NULL;
+    }
 
     i &= KBASE_TRACE_MASK;
 
@@ -551,8 +574,9 @@ static void *kbasep_trace_seq_next(struct seq_file *s, void *data, loff_t *pos)
     (*pos)++;
 
     i = (state->start + *pos) & KBASE_TRACE_MASK;
-    if (i == state->end)
+    if (i == state->end) {
         return NULL;
+    }
 
     return &state->trace_buf[i];
 }
@@ -582,8 +606,9 @@ static int kbasep_trace_debugfs_open(struct inode *inode, struct file *file)
     struct trace_seq_state *state;
 
     state = __seq_open_private(file, &kbasep_trace_seq_ops, sizeof(*state));
-    if (!state)
+    if (!state) {
         return -ENOMEM;
+    }
 
     spin_lock_irqsave(&kbdev->trace_lock, flags);
     state->start = kbdev->trace_first_out;
@@ -603,18 +628,16 @@ static const struct file_operations kbasep_trace_debugfs_fops = {
 
 void kbasep_trace_debugfs_init(struct kbase_device *kbdev)
 {
-    debugfs_create_file("mali_trace", S_IRUGO,
-            kbdev->mali_debugfs_directory, kbdev,
-            &kbasep_trace_debugfs_fops);
+    debugfs_create_file("mali_trace", S_IRUGO, kbdev->mali_debugfs_directory, kbdev, &kbasep_trace_debugfs_fops);
 }
 
 #else
 void kbasep_trace_debugfs_init(struct kbase_device *kbdev)
 {
 }
-#endif                /* CONFIG_DEBUG_FS */
+#endif /* CONFIG_DEBUG_FS */
 
-#else                /* KBASE_TRACE_ENABLE  */
+#else  /* KBASE_TRACE_ENABLE  */
 static int kbasep_trace_init(struct kbase_device *kbdev)
 {
     CSTD_UNUSED(kbdev);
@@ -635,23 +658,23 @@ void kbasep_trace_dump(struct kbase_device *kbdev)
 {
     CSTD_UNUSED(kbdev);
 }
-#endif                /* KBASE_TRACE_ENABLE  */
+#endif /* KBASE_TRACE_ENABLE  */
 
 void kbase_set_profiling_control(struct kbase_device *kbdev, u32 control, u32 value)
 {
     switch (control) {
-    case FBDUMP_CONTROL_ENABLE:
-        /* fall through */
-    case FBDUMP_CONTROL_RATE:
-        /* fall through */
-    case SW_COUNTER_ENABLE:
-        /* fall through */
-    case FBDUMP_CONTROL_RESIZE_FACTOR:
-        kbdev->kbase_profiling_controls[control] = value;
-        break;
-    default:
-        dev_err(kbdev->dev, "Profiling control %d not found\n", control);
-        break;
+        case FBDUMP_CONTROL_ENABLE:
+            /* fall through */
+        case FBDUMP_CONTROL_RATE:
+            /* fall through */
+        case SW_COUNTER_ENABLE:
+            /* fall through */
+        case FBDUMP_CONTROL_RESIZE_FACTOR:
+            kbdev->kbase_profiling_controls[control] = value;
+            break;
+        default:
+            dev_err(kbdev->dev, "Profiling control %d not found\n", control);
+            break;
     }
 }
 
@@ -667,8 +690,8 @@ void mali_profiling_control(u32 action, u32 value)
     /* find the first i.e. call with -1 */
     kbdev = kbase_find_device(-1);
 
-    if (NULL != kbdev)
+    if (NULL != kbdev) {
         kbase_set_profiling_control(kbdev, action, value);
+    }
 }
 KBASE_EXPORT_SYMBOL(mali_profiling_control);
-

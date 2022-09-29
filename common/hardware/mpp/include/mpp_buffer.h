@@ -128,7 +128,7 @@ typedef enum {
     MPP_BUFFER_TYPE_BUTT,
 } MppBufferType;
 
-#define MPP_BUFFER_TYPE_MASK            0x0000FFFF
+#define MPP_BUFFER_TYPE_MASK 0x0000FFFF
 
 /*
  * MPP_BUFFER_FLAGS cooperate with MppBufferType
@@ -143,11 +143,11 @@ typedef enum {
  * flags originate from drm_rockchip_gem_mem_type
  */
 
-#define MPP_BUFFER_FLAGS_MASK           0x000f0000      // ROCKCHIP_BO_MASK << 16
-#define MPP_BUFFER_FLAGS_CONTIG         0x00010000      // ROCKCHIP_BO_CONTIG << 16
-#define MPP_BUFFER_FLAGS_CACHABLE       0x00020000      // ROCKCHIP_BO_CACHABLE << 16
-#define MPP_BUFFER_FLAGS_WC             0x00040000      // ROCKCHIP_BO_WC << 16
-#define MPP_BUFFER_FLAGS_SECURE         0x00080000      // ROCKCHIP_BO_SECURE << 16
+#define MPP_BUFFER_FLAGS_MASK 0x000f0000     // ROCKCHIP_BO_MASK << 16
+#define MPP_BUFFER_FLAGS_CONTIG 0x00010000   // ROCKCHIP_BO_CONTIG << 16
+#define MPP_BUFFER_FLAGS_CACHABLE 0x00020000 // ROCKCHIP_BO_CACHABLE << 16
+#define MPP_BUFFER_FLAGS_WC 0x00040000       // ROCKCHIP_BO_WC << 16
+#define MPP_BUFFER_FLAGS_SECURE 0x00080000   // ROCKCHIP_BO_SECURE << 16
 
 /*
  * MppBufferInfo variable's meaning is different in different MppBufferType
@@ -170,15 +170,15 @@ typedef enum {
  *
  */
 typedef struct MppBufferInfo_t {
-    MppBufferType   type;
-    size_t          size;
-    void            *ptr;
-    void            *hnd;
-    int             fd;
-    int             index;
+    MppBufferType type;
+    size_t size;
+    void *ptr;
+    void *hnd;
+    int fd;
+    int index;
 } MppBufferInfo;
 
-#define BUFFER_GROUP_SIZE_DEFAULT           (SZ_1M*80)
+#define BUFFER_GROUP_SIZE_DEFAULT (SZ_1M * 80)
 
 /*
  * mpp_buffer_import_with_tag(MppBufferGroup group, MppBufferInfo *info, MppBuffer *buffer)
@@ -211,56 +211,43 @@ typedef struct MppBufferInfo_t {
  * imported buffer is leak or not and trace its usage inside mpp process. So we attach this kind
  * of buffer to default misc buffer group for management.
  */
-#define mpp_buffer_commit(group, info) \
-        mpp_buffer_import_with_tag(group, info, NULL, MODULE_TAG, __FUNCTION__)
+#define mpp_buffer_commit(group, info) mpp_buffer_import_with_tag(group, info, NULL, MODULE_TAG, __FUNCTION__)
 
-#define mpp_buffer_import(buffer, info) \
-        mpp_buffer_import_with_tag(NULL, info, buffer, MODULE_TAG, __FUNCTION__)
+#define mpp_buffer_import(buffer, info) mpp_buffer_import_with_tag(NULL, info, buffer, MODULE_TAG, __FUNCTION__)
 
-#define mpp_buffer_get(group, buffer, size) \
-        mpp_buffer_get_with_tag(group, buffer, size, MODULE_TAG, __FUNCTION__)
+#define mpp_buffer_get(group, buffer, size) mpp_buffer_get_with_tag(group, buffer, size, MODULE_TAG, __FUNCTION__)
 
-#define mpp_buffer_put(buffer) \
-        mpp_buffer_put_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_put(buffer) mpp_buffer_put_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_inc_ref(buffer) \
-        mpp_buffer_inc_ref_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_inc_ref(buffer) mpp_buffer_inc_ref_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_info_get(buffer, info) \
-        mpp_buffer_info_get_with_caller(buffer, info, __FUNCTION__)
+#define mpp_buffer_info_get(buffer, info) mpp_buffer_info_get_with_caller(buffer, info, __FUNCTION__)
 
-#define mpp_buffer_read(buffer, offset, data, size) \
-        mpp_buffer_read_with_caller(buffer, offset, data, size, __FUNCTION__)
+#define mpp_buffer_read(buffer, offset, data, size)                                                                    \
+    mpp_buffer_read_with_caller(buffer, offset, data, size, __FUNCTION__)
 
-#define mpp_buffer_write(buffer, offset, data, size) \
-        mpp_buffer_write_with_caller(buffer, offset, data, size, __FUNCTION__)
+#define mpp_buffer_write(buffer, offset, data, size)                                                                   \
+    mpp_buffer_write_with_caller(buffer, offset, data, size, __FUNCTION__)
 
-#define mpp_buffer_get_ptr(buffer) \
-        mpp_buffer_get_ptr_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_get_ptr(buffer) mpp_buffer_get_ptr_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_get_fd(buffer) \
-        mpp_buffer_get_fd_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_get_fd(buffer) mpp_buffer_get_fd_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_get_size(buffer) \
-        mpp_buffer_get_size_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_get_size(buffer) mpp_buffer_get_size_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_get_index(buffer) \
-        mpp_buffer_get_index_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_get_index(buffer) mpp_buffer_get_index_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_set_index(buffer, index) \
-        mpp_buffer_set_index_with_caller(buffer, index, __FUNCTION__)
+#define mpp_buffer_set_index(buffer, index) mpp_buffer_set_index_with_caller(buffer, index, __FUNCTION__)
 
-#define mpp_buffer_get_offset(buffer) \
-        mpp_buffer_get_offset_with_caller(buffer, __FUNCTION__)
+#define mpp_buffer_get_offset(buffer) mpp_buffer_get_offset_with_caller(buffer, __FUNCTION__)
 
-#define mpp_buffer_set_offset(buffer, offset) \
-        mpp_buffer_set_offset_with_caller(buffer, offset, __FUNCTION__)
+#define mpp_buffer_set_offset(buffer, offset) mpp_buffer_set_offset_with_caller(buffer, offset, __FUNCTION__)
 
-#define mpp_buffer_group_get_internal(group, type, ...) \
-        mpp_buffer_group_get(group, type, MPP_BUFFER_INTERNAL, MODULE_TAG, __FUNCTION__)
+#define mpp_buffer_group_get_internal(group, type, ...)                                                                \
+    mpp_buffer_group_get(group, type, MPP_BUFFER_INTERNAL, MODULE_TAG, __FUNCTION__)
 
-#define mpp_buffer_group_get_external(group, type, ...) \
-        mpp_buffer_group_get(group, type, MPP_BUFFER_EXTERNAL, MODULE_TAG, __FUNCTION__)
+#define mpp_buffer_group_get_external(group, type, ...)                                                                \
+    mpp_buffer_group_get(group, type, MPP_BUFFER_EXTERNAL, MODULE_TAG, __FUNCTION__)
 
 #ifdef __cplusplus
 extern "C" {
@@ -275,30 +262,30 @@ extern "C" {
  * mpp_buffer_import_with_tag - compounded interface for commit and import
  *
  */
-MPP_RET mpp_buffer_import_with_tag(MppBufferGroup group, MppBufferInfo *info, MppBuffer *buffer,
-                                   const char *tag, const char *caller);
-MPP_RET mpp_buffer_get_with_tag(MppBufferGroup group, MppBuffer *buffer, size_t size,
-                                const char *tag, const char *caller);
+MPP_RET mpp_buffer_import_with_tag(MppBufferGroup group, MppBufferInfo *info, MppBuffer *buffer, const char *tag,
+                                   const char *caller);
+MPP_RET mpp_buffer_get_with_tag(MppBufferGroup group, MppBuffer *buffer, size_t size, const char *tag,
+                                const char *caller);
 MPP_RET mpp_buffer_put_with_caller(MppBuffer buffer, const char *caller);
 MPP_RET mpp_buffer_inc_ref_with_caller(MppBuffer buffer, const char *caller);
 
 MPP_RET mpp_buffer_info_get_with_caller(MppBuffer buffer, MppBufferInfo *info, const char *caller);
 MPP_RET mpp_buffer_read_with_caller(MppBuffer buffer, size_t offset, void *data, size_t size, const char *caller);
 MPP_RET mpp_buffer_write_with_caller(MppBuffer buffer, size_t offset, void *data, size_t size, const char *caller);
-void   *mpp_buffer_get_ptr_with_caller(MppBuffer buffer, const char *caller);
-int     mpp_buffer_get_fd_with_caller(MppBuffer buffer, const char *caller);
-size_t  mpp_buffer_get_size_with_caller(MppBuffer buffer, const char *caller);
-int     mpp_buffer_get_index_with_caller(MppBuffer buffer, const char *caller);
+void *mpp_buffer_get_ptr_with_caller(MppBuffer buffer, const char *caller);
+int mpp_buffer_get_fd_with_caller(MppBuffer buffer, const char *caller);
+size_t mpp_buffer_get_size_with_caller(MppBuffer buffer, const char *caller);
+int mpp_buffer_get_index_with_caller(MppBuffer buffer, const char *caller);
 MPP_RET mpp_buffer_set_index_with_caller(MppBuffer buffer, int index, const char *caller);
-size_t  mpp_buffer_get_offset_with_caller(MppBuffer buffer, const char *caller);
+size_t mpp_buffer_get_offset_with_caller(MppBuffer buffer, const char *caller);
 MPP_RET mpp_buffer_set_offset_with_caller(MppBuffer buffer, size_t offset, const char *caller);
 
-MPP_RET mpp_buffer_group_get(MppBufferGroup *group, MppBufferType type, MppBufferMode mode,
-                             const char *tag, const char *caller);
+MPP_RET mpp_buffer_group_get(MppBufferGroup *group, MppBufferType type, MppBufferMode mode, const char *tag,
+                             const char *caller);
 MPP_RET mpp_buffer_group_put(MppBufferGroup group);
 MPP_RET mpp_buffer_group_clear(MppBufferGroup group);
-RK_S32  mpp_buffer_group_unused(MppBufferGroup group);
-size_t  mpp_buffer_group_usage(MppBufferGroup group);
+signed int mpp_buffer_group_unused(MppBufferGroup group);
+size_t mpp_buffer_group_usage(MppBufferGroup group);
 MppBufferMode mpp_buffer_group_mode(MppBufferGroup group);
 MppBufferType mpp_buffer_group_type(MppBufferGroup group);
 
@@ -306,10 +293,10 @@ MppBufferType mpp_buffer_group_type(MppBufferGroup group);
  * size  : 0 - no limit, other - max buffer size
  * count : 0 - no limit, other - max buffer count
  */
-MPP_RET mpp_buffer_group_limit_config(MppBufferGroup group, size_t size, RK_S32 count);
+MPP_RET mpp_buffer_group_limit_config(MppBufferGroup group, size_t size, signed int count);
 
-RK_U32 mpp_buffer_total_now(void);
-RK_U32 mpp_buffer_total_max(void);
+unsigned int mpp_buffer_total_now(void);
+unsigned int mpp_buffer_total_max(void);
 
 #ifdef __cplusplus
 }

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_DEBUG_KTRACE_DEFS_JM_H_
-#define _KBASE_DEBUG_KTRACE_DEFS_JM_H_
+#ifndef KBASE_DEBUG_KTRACE_DEFS_JM_H_
+#define KBASE_DEBUG_KTRACE_DEFS_JM_H_
 
 #if KBASE_KTRACE_TARGET_RBUF
 /**
@@ -60,15 +60,14 @@
 /* indicates if the trace message has a valid refcount member */
 #define KBASE_KTRACE_FLAG_JM_REFCOUNT (((kbase_ktrace_flag_t)1) << 0)
 /* indicates if the trace message has a valid jobslot member */
-#define KBASE_KTRACE_FLAG_JM_JOBSLOT  (((kbase_ktrace_flag_t)1) << 1)
+#define KBASE_KTRACE_FLAG_JM_JOBSLOT (((kbase_ktrace_flag_t)1) << 1)
 /* indicates if the trace message has valid atom related info. */
-#define KBASE_KTRACE_FLAG_JM_ATOM     (((kbase_ktrace_flag_t)1) << 2)
+#define KBASE_KTRACE_FLAG_JM_ATOM (((kbase_ktrace_flag_t)1) << 2)
 
 #if KBASE_KTRACE_TARGET_RBUF
 /* Collect all the flags together for debug checking */
-#define KBASE_KTRACE_FLAG_BACKEND_ALL \
-        (KBASE_KTRACE_FLAG_JM_REFCOUNT | KBASE_KTRACE_FLAG_JM_JOBSLOT \
-        | KBASE_KTRACE_FLAG_JM_ATOM)
+#define KBASE_KTRACE_FLAG_BACKEND_ALL                                                                                  \
+    (KBASE_KTRACE_FLAG_JM_REFCOUNT | KBASE_KTRACE_FLAG_JM_JOBSLOT | KBASE_KTRACE_FLAG_JM_ATOM)
 
 /**
  * struct kbase_ktrace_backend - backend specific part of a trace message

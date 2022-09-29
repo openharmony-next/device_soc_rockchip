@@ -23,9 +23,6 @@
 #ifndef KBASE_GPU_H
 #define KBASE_GPU_H
 
-#include "mali_kbase_gpu_regmap.h"
 #include "mali_kbase_gpu_fault.h"
-#include "mali_kbase_gpu_coherency.h"
-#include "mali_kbase_gpu_id.h"
 
 #endif /* _KBASE_GPU_H_ */

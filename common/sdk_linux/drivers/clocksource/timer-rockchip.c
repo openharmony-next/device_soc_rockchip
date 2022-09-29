@@ -18,19 +18,19 @@
 
 #define TIMER_NAME "rk_timer"
 
-#define TIMER_LOAD_COUNT0    0x00
-#define TIMER_LOAD_COUNT1    0x04
-#define TIMER_CURRENT_VALUE0    0x08
-#define TIMER_CURRENT_VALUE1    0x0C
-#define TIMER_CONTROL_REG3288    0x10
-#define TIMER_CONTROL_REG3399    0x1c
-#define TIMER_INT_STATUS    0x18
+#define TIMER_LOAD_COUNT0 0x00
+#define TIMER_LOAD_COUNT1 0x04
+#define TIMER_CURRENT_VALUE0 0x08
+#define TIMER_CURRENT_VALUE1 0x0C
+#define TIMER_CONTROL_REG3288 0x10
+#define TIMER_CONTROL_REG3399 0x1c
+#define TIMER_INT_STATUS 0x18
 
-#define TIMER_DISABLE        0x0
-#define TIMER_ENABLE        0x1
-#define TIMER_MODE_FREE_RUNNING            (0 << 1)
-#define TIMER_MODE_USER_DEFINED_COUNT        (1 << 1)
-#define TIMER_INT_UNMASK            (1 << 2)
+#define TIMER_DISABLE 0x0
+#define TIMER_ENABLE 0x1
+#define TIMER_MODE_FREE_RUNNING (0 << 1)
+#define TIMER_MODE_USER_DEFINED_COUNT (1 << 1)
+#define TIMER_INT_UNMASK (1 << 2)
 
 struct rk_timer {
     void __iomem *base;
@@ -66,8 +66,7 @@ static inline void rk_timer_enable(struct rk_timer *timer, u32 flags)
     writel_relaxed(TIMER_ENABLE | flags, timer->ctrl);
 }
 
-static void rk_timer_update_counter(unsigned long cycles,
-                    struct rk_timer *timer)
+static void rk_timer_update_counter(unsigned long cycles, struct rk_timer *timer)
 {
     writel_relaxed(cycles, timer->base + TIMER_LOAD_COUNT0);
     writel_relaxed(0, timer->base + TIMER_LOAD_COUNT1);
@@ -78,15 +77,13 @@ static void rk_timer_interrupt_clear(struct rk_timer *timer)
     writel_relaxed(1, timer->base + TIMER_INT_STATUS);
 }
 
-static inline int rk_timer_set_next_event(unsigned long cycles,
-                      struct clock_event_device *ce)
+static inline int rk_timer_set_next_event(unsigned long cycles, struct clock_event_device *ce)
 {
     struct rk_timer *timer = rk_timer(ce);
 
     rk_timer_disable(timer);
     rk_timer_update_counter(cycles, timer);
-    rk_timer_enable(timer, TIMER_MODE_USER_DEFINED_COUNT |
-                   TIMER_INT_UNMASK);
+    rk_timer_enable(timer, TIMER_MODE_USER_DEFINED_COUNT | TIMER_INT_UNMASK);
     return 0;
 }
 
@@ -115,8 +112,9 @@ static irqreturn_t rk_timer_interrupt(int irq, void *dev_id)
 
     rk_timer_interrupt_clear(timer);
 
-    if (clockevent_state_oneshot(ce))
+    if (clockevent_state_oneshot(ce)) {
         rk_timer_disable(timer);
+    }
 
     ce->event_handler(ce);
 
@@ -130,8 +128,7 @@ static u64 notrace rk_timer_sched_read(void)
 }
 #endif
 
-static int __init
-rk_timer_probe(struct rk_timer *timer, struct device_node *np)
+static int __init rk_timer_probe(struct rk_timer *timer, struct device_node *np)
 {
     struct clk *timer_clk;
     struct clk *pclk;
@@ -144,8 +141,9 @@ rk_timer_probe(struct rk_timer *timer, struct device_node *np)
         return -ENXIO;
     }
 
-    if (of_device_is_compatible(np, "rockchip,rk3399-timer"))
+    if (of_device_is_compatible(np, "rockchip,rk3399-timer")) {
         ctrl_reg = TIMER_CONTROL_REG3399;
+    }
 
     timer->ctrl = timer->base + ctrl_reg;
 
@@ -220,13 +218,13 @@ static int __init rk_clkevt_init(struct device_node *np)
     }
 
     ret = rk_timer_probe(&rk_clkevt->timer, np);
-    if (ret)
+    if (ret) {
         goto out_probe;
+    }
 
     ce = &rk_clkevt->ce;
     ce->name = TIMER_NAME;
-    ce->features = CLOCK_EVT_FEAT_PERIODIC | CLOCK_EVT_FEAT_ONESHOT |
-               CLOCK_EVT_FEAT_DYNIRQ;
+    ce->features = CLOCK_EVT_FEAT_PERIODIC | CLOCK_EVT_FEAT_ONESHOT | CLOCK_EVT_FEAT_DYNIRQ;
     ce->set_next_event = rk_timer_set_next_event;
     ce->set_state_shutdown = rk_timer_shutdown;
     ce->set_state_periodic = rk_timer_set_periodic;
@@ -234,16 +232,13 @@ static int __init rk_clkevt_init(struct device_node *np)
     ce->cpumask = cpu_possible_mask;
     ce->rating = 250;
 
-    ret = request_irq(rk_clkevt->timer.irq, rk_timer_interrupt, IRQF_TIMER,
-              TIMER_NAME, ce);
+    ret = request_irq(rk_clkevt->timer.irq, rk_timer_interrupt, IRQF_TIMER, TIMER_NAME, ce);
     if (ret) {
-        pr_err("Failed to initialize '%s': %d\n",
-            TIMER_NAME, ret);
+        pr_err("Failed to initialize '%s': %d\n", TIMER_NAME, ret);
         goto out_irq;
     }
 
-    clockevents_config_and_register(&rk_clkevt->ce,
-                    rk_clkevt->timer.freq, 1, UINT_MAX);
+    clockevents_config_and_register(&rk_clkevt->ce, rk_clkevt->timer.freq, 1, UINT_MAX);
     return 0;
 
 out_irq:
@@ -268,15 +263,15 @@ static int __init rk_clksrc_init(struct device_node *np)
     }
 
     ret = rk_timer_probe(rk_clksrc, np);
-    if (ret)
+    if (ret) {
         goto out_probe;
+    }
 
     rk_timer_update_counter(UINT_MAX, rk_clksrc);
     rk_timer_enable(rk_clksrc, 0);
 
-    ret = clocksource_mmio_init(rk_clksrc->base + TIMER_CURRENT_VALUE0,
-        TIMER_NAME, rk_clksrc->freq, 250, 32,
-        clocksource_mmio_readl_down);
+    ret = clocksource_mmio_init(rk_clksrc->base + TIMER_CURRENT_VALUE0, TIMER_NAME, rk_clksrc->freq, 250, 32,
+                                clocksource_mmio_readl_down);
     if (ret) {
         pr_err("Failed to register clocksource\n");
         goto out_clocksource;
@@ -298,12 +293,14 @@ out:
 
 static int __init rk_timer_init(struct device_node *np)
 {
-    if (!rk_clkevt)
+    if (!rk_clkevt) {
         return rk_clkevt_init(np);
+    }
 
 #ifndef MODULE
-    if (!rk_clksrc)
+    if (!rk_clksrc) {
         return rk_clksrc_init(np);
+    }
 #endif
 
     pr_err("Too many timer definitions for '%s'\n", TIMER_NAME);
@@ -320,16 +317,17 @@ static int __init rk_timer_driver_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id rk_timer_match_table[] = {
-    { .compatible = "rockchip,rk3288-timer" },
-    { .compatible = "rockchip,rk3399-timer" },
-    { /* sentinel */ },
+    {.compatible = "rockchip,rk3288-timer"},
+    {.compatible = "rockchip,rk3399-timer"},
+    {/* sentinel */},
 };
 
 static struct platform_driver rk_timer_driver = {
-    .driver = {
-        .name = TIMER_NAME,
-        .of_match_table = rk_timer_match_table,
-    },
+    .driver =
+        {
+            .name = TIMER_NAME,
+            .of_match_table = rk_timer_match_table,
+        },
 };
 module_platform_driver_probe(rk_timer_driver, rk_timer_driver_probe);
 

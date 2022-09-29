@@ -13,7 +13,8 @@
  *
  */
 
-
+#ifndef MALI_KBASE_PLATFORM_FAKE_H
+#define MALI_KBASE_PLATFORM_FAKE_H
 
 #ifdef CONFIG_MALI_PLATFORM_FAKE
 
@@ -36,3 +37,5 @@ int kbase_platform_fake_register(void);
 void kbase_platform_fake_unregister(void);
 
 #endif /* CONFIG_MALI_PLATFORM_FAKE */
+
+#endif

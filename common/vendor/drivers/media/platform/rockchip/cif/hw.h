@@ -19,19 +19,15 @@
 #include "regs.h"
 #include "version.h"
 
-#define RKCIF_DEV_MAX        7
-#define RKCIF_HW_DRIVER_NAME    "rkcifhw"
-#define RKCIF_MAX_BUS_CLK    8
-#define RKCIF_MAX_RESET        15
+#define RKCIF_DEV_MAX 7
+#define RKCIF_HW_DRIVER_NAME "rkcifhw"
+#define RKCIF_MAX_BUS_CLK 8
+#define RKCIF_MAX_RESET 15
 
-#define write_cif_reg(base, addr, val) \
-    writel(val, (addr) + (base))
-#define read_cif_reg(base, addr) \
-    readl((addr) + (base))
-#define write_cif_reg_or(base, addr, val) \
-    writel(readl((addr) + (base)) | (val), (addr) + (base))
-#define write_cif_reg_and(base, addr, val) \
-    writel(readl((addr) + (base)) & (val), (addr) + (base))
+#define write_cif_reg(base, addr, val) writel(val, (addr) + (base))
+#define read_cif_reg(base, addr) readl((addr) + (base))
+#define write_cif_reg_or(base, addr, val) writel(readl((addr) + (base)) | (val), (addr) + (base))
+#define write_cif_reg_and(base, addr, val) writel(readl((addr) + (base)) & (val), (addr) + (base))
 
 /*
  * multi sensor sync mode
@@ -84,8 +80,8 @@ enum rkcif_chip_id {
 
 struct rkcif_hw_match_data {
     int chip_id;
-    const char * const *clks;
-    const char * const *rsts;
+    const char *const *clks;
+    const char *const *rsts;
     int clks_num;
     int rsts_num;
     const struct cif_reg *cif_regs;
@@ -98,29 +94,29 @@ struct rkcif_hw_match_data {
  * @stream: capture video device
  */
 struct rkcif_hw {
-    struct device            *dev;
-    int                irq;
-    void __iomem            *base_addr;
-    void __iomem            *csi_base;
-    struct regmap            *grf;
-    struct clk            *clks[RKCIF_MAX_BUS_CLK];
-    int                clk_size;
-    struct iommu_domain        *domain;
-    struct reset_control        *cif_rst[RKCIF_MAX_RESET];
-    int                chip_id;
-    const struct cif_reg        *cif_regs;
-    const struct vb2_mem_ops    *mem_ops;
-    bool                iommu_en;
-    bool                can_be_reset;
-    bool                is_dma_sg_ops;
-    bool                is_dma_contig;
-    struct rkcif_device        *cif_dev[RKCIF_DEV_MAX];
-    int                dev_num;
+    struct device *dev;
+    int irq;
+    void __iomem *base_addr;
+    void __iomem *csi_base;
+    struct regmap *grf;
+    struct clk *clks[RKCIF_MAX_BUS_CLK];
+    int clk_size;
+    struct iommu_domain *domain;
+    struct reset_control *cif_rst[RKCIF_MAX_RESET];
+    int chip_id;
+    const struct cif_reg *cif_regs;
+    const struct vb2_mem_ops *mem_ops;
+    bool iommu_en;
+    bool can_be_reset;
+    bool is_dma_sg_ops;
+    bool is_dma_contig;
+    struct rkcif_device *cif_dev[RKCIF_DEV_MAX];
+    int dev_num;
 
-    atomic_t            power_cnt;
+    atomic_t power_cnt;
     const struct rkcif_hw_match_data *match_data;
-    struct mutex            dev_lock;
-    struct rkcif_multi_sync_config    sync_config;
+    struct mutex dev_lock;
+    struct rkcif_multi_sync_config sync_config;
 };
 
 void rkcif_hw_soft_reset(struct rkcif_hw *cif_hw, bool is_rst_iommu);

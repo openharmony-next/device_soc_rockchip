@@ -47,17 +47,17 @@
 #include <media/videobuf2-v4l2.h>
 #include <media/v4l2-mc.h>
 
-#define RKISP_DEFAULT_WIDTH        800
-#define RKISP_DEFAULT_HEIGHT        600
+#define RKISP_DEFAULT_WIDTH 800
+#define RKISP_DEFAULT_HEIGHT 600
 
-#define RKISP_PLANE_Y            0
-#define RKISP_PLANE_CB            1
-#define RKISP_PLANE_CR            2
+#define RKISP_PLANE_Y 0
+#define RKISP_PLANE_CB 1
+#define RKISP_PLANE_CR 2
 
-#define RKISP_EMDDATA_FIFO_MAX        4
-#define RKISP_DMATX_CHECK              0xA5A5A5A5
+#define RKISP_EMDDATA_FIFO_MAX 4
+#define RKISP_DMATX_CHECK 0xA5A5A5A5
 
-#define RKISP_MOTION_DECT_TS_SIZE    16
+#define RKISP_MOTION_DECT_TS_SIZE 16
 
 struct rkisp_device;
 
@@ -88,17 +88,7 @@ struct rkisp_vdev_node {
     struct media_pad pad;
 };
 
-enum rkisp_fmt_pix_type {
-    FMT_YUV,
-    FMT_RGB,
-    FMT_BAYER,
-    FMT_JPEG,
-    FMT_FBCGAIN,
-    FMT_EBD,
-    FMT_SPD,
-    FMT_FBC,
-    FMT_MAX
-};
+enum rkisp_fmt_pix_type { FMT_YUV, FMT_RGB, FMT_BAYER, FMT_JPEG, FMT_FBCGAIN, FMT_EBD, FMT_SPD, FMT_FBC, FMT_MAX };
 
 enum rkisp_fmt_raw_pat_type {
     RAW_RGGB = 0,
@@ -136,8 +126,7 @@ extern bool rkisp_monitor;
 extern u64 rkisp_debug_reg;
 extern struct platform_driver rkisp_plat_drv;
 
-static inline
-struct rkisp_vdev_node *vdev_to_node(struct video_device *vdev)
+static inline struct rkisp_vdev_node *vdev_to_node(struct video_device *vdev)
 {
     return container_of(vdev, struct rkisp_vdev_node, vdev);
 }
@@ -171,30 +160,29 @@ u32 rkisp_next_read_reg_cache(struct rkisp_device *dev, u32 reg);
 void rkisp_next_set_bits(struct rkisp_device *dev, u32 reg, u32 mask, u32 val, bool is_direct);
 void rkisp_next_clear_bits(struct rkisp_device *dev, u32 reg, u32 mask, bool is_direct);
 
-static inline void
-rkisp_unite_write(struct rkisp_device *dev, u32 reg, u32 val, bool is_direct, bool is_unite)
+static inline void rkisp_unite_write(struct rkisp_device *dev, u32 reg, u32 val, bool is_direct, bool is_unite)
 {
     rkisp_write(dev, reg, val, is_direct);
-    if (is_unite)
+    if (is_unite) {
         rkisp_next_write(dev, reg, val, is_direct);
+    }
 }
 
-static inline void
-rkisp_unite_set_bits(struct rkisp_device *dev, u32 reg, u32 mask,
-             u32 val, bool is_direct, bool is_unite)
+static inline void rkisp_unite_set_bits(struct rkisp_device *dev, u32 reg, u32 mask, u32 val, bool is_direct,
+                                        bool is_unite)
 {
     rkisp_set_bits(dev, reg, mask, val, is_direct);
-    if (is_unite)
+    if (is_unite) {
         rkisp_next_set_bits(dev, reg, mask, val, is_direct);
+    }
 }
 
-static inline void
-rkisp_unite_clear_bits(struct rkisp_device *dev, u32 reg, u32 mask,
-               bool is_direct, bool is_unite)
+static inline void rkisp_unite_clear_bits(struct rkisp_device *dev, u32 reg, u32 mask, bool is_direct, bool is_unite)
 {
     rkisp_clear_bits(dev, reg, mask, is_direct);
-    if (is_unite)
+    if (is_unite) {
         rkisp_next_clear_bits(dev, reg, mask, is_direct);
+    }
 }
 
 void rkisp_update_regs(struct rkisp_device *dev, u32 start, u32 end);

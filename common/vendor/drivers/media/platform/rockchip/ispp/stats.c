@@ -5,7 +5,7 @@
 #include <media/v4l2-common.h>
 #include <media/v4l2-ioctl.h>
 #include <media/videobuf2-core.h>
-#include <media/videobuf2-vmalloc.h>    /* for ISP statistics */
+#include <media/videobuf2-vmalloc.h> /* for ISP statistics */
 #include <media/videobuf2-dma-contig.h>
 #include <media/videobuf2-dma-sg.h>
 #include <media/v4l2-mc.h>
@@ -16,7 +16,7 @@
 
 #define RKISPP_STATS_REQ_BUFS_MIN 2
 #define RKISPP_STATS_REQ_BUFS_MAX 8
-#define RKISPP_STATS_OFFSET       4
+#define RKISPP_STATS_OFFSET 4
 
 static void update_addr(struct rkispp_stats_vdev *stats_vdev)
 {
@@ -30,8 +30,9 @@ static void update_addr(struct rkispp_stats_vdev *stats_vdev)
 
     if (!stats_vdev->next_buf) {
         dummy_buf = &stats_vdev->dev->hw_dev->dummy_buf;
-        if (!dummy_buf->mem_priv)
+        if (!dummy_buf->mem_priv) {
             return;
+        }
 
         rkispp_write(stats_vdev->dev, RKISPP_ORB_WR_BASE, dummy_buf->dma_addr);
     }
@@ -60,11 +61,9 @@ static int rkispp_stats_frame_end(struct rkispp_stats_vdev *stats_vdev)
         cur_stat_buf->frame_id = cur_frame_id;
         curr_buf->vb.vb2_buf.timestamp = ns;
         curr_buf->vb.sequence = cur_frame_id;
-        vb2_set_plane_payload(&curr_buf->vb.vb2_buf, 0,
-                          sizeof(struct rkispp_stats_buffer));
+        vb2_set_plane_payload(&curr_buf->vb.vb2_buf, 0, sizeof(struct rkispp_stats_buffer));
 
-        vb2_buffer_done(&curr_buf->vb.vb2_buf,
-                VB2_BUF_STATE_DONE);
+        vb2_buffer_done(&curr_buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
         stats_vdev->curr_buf = NULL;
     }
 
@@ -72,8 +71,7 @@ static int rkispp_stats_frame_end(struct rkispp_stats_vdev *stats_vdev)
     stats_vdev->next_buf = NULL;
     spin_lock_irqsave(&stats_vdev->irq_lock, lock_flags);
     if (!list_empty(&stats_vdev->stat)) {
-        stats_vdev->next_buf = list_first_entry(&stats_vdev->stat,
-                    struct rkispp_buffer, queue);
+        stats_vdev->next_buf = list_first_entry(&stats_vdev->stat, struct rkispp_buffer, queue);
         list_del(&stats_vdev->next_buf->queue);
     }
     spin_unlock_irqrestore(&stats_vdev->irq_lock, lock_flags);
@@ -82,28 +80,28 @@ static int rkispp_stats_frame_end(struct rkispp_stats_vdev *stats_vdev)
     return 0;
 }
 
-static int rkispp_stats_enum_fmt_meta_cap(struct file *file, void *priv,
-                      struct v4l2_fmtdesc *f)
+static int rkispp_stats_enum_fmt_meta_cap(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 {
     struct video_device *video = video_devdata(file);
     struct rkispp_stats_vdev *stats_vdev = video_get_drvdata(video);
 
-    if (f->index > 0 || f->type != video->queue->type)
+    if (f->index > 0 || f->type != video->queue->type) {
         return -EINVAL;
+    }
 
     f->pixelformat = stats_vdev->vdev_fmt.fmt.meta.dataformat;
     return 0;
 }
 
-static int rkispp_stats_g_fmt_meta_cap(struct file *file, void *priv,
-                       struct v4l2_format *f)
+static int rkispp_stats_g_fmt_meta_cap(struct file *file, void *priv, struct v4l2_format *f)
 {
     struct video_device *video = video_devdata(file);
     struct rkispp_stats_vdev *stats_vdev = video_get_drvdata(video);
     struct v4l2_meta_format *meta = &f->fmt.meta;
 
-    if (f->type != video->queue->type)
+    if (f->type != video->queue->type) {
         return -EINVAL;
+    }
 
     memset(meta, 0, sizeof(*meta));
     meta->dataformat = stats_vdev->vdev_fmt.fmt.meta.dataformat;
@@ -112,16 +110,13 @@ static int rkispp_stats_g_fmt_meta_cap(struct file *file, void *priv,
     return 0;
 }
 
-static int rkispp_stats_querycap(struct file *file,
-                 void *priv, struct v4l2_capability *cap)
+static int rkispp_stats_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
     struct video_device *vdev = video_devdata(file);
     struct rkispp_stats_vdev *stats_vdev = video_get_drvdata(vdev);
 
     strcpy(cap->driver, DRIVER_NAME);
-    snprintf(cap->driver, sizeof(cap->driver),
-         "%s_v%d", DRIVER_NAME,
-         stats_vdev->dev->ispp_ver >> RKISPP_STATS_OFFSET);
+    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, stats_vdev->dev->ispp_ver >> RKISPP_STATS_OFFSET);
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
     strlcpy(cap->bus_info, "platform: " DRIVER_NAME, sizeof(cap->bus_info));
 
@@ -138,8 +133,7 @@ static int rkispp_stats_fh_open(struct file *filp)
     if (!ret) {
         ret = v4l2_pipeline_pm_get(&stats->vnode.vdev.entity);
         if (ret < 0) {
-            v4l2_err(&isppdev->v4l2_dev,
-                 "pipeline power on failed %d\n", ret);
+            v4l2_err(&isppdev->v4l2_dev, "pipeline power on failed %d\n", ret);
             vb2_fop_release(filp);
         }
     }
@@ -152,28 +146,27 @@ static int rkispp_stats_fh_release(struct file *filp)
     int ret;
 
     ret = vb2_fop_release(filp);
-    if (!ret)
+    if (!ret) {
         v4l2_pipeline_pm_put(&stats->vnode.vdev.entity);
+    }
     return ret;
 }
 
 /* ISP video device IOCTLs */
-static const struct v4l2_ioctl_ops rkispp_stats_ioctl = {
-    .vidioc_reqbufs = vb2_ioctl_reqbufs,
-    .vidioc_querybuf = vb2_ioctl_querybuf,
-    .vidioc_create_bufs = vb2_ioctl_create_bufs,
-    .vidioc_qbuf = vb2_ioctl_qbuf,
-    .vidioc_dqbuf = vb2_ioctl_dqbuf,
-    .vidioc_prepare_buf = vb2_ioctl_prepare_buf,
-    .vidioc_expbuf = vb2_ioctl_expbuf,
-    .vidioc_streamon = vb2_ioctl_streamon,
-    .vidioc_streamoff = vb2_ioctl_streamoff,
-    .vidioc_enum_fmt_meta_cap = rkispp_stats_enum_fmt_meta_cap,
-    .vidioc_g_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
-    .vidioc_s_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
-    .vidioc_try_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
-    .vidioc_querycap = rkispp_stats_querycap
-};
+static const struct v4l2_ioctl_ops rkispp_stats_ioctl = {.vidioc_reqbufs = vb2_ioctl_reqbufs,
+                                                         .vidioc_querybuf = vb2_ioctl_querybuf,
+                                                         .vidioc_create_bufs = vb2_ioctl_create_bufs,
+                                                         .vidioc_qbuf = vb2_ioctl_qbuf,
+                                                         .vidioc_dqbuf = vb2_ioctl_dqbuf,
+                                                         .vidioc_prepare_buf = vb2_ioctl_prepare_buf,
+                                                         .vidioc_expbuf = vb2_ioctl_expbuf,
+                                                         .vidioc_streamon = vb2_ioctl_streamon,
+                                                         .vidioc_streamoff = vb2_ioctl_streamoff,
+                                                         .vidioc_enum_fmt_meta_cap = rkispp_stats_enum_fmt_meta_cap,
+                                                         .vidioc_g_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
+                                                         .vidioc_s_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
+                                                         .vidioc_try_fmt_meta_cap = rkispp_stats_g_fmt_meta_cap,
+                                                         .vidioc_querycap = rkispp_stats_querycap};
 
 struct v4l2_file_operations rkispp_stats_fops = {
     .mmap = vb2_fop_mmap,
@@ -183,18 +176,14 @@ struct v4l2_file_operations rkispp_stats_fops = {
     .release = rkispp_stats_fh_release,
 };
 
-static int rkispp_stats_vb2_queue_setup(struct vb2_queue *vq,
-                    unsigned int *num_buffers,
-                    unsigned int *num_planes,
-                    unsigned int sizes[],
-                    struct device *alloc_ctxs[])
+static int rkispp_stats_vb2_queue_setup(struct vb2_queue *vq, unsigned int *num_buffers, unsigned int *num_planes,
+                                        unsigned int sizes[], struct device *alloc_ctxs[])
 {
     struct rkispp_stats_vdev *stats_vdev = vq->drv_priv;
 
     *num_planes = 1;
 
-    *num_buffers = clamp_t(u32, *num_buffers, RKISPP_STATS_REQ_BUFS_MIN,
-                   RKISPP_STATS_REQ_BUFS_MAX);
+    *num_buffers = clamp_t(u32, *num_buffers, RKISPP_STATS_REQ_BUFS_MIN, RKISPP_STATS_REQ_BUFS_MAX);
 
     sizes[0] = sizeof(struct rkispp_stats_buffer);
 
@@ -220,8 +209,7 @@ static void rkispp_stats_vb2_buf_queue(struct vb2_buffer *vb)
         buf->buff_addr[0] = vb2_dma_contig_plane_dma_addr(vb, 0);
     }
     spin_lock_irqsave(&stats_dev->irq_lock, lock_flags);
-    if (stats_dev->streamon &&
-        !stats_dev->next_buf) {
+    if (stats_dev->streamon && !stats_dev->next_buf) {
         stats_dev->next_buf = buf;
         update_addr(stats_dev);
     } else {
@@ -230,8 +218,7 @@ static void rkispp_stats_vb2_buf_queue(struct vb2_buffer *vb)
     spin_unlock_irqrestore(&stats_dev->irq_lock, lock_flags);
 }
 
-static void destroy_buf_queue(struct rkispp_stats_vdev *stats_vdev,
-                  enum vb2_buffer_state state)
+static void destroy_buf_queue(struct rkispp_stats_vdev *stats_vdev, enum vb2_buffer_state state)
 {
     struct rkispp_buffer *buf;
 
@@ -244,8 +231,7 @@ static void destroy_buf_queue(struct rkispp_stats_vdev *stats_vdev,
         stats_vdev->next_buf = NULL;
     }
     while (!list_empty(&stats_vdev->stat)) {
-        buf = list_first_entry(&stats_vdev->stat,
-            struct rkispp_buffer, queue);
+        buf = list_first_entry(&stats_vdev->stat, struct rkispp_buffer, queue);
         list_del(&buf->queue);
         vb2_buffer_done(&buf->vb.vb2_buf, state);
     }
@@ -262,15 +248,14 @@ static void rkispp_stats_vb2_stop_streaming(struct vb2_queue *vq)
     spin_unlock_irqrestore(&stats_vdev->irq_lock, flags);
 }
 
-static int
-rkispp_stats_vb2_start_streaming(struct vb2_queue *queue,
-                 unsigned int count)
+static int rkispp_stats_vb2_start_streaming(struct vb2_queue *queue, unsigned int count)
 {
     struct rkispp_stats_vdev *stats_vdev = queue->drv_priv;
     unsigned long flags;
 
-    if (stats_vdev->streamon)
+    if (stats_vdev->streamon) {
         return -EBUSY;
+    }
 
     /* config first buf */
     rkispp_stats_frame_end(stats_vdev);
@@ -291,8 +276,7 @@ static struct vb2_ops rkispp_stats_vb2_ops = {
     .start_streaming = rkispp_stats_vb2_start_streaming,
 };
 
-static int rkispp_stats_init_vb2_queue(struct vb2_queue *q,
-                       struct rkispp_stats_vdev *stats_vdev)
+static int rkispp_stats_init_vb2_queue(struct vb2_queue *q, struct rkispp_stats_vdev *stats_vdev)
 {
     q->type = V4L2_BUF_TYPE_META_CAPTURE;
     q->io_modes = VB2_MMAP | VB2_USERPTR;
@@ -303,8 +287,9 @@ static int rkispp_stats_init_vb2_queue(struct vb2_queue *q,
     q->timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
     q->lock = &stats_vdev->dev->iqlock;
     q->dev = stats_vdev->dev->hw_dev->dev;
-    if (stats_vdev->dev->hw_dev->is_dma_contig)
+    if (stats_vdev->dev->hw_dev->is_dma_contig) {
         q->dma_attrs = DMA_ATTR_FORCE_CONTIGUOUS;
+    }
     q->gfp_flags = GFP_DMA32;
     return vb2_queue_init(q);
 }
@@ -318,16 +303,15 @@ void rkispp_stats_isr(struct rkispp_stats_vdev *stats_vdev, u32 mis)
     }
     spin_unlock(&stats_vdev->irq_lock);
 
-    if (mis & ORB_INT)
+    if (mis & ORB_INT) {
         rkispp_stats_frame_end(stats_vdev);
+    }
 }
 
 static void rkispp_init_stats_vdev(struct rkispp_stats_vdev *stats_vdev)
 {
-    stats_vdev->vdev_fmt.fmt.meta.dataformat =
-        V4L2_META_FMT_RK_ISPP_STAT;
-    stats_vdev->vdev_fmt.fmt.meta.buffersize =
-        sizeof(struct rkispp_stats_buffer);
+    stats_vdev->vdev_fmt.fmt.meta.dataformat = V4L2_META_FMT_RK_ISPP_STAT;
+    stats_vdev->vdev_fmt.fmt.meta.buffersize = sizeof(struct rkispp_stats_buffer);
 }
 
 int rkispp_register_stats_vdev(struct rkispp_device *dev)
@@ -350,20 +334,20 @@ int rkispp_register_stats_vdev(struct rkispp_device *dev)
     vdev->v4l2_dev = &dev->v4l2_dev;
     vdev->queue = &node->buf_queue;
     vdev->device_caps = V4L2_CAP_META_CAPTURE | V4L2_CAP_STREAMING;
-    vdev->vfl_dir =  VFL_DIR_RX;
+    vdev->vfl_dir = VFL_DIR_RX;
     rkispp_stats_init_vb2_queue(vdev->queue, stats_vdev);
     rkispp_init_stats_vdev(stats_vdev);
     video_set_drvdata(vdev, stats_vdev);
 
     node->pad.flags = MEDIA_PAD_FL_SINK;
     ret = media_entity_pads_init(&vdev->entity, 1, &node->pad);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_release_queue;
+    }
 
     ret = video_register_device(vdev, VFL_TYPE_VIDEO, -1);
     if (ret < 0) {
-        dev_err(&vdev->dev,
-            "could not register Video for Linux device\n");
+        dev_err(&vdev->dev, "could not register Video for Linux device\n");
         goto err_cleanup_media_entity;
     }
 
@@ -386,4 +370,3 @@ void rkispp_unregister_stats_vdev(struct rkispp_device *dev)
     media_entity_cleanup(&vdev->entity);
     vb2_queue_release(vdev->queue);
 }
-

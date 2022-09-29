@@ -75,8 +75,9 @@ static int kbase_context_kbase_kinstr_jm_init(struct kbase_context *kctx)
 {
     int ret = kbase_kinstr_jm_init(&kctx->kinstr_jm);
 
-    if (!ret)
+    if (!ret) {
         return ret;
+    }
 
     return 0;
 }
@@ -88,8 +89,7 @@ static void kbase_context_kbase_kinstr_jm_term(struct kbase_context *kctx)
 
 static int kbase_context_kbase_timer_setup(struct kbase_context *kctx)
 {
-    kbase_timer_setup(&kctx->soft_job_timeout,
-              kbasep_soft_job_timeout_worker);
+    kbase_timer_setup(&kctx->soft_job_timeout, kbasep_soft_job_timeout_worker);
 
     return 0;
 }
@@ -105,8 +105,9 @@ static int kbase_context_submit_check(struct kbase_context *kctx)
     spin_lock_irqsave(&kctx->kbdev->hwaccess_lock, irq_flags);
 
     /* Translate the flags */
-    if ((flags & BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED) == 0)
+    if ((flags & BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED) == 0) {
         kbase_ctx_flag_clear(kctx, KCTX_SUBMIT_DISABLED);
+    }
 
     spin_unlock_irqrestore(&kctx->kbdev->hwaccess_lock, irq_flags);
     mutex_unlock(&js_kctx_info->ctx.jsctx_mutex);
@@ -115,83 +116,74 @@ static int kbase_context_submit_check(struct kbase_context *kctx)
 }
 
 static const struct kbase_context_init context_init[] = {
-    { kbase_context_common_init, kbase_context_common_term, NULL },
-    { kbase_dma_fence_init, kbase_dma_fence_term,
-      "DMA fence initialization failed" },
-    { kbase_context_mem_pool_group_init, kbase_context_mem_pool_group_term,
-      "Memory pool goup initialization failed" },
-    { kbase_mem_evictable_init, kbase_mem_evictable_deinit,
-      "Memory evictable initialization failed" },
-    { kbase_context_mmu_init, kbase_context_mmu_term,
-      "MMU initialization failed" },
-    { kbase_context_mem_alloc_page, kbase_context_mem_pool_free,
-      "Memory alloc page failed" },
-    { kbase_region_tracker_init, kbase_region_tracker_term,
-      "Region tracker initialization failed" },
-    { kbase_sticky_resource_init, kbase_context_sticky_resource_term,
-      "Sticky resource initialization failed" },
-    { kbase_jit_init, kbase_jit_term, "JIT initialization failed" },
-    { kbase_context_kbase_kinstr_jm_init,
-      kbase_context_kbase_kinstr_jm_term,
-      "JM instrumentation initialization failed" },
-    { kbase_context_kbase_timer_setup, NULL, NULL },
-    { kbase_event_init, kbase_event_cleanup,
-      "Event initialization failed" },
-    { kbasep_js_kctx_init, kbasep_js_kctx_term,
-      "JS kctx initialization failed" },
-    { kbase_jd_init, kbase_jd_exit, "JD initialization failed" },
-    { kbase_context_submit_check, NULL, NULL },
+    {kbase_context_common_init, kbase_context_common_term, NULL},
+    {kbase_dma_fence_init, kbase_dma_fence_term, "DMA fence initialization failed"},
+    {kbase_context_mem_pool_group_init, kbase_context_mem_pool_group_term, "Memory pool goup initialization failed"},
+    {kbase_mem_evictable_init, kbase_mem_evictable_deinit, "Memory evictable initialization failed"},
+    {kbase_context_mmu_init, kbase_context_mmu_term, "MMU initialization failed"},
+    {kbase_context_mem_alloc_page, kbase_context_mem_pool_free, "Memory alloc page failed"},
+    {kbase_region_tracker_init, kbase_region_tracker_term, "Region tracker initialization failed"},
+    {kbase_sticky_resource_init, kbase_context_sticky_resource_term, "Sticky resource initialization failed"},
+    {kbase_jit_init, kbase_jit_term, "JIT initialization failed"},
+    {kbase_context_kbase_kinstr_jm_init, kbase_context_kbase_kinstr_jm_term,
+     "JM instrumentation initialization failed"},
+    {kbase_context_kbase_timer_setup, NULL, NULL},
+    {kbase_event_init, kbase_event_cleanup, "Event initialization failed"},
+    {kbasep_js_kctx_init, kbasep_js_kctx_term, "JS kctx initialization failed"},
+    {kbase_jd_init, kbase_jd_exit, "JD initialization failed"},
+    {kbase_context_submit_check, NULL, NULL},
 };
 
-static void kbase_context_term_partial(
-    struct kbase_context *kctx,
-    unsigned int i)
+static void kbase_context_term_partial(struct kbase_context *kctx, unsigned int i)
 {
     while (i-- > 0) {
-        if (context_init[i].term)
+        if (context_init[i].term) {
             context_init[i].term(kctx);
+        }
     }
 }
 
-struct kbase_context *kbase_create_context(struct kbase_device *kbdev,
-    bool is_compat,
-    base_context_create_flags const flags,
-    unsigned long const api_version,
-    struct file *const filp)
+struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_compat,
+                                           base_context_create_flags const flags, unsigned long const api_version,
+                                           struct file *const filp)
 {
     struct kbase_context *kctx;
     unsigned int i = 0;
 
-    if (WARN_ON(!kbdev))
+    if (WARN_ON(!kbdev)) {
         return NULL;
+    }
 
     /* Validate flags */
-    if (WARN_ON(flags != (flags & BASEP_CONTEXT_CREATE_KERNEL_FLAGS)))
+    if (WARN_ON(flags != (flags & BASEP_CONTEXT_CREATE_KERNEL_FLAGS))) {
         return NULL;
+    }
 
     /* zero-inited as lot of code assume it's zero'ed out on create */
     kctx = vzalloc(sizeof(*kctx));
-    if (WARN_ON(!kctx))
+    if (WARN_ON(!kctx)) {
         return NULL;
+    }
 
     kctx->kbdev = kbdev;
     kctx->api_version = api_version;
     kctx->filp = filp;
     kctx->create_flags = flags;
 
-    if (is_compat)
+    if (is_compat) {
         kbase_ctx_flag_set(kctx, KCTX_COMPAT);
+    }
 #if defined(CONFIG_64BIT)
-    else
+    else {
         kbase_ctx_flag_set(kctx, KCTX_FORCE_SAME_VA);
+    }
 #endif /* !defined(CONFIG_64BIT) */
 
     for (i = 0; i < ARRAY_SIZE(context_init); i++) {
         int err = context_init[i].init(kctx);
 
         if (err) {
-            dev_err(kbdev->dev, "%s error = %d\n",
-                        context_init[i].err_mes, err);
+            dev_err(kbdev->dev, "%s error = %d\n", context_init[i].err_mes, err);
             kbase_context_term_partial(kctx, i);
             return NULL;
         }
@@ -205,12 +197,14 @@ void kbase_destroy_context(struct kbase_context *kctx)
 {
     struct kbase_device *kbdev;
 
-    if (WARN_ON(!kctx))
+    if (WARN_ON(!kctx)) {
         return;
+    }
 
     kbdev = kctx->kbdev;
-    if (WARN_ON(!kbdev))
+    if (WARN_ON(!kbdev)) {
         return;
+    }
 
     /* Ensure the core is powered up for the destroy process
      * A suspend won't happen here, because we're in a syscall

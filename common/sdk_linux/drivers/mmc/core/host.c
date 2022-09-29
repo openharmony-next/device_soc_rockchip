@@ -30,7 +30,7 @@
 #include "pwrseq.h"
 #include "sdio_ops.h"
 
-#define cls_dev_to_mmc_host(d)    container_of(d, struct mmc_host, class_dev)
+#define cls_dev_to_mmc_host(d) container_of(d, struct mmc_host, class_dev)
 #define MMC_BUD_WIDTH_EIGHT 8
 #define MMC_BUD_WIDTH_FOUR 4
 #define MMC_BUD_WIDTH_ONE 1
@@ -51,12 +51,14 @@ static int mmc_host_class_prepare(struct device *dev)
      * It's safe to access the bus_ops pointer, as both userspace and the
      * workqueue for detecting cards are frozen at this point.
      */
-    if (!host->bus_ops)
+    if (!host->bus_ops) {
         return 0;
+    }
 
     /* Validate conditions for system suspend. */
-    if (host->bus_ops->pre_suspend)
+    if (host->bus_ops->pre_suspend) {
         return host->bus_ops->pre_suspend(host);
+    }
 
     return 0;
 }
@@ -82,15 +84,16 @@ static void mmc_host_classdev_release(struct device *dev)
 {
     struct mmc_host *host = cls_dev_to_mmc_host(dev);
     wakeup_source_unregister(host->ws);
-    if (of_alias_get_id(host->parent->of_node, "mmc") < 0)
+    if (of_alias_get_id(host->parent->of_node, "mmc") < 0) {
         ida_simple_remove(&mmc_host_ida, host->index);
+    }
     kfree(host);
 }
 
 static struct class mmc_host_class = {
-    .name        = "mmc_host",
-    .dev_release    = mmc_host_classdev_release,
-    .pm        = MMC_HOST_CLASS_DEV_PM_OPS,
+    .name = "mmc_host",
+    .dev_release = mmc_host_classdev_release,
+    .pm = MMC_HOST_CLASS_DEV_PM_OPS,
 };
 
 int mmc_register_host_class(void)
@@ -106,9 +109,9 @@ void mmc_unregister_host_class(void)
 void mmc_retune_enable(struct mmc_host *host)
 {
     host->can_retune = 1;
-    if (host->retune_period)
-        mod_timer(&host->retune_timer,
-              jiffies + host->retune_period * HZ);
+    if (host->retune_period) {
+        mod_timer(&host->retune_timer, jiffies + host->retune_period * HZ);
+    }
 }
 
 /*
@@ -151,17 +154,19 @@ EXPORT_SYMBOL(mmc_retune_timer_stop);
 
 void mmc_retune_hold(struct mmc_host *host)
 {
-    if (!host->hold_retune)
+    if (!host->hold_retune) {
         host->retune_now = 1;
+    }
     host->hold_retune += 1;
 }
 
 void mmc_retune_release(struct mmc_host *host)
 {
-    if (host->hold_retune)
+    if (host->hold_retune) {
         host->hold_retune -= 1;
-    else
+    } else {
         WARN_ON(1);
+    }
 }
 EXPORT_SYMBOL(mmc_retune_release);
 
@@ -170,13 +175,15 @@ int mmc_retune(struct mmc_host *host)
     bool return_to_hs400 = false;
     int err;
 
-    if (host->retune_now)
+    if (host->retune_now) {
         host->retune_now = 0;
-    else
+    } else {
         return 0;
+    }
 
-    if (!host->need_retune || host->doing_retune || !host->card)
+    if (!host->need_retune || host->doing_retune || !host->card) {
         return 0;
+    }
 
     host->need_retune = 0;
 
@@ -184,18 +191,21 @@ int mmc_retune(struct mmc_host *host)
 
     if (host->ios.timing == MMC_TIMING_MMC_HS400) {
         err = mmc_hs400_to_hs200(host->card);
-        if (err)
+        if (err) {
             goto out;
+        }
 
         return_to_hs400 = true;
     }
 
     err = mmc_execute_tuning(host->card);
-    if (err)
+    if (err) {
         goto out;
+    }
 
-    if (return_to_hs400)
+    if (return_to_hs400) {
         err = mmc_hs200_to_hs400(host->card);
+    }
 out:
     host->doing_retune = 0;
 
@@ -224,29 +234,28 @@ int mmc_of_parse(struct mmc_host *host)
     u32 bus_width, drv_type, cd_debounce_delay_ms;
     int ret;
 
-    if (!dev || !dev_fwnode(dev))
+    if (!dev || !dev_fwnode(dev)) {
         return 0;
+    }
 
     /* "bus-width" is translated to MMC_CAP_*_BIT_DATA flags */
     if (device_property_read_u32(dev, "bus-width", &bus_width) < 0) {
-        dev_dbg(host->parent,
-            "\"bus-width\" property is missing, assuming 1 bit.\n");
+        dev_dbg(host->parent, "\"bus-width\" property is missing, assuming 1 bit.\n");
         bus_width = 1;
     }
 
     switch (bus_width) {
-    case MMC_BUD_WIDTH_EIGHT:
-        host->caps |= MMC_CAP_8_BIT_DATA;
-        fallthrough;    /* Hosts capable of 8-bit can also do 4 bits */
-    case MMC_BUD_WIDTH_FOUR:
-        host->caps |= MMC_CAP_4_BIT_DATA;
-        break;
-    case MMC_BUD_WIDTH_ONE:
-        break;
-    default:
-        dev_err(host->parent,
-            "Invalid \"bus-width\" value %u!\n", bus_width);
-        return -EINVAL;
+        case MMC_BUD_WIDTH_EIGHT:
+            host->caps |= MMC_CAP_8_BIT_DATA;
+            fallthrough; /* Hosts capable of 8-bit can also do 4 bits */
+        case MMC_BUD_WIDTH_FOUR:
+            host->caps |= MMC_CAP_4_BIT_DATA;
+            break;
+        case MMC_BUD_WIDTH_ONE:
+            break;
+        default:
+            dev_err(host->parent, "Invalid \"bus-width\" value %u!\n", bus_width);
+            return -EINVAL;
     }
 
     /* f_max is obtained from the optional "max-frequency" property */
@@ -269,109 +278,136 @@ int mmc_of_parse(struct mmc_host *host)
     if (device_property_read_bool(dev, "non-removable")) {
         host->caps |= MMC_CAP_NONREMOVABLE;
     } else {
-        if (device_property_read_bool(dev, "cd-inverted"))
+        if (device_property_read_bool(dev, "cd-inverted")) {
             host->caps2 |= MMC_CAP2_CD_ACTIVE_HIGH;
+        }
 
-        if (device_property_read_u32(dev, "cd-debounce-delay-ms",
-                         &cd_debounce_delay_ms))
+        if (device_property_read_u32(dev, "cd-debounce-delay-ms", &cd_debounce_delay_ms)) {
             cd_debounce_delay_ms = MMC_DEBOUNCE_DELAY_MS;
+        }
 
-        if (device_property_read_bool(dev, "broken-cd"))
+        if (device_property_read_bool(dev, "broken-cd")) {
             host->caps |= MMC_CAP_NEEDS_POLL;
+        }
 
-        ret = mmc_gpiod_request_cd(host, "cd", 0, false,
-                       cd_debounce_delay_ms * MMC_DEBOUNCE_DELAY_MS_MUL);
-        if (!ret)
+        ret = mmc_gpiod_request_cd(host, "cd", 0, false, cd_debounce_delay_ms * MMC_DEBOUNCE_DELAY_MS_MUL);
+        if (!ret) {
             dev_info(host->parent, "Got CD GPIO\n");
-        else if (ret != -ENOENT && ret != -ENOSYS)
+        } else if (ret != -ENOENT && ret != -ENOSYS) {
             return ret;
+        }
     }
 
     /* Parse Write Protection */
 
-    if (device_property_read_bool(dev, "wp-inverted"))
+    if (device_property_read_bool(dev, "wp-inverted")) {
         host->caps2 |= MMC_CAP2_RO_ACTIVE_HIGH;
+    }
 
     ret = mmc_gpiod_request_ro(host, "wp", 0, 0);
-    if (!ret)
+    if (!ret) {
         dev_info(host->parent, "Got WP GPIO\n");
-    else if (ret != -ENOENT && ret != -ENOSYS)
+    } else if (ret != -ENOENT && ret != -ENOSYS) {
         return ret;
+    }
 
-    if (device_property_read_bool(dev, "disable-wp"))
+    if (device_property_read_bool(dev, "disable-wp")) {
         host->caps2 |= MMC_CAP2_NO_WRITE_PROTECT;
+    }
 
-    if (device_property_read_bool(dev, "cap-sd-highspeed"))
+    if (device_property_read_bool(dev, "cap-sd-highspeed")) {
         host->caps |= MMC_CAP_SD_HIGHSPEED;
-    if (device_property_read_bool(dev, "cap-mmc-highspeed"))
+    }
+    if (device_property_read_bool(dev, "cap-mmc-highspeed")) {
         host->caps |= MMC_CAP_MMC_HIGHSPEED;
-    if (device_property_read_bool(dev, "sd-uhs-sdr12"))
+    }
+    if (device_property_read_bool(dev, "sd-uhs-sdr12")) {
         host->caps |= MMC_CAP_UHS_SDR12;
-    if (device_property_read_bool(dev, "sd-uhs-sdr25"))
+    }
+    if (device_property_read_bool(dev, "sd-uhs-sdr25")) {
         host->caps |= MMC_CAP_UHS_SDR25;
-    if (device_property_read_bool(dev, "sd-uhs-sdr50"))
+    }
+    if (device_property_read_bool(dev, "sd-uhs-sdr50")) {
         host->caps |= MMC_CAP_UHS_SDR50;
-    if (device_property_read_bool(dev, "sd-uhs-sdr104"))
+    }
+    if (device_property_read_bool(dev, "sd-uhs-sdr104")) {
         host->caps |= MMC_CAP_UHS_SDR104;
-    if (device_property_read_bool(dev, "sd-uhs-ddr50"))
+    }
+    if (device_property_read_bool(dev, "sd-uhs-ddr50")) {
         host->caps |= MMC_CAP_UHS_DDR50;
-    if (device_property_read_bool(dev, "cap-power-off-card"))
+    }
+    if (device_property_read_bool(dev, "cap-power-off-card")) {
         host->caps |= MMC_CAP_POWER_OFF_CARD;
-    if (device_property_read_bool(dev, "cap-mmc-hw-reset"))
+    }
+    if (device_property_read_bool(dev, "cap-mmc-hw-reset")) {
         host->caps |= MMC_CAP_HW_RESET;
-    if (device_property_read_bool(dev, "cap-sdio-irq"))
+    }
+    if (device_property_read_bool(dev, "cap-sdio-irq")) {
         host->caps |= MMC_CAP_SDIO_IRQ;
-    if (device_property_read_bool(dev, "full-pwr-cycle"))
+    }
+    if (device_property_read_bool(dev, "full-pwr-cycle")) {
         host->caps2 |= MMC_CAP2_FULL_PWR_CYCLE;
-    if (device_property_read_bool(dev, "full-pwr-cycle-in-suspend"))
+    }
+    if (device_property_read_bool(dev, "full-pwr-cycle-in-suspend")) {
         host->caps2 |= MMC_CAP2_FULL_PWR_CYCLE_IN_SUSPEND;
-    if (device_property_read_bool(dev, "keep-power-in-suspend"))
+    }
+    if (device_property_read_bool(dev, "keep-power-in-suspend")) {
         host->pm_caps |= MMC_PM_KEEP_POWER;
+    }
     if (device_property_read_bool(dev, "wakeup-source") ||
-        device_property_read_bool(dev, "enable-sdio-wakeup")) /* legacy */
+        device_property_read_bool(dev, "enable-sdio-wakeup")) { /* legacy */
         host->pm_caps |= MMC_PM_WAKE_SDIO_IRQ;
-    if (device_property_read_bool(dev, "mmc-ddr-3_3v"))
+    }
+    if (device_property_read_bool(dev, "mmc-ddr-3_3v")) {
         host->caps |= MMC_CAP_3_3V_DDR;
-    if (device_property_read_bool(dev, "mmc-ddr-1_8v"))
+    }
+    if (device_property_read_bool(dev, "mmc-ddr-1_8v")) {
         host->caps |= MMC_CAP_1_8V_DDR;
-    if (device_property_read_bool(dev, "mmc-ddr-1_2v"))
+    }
+    if (device_property_read_bool(dev, "mmc-ddr-1_2v")) {
         host->caps |= MMC_CAP_1_2V_DDR;
-    if (device_property_read_bool(dev, "mmc-hs200-1_8v"))
+    }
+    if (device_property_read_bool(dev, "mmc-hs200-1_8v")) {
         host->caps2 |= MMC_CAP2_HS200_1_8V_SDR;
-    if (device_property_read_bool(dev, "mmc-hs200-1_2v"))
+    }
+    if (device_property_read_bool(dev, "mmc-hs200-1_2v")) {
         host->caps2 |= MMC_CAP2_HS200_1_2V_SDR;
-    if (device_property_read_bool(dev, "mmc-hs400-1_8v"))
+    }
+    if (device_property_read_bool(dev, "mmc-hs400-1_8v")) {
         host->caps2 |= MMC_CAP2_HS400_1_8V | MMC_CAP2_HS200_1_8V_SDR;
-    if (device_property_read_bool(dev, "mmc-hs400-1_2v"))
+    }
+    if (device_property_read_bool(dev, "mmc-hs400-1_2v")) {
         host->caps2 |= MMC_CAP2_HS400_1_2V | MMC_CAP2_HS200_1_2V_SDR;
-    if (device_property_read_bool(dev, "mmc-hs400-enhanced-strobe"))
+    }
+    if (device_property_read_bool(dev, "mmc-hs400-enhanced-strobe")) {
         host->caps2 |= MMC_CAP2_HS400_ES;
-    if (device_property_read_bool(dev, "no-sdio"))
+    }
+    if (device_property_read_bool(dev, "no-sdio")) {
         host->caps2 |= MMC_CAP2_NO_SDIO;
-    if (device_property_read_bool(dev, "no-sd"))
+    }
+    if (device_property_read_bool(dev, "no-sd")) {
         host->caps2 |= MMC_CAP2_NO_SD;
-    if (device_property_read_bool(dev, "no-mmc"))
+    }
+    if (device_property_read_bool(dev, "no-mmc")) {
         host->caps2 |= MMC_CAP2_NO_MMC;
+    }
 
     /* Must be after "non-removable" check */
     if (device_property_read_u32(dev, "fixed-emmc-driver-type", &drv_type) == 0) {
-        if (host->caps & MMC_CAP_NONREMOVABLE)
+        if (host->caps & MMC_CAP_NONREMOVABLE) {
             host->fixed_drv_type = drv_type;
-        else
-            dev_err(host->parent,
-                "can't use fixed driver type, media is removable\n");
+        } else {
+            dev_err(host->parent, "can't use fixed driver type, media is removable\n");
+        }
     }
 
     host->dsr_req = !device_property_read_u32(dev, "dsr", &host->dsr);
     if (host->dsr_req && (host->dsr & ~0xffff)) {
-        dev_err(host->parent,
-            "device tree specified broken value for DSR: 0x%x, ignoring\n",
-            host->dsr);
+        dev_err(host->parent, "device tree specified broken value for DSR: 0x%x, ignoring\n", host->dsr);
         host->dsr_req = 0;
     }
 
-    device_property_read_u32(dev, "post-power-on-delay-ms",
-                 &host->ios.power_delay_ms);
+    device_property_read_u32(dev, "post-power-on-delay-ms", &host->ios.power_delay_ms);
 
     return mmc_pwrseq_alloc(host);
 }
@@ -407,12 +443,9 @@ int mmc_of_parse_voltage(struct device_node *np, u32 *mask)
         const int j = i * MMC_NUM_RANGES_DIV;
         u32 ocr_mask;
 
-        ocr_mask = mmc_vddrange_to_ocrmask(
-                be32_to_cpu(voltage_ranges[j]),
-                be32_to_cpu(voltage_ranges[j + 1]));
+        ocr_mask = mmc_vddrange_to_ocrmask(be32_to_cpu(voltage_ranges[j]), be32_to_cpu(voltage_ranges[j + 1]));
         if (!ocr_mask) {
-            pr_err("%pOF: voltage-range #%d is invalid\n",
-                np, i);
+            pr_err("%pOF: voltage-range #%d is invalid\n", np, i);
             return -EINVAL;
         }
         *mask |= ocr_mask;
@@ -430,8 +463,9 @@ static int mmc_first_nonreserved_index(void)
     int max;
 
     max = of_alias_get_highest_id("mmc");
-    if (max < 0)
+    if (max < 0) {
         return 0;
+    }
 
     return max + 1;
 }
@@ -450,8 +484,9 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
     int alias_id, min_idx, max_idx;
 
     host = kzalloc(sizeof(struct mmc_host) + extra, GFP_KERNEL);
-    if (!host)
+    if (!host) {
         return NULL;
+    }
 
     /* scanning will be enabled when we're ready */
     host->rescan_disable = 1;
@@ -527,12 +562,12 @@ int mmc_add_host(struct mmc_host *host)
 {
     int err;
 
-    WARN_ON((host->caps & MMC_CAP_SDIO_IRQ) &&
-        !host->ops->enable_sdio_irq);
+    WARN_ON((host->caps & MMC_CAP_SDIO_IRQ) && !host->ops->enable_sdio_irq);
 
     err = device_add(&host->class_dev);
-    if (err)
+    if (err) {
         return err;
+    }
 
     led_trigger_register_simple(dev_name(&host->class_dev), &host->led);
 
@@ -596,11 +631,11 @@ EXPORT_SYMBOL(mmc_free_host);
 int mmc_host_rescan(struct mmc_host *host, int val, int is_cap_sdio_irq)
 {
     if (NULL != primary_sdio_host) {
-        if (!host)
+        if (!host) {
             host = primary_sdio_host;
-        else
-            pr_info("%s: mmc_host_rescan pass in host from argument!\n",
-                mmc_hostname(host));
+        } else {
+            pr_info("%s: mmc_host_rescan pass in host from argument!\n", mmc_hostname(host));
+        }
     } else {
         pr_err("sdio: host isn't  initialization successfully.\n");
         return -ENOMEDIUM;
@@ -618,8 +653,9 @@ int mmc_host_rescan(struct mmc_host *host, int val, int is_cap_sdio_irq)
         return -ENOMEDIUM;
     }
 
-    if (!(host->caps & MMC_CAP_NONREMOVABLE) && host->ops->set_sdio_status)
+    if (!(host->caps & MMC_CAP_NONREMOVABLE) && host->ops->set_sdio_status) {
         host->ops->set_sdio_status(host, val);
+    }
 
     return 0;
 }

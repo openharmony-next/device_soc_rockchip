@@ -24,8 +24,8 @@
  * Backend specific IRQ APIs
  */
 
-#ifndef _KBASE_IRQ_INTERNAL_H_
-#define _KBASE_IRQ_INTERNAL_H_
+#ifndef KBASE_IRQ_INTERNAL_H
+#define KBASE_IRQ_INTERNAL_H
 
 int kbase_install_interrupts(struct kbase_device *kbdev);
 
@@ -38,7 +38,6 @@ void kbase_release_interrupts(struct kbase_device *kbdev);
  */
 void kbase_synchronize_irqs(struct kbase_device *kbdev);
 
-int kbasep_common_test_interrupt_handlers(
-                    struct kbase_device * const kbdev);
+int kbasep_common_test_interrupt_handlers(struct kbase_device *const kbdev);
 
 #endif /* _KBASE_IRQ_INTERNAL_H_ */

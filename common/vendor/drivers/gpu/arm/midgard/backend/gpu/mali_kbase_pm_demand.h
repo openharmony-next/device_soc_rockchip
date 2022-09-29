@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * A simple demand based power management policy
  */

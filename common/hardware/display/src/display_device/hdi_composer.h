@@ -19,51 +19,60 @@
 #include <memory>
 #include "hdi_layer.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class HdiComposition {
-public:
-    HdiComposition() {}
-    virtual int32_t Init()
+namespace OHOS
+{
+    namespace HDI
     {
-        return DISPLAY_SUCCESS;
-    };
-    virtual int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
-    {
-        return DISPLAY_SUCCESS;
-    }
-    virtual int32_t Apply(bool modeSet)
-    {
-        return DISPLAY_SUCCESS;
-    }
-    virtual ~HdiComposition() {}
+        namespace DISPLAY
+        {
+            class HdiComposition
+            {
+            public:
+                HdiComposition()
+                {
+                }
+                virtual int32_t Init()
+                {
+                    return DISPLAY_SUCCESS;
+                };
+                virtual int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
+                {
+                    return DISPLAY_SUCCESS;
+                }
+                virtual int32_t Apply(bool modeSet)
+                {
+                    return DISPLAY_SUCCESS;
+                }
+                virtual ~HdiComposition()
+                {
+                }
 
-protected:
-    std::vector<HdiLayer *> mCompLayers;
-};
+            protected:
+                std::vector<HdiLayer *> mCompLayers;
+            };
 
-class HdiComposer {
-public:
-    HdiComposer(std::unique_ptr<HdiComposition> pre, std::unique_ptr<HdiComposition> post);
-    virtual ~HdiComposer() {};
-    int32_t Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);
-    int32_t Commit(bool modeSet);
-    HdiComposition *GetPreCompostion()
-    {
-        return mPreComp.get();
-    }
-    HdiComposition *GetPostCompostion()
-    {
-        return mPostComp.get();
-    }
+            class HdiComposer
+            {
+            public:
+                HdiComposer(std::unique_ptr<HdiComposition> pre, std::unique_ptr<HdiComposition> post);
+                virtual ~HdiComposer(){};
+                int32_t Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);
+                int32_t Commit(bool modeSet);
+                HdiComposition *GetPreCompostion()
+                {
+                    return mPreComp.get();
+                }
+                HdiComposition *GetPostCompostion()
+                {
+                    return mPostComp.get();
+                }
 
-private:
-    std::unique_ptr<HdiComposition> mPreComp;
-    std::unique_ptr<HdiComposition> mPostComp;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                std::unique_ptr<HdiComposition> mPreComp;
+                std::unique_ptr<HdiComposition> mPostComp;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_COMPOSER_H

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -27,11 +28,13 @@ mali_osk_errcode_t mali_hw_core_create(struct mali_hw_core *core, const _mali_os
         if (NULL != core->mapped_registers) {
             return MALI_OSK_ERR_OK;
         } else {
-            MALI_PRINT_ERROR(("Failed to map memory region for core %s at phys_addr 0x%08X\n", core->description, core->phys_addr));
+            MALI_PRINT_ERROR(
+                ("Failed to map memory region for core %s at phys_addr 0x%08X\n", core->description, core->phys_addr));
         }
         _mali_osk_mem_unreqregion(core->phys_addr, core->size);
     } else {
-        MALI_PRINT_ERROR(("Failed to request memory region for core %s at phys_addr 0x%08X\n", core->description, core->phys_addr));
+        MALI_PRINT_ERROR(
+            ("Failed to request memory region for core %s at phys_addr 0x%08X\n", core->description, core->phys_addr));
     }
 
     return MALI_OSK_ERR_FAULT;

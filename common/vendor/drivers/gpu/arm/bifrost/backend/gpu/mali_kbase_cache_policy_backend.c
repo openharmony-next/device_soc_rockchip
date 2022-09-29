@@ -23,12 +23,11 @@
 #include "backend/gpu/mali_kbase_cache_policy_backend.h"
 #include <device/mali_kbase_device.h>
 
-void kbase_cache_set_coherency_mode(struct kbase_device *kbdev,
-        u32 mode)
+void kbase_cache_set_coherency_mode(struct kbase_device *kbdev, u32 mode)
 {
     kbdev->current_gpu_coherency_mode = mode;
 
-    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_COHERENCY_REG))
+    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_COHERENCY_REG)) {
         kbase_reg_write(kbdev, COHERENCY_ENABLE, mode);
+    }
 }
-

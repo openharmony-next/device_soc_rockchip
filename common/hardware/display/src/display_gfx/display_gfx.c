@@ -39,110 +39,110 @@ RgaSURF_FORMAT colorSpaceModeChange(PixelFormat color, uint8_t *isYuv)
 {
     RgaSURF_FORMAT rkFormat;
     switch (color) {
-        case PIXEL_FMT_RGB_565:          /**< RGB565 format */
+        case PIXEL_FMT_RGB_565: /**< RGB565 format */
             rkFormat = RK_FORMAT_RGB_565;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_RGBA_4444:        /**< RGBA4444 format */
+        case PIXEL_FMT_RGBA_4444: /**< RGBA4444 format */
             rkFormat = RK_FORMAT_RGBA_4444;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_RGBA_5551:        /**< RGBA5551 format */
+        case PIXEL_FMT_RGBA_5551: /**< RGBA5551 format */
             rkFormat = RK_FORMAT_RGBA_5551;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_RGBX_8888:        /**< RGBX8888 format */
+        case PIXEL_FMT_RGBX_8888: /**< RGBX8888 format */
             rkFormat = RK_FORMAT_RGBX_8888;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_RGBA_8888:        /**< RGBA8888 format */
+        case PIXEL_FMT_RGBA_8888: /**< RGBA8888 format */
             rkFormat = RK_FORMAT_RGBA_8888;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_RGB_888:          /**< RGB888 format */
+        case PIXEL_FMT_RGB_888: /**< RGB888 format */
             rkFormat = RK_FORMAT_RGB_888;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_BGR_565:          /**< BGR565 format */
+        case PIXEL_FMT_BGR_565: /**< BGR565 format */
             rkFormat = RK_FORMAT_BGR_565;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_BGRA_4444:        /**< BGRA4444 format */
+        case PIXEL_FMT_BGRA_4444: /**< BGRA4444 format */
             rkFormat = RK_FORMAT_BGRA_4444;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_BGRA_5551:        /**< BGRA5551 format */
+        case PIXEL_FMT_BGRA_5551: /**< BGRA5551 format */
             rkFormat = RK_FORMAT_BGRA_5551;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_BGRX_8888:        /**< BGRX8888 format */
+        case PIXEL_FMT_BGRX_8888: /**< BGRX8888 format */
             rkFormat = RK_FORMAT_BGRX_8888;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_BGRA_8888:        /**< BGRA8888 format */
+        case PIXEL_FMT_BGRA_8888: /**< BGRA8888 format */
             rkFormat = RK_FORMAT_BGRA_8888;
             *isYuv = 0;
             break;
-        case PIXEL_FMT_YCBCR_422_SP:     /**< YCBCR422 semi-planar format */
+        case PIXEL_FMT_YCBCR_422_SP: /**< YCBCR422 semi-planar format */
             rkFormat = RK_FORMAT_YCbCr_420_SP;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCRCB_422_SP:     /**< YCRCB422 semi-planar format */
+        case PIXEL_FMT_YCRCB_422_SP: /**< YCRCB422 semi-planar format */
             rkFormat = RK_FORMAT_YCrCb_422_SP;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCBCR_420_SP:     /**< YCBCR420 semi-planar format */
+        case PIXEL_FMT_YCBCR_420_SP: /**< YCBCR420 semi-planar format */
             rkFormat = RK_FORMAT_YCbCr_420_SP;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCRCB_420_SP:     /**< YCRCB420 semi-planar format */
+        case PIXEL_FMT_YCRCB_420_SP: /**< YCRCB420 semi-planar format */
             rkFormat = RK_FORMAT_YCrCb_420_SP;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCBCR_422_P:      /**< YCBCR422 planar format */
+        case PIXEL_FMT_YCBCR_422_P: /**< YCBCR422 planar format */
             rkFormat = RK_FORMAT_YCbCr_422_P;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCRCB_422_P:      /**< YCRCB422 planar format */
+        case PIXEL_FMT_YCRCB_422_P: /**< YCRCB422 planar format */
             rkFormat = RK_FORMAT_YCrCb_422_P;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCBCR_420_P:      /**< YCBCR420 planar format */
+        case PIXEL_FMT_YCBCR_420_P: /**< YCBCR420 planar format */
             rkFormat = RK_FORMAT_YCbCr_420_P;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YCRCB_420_P:      /**< YCRCB420 planar format */
+        case PIXEL_FMT_YCRCB_420_P: /**< YCRCB420 planar format */
             rkFormat = RK_FORMAT_YCrCb_420_P;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YUYV_422_PKG:     /**< YUYV422 packed format */
+        case PIXEL_FMT_YUYV_422_PKG: /**< YUYV422 packed format */
             rkFormat = RK_FORMAT_YUYV_422;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_UYVY_422_PKG:     /**< UYVY422 packed format */
+        case PIXEL_FMT_UYVY_422_PKG: /**< UYVY422 packed format */
             rkFormat = RK_FORMAT_UYVY_422;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_YVYU_422_PKG:     /**< YVYU422 packed format */
+        case PIXEL_FMT_YVYU_422_PKG: /**< YVYU422 packed format */
             rkFormat = RK_FORMAT_YUYV_422;
             *isYuv = 1;
             break;
-        case PIXEL_FMT_VYUY_422_PKG:     /**< VYUY422 packed format */
+        case PIXEL_FMT_VYUY_422_PKG: /**< VYUY422 packed format */
             rkFormat = RK_FORMAT_VYUY_422;
             *isYuv = 1;
             break;
         default:
-//          PIXEL_FMT_CLUT8:        /**< CLUT8 format */
-//          PIXEL_FMT_CLUT1,            /**< CLUT1 format */
-//          PIXEL_FMT_CLUT4,            /**< CLUT4 format */
-//          PIXEL_FMT_RGBA_5658,        /**< RGBA5658 format */
-//          PIXEL_FMT_RGBX_4444,        /**< RGBX4444 format */
-//          PIXEL_FMT_RGB_444,          /**< RGB444 format */
-//          PIXEL_FMT_RGBX_5551,        /**< RGBX5551 format */
-//          PIXEL_FMT_RGB_555,          /**< RGB555 format */
-//          PIXEL_FMT_BGRX_4444,        /**< BGRX4444 format */
-//          PIXEL_FMT_BGRX_5551,        /**< BGRX5551 format */
-//          PIXEL_FMT_YUV_422_I,        /**< YUV422 interleaved format */
+            //          PIXEL_FMT_CLUT8:        /**< CLUT8 format */
+            //          PIXEL_FMT_CLUT1,            /**< CLUT1 format */
+            //          PIXEL_FMT_CLUT4,            /**< CLUT4 format */
+            //          PIXEL_FMT_RGBA_5658,        /**< RGBA5658 format */
+            //          PIXEL_FMT_RGBX_4444,        /**< RGBX4444 format */
+            //          PIXEL_FMT_RGB_444,          /**< RGB444 format */
+            //          PIXEL_FMT_RGBX_5551,        /**< RGBX5551 format */
+            //          PIXEL_FMT_RGB_555,          /**< RGB555 format */
+            //          PIXEL_FMT_BGRX_4444,        /**< BGRX4444 format */
+            //          PIXEL_FMT_BGRX_5551,        /**< BGRX5551 format */
+            //          PIXEL_FMT_YUV_422_I,        /**< YUV422 interleaved format */
             rkFormat = RK_FORMAT_UNKNOWN;
             break;
     }
@@ -186,47 +186,49 @@ int32_t rkFillRect(ISurface *iSurface, IRect *rect, uint32_t color, GfxOpt *opt)
     dst.format = colorSpaceModeChange(iSurface->enColorFmt, &isYuv);
     dst.color_space_mode = IM_COLOR_SPACE_DEFAULT;
     dst.color = color;
-    if (opt->enGlobalAlpha)
+    if (opt->enGlobalAlpha) {
         dst.global_alpha = opt->globalAlpha;
+    }
     ret = imfill(dst, imRect, color);
-    if (ret != IM_STATUS_SUCCESS)
+    if (ret != IM_STATUS_SUCCESS) {
         return DISPLAY_FAILURE;
-    else
+    } else {
         return DISPLAY_SUCCESS;
+    }
 }
 
 int32_t blendTypeChange(BlendType blendType)
 {
     int32_t rkBlendType;
     switch (blendType) {
-        case BLEND_SRC:              /**< SRC blending */
+        case BLEND_SRC: /**< SRC blending */
             rkBlendType = IM_ALPHA_BLEND_SRC;
             break;
-        case BLEND_DST:              /**< SRC blending */
+        case BLEND_DST: /**< SRC blending */
             rkBlendType = IM_ALPHA_BLEND_DST;
             break;
-        case BLEND_SRCOVER:          /**< SRC_OVER blending */
+        case BLEND_SRCOVER: /**< SRC_OVER blending */
             rkBlendType = IM_ALPHA_BLEND_SRC_OVER;
             break;
-        case BLEND_DSTOVER:          /**< DST_OVER blending */
+        case BLEND_DSTOVER: /**< DST_OVER blending */
             rkBlendType = IM_ALPHA_BLEND_DST_OVER;
             break;
         default:
             /* Fix up later */
-//        BLEND_NONE         /**< No blending */
-//        BLEND_CLEAR:            /**< CLEAR blending */
-//        BLEND_SRCIN:            /**< SRC_IN blending */
-//        BLEND_DSTIN:            /**< DST_IN blending */
-//        BLEND_SRCOUT:           /**< SRC_OUT blending */
-//        BLEND_DSTOUT:           /**< DST_OUT blending */
-//        BLEND_SRCATOP:          /**< SRC_ATOP blending */
-//        BLEND_DSTATOP:          /**< DST_ATOP blending */
-//        BLEND_ADD:              /**< ADD blending */
-//        BLEND_XOR:              /**< XOR blending */
-//        BLEND_DST:              /**< DST blending */
-//        BLEND_AKS:              /**< AKS blending */
-//        BLEND_AKD:              /**< AKD blending */
-//        BLEND_BUTT:              /**< Null operation */
+            //        BLEND_NONE         /**< No blending */
+            //        BLEND_CLEAR:            /**< CLEAR blending */
+            //        BLEND_SRCIN:            /**< SRC_IN blending */
+            //        BLEND_DSTIN:            /**< DST_IN blending */
+            //        BLEND_SRCOUT:           /**< SRC_OUT blending */
+            //        BLEND_DSTOUT:           /**< DST_OUT blending */
+            //        BLEND_SRCATOP:          /**< SRC_ATOP blending */
+            //        BLEND_DSTATOP:          /**< DST_ATOP blending */
+            //        BLEND_ADD:              /**< ADD blending */
+            //        BLEND_XOR:              /**< XOR blending */
+            //        BLEND_DST:              /**< DST blending */
+            //        BLEND_AKS:              /**< AKS blending */
+            //        BLEND_AKD:              /**< AKD blending */
+            //        BLEND_BUTT:              /**< Null operation */
             rkBlendType = IM_STATUS_NOT_SUPPORTED;
             break;
     }
@@ -237,17 +239,17 @@ int32_t TransformTypeChange(TransformType type)
 {
     int32_t rkRotateType;
     switch (type) {
-        case ROTATE_90:            /**< Rotation by 90 degrees */
+        case ROTATE_90: /**< Rotation by 90 degrees */
             rkRotateType = IM_HAL_TRANSFORM_ROT_90;
             break;
-        case ROTATE_180:             /**< Rotation by 180 degrees */
+        case ROTATE_180: /**< Rotation by 180 degrees */
             rkRotateType = IM_HAL_TRANSFORM_ROT_180;
             break;
-        case ROTATE_270:             /**< Rotation by 270 degrees */
+        case ROTATE_270: /**< Rotation by 270 degrees */
             rkRotateType = IM_HAL_TRANSFORM_ROT_270;
             break;
         default:
-            rkRotateType = 0;        /**< No rotation */
+            rkRotateType = 0; /**< No rotation */
             break;
     }
     return rkRotateType;
@@ -257,10 +259,10 @@ int32_t mirrorTypeChange(MirrorType type)
 {
     int32_t rkMirrorType;
     switch (type) {
-        case MIRROR_LR:            /**< Left and right mirrors */
+        case MIRROR_LR: /**< Left and right mirrors */
             rkMirrorType = IM_HAL_TRANSFORM_FLIP_H;
             break;
-        case MIRROR_TB:            /**< Top and bottom mirrors */
+        case MIRROR_TB: /**< Top and bottom mirrors */
             rkMirrorType = IM_HAL_TRANSFORM_FLIP_V;
             break;
         default:
@@ -347,11 +349,11 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     }
 
     DISPLAY_DEBUGLOG("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d vir %{public}p",
-        (int32_t)srcSurface->phyAddr, srcSurface->width, srcSurface->height, ALIGN_UP(srcSurface->width, 16),
-        ALIGN_UP(srcSurface->height, 16), srcRgaBuffer.vir_addr);
+                     (int32_t)srcSurface->phyAddr, srcSurface->width, srcSurface->height,
+                     ALIGN_UP(srcSurface->width, 16), ALIGN_UP(srcSurface->height, 16), srcRgaBuffer.vir_addr);
     DISPLAY_DEBUGLOG("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d vir %{public}p",
-        (int32_t)dstSurface->phyAddr, dstSurface->width, dstSurface->height, ALIGN_UP(dstSurface->width, 16),
-        ALIGN_UP(dstSurface->height, 16), dstRgaBuffer.vir_addr);
+                     (int32_t)dstSurface->phyAddr, dstSurface->width, dstSurface->height,
+                     ALIGN_UP(dstSurface->width, 16), ALIGN_UP(dstSurface->height, 16), dstRgaBuffer.vir_addr);
 
     srect.x = srcRect->x;
     srect.x = (srect.x == 1) ? 0 : srect.x;
@@ -370,25 +372,28 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         rkBlendType = blendTypeChange(opt->blendType);
         if (rkBlendType > 0) {
             usage |= rkBlendType;
-            if (rkBlendType == IM_ALPHA_BLEND_DST_OVER || rkBlendType == IM_ALPHA_BLEND_SRC_OVER)
+            if (rkBlendType == IM_ALPHA_BLEND_DST_OVER || rkBlendType == IM_ALPHA_BLEND_SRC_OVER) {
                 usage |= IM_ALPHA_BLEND_PRE_MUL;
+            }
         } else if (rkBlendType == IM_STATUS_NOT_SUPPORTED) {
             return DISPLAY_NOT_SUPPORT;
         }
     }
     if (opt->rotateType) {
         rkRotateType = TransformTypeChange(opt->rotateType);
-        if (rkRotateType != 0)
+        if (rkRotateType != 0) {
             usage |= rkRotateType;
+        }
     }
     if (opt->mirrorType == MIRROR_LR || opt->mirrorType == MIRROR_TB) {
         rkMirrorType = mirrorTypeChange(opt->mirrorType);
-        if (rkMirrorType != 0)
+        if (rkMirrorType != 0) {
             usage |= rkMirrorType;
+        }
     }
     if (opt->enableScale) {
-        DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", \
-            srcRgaBuffer.width, srcRgaBuffer.height, dstRgaBuffer.width, dstRgaBuffer.height);
+        DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", srcRgaBuffer.width,
+                     srcRgaBuffer.height, dstRgaBuffer.width, dstRgaBuffer.height);
     }
     usage |= IM_SYNC;
     if (isYuv == 1) {
@@ -439,8 +444,8 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             bRgbBuffer.wstride = dstRgaBuffer.wstride;
             bRgbBuffer.hstride = dstRgaBuffer.hstride;
             bRgbBuffer.format = RK_FORMAT_RGBA_8888; // srcRgaBuffer.format;
-            bRgbBuffer.phy_addr = 0; // (void *) buffer->phyAddr;
-            bRgbBuffer.vir_addr = 0; // buffer->virAddr;
+            bRgbBuffer.phy_addr = 0;                 // (void *) buffer->phyAddr;
+            bRgbBuffer.vir_addr = 0;                 // buffer->virAddr;
             bRgbBuffer.color_space_mode = dstRgaBuffer.color_space_mode;
             bRgbBuffer.fd = (int32_t)buffer->phyAddr;
             int ret = memcpy_s(&prect, sizeof(drect), &drect, sizeof(drect));
@@ -464,10 +469,11 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
         }
     }
-    if (ret != IM_STATUS_SUCCESS)
+    if (ret != IM_STATUS_SUCCESS) {
         return DISPLAY_FAILURE;
-    else
+    } else {
         return DISPLAY_SUCCESS;
+    }
 }
 
 int32_t rkBlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect *dstRect, GfxOpt *opt)
@@ -478,10 +484,11 @@ int32_t rkBlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     CHECK_NULLPOINTER_RETURN_VALUE(dstRect, DISPLAY_NULL_PTR);
     CHECK_NULLPOINTER_RETURN_VALUE(opt, DISPLAY_NULL_PTR);
 
-    if (doFlit(srcSurface, srcRect, dstSurface, dstRect, opt) < 0)
+    if (doFlit(srcSurface, srcRect, dstSurface, dstRect, opt) < 0) {
         return DISPLAY_FAILURE;
-    else
+    } else {
         return DISPLAY_SUCCESS;
+    }
 }
 
 int32_t rkSync(int32_t timeOut)

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -18,7 +19,7 @@
 
 #include <linux/seq_file.h>
 #include "mali_osk_types.h"
-#include "mali_osk_specific.h"           /* include any per-os specifics */
+#include "mali_osk_specific.h" /* include any per-os specifics */
 #include "mali_osk_locks.h"
 
 #ifdef __cplusplus
@@ -26,16 +27,16 @@ extern "C" {
 #endif
 
 /* mail define value begin */
-#define MAIL_DEBUG_LEVEL_TO    (2)
-#define MAIL_DEBUG_LEVEL_TH    (3)
-#define MAIL_DEBUG_LEVEL_FO    (4)
-#define MAIL_DEBUG_LEVEL_FI    (5)
-#define MAIL_EVENT_TO          (2)
-#define MAIL_EVENT_TH          (3)
-#define MAIL_EVENT_FO          (4)
-#define NEW_SESSION_SIZE       (8)
-#define MAIL_OFFSET_TH         (32)
-#define PER_PAGE_SIZE          (512)
+#define MAIL_DEBUG_LEVEL_TO (2)
+#define MAIL_DEBUG_LEVEL_TH (3)
+#define MAIL_DEBUG_LEVEL_FO (4)
+#define MAIL_DEBUG_LEVEL_FI (5)
+#define MAIL_EVENT_TO (2)
+#define MAIL_EVENT_TH (3)
+#define MAIL_EVENT_FO (4)
+#define NEW_SESSION_SIZE (8)
+#define MAIL_OFFSET_TH (32)
+#define PER_PAGE_SIZE (512)
 
 /* mail define value end */
 
@@ -57,15 +58,18 @@ extern "C" {
 #ifdef DEBUG
 /** @brief Macro for asserting that the current thread holds a given lock
  */
-#define MALI_DEBUG_ASSERT_LOCK_HELD(l) MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == mali_osk_get_tid());
+#define MALI_DEBUG_ASSERT_LOCK_HELD(l)                                                                                 \
+    MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == mali_osk_get_tid());
 
 /** @brief returns a lock's owner (thread id) if debugging is enabled
  */
 #else
-#define MALI_DEBUG_ASSERT_LOCK_HELD(l) do {} while(0)
+#define MALI_DEBUG_ASSERT_LOCK_HELD(l)                                                                                 \
+    do {                                                                                                               \
+    } while (0)
 #endif
 
-#define _mali_osk_ctxprintf     seq_printf
+#define _mali_osk_ctxprintf seq_printf
 
 /** @} */ /* end group _mali_osk_lock */
 
@@ -94,8 +98,7 @@ extern "C" {
  * @return a pointer to a \a type object which contains \a member, as pointed
  * to by \a ptr.
  */
-#define MALI_OSK_CONTAINER_OF(ptr, type, member) \
-    ((type *)( ((char *)ptr) - offsetof(type,member) ))
+#define MALI_OSK_CONTAINER_OF(ptr, type, member) ((type *)(((char *)(ptr)) - offsetof(type, member)))
 
 /** @addtogroup _mali_osk_wq
  * @{ */
@@ -216,7 +219,7 @@ void mali_osk_wq_schedule_work(_mali_osk_wq_work_t *work);
  *
  * This is allowed to sleep, but the work should be small since it will block
  * all other applications.
-*/
+ */
 void mali_osk_wq_schedule_work_high_pri(_mali_osk_wq_work_t *work);
 
 /** @brief Flush the work queue
@@ -283,7 +286,6 @@ void _mali_osk_wq_delayed_schedule_work(_mali_osk_wq_delayed_work_t *work, u32 d
 
 /** @} */ /* end group _mali_osk_wq */
 
-
 /** @addtogroup _mali_osk_irq
  * @{ */
 
@@ -312,7 +314,9 @@ void _mali_osk_wq_delayed_schedule_work(_mali_osk_wq_delayed_work_t *work, u32 d
  * @return on success, a pointer to a _mali_osk_irq_t object, which represents
  * the IRQ handling on this resource. NULL on failure.
  */
-_mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandler, void *int_data, _mali_osk_irq_trigger_t trigger_func, _mali_osk_irq_ack_t ack_func, void *probe_data, const char *description);
+_mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandler, void *int_data,
+                                    _mali_osk_irq_trigger_t trigger_func, _mali_osk_irq_ack_t ack_func,
+                                    void *probe_data, const char *description);
 
 /** @brief Terminate IRQ handling on a resource.
  *
@@ -329,7 +333,6 @@ _mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandle
 void _mali_osk_irq_term(_mali_osk_irq_t *irq);
 
 /** @} */ /* end group _mali_osk_irq */
-
 
 /** @addtogroup _mali_osk_atomic
  * @{ */
@@ -392,8 +395,7 @@ void mali_osk_atomic_term(_mali_osk_atomic_t *atom);
  * @return the old value of the atomic counter
  */
 u32 mali_osk_atomic_xchg(_mali_osk_atomic_t *atom, u32 val);
-/** @} */  /* end group _mali_osk_atomic */
-
+/** @} */ /* end group _mali_osk_atomic */
 
 /** @defgroup _mali_osk_memory OSK Memory Allocation
  * @{ */
@@ -534,7 +536,6 @@ void *mali_osk_memcpy(void *dst, const void *src, u32 len);
 void *mali_osk_memset(void *s, u32 c, u32 n);
 /** @} */ /* end group _mali_osk_memory */
 
-
 /** @brief Checks the amount of memory allocated
  *
  * Checks that not more than \a max_allocated bytes are allocated.
@@ -549,7 +550,6 @@ void *mali_osk_memset(void *s, u32 c, u32 n);
  * when at least \a max_allocated bytes are in use.
  */
 mali_bool _mali_osk_mem_check_allocated(u32 max_allocated);
-
 
 /** @addtogroup _mali_osk_low_level_memory
  * @{ */
@@ -614,7 +614,7 @@ void _mali_osk_mem_unmapioregion(uintptr_t phys, u32 size, mali_io_address mappi
  * visible from kernel-space.
  *
  * The alignment of the returned memory is guaranteed to be at least
- * _MALI_OSK_CPU_PAGE_SIZE.
+ * MALI_OSK_CPU_PAGE_SIZE.
  *
  * Access must go through _mali_osk_mem_ioread32 and _mali_osk_mem_iowrite32
  *
@@ -624,10 +624,10 @@ void _mali_osk_mem_unmapioregion(uintptr_t phys, u32 size, mali_io_address mappi
  *
  * @param[out] phys CPU-physical base address of memory that was allocated.
  * (*phys) will be guaranteed to be aligned to at least
- * _MALI_OSK_CPU_PAGE_SIZE on success.
+ * MALI_OSK_CPU_PAGE_SIZE on success.
  *
  * @param[in] size the number of bytes of physically contiguous memory to
- * allocate. This must be a multiple of _MALI_OSK_CPU_PAGE_SIZE.
+ * allocate. This must be a multiple of MALI_OSK_CPU_PAGE_SIZE.
  *
  * @return On success, a Mali IO address through which the mapped-in
  * memory/registers can be accessed. NULL on failure, and (*phys) is unmodified.
@@ -648,9 +648,9 @@ mali_io_address _mali_osk_mem_allocioregion(u32 *phys, u32 size);
  * - provide a mapping that does not map to phys.
  *
  * @param phys CPU-physical base address of the memory that was originally
- * mapped in, which was aligned to _MALI_OSK_CPU_PAGE_SIZE.
+ * mapped in, which was aligned to MALI_OSK_CPU_PAGE_SIZE.
  * @param size The number of bytes that were originally mapped in, which was
- * a multiple of _MALI_OSK_CPU_PAGE_SIZE.
+ * a multiple of MALI_OSK_CPU_PAGE_SIZE.
  * @param mapping The Mali IO address through which the mapping is
  * accessed.
  */
@@ -768,7 +768,6 @@ void _mali_osk_cache_ensure_uncached_range_flushed(void *uncached_mapping, u32 o
 u32 _mali_osk_mem_write_safe(void *dest, const void *src, u32 size);
 
 /** @} */ /* end group _mali_osk_low_level_memory */
-
 
 /** @addtogroup _mali_osk_notification
  *
@@ -934,7 +933,8 @@ void mali_osk_notification_queue_send(_mali_osk_notification_queue_t *queue, _ma
  * \ref _mali_osk_notification_t object, or NULL if none were received.
  * @return MALI_OSK_ERR_OK on success. MALI_OSK_ERR_RESTARTSYSCALL if the sleep was interrupted.
  */
-mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
+mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue,
+                                                        _mali_osk_notification_t **result);
 
 /** @brief Dequeues a notification from a queue
  *
@@ -949,10 +949,10 @@ mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_q
  * \ref _mali_osk_notification_t object, or NULL if none were received.
  * @return MALI_OSK_ERR_OK on success, MALI_OSK_ERR_ITEM_NOT_FOUND if queue was empty.
  */
-mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result);
+mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue,
+                                                        _mali_osk_notification_t **result);
 
 /** @} */ /* end group _mali_osk_notification */
-
 
 /** @addtogroup _mali_osk_timer
  *
@@ -1075,7 +1075,6 @@ void _mali_osk_timer_setcallback(_mali_osk_timer_t *tim, _mali_osk_timer_callbac
 void _mali_osk_timer_term(_mali_osk_timer_t *tim);
 /** @} */ /* end group _mali_osk_timer */
 
-
 /** @defgroup _mali_osk_time OSK Time functions
  *
  * \ref _mali_osk_time use the OS's representation of time, which are
@@ -1121,7 +1120,6 @@ unsigned long _mali_osk_time_mstoticks(u32 ms);
  * @return the corresponding time interval in milliseconds
  */
 u32 _mali_osk_time_tickstoms(unsigned long ticks);
-
 
 /** @brief Get the current time in OS 'ticks'.
  * @return the current time in OS 'ticks'.
@@ -1195,7 +1193,7 @@ _mali_osk_wait_queue_t *_mali_osk_wait_queue_init(void);
  * being asked to wake up again, the condition will be re-checked and the
  * thread only woken up if the condition is now true.
  */
-void _mali_osk_wait_queue_wait_event(_mali_osk_wait_queue_t *queue, mali_bool(*condition)(void *), void *data);
+void _mali_osk_wait_queue_wait_event(_mali_osk_wait_queue_t *queue, mali_bool (*condition)(void *), void *data);
 
 /** @brief Sleep if condition is false
  *
@@ -1209,7 +1207,8 @@ void _mali_osk_wait_queue_wait_event(_mali_osk_wait_queue_t *queue, mali_bool(*c
  * thread only woken up if the condition is now true.  Will return if time
  * exceeds timeout.
  */
-void _mali_osk_wait_queue_wait_event_timeout(_mali_osk_wait_queue_t *queue, mali_bool(*condition)(void *), void *data, u32 timeout);
+void _mali_osk_wait_queue_wait_event_timeout(_mali_osk_wait_queue_t *queue, mali_bool (*condition)(void *), void *data,
+                                             u32 timeout);
 
 /** @brief Wake up all threads in wait queue if their respective conditions are
  * true
@@ -1226,7 +1225,6 @@ void _mali_osk_wait_queue_wake_up(_mali_osk_wait_queue_t *queue);
  */
 void _mali_osk_wait_queue_term(_mali_osk_wait_queue_t *queue);
 /** @} */ /* end group _mali_osk_wait_queue */
-
 
 /** @addtogroup _mali_osk_miscellaneous
  * @{ */
@@ -1294,7 +1292,6 @@ char *_mali_osk_get_comm(void);
  * @return Identificator for calling thread.
  */
 u32 mali_osk_get_tid(void);
-
 
 /** @brief Take a reference to the power manager system for the Mali device (synchronously).
  *
@@ -1384,8 +1381,6 @@ void _mali_osk_bitmap_term(struct _mali_osk_bitmap *bitmap);
 /** @} */ /* end group osuapi */
 
 /** @} */ /* end group uddapi */
-
-
 
 #ifdef __cplusplus
 }

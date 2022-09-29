@@ -19,7 +19,8 @@
  * SPDX-License-Identifier: GPL-2.0
  *
  */
-
+#ifndef BIFROST_BACKEND_GPU_MALI_KBASE_PM_L2_STATES_H
+#define BIFROST_BACKEND_GPU_MALI_KBASE_PM_L2_STATES_H
 /*
  * Backend-specific Power Manager level 2 cache state definitions.
  * The function-like macro KBASEP_L2_STATE() must be defined before including
@@ -36,3 +37,4 @@ KBASEP_L2_STATE(SLOW_DOWN_CLOCKS)
 KBASEP_L2_STATE(POWER_DOWN)
 KBASEP_L2_STATE(PEND_OFF)
 KBASEP_L2_STATE(RESET_WAIT)
+#endif

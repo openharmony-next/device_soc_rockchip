@@ -40,9 +40,10 @@ static void rockchip_drm_fb_destroy(struct drm_framebuffer *fb)
 #endif
         kfree(rockchip_logo_fb);
     } else {
-        for (i = 0; i < 4; i++) {
-            if (fb->obj[i])
+        for (i = 0; i < 0x4; i++) {
+            if (fb->obj[i]) {
                 drm_gem_object_put(fb->obj[i]);
+            }
         }
 
         kfree(fb);
@@ -50,33 +51,32 @@ static void rockchip_drm_fb_destroy(struct drm_framebuffer *fb)
 }
 
 static const struct drm_framebuffer_funcs rockchip_drm_fb_funcs = {
-    .destroy       = rockchip_drm_fb_destroy,
+    .destroy = rockchip_drm_fb_destroy,
     .create_handle = drm_gem_fb_create_handle,
-    .dirty           = drm_atomic_helper_dirtyfb,
+    .dirty = drm_atomic_helper_dirtyfb,
 };
 
-static struct drm_framebuffer *
-rockchip_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cmd,
-          struct drm_gem_object **obj, unsigned int num_planes)
+static struct drm_framebuffer *rockchip_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cmd,
+                                                 struct drm_gem_object **obj, unsigned int num_planes)
 {
     struct drm_framebuffer *fb;
     int ret;
     int i;
 
     fb = kzalloc(sizeof(*fb), GFP_KERNEL);
-    if (!fb)
+    if (!fb) {
         return ERR_PTR(-ENOMEM);
+    }
 
     drm_helper_mode_fill_fb_struct(dev, fb, mode_cmd);
 
-    for (i = 0; i < num_planes; i++)
+    for (i = 0; i < num_planes; i++) {
         fb->obj[i] = obj[i];
+    }
 
     ret = drm_framebuffer_init(dev, fb, &rockchip_drm_fb_funcs);
     if (ret) {
-        DRM_DEV_ERROR(dev->dev,
-                  "Failed to initialize framebuffer: %d\n",
-                  ret);
+        DRM_DEV_ERROR(dev->dev, "Failed to initialize framebuffer: %d\n", ret);
         kfree(fb);
         return ERR_PTR(ret);
     }
@@ -84,26 +84,24 @@ rockchip_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cm
     return fb;
 }
 
-struct drm_framebuffer *
-rockchip_drm_logo_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cmd,
-               struct rockchip_logo *logo)
+struct drm_framebuffer *rockchip_drm_logo_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cmd,
+                                                   struct rockchip_logo *logo)
 {
     int ret = 0;
     struct rockchip_drm_logo_fb *rockchip_logo_fb;
     struct drm_framebuffer *fb;
 
     rockchip_logo_fb = kzalloc(sizeof(*rockchip_logo_fb), GFP_KERNEL);
-    if (!rockchip_logo_fb)
+    if (!rockchip_logo_fb) {
         return ERR_PTR(-ENOMEM);
+    }
     fb = &rockchip_logo_fb->fb;
 
     drm_helper_mode_fill_fb_struct(dev, fb, mode_cmd);
 
     ret = drm_framebuffer_init(dev, fb, &rockchip_drm_fb_funcs);
     if (ret) {
-        DRM_DEV_ERROR(dev->dev,
-                  "Failed to initialize rockchip logo fb: %d\n",
-                  ret);
+        DRM_DEV_ERROR(dev->dev, "Failed to initialize rockchip logo fb: %d\n", ret);
         kfree(rockchip_logo_fb);
         return ERR_PTR(ret);
     }
@@ -118,9 +116,8 @@ rockchip_drm_logo_fb_alloc(struct drm_device *dev, const struct drm_mode_fb_cmd2
     return &rockchip_logo_fb->fb;
 }
 
-static int rockchip_drm_bandwidth_atomic_check(struct drm_device *dev,
-                           struct drm_atomic_state *state,
-                           struct dmcfreq_vop_info *vop_bw_info)
+static int rockchip_drm_bandwidth_atomic_check(struct drm_device *dev, struct drm_atomic_state *state,
+                                               struct dmcfreq_vop_info *vop_bw_info)
 {
     struct rockchip_drm_private *priv = dev->dev_private;
     struct drm_crtc_state *old_crtc_state;
@@ -132,11 +129,13 @@ static int rockchip_drm_bandwidth_atomic_check(struct drm_device *dev,
     vop_bw_info->frame_bw_mbyte = 0;
     vop_bw_info->plane_num = 0;
 
-    for_each_old_crtc_in_state(state, crtc, old_crtc_state, i) {
+    for_each_old_crtc_in_state(state, crtc, old_crtc_state, i)
+    {
         funcs = priv->crtc_funcs[drm_crtc_index(crtc)];
 
-        if (funcs && funcs->bandwidth)
+        if (funcs && funcs->bandwidth) {
             funcs->bandwidth(crtc, old_crtc_state, vop_bw_info);
+        }
     }
 
     return 0;
@@ -183,24 +182,24 @@ static const struct drm_mode_config_helper_funcs rockchip_mode_config_helpers = 
     .atomic_commit_tail = rockchip_drm_atomic_helper_commit_tail_rpm,
 };
 
-static struct drm_framebuffer *
-rockchip_fb_create(struct drm_device *dev, struct drm_file *file,
-           const struct drm_mode_fb_cmd2 *mode_cmd)
+static struct drm_framebuffer *rockchip_fb_create(struct drm_device *dev, struct drm_file *file,
+                                                  const struct drm_mode_fb_cmd2 *mode_cmd)
 {
     struct drm_afbc_framebuffer *afbc_fb;
     const struct drm_format_info *info;
     int ret;
 
     info = drm_get_format_info(dev, mode_cmd);
-    if (!info)
+    if (!info) {
         return ERR_PTR(-ENOMEM);
+    }
 
     afbc_fb = kzalloc(sizeof(*afbc_fb), GFP_KERNEL);
-    if (!afbc_fb)
+    if (!afbc_fb) {
         return ERR_PTR(-ENOMEM);
+    }
 
-    ret = drm_gem_fb_init_with_funcs(dev, &afbc_fb->base, file, mode_cmd,
-                     &rockchip_drm_fb_funcs);
+    ret = drm_gem_fb_init_with_funcs(dev, &afbc_fb->base, file, mode_cmd, &rockchip_drm_fb_funcs);
     if (ret) {
         kfree(afbc_fb);
         return ERR_PTR(ret);
@@ -213,8 +212,9 @@ rockchip_fb_create(struct drm_device *dev, struct drm_file *file,
         if (ret) {
             struct drm_gem_object **obj = afbc_fb->base.obj;
 
-            for (i = 0; i < info->num_planes; ++i)
+            for (i = 0; i < info->num_planes; ++i) {
                 drm_gem_object_put(obj[i]);
+            }
 
             kfree(afbc_fb);
             return ERR_PTR(ret);
@@ -229,8 +229,9 @@ static void rockchip_drm_output_poll_changed(struct drm_device *dev)
     struct rockchip_drm_private *private = dev->dev_private;
     struct drm_fb_helper *fb_helper = private->fbdev_helper;
 
-    if (fb_helper && dev->mode_config.poll_enabled && !private->loader_protect)
+    if (fb_helper && dev->mode_config.poll_enabled && !private->loader_protect) {
         drm_fb_helper_hotplug_event(fb_helper);
+    }
 }
 
 static const struct drm_mode_config_funcs rockchip_drm_mode_config_funcs = {
@@ -240,16 +241,15 @@ static const struct drm_mode_config_funcs rockchip_drm_mode_config_funcs = {
     .atomic_commit = drm_atomic_helper_commit,
 };
 
-struct drm_framebuffer *
-rockchip_drm_framebuffer_init(struct drm_device *dev,
-                  const struct drm_mode_fb_cmd2 *mode_cmd,
-                  struct drm_gem_object *obj)
+struct drm_framebuffer *rockchip_drm_framebuffer_init(struct drm_device *dev, const struct drm_mode_fb_cmd2 *mode_cmd,
+                                                      struct drm_gem_object *obj)
 {
     struct drm_framebuffer *fb;
 
     fb = rockchip_fb_alloc(dev, mode_cmd, &obj, 1);
-    if (IS_ERR(fb))
+    if (IS_ERR(fb)) {
         return ERR_CAST(fb);
+    }
 
     return fb;
 }
@@ -264,8 +264,8 @@ void rockchip_drm_mode_config_init(struct drm_device *dev)
      * this value would be used to check framebuffer size limitation
      * at drm_mode_addfb().
      */
-    dev->mode_config.max_width = 16384;
-    dev->mode_config.max_height = 16384;
+    dev->mode_config.max_width = 0x4000;
+    dev->mode_config.max_height = 0x4000;
     dev->mode_config.async_page_flip = true;
 
     dev->mode_config.funcs = &rockchip_drm_mode_config_funcs;

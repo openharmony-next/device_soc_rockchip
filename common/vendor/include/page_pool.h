@@ -19,8 +19,8 @@
 
 /* page types we track in the pool */
 enum {
-    POOL_LOWPAGE,      /* Clean lowmem pages */
-    POOL_HIGHPAGE,     /* Clean highmem pages */
+    POOL_LOWPAGE,  /* Clean lowmem pages */
+    POOL_HIGHPAGE, /* Clean highmem pages */
 
     POOL_TYPE_SIZE,
 };
@@ -46,8 +46,7 @@ struct dmabuf_page_pool {
     struct list_head list;
 };
 
-struct dmabuf_page_pool *dmabuf_page_pool_create(gfp_t gfp_mask,
-                         unsigned int order);
+struct dmabuf_page_pool *dmabuf_page_pool_create(gfp_t gfp_mask, unsigned int order);
 void dmabuf_page_pool_destroy(struct dmabuf_page_pool *pool);
 struct page *dmabuf_page_pool_alloc(struct dmabuf_page_pool *pool);
 void dmabuf_page_pool_free(struct dmabuf_page_pool *pool, struct page *page);

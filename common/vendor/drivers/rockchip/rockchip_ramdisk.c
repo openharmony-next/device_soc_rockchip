@@ -11,16 +11,16 @@
 #include <linux/of_address.h>
 #include <linux/platform_device.h>
 
-#define PAGE_SECTORS_SHIFT    (PAGE_SHIFT - SECTOR_SHIFT)
-#define PAGE_SECTORS        (1 << PAGE_SECTORS_SHIFT)
+#define PAGE_SECTORS_SHIFT (PAGE_SHIFT - SECTOR_SHIFT)
+#define PAGE_SECTORS (1 << PAGE_SECTORS_SHIFT)
 
 struct rd_device {
-    struct request_queue    *rd_queue;
-    struct gendisk        *rd_disk;
+    struct request_queue *rd_queue;
+    struct gendisk *rd_disk;
 
-    struct device        *dev;
-    phys_addr_t        mem_addr;
-    size_t            mem_size;
+    struct device *dev;
+    phys_addr_t mem_addr;
+    size_t mem_size;
 };
 
 static int rd_major;
@@ -43,8 +43,7 @@ static struct page *rd_lookup_page(struct rd_device *rd, sector_t sector)
 /*
  * Copy n bytes from src to the rd starting at sector. Does not sleep.
  */
-static void copy_to_rd(struct rd_device *rd, const void *src,
-               sector_t sector, size_t n)
+static void copy_to_rd(struct rd_device *rd, const void *src, sector_t sector, size_t n)
 {
     struct page *page;
     void *dst;
@@ -75,8 +74,7 @@ static void copy_to_rd(struct rd_device *rd, const void *src,
 /*
  * Copy n bytes to dst from the rd starting at sector. Does not sleep.
  */
-static void copy_from_rd(void *dst, struct rd_device *rd,
-             sector_t sector, size_t n)
+static void copy_from_rd(void *dst, struct rd_device *rd, sector_t sector, size_t n)
 {
     struct page *page;
     void *src;
@@ -111,9 +109,8 @@ static void copy_from_rd(void *dst, struct rd_device *rd,
 /*
  * Process a single bvec of a bio.
  */
-static int rd_do_bvec(struct rd_device *rd, struct page *page,
-              unsigned int len, unsigned int off, unsigned int op,
-              sector_t sector)
+static int rd_do_bvec(struct rd_device *rd, struct page *page, unsigned int len, unsigned int off, unsigned int op,
+                      sector_t sector)
 {
     void *mem;
 
@@ -138,17 +135,19 @@ static blk_qc_t rd_make_request(struct request_queue *q, struct bio *bio)
     struct bvec_iter iter;
 
     sector = bio->bi_iter.bi_sector;
-    if (bio_end_sector(bio) > get_capacity(bio->bi_disk))
+    if (bio_end_sector(bio) > get_capacity(bio->bi_disk)) {
         goto io_error;
+    }
 
-    bio_for_each_segment(bvec, bio, iter) {
+    bio_for_each_segment(bvec, bio, iter)
+    {
         unsigned int len = bvec.bv_len;
         int err;
 
-        err = rd_do_bvec(rd, bvec.bv_page, len, bvec.bv_offset,
-                 bio_op(bio), sector);
-        if (err)
+        err = rd_do_bvec(rd, bvec.bv_page, len, bvec.bv_offset, bio_op(bio), sector);
+        if (err) {
             goto io_error;
+        }
         sector += len >> SECTOR_SHIFT;
     }
 
@@ -159,22 +158,22 @@ io_error:
     return BLK_QC_T_NONE;
 }
 
-static int rd_rw_page(struct block_device *bdev, sector_t sector,
-              struct page *page, unsigned int op)
+static int rd_rw_page(struct block_device *bdev, sector_t sector, struct page *page, unsigned int op)
 {
     struct rd_device *rd = bdev->bd_disk->private_data;
     int err;
 
-    if (PageTransHuge(page))
+    if (PageTransHuge(page)) {
         return -ENOTSUPP;
+    }
     err = rd_do_bvec(rd, page, PAGE_SIZE, 0, op, sector);
     page_endio(page, op_is_write(op), err);
     return err;
 }
 
 static const struct block_device_operations rd_fops = {
-    .owner =    THIS_MODULE,
-    .rw_page =    rd_rw_page,
+    .owner = THIS_MODULE,
+    .rw_page = rd_rw_page,
 };
 
 static int rd_init(struct rd_device *rd, int major, int minor)
@@ -182,8 +181,9 @@ static int rd_init(struct rd_device *rd, int major, int minor)
     struct gendisk *disk;
 
     rd->rd_queue = blk_alloc_queue(GFP_KERNEL);
-    if (!rd->rd_queue)
+    if (!rd->rd_queue) {
         return -ENOMEM;
+    }
 
     blk_queue_make_request(rd->rd_queue, rd_make_request);
     blk_queue_max_hw_sectors(rd->rd_queue, 1024);
@@ -196,13 +196,14 @@ static int rd_init(struct rd_device *rd, int major, int minor)
      */
     blk_queue_physical_block_size(rd->rd_queue, PAGE_SIZE);
     disk = alloc_disk(1);
-    if (!disk)
+    if (!disk) {
         goto out_free_queue;
-    disk->major        = major;
-    disk->first_minor    = 0;
-    disk->fops        = &rd_fops;
-    disk->private_data    = rd;
-    disk->flags        = GENHD_FL_EXT_DEVT;
+    }
+    disk->major = major;
+    disk->first_minor = 0;
+    disk->fops = &rd_fops;
+    disk->private_data = rd;
+    disk->flags = GENHD_FL_EXT_DEVT;
     sprintf(disk->disk_name, "rd%d", minor);
     set_capacity(disk, rd->mem_size >> SECTOR_SHIFT);
     rd->rd_disk = disk;
@@ -231,8 +232,9 @@ static int rd_probe(struct platform_device *pdev)
     int ret;
 
     rd = devm_kzalloc(dev, sizeof(*rd), GFP_KERNEL);
-    if (!rd)
+    if (!rd) {
         return -ENOMEM;
+    }
 
     rd->dev = dev;
     node = of_parse_phandle(dev->of_node, "memory-region", 0);
@@ -257,15 +259,16 @@ static int rd_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id rd_dt_match[] = {
-    { .compatible = "rockchip,ramdisk" },
+    {.compatible = "rockchip,ramdisk"},
     {},
 };
 
 static struct platform_driver rd_driver = {
-    .driver        = {
-        .name    = "rd",
-        .of_match_table = rd_dt_match,
-    },
+    .driver =
+        {
+            .name = "rd",
+            .of_match_table = rd_dt_match,
+        },
     .probe = rd_probe,
 };
 
@@ -274,8 +277,9 @@ static int __init rd_driver_init(void)
     int ret;
 
     ret = register_blkdev(0, "rd");
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
     rd_major = ret;
 
     return platform_driver_register(&rd_driver);

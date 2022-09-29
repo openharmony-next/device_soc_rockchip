@@ -24,8 +24,7 @@
  * Backend specific configuration
  */
 
-#ifndef _KBASE_BACKEND_CONFIG_H_
-#define _KBASE_BACKEND_CONFIG_H_
+#ifndef KBASE_BACKEND_CONFIG_H
+#define KBASE_BACKEND_CONFIG_H
 
 #endif /* _KBASE_BACKEND_CONFIG_H_ */
-

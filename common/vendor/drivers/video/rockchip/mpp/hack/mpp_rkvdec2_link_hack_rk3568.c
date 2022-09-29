@@ -6,12 +6,12 @@
  *    Herman Chen <herman.chen@rock-chips.com>
  */
 
-#define FIX_RK3568_BUF_SIZE        (2 * PAGE_SIZE)
-#define RKDEC_HACK_DATA_RPS_OFFSET    (128 * 1)
-#define RKDEC_HACK_DATA_PPS_OFFSET    (128 * 2)
-#define RKDEC_HACK_DATA_RLC_OFFSET    (128 * 3)
-#define RKDEC_HACK_DATA_OUT_OFFSET    (128 * 4)
-#define RKDEC_HACK_DATA_COLMV_OFFSET    (128 * 5)
+#define FIX_RK3568_BUF_SIZE (2 * PAGE_SIZE)
+#define RKDEC_HACK_DATA_RPS_OFFSET (128 * 1)
+#define RKDEC_HACK_DATA_PPS_OFFSET (128 * 2)
+#define RKDEC_HACK_DATA_RLC_OFFSET (128 * 3)
+#define RKDEC_HACK_DATA_OUT_OFFSET (128 * 4)
+#define RKDEC_HACK_DATA_COLMV_OFFSET (128 * 5)
 
 static u32 rkvdec2_3568_hack_link[] = {
     0x00000000, /* 0x0020 */
@@ -192,22 +192,23 @@ void rkvdec2_link_hack_data_setup(struct mpp_dma_buffer *fix)
     u32 i;
 
     /* input stream */
-    rkvdec2_3568_hack_link[72] = iova;
+    rkvdec2_3568_hack_link[0x48] = iova;
     /* error info */
-    rkvdec2_3568_hack_link[73] = iova + RKDEC_HACK_DATA_RLC_OFFSET;
+    rkvdec2_3568_hack_link[0x49] = iova + RKDEC_HACK_DATA_RLC_OFFSET;
     /* output frame */
-    rkvdec2_3568_hack_link[74] = iova + RKDEC_HACK_DATA_OUT_OFFSET;
+    rkvdec2_3568_hack_link[0x4a] = iova + RKDEC_HACK_DATA_OUT_OFFSET;
     /* colmv out */
-    rkvdec2_3568_hack_link[75] = iova + 128 * 6;
+    rkvdec2_3568_hack_link[0x4b] = iova + 128 * 6;
     /* error ref */
-    rkvdec2_3568_hack_link[76] = iova + 128 * 4;
+    rkvdec2_3568_hack_link[0x4c] = iova + 128 * 4;
 
     /* rps in */
-    rkvdec2_3568_hack_link[89] = iova + RKDEC_HACK_DATA_PPS_OFFSET;
+    rkvdec2_3568_hack_link[0x59] = iova + RKDEC_HACK_DATA_PPS_OFFSET;
     /* pps in */
-    rkvdec2_3568_hack_link[91] = iova + RKDEC_HACK_DATA_RPS_OFFSET;
-    for (i = 0; i < 33; i++)
-        rkvdec2_3568_hack_link[92 + i] = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
+    rkvdec2_3568_hack_link[0x5b] = iova + RKDEC_HACK_DATA_RPS_OFFSET;
+    for (i = 0; i < 0x21; i++) {
+        rkvdec2_3568_hack_link[0x5c + i] = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
+    }
 
-    rkvdec2_3568_hack_link[125] = iova + PAGE_SIZE;
+    rkvdec2_3568_hack_link[0x7d] = iova + PAGE_SIZE;
 }

@@ -38,8 +38,8 @@
  *
  */
 
-#ifndef _KBASE_L2_MMU_CONFIG_H_
-#define _KBASE_L2_MMU_CONFIG_H_
+#ifndef KBASE_L2_MMU_CONFIG_H
+#define KBASE_L2_MMU_CONFIG_H
 /**
  * kbase_set_mmu_quirks - Set the hw_quirks_mmu field of kbdev
  *

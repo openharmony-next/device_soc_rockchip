@@ -55,20 +55,20 @@ enum drm_driver_feature {
      * Driver use the GEM memory manager. This should be set for all modern
      * drivers.
      */
-    DRIVER_GEM            = BIT(0),
+    DRIVER_GEM = BIT(0),
     /**
      * @DRIVER_MODESET:
      *
      * Driver supports mode setting interfaces (KMS).
      */
-    DRIVER_MODESET            = BIT(1),
+    DRIVER_MODESET = BIT(1),
     /**
      * @DRIVER_RENDER:
      *
      * Driver supports dedicated render nodes. See also the :ref:`section on
      * render nodes <drm_render_node>` for details.
      */
-    DRIVER_RENDER            = BIT(3),
+    DRIVER_RENDER = BIT(3),
     /**
      * @DRIVER_ATOMIC:
      *
@@ -78,21 +78,21 @@ enum drm_driver_feature {
      * multi-plane updates are not guaranteed to be tear-free) should not
      * set this flag.
      */
-    DRIVER_ATOMIC            = BIT(4),
+    DRIVER_ATOMIC = BIT(4),
     /**
      * @DRIVER_SYNCOBJ:
      *
      * Driver supports &drm_syncobj for explicit synchronization of command
      * submission.
      */
-    DRIVER_SYNCOBJ                  = BIT(5),
+    DRIVER_SYNCOBJ = BIT(5),
     /**
      * @DRIVER_SYNCOBJ_TIMELINE:
      *
      * Driver supports the timeline flavor of &drm_syncobj for explicit
      * synchronization of command submission.
      */
-    DRIVER_SYNCOBJ_TIMELINE         = BIT(6),
+    DRIVER_SYNCOBJ_TIMELINE = BIT(6),
 
     /* IMPORTANT: Below are all the legacy flags, add new ones above. */
 
@@ -102,20 +102,20 @@ enum drm_driver_feature {
      * Set up DRM AGP support, see drm_agp_init(), the DRM core will manage
      * AGP resources. New drivers don't need this.
      */
-    DRIVER_USE_AGP            = BIT(25),
+    DRIVER_USE_AGP = BIT(25),
     /**
      * @DRIVER_LEGACY:
      *
      * Denote a legacy driver using shadow attach. Do not use.
      */
-    DRIVER_LEGACY            = BIT(26),
+    DRIVER_LEGACY = BIT(26),
     /**
      * @DRIVER_PCI_DMA:
      *
      * Driver is capable of PCI DMA, mapping of PCI DMA buffers to userspace
      * will be enabled. Only for legacy drivers. Do not use.
      */
-    DRIVER_PCI_DMA            = BIT(27),
+    DRIVER_PCI_DMA = BIT(27),
     /**
      * @DRIVER_SG:
      *
@@ -123,7 +123,7 @@ enum drm_driver_feature {
      * scatter/gather buffers will be enabled. Only for legacy drivers. Do
      * not use.
      */
-    DRIVER_SG            = BIT(28),
+    DRIVER_SG = BIT(28),
 
     /**
      * @DRIVER_HAVE_DMA:
@@ -131,7 +131,7 @@ enum drm_driver_feature {
      * Driver supports DMA, the userspace DMA API will be supported. Only
      * for legacy drivers. Do not use.
      */
-    DRIVER_HAVE_DMA            = BIT(29),
+    DRIVER_HAVE_DMA = BIT(29),
     /**
      * @DRIVER_HAVE_IRQ:
      *
@@ -141,14 +141,14 @@ enum drm_driver_feature {
      * drm_irq_uninstall() helper functions, or roll their own irq support
      * code by calling request_irq() directly.
      */
-    DRIVER_HAVE_IRQ            = BIT(30),
+    DRIVER_HAVE_IRQ = BIT(30),
     /**
      * @DRIVER_KMS_LEGACY_CONTEXT:
      *
      * Used only by nouveau for backwards compatibility with existing
      * userspace.  Do not use.
      */
-    DRIVER_KMS_LEGACY_CONTEXT    = BIT(31),
+    DRIVER_KMS_LEGACY_CONTEXT = BIT(31),
 };
 
 /**
@@ -177,7 +177,7 @@ struct drm_driver {
      *
      * Zero on success, non-zero value on failure.
      */
-    int (*load) (struct drm_device *, unsigned long flags);
+    int (*load)(struct drm_device *, unsigned long flags);
 
     /**
      * @open:
@@ -197,7 +197,7 @@ struct drm_driver {
      * 0 on success, a negative error code on failure, which will be
      * promoted to userspace as the result of the open() system call.
      */
-    int (*open) (struct drm_device *, struct drm_file *);
+    int (*open)(struct drm_device *, struct drm_file *);
 
     /**
      * @postclose:
@@ -211,7 +211,7 @@ struct drm_driver {
      * there should never be a need to tear down any modeset related
      * resources in this callback. Doing so would be a driver design bug.
      */
-    void (*postclose) (struct drm_device *, struct drm_file *);
+    void (*postclose)(struct drm_device *, struct drm_file *);
 
     /**
      * @lastclose:
@@ -239,7 +239,7 @@ struct drm_driver {
      * Legacy drivers initialize the hardware in the @firstopen callback,
      * which isn't even called for modern drivers.
      */
-    void (*lastclose) (struct drm_device *);
+    void (*lastclose)(struct drm_device *);
 
     /**
      * @unload:
@@ -256,7 +256,7 @@ struct drm_driver {
      * the device.
      *
      */
-    void (*unload) (struct drm_device *);
+    void (*unload)(struct drm_device *);
 
     /**
      * @release:
@@ -268,7 +268,7 @@ struct drm_driver {
      * &drm_device using drmm_add_action(), drmm_kmalloc() and related
      * managed resources functions.
      */
-    void (*release) (struct drm_device *);
+    void (*release)(struct drm_device *);
 
     /**
      * @irq_handler:
@@ -276,7 +276,7 @@ struct drm_driver {
      * Interrupt handler called when using drm_irq_install(). Not used by
      * drivers which implement their own interrupt handling.
      */
-    irqreturn_t(*irq_handler) (int irq, void *arg);
+    irqreturn_t (*irq_handler)(int irq, void *arg);
 
     /**
      * @irq_preinstall:
@@ -286,7 +286,7 @@ struct drm_driver {
      * any pending interrupts (from e.g. firmware based drives) and reset
      * the interrupt handling registers.
      */
-    void (*irq_preinstall) (struct drm_device *dev);
+    void (*irq_preinstall)(struct drm_device *dev);
 
     /**
      * @irq_postinstall:
@@ -295,7 +295,7 @@ struct drm_driver {
      * the interrupt handler is registered. This should be used to enable
      * interrupt generation in the hardware.
      */
-    int (*irq_postinstall) (struct drm_device *dev);
+    int (*irq_postinstall)(struct drm_device *dev);
 
     /**
      * @irq_uninstall:
@@ -304,15 +304,14 @@ struct drm_driver {
      * the interrupt handler is unregistered. This should be used to disable
      * interrupt generation in the hardware.
      */
-    void (*irq_uninstall) (struct drm_device *dev);
+    void (*irq_uninstall)(struct drm_device *dev);
 
     /**
      * @master_set:
      *
      * Called whenever the minor master is set. Only used by vmwgfx.
      */
-    void (*master_set)(struct drm_device *dev, struct drm_file *file_priv,
-               bool from_open);
+    void (*master_set)(struct drm_device *dev, struct drm_file *file_priv, bool from_open);
     /**
      * @master_drop:
      *
@@ -333,7 +332,7 @@ struct drm_driver {
      * This is deprecated and should not be used by new drivers. Use
      * &drm_gem_object_funcs.free instead.
      */
-    void (*gem_free_object_unlocked) (struct drm_gem_object *obj);
+    void (*gem_free_object_unlocked)(struct drm_gem_object *obj);
 
     /**
      * @gem_open_object:
@@ -342,7 +341,7 @@ struct drm_driver {
      *
      * Driver hook called upon gem handle creation
      */
-    int (*gem_open_object) (struct drm_gem_object *, struct drm_file *);
+    int (*gem_open_object)(struct drm_gem_object *, struct drm_file *);
 
     /**
      * @gem_close_object:
@@ -351,7 +350,7 @@ struct drm_driver {
      *
      * Driver hook called upon gem handle release
      */
-    void (*gem_close_object) (struct drm_gem_object *, struct drm_file *);
+    void (*gem_close_object)(struct drm_gem_object *, struct drm_file *);
 
     /**
      * @gem_create_object: constructor for gem objects
@@ -359,8 +358,7 @@ struct drm_driver {
      * Hook for allocating the GEM object struct, for use by the CMA and
      * SHMEM GEM helpers.
      */
-    struct drm_gem_object *(*gem_create_object)(struct drm_device *dev,
-                            size_t size);
+    struct drm_gem_object *(*gem_create_object)(struct drm_device *dev, size_t size);
     /**
      * @prime_handle_to_fd:
      *
@@ -370,8 +368,8 @@ struct drm_driver {
      * For an in-depth discussion see :ref:`PRIME buffer sharing
      * documentation <prime_buffer_sharing>`.
      */
-    int (*prime_handle_to_fd)(struct drm_device *dev, struct drm_file *file_priv,
-                uint32_t handle, uint32_t flags, int *prime_fd);
+    int (*prime_handle_to_fd)(struct drm_device *dev, struct drm_file *file_priv, uint32_t handle, uint32_t flags,
+                              int *prime_fd);
     /**
      * @prime_fd_to_handle:
      *
@@ -381,16 +379,14 @@ struct drm_driver {
      * For an in-depth discussion see :ref:`PRIME buffer sharing
      * documentation <prime_buffer_sharing>`.
      */
-    int (*prime_fd_to_handle)(struct drm_device *dev, struct drm_file *file_priv,
-                int prime_fd, uint32_t *handle);
+    int (*prime_fd_to_handle)(struct drm_device *dev, struct drm_file *file_priv, int prime_fd, uint32_t *handle);
     /**
      * @gem_prime_export:
      *
      * Export hook for GEM drivers. Deprecated in favour of
      * &drm_gem_object_funcs.export.
      */
-    struct dma_buf * (*gem_prime_export)(struct drm_gem_object *obj,
-                         int flags);
+    struct dma_buf *(*gem_prime_export)(struct drm_gem_object *obj, int flags);
     /**
      * @gem_prime_import:
      *
@@ -398,8 +394,7 @@ struct drm_driver {
      *
      * This defaults to drm_gem_prime_import() if not set.
      */
-    struct drm_gem_object * (*gem_prime_import)(struct drm_device *dev,
-                struct dma_buf *dma_buf);
+    struct drm_gem_object *(*gem_prime_import)(struct drm_device *dev, struct dma_buf *dma_buf);
 
     /**
      * @gem_prime_pin:
@@ -415,7 +410,6 @@ struct drm_driver {
      */
     void (*gem_prime_unpin)(struct drm_gem_object *obj);
 
-
     /**
      * @gem_prime_get_sg_table:
      *
@@ -429,10 +423,8 @@ struct drm_driver {
      * Optional hook used by the PRIME helper functions
      * drm_gem_prime_import() respectively drm_gem_prime_import_dev().
      */
-    struct drm_gem_object *(*gem_prime_import_sg_table)(
-                struct drm_device *dev,
-                struct dma_buf_attachment *attach,
-                struct sg_table *sgt);
+    struct drm_gem_object *(*gem_prime_import_sg_table)(struct drm_device *dev, struct dma_buf_attachment *attach,
+                                                        struct sg_table *sgt);
     /**
      * @gem_prime_vmap:
      *
@@ -458,8 +450,7 @@ struct drm_driver {
      * FIXME: There's way too much duplication going on here, and also moved
      * to &drm_gem_object_funcs.
      */
-    int (*gem_prime_mmap)(struct drm_gem_object *obj,
-                struct vm_area_struct *vma);
+    int (*gem_prime_mmap)(struct drm_gem_object *obj, struct vm_area_struct *vma);
 
     /**
      * @gem_prime_get_uuid
@@ -467,8 +458,7 @@ struct drm_driver {
      * get_uuid hook for GEM drivers. Retrieves the virtio uuid of the
      * given GEM buffer.
      */
-    int (*gem_prime_get_uuid)(struct drm_gem_object *obj,
-                  uuid_t *uuid);
+    int (*gem_prime_get_uuid)(struct drm_gem_object *obj, uuid_t *uuid);
 
     /**
      * @dumb_create:
@@ -491,9 +481,7 @@ struct drm_driver {
      *
      * Zero on success, negative errno on failure.
      */
-    int (*dumb_create)(struct drm_file *file_priv,
-               struct drm_device *dev,
-               struct drm_mode_create_dumb *args);
+    int (*dumb_create)(struct drm_file *file_priv, struct drm_device *dev, struct drm_mode_create_dumb *args);
     /**
      * @dumb_map_offset:
      *
@@ -509,9 +497,7 @@ struct drm_driver {
      *
      * Zero on success, negative errno on failure.
      */
-    int (*dumb_map_offset)(struct drm_file *file_priv,
-                   struct drm_device *dev, uint32_t handle,
-                   uint64_t *offset);
+    int (*dumb_map_offset)(struct drm_file *file_priv, struct drm_device *dev, uint32_t handle, uint64_t *offset);
     /**
      * @dumb_destroy:
      *
@@ -528,9 +514,7 @@ struct drm_driver {
      *
      * Zero on success, negative errno on failure.
      */
-    int (*dumb_destroy)(struct drm_file *file_priv,
-                struct drm_device *dev,
-                uint32_t handle);
+    int (*dumb_destroy)(struct drm_file *file_priv, struct drm_device *dev, uint32_t handle);
 
     /**
      * @gem_vm_ops: Driver private ops for this object
@@ -587,19 +571,18 @@ struct drm_driver {
 
     /* List of devices hanging off this driver with stealth attach. */
     struct list_head legacy_dev_list;
-    int (*firstopen) (struct drm_device *);
-    void (*preclose) (struct drm_device *, struct drm_file *file_priv);
-    int (*dma_ioctl) (struct drm_device *dev, void *data, struct drm_file *file_priv);
-    int (*dma_quiescent) (struct drm_device *);
-    int (*context_dtor) (struct drm_device *dev, int context);
+    int (*firstopen)(struct drm_device *);
+    void (*preclose)(struct drm_device *, struct drm_file *file_priv);
+    int (*dma_ioctl)(struct drm_device *dev, void *data, struct drm_file *file_priv);
+    int (*dma_quiescent)(struct drm_device *);
+    int (*context_dtor)(struct drm_device *dev, int context);
     u32 (*get_vblank_counter)(struct drm_device *dev, unsigned int pipe);
     int (*enable_vblank)(struct drm_device *dev, unsigned int pipe);
     void (*disable_vblank)(struct drm_device *dev, unsigned int pipe);
     int dev_priv_size;
 };
 
-void *_devm_drm_dev_alloc(struct device *parent, struct drm_driver *driver,
-               size_t size, size_t offset);
+void *_devm_drm_dev_alloc(struct device *parent, struct drm_driver *driver, size_t size, size_t offset);
 
 /**
  * devm_drm_dev_alloc - Resource managed allocation of a &drm_device instance
@@ -627,12 +610,10 @@ void *_devm_drm_dev_alloc(struct device *parent, struct drm_driver *driver,
  * RETURNS:
  * Pointer to new DRM device, or ERR_PTR on failure.
  */
-#define devm_drm_dev_alloc(parent, driver, type, member) \
-    ((type *) _devm_drm_dev_alloc(parent, driver, sizeof(type), \
-                       offsetof(type, member)))
+#define devm_drm_dev_alloc(parent, driver, type, member)                                                               \
+    ((type *)_devm_drm_dev_alloc(parent, driver, sizeof(type), offsetof(type, member)))
 
-struct drm_device *drm_dev_alloc(struct drm_driver *driver,
-                 struct device *parent);
+struct drm_device *drm_dev_alloc(struct drm_driver *driver, struct device *parent);
 int drm_dev_register(struct drm_device *dev, unsigned long flags);
 void drm_dev_unregister(struct drm_device *dev);
 
@@ -679,8 +660,7 @@ static inline bool drm_dev_is_unplugged(struct drm_device *dev)
  * Returns true if all features in the @features mask are supported, false
  * otherwise.
  */
-static inline bool drm_core_check_all_features(const struct drm_device *dev,
-                           u32 features)
+static inline bool drm_core_check_all_features(const struct drm_device *dev, u32 features)
 {
     u32 supported = dev->driver->driver_features & dev->driver_features;
 
@@ -697,8 +677,7 @@ static inline bool drm_core_check_all_features(const struct drm_device *dev,
  *
  * Returns true if the @feature is supported, false otherwise.
  */
-static inline bool drm_core_check_feature(const struct drm_device *dev,
-                      enum drm_driver_feature feature)
+static inline bool drm_core_check_feature(const struct drm_device *dev, enum drm_driver_feature feature)
 {
     return drm_core_check_all_features(dev, feature);
 }
@@ -714,11 +693,9 @@ static inline bool drm_core_check_feature(const struct drm_device *dev,
 static inline bool drm_drv_uses_atomic_modeset(struct drm_device *dev)
 {
     return drm_core_check_feature(dev, DRIVER_ATOMIC) ||
-        (dev->mode_config.funcs && dev->mode_config.funcs->atomic_commit != NULL);
+           (dev->mode_config.funcs && dev->mode_config.funcs->atomic_commit != NULL);
 }
 
-
 int drm_dev_set_unique(struct drm_device *dev, const char *name);
-
 
 #endif

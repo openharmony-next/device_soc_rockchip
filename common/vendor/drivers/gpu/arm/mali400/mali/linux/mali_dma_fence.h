@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -47,7 +48,8 @@ struct mali_dma_fence_context {
     struct mali_dma_fence_waiter **mali_dma_fence_waiters;
     u32 num_dma_fence_waiter;
     atomic_t count;
-    void *pp_job_ptr; /* the mali pp job pointer */;
+    void *pp_job_ptr; /* the mali pp job pointer */
+    ;
     mali_dma_fence_context_callback_func_t cb_func;
 };
 
@@ -57,9 +59,9 @@ struct mali_dma_fence_context {
  * @return the new dma fence if success, or NULL on failure.
  */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-struct dma_fence *mali_dma_fence_new(u32  context, u32 seqno);
+struct dma_fence *mali_dma_fence_new(u32 context, u32 seqno);
 #else
-struct fence *mali_dma_fence_new(u32  context, u32 seqno);
+struct fence *mali_dma_fence_new(u32 context, u32 seqno);
 #endif
 /* Signal and put dma fence
  * @param fence The dma fence to signal and put
@@ -76,8 +78,7 @@ void mali_dma_fence_signal_and_put(struct fence **fence);
  * @param pp_job_ptr The pp_job to call function with.
  */
 void mali_dma_fence_context_init(struct mali_dma_fence_context *dma_fence_context,
-                 mali_dma_fence_context_callback_func_t  cb_func,
-                 void *pp_job_ptr);
+                                 mali_dma_fence_context_callback_func_t cb_func, void *pp_job_ptr);
 
 /**
  * Add new mali dma fence waiter into mali dma fence context
@@ -86,7 +87,7 @@ void mali_dma_fence_context_init(struct mali_dma_fence_context *dma_fence_contex
  * @return MALI_OSK_ERR_OK if success, or not.
  */
 mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_context *dma_fence_context,
-        struct reservation_object *dma_reservation_object);
+                                                      struct reservation_object *dma_reservation_object);
 
 /**
  * Release the dma fence context
@@ -107,18 +108,18 @@ void mali_dma_fence_context_dec_count(struct mali_dma_fence_context *dma_fence_c
  * @param num_dma_reservation_object The number of all reservation object
  */
 void mali_dma_fence_add_reservation_object_list(struct reservation_object *dma_reservation_object,
-        struct reservation_object **dma_reservation_object_list,
-        u32 *num_dma_reservation_object);
+                                                struct reservation_object **dma_reservation_object_list,
+                                                u32 *num_dma_reservation_object);
 
 /**
  * Wait/wound mutex lock to lock all reservation object.
  */
 int mali_dma_fence_lock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-        u32  num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
+                                                u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
 
 /**
  * Wait/wound mutex lock to unlock all reservation object.
  */
 void mali_dma_fence_unlock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-        u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
+                                                   u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx);
 #endif

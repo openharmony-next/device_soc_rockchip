@@ -54,37 +54,33 @@ void sync_file_debug_remove(struct sync_file *sync_file)
 
 static const char *sync_status_str(int status)
 {
-    if (status < 0)
+    if (status < 0) {
         return "error";
+    }
 
-    if (status > 0)
+    if (status > 0) {
         return "signaled";
+    }
 
     return "active";
 }
 
-static void sync_print_fence(struct seq_file *s,
-                 struct dma_fence *fence, bool show)
+static void sync_print_fence(struct seq_file *s, struct dma_fence *fence, bool show)
 {
     struct sync_timeline *parent = dma_fence_parent(fence);
     int status;
 
     status = dma_fence_get_status_locked(fence);
 
-    seq_printf(s, "  %s%sfence %s",
-           show ? parent->name : "",
-           show ? "_" : "",
-           sync_status_str(status));
+    seq_printf(s, "  %s%sfence %s", show ? parent->name : "", show ? "_" : "", sync_status_str(status));
 
     if (test_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags)) {
-        struct timespec64 ts64 =
-            ktime_to_timespec64(fence->timestamp);
+        struct timespec64 ts64 = ktime_to_timespec64(fence->timestamp);
 
         seq_printf(s, "@%lld.%09ld", (s64)ts64.tv_sec, ts64.tv_nsec);
     }
 
-    if (fence->ops->timeline_value_str &&
-        fence->ops->fence_value_str) {
+    if (fence->ops->timeline_value_str && fence->ops->fence_value_str) {
         char value[64];
         bool success;
 
@@ -94,11 +90,11 @@ static void sync_print_fence(struct seq_file *s,
         if (success) {
             seq_printf(s, ": %s", value);
 
-            fence->ops->timeline_value_str(fence, value,
-                               sizeof(value));
+            fence->ops->timeline_value_str(fence, value, sizeof(value));
 
-            if (strlen(value))
+            if (strlen(value)) {
                 seq_printf(s, " / %s", value);
+            }
         }
     }
 
@@ -112,28 +108,28 @@ static void sync_print_obj(struct seq_file *s, struct sync_timeline *obj)
     seq_printf(s, "%s: %d\n", obj->name, obj->value);
 
     spin_lock_irq(&obj->lock);
-    list_for_each(pos, &obj->pt_list) {
+    list_for_each(pos, &obj->pt_list)
+    {
         struct sync_pt *pt = container_of(pos, struct sync_pt, link);
         sync_print_fence(s, &pt->base, false);
     }
     spin_unlock_irq(&obj->lock);
 }
 
-static void sync_print_sync_file(struct seq_file *s,
-                  struct sync_file *sync_file)
+static void sync_print_sync_file(struct seq_file *s, struct sync_file *sync_file)
 {
     char buf[128];
     int i;
 
-    seq_printf(s, "[%p] %s: %s\n", sync_file,
-           sync_file_get_name(sync_file, buf, sizeof(buf)),
-           sync_status_str(dma_fence_get_status(sync_file->fence)));
+    seq_printf(s, "[%p] %s: %s\n", sync_file, sync_file_get_name(sync_file, buf, sizeof(buf)),
+               sync_status_str(dma_fence_get_status(sync_file->fence)));
 
     if (dma_fence_is_array(sync_file->fence)) {
         struct dma_fence_array *array = to_dma_fence_array(sync_file->fence);
 
-        for (i = 0; i < array->num_fences; ++i)
+        for (i = 0; i < array->num_fences; ++i) {
             sync_print_fence(s, array->fences[i], true);
+        }
     } else {
         sync_print_fence(s, sync_file->fence, true);
     }
@@ -146,10 +142,9 @@ static int sync_info_debugfs_show(struct seq_file *s, void *unused)
     seq_puts(s, "objs:\n--------------\n");
 
     spin_lock_irq(&sync_timeline_list_lock);
-    list_for_each(pos, &sync_timeline_list_head) {
-        struct sync_timeline *obj =
-            container_of(pos, struct sync_timeline,
-                     sync_timeline_list);
+    list_for_each(pos, &sync_timeline_list_head)
+    {
+        struct sync_timeline *obj = container_of(pos, struct sync_timeline, sync_timeline_list);
 
         sync_print_obj(s, obj);
         seq_putc(s, '\n');
@@ -159,9 +154,9 @@ static int sync_info_debugfs_show(struct seq_file *s, void *unused)
     seq_puts(s, "fences:\n--------------\n");
 
     spin_lock_irq(&sync_file_list_lock);
-    list_for_each(pos, &sync_file_list_head) {
-        struct sync_file *sync_file =
-            container_of(pos, struct sync_file, sync_file_list);
+    list_for_each(pos, &sync_file_list_head)
+    {
+        struct sync_file *sync_file = container_of(pos, struct sync_file, sync_file_list);
 
         sync_print_sync_file(s, sync_file);
         seq_putc(s, '\n');
@@ -181,10 +176,8 @@ static __init int sync_debugfs_init(void)
      * no need to protect it against removal races. The use of
      * debugfs_create_file_unsafe() is actually safe here.
      */
-    debugfs_create_file_unsafe("info", 0444, dbgfs, NULL,
-                   &sync_info_debugfs_fops);
-    debugfs_create_file_unsafe("sw_sync", 0644, dbgfs, NULL,
-                   &sw_sync_debugfs_fops);
+    debugfs_create_file_unsafe("info", 0444, dbgfs, NULL, &sync_info_debugfs_fops);
+    debugfs_create_file_unsafe("sw_sync", 0644, dbgfs, NULL, &sw_sync_debugfs_fops);
 
     return 0;
 }

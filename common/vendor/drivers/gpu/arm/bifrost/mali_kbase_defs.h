@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_defs.h
  *
@@ -29,8 +27,8 @@
  * allow the hierarchy of header files to work.
  */
 
-#ifndef _KBASE_DEFS_H_
-#define _KBASE_DEFS_H_
+#ifndef KBASE_DEFS_H_
+#define KBASE_DEFS_H_
 
 #include <mali_kbase_config.h>
 #include <mali_base_hwconfig_features.h>
@@ -75,15 +73,14 @@
 #include <linux/regulator/consumer.h>
 #include <linux/memory_group_manager.h>
 
-#if defined(CONFIG_PM_RUNTIME) || \
-    (defined(CONFIG_PM) && LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
+#if defined(CONFIG_PM_RUNTIME) || (defined(CONFIG_PM) && LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
 #define KBASE_PM_RUNTIME 1
 #endif
 
 #include "debug/mali_kbase_debug_ktrace_defs.h"
 
 /** Number of milliseconds before we time out on a GPU soft/hard reset */
-#define RESET_TIMEOUT           500
+#define RESET_TIMEOUT 500
 
 /**
  * The maximum number of Job Slots to support in the Hardware.
@@ -91,7 +88,7 @@
  * You can optimize this down if your target devices will only ever support a
  * small number of job slots.
  */
-#define BASE_JM_MAX_NR_SLOTS        3
+#define BASE_JM_MAX_NR_SLOTS 3
 
 /**
  * The maximum number of Address Spaces to support in the Hardware.
@@ -99,19 +96,19 @@
  * You can optimize this down if your target devices will only ever support a
  * small number of Address Spaces
  */
-#define BASE_MAX_NR_AS              16
+#define BASE_MAX_NR_AS 16
 
 /* mmu */
 #define MIDGARD_MMU_LEVEL(x) (x)
 
-#define MIDGARD_MMU_TOPLEVEL    MIDGARD_MMU_LEVEL(0)
+#define MIDGARD_MMU_TOPLEVEL MIDGARD_MMU_LEVEL(0)
 
 #define MIDGARD_MMU_BOTTOMLEVEL MIDGARD_MMU_LEVEL(3)
 
 #define GROWABLE_FLAGS_REQUIRED (KBASE_REG_PF_GROW | KBASE_REG_GPU_WR)
 
 /** setting in kbase_context::as_nr that indicates it's invalid */
-#define KBASEP_AS_NR_INVALID     (-1)
+#define KBASEP_AS_NR_INVALID (-1)
 
 /**
  * Maximum size in bytes of a MMU lock region, as a logarithm
@@ -128,8 +125,7 @@
 /* Maximum number of pages of memory that require a permanent mapping, per
  * kbase_context
  */
-#define KBASE_PERMANENTLY_MAPPED_MEM_LIMIT_PAGES ((32 * 1024ul * 1024ul) >> \
-                                PAGE_SHIFT)
+#define KBASE_PERMANENTLY_MAPPED_MEM_LIMIT_PAGES ((32 * 1024ul * 1024ul) >> PAGE_SHIFT)
 /* Minimum threshold period for hwcnt dumps between different hwcnt virtualizer
  * clients, to reduce undesired system load.
  * If a virtualizer client requests a dump within this threshold period after
@@ -143,8 +139,7 @@
  * This is dependent on support for of_property_read_u64_array() in the
  * kernel.
  */
-#if (KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE) || \
-            defined(LSK_OPPV2_BACKPORT)
+#if (KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE) || defined(LSK_OPPV2_BACKPORT)
 #define BASE_MAX_NR_CLOCKS_REGULATORS (2)
 #else
 #define BASE_MAX_NR_CLOCKS_REGULATORS (1)
@@ -223,9 +218,9 @@ struct kbase_device_info {
 };
 
 struct kbase_mmu_setup {
-    u64    transtab;
-    u64    memattr;
-    u64    transcfg;
+    u64 transtab;
+    u64 memattr;
+    u64 transcfg;
 };
 
 /**
@@ -275,14 +270,12 @@ struct kbase_mmu_table {
 #include "jm/mali_kbase_jm_defs.h"
 #endif
 
-static inline int kbase_as_has_bus_fault(struct kbase_as *as,
-    struct kbase_fault *fault)
+static inline int kbase_as_has_bus_fault(struct kbase_as *as, struct kbase_fault *fault)
 {
     return (fault == &as->bf_data);
 }
 
-static inline int kbase_as_has_page_fault(struct kbase_as *as,
-    struct kbase_fault *fault)
+static inline int kbase_as_has_page_fault(struct kbase_as *as, struct kbase_fault *fault)
 {
     return (fault == &as->pf_data);
 }
@@ -315,10 +308,8 @@ struct kbase_clk_rate_listener;
  * sleep. No clock rate manager functions must be called from here, as
  * its lock is taken.
  */
-typedef void (*kbase_clk_rate_listener_on_change_t)(
-    struct kbase_clk_rate_listener *listener,
-    u32 clk_index,
-    u32 clk_rate_hz);
+typedef void (*kbase_clk_rate_listener_on_change_t)(struct kbase_clk_rate_listener *listener, u32 clk_index,
+                                                    u32 clk_rate_hz);
 
 /**
  * struct kbase_clk_rate_listener - Clock frequency listener
@@ -399,7 +390,7 @@ struct kbase_pm_device_data {
      *
      * @return 0 on success, else error code
      */
-     int (*callback_power_runtime_init)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_init)(struct kbase_device *kbdev);
 
     /**
      * Callback for terminating the runtime power management.
@@ -451,13 +442,13 @@ struct kbase_pm_device_data {
  */
 struct kbase_mem_pool {
     struct kbase_device *kbdev;
-    size_t              cur_size;
-    size_t              max_size;
-    u8                  order;
-    u8                  group_id;
-    spinlock_t          pool_lock;
-    struct list_head    page_list;
-    struct shrinker     reclaim;
+    size_t cur_size;
+    size_t max_size;
+    u8 order;
+    u8 group_id;
+    spinlock_t pool_lock;
+    struct list_head page_list;
+    struct shrinker reclaim;
 
     struct kbase_mem_pool *next_pool;
 
@@ -547,17 +538,13 @@ struct kbase_devfreq_opp {
  * @flags:            bitmask of MMU mode flags. Refer to KBASE_MMU_MODE_ constants.
  */
 struct kbase_mmu_mode {
-    void (*update)(struct kbase_device *kbdev,
-            struct kbase_mmu_table *mmut,
-            int as_nr);
-    void (*get_as_setup)(struct kbase_mmu_table *mmut,
-            struct kbase_mmu_setup * const setup);
+    void (*update)(struct kbase_device *kbdev, struct kbase_mmu_table *mmut, int as_nr);
+    void (*get_as_setup)(struct kbase_mmu_table *mmut, struct kbase_mmu_setup *const setup);
     void (*disable_as)(struct kbase_device *kbdev, int as_nr);
     phys_addr_t (*pte_to_phy_addr)(u64 entry);
     int (*ate_is_valid)(u64 ate, int level);
     int (*pte_is_valid)(u64 pte, int level);
-    void (*entry_set_ate)(u64 *entry, struct tagged_addr phy,
-            unsigned long flags, int level);
+    void (*entry_set_ate)(u64 *entry, struct tagged_addr phy, unsigned long flags, int level);
     void (*entry_set_pte)(u64 *entry, phys_addr_t phy);
     void (*entry_invalidate)(u64 *entry);
     unsigned long flags;
@@ -566,7 +553,7 @@ struct kbase_mmu_mode {
 struct kbase_mmu_mode const *kbase_mmu_mode_get_lpae(void);
 struct kbase_mmu_mode const *kbase_mmu_mode_get_aarch64(void);
 
-#define DEVNAME_SIZE    16
+#define DEVNAME_SIZE 16
 
 /**
  * enum kbase_devfreq_work_type - The type of work to perform in the devfreq
@@ -575,11 +562,7 @@ struct kbase_mmu_mode const *kbase_mmu_mode_get_aarch64(void);
  * @DEVFREQ_WORK_SUSPEND: Call devfreq_suspend_device().
  * @DEVFREQ_WORK_RESUME:  Call devfreq_resume_device().
  */
-enum kbase_devfreq_work_type {
-    DEVFREQ_WORK_NONE,
-    DEVFREQ_WORK_SUSPEND,
-    DEVFREQ_WORK_RESUME
-};
+enum kbase_devfreq_work_type { DEVFREQ_WORK_NONE, DEVFREQ_WORK_SUSPEND, DEVFREQ_WORK_RESUME };
 
 /**
  * struct kbase_devfreq_queue_info - Object representing an instance for managing
@@ -914,7 +897,7 @@ struct kbase_device {
 #endif /* (KERNEL_VERSION(4, 10, 0) <= LINUX_VERSION_CODE */
 #endif /* CONFIG_REGULATOR */
     char devname[DEVNAME_SIZE];
-    u32  id;
+    u32 id;
 
 #ifdef CONFIG_MALI_BIFROST_NO_MALI
     void *model;
@@ -924,7 +907,7 @@ struct kbase_device {
     atomic_t serving_gpu_irq;
     atomic_t serving_mmu_irq;
     spinlock_t reg_op_lock;
-#endif    /* CONFIG_MALI_BIFROST_NO_MALI */
+#endif /* CONFIG_MALI_BIFROST_NO_MALI */
 
     struct kbase_pm_device_data pm;
 
@@ -969,7 +952,7 @@ struct kbase_device {
     struct kbase_hwcnt_virtualizer *hwcnt_gpu_virt;
     struct kbase_vinstr_context *vinstr_ctx;
 
-    atomic_t               timeline_flags;
+    atomic_t timeline_flags;
     struct kbase_timeline *timeline;
 
 #if KBASE_KTRACE_TARGET_RBUF
@@ -983,8 +966,8 @@ struct kbase_device {
 
     void *platform_context;
 
-    struct list_head        kctx_list;
-    struct mutex            kctx_list_lock;
+    struct list_head kctx_list;
+    struct mutex kctx_list_lock;
 
 #ifdef CONFIG_MALI_BIFROST_DEVFREQ
     struct devfreq_dev_profile devfreq_profile;
@@ -1066,7 +1049,6 @@ struct kbase_device {
 
     bool poweroff_pending;
 
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
     bool infinite_cache_active_default;
 #else
@@ -1144,8 +1126,8 @@ struct kbase_device {
     } dummy_job_wa;
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-        /* Pointer to the arbiter device */
-        struct kbase_arbiter_device arb;
+    /* Pointer to the arbiter device */
+    struct kbase_arbiter_device arb;
 #endif
 };
 
@@ -1192,11 +1174,11 @@ enum kbase_file_state {
  *                       the kbase_file_state enumeration.
  */
 struct kbase_file {
-    struct kbase_device  *kbdev;
-    struct file          *filp;
+    struct kbase_device *kbdev;
+    struct file *filp;
     struct kbase_context *kctx;
-    unsigned long         api_version;
-    atomic_t              setup_state;
+    unsigned long api_version;
+    atomic_t setup_state;
 };
 
 /**
@@ -1576,10 +1558,10 @@ struct kbase_context {
 
     struct tagged_addr aliasing_sink_page;
 
-    spinlock_t              mem_partials_lock;
-    struct list_head        mem_partials;
+    spinlock_t mem_partials_lock;
+    struct list_head mem_partials;
 
-    struct mutex            reg_lock;
+    struct mutex reg_lock;
 
     struct rb_root reg_rbtree_same;
     struct rb_root reg_rbtree_custom;
@@ -1589,8 +1571,7 @@ struct kbase_context {
     struct kbase_csf_context csf;
 #else
     struct kbase_jd_context jctx;
-    struct jsctx_queue jsctx_queue
-        [KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
+    struct jsctx_queue jsctx_queue[KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
 
     struct list_head completed_jobs;
     atomic_t work_count;
@@ -1598,8 +1579,7 @@ struct kbase_context {
 
     atomic_t atoms_pulled;
     atomic_t atoms_pulled_slot[BASE_JM_MAX_NR_SLOTS];
-    int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][
-            KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+    int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][KBASE_JS_ATOM_SCHED_PRIO_COUNT];
     int priority;
     bool blocked_js[BASE_JM_MAX_NR_SLOTS][KBASE_JS_ATOM_SCHED_PRIO_COUNT];
     s16 atoms_count[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
@@ -1619,8 +1599,8 @@ struct kbase_context {
 
     struct kbase_mem_pool_group mem_pools;
 
-    struct shrinker         reclaim;
-    struct list_head        evict_list;
+    struct shrinker reclaim;
+    struct list_head evict_list;
 
     struct list_head waiting_soft_jobs;
     spinlock_t waiting_soft_jobs_lock;
@@ -1635,7 +1615,7 @@ struct kbase_context {
 
     atomic_t refcount;
 
-    spinlock_t         mm_update_lock;
+    spinlock_t mm_update_lock;
     struct mm_struct __rcu *process_mm;
     u64 same_va_end;
     u64 exec_va_start;
@@ -1744,15 +1724,12 @@ struct kbase_ctx_ext_res_meta {
     u32 ref;
 };
 
-enum kbase_reg_access_type {
-    REG_READ,
-    REG_WRITE
-};
+enum kbase_reg_access_type { REG_READ, REG_WRITE };
 
 enum kbase_share_attr_bits {
     /* (1ULL << 8) bit is reserved */
-    SHARE_BOTH_BITS = (2ULL << 8),    /* inner and outer shareable coherency */
-    SHARE_INNER_BITS = (3ULL << 8)    /* inner shareable coherency */
+    SHARE_BOTH_BITS = (2ULL << 8), /* inner and outer shareable coherency */
+    SHARE_INNER_BITS = (3ULL << 8) /* inner shareable coherency */
 };
 
 /**
@@ -1763,21 +1740,21 @@ enum kbase_share_attr_bits {
  */
 static inline bool kbase_device_is_cpu_coherent(struct kbase_device *kbdev)
 {
-    if ((kbdev->system_coherency == COHERENCY_ACE_LITE) ||
-            (kbdev->system_coherency == COHERENCY_ACE))
+    if ((kbdev->system_coherency == COHERENCY_ACE_LITE) || (kbdev->system_coherency == COHERENCY_ACE)) {
         return true;
+    }
 
     return false;
 }
 
 /* Conversion helpers for setting up high resolution timers */
-#define HR_TIMER_DELAY_MSEC(x) (ns_to_ktime(((u64)(x))*1000000U))
+#define HR_TIMER_DELAY_MSEC(x) (ns_to_ktime(((u64)(x)) * 1000000U))
 #define HR_TIMER_DELAY_NSEC(x) (ns_to_ktime(x))
 
 /* Maximum number of loops polling the GPU for a cache flush before we assume it must have completed */
-#define KBASE_CLEAN_CACHE_MAX_LOOPS     100000
+#define KBASE_CLEAN_CACHE_MAX_LOOPS 100000
 /* Maximum number of loops polling the GPU for an AS command to complete before we assume the GPU has hung */
-#define KBASE_AS_INACTIVE_MAX_LOOPS     100000000
+#define KBASE_AS_INACTIVE_MAX_LOOPS 100000000
 
 /* JobDescriptorHeader - taken from the architecture specifications, the layout
  * is currently identical for all GPU archs. */
@@ -1804,4 +1781,4 @@ struct job_descriptor_header {
     } next_job;
 };
 
-#endif                /* _KBASE_DEFS_H_ */
+#endif /* _KBASE_DEFS_H_ */

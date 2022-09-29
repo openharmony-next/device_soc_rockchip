@@ -1,15 +1,16 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __MALI_HW_CORE_H__
-#define __MALI_HW_CORE_H__
+#ifndef H__MALI_HW_CORE_H__
+#define H__MALI_HW_CORE_H__
 
 #include "mali_osk.h"
 #include "mali_kernel_common.h"
@@ -48,25 +49,27 @@ MALI_STATIC_INLINE u32 mali_hw_core_register_read(struct mali_hw_core *core, u32
 {
     u32 read_val;
     read_val = _mali_osk_mem_ioread32(core->mapped_registers, relative_address);
-    MALI_DEBUG_PRINT(6, ("register_read for core %s, relative addr=0x%04X, val=0x%08X\n",
-                 core->description, relative_address, read_val));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE, ("register_read for core %s, relative addr=0x%04X, val=0x%08X\n",
+                                              core->description, relative_address, read_val));
     return read_val;
 }
 
-MALI_STATIC_INLINE void mali_hw_core_register_write_relaxed(struct mali_hw_core *core, u32 relative_address, u32 new_val)
+MALI_STATIC_INLINE void mali_hw_core_register_write_relaxed(struct mali_hw_core *core, u32 relative_address,
+                                                            u32 new_val)
 {
-    MALI_DEBUG_PRINT(6, ("register_write_relaxed for core %s, relative addr=0x%04X, val=0x%08X\n",
-                 core->description, relative_address, new_val));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE, ("register_write_relaxed for core %s, relative addr=0x%04X, val=0x%08X\n",
+                                              core->description, relative_address, new_val));
     _mali_osk_mem_iowrite32_relaxed(core->mapped_registers, relative_address, new_val);
 }
 
 /* Conditionally write a register.
  * The register will only be written if the new value is different from the old_value.
  * If the new value is different, the old value will also be updated */
-MALI_STATIC_INLINE void mali_hw_core_register_write_relaxed_conditional(struct mali_hw_core *core, u32 relative_address, u32 new_val, const u32 old_val)
+MALI_STATIC_INLINE void mali_hw_core_register_write_relaxed_conditional(struct mali_hw_core *core, u32 relative_address,
+                                                                        u32 new_val, const u32 old_val)
 {
-    MALI_DEBUG_PRINT(6, ("register_write_relaxed for core %s, relative addr=0x%04X, val=0x%08X\n",
-                 core->description, relative_address, new_val));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE, ("register_write_relaxed for core %s, relative addr=0x%04X, val=0x%08X\n",
+                                              core->description, relative_address, new_val));
     if (old_val != new_val) {
         _mali_osk_mem_iowrite32_relaxed(core->mapped_registers, relative_address, new_val);
     }
@@ -74,36 +77,41 @@ MALI_STATIC_INLINE void mali_hw_core_register_write_relaxed_conditional(struct m
 
 MALI_STATIC_INLINE void mali_hw_core_register_write(struct mali_hw_core *core, u32 relative_address, u32 new_val)
 {
-    MALI_DEBUG_PRINT(6, ("register_write for core %s, relative addr=0x%04X, val=0x%08X\n",
-                 core->description, relative_address, new_val));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE, ("register_write for core %s, relative addr=0x%04X, val=0x%08X\n",
+                                              core->description, relative_address, new_val));
     _mali_osk_mem_iowrite32(core->mapped_registers, relative_address, new_val);
 }
 
-MALI_STATIC_INLINE void mali_hw_core_register_write_array_relaxed(struct mali_hw_core *core, u32 relative_address, u32 *write_array, u32 nr_of_regs)
+MALI_STATIC_INLINE void mali_hw_core_register_write_array_relaxed(struct mali_hw_core *core, u32 relative_address,
+                                                                  u32 *write_array, u32 nr_of_regs)
 {
     u32 i;
-    MALI_DEBUG_PRINT(6, ("register_write_array: for core %s, relative addr=0x%04X, nr of regs=%u\n",
-                 core->description, relative_address, nr_of_regs));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE,
+                     ("register_write_array: for core %s, relative addr=0x%04X, nr of regs=%u\n", core->description,
+                      relative_address, nr_of_regs));
 
     /* Do not use burst writes against the registers */
     for (i = 0; i < nr_of_regs; i++) {
-        mali_hw_core_register_write_relaxed(core, relative_address + i * 4, write_array[i]);
+        mali_hw_core_register_write_relaxed(core, relative_address + i * 0X4, write_array[i]);
     }
 }
 
 /* Conditionally write a set of registers.
  * The register will only be written if the new value is different from the old_value.
  * If the new value is different, the old value will also be updated */
-MALI_STATIC_INLINE void mali_hw_core_register_write_array_relaxed_conditional(struct mali_hw_core *core, u32 relative_address, u32 *write_array, u32 nr_of_regs, const u32 *old_array)
+MALI_STATIC_INLINE void mali_hw_core_register_write_array_relaxed_conditional(struct mali_hw_core *core,
+                                                                              u32 relative_address, u32 *write_array,
+                                                                              u32 nr_of_regs, const u32 *old_array)
 {
     u32 i;
-    MALI_DEBUG_PRINT(6, ("register_write_array: for core %s, relative addr=0x%04X, nr of regs=%u\n",
-                 core->description, relative_address, nr_of_regs));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE,
+                     ("register_write_array: for core %s, relative addr=0x%04X, nr of regs=%u\n", core->description,
+                      relative_address, nr_of_regs));
 
     /* Do not use burst writes against the registers */
     for (i = 0; i < nr_of_regs; i++) {
         if (old_array[i] != write_array[i]) {
-            mali_hw_core_register_write_relaxed(core, relative_address + i * 4, write_array[i]);
+            mali_hw_core_register_write_relaxed(core, relative_address + i * 0x4, write_array[i]);
         }
     }
 }

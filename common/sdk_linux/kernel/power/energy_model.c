@@ -16,7 +16,7 @@
 #include <linux/sched/topology.h>
 #include <linux/slab.h>
 
-#define FILE_PROPERTY     0444
+#define FILE_PROPERTY 0444
 
 /*
  * Mutex serializing the registrations of performance domains and letting
@@ -73,16 +73,16 @@ static void em_debug_create_pd(struct device *dev)
     /* Create the directory of the performance domain */
     d = debugfs_create_dir(dev_name(dev), rootdir);
 
-    if (_is_cpu_device(dev))
-        debugfs_create_file("cpus", FILE_PROPERTY, d, dev->em_pd->cpus,
-                    &em_debug_cpus_fops);
+    if (_is_cpu_device(dev)) {
+        debugfs_create_file("cpus", FILE_PROPERTY, d, dev->em_pd->cpus, &em_debug_cpus_fops);
+    }
 
     debugfs_create_file("units", FILE_PROPERTY, d, dev->em_pd, &em_debug_units_fops);
 
     /* Create a sub-directory for each performance state */
-    for (i = 0; i < dev->em_pd->nr_perf_states; i++)
+    for (i = 0; i < dev->em_pd->nr_perf_states; i++) {
         em_debug_create_ps(&dev->em_pd->table[i], d);
-
+    }
 }
 
 static void em_debug_remove_pd(struct device *dev)
@@ -102,12 +102,16 @@ static int __init em_debug_init(void)
 }
 fs_initcall(em_debug_init);
 #else /* CONFIG_DEBUG_FS */
-static void em_debug_create_pd(struct device *dev) {}
-static void em_debug_remove_pd(struct device *dev) {}
+static void em_debug_create_pd(struct device *dev)
+{
+}
+static void em_debug_remove_pd(struct device *dev)
+{
+}
 #endif
 
-static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
-                int nr_states, struct em_data_callback *cb)
+static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd, int nr_states,
+                                struct em_data_callback *cb)
 {
     unsigned long opp_eff, prev_opp_eff = ULONG_MAX;
     unsigned long power, freq, prev_freq = 0;
@@ -116,8 +120,9 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
     u64 fmax;
 
     table = kcalloc(nr_states, sizeof(*table), GFP_KERNEL);
-    if (!table)
+    if (!table) {
         return -ENOMEM;
+    }
 
     /* Build the list of performance states for this performance domain */
     for (i = 0, freq = 0; i < nr_states; i++, freq++) {
@@ -128,8 +133,7 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
          */
         ret = cb->active_power(&power, &freq, dev);
         if (ret) {
-            dev_err(dev, "EM: invalid perf. state: %d\n",
-                ret);
+            dev_err(dev, "EM: invalid perf. state: %d\n", ret);
             goto free_ps_table;
         }
 
@@ -138,8 +142,7 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
          * higher performance states.
          */
         if (freq <= prev_freq) {
-            dev_err(dev, "EM: non-increasing freq: %lu\n",
-                freq);
+            dev_err(dev, "EM: non-increasing freq: %lu\n", freq);
             goto free_ps_table;
         }
 
@@ -148,8 +151,7 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
          * positive, in milli-watts and to fit into 16 bits.
          */
         if (!power || power > EM_MAX_POWER) {
-            dev_err(dev, "EM: invalid power: %lu\n",
-                power);
+            dev_err(dev, "EM: invalid power: %lu\n", power);
             goto free_ps_table;
         }
 
@@ -163,19 +165,19 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd,
          * power efficient than a lower one.
          */
         opp_eff = freq / power;
-        if (opp_eff >= prev_opp_eff)
-            dev_dbg(dev, "EM: hertz/watts ratio non-monotonically decreasing: em_perf_state %d >= em_perf_state%d\n",
-                    i, i - 1);
+        if (opp_eff >= prev_opp_eff) {
+            dev_dbg(dev, "EM: hertz/watts ratio non-monotonically decreasing: em_perf_state %d >= em_perf_state%d\n", i,
+                    i - 1);
+        }
         prev_opp_eff = opp_eff;
     }
 
     /* Compute the cost of each performance state. */
-    fmax = (u64) table[nr_states - 1].frequency;
+    fmax = (u64)table[nr_states - 1].frequency;
     for (i = 0; i < nr_states; i++) {
         unsigned long power_res = em_scale_power(table[i].power);
 
-        table[i].cost = div64_u64(fmax * power_res,
-                      table[i].frequency);
+        table[i].cost = div64_u64(fmax * power_res, table[i].frequency);
     }
 
     pd->table = table;
@@ -188,8 +190,7 @@ free_ps_table:
     return -EINVAL;
 }
 
-static int em_create_pd(struct device *dev, int nr_states,
-            struct em_data_callback *cb, cpumask_t *cpus)
+static int em_create_pd(struct device *dev, int nr_states, struct em_data_callback *cb, cpumask_t *cpus)
 {
     struct em_perf_domain *pd;
     struct device *cpu_dev;
@@ -197,14 +198,16 @@ static int em_create_pd(struct device *dev, int nr_states,
 
     if (_is_cpu_device(dev)) {
         pd = kzalloc(sizeof(*pd) + cpumask_size(), GFP_KERNEL);
-        if (!pd)
+        if (!pd) {
             return -ENOMEM;
+        }
 
         cpumask_copy(em_span_cpus(pd), cpus);
     } else {
         pd = kzalloc(sizeof(*pd), GFP_KERNEL);
-        if (!pd)
+        if (!pd) {
             return -ENOMEM;
+        }
     }
 
     ret = em_create_perf_table(dev, pd, nr_states, cb);
@@ -213,11 +216,13 @@ static int em_create_pd(struct device *dev, int nr_states,
         return ret;
     }
 
-    if (_is_cpu_device(dev))
-        for_each_cpu(cpu, cpus) {
+    if (_is_cpu_device(dev)) {
+        for_each_cpu(cpu, cpus)
+        {
             cpu_dev = get_cpu_device(cpu);
             cpu_dev->em_pd = pd;
         }
+    }
 
     dev->em_pd = pd;
 
@@ -233,8 +238,9 @@ static int em_create_pd(struct device *dev, int nr_states,
  */
 struct em_perf_domain *em_pd_get(struct device *dev)
 {
-    if (IS_ERR_OR_NULL(dev))
+    if (IS_ERR_OR_NULL(dev)) {
         return NULL;
+    }
 
     return dev->em_pd;
 }
@@ -252,8 +258,9 @@ struct em_perf_domain *em_cpu_get(int cpu)
     struct device *cpu_dev;
 
     cpu_dev = get_cpu_device(cpu);
-    if (!cpu_dev)
+    if (!cpu_dev) {
         return NULL;
+    }
 
     return em_pd_get(cpu_dev);
 }
@@ -282,15 +289,15 @@ EXPORT_SYMBOL_GPL(em_cpu_get);
  *
  * Return 0 on success
  */
-int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
-                struct em_data_callback *cb, cpumask_t *cpus,
-                bool milliwatts)
+int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states, struct em_data_callback *cb,
+                                cpumask_t *cpus, bool milliwatts)
 {
     unsigned long cap, prev_cap = 0;
     int cpu, ret;
 
-    if (!dev || !nr_states || !cb)
+    if (!dev || !nr_states || !cb) {
         return -EINVAL;
+    }
 
     /*
      * Use a mutex to serialize the registration of performance domains and
@@ -310,7 +317,8 @@ int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
             goto unlock;
         }
 
-        for_each_cpu(cpu, cpus) {
+        for_each_cpu(cpu, cpus)
+        {
             if (em_cpu_get(cpu)) {
                 dev_err(dev, "EM: exists for CPU%d\n", cpu);
                 ret = -EEXIST;
@@ -323,8 +331,7 @@ int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
              */
             cap = arch_scale_cpu_capacity(cpu);
             if (prev_cap && prev_cap != cap) {
-                dev_err(dev, "EM: CPUs of %*pbl must have the same capacity\n",
-                    cpumask_pr_args(cpus));
+                dev_err(dev, "EM: CPUs of %*pbl must have the same capacity\n", cpumask_pr_args(cpus));
 
                 ret = -EINVAL;
                 goto unlock;
@@ -334,8 +341,9 @@ int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
     }
 
     ret = em_create_pd(dev, nr_states, cb, cpus);
-    if (ret)
+    if (ret) {
         goto unlock;
+    }
 
     dev->em_pd->milliwatts = milliwatts;
 
@@ -356,11 +364,13 @@ EXPORT_SYMBOL_GPL(em_dev_register_perf_domain);
  */
 void em_dev_unregister_perf_domain(struct device *dev)
 {
-    if (IS_ERR_OR_NULL(dev) || !dev->em_pd)
+    if (IS_ERR_OR_NULL(dev) || !dev->em_pd) {
         return;
+    }
 
-    if (_is_cpu_device(dev))
+    if (_is_cpu_device(dev)) {
         return;
+    }
 
     /*
      * The mutex separates all register/unregister requests and protects

@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * Cache Policy API.
  */
@@ -43,25 +41,24 @@ u32 kbase_cache_enabled(u32 flags, u32 nr_pages)
 
     CSTD_UNUSED(nr_pages);
 
-    if (!(flags & BASE_MEM_UNCACHED_GPU))
+    if (!(flags & BASE_MEM_UNCACHED_GPU)) {
         cache_flags |= KBASE_REG_GPU_CACHED;
+    }
 
-    if (flags & BASE_MEM_CACHED_CPU)
+    if (flags & BASE_MEM_CACHED_CPU) {
         cache_flags |= KBASE_REG_CPU_CACHED;
+    }
 
     return cache_flags;
 }
 
-
-void kbase_sync_single_for_device(struct kbase_device *kbdev, dma_addr_t handle,
-        size_t size, enum dma_data_direction dir)
+void kbase_sync_single_for_device(struct kbase_device *kbdev, dma_addr_t handle, size_t size,
+                                  enum dma_data_direction dir)
 {
     dma_sync_single_for_device(kbdev->dev, handle, size, dir);
 }
 
-
-void kbase_sync_single_for_cpu(struct kbase_device *kbdev, dma_addr_t handle,
-        size_t size, enum dma_data_direction dir)
+void kbase_sync_single_for_cpu(struct kbase_device *kbdev, dma_addr_t handle, size_t size, enum dma_data_direction dir)
 {
     dma_sync_single_for_cpu(kbdev->dev, handle, size, dir);
 }

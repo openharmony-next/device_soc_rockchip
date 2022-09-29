@@ -13,15 +13,12 @@
  *
  */
 
-
-
-
 /*
  * Register-based HW access backend specific APIs
  */
 
-#ifndef _KBASE_HWACCESS_GPU_H_
-#define _KBASE_HWACCESS_GPU_H_
+#ifndef KBASE_HWACCESS_GPU_H_
+#define KBASE_HWACCESS_GPU_H_
 
 #include <backend/gpu/mali_kbase_pm_internal.h>
 
@@ -48,10 +45,8 @@ bool kbase_gpu_irq_evict(struct kbase_device *kbdev, int js);
  *                   completed
  * @end_timestamp:   Time of completion
  */
-void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js,
-                u32 completion_code,
-                u64 job_tail,
-                ktime_t *end_timestamp);
+void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js, u32 completion_code, u64 job_tail,
+                           ktime_t *end_timestamp);
 
 /**
  * kbase_gpu_inspect - Inspect the contents of the HW access ringbuffer
@@ -63,8 +58,7 @@ void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js,
  * Return:  The atom at that position in the ringbuffer
  *          or NULL if no atom present
  */
-struct kbase_jd_atom *kbase_gpu_inspect(struct kbase_device *kbdev, int js,
-                    int idx);
+struct kbase_jd_atom *kbase_gpu_inspect(struct kbase_device *kbdev, int js, int idx);
 
 /**
  * kbase_gpu_dump_slots - Print the contents of the slot ringbuffers

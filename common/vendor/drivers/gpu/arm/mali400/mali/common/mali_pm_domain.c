@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -15,8 +16,9 @@
 #include "mali_group.h"
 #include "mali_pm.h"
 
-static struct mali_pm_domain *mali_pm_domains[MALI_MAX_NUMBER_OF_DOMAINS] =
-{ NULL, };
+static struct mali_pm_domain *mali_pm_domains[MALI_MAX_NUMBER_OF_DOMAINS] = {
+    NULL,
+};
 
 void mali_pm_domain_initialize(void)
 {
@@ -40,14 +42,14 @@ struct mali_pm_domain *mali_pm_domain_create(u32 pmu_mask)
     u32 domain_id = 0;
 
     domain = mali_pm_domain_get_from_mask(pmu_mask);
-    if (NULL != domain) return domain;
+    if (NULL != domain) {
+        return domain;
+    }
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
-             ("Mali PM domain: Creating Mali PM domain (mask=0x%08X)\n",
-              pmu_mask));
+                     ("Mali PM domain: Creating Mali PM domain (mask=0x%08X)\n", pmu_mask));
 
-    domain = (struct mali_pm_domain *)mali_osk_malloc(
-             sizeof(struct mali_pm_domain));
+    domain = (struct mali_pm_domain *)mali_osk_malloc(sizeof(struct mali_pm_domain));
     if (NULL != domain) {
         domain->power_is_on = MALI_FALSE;
         domain->pmu_mask = pmu_mask;
@@ -82,8 +84,7 @@ void mali_pm_domain_delete(struct mali_pm_domain *domain)
     _mali_osk_free(domain);
 }
 
-void mali_pm_domain_add_group(struct mali_pm_domain *domain,
-                  struct mali_group *group)
+void mali_pm_domain_add_group(struct mali_pm_domain *domain, struct mali_group *group)
 {
     MALI_DEBUG_ASSERT_POINTER(domain);
     MALI_DEBUG_ASSERT_POINTER(group);
@@ -96,8 +97,7 @@ void mali_pm_domain_add_group(struct mali_pm_domain *domain,
     mali_osk_list_addtail(&group->pm_domain_list, &domain->group_list);
 }
 
-void mali_pm_domain_add_l2_cache(struct mali_pm_domain *domain,
-                 struct mali_l2_cache_core *l2_cache)
+void mali_pm_domain_add_l2_cache(struct mali_pm_domain *domain, struct mali_l2_cache_core *l2_cache)
 {
     MALI_DEBUG_ASSERT_POINTER(domain);
     MALI_DEBUG_ASSERT_POINTER(l2_cache);

@@ -1,14 +1,15 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <linux/fs.h>       /* file system operations */
-#include <linux/uaccess.h>  /* user space access */
+#include <linux/fs.h>      /* file system operations */
+#include <linux/uaccess.h> /* user space access */
 #include <linux/slab.h>
 
 #include "mali_ukk.h"
@@ -37,7 +38,8 @@ int profiling_add_event_wrapper(struct mali_session_data *session_data, mali_uk_
     return 0;
 }
 
-int profiling_report_sw_counters_wrapper(struct mali_session_data *session_data, mali_uk_sw_counters_report_s __user *uargs)
+int profiling_report_sw_counters_wrapper(struct mali_session_data *session_data,
+                                         mali_uk_sw_counters_report_s __user *uargs)
 {
     mali_uk_sw_counters_report_s kargs;
     mali_osk_errcode_t err;
@@ -82,7 +84,8 @@ int profiling_report_sw_counters_wrapper(struct mali_session_data *session_data,
     return 0;
 }
 
-int profiling_get_stream_fd_wrapper(struct mali_session_data *session_data, mali_uk_profiling_stream_fd_get_s __user *uargs)
+int profiling_get_stream_fd_wrapper(struct mali_session_data *session_data,
+                                    mali_uk_profiling_stream_fd_get_s __user *uargs)
 {
     mali_uk_profiling_stream_fd_get_s kargs;
     mali_osk_errcode_t err;
@@ -115,20 +118,25 @@ int profiling_control_set_wrapper(struct mali_session_data *session_data, mali_u
 
     MALI_CHECK_NON_NULL(uargs, -EINVAL);
 
-    if (0 != get_user(kargs.control_packet_size, &uargs->control_packet_size)) return -EFAULT;
-    if (0 != get_user(kargs.response_packet_size, &uargs->response_packet_size)) return -EFAULT;
+    if (0 != get_user(kargs.control_packet_size, &uargs->control_packet_size)) {
+        return -EFAULT;
+    }
+    if (0 != get_user(kargs.response_packet_size, &uargs->response_packet_size)) {
+        return -EFAULT;
+    }
 
     kargs.ctx = (uintptr_t)session_data;
 
-
     /* Sanity check about the size */
-    if (kargs.control_packet_size > PAGE_SIZE || kargs.response_packet_size > PAGE_SIZE)
+    if (kargs.control_packet_size > PAGE_SIZE || kargs.response_packet_size > PAGE_SIZE) {
         return -EINVAL;
+    }
 
-    if (0 !=  kargs.control_packet_size) {
+    if (0 != kargs.control_packet_size) {
 
-        if (0 == kargs.response_packet_size)
+        if (0 == kargs.response_packet_size) {
             return -EINVAL;
+        }
 
         kernel_control_data = mali_osk_calloc(1, kargs.control_packet_size);
         if (NULL == kernel_control_data) {
@@ -144,7 +152,8 @@ int profiling_control_set_wrapper(struct mali_session_data *session_data, mali_u
         kargs.control_packet_data = (uintptr_t)kernel_control_data;
         kargs.response_packet_data = (uintptr_t)kernel_response_data;
 
-        if (0 != copy_from_user((void *)(uintptr_t)kernel_control_data, (void *)(uintptr_t)uargs->control_packet_data, kargs.control_packet_size)) {
+        if (0 != copy_from_user((void *)(uintptr_t)kernel_control_data, (void *)(uintptr_t)uargs->control_packet_data,
+                                kargs.control_packet_size)) {
             _mali_osk_free(kernel_control_data);
             _mali_osk_free(kernel_response_data);
             return -EFAULT;
@@ -157,7 +166,9 @@ int profiling_control_set_wrapper(struct mali_session_data *session_data, mali_u
             return map_errcode(err);
         }
 
-        if (0 != kargs.response_packet_size && 0 != copy_to_user(((void *)(uintptr_t)uargs->response_packet_data), ((void *)(uintptr_t)kargs.response_packet_data), kargs.response_packet_size)) {
+        if (0 != kargs.response_packet_size &&
+            0 != copy_to_user(((void *)(uintptr_t)uargs->response_packet_data),
+                              ((void *)(uintptr_t)kargs.response_packet_data), kargs.response_packet_size)) {
             _mali_osk_free(kernel_control_data);
             _mali_osk_free(kernel_response_data);
             return -EFAULT;
@@ -177,7 +188,6 @@ int profiling_control_set_wrapper(struct mali_session_data *session_data, mali_u
         if (MALI_OSK_ERR_OK != err) {
             return map_errcode(err);
         }
-
     }
     return 0;
 }

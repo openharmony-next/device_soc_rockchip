@@ -18,8 +18,8 @@
 #include <linux/miscdevice.h>
 
 #define DW_HDCP_DRIVER_NAME "dw-hdmi-hdcp"
-#define HDCP_PRIVATE_KEY_SIZE   280
-#define HDCP_KEY_SHA_SIZE       20
+#define HDCP_PRIVATE_KEY_SIZE 280
+#define HDCP_KEY_SHA_SIZE 20
 
 struct hdcp_keys {
     u8 KSV[8];

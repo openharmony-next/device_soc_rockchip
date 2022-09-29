@@ -127,8 +127,7 @@ struct arbiter_if_vm_arb_ops {
      * @ops: The callbacks that the device driver supports
      *       (none are optional).
      */
-    int (*vm_arb_register_dev)(struct arbiter_if_dev *arbif_dev,
-        struct device *dev, struct arbiter_if_arb_vm_ops *ops);
+    int (*vm_arb_register_dev)(struct arbiter_if_dev *arbif_dev, struct device *dev, struct arbiter_if_arb_vm_ops *ops);
 
     /**
      * vm_arb_unregister_dev() - Unregister VM device driver callbacks.
@@ -160,8 +159,7 @@ struct arbiter_if_vm_arb_ops {
      * @arbif_dev: The arbiter interface device.
      * @gpu_required: The GPU is still needed to do more work.
      */
-    void (*vm_arb_gpu_stopped)(struct arbiter_if_dev *arbif_dev,
-        u8 gpu_required);
+    void (*vm_arb_gpu_stopped)(struct arbiter_if_dev *arbif_dev, u8 gpu_required);
 };
 
 /**

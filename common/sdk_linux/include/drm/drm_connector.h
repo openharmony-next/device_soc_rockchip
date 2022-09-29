@@ -334,27 +334,27 @@ struct drm_monitor_range_info {
  */
 
 /* For Default case, driver will set the colorspace */
-#define DRM_MODE_COLORIMETRY_DEFAULT            0
+#define DRM_MODE_COLORIMETRY_DEFAULT 0
 /* CEA 861 Normal Colorimetry options */
-#define DRM_MODE_COLORIMETRY_NO_DATA            0
-#define DRM_MODE_COLORIMETRY_SMPTE_170M_YCC        1
-#define DRM_MODE_COLORIMETRY_BT709_YCC            2
+#define DRM_MODE_COLORIMETRY_NO_DATA 0
+#define DRM_MODE_COLORIMETRY_SMPTE_170M_YCC 1
+#define DRM_MODE_COLORIMETRY_BT709_YCC 2
 /* CEA 861 Extended Colorimetry Options */
-#define DRM_MODE_COLORIMETRY_XVYCC_601            3
-#define DRM_MODE_COLORIMETRY_XVYCC_709            4
-#define DRM_MODE_COLORIMETRY_SYCC_601            5
-#define DRM_MODE_COLORIMETRY_OPYCC_601            6
-#define DRM_MODE_COLORIMETRY_OPRGB            7
-#define DRM_MODE_COLORIMETRY_BT2020_CYCC        8
-#define DRM_MODE_COLORIMETRY_BT2020_RGB            9
-#define DRM_MODE_COLORIMETRY_BT2020_YCC            10
+#define DRM_MODE_COLORIMETRY_XVYCC_601 3
+#define DRM_MODE_COLORIMETRY_XVYCC_709 4
+#define DRM_MODE_COLORIMETRY_SYCC_601 5
+#define DRM_MODE_COLORIMETRY_OPYCC_601 6
+#define DRM_MODE_COLORIMETRY_OPRGB 7
+#define DRM_MODE_COLORIMETRY_BT2020_CYCC 8
+#define DRM_MODE_COLORIMETRY_BT2020_RGB 9
+#define DRM_MODE_COLORIMETRY_BT2020_YCC 10
 /* Additional Colorimetry extension added as part of CTA 861.G */
-#define DRM_MODE_COLORIMETRY_DCI_P3_RGB_D65        11
-#define DRM_MODE_COLORIMETRY_DCI_P3_RGB_THEATER        12
+#define DRM_MODE_COLORIMETRY_DCI_P3_RGB_D65 11
+#define DRM_MODE_COLORIMETRY_DCI_P3_RGB_THEATER 12
 /* Additional Colorimetry Options added for DP 1.4a VSC Colorimetry Format */
-#define DRM_MODE_COLORIMETRY_RGB_WIDE_FIXED        13
-#define DRM_MODE_COLORIMETRY_RGB_WIDE_FLOAT        14
-#define DRM_MODE_COLORIMETRY_BT601_YCC            15
+#define DRM_MODE_COLORIMETRY_RGB_WIDE_FIXED 13
+#define DRM_MODE_COLORIMETRY_RGB_WIDE_FLOAT 14
+#define DRM_MODE_COLORIMETRY_BT601_YCC 15
 
 /**
  * enum drm_bus_flags - bus_flags info for &drm_display_info
@@ -408,14 +408,14 @@ enum drm_bus_flags {
      *
      * Data is sampled on the rising edge of the pixel clock
      */
-    DRM_BUS_FLAG_PIXDATA_SAMPLE_POSEDGE = DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE,
+    DRM_BUS_FLAG_PIXDATA_SAMPLE_POSEDGE = BIT(3),
 
     /**
      * @DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE:
      *
      * Data is sampled on the falling edge of the pixel clock
      */
-    DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE = DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE,
+    DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE = BIT(2),
 
     /**
      * @DRM_BUS_FLAG_DATA_MSB_TO_LSB:
@@ -450,14 +450,14 @@ enum drm_bus_flags {
      *
      * Sync signals are sampled on the rising edge of the pixel clock
      */
-    DRM_BUS_FLAG_SYNC_SAMPLE_POSEDGE = DRM_BUS_FLAG_SYNC_DRIVE_NEGEDGE,
+    DRM_BUS_FLAG_SYNC_SAMPLE_POSEDGE = BIT(7),
 
     /**
      * @DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE:
      *
      * Sync signals are sampled on the falling edge of the pixel clock
      */
-    DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE = DRM_BUS_FLAG_SYNC_DRIVE_POSEDGE,
+    DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE = BIT(6),
 
     /**
      * @DRM_BUS_FLAG_SHARP_SIGNALS:
@@ -499,10 +499,10 @@ struct drm_display_info {
      */
     enum subpixel_order subpixel_order;
 
-#define DRM_COLOR_FORMAT_RGB444        (1<<0)
-#define DRM_COLOR_FORMAT_YCRCB444    (1<<1)
-#define DRM_COLOR_FORMAT_YCRCB422    (1<<2)
-#define DRM_COLOR_FORMAT_YCRCB420    (1<<3)
+#define DRM_COLOR_FORMAT_RGB444 (1 << 0)
+#define DRM_COLOR_FORMAT_YCRCB444 (1 << 1)
+#define DRM_COLOR_FORMAT_YCRCB422 (1 << 2)
+#define DRM_COLOR_FORMAT_YCRCB420 (1 << 3)
 
     /**
      * @panel_orientation: Read only connector property for built-in panels,
@@ -596,9 +596,7 @@ struct drm_display_info {
     struct drm_monitor_range_info monitor_range;
 };
 
-int drm_display_info_set_bus_formats(struct drm_display_info *info,
-                     const u32 *formats,
-                     unsigned int num_formats);
+int drm_display_info_set_bus_formats(struct drm_display_info *info, const u32 *formats, unsigned int num_formats);
 
 /**
  * struct drm_connector_tv_margins - TV connector related margins
@@ -856,8 +854,7 @@ struct drm_connector_funcs {
      *
      * drm_connector_status indicating the connector's status.
      */
-    enum drm_connector_status (*detect)(struct drm_connector *connector,
-                        bool force);
+    enum drm_connector_status (*detect)(struct drm_connector *connector, bool force);
 
     /**
      * @force:
@@ -914,8 +911,7 @@ struct drm_connector_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*set_property)(struct drm_connector *connector, struct drm_property *property,
-                 uint64_t val);
+    int (*set_property)(struct drm_connector *connector, struct drm_property *property, uint64_t val);
 
     /**
      * @late_register:
@@ -999,8 +995,7 @@ struct drm_connector_funcs {
      *
      * This callback is mandatory for atomic drivers.
      */
-    void (*atomic_destroy_state)(struct drm_connector *connector,
-                     struct drm_connector_state *state);
+    void (*atomic_destroy_state)(struct drm_connector *connector, struct drm_connector_state *state);
 
     /**
      * @atomic_set_property:
@@ -1044,10 +1039,8 @@ struct drm_connector_funcs {
      * value is within the range (integer, valid enum value, ...) the driver
      * set when registering the property.
      */
-    int (*atomic_set_property)(struct drm_connector *connector,
-                   struct drm_connector_state *state,
-                   struct drm_property *property,
-                   uint64_t val);
+    int (*atomic_set_property)(struct drm_connector *connector, struct drm_connector_state *state,
+                               struct drm_property *property, uint64_t val);
 
     /**
      * @atomic_get_property:
@@ -1067,10 +1060,8 @@ struct drm_connector_funcs {
      * driver (which shouldn't ever happen, the core only asks for
      * properties attached to this connector).
      */
-    int (*atomic_get_property)(struct drm_connector *connector,
-                   const struct drm_connector_state *state,
-                   struct drm_property *property,
-                   uint64_t *val);
+    int (*atomic_get_property)(struct drm_connector *connector, const struct drm_connector_state *state,
+                               struct drm_property *property, uint64_t *val);
 
     /**
      * @atomic_print_state:
@@ -1081,8 +1072,7 @@ struct drm_connector_funcs {
      * Do not call this directly, use drm_atomic_connector_print_state()
      * instead.
      */
-    void (*atomic_print_state)(struct drm_printer *p,
-                   const struct drm_connector_state *state);
+    void (*atomic_print_state)(struct drm_printer *p, const struct drm_connector_state *state);
 };
 
 /**
@@ -1446,7 +1436,7 @@ struct drm_connector {
      */
     struct drm_encoder *encoder;
 
-#define MAX_ELD_BYTES    128
+#define MAX_ELD_BYTES 128
     /** @eld: EDID-like data, if present */
     uint8_t eld[MAX_ELD_BYTES];
     /** @latency_present: AV delay info from ELD, if found */
@@ -1563,20 +1553,14 @@ struct drm_connector {
 
 #define obj_to_connector(x) container_of(x, struct drm_connector, base)
 
-int drm_connector_init(struct drm_device *dev,
-               struct drm_connector *connector,
-               const struct drm_connector_funcs *funcs,
-               int connector_type);
-int drm_connector_init_with_ddc(struct drm_device *dev,
-                struct drm_connector *connector,
-                const struct drm_connector_funcs *funcs,
-                int connector_type,
-                struct i2c_adapter *ddc);
+int drm_connector_init(struct drm_device *dev, struct drm_connector *connector, const struct drm_connector_funcs *funcs,
+                       int connector_type);
+int drm_connector_init_with_ddc(struct drm_device *dev, struct drm_connector *connector,
+                                const struct drm_connector_funcs *funcs, int connector_type, struct i2c_adapter *ddc);
 void drm_connector_attach_edid_property(struct drm_connector *connector);
 int drm_connector_register(struct drm_connector *connector);
 void drm_connector_unregister(struct drm_connector *connector);
-int drm_connector_attach_encoder(struct drm_connector *connector,
-                      struct drm_encoder *encoder);
+int drm_connector_attach_encoder(struct drm_connector *connector, struct drm_encoder *encoder);
 
 void drm_connector_cleanup(struct drm_connector *connector);
 
@@ -1599,9 +1583,8 @@ static inline u32 drm_connector_mask(const struct drm_connector *connector)
  * This function looks up the connector object specified by id
  * add takes a reference to it.
  */
-static inline struct drm_connector *drm_connector_lookup(struct drm_device *dev,
-        struct drm_file *file_priv,
-        uint32_t id)
+static inline struct drm_connector *drm_connector_lookup(struct drm_device *dev, struct drm_file *file_priv,
+                                                         uint32_t id)
 {
     struct drm_mode_object *mo;
     mo = drm_mode_object_find(dev, file_priv, id, DRM_MODE_OBJECT_CONNECTOR);
@@ -1642,11 +1625,9 @@ static inline void drm_connector_put(struct drm_connector *connector)
  * True if the connector was unregistered, false if the connector is
  * registered or has not yet been registered with userspace.
  */
-static inline bool
-drm_connector_is_unregistered(struct drm_connector *connector)
+static inline bool drm_connector_is_unregistered(struct drm_connector *connector)
 {
-    return READ_ONCE(connector->registration_state) ==
-        DRM_CONNECTOR_UNREGISTERED;
+    return READ_ONCE(connector->registration_state) == DRM_CONNECTOR_UNREGISTERED;
 }
 
 void drm_connector_oob_hotplug_event(struct fwnode_handle *connector_fwnode);
@@ -1666,43 +1647,30 @@ int drm_mode_create_dvi_i_properties(struct drm_device *dev);
 void drm_connector_attach_dp_subconnector_property(struct drm_connector *connector);
 
 int drm_mode_create_tv_margin_properties(struct drm_device *dev);
-int drm_mode_create_tv_properties(struct drm_device *dev,
-                  unsigned int num_modes,
-                  const char * const modes[]);
+int drm_mode_create_tv_properties(struct drm_device *dev, unsigned int num_modes, const char *const modes[]);
 void drm_connector_attach_tv_margin_properties(struct drm_connector *conn);
 int drm_mode_create_scaling_mode_property(struct drm_device *dev);
 int drm_connector_attach_content_type_property(struct drm_connector *dev);
-int drm_connector_attach_scaling_mode_property(struct drm_connector *connector,
-                           u32 scaling_mode_mask);
-int drm_connector_attach_vrr_capable_property(
-        struct drm_connector *connector);
+int drm_connector_attach_scaling_mode_property(struct drm_connector *connector, u32 scaling_mode_mask);
+int drm_connector_attach_vrr_capable_property(struct drm_connector *connector);
 int drm_mode_create_aspect_ratio_property(struct drm_device *dev);
 int drm_mode_create_hdmi_colorspace_property(struct drm_connector *connector);
 int drm_mode_create_dp_colorspace_property(struct drm_connector *connector);
 int drm_mode_create_content_type_property(struct drm_device *dev);
 void drm_hdmi_avi_infoframe_content_type(struct hdmi_avi_infoframe *frame,
-                     const struct drm_connector_state *conn_state);
+                                         const struct drm_connector_state *conn_state);
 
 int drm_mode_create_suggested_offset_properties(struct drm_device *dev);
 
-int drm_connector_set_path_property(struct drm_connector *connector,
-                    const char *path);
+int drm_connector_set_path_property(struct drm_connector *connector, const char *path);
 int drm_connector_set_tile_property(struct drm_connector *connector);
-int drm_connector_update_edid_property(struct drm_connector *connector,
-                       const struct edid *edid);
-void drm_connector_set_link_status_property(struct drm_connector *connector,
-                        uint64_t link_status);
-void drm_connector_set_vrr_capable_property(
-        struct drm_connector *connector, bool capable);
-int drm_connector_set_panel_orientation(
-    struct drm_connector *connector,
-    enum drm_panel_orientation panel_orientation);
-int drm_connector_set_panel_orientation_with_quirk(
-    struct drm_connector *connector,
-    enum drm_panel_orientation panel_orientation,
-    int width, int height);
-int drm_connector_attach_max_bpc_property(struct drm_connector *connector,
-                      int min, int max);
+int drm_connector_update_edid_property(struct drm_connector *connector, const struct edid *edid);
+void drm_connector_set_link_status_property(struct drm_connector *connector, uint64_t link_status);
+void drm_connector_set_vrr_capable_property(struct drm_connector *connector, bool capable);
+int drm_connector_set_panel_orientation(struct drm_connector *connector, enum drm_panel_orientation panel_orientation);
+int drm_connector_set_panel_orientation_with_quirk(struct drm_connector *connector,
+                                                   enum drm_panel_orientation panel_orientation, int width, int height);
+int drm_connector_attach_max_bpc_property(struct drm_connector *connector, int min, int max);
 
 /**
  * struct drm_tile_group - Tile group metadata
@@ -1721,12 +1689,9 @@ struct drm_tile_group {
     u8 group_data[8];
 };
 
-struct drm_tile_group *drm_mode_create_tile_group(struct drm_device *dev,
-                          const char topology[8]);
-struct drm_tile_group *drm_mode_get_tile_group(struct drm_device *dev,
-                           const char topology[8]);
-void drm_mode_put_tile_group(struct drm_device *dev,
-                 struct drm_tile_group *tg);
+struct drm_tile_group *drm_mode_create_tile_group(struct drm_device *dev, const char topology[8]);
+struct drm_tile_group *drm_mode_get_tile_group(struct drm_device *dev, const char topology[8]);
+void drm_mode_put_tile_group(struct drm_device *dev, struct drm_tile_group *tg);
 
 /**
  * struct drm_connector_list_iter - connector_list iterator
@@ -1738,19 +1703,16 @@ void drm_mode_put_tile_group(struct drm_device *dev,
  * drm_for_each_connector_iter().
  */
 struct drm_connector_list_iter {
-/* private: */
+    /* private: */
     struct drm_device *dev;
     struct drm_connector *conn;
 };
 
-void drm_connector_list_iter_begin(struct drm_device *dev,
-                   struct drm_connector_list_iter *iter);
-struct drm_connector *
-drm_connector_list_iter_next(struct drm_connector_list_iter *iter);
+void drm_connector_list_iter_begin(struct drm_device *dev, struct drm_connector_list_iter *iter);
+struct drm_connector *drm_connector_list_iter_next(struct drm_connector_list_iter *iter);
 void drm_connector_list_iter_end(struct drm_connector_list_iter *iter);
 
-bool drm_connector_has_possible_encoder(struct drm_connector *connector,
-                    struct drm_encoder *encoder);
+bool drm_connector_has_possible_encoder(struct drm_connector *connector, struct drm_encoder *encoder);
 
 /**
  * drm_for_each_connector_iter - connector_list iterator macro
@@ -1761,16 +1723,14 @@ bool drm_connector_has_possible_encoder(struct drm_connector *connector,
  * @connector after calling drm_connector_list_iter_end() then you need to grab
  * your own reference first using drm_connector_get().
  */
-#define drm_for_each_connector_iter(connector, iter) \
-    while ((connector = drm_connector_list_iter_next(iter)))
+#define drm_for_each_connector_iter(connector, iter) while (((connector) = drm_connector_list_iter_next(iter)))
 
 /**
  * drm_connector_for_each_possible_encoder - iterate connector's possible encoders
  * @connector: &struct drm_connector pointer
  * @encoder: &struct drm_encoder pointer used as cursor
  */
-#define drm_connector_for_each_possible_encoder(connector, encoder) \
-    drm_for_each_encoder_mask(encoder, (connector)->dev, \
-                  (connector)->possible_encoders)
+#define drm_connector_for_each_possible_encoder(connector, encoder)                                                    \
+    drm_for_each_encoder_mask(encoder, (connector)->dev, (connector)->possible_encoders)
 
 #endif

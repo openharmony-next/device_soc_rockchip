@@ -13,7 +13,6 @@
  *
  */
 
-
 #include <linux/dma-mapping.h>
 #include <mali_kbase.h>
 #include <mali_kbase_10969_workaround.h>
@@ -28,7 +27,7 @@
 #define Y_COORDINATE_MASK 0x0FFF0000
 /* Max number of words needed from the fragment shader job descriptor */
 #define JOB_HEADER_SIZE_IN_WORDS 10
-#define JOB_HEADER_SIZE (JOB_HEADER_SIZE_IN_WORDS*sizeof(u32))
+#define JOB_HEADER_SIZE (JOB_HEADER_SIZE_IN_WORDS * sizeof(u32))
 
 /* Word 0: Status Word */
 #define JOB_DESC_STATUS_WORD 0
@@ -44,14 +43,14 @@
 int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
 {
     struct device *dev = katom->kctx->kbdev->dev;
-    u32   clamped = 0;
+    u32 clamped = 0;
     struct kbase_va_region *region;
     phys_addr_t *page_array;
     u64 page_index;
     u32 offset = katom->jc & (~PAGE_MASK);
     u32 *page_1 = NULL;
     u32 *page_2 = NULL;
-    u32   job_header[JOB_HEADER_SIZE_IN_WORDS];
+    u32 job_header[JOB_HEADER_SIZE_IN_WORDS];
     void *dst = job_header;
     u32 minX, minY, maxX, maxY;
     u32 restartX, restartY;
@@ -59,18 +58,20 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
     u32 copy_size;
 
     dev_warn(dev, "Called TILE_RANGE_FAULT workaround clamping function.\n");
-    if (!(katom->core_req & BASE_JD_REQ_FS))
+    if (!(katom->core_req & BASE_JD_REQ_FS)) {
         return 0;
+    }
 
     kbase_gpu_vm_lock(katom->kctx);
-    region = kbase_region_tracker_find_region_enclosing_address(katom->kctx,
-            katom->jc);
-    if (!region || (region->flags & KBASE_REG_FREE))
+    region = kbase_region_tracker_find_region_enclosing_address(katom->kctx, katom->jc);
+    if (!region || (region->flags & KBASE_REG_FREE)) {
         goto out_unlock;
+    }
 
     page_array = kbase_get_cpu_phy_pages(region);
-    if (!page_array)
+    if (!page_array) {
         goto out_unlock;
+    }
 
     page_index = (katom->jc >> PAGE_SHIFT) - region->start_pfn;
 
@@ -87,11 +88,9 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
     page_1 = kmap_atomic(p);
 
     /* page_1 is a u32 pointer, offset is expressed in bytes */
-    page_1 += offset>>2;
+    page_1 += offset >> 2;
 
-    kbase_sync_single_for_cpu(katom->kctx->kbdev,
-            kbase_dma_addr(p) + offset,
-            copy_size, DMA_BIDIRECTIONAL);
+    kbase_sync_single_for_cpu(katom->kctx->kbdev, kbase_dma_addr(p) + offset, copy_size, DMA_BIDIRECTIONAL);
 
     memcpy(dst, page_1, copy_size);
 
@@ -101,9 +100,8 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
         p = pfn_to_page(PFN_DOWN(page_array[page_index + 1]));
         page_2 = kmap_atomic(p);
 
-        kbase_sync_single_for_cpu(katom->kctx->kbdev,
-                kbase_dma_addr(p),
-                JOB_HEADER_SIZE - copy_size, DMA_BIDIRECTIONAL);
+        kbase_sync_single_for_cpu(katom->kctx->kbdev, kbase_dma_addr(p), JOB_HEADER_SIZE - copy_size,
+                                  DMA_BIDIRECTIONAL);
 
         memcpy(dst + copy_size, page_2, JOB_HEADER_SIZE - copy_size);
     }
@@ -117,49 +115,38 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
     restartX = job_header[JOB_DESC_FAULT_ADDR_LOW_WORD] & X_COORDINATE_MASK;
     restartY = job_header[JOB_DESC_FAULT_ADDR_LOW_WORD] & Y_COORDINATE_MASK;
 
-    dev_warn(dev, "Before Clamping:\n"
-            "Jobstatus: %08x\n"
-            "restartIdx: %08x\n"
-            "Fault_addr_low: %08x\n"
-            "minCoordsX: %08x minCoordsY: %08x\n"
-            "maxCoordsX: %08x maxCoordsY: %08x\n",
-            job_header[JOB_DESC_STATUS_WORD],
-            job_header[JOB_DESC_RESTART_INDEX_WORD],
-            job_header[JOB_DESC_FAULT_ADDR_LOW_WORD],
-            minX, minY,
-            maxX, maxY);
+    dev_warn(dev,
+             "Before Clamping:\n"
+             "Jobstatus: %08x\n"
+             "restartIdx: %08x\n"
+             "Fault_addr_low: %08x\n"
+             "minCoordsX: %08x minCoordsY: %08x\n"
+             "maxCoordsX: %08x maxCoordsY: %08x\n",
+             job_header[JOB_DESC_STATUS_WORD], job_header[JOB_DESC_RESTART_INDEX_WORD],
+             job_header[JOB_DESC_FAULT_ADDR_LOW_WORD], minX, minY, maxX, maxY);
 
     /* Set the restart index to the one which generated the fault*/
-    job_header[JOB_DESC_RESTART_INDEX_WORD] =
-            job_header[JOB_DESC_FAULT_ADDR_LOW_WORD];
+    job_header[JOB_DESC_RESTART_INDEX_WORD] = job_header[JOB_DESC_FAULT_ADDR_LOW_WORD];
 
     if (restartX < minX) {
         job_header[JOB_DESC_RESTART_INDEX_WORD] = (minX) | restartY;
-        dev_warn(dev,
-            "Clamping restart X index to minimum. %08x clamped to %08x\n",
-            restartX, minX);
-        clamped =  1;
+        dev_warn(dev, "Clamping restart X index to minimum. %08x clamped to %08x\n", restartX, minX);
+        clamped = 1;
     }
     if (restartY < minY) {
         job_header[JOB_DESC_RESTART_INDEX_WORD] = (minY) | restartX;
-        dev_warn(dev,
-            "Clamping restart Y index to minimum. %08x clamped to %08x\n",
-            restartY, minY);
-        clamped =  1;
+        dev_warn(dev, "Clamping restart Y index to minimum. %08x clamped to %08x\n", restartY, minY);
+        clamped = 1;
     }
     if (restartX > maxX) {
         job_header[JOB_DESC_RESTART_INDEX_WORD] = (maxX) | restartY;
-        dev_warn(dev,
-            "Clamping restart X index to maximum. %08x clamped to %08x\n",
-            restartX, maxX);
-        clamped =  1;
+        dev_warn(dev, "Clamping restart X index to maximum. %08x clamped to %08x\n", restartX, maxX);
+        clamped = 1;
     }
     if (restartY > maxY) {
         job_header[JOB_DESC_RESTART_INDEX_WORD] = (maxY) | restartX;
-        dev_warn(dev,
-            "Clamping restart Y index to maximum. %08x clamped to %08x\n",
-            restartY, maxY);
-        clamped =  1;
+        dev_warn(dev, "Clamping restart Y index to maximum. %08x clamped to %08x\n", restartY, maxY);
+        clamped = 1;
     }
 
     if (clamped) {
@@ -167,39 +154,33 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
          * and set the job status to STOPPED */
         job_header[JOB_DESC_FAULT_ADDR_LOW_WORD] = 0x0;
         job_header[JOB_DESC_STATUS_WORD] = BASE_JD_EVENT_STOPPED;
-        dev_warn(dev, "After Clamping:\n"
-                "Jobstatus: %08x\n"
-                "restartIdx: %08x\n"
-                "Fault_addr_low: %08x\n"
-                "minCoordsX: %08x minCoordsY: %08x\n"
-                "maxCoordsX: %08x maxCoordsY: %08x\n",
-                job_header[JOB_DESC_STATUS_WORD],
-                job_header[JOB_DESC_RESTART_INDEX_WORD],
-                job_header[JOB_DESC_FAULT_ADDR_LOW_WORD],
-                minX, minY,
-                maxX, maxY);
+        dev_warn(dev,
+                 "After Clamping:\n"
+                 "Jobstatus: %08x\n"
+                 "restartIdx: %08x\n"
+                 "Fault_addr_low: %08x\n"
+                 "minCoordsX: %08x minCoordsY: %08x\n"
+                 "maxCoordsX: %08x maxCoordsY: %08x\n",
+                 job_header[JOB_DESC_STATUS_WORD], job_header[JOB_DESC_RESTART_INDEX_WORD],
+                 job_header[JOB_DESC_FAULT_ADDR_LOW_WORD], minX, minY, maxX, maxY);
 
         /* Flush CPU cache to update memory for future GPU reads*/
         memcpy(page_1, dst, copy_size);
         p = pfn_to_page(PFN_DOWN(page_array[page_index]));
 
-        kbase_sync_single_for_device(katom->kctx->kbdev,
-                kbase_dma_addr(p) + offset,
-                copy_size, DMA_TO_DEVICE);
+        kbase_sync_single_for_device(katom->kctx->kbdev, kbase_dma_addr(p) + offset, copy_size, DMA_TO_DEVICE);
 
         if (copy_size < JOB_HEADER_SIZE) {
-            memcpy(page_2, dst + copy_size,
-                    JOB_HEADER_SIZE - copy_size);
+            memcpy(page_2, dst + copy_size, JOB_HEADER_SIZE - copy_size);
             p = pfn_to_page(PFN_DOWN(page_array[page_index + 1]));
 
-            kbase_sync_single_for_device(katom->kctx->kbdev,
-                    kbase_dma_addr(p),
-                    JOB_HEADER_SIZE - copy_size,
-                    DMA_TO_DEVICE);
+            kbase_sync_single_for_device(katom->kctx->kbdev, kbase_dma_addr(p), JOB_HEADER_SIZE - copy_size,
+                                         DMA_TO_DEVICE);
         }
     }
-    if (copy_size < JOB_HEADER_SIZE)
+    if (copy_size < JOB_HEADER_SIZE) {
         kunmap_atomic(page_2);
+    }
 
     kunmap_atomic(page_1);
 

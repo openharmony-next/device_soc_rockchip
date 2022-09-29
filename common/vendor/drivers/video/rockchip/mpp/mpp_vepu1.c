@@ -27,46 +27,44 @@
 #include "mpp_common.h"
 #include "mpp_iommu.h"
 
-#define VEPU1_DRIVER_NAME        "mpp_vepu1"
+#define VEPU1_DRIVER_NAME "mpp_vepu1"
 
-#define    VEPU1_SESSION_MAX_BUFFERS    20
+#define VEPU1_SESSION_MAX_BUFFERS 20
 /* The maximum registers number of all the version */
-#define VEPU1_REG_NUM            164
-#define VEPU1_REG_HW_ID_INDEX        0
-#define VEPU1_REG_START_INDEX        0
-#define VEPU1_REG_END_INDEX        163
+#define VEPU1_REG_NUM 164
+#define VEPU1_REG_HW_ID_INDEX 0
+#define VEPU1_REG_START_INDEX 0
+#define VEPU1_REG_END_INDEX 163
 
-#define VEPU1_REG_INT            0x004
-#define VEPU1_REG_INT_INDEX        (1)
-#define VEPU1_INT_SLICE            BIT(8)
-#define VEPU1_INT_TIMEOUT        BIT(6)
-#define VEPU1_INT_BUF_FULL        BIT(5)
-#define VEPU1_INT_RESET            BIT(4)
-#define VEPU1_INT_BUS_ERROR        BIT(3)
-#define VEPU1_INT_RDY            BIT(2)
-#define VEPU1_IRQ_DIS            BIT(1)
-#define VEPU1_INT_RAW            BIT(0)
+#define VEPU1_REG_INT 0x004
+#define VEPU1_REG_INT_INDEX (1)
+#define VEPU1_INT_SLICE BIT(8)
+#define VEPU1_INT_TIMEOUT BIT(6)
+#define VEPU1_INT_BUF_FULL BIT(5)
+#define VEPU1_INT_RESET BIT(4)
+#define VEPU1_INT_BUS_ERROR BIT(3)
+#define VEPU1_INT_RDY BIT(2)
+#define VEPU1_IRQ_DIS BIT(1)
+#define VEPU1_INT_RAW BIT(0)
 
-#define VEPU1_REG_ENC_EN        0x038
-#define VEPU1_REG_ENC_EN_INDEX        (14)
-#define VEPU1_INT_TIMEOUT_EN        BIT(31)
-#define VEPU1_INT_SLICE_EN        BIT(28)
-#define VEPU1_ENC_START            BIT(0)
+#define VEPU1_REG_ENC_EN 0x038
+#define VEPU1_REG_ENC_EN_INDEX (14)
+#define VEPU1_INT_TIMEOUT_EN BIT(31)
+#define VEPU1_INT_SLICE_EN BIT(28)
+#define VEPU1_ENC_START BIT(0)
 
-#define VEPU1_GET_FORMAT(x)        (((x) >> 1) & 0x3)
-#define VEPU1_FORMAT_MASK        (0x06)
+#define VEPU1_GET_FORMAT(x) (((x) >> 1) & 0x3)
+#define VEPU1_FORMAT_MASK (0x06)
 
-#define VEPU1_FMT_RESERVED        (0)
-#define VEPU1_FMT_VP8E            (1)
-#define VEPU1_FMT_JPEGE            (2)
-#define VEPU1_FMT_H264E            (3)
+#define VEPU1_FMT_RESERVED (0)
+#define VEPU1_FMT_VP8E (1)
+#define VEPU1_FMT_JPEGE (2)
+#define VEPU1_FMT_H264E (3)
 
-#define VEPU1_REG_CLR_CACHE_BASE    0xc10
+#define VEPU1_REG_CLR_CACHE_BASE 0xc10
 
-#define to_vepu_task(task)        \
-        container_of(task, struct vepu_task, mpp_task)
-#define to_vepu_dev(dev)        \
-        container_of(dev, struct vepu_dev, mpp)
+#define to_vepu_task(task) container_of(task, struct vepu_task, mpp_task)
+#define to_vepu_dev(dev) container_of(dev, struct vepu_dev, mpp)
 
 struct vepu_task {
     struct mpp_task mpp_task;
@@ -117,53 +115,49 @@ static struct mpp_hw_info vepu_v1_hw_info = {
 /*
  * file handle translate information
  */
-static const u16 trans_tbl_default[] = {
-    5, 6, 7, 8, 9, 10, 11, 12, 13, 51
-};
+static const u16 trans_tbl_default[] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 51};
 
-static const u16 trans_tbl_vp8e[] = {
-    5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 26, 51, 52, 58, 59, 71
-};
+static const u16 trans_tbl_vp8e[] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 26, 51, 52, 58, 59, 71};
 
 static struct mpp_trans_info trans_rk_vepu1[] = {
-    [VEPU1_FMT_RESERVED] = {
-        .count = 0,
-        .table = NULL,
-    },
-    [VEPU1_FMT_VP8E] = {
-        .count = ARRAY_SIZE(trans_tbl_vp8e),
-        .table = trans_tbl_vp8e,
-    },
-    [VEPU1_FMT_JPEGE] = {
-        .count = ARRAY_SIZE(trans_tbl_default),
-        .table = trans_tbl_default,
-    },
-    [VEPU1_FMT_H264E] = {
-        .count = ARRAY_SIZE(trans_tbl_default),
-        .table = trans_tbl_default,
-    },
+    [VEPU1_FMT_RESERVED] =
+        {
+            .count = 0,
+            .table = NULL,
+        },
+    [VEPU1_FMT_VP8E] =
+        {
+            .count = ARRAY_SIZE(trans_tbl_vp8e),
+            .table = trans_tbl_vp8e,
+        },
+    [VEPU1_FMT_JPEGE] =
+        {
+            .count = ARRAY_SIZE(trans_tbl_default),
+            .table = trans_tbl_default,
+        },
+    [VEPU1_FMT_H264E] =
+        {
+            .count = ARRAY_SIZE(trans_tbl_default),
+            .table = trans_tbl_default,
+        },
 };
 
-static int vepu_process_reg_fd(struct mpp_session *session,
-                   struct vepu_task *task,
-                   struct mpp_task_msgs *msgs)
+static int vepu_process_reg_fd(struct mpp_session *session, struct vepu_task *task, struct mpp_task_msgs *msgs)
 {
     int ret = 0;
     int fmt = VEPU1_GET_FORMAT(task->reg[VEPU1_REG_ENC_EN_INDEX]);
 
-    ret = mpp_translate_reg_address(session, &task->mpp_task,
-                    fmt, task->reg, &task->off_inf);
-    if (ret)
+    ret = mpp_translate_reg_address(session, &task->mpp_task, fmt, task->reg, &task->off_inf);
+    if (ret) {
         return ret;
+    }
 
-    mpp_translate_reg_offset_info(&task->mpp_task,
-                      &task->off_inf, task->reg);
+    mpp_translate_reg_offset_info(&task->mpp_task, &task->off_inf, task->reg);
 
     return 0;
 }
 
-static int vepu_extract_task_msg(struct vepu_task *task,
-                 struct mpp_task_msgs *msgs)
+static int vepu_extract_task_msg(struct vepu_task *task, struct mpp_task_msgs *msgs)
 {
     u32 i;
     int ret;
@@ -174,50 +168,46 @@ static int vepu_extract_task_msg(struct vepu_task *task,
         u32 off_s, off_e;
 
         req = &msgs->reqs[i];
-        if (!req->size)
+        if (!req->size) {
             continue;
+        }
 
         switch (req->cmd) {
-        case MPP_CMD_SET_REG_WRITE: {
-            off_s = hw_info->reg_start * sizeof(u32);
-            off_e = hw_info->reg_end * sizeof(u32);
-            ret = mpp_check_req(req, 0, sizeof(task->reg),
-                        off_s, off_e);
-            if (ret)
-                continue;
-            if (copy_from_user((u8 *)task->reg + req->offset,
-                       req->data, req->size)) {
-                mpp_err("copy_from_user reg failed\n");
-                return -EIO;
-            }
-            memcpy(&task->w_reqs[task->w_req_cnt++],
-                   req, sizeof(*req));
-        } break;
-        case MPP_CMD_SET_REG_READ: {
-            off_s = hw_info->reg_start * sizeof(u32);
-            off_e = hw_info->reg_end * sizeof(u32);
-            ret = mpp_check_req(req, 0, sizeof(task->reg),
-                        off_s, off_e);
-            if (ret)
-                continue;
-            memcpy(&task->r_reqs[task->r_req_cnt++],
-                   req, sizeof(*req));
-        } break;
-        case MPP_CMD_SET_REG_ADDR_OFFSET: {
-            mpp_extract_reg_offset_info(&task->off_inf, req);
-        } break;
-        default:
-            break;
+            case MPP_CMD_SET_REG_WRITE: {
+                off_s = hw_info->reg_start * sizeof(u32);
+                off_e = hw_info->reg_end * sizeof(u32);
+                ret = mpp_check_req(req, 0, sizeof(task->reg), off_s, off_e);
+                if (ret) {
+                    continue;
+                }
+                if (copy_from_user((u8 *)task->reg + req->offset, req->data, req->size)) {
+                    mpp_err("copy_from_user reg failed\n");
+                    return -EIO;
+                }
+                memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
+            } break;
+            case MPP_CMD_SET_REG_READ: {
+                off_s = hw_info->reg_start * sizeof(u32);
+                off_e = hw_info->reg_end * sizeof(u32);
+                ret = mpp_check_req(req, 0, sizeof(task->reg), off_s, off_e);
+                if (ret) {
+                    continue;
+                }
+                memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
+            } break;
+            case MPP_CMD_SET_REG_ADDR_OFFSET: {
+                mpp_extract_reg_offset_info(&task->off_inf, req);
+            } break;
+            default:
+                break;
         }
     }
-    mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n",
-          task->w_req_cnt, task->r_req_cnt);
+    mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n", task->w_req_cnt, task->r_req_cnt);
 
     return 0;
 }
 
-static void *vepu_alloc_task(struct mpp_session *session,
-                 struct mpp_task_msgs *msgs)
+static void *vepu_alloc_task(struct mpp_session *session, struct mpp_task_msgs *msgs)
 {
     int ret;
     struct mpp_task *mpp_task = NULL;
@@ -227,8 +217,9 @@ static void *vepu_alloc_task(struct mpp_session *session,
     mpp_debug_enter();
 
     task = kzalloc(sizeof(*task), GFP_KERNEL);
-    if (!task)
+    if (!task) {
         return NULL;
+    }
 
     mpp_task = &task->mpp_task;
     mpp_task_init(session, mpp_task);
@@ -236,13 +227,15 @@ static void *vepu_alloc_task(struct mpp_session *session,
     mpp_task->reg = task->reg;
     /* extract reqs for current task */
     ret = vepu_extract_task_msg(task, msgs);
-    if (ret)
+    if (ret) {
         goto fail;
+    }
     /* process fd in register */
     if (!(msgs->flags & MPP_FLAGS_REG_FD_NO_TRANS)) {
         ret = vepu_process_reg_fd(session, task, msgs);
-        if (ret)
+        if (ret) {
             goto fail;
+        }
     }
     task->clk_mode = CLK_MODE_NORMAL;
 
@@ -258,8 +251,7 @@ fail:
     return NULL;
 }
 
-static int vepu_run(struct mpp_dev *mpp,
-            struct mpp_task *mpp_task)
+static int vepu_run(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     u32 i;
     u32 reg_en;
@@ -272,8 +264,7 @@ static int vepu_run(struct mpp_dev *mpp,
     /* set registers for hardware */
     reg_en = mpp_task->hw_info->reg_en;
     /* First, flush correct encoder format */
-    mpp_write_relaxed(mpp, VEPU1_REG_ENC_EN,
-              task->reg[reg_en] & VEPU1_FORMAT_MASK);
+    mpp_write_relaxed(mpp, VEPU1_REG_ENC_EN, task->reg[reg_en] & VEPU1_FORMAT_MASK);
     /* Second, flush others register */
     for (i = 0; i < task->w_req_cnt; i++) {
         struct mpp_request *req = &task->w_reqs[i];
@@ -286,8 +277,7 @@ static int vepu_run(struct mpp_dev *mpp,
     mpp->cur_task = mpp_task;
     /* Last, flush start registers */
     wmb();
-    mpp_write(mpp, VEPU1_REG_ENC_EN,
-          task->reg[reg_en] | VEPU1_ENC_START);
+    mpp_write(mpp, VEPU1_REG_ENC_EN, task->reg[reg_en] | VEPU1_ENC_START);
 
     mpp_debug_leave();
 
@@ -297,8 +287,9 @@ static int vepu_run(struct mpp_dev *mpp,
 static int vepu_irq(struct mpp_dev *mpp)
 {
     mpp->irq_status = mpp_read(mpp, VEPU1_REG_INT);
-    if (!(mpp->irq_status & VEPU1_INT_RAW))
+    if (!(mpp->irq_status & VEPU1_INT_RAW)) {
         return IRQ_NONE;
+    }
 
     mpp_write(mpp, VEPU1_REG_INT, 0);
 
@@ -320,15 +311,13 @@ static int vepu_isr(struct mpp_dev *mpp)
     mpp->cur_task = NULL;
     task = to_vepu_task(mpp_task);
     task->irq_status = mpp->irq_status;
-    mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n",
-          task->irq_status);
+    mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n", task->irq_status);
 
-    err_mask = VEPU1_INT_TIMEOUT
-        | VEPU1_INT_BUF_FULL
-        | VEPU1_INT_BUS_ERROR;
+    err_mask = VEPU1_INT_TIMEOUT | VEPU1_INT_BUF_FULL | VEPU1_INT_BUS_ERROR;
 
-    if (err_mask & task->irq_status)
+    if (err_mask & task->irq_status) {
         atomic_inc(&mpp->reset_request);
+    }
 
     mpp_task_finish(mpp_task->session, mpp_task);
 
@@ -336,8 +325,7 @@ static int vepu_isr(struct mpp_dev *mpp)
     return IRQ_HANDLED;
 }
 
-static int vepu_finish(struct mpp_dev *mpp,
-               struct mpp_task *mpp_task)
+static int vepu_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     u32 i;
     u32 s, e;
@@ -361,9 +349,7 @@ static int vepu_finish(struct mpp_dev *mpp,
     return 0;
 }
 
-static int vepu_result(struct mpp_dev *mpp,
-               struct mpp_task *mpp_task,
-               struct mpp_task_msgs *msgs)
+static int vepu_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct mpp_task_msgs *msgs)
 {
     u32 i;
     struct mpp_request *req;
@@ -373,9 +359,7 @@ static int vepu_result(struct mpp_dev *mpp,
     for (i = 0; i < task->r_req_cnt; i++) {
         req = &task->r_reqs[i];
 
-        if (copy_to_user(req->data,
-                 (u8 *)task->reg + req->offset,
-                 req->size)) {
+        if (copy_to_user(req->data, (u8 *)task->reg + req->offset, req->size)) {
             mpp_err("copy_to_user reg fail\n");
             return -EIO;
         }
@@ -383,8 +367,7 @@ static int vepu_result(struct mpp_dev *mpp,
     return 0;
 }
 
-static int vepu_free_task(struct mpp_session *session,
-              struct mpp_task *mpp_task)
+static int vepu_free_task(struct mpp_session *session, struct mpp_task *mpp_task)
 {
     struct vepu_task *task = to_vepu_task(mpp_task);
 
@@ -397,42 +380,41 @@ static int vepu_free_task(struct mpp_session *session,
 static int vepu_control(struct mpp_session *session, struct mpp_request *req)
 {
     switch (req->cmd) {
-    case MPP_CMD_SEND_CODEC_INFO: {
-        int i;
-        int cnt;
-        struct codec_info_elem elem;
-        struct vepu_session_priv *priv;
+        case MPP_CMD_SEND_CODEC_INFO: {
+            int i;
+            int cnt;
+            struct codec_info_elem elem;
+            struct vepu_session_priv *priv;
 
-        if (!session || !session->priv) {
-            mpp_err("session info null\n");
-            return -EINVAL;
-        }
-        priv = session->priv;
+            if (!session || !session->priv) {
+                mpp_err("session info null\n");
+                return -EINVAL;
+            }
+            priv = session->priv;
 
-        cnt = req->size / sizeof(elem);
-        cnt = (cnt > ENC_INFO_BUTT) ? ENC_INFO_BUTT : cnt;
-        mpp_debug(DEBUG_IOCTL, "codec info count %d\n", cnt);
-        down_write(&priv->rw_sem);
-        for (i = 0; i < cnt; i++) {
-            if (copy_from_user(&elem, req->data + i * sizeof(elem), sizeof(elem))) {
-                mpp_err("copy_from_user failed\n");
-                continue;
+            cnt = req->size / sizeof(elem);
+            cnt = (cnt > ENC_INFO_BUTT) ? ENC_INFO_BUTT : cnt;
+            mpp_debug(DEBUG_IOCTL, "codec info count %d\n", cnt);
+            down_write(&priv->rw_sem);
+            for (i = 0; i < cnt; i++) {
+                if (copy_from_user(&elem, req->data + i * sizeof(elem), sizeof(elem))) {
+                    mpp_err("copy_from_user failed\n");
+                    continue;
+                }
+                if (elem.type > ENC_INFO_BASE && elem.type < ENC_INFO_BUTT && elem.flag > CODEC_INFO_FLAG_NULL &&
+                    elem.flag < CODEC_INFO_FLAG_BUTT) {
+                    elem.type = array_index_nospec(elem.type, ENC_INFO_BUTT);
+                    priv->codec_info[elem.type].flag = elem.flag;
+                    priv->codec_info[elem.type].val = elem.data;
+                } else {
+                    mpp_err("codec info invalid, type %d, flag %d\n", elem.type, elem.flag);
+                }
             }
-            if (elem.type > ENC_INFO_BASE && elem.type < ENC_INFO_BUTT &&
-                elem.flag > CODEC_INFO_FLAG_NULL && elem.flag < CODEC_INFO_FLAG_BUTT) {
-                elem.type = array_index_nospec(elem.type, ENC_INFO_BUTT);
-                priv->codec_info[elem.type].flag = elem.flag;
-                priv->codec_info[elem.type].val = elem.data;
-            } else {
-                mpp_err("codec info invalid, type %d, flag %d\n",
-                    elem.type, elem.flag);
-            }
-        }
-        up_write(&priv->rw_sem);
-    } break;
-    default: {
-        mpp_err("unknown mpp ioctl cmd %x\n", req->cmd);
-    } break;
+            up_write(&priv->rw_sem);
+        } break;
+        default: {
+            mpp_err("unknown mpp ioctl cmd %x\n", req->cmd);
+        } break;
     }
 
     return 0;
@@ -458,8 +440,9 @@ static int vepu_init_session(struct mpp_session *session)
     }
 
     priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-    if (!priv)
+    if (!priv) {
         return -ENOMEM;
+    }
 
     init_rwsem(&priv->rw_sem);
     session->priv = priv;
@@ -494,8 +477,9 @@ static int vepu_dump_session(struct mpp_session *session, struct seq_file *seq)
     for (i = ENC_INFO_BASE; i < ENC_INFO_BUTT; i++) {
         bool show = priv->codec_info[i].flag;
 
-        if (show)
+        if (show) {
             seq_printf(seq, "%8s|", enc_info_item_name[i]);
+        }
     }
     seq_puts(seq, "\n");
     /* item data*/
@@ -504,8 +488,9 @@ static int vepu_dump_session(struct mpp_session *session, struct seq_file *seq)
     for (i = ENC_INFO_BASE; i < ENC_INFO_BUTT; i++) {
         u32 flag = priv->codec_info[i].flag;
 
-        if (!flag)
+        if (!flag) {
             continue;
+        }
         if (flag == CODEC_INFO_FLAG_NUMBER) {
             u32 data = priv->codec_info[i].val;
 
@@ -530,15 +515,17 @@ static int vepu_show_session_info(struct seq_file *seq, void *offset)
     struct mpp_dev *mpp = seq->private;
 
     mutex_lock(&mpp->srv->session_lock);
-    list_for_each_entry_safe(session, n,
-                 &mpp->srv->session_list,
-                 session_link) {
-        if (session->device_type != MPP_DEVICE_VEPU1)
+    list_for_each_entry_safe(session, n, &mpp->srv->session_list, session_link)
+    {
+        if (session->device_type != MPP_DEVICE_VEPU1) {
             continue;
-        if (!session->priv)
+        }
+        if (!session->priv) {
             continue;
-        if (mpp->dev_ops->dump_session)
+        }
+        if (mpp->dev_ops->dump_session) {
             mpp->dev_ops->dump_session(session, seq);
+        }
     }
     mutex_unlock(&mpp->srv->session_lock);
 
@@ -555,13 +542,10 @@ static int vepu_procfs_init(struct mpp_dev *mpp)
         enc->procfs = NULL;
         return -EIO;
     }
-    mpp_procfs_create_u32("aclk", 0644,
-                  enc->procfs, &enc->aclk_info.debug_rate_hz);
-    mpp_procfs_create_u32("session_buffers", 0644,
-                  enc->procfs, &mpp->session_max_buffers);
+    mpp_procfs_create_u32("aclk", 0644, enc->procfs, &enc->aclk_info.debug_rate_hz);
+    mpp_procfs_create_u32("session_buffers", 0644, enc->procfs, &mpp->session_max_buffers);
     /* for show session info */
-    proc_create_single_data("sessions-info", 0444,
-                enc->procfs, vepu_show_session_info, mpp);
+    proc_create_single_data("sessions-info", 0444, enc->procfs, vepu_show_session_info, mpp);
 
     return 0;
 }
@@ -591,21 +575,25 @@ static int vepu_init(struct mpp_dev *mpp)
 
     /* Get clock info from dtsi */
     ret = mpp_get_clk_info(mpp, &enc->aclk_info, "aclk_vcodec");
-    if (ret)
+    if (ret) {
         mpp_err("failed on clk_get aclk_vcodec\n");
+    }
     ret = mpp_get_clk_info(mpp, &enc->hclk_info, "hclk_vcodec");
-    if (ret)
+    if (ret) {
         mpp_err("failed on clk_get hclk_vcodec\n");
+    }
     /* Set default rates */
     mpp_set_clk_info_rate_hz(&enc->aclk_info, CLK_MODE_DEFAULT, 300 * MHZ);
 
     /* Get reset control from dtsi */
     enc->rst_a = mpp_reset_control_get(mpp, RST_TYPE_A, "video_a");
-    if (!enc->rst_a)
+    if (!enc->rst_a) {
         mpp_err("No aclk reset resource define\n");
+    }
     enc->rst_h = mpp_reset_control_get(mpp, RST_TYPE_H, "video_h");
-    if (!enc->rst_h)
+    if (!enc->rst_h) {
         mpp_err("No hclk reset resource define\n");
+    }
 
     return 0;
 }
@@ -630,8 +618,7 @@ static int vepu_clk_off(struct mpp_dev *mpp)
     return 0;
 }
 
-static int vepu_set_freq(struct mpp_dev *mpp,
-             struct mpp_task *mpp_task)
+static int vepu_set_freq(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     struct vepu_dev *enc = to_vepu_dev(mpp);
     struct vepu_task *task = to_vepu_task(mpp_task);
@@ -718,16 +705,18 @@ static int vepu_probe(struct platform_device *pdev)
 
     dev_info(dev, "probe device\n");
     enc = devm_kzalloc(dev, sizeof(struct vepu_dev), GFP_KERNEL);
-    if (!enc)
+    if (!enc) {
         return -ENOMEM;
+    }
 
     mpp = &enc->mpp;
     platform_set_drvdata(pdev, enc);
 
     if (pdev->dev.of_node) {
         match = of_match_node(mpp_vepu1_dt_match, pdev->dev.of_node);
-        if (match)
+        if (match) {
             mpp->var = (struct mpp_dev_var *)match->data;
+        }
     }
 
     ret = mpp_dev_probe(mpp, pdev);
@@ -736,11 +725,7 @@ static int vepu_probe(struct platform_device *pdev)
         return -EINVAL;
     }
 
-    ret = devm_request_threaded_irq(dev, mpp->irq,
-                    mpp_dev_irq,
-                    mpp_dev_isr_sched,
-                    IRQF_SHARED,
-                    dev_name(dev), mpp);
+    ret = devm_request_threaded_irq(dev, mpp->irq, mpp_dev_irq, mpp_dev_isr_sched, IRQF_SHARED, dev_name(dev), mpp);
     if (ret) {
         dev_err(dev, "register interrupter runtime failed\n");
         return -EINVAL;
@@ -778,20 +763,20 @@ static void vepu_shutdown(struct platform_device *pdev)
     dev_info(dev, "shutdown device\n");
 
     atomic_inc(&mpp->srv->shutdown_request);
-    ret = readx_poll_timeout(atomic_read,
-                 &mpp->task_count,
-                 val, val == 0, 20000, 200000);
-    if (ret == -ETIMEDOUT)
+    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 20000, 200000);
+    if (ret == -ETIMEDOUT) {
         dev_err(dev, "wait total running time out\n");
+    }
 }
 
 struct platform_driver rockchip_vepu1_driver = {
     .probe = vepu_probe,
     .remove = vepu_remove,
     .shutdown = vepu_shutdown,
-    .driver = {
-        .name = VEPU1_DRIVER_NAME,
-        .of_match_table = of_match_ptr(mpp_vepu1_dt_match),
-    },
+    .driver =
+        {
+            .name = VEPU1_DRIVER_NAME,
+            .of_match_table = of_match_ptr(mpp_vepu1_dt_match),
+        },
 };
 EXPORT_SYMBOL(rockchip_vepu1_driver);

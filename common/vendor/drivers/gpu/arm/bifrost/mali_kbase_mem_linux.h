@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_mem_linux.h
  * Base kernel memory APIs, Linux implementation.
@@ -32,9 +30,9 @@
 
 /** A HWC dump mapping */
 struct kbase_hwc_dma_mapping {
-    void       *cpu_va;
-    dma_addr_t  dma_pa;
-    size_t      size;
+    void *cpu_va;
+    dma_addr_t dma_pa;
+    size_t size;
 };
 
 /**
@@ -52,9 +50,8 @@ struct kbase_hwc_dma_mapping {
  *
  * Return: 0 on success or error code
  */
-struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx,
-        u64 va_pages, u64 commit_pages, u64 extent, u64 *flags,
-        u64 *gpu_va);
+struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx, u64 va_pages, u64 commit_pages, u64 extent,
+                                        u64 *flags, u64 *gpu_va);
 
 /**
  * kbase_mem_query - Query properties of a GPU memory region
@@ -69,8 +66,7 @@ struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx,
  *
  * Return: 0 on success or error code
  */
-int kbase_mem_query(struct kbase_context *kctx, u64 gpu_addr, u64 query,
-        u64 *const out);
+int kbase_mem_query(struct kbase_context *kctx, u64 gpu_addr, u64 query, u64 *const out);
 
 /**
  * kbase_mem_import - Import the external memory for use by the GPU
@@ -86,9 +82,8 @@ int kbase_mem_query(struct kbase_context *kctx, u64 gpu_addr, u64 query,
  *            memory.
  * Return: 0 on success or error code
  */
-int kbase_mem_import(struct kbase_context *kctx, enum base_mem_import_type type,
-        void __user *phandle, u32 padding, u64 *gpu_va, u64 *va_pages,
-        u64 *flags);
+int kbase_mem_import(struct kbase_context *kctx, enum base_mem_import_type type, void __user *phandle, u32 padding,
+                     u64 *gpu_va, u64 *va_pages, u64 *flags);
 
 /**
  * kbase_mem_alias - Create a new allocation for GPU, aliasing one or more
@@ -103,7 +98,8 @@ int kbase_mem_import(struct kbase_context *kctx, enum base_mem_import_type type,
  *
  * Return: 0 on failure or otherwise the GPU VA for the alias
  */
-u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride, u64 nents, struct base_mem_aliasing_info *ai, u64 *num_pages);
+u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride, u64 nents, struct base_mem_aliasing_info *ai,
+                    u64 *num_pages);
 
 /**
  * kbase_mem_flags_change - Change the flags for a memory region
@@ -137,8 +133,7 @@ int kbase_mem_commit(struct kbase_context *kctx, u64 gpu_addr, u64 new_pages);
  *
  * Return: 0 on success or error code
  */
-int kbase_mem_shrink(struct kbase_context *kctx,
-        struct kbase_va_region *reg, u64 new_pages);
+int kbase_mem_shrink(struct kbase_context *kctx, struct kbase_va_region *const reg, u64 const new_pages);
 
 /**
  * kbase_context_mmap - Memory map method, gets invoked when mmap system call is
@@ -181,9 +176,7 @@ void kbase_mem_evictable_deinit(struct kbase_context *kctx);
  *
  * Note: Caller must be holding the region lock.
  */
-int kbase_mem_grow_gpu_mapping(struct kbase_context *kctx,
-        struct kbase_va_region *reg,
-        u64 new_pages, u64 old_pages);
+int kbase_mem_grow_gpu_mapping(struct kbase_context *kctx, struct kbase_va_region *reg, u64 new_pages, u64 old_pages);
 
 /**
  * kbase_mem_evictable_make - Make a physical allocation eligible for eviction
@@ -228,7 +221,6 @@ struct kbase_vmap_struct {
     bool sync_needed;
 };
 
-
 /**
  * kbase_vmap_prot - Map a GPU VA range into the kernel safely, only if the
  * requested access permissions are supported
@@ -269,8 +261,8 @@ struct kbase_vmap_struct {
  * memory region has been imported.
  *
  */
-void *kbase_vmap_prot(struct kbase_context *kctx, u64 gpu_addr, size_t size,
-              unsigned long prot_request, struct kbase_vmap_struct *map);
+void *kbase_vmap_prot(struct kbase_context *kctx, u64 gpu_addr, size_t size, unsigned long prot_request,
+                      struct kbase_vmap_struct *map);
 
 /**
  * kbase_vmap - Map a GPU VA range into the kernel safely
@@ -295,8 +287,7 @@ void *kbase_vmap_prot(struct kbase_context *kctx, u64 gpu_addr, size_t size,
  * Note: All cache maintenance operations shall be ignored if the memory region
  * has been imported.
  */
-void *kbase_vmap(struct kbase_context *kctx, u64 gpu_addr, size_t size,
-        struct kbase_vmap_struct *map);
+void *kbase_vmap(struct kbase_context *kctx, u64 gpu_addr, size_t size, struct kbase_vmap_struct *map);
 
 /**
  * kbase_vunmap - Unmap a GPU VA range from the kernel
@@ -328,8 +319,7 @@ extern const struct vm_operations_struct kbase_vm_ops;
  * Note: The caller shall ensure that CPU mapping is not revoked & remains
  * active whilst the maintenance is in progress.
  */
-void kbase_sync_mem_regions(struct kbase_context *kctx,
-        struct kbase_vmap_struct *map, enum kbase_sync_type dest);
+void kbase_sync_mem_regions(struct kbase_context *kctx, struct kbase_vmap_struct *map, enum kbase_sync_type dest);
 
 /**
  * kbase_mem_shrink_cpu_mapping - Shrink the CPU mapping(s) of an allocation
@@ -341,9 +331,8 @@ void kbase_sync_mem_regions(struct kbase_context *kctx,
  * Shrink (or completely remove) all CPU mappings which reference the shrunk
  * part of the allocation.
  */
-void kbase_mem_shrink_cpu_mapping(struct kbase_context *kctx,
-        struct kbase_va_region *reg,
-        u64 new_pages, u64 old_pages);
+void kbase_mem_shrink_cpu_mapping(struct kbase_context *kctx, struct kbase_va_region *reg, u64 new_pages,
+                                  u64 old_pages);
 
 /**
  * kbase_phy_alloc_mapping_term - Terminate the kernel side mapping of a
@@ -354,8 +343,7 @@ void kbase_mem_shrink_cpu_mapping(struct kbase_context *kctx,
  * This function will unmap the kernel mapping, and free any structures used to
  * track it.
  */
-void kbase_phy_alloc_mapping_term(struct kbase_context *kctx,
-        struct kbase_mem_phy_alloc *alloc);
+void kbase_phy_alloc_mapping_term(struct kbase_context *kctx, struct kbase_mem_phy_alloc *alloc);
 
 /**
  * kbase_phy_alloc_mapping_get - Get a kernel-side CPU pointer to the permanent
@@ -399,7 +387,7 @@ void kbase_phy_alloc_mapping_term(struct kbase_context *kctx,
  * - the region containing @gpu_addr does not support a permanent kernel mapping
  */
 void *kbase_phy_alloc_mapping_get(struct kbase_context *kctx, u64 gpu_addr,
-        struct kbase_vmap_struct **out_kern_mapping);
+                                  struct kbase_vmap_struct **out_kern_mapping);
 
 /**
  * kbase_phy_alloc_mapping_put - Put a reference to the kernel-side mapping of a
@@ -420,8 +408,7 @@ void *kbase_phy_alloc_mapping_get(struct kbase_context *kctx, u64 gpu_addr,
  * expected to execute quickly in the normal case, i.e. when the region holding
  * the physical allocation is still present.
  */
-void kbase_phy_alloc_mapping_put(struct kbase_context *kctx,
-        struct kbase_vmap_struct *kern_mapping);
+void kbase_phy_alloc_mapping_put(struct kbase_context *kctx, struct kbase_vmap_struct *kern_mapping);
 
 /**
  * kbase_get_cache_line_alignment - Return cache line alignment
@@ -436,26 +423,28 @@ void kbase_phy_alloc_mapping_put(struct kbase_context *kctx,
 u32 kbase_get_cache_line_alignment(struct kbase_device *kbdev);
 
 #if (KERNEL_VERSION(4, 20, 0) > LINUX_VERSION_CODE)
-static inline vm_fault_t vmf_insert_pfn_prot(struct vm_area_struct *vma,
-            unsigned long addr, unsigned long pfn, pgprot_t pgprot)
+static inline vm_fault_t vmf_insert_pfn_prot(struct vm_area_struct *vma, unsigned long addr, unsigned long pfn,
+                                             pgprot_t pgprot)
 {
     int err;
 
-#if ((KERNEL_VERSION(4, 4, 147) >= LINUX_VERSION_CODE) || \
-        ((KERNEL_VERSION(4, 6, 0) > LINUX_VERSION_CODE) && \
-         (KERNEL_VERSION(4, 5, 0) <= LINUX_VERSION_CODE)))
-    if (pgprot_val(pgprot) != pgprot_val(vma->vm_page_prot))
+#if ((KERNEL_VERSION(4, 4, 147) >= LINUX_VERSION_CODE) ||                                                              \
+     ((KERNEL_VERSION(4, 6, 0) > LINUX_VERSION_CODE) && (KERNEL_VERSION(4, 5, 0) <= LINUX_VERSION_CODE)))
+    if (pgprot_val(pgprot) != pgprot_val(vma->vm_page_prot)) {
         return VM_FAULT_SIGBUS;
+    }
 
     err = vm_insert_pfn(vma, addr, pfn);
 #else
     err = vm_insert_pfn_prot(vma, addr, pfn, pgprot);
 #endif
 
-    if (unlikely(err == -ENOMEM))
+    if (unlikely(err == -ENOMEM)) {
         return VM_FAULT_OOM;
-    if (unlikely(err < 0 && err != -EBUSY))
+    }
+    if (unlikely(err < 0 && err != -EBUSY)) {
         return VM_FAULT_SIGBUS;
+    }
 
     return VM_FAULT_NOPAGE;
 }
@@ -470,9 +459,9 @@ static inline struct rw_semaphore *kbase_mem_get_process_mmap_lock(void)
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
     return &current->mm->mmap_sem;
-#else /* LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0) */
+#else  /* LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0) */
     return &current->mm->mmap_lock;
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0) */
 }
 
-#endif                /* _KBASE_MEM_LINUX_H_ */
+#endif /* _KBASE_MEM_LINUX_H_ */

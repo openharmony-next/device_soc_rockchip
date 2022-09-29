@@ -30,11 +30,9 @@
 static DEFINE_SPINLOCK(kbase_fence_lock);
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-struct fence *
-kbase_fence_out_new(struct kbase_jd_atom *katom)
+struct fence *kbase_fence_out_new(struct kbase_jd_atom *katom)
 #else
-struct dma_fence *
-kbase_fence_out_new(struct kbase_jd_atom *katom)
+struct dma_fence *kbase_fence_out_new(struct kbase_jd_atom *katom)
 #endif
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
@@ -46,22 +44,19 @@ kbase_fence_out_new(struct kbase_jd_atom *katom)
     WARN_ON(katom->dma_fence.fence);
 
     fence = kzalloc(sizeof(*fence), GFP_KERNEL);
-    if (!fence)
+    if (!fence) {
         return NULL;
+    }
 
-    dma_fence_init(fence,
-               &kbase_fence_ops,
-               &kbase_fence_lock,
-               katom->dma_fence.context,
-               atomic_inc_return(&katom->dma_fence.seqno));
+    dma_fence_init(fence, &kbase_fence_ops, &kbase_fence_lock, katom->dma_fence.context,
+                   atomic_inc_return(&katom->dma_fence.seqno));
 
     katom->dma_fence.fence = fence;
 
     return fence;
 }
 
-bool
-kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
+bool kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
 {
     struct kbase_fence_cb *cb, *tmp;
     bool res = false;
@@ -69,7 +64,8 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
     lockdep_assert_held(&katom->kctx->jctx.lock);
 
     /* Clean up and free callbacks. */
-    list_for_each_entry_safe(cb, tmp, &katom->dma_fence.callbacks, node) {
+    list_for_each_entry_safe(cb, tmp, &katom->dma_fence.callbacks, node)
+    {
         bool ret;
 
         /* Cancel callbacks that hasn't been called yet. */
@@ -82,8 +78,9 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
              */
             ret = atomic_dec_return(&katom->dma_fence.dep_count);
 
-            if (unlikely(ret == 0))
+            if (unlikely(ret == 0)) {
                 res = true;
+            }
         }
 
         /*
@@ -99,41 +96,37 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-int
-kbase_fence_add_callback(struct kbase_jd_atom *katom,
-             struct fence *fence,
-             fence_func_t callback)
+int kbase_fence_add_callback(struct kbase_jd_atom *katom, struct fence *fence, fence_func_t callback)
 #else
-int
-kbase_fence_add_callback(struct kbase_jd_atom *katom,
-             struct dma_fence *fence,
-             dma_fence_func_t callback)
+int kbase_fence_add_callback(struct kbase_jd_atom *katom, struct dma_fence *fence, dma_fence_func_t callback)
 #endif
 {
     int err = 0;
     struct kbase_fence_cb *kbase_fence_cb;
 
-    if (!fence)
+    if (!fence) {
         return -EINVAL;
+    }
 
     kbase_fence_cb = kmalloc(sizeof(*kbase_fence_cb), GFP_KERNEL);
-    if (!kbase_fence_cb)
+    if (!kbase_fence_cb) {
         return -ENOMEM;
+    }
 
     kbase_fence_cb->fence = fence;
     kbase_fence_cb->katom = katom;
     INIT_LIST_HEAD(&kbase_fence_cb->node);
     atomic_inc(&katom->dma_fence.dep_count);
 
-    err = dma_fence_add_callback(fence, &kbase_fence_cb->fence_cb,
-                     callback);
+    err = dma_fence_add_callback(fence, &kbase_fence_cb->fence_cb, callback);
     if (err == -ENOENT) {
         /* Fence signaled, get the completion result */
         err = dma_fence_get_status(fence);
 
         /* remap success completion to err code */
-        if (err == 1)
+        if (err == 1) {
             err = 0;
+        }
 
         kfree(kbase_fence_cb);
         atomic_dec(&katom->dma_fence.dep_count);

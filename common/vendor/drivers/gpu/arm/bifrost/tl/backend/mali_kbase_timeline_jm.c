@@ -32,36 +32,31 @@ void kbase_create_timeline_objects(struct kbase_device *kbdev)
     unsigned int as_nr;
     struct kbase_context *kctx;
     struct kbase_timeline *timeline = kbdev->timeline;
-    struct kbase_tlstream *summary =
-        &timeline->streams[TL_STREAM_TYPE_OBJ_SUMMARY];
+    struct kbase_tlstream *summary = &timeline->streams[TL_STREAM_TYPE_OBJ_SUMMARY];
 
     /* Summarize the LPU objects. */
     for (lpu_id = 0; lpu_id < kbdev->gpu_props.num_job_slots; lpu_id++) {
-        u32 *lpu =
-            &kbdev->gpu_props.props.raw_props.js_features[lpu_id];
+        u32 *lpu = &kbdev->gpu_props.props.raw_props.js_features[lpu_id];
         mali_kbase_kbase_tlstream_tl_new_lpu(summary, lpu, lpu_id, *lpu);
     }
 
     /* Summarize the Address Space objects. */
-    for (as_nr = 0; as_nr < kbdev->nr_hw_address_spaces; as_nr++)
+    for (as_nr = 0; as_nr < kbdev->nr_hw_address_spaces; as_nr++) {
         mali_kbase_kbase_tlstream_tl_new_as(summary, &kbdev->as[as_nr], as_nr);
+    }
 
     /* Create GPU object and make it retain all LPUs and address spaces. */
-    mali_kbase_kbase_tlstream_tl_new_gpu(summary,
-            kbdev,
-            kbdev->gpu_props.props.raw_props.gpu_id,
-            kbdev->gpu_props.num_cores);
+    mali_kbase_kbase_tlstream_tl_new_gpu(summary, kbdev, kbdev->gpu_props.props.raw_props.gpu_id,
+                                         kbdev->gpu_props.num_cores);
 
     for (lpu_id = 0; lpu_id < kbdev->gpu_props.num_job_slots; lpu_id++) {
-        void *lpu =
-            &kbdev->gpu_props.props.raw_props.js_features[lpu_id];
+        void *lpu = &kbdev->gpu_props.props.raw_props.js_features[lpu_id];
         mali_kbase_kbase_tlstream_tl_lifelink_lpu_gpu(summary, lpu, kbdev);
     }
 
-    for (as_nr = 0; as_nr < kbdev->nr_hw_address_spaces; as_nr++)
-        mali_kbase_kbase_tlstream_tl_lifelink_as_gpu(summary,
-                &kbdev->as[as_nr],
-                kbdev);
+    for (as_nr = 0; as_nr < kbdev->nr_hw_address_spaces; as_nr++) {
+        mali_kbase_kbase_tlstream_tl_lifelink_as_gpu(summary, &kbdev->as[as_nr], kbdev);
+    }
 
     /* Lock the context list, to ensure no changes to the list are made
      * while we're summarizing the contexts and their contents.
@@ -69,12 +64,10 @@ void kbase_create_timeline_objects(struct kbase_device *kbdev)
     mutex_lock(&kbdev->kctx_list_lock);
 
     /* For each context in the device... */
-    list_for_each_entry(kctx, &kbdev->kctx_list, kctx_list_link) {
+    list_for_each_entry(kctx, &kbdev->kctx_list, kctx_list_link)
+    {
         /* Summarize the context itself */
-        mali_kbase_kbase_tlstream_tl_new_ctx(summary,
-                kctx,
-                kctx->id,
-                (u32)(kctx->tgid));
+        mali_kbase_kbase_tlstream_tl_new_ctx(summary, kctx, kctx->id, (u32)(kctx->tgid));
     };
 
     /* Reset body stream buffers while holding the kctx lock.

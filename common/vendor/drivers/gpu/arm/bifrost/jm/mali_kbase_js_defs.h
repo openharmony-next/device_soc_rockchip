@@ -20,14 +20,13 @@
  *
  */
 
-
 /**
  * @file mali_kbase_js.h
  * Job Scheduler Type Definitions
  */
 
-#ifndef _KBASE_JS_DEFS_H_
-#define _KBASE_JS_DEFS_H_
+#ifndef KBASE_JS_DEFS_H_
+#define KBASE_JS_DEFS_H_
 
 /**
  * @addtogroup base_api
@@ -46,7 +45,6 @@
 /* Forward decls */
 struct kbase_device;
 struct kbase_jd_atom;
-
 
 typedef u32 kbase_context_flags;
 
@@ -175,7 +173,7 @@ enum {
 };
 
 /* Invalid priority for kbase_jd_atom::sched_prio */
-#define KBASE_JS_ATOM_SCHED_PRIO_INVALID -1
+#define KBASE_JS_ATOM_SCHED_PRIO_INVALID (-1)
 
 /* Default priority in the case of contexts with no atoms, or being lenient
  * about invalid priorities from userspace.
@@ -265,14 +263,14 @@ struct kbasep_js_device_data {
 
     u32 scheduling_period_ns;    /*< Value for JS_SCHEDULING_PERIOD_NS */
     u32 soft_stop_ticks;         /*< Value for JS_SOFT_STOP_TICKS */
-    u32 soft_stop_ticks_cl;         /*< Value for JS_SOFT_STOP_TICKS_CL */
-    u32 hard_stop_ticks_ss;         /*< Value for JS_HARD_STOP_TICKS_SS */
-    u32 hard_stop_ticks_cl;         /*< Value for JS_HARD_STOP_TICKS_CL */
+    u32 soft_stop_ticks_cl;      /*< Value for JS_SOFT_STOP_TICKS_CL */
+    u32 hard_stop_ticks_ss;      /*< Value for JS_HARD_STOP_TICKS_SS */
+    u32 hard_stop_ticks_cl;      /*< Value for JS_HARD_STOP_TICKS_CL */
     u32 hard_stop_ticks_dumping; /*< Value for JS_HARD_STOP_TICKS_DUMPING */
-    u32 gpu_reset_ticks_ss;         /*< Value for JS_RESET_TICKS_SS */
-    u32 gpu_reset_ticks_cl;         /*< Value for JS_RESET_TICKS_CL */
+    u32 gpu_reset_ticks_ss;      /*< Value for JS_RESET_TICKS_SS */
+    u32 gpu_reset_ticks_cl;      /*< Value for JS_RESET_TICKS_CL */
     u32 gpu_reset_ticks_dumping; /*< Value for JS_RESET_TICKS_DUMPING */
-    u32 ctx_timeslice_ns;         /**< Value for JS_CTX_TIMESLICE_NS */
+    u32 ctx_timeslice_ns;        /**< Value for JS_CTX_TIMESLICE_NS */
 
     /** List of suspended soft jobs */
     struct list_head suspended_soft_jobs_list;
@@ -280,7 +278,7 @@ struct kbasep_js_device_data {
 #ifdef CONFIG_MALI_BIFROST_DEBUG
     /* Support soft-stop on a single context */
     bool softstop_always;
-#endif                /* CONFIG_MALI_BIFROST_DEBUG */
+#endif /* CONFIG_MALI_BIFROST_DEBUG */
 
     /** The initalized-flag is placed at the end, to avoid cache-pollution (we should
      * only be using this during init/term paths).
@@ -337,7 +335,7 @@ struct kbasep_js_kctx_info {
      * You may not access any of these members from IRQ context.
      */
     struct kbase_jsctx {
-        struct mutex jsctx_mutex;            /**< Job Scheduler Context lock */
+        struct mutex jsctx_mutex; /**< Job Scheduler Context lock */
 
         /** Number of jobs <b>ready to run</b> - does \em not include the jobs waiting in
          * the dispatcher, and dependency-only jobs. See kbase_jd_context::job_nr
@@ -377,7 +375,6 @@ struct kbasep_js_atom_retained_state {
     int sched_priority;
     /* Core group atom was executed on */
     u32 device_nr;
-
 };
 
 /**
@@ -401,9 +398,8 @@ struct kbasep_js_atom_retained_state {
  */
 #define KBASEP_JS_TICK_RESOLUTION_US 1
 
+/** @} */ /* end group kbase_js */
+/** @} */ /* end group base_kbase_api */
+/** @} */ /* end group base_api */
 
-      /** @} *//* end group kbase_js */
-      /** @} *//* end group base_kbase_api */
-      /** @} *//* end group base_api */
-
-#endif                /* _KBASE_JS_DEFS_H_ */
+#endif /* _KBASE_JS_DEFS_H_ */

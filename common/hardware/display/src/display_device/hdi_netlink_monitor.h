@@ -18,23 +18,27 @@
 
 #include <thread>
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class HdiNetLinkMonitor {
-public:
-    HdiNetLinkMonitor();
-    int Init();
-    virtual ~HdiNetLinkMonitor();
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            class HdiNetLinkMonitor
+            {
+            public:
+                HdiNetLinkMonitor();
+                int Init();
+                virtual ~HdiNetLinkMonitor();
 
-private:
-    void MonitorThread();
-    volatile bool mRunning = false;
-    int mScoketFd = -1;
-    std::unique_ptr<std::thread> mThread;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                void MonitorThread();
+                volatile bool mRunning = false;
+                int mScoketFd = -1;
+                std::unique_ptr<std::thread> mThread;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_NETLINK_NONITOR_H

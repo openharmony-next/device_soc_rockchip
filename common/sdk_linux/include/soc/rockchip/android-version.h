@@ -12,6 +12,5 @@
  */
 
 #ifndef ANDROID_VERSION
-#define ANDROID_VERSION(a, b, c, r) \
-    (((a) << 24) + ((b) << 16) + ((c) << 8) + (r))
+#define ANDROID_VERSION(a, b, c, r) (((a) << 24) + ((b) << 16) + ((c) << 8) + (r))
 #endif

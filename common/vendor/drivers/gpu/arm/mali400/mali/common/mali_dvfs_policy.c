@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2012, 2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -16,19 +17,19 @@
 #include "mali_osk_profiling.h"
 
 #define CLOCK_TUNING_TIME_DEBUG 0
-#define VOL_MILLI               1000
-#define MALI_FPS_STEP_ONE       3
-#define MALI_FPS_STEP_TWO       5
-#define MALI_OSK_CLZ_START      32
+#define VOL_MILLI 1000
+#define MALI_FPS_STEP_ONE 3
+#define MALI_FPS_STEP_TWO 5
+#define MALI_OSK_CLZ_START 32
 
-#define MALI_PERCENTAGE_NINETY       90
-#define MALI_PERCENTAGE_SEVENTY      70
-#define MALI_PERCENTAGE_FIVETY_FIVE  55
-#define MALI_PERCENTAGE_FIVETY       50
-#define MALI_PERCENTAGE_THIRTY_FIVE  35
+#define MALI_PERCENTAGE_NINETY 90
+#define MALI_PERCENTAGE_SEVENTY 70
+#define MALI_PERCENTAGE_FIVETY_FIVE 55
+#define MALI_PERCENTAGE_FIVETY 50
+#define MALI_PERCENTAGE_THIRTY_FIVE 35
 
 #define MAX_PERFORMANCE_VALUE 256
-#define MALI_PERCENTAGE_TO_UTILIZATION_FRACTION(percent) ((int) ((percent)*(MAX_PERFORMANCE_VALUE)/100.0 + 0.5))
+#define MALI_PERCENTAGE_TO_UTILIZATION_FRACTION(percent) ((int)((percent) * (MAX_PERFORMANCE_VALUE) / 100.0 + 0.5))
 
 /** The max fps the same as display vsync default 60, can set by module insert parameter */
 int mali_max_system_fps = 60;
@@ -48,7 +49,7 @@ static int (*mali_gpu_get_freq)(void) = NULL;
 
 static mali_bool mali_dvfs_enabled = MALI_FALSE;
 
-#define NUMBER_OF_NANOSECONDS_PER_SECOND  1000000000ULL
+#define NUMBER_OF_NANOSECONDS_PER_SECOND 1000000000ULL
 static u32 calculate_window_render_fps(u64 time_period)
 {
     u32 max_window_number;
@@ -155,8 +156,10 @@ void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_p
     }
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Using ARM power policy: gpu util = %d \n", current_gpu_util));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Using ARM power policy: under_perform = %d,  over_perform = %d \n", under_perform_boundary_value, over_perform_boundary_value));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Using ARM power policy: render fps = %d,  pressure render fps = %d \n", current_fps, window_render_fps));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Using ARM power policy: under_perform = %d,  over_perform = %d \n",
+                                              under_perform_boundary_value, over_perform_boundary_value));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Using ARM power policy: render fps = %d,  pressure render fps = %d \n",
+                                              current_fps, window_render_fps));
 
     /* Get current clock value */
     cur_clk_step = mali_gpu_get_freq();
@@ -189,7 +192,8 @@ void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_p
 
         if (current_gpu_util > under_perform_boundary_value) {
             /* when under perform, need to consider the fps part */
-            target_clk_mhz = gpu_clk->item[cur_clk_step].clock * current_gpu_util * mali_desired_fps / under_perform_boundary_value / current_fps;
+            target_clk_mhz = gpu_clk->item[cur_clk_step].clock * current_gpu_util * mali_desired_fps /
+                             under_perform_boundary_value / current_fps;
             pick_clock_up = MALI_TRUE;
         } else if (current_gpu_util < over_perform_boundary_value) {
             /* when over perform, did't need to consider fps, system didn't want to reach desired fps */
@@ -206,12 +210,10 @@ real_setting:
     if (clock_changed) {
         mali_gpu_set_freq(clock_step);
 
-        _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE |
-                          MALI_PROFILING_EVENT_CHANNEL_GPU |
-                          MALI_PROFILING_EVENT_REASON_SINGLE_GPU_FREQ_VOLT_CHANGE,
-                          gpu_clk->item[clock_step].clock,
-                          gpu_clk->item[clock_step].vol / VOL_MILLI,
-                          0, 0, 0);
+        _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_GPU |
+                                          MALI_PROFILING_EVENT_REASON_SINGLE_GPU_FREQ_VOLT_CHANGE,
+                                      gpu_clk->item[clock_step].clock, gpu_clk->item[clock_step].vol / VOL_MILLI, 0, 0,
+                                      0);
     }
 
 #if CLOCK_TUNING_TIME_DEBUG
@@ -231,7 +233,6 @@ mali_osk_errcode_t mali_dvfs_policy_init(void)
         if ((NULL != data.get_clock_info) && (NULL != data.set_freq) && (NULL != data.get_freq)) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali DVFS init: using arm dvfs policy \n"));
 
-
             mali_fps_step1 = mali_max_system_fps / MALI_FPS_STEP_ONE;
             mali_fps_step2 = mali_max_system_fps / MALI_FPS_STEP_TWO;
 
@@ -241,23 +242,25 @@ mali_osk_errcode_t mali_dvfs_policy_init(void)
 #ifdef DEBUG
                 int i;
                 for (i = 0; i < gpu_clk->num_of_steps; i++) {
-                    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("mali gpu clock info: step%d clock(%d)Hz,vol(%d) \n",
-                                 i, gpu_clk->item[i].clock, gpu_clk->item[i].vol));
+                    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("mali gpu clock info: step%d clock(%d)Hz,vol(%d) \n", i,
+                                                              gpu_clk->item[i].clock, gpu_clk->item[i].vol));
                 }
 #endif
             } else {
-                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali DVFS init: platform didn't define enough info for ddk to do DVFS \n"));
+                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
+                                 ("Mali DVFS init: platform didn't define enough info for ddk to do DVFS \n"));
             }
 
             mali_gpu_get_freq = data.get_freq;
             mali_gpu_set_freq = data.set_freq;
 
-            if ((NULL != gpu_clk) && (gpu_clk->num_of_steps > 0)
-                && (NULL != mali_gpu_get_freq) && (NULL != mali_gpu_set_freq)) {
+            if ((NULL != gpu_clk) && (gpu_clk->num_of_steps > 0) && (NULL != mali_gpu_get_freq) &&
+                (NULL != mali_gpu_set_freq)) {
                 mali_dvfs_enabled = MALI_TRUE;
             }
         } else {
-            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali DVFS init: platform function callback incomplete, need check mali_gpu_device_data in platform .\n"));
+            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali DVFS init: platform function callback incomplete, "
+                                                             "need check mali_gpu_device_data in platform .\n"));
         }
     } else {
         err = MALI_OSK_ERR_FAULT;
@@ -274,17 +277,17 @@ mali_osk_errcode_t mali_dvfs_policy_init(void)
 void mali_dvfs_policy_new_period(void)
 {
     /* Always give full power when start a new period */
-    unsigned int cur_clk_step = 0;
+    unsigned int cur_clk_step2 = 0;
 
-    cur_clk_step = mali_gpu_get_freq();
+    cur_clk_step2 = mali_gpu_get_freq();
 
-    if (cur_clk_step != (gpu_clk->num_of_steps - 1)) {
+    if (cur_clk_step2 != (gpu_clk->num_of_steps - 1)) {
         mali_gpu_set_freq(gpu_clk->num_of_steps - 1);
 
-        _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE |
-                          MALI_PROFILING_EVENT_CHANNEL_GPU |
-                          MALI_PROFILING_EVENT_REASON_SINGLE_GPU_FREQ_VOLT_CHANGE, gpu_clk->item[gpu_clk->num_of_steps - 1].clock,
-                          gpu_clk->item[gpu_clk->num_of_steps - 1].vol / VOL_MILLI, 0, 0, 0);
+        _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SINGLE | MALI_PROFILING_EVENT_CHANNEL_GPU |
+                                          MALI_PROFILING_EVENT_REASON_SINGLE_GPU_FREQ_VOLT_CHANGE,
+                                      gpu_clk->item[gpu_clk->num_of_steps - 1].clock,
+                                      gpu_clk->item[gpu_clk->num_of_steps - 1].vol / VOL_MILLI, 0, 0, 0);
     }
 }
 
@@ -303,16 +306,17 @@ void mali_get_current_gpu_clk_item(struct mali_gpu_clk_item *clk_item)
 
         if ((NULL != device_data->get_clock_info) && (NULL != device_data->get_freq)) {
 
-            int cur_clk_step = device_data->get_freq();
+            int cur_clk_step2 = device_data->get_freq();
             struct mali_gpu_clock *mali_gpu_clk = NULL;
 
             device_data->get_clock_info(&mali_gpu_clk);
-            clk_item->clock = mali_gpu_clk->item[cur_clk_step].clock;
-            clk_item->vol = mali_gpu_clk->item[cur_clk_step].vol;
+            clk_item->clock = mali_gpu_clk->item[cur_clk_step2].clock;
+            clk_item->vol = mali_gpu_clk->item[cur_clk_step2].vol;
         } else {
-            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali GPU Utilization: platform function callback incomplete, need check mali_gpu_device_data in platform .\n"));
+            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
+                             ("Mali GPU Utilization: platform function callback incomplete, need check "
+                              "mali_gpu_device_data in platform .\n"));
         }
     }
 }
 #endif
-

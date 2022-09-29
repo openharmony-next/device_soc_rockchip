@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /*
  * Register-based HW access backend specific job scheduler APIs
  */
@@ -44,8 +41,9 @@ static inline bool timer_callback_should_run(struct kbase_device *kbdev)
     lockdep_assert_held(&kbdev->js_data.runpool_mutex);
 
     /* Timer must stop if we are suspending */
-    if (backend->suspend_timer)
+    if (backend->suspend_timer) {
         return false;
+    }
 
     /* nr_contexts_pullable is updated with the runpool_mutex. However, the
      * locking in the caller gives us a barrier that ensures
@@ -57,7 +55,7 @@ static inline bool timer_callback_should_run(struct kbase_device *kbdev)
         /* Debug support for allowing soft-stop on a single context */
         return true;
     }
-#endif                /* CONFIG_MALI_DEBUG */
+#endif /* CONFIG_MALI_DEBUG */
 
     if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_9435)) {
         /* Timeouts would have to be 4x longer (due to micro-
@@ -71,19 +69,15 @@ static inline bool timer_callback_should_run(struct kbase_device *kbdev)
          * don't check KBASEP_JS_CTX_ATTR_NON_COMPUTE).
          */
         {
-            s8 nr_compute_ctxs =
-                kbasep_js_ctx_attr_count_on_runpool(kbdev,
-                        KBASEP_JS_CTX_ATTR_COMPUTE);
-            s8 nr_noncompute_ctxs = nr_running_ctxs -
-                            nr_compute_ctxs;
+            s8 nr_compute_ctxs = kbasep_js_ctx_attr_count_on_runpool(kbdev, KBASEP_JS_CTX_ATTR_COMPUTE);
+            s8 nr_noncompute_ctxs = nr_running_ctxs - nr_compute_ctxs;
 
-            return (bool) (nr_compute_ctxs >= 2 ||
-                            nr_noncompute_ctxs > 0);
+            return (bool)(nr_compute_ctxs >= 0x2 || nr_noncompute_ctxs > 0);
         }
     } else {
         /* Run the timer callback whenever you have at least 1 context
          */
-        return (bool) (nr_running_ctxs > 0);
+        return (bool)(nr_running_ctxs > 0);
     }
 }
 
@@ -98,8 +92,7 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
 
     KBASE_DEBUG_ASSERT(timer != NULL);
 
-    backend = container_of(timer, struct kbase_backend_data,
-                            scheduling_timer);
+    backend = container_of(timer, struct kbase_backend_data, scheduling_timer);
     kbdev = container_of(backend, struct kbase_device, hwaccess.backend);
     js_devdata = &kbdev->js_data;
 
@@ -120,22 +113,15 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                 u32 ticks = atom->ticks++;
 
 #if !CINSTR_DUMPING_ENABLED
-                u32 soft_stop_ticks, hard_stop_ticks,
-                                gpu_reset_ticks;
+                u32 soft_stop_ticks, hard_stop_ticks, gpu_reset_ticks;
                 if (atom->core_req & BASE_JD_REQ_ONLY_COMPUTE) {
-                    soft_stop_ticks =
-                        js_devdata->soft_stop_ticks_cl;
-                    hard_stop_ticks =
-                        js_devdata->hard_stop_ticks_cl;
-                    gpu_reset_ticks =
-                        js_devdata->gpu_reset_ticks_cl;
+                    soft_stop_ticks = js_devdata->soft_stop_ticks_cl;
+                    hard_stop_ticks = js_devdata->hard_stop_ticks_cl;
+                    gpu_reset_ticks = js_devdata->gpu_reset_ticks_cl;
                 } else {
-                    soft_stop_ticks =
-                        js_devdata->soft_stop_ticks;
-                    hard_stop_ticks =
-                        js_devdata->hard_stop_ticks_ss;
-                    gpu_reset_ticks =
-                        js_devdata->gpu_reset_ticks_ss;
+                    soft_stop_ticks = js_devdata->soft_stop_ticks;
+                    hard_stop_ticks = js_devdata->hard_stop_ticks_ss;
+                    gpu_reset_ticks = js_devdata->gpu_reset_ticks_ss;
                 }
 
                 /* If timeouts have been changed then ensure
@@ -144,14 +130,13 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                  * atoms do not miss any of the timeouts due to
                  * races between this worker and the thread
                  * changing the timeouts. */
-                if (backend->timeouts_updated &&
-                        ticks > soft_stop_ticks)
+                if (backend->timeouts_updated && ticks > soft_stop_ticks) {
                     ticks = atom->ticks = soft_stop_ticks;
+                }
 
                 /* Job is Soft-Stoppable */
                 if (ticks == soft_stop_ticks) {
-                    int disjoint_threshold =
-        KBASE_DISJOINT_STATE_INTERLEAVED_CONTEXT_COUNT_THRESHOLD;
+                    int disjoint_threshold = KBASE_DISJOINT_STATE_INTERLEAVED_CONTEXT_COUNT_THRESHOLD;
                     u32 softstop_flags = 0u;
                     /* Job has been scheduled for at least
                      * js_devdata->soft_stop_ticks ticks.
@@ -176,13 +161,11 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                      * not too bad that we observe the older
                      * value and register a disjoint event
                      * when we try soft-stopping */
-                    if (js_devdata->nr_user_contexts_running
-                            >= disjoint_threshold)
-                        softstop_flags |=
-                        JS_COMMAND_SW_CAUSES_DISJOINT;
+                    if (js_devdata->nr_user_contexts_running >= disjoint_threshold) {
+                        softstop_flags |= JS_COMMAND_SW_CAUSES_DISJOINT;
+                    }
 
-                    kbase_job_slot_softstop_swflags(kbdev,
-                        s, atom, softstop_flags);
+                    kbase_job_slot_softstop_swflags(kbdev, s, atom, softstop_flags);
 #endif
                 } else if (ticks == hard_stop_ticks) {
                     /* Job has been scheduled for at least
@@ -191,14 +174,10 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                      * now. Hard stop the slot.
                      */
 #if !KBASE_DISABLE_SCHEDULING_HARD_STOPS
-                    int ms =
-                        js_devdata->scheduling_period_ns
-                                / 1000000u;
+                    int ms = js_devdata->scheduling_period_ns / 1000000u;
                     dev_warn(kbdev->dev, "JS: Job Hard-Stopped (took more than %lu ticks at %lu ms/tick)",
-                            (unsigned long)ticks,
-                            (unsigned long)ms);
-                    kbase_job_slot_hardstop(atom->kctx, s,
-                                    atom);
+                             (unsigned long)ticks, (unsigned long)ms);
+                    kbase_job_slot_hardstop(atom->kctx, s, atom);
 #endif
                 } else if (ticks == gpu_reset_ticks) {
                     /* Job has been scheduled for at least
@@ -209,7 +188,7 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                      */
                     reset_needed = true;
                 }
-#else                /* !CINSTR_DUMPING_ENABLED */
+#else /* !CINSTR_DUMPING_ENABLED */
                 /* NOTE: During CINSTR_DUMPING_ENABLED, we use
                  * the alternate timeouts, which makes the hard-
                  * stop and GPU reset timeout much longer. We
@@ -222,24 +201,18 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                      * CINSTR_DUMPING_ENABLED, however.
                      */
                     dev_dbg(kbdev->dev, "Soft-stop");
-                } else if (ticks ==
-                    js_devdata->hard_stop_ticks_dumping) {
+                } else if (ticks == js_devdata->hard_stop_ticks_dumping) {
                     /* Job has been scheduled for at least
                      * js_devdata->hard_stop_ticks_dumping
                      * ticks. Hard stop the slot.
                      */
 #if !KBASE_DISABLE_SCHEDULING_HARD_STOPS
-                    int ms =
-                        js_devdata->scheduling_period_ns
-                                / 1000000u;
+                    int ms = js_devdata->scheduling_period_ns / 1000000u;
                     dev_warn(kbdev->dev, "JS: Job Hard-Stopped (took more than %lu ticks at %lu ms/tick)",
-                            (unsigned long)ticks,
-                            (unsigned long)ms);
-                    kbase_job_slot_hardstop(atom->kctx, s,
-                                    atom);
+                             (unsigned long)ticks, (unsigned long)ms);
+                    kbase_job_slot_hardstop(atom->kctx, s, atom);
 #endif
-                } else if (ticks ==
-                    js_devdata->gpu_reset_ticks_dumping) {
+                } else if (ticks == js_devdata->gpu_reset_ticks_dumping) {
                     /* Job has been scheduled for at least
                      * js_devdata->gpu_reset_ticks_dumping
                      * ticks. It should have left the GPU by
@@ -248,24 +221,26 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
                      */
                     reset_needed = true;
                 }
-#endif                /* !CINSTR_DUMPING_ENABLED */
+#endif /* !CINSTR_DUMPING_ENABLED */
             }
         }
     }
 #if KBASE_GPU_RESET_EN
     if (reset_needed) {
-        dev_err(kbdev->dev, "JS: Job has been on the GPU for too long (JS_RESET_TICKS_SS/DUMPING timeout hit). Issueing GPU soft-reset to resolve.");
+        dev_err(kbdev->dev, "JS: Job has been on the GPU for too long (JS_RESET_TICKS_SS/DUMPING timeout hit). "
+                            "Issueing GPU soft-reset to resolve.");
 
-        if (kbase_prepare_to_reset_gpu_locked(kbdev))
+        if (kbase_prepare_to_reset_gpu_locked(kbdev)) {
             kbase_reset_gpu_locked(kbdev);
+        }
     }
 #endif /* KBASE_GPU_RESET_EN */
     /* the timer is re-issued if there is contexts in the run-pool */
 
-    if (backend->timer_running)
-        hrtimer_start(&backend->scheduling_timer,
-            HR_TIMER_DELAY_NSEC(js_devdata->scheduling_period_ns),
-            HRTIMER_MODE_REL);
+    if (backend->timer_running) {
+        hrtimer_start(&backend->scheduling_timer, HR_TIMER_DELAY_NSEC(js_devdata->scheduling_period_ns),
+                      HRTIMER_MODE_REL);
+    }
 
     backend->timeouts_updated = false;
 
@@ -300,12 +275,10 @@ void kbase_backend_ctx_count_changed(struct kbase_device *kbdev)
         spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
         backend->timer_running = true;
         spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
-        hrtimer_start(&backend->scheduling_timer,
-            HR_TIMER_DELAY_NSEC(js_devdata->scheduling_period_ns),
-                            HRTIMER_MODE_REL);
+        hrtimer_start(&backend->scheduling_timer, HR_TIMER_DELAY_NSEC(js_devdata->scheduling_period_ns),
+                      HRTIMER_MODE_REL);
 
-        KBASE_TRACE_ADD(kbdev, JS_POLICY_TIMER_START, NULL, NULL, 0u,
-                                    0u);
+        KBASE_TRACE_ADD(kbdev, JS_POLICY_TIMER_START, NULL, NULL, 0u, 0u);
     }
 }
 
@@ -313,8 +286,7 @@ int kbase_backend_timer_init(struct kbase_device *kbdev)
 {
     struct kbase_backend_data *backend = &kbdev->hwaccess.backend;
 
-    hrtimer_init(&backend->scheduling_timer, CLOCK_MONOTONIC,
-                            HRTIMER_MODE_REL);
+    hrtimer_init(&backend->scheduling_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
     backend->scheduling_timer.function = timer_callback;
 
     backend->timer_running = false;
@@ -353,4 +325,3 @@ void kbase_backend_timeouts_changed(struct kbase_device *kbdev)
 
     backend->timeouts_updated = true;
 }
-

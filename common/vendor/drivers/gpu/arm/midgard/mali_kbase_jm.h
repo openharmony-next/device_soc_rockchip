@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /*
  * Job manager common APIs
  */
@@ -93,8 +90,7 @@ void kbase_jm_idle_ctx(struct kbase_device *kbdev, struct kbase_context *kctx);
  *
  * Return: Atom that has now been unblocked and can now be run, or NULL if none
  */
-struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev,
-            struct kbase_jd_atom *katom);
+struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev, struct kbase_jd_atom *katom);
 
 /**
  * kbase_jm_complete() - Complete an atom
@@ -104,7 +100,7 @@ struct kbase_jd_atom *kbase_jm_return_atom_to_js(struct kbase_device *kbdev,
  *
  * Return: Atom that has now been unblocked and can now be run, or NULL if none
  */
-struct kbase_jd_atom *kbase_jm_complete(struct kbase_device *kbdev,
-        struct kbase_jd_atom *katom, ktime_t *end_timestamp);
+struct kbase_jd_atom *kbase_jm_complete(struct kbase_device *kbdev, struct kbase_jd_atom *katom,
+                                        ktime_t *end_timestamp);
 
 #endif /* _KBASE_JM_H_ */

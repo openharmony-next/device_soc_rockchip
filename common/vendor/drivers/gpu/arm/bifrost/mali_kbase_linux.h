@@ -20,15 +20,13 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_linux.h
  * Base kernel APIs, Linux implementation.
  */
 
-#ifndef _KBASE_LINUX_H_
-#define _KBASE_LINUX_H_
+#ifndef KBASE_LINUX_H_
+#define KBASE_LINUX_H_
 
 /* All things that are needed for the Linux port. */
 #include <linux/platform_device.h>
@@ -38,9 +36,9 @@
 #include <linux/atomic.h>
 
 #if (defined(MALI_KERNEL_TEST_API) && (1 == MALI_KERNEL_TEST_API))
-    #define KBASE_EXPORT_TEST_API(func) EXPORT_SYMBOL(func)
+#define KBASE_EXPORT_TEST_API(func) EXPORT_SYMBOL(func)
 #else
-    #define KBASE_EXPORT_TEST_API(func)
+#define KBASE_EXPORT_TEST_API(func)
 #endif
 
 #define KBASE_EXPORT_SYMBOL(func) EXPORT_SYMBOL(func)

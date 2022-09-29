@@ -33,7 +33,7 @@ static int kbase_ktrace_get_ctx_refcnt(struct kbase_context *kctx)
 {
     return atomic_read(&kctx->refcount);
 }
-#else /* KBASE_KTRACE_ENABLE  */
+#else  /* KBASE_KTRACE_ENABLE  */
 static int kbase_ktrace_get_ctx_refcnt(struct kbase_context *kctx)
 {
     CSTD_UNUSED(kctx);
@@ -84,16 +84,17 @@ static int kbasep_ctx_sched_find_as_for_ctx(struct kbase_context *kctx)
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     /* First check if the previously assigned AS is available */
-    if ((kctx->as_nr != KBASEP_AS_NR_INVALID) &&
-            (kbdev->as_free & (1u << kctx->as_nr)))
+    if ((kctx->as_nr != KBASEP_AS_NR_INVALID) && (kbdev->as_free & (1u << kctx->as_nr))) {
         return kctx->as_nr;
+    }
 
     /* The previously assigned AS was taken, we'll be returning any free
      * AS at this point.
      */
     free_as = ffs(kbdev->as_free) - 1;
-    if (free_as >= 0 && free_as < kbdev->nr_hw_address_spaces)
+    if (free_as >= 0 && free_as < kbdev->nr_hw_address_spaces) {
         return free_as;
+    }
 
     return KBASEP_AS_NR_INVALID;
 }
@@ -116,23 +117,19 @@ int kbase_ctx_sched_retain_ctx(struct kbase_context *kctx)
              * assigned the same address space before.
              */
             if (free_as != kctx->as_nr) {
-                struct kbase_context *const prev_kctx =
-                    kbdev->as_to_kctx[free_as];
+                struct kbase_context *const prev_kctx = kbdev->as_to_kctx[free_as];
 
                 if (prev_kctx) {
                     WARN_ON(atomic_read(&prev_kctx->refcount) != 0);
                     kbase_mmu_disable(prev_kctx);
-                    KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(
-                        kbdev, prev_kctx->id);
+                    KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(kbdev, prev_kctx->id);
                     prev_kctx->as_nr = KBASEP_AS_NR_INVALID;
                 }
 
                 kctx->as_nr = free_as;
                 kbdev->as_to_kctx[free_as] = kctx;
-                KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(
-                    kbdev, kctx->id, free_as);
-                kbase_mmu_update(kbdev, &kctx->mmu,
-                    kctx->as_nr);
+                KBASE_TLSTREAM_TL_KBASE_CTX_ASSIGN_AS(kbdev, kctx->id, free_as);
+                kbase_mmu_update(kbdev, &kctx->mmu, kctx->as_nr);
             }
         } else {
             atomic_dec(&kctx->refcount);
@@ -170,8 +167,7 @@ void kbase_ctx_sched_release_ctx(struct kbase_context *kctx)
     if (new_ref_count == 0) {
         kbdev->as_free |= (1u << kctx->as_nr);
         if (kbase_ctx_flag(kctx, KCTX_AS_DISABLED_ON_FAULT)) {
-            KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(
-                kbdev, kctx->id);
+            KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(kbdev, kctx->id);
             kbdev->as_to_kctx[kctx->as_nr] = NULL;
             kctx->as_nr = KBASEP_AS_NR_INVALID;
             kbase_ctx_flag_clear(kctx, KCTX_AS_DISABLED_ON_FAULT);
@@ -191,8 +187,9 @@ void kbase_ctx_sched_remove_ctx(struct kbase_context *kctx)
     WARN_ON(atomic_read(&kctx->refcount) != 0);
 
     if (kctx->as_nr != KBASEP_AS_NR_INVALID) {
-        if (kbdev->pm.backend.gpu_powered)
+        if (kbdev->pm.backend.gpu_powered) {
             kbase_mmu_disable(kctx);
+        }
 
         KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(kbdev, kctx->id);
         kbdev->as_to_kctx[kctx->as_nr] = NULL;
@@ -214,8 +211,7 @@ void kbase_ctx_sched_restore_all_as(struct kbase_device *kbdev)
 
 #if MALI_USE_CSF
         if ((i == MCU_AS_NR) && kbdev->csf.firmware_inited) {
-            kbase_mmu_update(kbdev, &kbdev->csf.mcu_mmu,
-                     MCU_AS_NR);
+            kbase_mmu_update(kbdev, &kbdev->csf.mcu_mmu, MCU_AS_NR);
             continue;
         }
 #endif
@@ -224,17 +220,14 @@ void kbase_ctx_sched_restore_all_as(struct kbase_device *kbdev)
             if (atomic_read(&kctx->refcount)) {
                 WARN_ON(kctx->as_nr != i);
 
-                kbase_mmu_update(kbdev, &kctx->mmu,
-                    kctx->as_nr);
-                kbase_ctx_flag_clear(kctx,
-                    KCTX_AS_DISABLED_ON_FAULT);
+                kbase_mmu_update(kbdev, &kctx->mmu, kctx->as_nr);
+                kbase_ctx_flag_clear(kctx, KCTX_AS_DISABLED_ON_FAULT);
             } else {
                 /* This context might have been assigned an
                  * AS before, clear it.
                  */
                 if (kctx->as_nr != KBASEP_AS_NR_INVALID) {
-                    KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(
-                        kbdev, kctx->id);
+                    KBASE_TLSTREAM_TL_KBASE_CTX_UNASSIGN_AS(kbdev, kctx->id);
                     kbdev->as_to_kctx[kctx->as_nr] = NULL;
                     kctx->as_nr = KBASEP_AS_NR_INVALID;
                 }
@@ -245,49 +238,53 @@ void kbase_ctx_sched_restore_all_as(struct kbase_device *kbdev)
     }
 }
 
-struct kbase_context *kbase_ctx_sched_as_to_ctx_refcount(
-        struct kbase_device *kbdev, size_t as_nr)
+struct kbase_context *kbase_ctx_sched_as_to_ctx_refcount(struct kbase_device *kbdev, size_t as_nr)
 {
     unsigned long flags;
     struct kbase_context *found_kctx = NULL;
 
-    if (WARN_ON(kbdev == NULL))
+    if (WARN_ON(kbdev == NULL)) {
         return NULL;
+    }
 
-    if (WARN_ON(as_nr >= BASE_MAX_NR_AS))
+    if (WARN_ON(as_nr >= BASE_MAX_NR_AS)) {
         return NULL;
+    }
 
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
 
     found_kctx = kbdev->as_to_kctx[as_nr];
 
-    if (found_kctx != NULL)
+    if (found_kctx != NULL) {
         kbase_ctx_sched_retain_ctx_refcount(found_kctx);
+    }
 
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 
     return found_kctx;
 }
 
-struct kbase_context *kbase_ctx_sched_as_to_ctx(struct kbase_device *kbdev,
-        size_t as_nr)
+struct kbase_context *kbase_ctx_sched_as_to_ctx(struct kbase_device *kbdev, size_t as_nr)
 {
     unsigned long flags;
     struct kbase_context *found_kctx;
 
-    if (WARN_ON(kbdev == NULL))
+    if (WARN_ON(kbdev == NULL)) {
         return NULL;
+    }
 
-    if (WARN_ON(as_nr >= BASE_MAX_NR_AS))
+    if (WARN_ON(as_nr >= BASE_MAX_NR_AS)) {
         return NULL;
+    }
 
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
 
     found_kctx = kbdev->as_to_kctx[as_nr];
 
     if (found_kctx) {
-        if (WARN_ON(atomic_read(&found_kctx->refcount) <= 0))
+        if (WARN_ON(atomic_read(&found_kctx->refcount) <= 0)) {
             found_kctx = NULL;
+        }
     }
 
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
@@ -300,8 +297,9 @@ bool kbase_ctx_sched_inc_refcount_nolock(struct kbase_context *kctx)
     bool result = false;
     int as_nr;
 
-    if (WARN_ON(kctx == NULL))
+    if (WARN_ON(kctx == NULL)) {
         return result;
+    }
 
     lockdep_assert_held(&kctx->kbdev->hwaccess_lock);
 
@@ -310,8 +308,7 @@ bool kbase_ctx_sched_inc_refcount_nolock(struct kbase_context *kctx)
         KBASE_DEBUG_ASSERT(as_nr >= 0);
 
         kbase_ctx_sched_retain_ctx_refcount(kctx);
-        KBASE_KTRACE_ADD(kctx->kbdev, SCHED_RETAIN_CTX_NOLOCK, kctx,
-                kbase_ktrace_get_ctx_refcnt(kctx));
+        KBASE_KTRACE_ADD(kctx->kbdev, SCHED_RETAIN_CTX_NOLOCK, kctx, kbase_ktrace_get_ctx_refcnt(kctx));
         result = true;
     }
 
@@ -323,11 +320,13 @@ bool kbase_ctx_sched_inc_refcount(struct kbase_context *kctx)
     unsigned long flags;
     bool result = false;
 
-    if (WARN_ON(kctx == NULL))
+    if (WARN_ON(kctx == NULL)) {
         return result;
+    }
 
-    if (WARN_ON(kctx->kbdev == NULL))
+    if (WARN_ON(kctx->kbdev == NULL)) {
         return result;
+    }
 
     mutex_lock(&kctx->kbdev->mmu_hw_mutex);
     spin_lock_irqsave(&kctx->kbdev->hwaccess_lock, flags);
@@ -342,14 +341,15 @@ void kbase_ctx_sched_release_ctx_lock(struct kbase_context *kctx)
 {
     unsigned long flags;
 
-    if (WARN_ON(!kctx))
+    if (WARN_ON(!kctx)) {
         return;
+    }
 
     spin_lock_irqsave(&kctx->kbdev->hwaccess_lock, flags);
 
-    if (!WARN_ON(kctx->as_nr == KBASEP_AS_NR_INVALID) &&
-            !WARN_ON(atomic_read(&kctx->refcount) <= 0))
+    if (!WARN_ON(kctx->as_nr == KBASEP_AS_NR_INVALID) && !WARN_ON(atomic_read(&kctx->refcount) <= 0)) {
         kbase_ctx_sched_release_ctx(kctx);
+    }
 
     spin_unlock_irqrestore(&kctx->kbdev->hwaccess_lock, flags);
 }

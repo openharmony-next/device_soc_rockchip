@@ -36,8 +36,7 @@ enum df_reason {
  */
 struct deferred_freelist_item {
     size_t nr_pages;
-    void (*free)(struct deferred_freelist_item *i,
-             enum df_reason reason);
+    void (*free)(struct deferred_freelist_item *i, enum df_reason reason);
     struct list_head list;
 };
 
@@ -49,7 +48,5 @@ struct deferred_freelist_item {
  * @nr_pages: number of pages to be freed
  */
 void deferred_free(struct deferred_freelist_item *item,
-           void (*free)(struct deferred_freelist_item *i,
-                enum df_reason reason),
-           size_t nr_pages);
+                   void (*free)(struct deferred_freelist_item *i, enum df_reason reason), size_t nr_pages);
 #endif

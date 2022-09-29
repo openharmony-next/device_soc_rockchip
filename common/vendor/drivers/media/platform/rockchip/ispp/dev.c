@@ -56,8 +56,7 @@ module_param_named(sendreg_withstream, rkispp_reg_withstream, bool, 0644);
 MODULE_PARM_DESC(sendreg_withstream, "rkispp send reg out with stream");
 
 char rkispp_reg_withstream_video_name[RKISPP_VIDEO_NAME_LEN];
-module_param_string(sendreg_withstream_video_name, rkispp_reg_withstream_video_name,
-            RKISPP_VIDEO_NAME_LEN, 0644);
+module_param_string(sendreg_withstream_video_name, rkispp_reg_withstream_video_name, RKISPP_VIDEO_NAME_LEN, 0644);
 MODULE_PARM_DESC(sendreg_withstream, "rkispp video send reg out with stream");
 
 unsigned int rkispp_debug_reg = 0x1F;
@@ -74,8 +73,9 @@ MODULE_PARM_DESC(dump_path, "rkispp dump debug file path");
 
 void rkispp_set_clk_rate(struct clk *clk, unsigned long rate)
 {
-    if (rkispp_clk_dbg)
+    if (rkispp_clk_dbg) {
         return;
+    }
 
     clk_set_rate(clk, rate);
 }
@@ -91,13 +91,13 @@ static void get_remote_node_dev(struct rkispp_device *ispp_dev)
 
     for (i = 0; i < RKISPP_NODE_INDEX; i++) {
         remote = of_graph_get_remote_node(parent, 0, i);
-        if (!remote)
+        if (!remote) {
             continue;
+        }
         remote_dev = of_find_device_by_node(remote);
         of_node_put(remote);
         if (!remote_dev) {
-            dev_err(dev, "Failed to get remote device(%s)\n",
-                of_node_full_name(remote));
+            dev_err(dev, "Failed to get remote device(%s)\n", of_node_full_name(remote));
             continue;
         } else {
             rkisp_get_bridge_sd(remote_dev, &sd);
@@ -106,9 +106,9 @@ static void get_remote_node_dev(struct rkispp_device *ispp_dev)
             } else {
                 ispp_dev->ispp_sdev.remote_sd = sd;
                 v4l2_set_subdev_hostdata(sd, &ispp_dev->ispp_sdev.sd);
-                if (ispp_dev->hw_dev->max_in.w && ispp_dev->hw_dev->max_in.h)
-                    v4l2_subdev_call(sd, core, ioctl, RKISP_ISPP_CMD_SET_FMT,
-                             &ispp_dev->hw_dev->max_in);
+                if (ispp_dev->hw_dev->max_in.w && ispp_dev->hw_dev->max_in.h) {
+                    v4l2_subdev_call(sd, core, ioctl, RKISP_ISPP_CMD_SET_FMT, &ispp_dev->hw_dev->max_in);
+                }
                 break;
             }
         }
@@ -137,15 +137,17 @@ static int rkispp_create_links(struct rkispp_device *ispp_dev)
     }
     source = &stream->vnode.vdev.entity;
     ret = media_create_pad_link(source, 0, sink, RKISPP_PAD_SINK, flags);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     /* params links */
     flags = MEDIA_LNK_FL_ENABLED;
     source = &ispp_dev->params_vdev.vnode.vdev.entity;
     ret = media_create_pad_link(source, 0, sink, RKISPP_PAD_SINK_PARAMS, flags);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
     ispp_dev->stream_vdev.module_ens = ISPP_MODULE_FEC;
     if (ispp_dev->ispp_ver == ISPP_V10) {
         /* stats links */
@@ -153,30 +155,34 @@ static int rkispp_create_links(struct rkispp_device *ispp_dev)
         source = &ispp_dev->ispp_sdev.sd.entity;
         sink = &ispp_dev->stats_vdev.vnode.vdev.entity;
         ret = media_create_pad_link(source, RKISPP_PAD_SOURCE_STATS, sink, 0, flags);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
 
         /* output stream links */
         stream = &stream_vdev->stream[STREAM_S0];
         stream->linked = flags;
         sink = &stream->vnode.vdev.entity;
         ret = media_create_pad_link(source, RKISPP_PAD_SOURCE, sink, 0, flags);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
 
         stream = &stream_vdev->stream[STREAM_S1];
         stream->linked = flags;
         sink = &stream->vnode.vdev.entity;
         ret = media_create_pad_link(source, RKISPP_PAD_SOURCE, sink, 0, flags);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
 
         stream = &stream_vdev->stream[STREAM_S2];
         stream->linked = flags;
         sink = &stream->vnode.vdev.entity;
         ret = media_create_pad_link(source, RKISPP_PAD_SOURCE, sink, 0, flags);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
 
         ispp_dev->stream_vdev.module_ens = ISPP_MODULE_NR | ISPP_MODULE_SHP;
     }
@@ -187,15 +193,17 @@ static int rkispp_create_links(struct rkispp_device *ispp_dev)
     source = &ispp_dev->ispp_sdev.sd.entity;
     sink = &stream->vnode.vdev.entity;
     ret = media_create_pad_link(source, RKISPP_PAD_SOURCE, sink, 0, flags);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     stream = &stream_vdev->stream[STREAM_VIR];
     stream->linked = flags;
     sink = &stream->vnode.vdev.entity;
     ret = media_create_pad_link(source, RKISPP_PAD_SOURCE, sink, 0, flags);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     /* default enable */
     return 0;
@@ -206,24 +214,29 @@ static int rkispp_register_platform_subdevs(struct rkispp_device *ispp_dev)
     int ret;
 
     ret = rkispp_register_stream_vdevs(ispp_dev);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     ret = rkispp_register_params_vdev(ispp_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_unreg_stream_vdevs;
+    }
 
     ret = rkispp_register_stats_vdev(ispp_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_unreg_params_vdev;
+    }
 
     ret = rkispp_register_subdev(ispp_dev, &ispp_dev->v4l2_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_unreg_stats_vdev;
+    }
 
     ret = rkispp_create_links(ispp_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_unreg_ispp_subdev;
+    }
     return ret;
 err_unreg_ispp_subdev:
     rkispp_unregister_subdev(ispp_dev);
@@ -239,7 +252,8 @@ err_unreg_stream_vdevs:
 static const struct of_device_id rkispp_plat_of_match[] = {
     {
         .compatible = "rockchip,rv1126-rkispp-vir",
-    }, {
+    },
+    {
         .compatible = "rockchip,rk3588-rkispp-vir",
     },
     {},
@@ -252,37 +266,36 @@ static int rkispp_plat_probe(struct platform_device *pdev)
     struct rkispp_device *ispp_dev;
     int ret;
 
-    sprintf(rkispp_version, "v%02x.%02x.%02x",
-        RKISPP_DRIVER_VERSION >> RKISPP_NODE_OFFSET_THI,
-        (RKISPP_DRIVER_VERSION & 0xff00) >> RKISPP_NODE_OFFSET_EI,
-        RKISPP_DRIVER_VERSION & 0x00ff);
+    sprintf(rkispp_version, "v%02x.%02x.%02x", RKISPP_DRIVER_VERSION >> RKISPP_NODE_OFFSET_THI,
+            (RKISPP_DRIVER_VERSION & 0xff00) >> RKISPP_NODE_OFFSET_EI, RKISPP_DRIVER_VERSION & 0x00ff);
 
     dev_info(dev, "rkispp driver version: %s\n", rkispp_version);
 
     ispp_dev = devm_kzalloc(dev, sizeof(*ispp_dev), GFP_KERNEL);
-    if (!ispp_dev)
+    if (!ispp_dev) {
         return -ENOMEM;
+    }
     ispp_dev->sw_base_addr = devm_kzalloc(dev, RKISP_ISPP_SW_MAX_SIZE, GFP_KERNEL);
-    if (!ispp_dev->sw_base_addr)
+    if (!ispp_dev->sw_base_addr) {
         return -ENOMEM;
+    }
 
     dev_set_drvdata(dev, ispp_dev);
     ispp_dev->dev = dev;
 
     ret = rkispp_attach_hw(ispp_dev);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
-    sprintf(ispp_dev->media_dev.model, "%s%d",
-        DRIVER_NAME, ispp_dev->dev_id);
+    sprintf(ispp_dev->media_dev.model, "%s%d", DRIVER_NAME, ispp_dev->dev_id);
     ispp_dev->irq_hdl = rkispp_isr;
     mutex_init(&ispp_dev->apilock);
     mutex_init(&ispp_dev->iqlock);
     init_waitqueue_head(&ispp_dev->sync_onoff);
 
     strscpy(ispp_dev->name, dev_name(dev), sizeof(ispp_dev->name));
-    strscpy(ispp_dev->media_dev.driver_name, ispp_dev->name,
-        sizeof(ispp_dev->media_dev.driver_name));
+    strscpy(ispp_dev->media_dev.driver_name, ispp_dev->name, sizeof(ispp_dev->media_dev.driver_name));
     ispp_dev->media_dev.dev = &pdev->dev;
     v4l2_dev = &ispp_dev->v4l2_dev;
     v4l2_dev->mdev = &ispp_dev->media_dev;
@@ -303,12 +316,12 @@ static int rkispp_plat_probe(struct platform_device *pdev)
     }
 
     ret = rkispp_register_platform_subdevs(ispp_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_unreg_media_dev;
+    }
 
     rkispp_wait_line = 0;
-    of_property_read_u32(pdev->dev.of_node, "wait-line",
-                 &rkispp_wait_line);
+    of_property_read_u32(pdev->dev.of_node, "wait-line", &rkispp_wait_line);
     rkispp_proc_init(ispp_dev);
     pm_runtime_enable(&pdev->dev);
 
@@ -368,18 +381,16 @@ static int __maybe_unused rkispp_runtime_resume(struct device *dev)
 }
 
 static const struct dev_pm_ops rkispp_plat_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-                pm_runtime_force_resume)
-    SET_RUNTIME_PM_OPS(rkispp_runtime_suspend,
-               rkispp_runtime_resume, NULL)
-};
+    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
+        SET_RUNTIME_PM_OPS(rkispp_runtime_suspend, rkispp_runtime_resume, NULL)};
 
 struct platform_driver rkispp_plat_drv = {
-    .driver = {
-        .name = DRIVER_NAME,
-        .of_match_table = of_match_ptr(rkispp_plat_of_match),
-        .pm = &rkispp_plat_pm_ops,
-    },
+    .driver =
+        {
+            .name = DRIVER_NAME,
+            .of_match_table = of_match_ptr(rkispp_plat_of_match),
+            .pm = &rkispp_plat_pm_ops,
+        },
     .probe = rkispp_plat_probe,
     .remove = rkispp_plat_remove,
 };

@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Power management API definitions used internally by GPU backend
  */
@@ -28,7 +24,6 @@
 
 #include "mali_kbase_pm_ca.h"
 #include "mali_kbase_pm_policy.h"
-
 
 /**
  * kbase_pm_dev_idle - The GPU is idle.
@@ -62,8 +57,7 @@ void kbase_pm_dev_activate(struct kbase_device *kbdev);
  *
  * Return: The bit mask of cores present
  */
-u64 kbase_pm_get_present_cores(struct kbase_device *kbdev,
-                        enum kbase_pm_core_type type);
+u64 kbase_pm_get_present_cores(struct kbase_device *kbdev, enum kbase_pm_core_type type);
 
 /**
  * kbase_pm_get_active_cores - Get details of the cores that are currently
@@ -78,8 +72,7 @@ u64 kbase_pm_get_present_cores(struct kbase_device *kbdev,
  *
  * Return: The bit mask of active cores
  */
-u64 kbase_pm_get_active_cores(struct kbase_device *kbdev,
-                        enum kbase_pm_core_type type);
+u64 kbase_pm_get_active_cores(struct kbase_device *kbdev, enum kbase_pm_core_type type);
 
 /**
  * kbase_pm_get_trans_cores - Get details of the cores that are currently
@@ -94,8 +87,7 @@ u64 kbase_pm_get_active_cores(struct kbase_device *kbdev,
  *
  * Return: The bit mask of transitioning cores
  */
-u64 kbase_pm_get_trans_cores(struct kbase_device *kbdev,
-                        enum kbase_pm_core_type type);
+u64 kbase_pm_get_trans_cores(struct kbase_device *kbdev, enum kbase_pm_core_type type);
 
 /**
  * kbase_pm_get_ready_cores - Get details of the cores that are currently
@@ -110,8 +102,7 @@ u64 kbase_pm_get_trans_cores(struct kbase_device *kbdev,
  *
  * Return: The bit mask of ready cores
  */
-u64 kbase_pm_get_ready_cores(struct kbase_device *kbdev,
-                        enum kbase_pm_core_type type);
+u64 kbase_pm_get_ready_cores(struct kbase_device *kbdev, enum kbase_pm_core_type type);
 
 /**
  * kbase_pm_clock_on - Turn the clock for the device on, and enable device
@@ -200,7 +191,6 @@ int kbase_pm_init_hw(struct kbase_device *kbdev, unsigned int flags);
  * @kbdev: The kbase device structure for the device (must be a valid pointer)
  */
 void kbase_pm_reset_done(struct kbase_device *kbdev);
-
 
 /**
  * kbase_pm_check_transitions_nolock - Check if there are any power transitions
@@ -487,8 +477,7 @@ void kbase_pm_do_poweron(struct kbase_device *kbdev, bool is_resume);
 void kbase_pm_do_poweroff(struct kbase_device *kbdev, bool is_suspend);
 
 #if defined(CONFIG_MALI_DEVFREQ) || defined(CONFIG_MALI_MIDGARD_DVFS)
-void kbase_pm_get_dvfs_utilisation(struct kbase_device *kbdev,
-        unsigned long *total, unsigned long *busy);
+void kbase_pm_get_dvfs_utilisation(struct kbase_device *kbdev, unsigned long *total, unsigned long *busy);
 void kbase_pm_reset_dvfs_utilisation(struct kbase_device *kbdev);
 #endif /* defined(CONFIG_MALI_DEVFREQ) || defined(CONFIG_MALI_MIDGARD_DVFS) */
 
@@ -509,8 +498,7 @@ void kbase_pm_reset_dvfs_utilisation(struct kbase_device *kbdev);
  * Return:         Returns 0 on failure and non zero on success.
  */
 
-int kbase_platform_dvfs_event(struct kbase_device *kbdev, u32 utilisation,
-    u32 util_gl_share, u32 util_cl_share[2]);
+int kbase_platform_dvfs_event(struct kbase_device *kbdev, u32 utilisation, u32 util_gl_share, u32 util_cl_share[2]);
 #endif
 
 void kbase_pm_power_changed(struct kbase_device *kbdev);
@@ -523,8 +511,7 @@ void kbase_pm_power_changed(struct kbase_device *kbdev);
  *
  * Caller must hold hwaccess_lock
  */
-void kbase_pm_metrics_update(struct kbase_device *kbdev,
-                ktime_t *now);
+void kbase_pm_metrics_update(struct kbase_device *kbdev, ktime_t *now);
 
 /**
  * kbase_pm_cache_snoop_enable - Allow CPU snoops on the GPU

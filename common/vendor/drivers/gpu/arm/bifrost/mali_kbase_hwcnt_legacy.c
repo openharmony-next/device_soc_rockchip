@@ -43,30 +43,31 @@ struct kbase_hwcnt_legacy_client {
     struct kbase_hwcnt_virtualizer_client *hvcli;
 };
 
-int kbase_hwcnt_legacy_client_create(
-    struct kbase_hwcnt_virtualizer *hvirt,
-    struct kbase_ioctl_hwcnt_enable *enable,
-    struct kbase_hwcnt_legacy_client **out_hlcli)
+int kbase_hwcnt_legacy_client_create(struct kbase_hwcnt_virtualizer *hvirt, struct kbase_ioctl_hwcnt_enable *enable,
+                                     struct kbase_hwcnt_legacy_client **out_hlcli)
 {
     int errcode;
     struct kbase_hwcnt_legacy_client *hlcli;
     const struct kbase_hwcnt_metadata *metadata;
     struct kbase_hwcnt_physical_enable_map phys_em;
 
-    if (!hvirt || !enable || !enable->dump_buffer || !out_hlcli)
+    if (!hvirt || !enable || !enable->dump_buffer || !out_hlcli) {
         return -EINVAL;
+    }
 
     metadata = kbase_hwcnt_virtualizer_metadata(hvirt);
 
     hlcli = kzalloc(sizeof(*hlcli), GFP_KERNEL);
-    if (!hlcli)
+    if (!hlcli) {
         return -ENOMEM;
+    }
 
     hlcli->user_dump_buf = (void __user *)(uintptr_t)enable->dump_buffer;
 
     errcode = kbase_hwcnt_enable_map_alloc(metadata, &hlcli->enable_map);
-    if (errcode)
+    if (errcode) {
         goto error;
+    }
 
     /* Translate from the ioctl enable map to the internal one */
     phys_em.fe_bm = enable->fe_bm;
@@ -76,13 +77,14 @@ int kbase_hwcnt_legacy_client_create(
     kbase_hwcnt_gpu_enable_map_from_physical(&hlcli->enable_map, &phys_em);
 
     errcode = kbase_hwcnt_dump_buffer_alloc(metadata, &hlcli->dump_buf);
-    if (errcode)
+    if (errcode) {
         goto error;
+    }
 
-    errcode = kbase_hwcnt_virtualizer_client_create(
-        hvirt, &hlcli->enable_map, &hlcli->hvcli);
-    if (errcode)
+    errcode = kbase_hwcnt_virtualizer_client_create(hvirt, &hlcli->enable_map, &hlcli->hvcli);
+    if (errcode) {
         goto error;
+    }
 
     *out_hlcli = hlcli;
     return 0;
@@ -94,8 +96,9 @@ error:
 
 void kbase_hwcnt_legacy_client_destroy(struct kbase_hwcnt_legacy_client *hlcli)
 {
-    if (!hlcli)
+    if (!hlcli) {
         return;
+    }
 
     kbase_hwcnt_virtualizer_client_destroy(hlcli->hvcli);
     kbase_hwcnt_dump_buffer_free(&hlcli->dump_buf);
@@ -109,31 +112,30 @@ int kbase_hwcnt_legacy_client_dump(struct kbase_hwcnt_legacy_client *hlcli)
     u64 ts_start_ns;
     u64 ts_end_ns;
 
-    if (!hlcli)
+    if (!hlcli) {
         return -EINVAL;
+    }
 
     /* Dump into the kernel buffer */
-    errcode = kbase_hwcnt_virtualizer_client_dump(hlcli->hvcli,
-        &ts_start_ns, &ts_end_ns, &hlcli->dump_buf);
-    if (errcode)
+    errcode = kbase_hwcnt_virtualizer_client_dump(hlcli->hvcli, &ts_start_ns, &ts_end_ns, &hlcli->dump_buf);
+    if (errcode) {
         return errcode;
+    }
 
     /* Patch the dump buf headers, to hide the counters that other hwcnt
      * clients are using.
      */
-    kbase_hwcnt_gpu_patch_dump_headers(
-        &hlcli->dump_buf, &hlcli->enable_map);
+    kbase_hwcnt_gpu_patch_dump_headers(&hlcli->dump_buf, &hlcli->enable_map);
 
     /* Zero all non-enabled counters (current values are undefined) */
-    kbase_hwcnt_dump_buffer_zero_non_enabled(
-        &hlcli->dump_buf, &hlcli->enable_map);
+    kbase_hwcnt_dump_buffer_zero_non_enabled(&hlcli->dump_buf, &hlcli->enable_map);
 
     /* Copy into the user's buffer */
-    errcode = copy_to_user(hlcli->user_dump_buf, hlcli->dump_buf.dump_buf,
-        hlcli->dump_buf.metadata->dump_buf_bytes);
+    errcode = copy_to_user(hlcli->user_dump_buf, hlcli->dump_buf.dump_buf, hlcli->dump_buf.metadata->dump_buf_bytes);
     /* Non-zero errcode implies user buf was invalid or too small */
-    if (errcode)
+    if (errcode) {
         return -EFAULT;
+    }
 
     return 0;
 }
@@ -143,10 +145,10 @@ int kbase_hwcnt_legacy_client_clear(struct kbase_hwcnt_legacy_client *hlcli)
     u64 ts_start_ns;
     u64 ts_end_ns;
 
-    if (!hlcli)
+    if (!hlcli) {
         return -EINVAL;
+    }
 
     /* Dump with a NULL buffer to clear this client's counters */
-    return kbase_hwcnt_virtualizer_client_dump(hlcli->hvcli,
-        &ts_start_ns, &ts_end_ns, NULL);
+    return kbase_hwcnt_virtualizer_client_dump(hlcli->hvcli, &ts_start_ns, &ts_end_ns, NULL);
 }

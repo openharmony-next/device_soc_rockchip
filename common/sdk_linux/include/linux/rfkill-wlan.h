@@ -8,40 +8,40 @@
 #include <linux/clk.h>
 
 struct rksdmmc_iomux {
-    char    *name;  //set the MACRO of gpio
-    int     fgpio;
-    int     fmux;
+    char *name; // set the MACRO of gpio
+    int fgpio;
+    int fmux;
 };
 
 struct rksdmmc_gpio {
-    int     io;                             //set the address of gpio
-    char    name[64];   //
-    int     enable;  // disable = !enable   //set the default value,i.e,GPIO_HIGH or GPIO_LOW
-    struct rksdmmc_iomux  iomux;
+    int io;        // set the address of gpio
+    char name[64]; //
+    int enable;    // disable = !enable   //set the default value,i.e,GPIO_HIGH or GPIO_LOW
+    struct rksdmmc_iomux iomux;
 };
 
 struct rksdmmc_pmu {
     bool power_ctrl_by_pmu;
     char pmu_regulator[20];
-    int  enable;
+    int enable;
 };
 
 struct rksdmmc_gpio_wifi_moudle {
-    int sdio_vol;    //sdio reference voltage
+    int sdio_vol; // sdio reference voltage
     bool vref_ctrl_enble;
     bool wifi_power_remain;
-    struct rksdmmc_pmu    mregulator;
-    struct rksdmmc_pmu    ioregulator;
-    struct rksdmmc_gpio   vbat_n;
-    struct rksdmmc_gpio   power_n;  //PMU_EN  
-    struct rksdmmc_gpio   reset_n;  //SYSRET_B, DAIRST 
-    struct rksdmmc_gpio   vddio;
-    struct rksdmmc_gpio   bgf_int_b;
-    struct rksdmmc_gpio   wifi_int_b;
-    struct rksdmmc_gpio   gps_sync;
-    struct rksdmmc_gpio   ANTSEL2;  //pin5--ANTSEL2  
-    struct rksdmmc_gpio   ANTSEL3;  //pin6--ANTSEL3 
-    struct rksdmmc_gpio   GPS_LAN;  //pin33--GPS_LAN
+    struct rksdmmc_pmu mregulator;
+    struct rksdmmc_pmu ioregulator;
+    struct rksdmmc_gpio vbat_n;
+    struct rksdmmc_gpio power_n; // PMU_EN
+    struct rksdmmc_gpio reset_n; // SYSRET_B, DAIRST
+    struct rksdmmc_gpio vddio;
+    struct rksdmmc_gpio bgf_int_b;
+    struct rksdmmc_gpio wifi_int_b;
+    struct rksdmmc_gpio gps_sync;
+    struct rksdmmc_gpio ANTSEL2; // pin5--ANTSEL2
+    struct rksdmmc_gpio ANTSEL3; // pin6--ANTSEL3
+    struct rksdmmc_gpio GPS_LAN; // pin33--GPS_LAN
     struct regmap *grf;
     struct clk *ext_clk;
 };

@@ -68,10 +68,10 @@ int drm_getmagic(struct drm_device *dev, void *data, struct drm_file *file_priv)
 
     mutex_lock(&dev->master_mutex);
     if (!file_priv->magic) {
-        ret = idr_alloc(&file_priv->master->magic_map, file_priv,
-                1, 0, GFP_KERNEL);
-        if (ret >= 0)
+        ret = idr_alloc(&file_priv->master->magic_map, file_priv, 1, 0, GFP_KERNEL);
+        if (ret >= 0) {
             file_priv->magic = ret;
+        }
     }
     auth->magic = file_priv->magic;
     mutex_unlock(&dev->master_mutex);
@@ -81,8 +81,7 @@ int drm_getmagic(struct drm_device *dev, void *data, struct drm_file *file_priv)
     return ret < 0 ? ret : 0;
 }
 
-int drm_authmagic(struct drm_device *dev, void *data,
-          struct drm_file *file_priv)
+int drm_authmagic(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
     struct drm_auth *auth = data;
     struct drm_file *file;
@@ -105,8 +104,9 @@ struct drm_master *drm_master_create(struct drm_device *dev)
     struct drm_master *master;
 
     master = kzalloc(sizeof(*master), GFP_KERNEL);
-    if (!master)
+    if (!master) {
         return NULL;
+    }
 
     kref_init(&master->refcount);
     drm_master_legacy_init(master);
@@ -122,12 +122,12 @@ struct drm_master *drm_master_create(struct drm_device *dev)
     return master;
 }
 
-static void drm_set_master(struct drm_device *dev, struct drm_file *fpriv,
-               bool new_master)
+static void drm_set_master(struct drm_device *dev, struct drm_file *fpriv, bool new_master)
 {
     dev->master = drm_master_get(fpriv->master);
-    if (dev->driver->master_set)
+    if (dev->driver->master_set) {
         dev->driver->master_set(dev, fpriv, new_master);
+    }
 
     fpriv->was_master = true;
 }
@@ -151,8 +151,9 @@ static int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv)
 
     drm_set_master(dev, fpriv, true);
 
-    if (old_master)
+    if (old_master) {
         drm_master_put(&old_master);
+    }
 
     return 0;
 }
@@ -200,31 +201,33 @@ static int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv)
  * - weston
  * - various compositors based on wlroots
  */
-static int
-drm_master_check_perm(struct drm_device *dev, struct drm_file *file_priv)
+static int drm_master_check_perm(struct drm_device *dev, struct drm_file *file_priv)
 {
-    if (file_priv->pid == task_pid(current) && file_priv->was_master)
+    if (file_priv->pid == task_pid(current) && file_priv->was_master) {
         return 0;
+    }
 
-    if (!capable(CAP_SYS_ADMIN))
+    if (!capable(CAP_SYS_ADMIN)) {
         return -EACCES;
+    }
 
     return 0;
 }
 
-int drm_setmaster_ioctl(struct drm_device *dev, void *data,
-            struct drm_file *file_priv)
+int drm_setmaster_ioctl(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
     int ret;
 
     mutex_lock(&dev->master_mutex);
 
     ret = drm_master_check_perm(dev, file_priv);
-    if (ret)
+    if (ret) {
         goto out_unlock;
+    }
 
-    if (drm_is_current_master(file_priv))
+    if (drm_is_current_master(file_priv)) {
         goto out_unlock;
+    }
 
     if (dev->master) {
         ret = -EBUSY;
@@ -253,24 +256,24 @@ out_unlock:
     return ret;
 }
 
-static void drm_drop_master(struct drm_device *dev,
-                struct drm_file *fpriv)
+static void drm_drop_master(struct drm_device *dev, struct drm_file *fpriv)
 {
-    if (dev->driver->master_drop)
+    if (dev->driver->master_drop) {
         dev->driver->master_drop(dev, fpriv);
+    }
     drm_master_put(&dev->master);
 }
 
-int drm_dropmaster_ioctl(struct drm_device *dev, void *data,
-             struct drm_file *file_priv)
+int drm_dropmaster_ioctl(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
     int ret;
 
     mutex_lock(&dev->master_mutex);
 
     ret = drm_master_check_perm(dev, file_priv);
-    if (ret)
+    if (ret) {
         goto out_unlock;
+    }
 
     if (!drm_is_current_master(file_priv)) {
         ret = -EINVAL;
@@ -302,10 +305,11 @@ int drm_master_open(struct drm_file *file_priv)
     /* if there is no current master make this fd it, but do not create
      * any master object for render clients */
     mutex_lock(&dev->master_mutex);
-    if (!dev->master)
+    if (!dev->master) {
         ret = drm_new_set_master(dev, file_priv);
-    else
+    } else {
         file_priv->master = drm_master_get(dev->master);
+    }
     mutex_unlock(&dev->master_mutex);
 
     return ret;
@@ -318,16 +322,19 @@ void drm_master_release(struct drm_file *file_priv)
 
     mutex_lock(&dev->master_mutex);
     master = file_priv->master;
-    if (file_priv->magic)
+    if (file_priv->magic) {
         idr_remove(&file_priv->master->magic_map, file_priv->magic);
+    }
 
-    if (!drm_is_current_master(file_priv))
+    if (!drm_is_current_master(file_priv)) {
         goto out;
+    }
 
     drm_legacy_lock_master_cleanup(dev, master);
 
-    if (dev->master == file_priv->master)
+    if (dev->master == file_priv->master) {
         drm_drop_master(dev, file_priv);
+    }
 out:
     if (drm_core_check_feature(dev, DRIVER_MODESET) && file_priv->is_master) {
         /* Revoke any leases held by this or lessees, but only if
@@ -337,8 +344,9 @@ out:
     }
 
     /* drop the master reference held by the file priv */
-    if (file_priv->master)
+    if (file_priv->master) {
         drm_master_put(&file_priv->master);
+    }
     mutex_unlock(&dev->master_mutex);
 }
 
@@ -376,8 +384,9 @@ static void drm_master_destroy(struct kref *kref)
     struct drm_master *master = container_of(kref, struct drm_master, refcount);
     struct drm_device *dev = master->dev;
 
-    if (drm_core_check_feature(dev, DRIVER_MODESET))
+    if (drm_core_check_feature(dev, DRIVER_MODESET)) {
         drm_lease_destroy(master);
+    }
 
     drm_legacy_master_rmmaps(dev, master);
 

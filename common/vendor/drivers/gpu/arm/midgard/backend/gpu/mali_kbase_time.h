@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #ifndef _KBASE_BACKEND_TIME_H_
 #define _KBASE_BACKEND_TIME_H_
 
@@ -26,8 +24,8 @@
  * @ts:            Pointer to struct timespec64 to store current monotonic
  *            time in
  */
-void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
-                u64 *system_time, struct timespec64 *ts);
+void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter, u64 *system_time,
+                                struct timespec64 *ts);
 
 /**
  * kbase_wait_write_flush() -  Wait for GPU write flush

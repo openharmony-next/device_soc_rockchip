@@ -22,12 +22,12 @@
 extern "C" {
 #endif
 
-void mpp_trace_begin(const char* name);
-void mpp_trace_end(const char* name);
-void mpp_trace_async_begin(const char* name, RK_S32 cookie);
-void mpp_trace_async_end(const char* name, RK_S32 cookie);
-void mpp_trace_int32(const char* name, RK_S32 value);
-void mpp_trace_int64(const char* name, RK_S64 value);
+void mpp_trace_begin(const char *name);
+void mpp_trace_end(const char *name);
+void mpp_trace_async_begin(const char *name, signed int cookie);
+void mpp_trace_async_end(const char *name, signed int cookie);
+void mpp_trace_int32(const char *name, signed int value);
+void mpp_trace_int64(const char *name, RK_S64 value);
 
 #ifdef __cplusplus
 }

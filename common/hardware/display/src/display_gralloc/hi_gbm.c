@@ -41,37 +41,47 @@ typedef struct {
 
 static const PlaneLayoutInfo g_yuv420SPLayout = {
     .numPlanes = 2,
-    .radio = { 4, 2 },
+    .radio = {4, 2},
 };
 
 static const PlaneLayoutInfo g_yuv420PLayout = {
     .numPlanes = 3,
-    .radio = { 4, 1, 1 },
+    .radio = {4, 1, 1},
 };
 
 static const PlaneLayoutInfo g_yuv422SPLayout = {
     .numPlanes = 2,
-    .radio = { 4, 4 },
+    .radio = {4, 4},
 };
 
 static const PlaneLayoutInfo g_yuv422PLayout = {
     .numPlanes = 3,
-    .radio = { 4, 2, 2 },
+    .radio = {4, 2, 2},
 };
 
 static const FormatInfo *GetFormatInfo(uint32_t format)
 {
     static const FormatInfo fmtInfos[] = {
-        {DRM_FORMAT_RGBX8888,  32, NULL},  {DRM_FORMAT_RGBA8888, 32,  NULL},
-        {DRM_FORMAT_BGRX8888,  32, NULL},  {DRM_FORMAT_BGRA8888, 32,  NULL},
-        {DRM_FORMAT_RGB888,    24, NULL},  {DRM_FORMAT_RGB565,   16,  NULL},
-        {DRM_FORMAT_BGRX4444,  16, NULL},  {DRM_FORMAT_BGRA4444, 16,  NULL},
-        {DRM_FORMAT_RGBA4444,  16, NULL},  {DRM_FORMAT_RGBX4444, 16,  NULL},
-        {DRM_FORMAT_BGRX5551,  16, NULL},  {DRM_FORMAT_BGRA5551, 16,  NULL},
-        {DRM_FORMAT_NV12, 8, &g_yuv420SPLayout}, {DRM_FORMAT_NV21, 8, &g_yuv420SPLayout},
-        {DRM_FORMAT_NV16, 8, &g_yuv422SPLayout},  {DRM_FORMAT_NV61, 8, &g_yuv422SPLayout},
-        {DRM_FORMAT_YUV420, 8, &g_yuv420PLayout}, {DRM_FORMAT_YVU420, 8, &g_yuv420PLayout},
-        {DRM_FORMAT_YUV422, 8, &g_yuv422PLayout}, {DRM_FORMAT_YVU422, 8, &g_yuv422PLayout},
+        {DRM_FORMAT_RGBX8888, 32, NULL},
+        {DRM_FORMAT_RGBA8888, 32, NULL},
+        {DRM_FORMAT_BGRX8888, 32, NULL},
+        {DRM_FORMAT_BGRA8888, 32, NULL},
+        {DRM_FORMAT_RGB888, 24, NULL},
+        {DRM_FORMAT_RGB565, 16, NULL},
+        {DRM_FORMAT_BGRX4444, 16, NULL},
+        {DRM_FORMAT_BGRA4444, 16, NULL},
+        {DRM_FORMAT_RGBA4444, 16, NULL},
+        {DRM_FORMAT_RGBX4444, 16, NULL},
+        {DRM_FORMAT_BGRX5551, 16, NULL},
+        {DRM_FORMAT_BGRA5551, 16, NULL},
+        {DRM_FORMAT_NV12, 8, &g_yuv420SPLayout},
+        {DRM_FORMAT_NV21, 8, &g_yuv420SPLayout},
+        {DRM_FORMAT_NV16, 8, &g_yuv422SPLayout},
+        {DRM_FORMAT_NV61, 8, &g_yuv422SPLayout},
+        {DRM_FORMAT_YUV420, 8, &g_yuv420PLayout},
+        {DRM_FORMAT_YVU420, 8, &g_yuv420PLayout},
+        {DRM_FORMAT_YUV422, 8, &g_yuv422PLayout},
+        {DRM_FORMAT_YVU422, 8, &g_yuv422PLayout},
     };
 
     for (uint32_t i = 0; i < sizeof(fmtInfos) / sizeof(FormatInfo); i++) {
@@ -110,12 +120,12 @@ static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t height)
 }
 
 struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_t height, uint32_t format,
-    uint32_t usage)
+                                 uint32_t usage)
 {
     DISPLAY_UNUSED(usage);
     int ret;
     struct gbm_bo *bo;
-    struct drm_mode_create_dumb dumb = { 0 };
+    struct drm_mode_create_dumb dumb = {0};
     const FormatInfo *fmtInfo = GetFormatInfo(format);
     DISPLAY_CHK_RETURN((fmtInfo == NULL), NULL, DISPLAY_LOGE("formt: 0x%{public}x can not get layout info", format));
     bo = (struct gbm_bo *)calloc(1, sizeof(struct gbm_bo));
@@ -132,8 +142,8 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     dumb.bpp = fmtInfo->bitsPerPixel;
     ret = drmIoctl(gbm->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
     DISPLAY_DEBUGLOG("fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d bpp: %{public}u pitch"
-        "%{public}d size %{public}llu",
-        format, dumb.width, dumb.height, dumb.bpp, dumb.pitch, dumb.size);
+                     "%{public}d size %{public}llu",
+                     format, dumb.width, dumb.height, dumb.bpp, dumb.pitch, dumb.size);
     DISPLAY_CHK_RETURN((ret != 0), NULL, DISPLAY_LOGE("DRM_IOCTL_MODE_CREATE_DUMB failed errno %{public}d", errno));
     InitGbmBo(bo, &dumb);
     DISPLAY_DEBUGLOG(
@@ -178,7 +188,7 @@ void hdi_gbm_bo_destroy(struct gbm_bo *bo)
 {
     int ret;
     DISPLAY_CHK_RETURN_NOT_VALUE((bo == NULL), DISPLAY_LOGE("the bo is null"));
-    struct drm_mode_destroy_dumb dumb = { 0 };
+    struct drm_mode_destroy_dumb dumb = {0};
     dumb.handle = bo->handle;
     ret = drmIoctl(bo->gbm->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &dumb);
     DISPLAY_CHK_RETURN_NOT_VALUE((ret), DISPLAY_LOGE("dumb buffer destroy failed errno %{public}d", errno));
@@ -190,6 +200,6 @@ int hdi_gbm_bo_get_fd(struct gbm_bo *bo)
     int fd, ret;
     ret = drmPrimeHandleToFD(bo->gbm->fd, bo->handle, DRM_CLOEXEC | DRM_RDWR, &fd);
     DISPLAY_CHK_RETURN((ret), -1,
-        DISPLAY_LOGE("drmPrimeHandleToFD  failed ret: %{public}d  errno: %{public}d", ret, errno));
+                       DISPLAY_LOGE("drmPrimeHandleToFD  failed ret: %{public}d  errno: %{public}d", ret, errno));
     return fd;
 }

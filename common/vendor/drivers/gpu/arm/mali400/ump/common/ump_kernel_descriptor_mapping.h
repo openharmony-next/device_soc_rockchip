@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2011, 2013-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -21,7 +22,7 @@
  * The actual descriptor mapping table, never directly accessed by clients
  */
 typedef struct ump_descriptor_table {
-    u32 *usage;  /**< Pointer to bitpattern indicating if a descriptor is valid/used or not */
+    u32 *usage;      /**< Pointer to bitpattern indicating if a descriptor is valid/used or not */
     void **mappings; /**< Array of the pointers the descriptors map to */
 } ump_descriptor_table;
 
@@ -30,10 +31,10 @@ typedef struct ump_descriptor_table {
  * Provides a separate namespace where we can map an integer to a pointer
  */
 typedef struct ump_descriptor_mapping {
-    _mali_osk_mutex_rw_t *lock; /**< Lock protecting access to the mapping object */
+    _mali_osk_mutex_rw_t *lock;  /**< Lock protecting access to the mapping object */
     int max_nr_mappings_allowed; /**< Max number of mappings to support in this namespace */
-    int current_nr_mappings; /**< Current number of possible mappings */
-    ump_descriptor_table *table;  /**< Pointer to the current mapping table */
+    int current_nr_mappings;     /**< Current number of possible mappings */
+    ump_descriptor_table *table; /**< Pointer to the current mapping table */
 } ump_descriptor_mapping;
 
 /**

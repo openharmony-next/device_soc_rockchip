@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * HW Access instrumentation common APIs
  */
@@ -36,9 +32,8 @@
  *
  * Return: 0 on success
  */
-int kbase_instr_hwcnt_enable_internal(struct kbase_device *kbdev,
-                    struct kbase_context *kctx,
-                    struct kbase_uk_hwcnt_setup *setup);
+int kbase_instr_hwcnt_enable_internal(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                      struct kbase_uk_hwcnt_setup *setup);
 
 /**
  * kbase_instr_hwcnt_disable_internal - Disable HW counters collection
@@ -82,8 +77,7 @@ int kbase_instr_hwcnt_wait_for_dump(struct kbase_context *kctx);
  *
  * Return: true if the dump is complete
  */
-bool kbase_instr_hwcnt_dump_complete(struct kbase_context *kctx,
-                        bool * const success);
+bool kbase_instr_hwcnt_dump_complete(struct kbase_context *kctx, bool *const success);
 
 /**
  * kbase_instr_hwcnt_clear() - Clear HW counters

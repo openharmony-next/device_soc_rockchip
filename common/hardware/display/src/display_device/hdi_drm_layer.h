@@ -23,41 +23,50 @@
 #include "hdi_layer.h"
 #include "hdi_device_common.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-const int INVALID_DRM_ID = 0;
-class DrmGemBuffer {
-public:
-    DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl);
-    virtual ~DrmGemBuffer();
-    uint32_t GetFbId() const
+namespace OHOS
+{
+    namespace HDI
     {
-        return mFdId;
-    }
-    bool IsValid();
+        namespace DISPLAY
+        {
+            const int INVALID_DRM_ID = 0;
+            class DrmGemBuffer
+            {
+            public:
+                DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl);
+                virtual ~DrmGemBuffer();
+                uint32_t GetFbId() const
+                {
+                    return mFdId;
+                }
+                bool IsValid();
 
-private:
-    void Init(int drmFd, HdiLayerBuffer &hdl);
-    uint32_t mGemHandle = 0;
-    uint32_t mFdId = 0;
-    int mDrmFd = -1; // the fd can not close. the other module will close it.
-    uint32_t mDrmFormat = DRM_FORMAT_INVALID;
-};
+            private:
+                void Init(int drmFd, HdiLayerBuffer &hdl);
+                uint32_t mGemHandle = 0;
+                uint32_t mFdId = 0;
+                int mDrmFd = -1; // the fd can not close. the other module will close it.
+                uint32_t mDrmFormat = DRM_FORMAT_INVALID;
+            };
 
-class HdiDrmLayer : public HdiLayer {
-public:
-    explicit HdiDrmLayer(LayerType type) : HdiLayer(type) {}
-    ~HdiDrmLayer() override {}
-    // Return value optimization
-    DrmGemBuffer *GetGemBuffer();
+            class HdiDrmLayer : public HdiLayer
+            {
+            public:
+                explicit HdiDrmLayer(LayerType type) : HdiLayer(type)
+                {
+                }
+                ~HdiDrmLayer() override
+                {
+                }
+                // Return value optimization
+                DrmGemBuffer *GetGemBuffer();
 
-private:
-    std::unique_ptr<DrmGemBuffer> mCurrentBuffer;
-    std::unique_ptr<DrmGemBuffer> mLastBuffer;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                std::unique_ptr<DrmGemBuffer> mCurrentBuffer;
+                std::unique_ptr<DrmGemBuffer> mLastBuffer;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // HDI_DRM_LAYER_H

@@ -45,43 +45,43 @@ typedef enum RockchipSocType_e {
 } RockchipSocType;
 
 typedef struct MppDecHwCap_t {
-    RK_U32          cap_coding;
+    unsigned int cap_coding;
 
-    MppClientType   type            : 8;
+    MppClientType type : 8;
 
-    RK_U32          cap_fbc         : 4;
-    RK_U32          cap_4k          : 1;
-    RK_U32          cap_8k          : 1;
-    RK_U32          cap_colmv_buf   : 1;
-    RK_U32          cap_hw_h265_rps : 1;
-    RK_U32          cap_hw_vp9_prob : 1;
-    RK_U32          cap_jpg_pp_out  : 1;
-    RK_U32          cap_10bit       : 1;
-    RK_U32          reserved        : 13;
+    unsigned int cap_fbc : 4;
+    unsigned int cap_4k : 1;
+    unsigned int cap_8k : 1;
+    unsigned int cap_colmv_buf : 1;
+    unsigned int cap_hw_h265_rps : 1;
+    unsigned int cap_hw_vp9_prob : 1;
+    unsigned int cap_jpg_pp_out : 1;
+    unsigned int cap_10bit : 1;
+    unsigned int reserved : 13;
 } MppDecHwCap;
 
 typedef struct MppEncHwCap_t {
-    RK_U32          cap_coding;
+    unsigned int cap_coding;
 
-    MppClientType   type            : 8;
+    MppClientType type : 8;
 
-    RK_U32          cap_fbc         : 4;
-    RK_U32          cap_4k          : 1;
-    RK_U32          cap_8k          : 1;
-    RK_U32          cap_hw_osd      : 1;
-    RK_U32          cap_hw_roi      : 1;
-    RK_U32          reserved        : 16;
+    unsigned int cap_fbc : 4;
+    unsigned int cap_4k : 1;
+    unsigned int cap_8k : 1;
+    unsigned int cap_hw_osd : 1;
+    unsigned int cap_hw_roi : 1;
+    unsigned int reserved : 16;
 } MppEncHwCap;
 
 typedef struct {
-    const char              *compatible;
-    const RockchipSocType   soc_type;
-    const RK_U32            vcodec_type;
+    const char *compatible;
+    const RockchipSocType soc_type;
+    const unsigned int vcodec_type;
 
     /* Max 4 decoder cap */
-    const MppDecHwCap       *dec_caps[4];
+    const MppDecHwCap *dec_caps[4];
     /* Max 4 encoder cap */
-    const MppEncHwCap       *enc_caps[4];
+    const MppEncHwCap *enc_caps[4];
 } MppSocInfo;
 
 #ifdef __cplusplus
@@ -90,10 +90,10 @@ extern "C" {
 
 const char *mpp_get_soc_name(void);
 RockchipSocType mpp_get_soc_type(void);
-RK_U32 mpp_get_vcodec_type(void);
+unsigned int mpp_get_vcodec_type(void);
 
 const MppSocInfo *mpp_get_soc_info(void);
-RK_U32 mpp_check_soc_cap(MppCtxType type, MppCodingType coding);
+unsigned int mpp_check_soc_cap(MppCtxType type, MppCodingType coding);
 
 #ifdef __cplusplus
 }

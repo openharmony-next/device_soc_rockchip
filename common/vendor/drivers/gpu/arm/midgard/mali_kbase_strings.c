@@ -1,4 +1,4 @@
- /*
+/*
  *
  * (C) COPYRIGHT 2010-2016 ARM Limited. All rights reserved.
  *
@@ -12,7 +12,6 @@
  * Boston, MA  02110-1301, USA.
  *
  */
-
 
 #include "mali_kbase_strings.h"
 

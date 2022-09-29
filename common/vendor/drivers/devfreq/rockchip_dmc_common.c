@@ -9,10 +9,8 @@
 #include <linux/module.h>
 #include <soc/rockchip/rockchip_dmc.h>
 
-#define msch_rl_to_dmcfreq(work) container_of(to_delayed_work(work), \
-                          struct rockchip_dmcfreq, \
-                          msch_rl_work)
-#define MSCH_RL_DELAY_TIME    50 /* ms */
+#define msch_rl_to_dmcfreq(work) container_of(to_delayed_work(work), struct rockchip_dmcfreq, msch_rl_work)
+#define MSCH_RL_DELAY_TIME 50 /* ms */
 
 static struct dmcfreq_common_info *common_info;
 static DECLARE_RWSEM(rockchip_dmcfreq_sem);
@@ -51,12 +49,12 @@ static void set_msch_rl(unsigned int readlatency)
 
 {
     rockchip_dmcfreq_lock();
-    dev_dbg(common_info->dev, "rl 0x%x -> 0x%x\n",
-        common_info->read_latency, readlatency);
-    if (!common_info->set_msch_readlatency(readlatency))
+    dev_dbg(common_info->dev, "rl 0x%x -> 0x%x\n", common_info->read_latency, readlatency);
+    if (!common_info->set_msch_readlatency(readlatency)) {
         common_info->read_latency = readlatency;
-    else
+    } else {
         dev_err(common_info->dev, "failed to set msch rl\n");
+    }
     rockchip_dmcfreq_unlock();
 }
 
@@ -68,8 +66,9 @@ static void set_msch_rl_work(struct work_struct *work)
 
 int rockchip_dmcfreq_vop_bandwidth_init(struct dmcfreq_common_info *info)
 {
-    if (info->set_msch_readlatency)
+    if (info->set_msch_readlatency) {
         INIT_DELAYED_WORK(&info->msch_rl_work, set_msch_rl_work);
+    }
     common_info = info;
 
     return 0;
@@ -82,49 +81,53 @@ void rockchip_dmcfreq_vop_bandwidth_update(struct dmcfreq_vop_info *vop_info)
     unsigned int readlatency = 0;
     int i;
 
-    if (!common_info)
+    if (!common_info) {
         return;
+    }
 
-    dev_dbg(common_info->dev, "line bw=%u, frame bw=%u, pn=%u\n",
-        vop_info->line_bw_mbyte, vop_info->frame_bw_mbyte,
-        vop_info->plane_num);
+    dev_dbg(common_info->dev, "line bw=%u, frame bw=%u, pn=%u\n", vop_info->line_bw_mbyte, vop_info->frame_bw_mbyte,
+            vop_info->plane_num);
 
-    if (!common_info->vop_pn_rl_tbl || !common_info->set_msch_readlatency)
+    if (!common_info->vop_pn_rl_tbl || !common_info->set_msch_readlatency) {
         goto vop_bw_tbl;
+    }
     for (i = 0; common_info->vop_pn_rl_tbl[i].rl != DMCFREQ_TABLE_END; i++) {
-        if (vop_info->plane_num >= common_info->vop_pn_rl_tbl[i].pn)
+        if (vop_info->plane_num >= common_info->vop_pn_rl_tbl[i].pn) {
             readlatency = common_info->vop_pn_rl_tbl[i].rl;
+        }
     }
     dev_dbg(common_info->dev, "pn=%u\n", vop_info->plane_num);
     if (readlatency) {
         cancel_delayed_work_sync(&common_info->msch_rl_work);
         common_info->is_msch_rl_work_started = false;
-        if (common_info->read_latency != readlatency)
+        if (common_info->read_latency != readlatency) {
             set_msch_rl(readlatency);
-    } else if (common_info->read_latency &&
-           !common_info->is_msch_rl_work_started) {
+        }
+    } else if (common_info->read_latency && !common_info->is_msch_rl_work_started) {
         common_info->is_msch_rl_work_started = true;
-        schedule_delayed_work(&common_info->msch_rl_work,
-                      msecs_to_jiffies(MSCH_RL_DELAY_TIME));
+        schedule_delayed_work(&common_info->msch_rl_work, msecs_to_jiffies(MSCH_RL_DELAY_TIME));
     }
 
 vop_bw_tbl:
-    if (!common_info->auto_freq_en || !common_info->vop_bw_tbl)
+    if (!common_info->auto_freq_en || !common_info->vop_bw_tbl) {
         goto vop_frame_bw_tbl;
+    }
 
     for (i = 0; common_info->vop_bw_tbl[i].freq != DMCFREQ_TABLE_END; i++) {
-        if (vop_info->line_bw_mbyte >= common_info->vop_bw_tbl[i].min)
+        if (vop_info->line_bw_mbyte >= common_info->vop_bw_tbl[i].min) {
             target = common_info->vop_bw_tbl[i].freq;
+        }
     }
 
 vop_frame_bw_tbl:
-    if (!common_info->auto_freq_en || !common_info->vop_frame_bw_tbl)
+    if (!common_info->auto_freq_en || !common_info->vop_frame_bw_tbl) {
         goto next;
-    for (i = 0; common_info->vop_frame_bw_tbl[i].freq != DMCFREQ_TABLE_END;
-         i++) {
+    }
+    for (i = 0; common_info->vop_frame_bw_tbl[i].freq != DMCFREQ_TABLE_END; i++) {
         if (vop_info->frame_bw_mbyte >= common_info->vop_frame_bw_tbl[i].min) {
-            if (target < common_info->vop_frame_bw_tbl[i].freq)
+            if (target < common_info->vop_frame_bw_tbl[i].freq) {
                 target = common_info->vop_frame_bw_tbl[i].freq;
+            }
         }
     }
 
@@ -145,9 +148,9 @@ int rockchip_dmcfreq_vop_bandwidth_request(struct dmcfreq_vop_info *vop_info)
     unsigned long target = 0;
     int i;
 
-    if (!common_info || !common_info->auto_freq_en ||
-        !common_info->vop_bw_tbl)
+    if (!common_info || !common_info->auto_freq_en || !common_info->vop_bw_tbl) {
         return 0;
+    }
 
     for (i = 0; common_info->vop_bw_tbl[i].freq != DMCFREQ_TABLE_END; i++) {
         if (vop_info->line_bw_mbyte <= common_info->vop_bw_tbl[i].max) {
@@ -156,8 +159,9 @@ int rockchip_dmcfreq_vop_bandwidth_request(struct dmcfreq_vop_info *vop_info)
         }
     }
 
-    if (!target)
+    if (!target) {
         return -EINVAL;
+    }
 
     return 0;
 }

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -19,7 +20,7 @@
 struct mali_scheduler_job_queue {
     MALI_OSK_LIST_HEAD(normal_pri); /* Queued jobs with normal priority */
     MALI_OSK_LIST_HEAD(high_pri);   /* Queued jobs with high priority */
-    u32 depth;                       /* Depth of combined queues. */
+    u32 depth;                      /* Depth of combined queues. */
     u32 big_job_num;
 };
 
@@ -107,20 +108,15 @@ mali_scheduler_mask mali_scheduler_activate_gp_job(struct mali_gp_job *job);
  */
 mali_scheduler_mask mali_scheduler_activate_pp_job(struct mali_pp_job *job);
 
-void mali_scheduler_complete_gp_job(struct mali_gp_job *job,
-                    mali_bool success,
-                    mali_bool user_notification,
-                    mali_bool dequeued);
+void mali_scheduler_complete_gp_job(struct mali_gp_job *job, mali_bool success, mali_bool user_notification,
+                                    mali_bool dequeued);
 
-void mali_scheduler_complete_pp_job(struct mali_pp_job *job,
-                    u32 num_cores_in_virtual,
-                    mali_bool user_notification,
-                    mali_bool dequeued);
+void mali_scheduler_complete_pp_job(struct mali_pp_job *job, u32 num_cores_in_virtual, mali_bool user_notification,
+                                    mali_bool dequeued);
 
 void mali_scheduler_abort_session(struct mali_session_data *session);
 
-void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job,
-        u32 num_cores_in_virtual);
+void mali_scheduler_return_pp_job_to_user(struct mali_pp_job *job, u32 num_cores_in_virtual);
 
 #if MALI_STATE_TRACKING
 u32 mali_scheduler_dump_state(char *buf, u32 size);

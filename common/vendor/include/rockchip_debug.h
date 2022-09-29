@@ -2,8 +2,8 @@
 
 /* Copyright (c) 2020 Fuzhou Rockchip Electronics Co., Ltd */
 
-#ifndef _ROCKCHIP_DEBUG
-#define _ROCKCHIP_DEBUG
+#ifndef H_ROCKCHIP_DEBUG_H
+#define H_ROCKCHIP_DEBUG_H
 
 struct fiq_debugger_output;
 

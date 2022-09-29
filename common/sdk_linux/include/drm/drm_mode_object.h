@@ -103,33 +103,26 @@ struct drm_object_properties {
 };
 
 /* Avoid boilerplate.  I'm tired of typing. */
-#define DRM_ENUM_NAME_FN(fnname, list)                \
-    const char *fnname(int val)                \
-    {                            \
-        int i;                        \
-        for (i = 0; i < ARRAY_SIZE(list); i++) {    \
-            if (list[i].type == val)        \
-                return list[i].name;        \
-        }                        \
-        return "(unknown)";                \
+#define DRM_ENUM_NAME_FN(fnname, list)                                                                                 \
+    const char *fnname(int val)                                                                                        \
+    {                                                                                                                  \
+        int i;                                                                                                         \
+        for (i = 0; i < ARRAY_SIZE(list); i++) {                                                                       \
+            if ((list)[i].type == val)                                                                                 \
+                return (list)[i].name;                                                                                 \
+        }                                                                                                              \
+        return "(unknown)";                                                                                            \
     }
 
-struct drm_mode_object *drm_mode_object_find(struct drm_device *dev,
-                         struct drm_file *file_priv,
-                         uint32_t id, uint32_t type);
+struct drm_mode_object *drm_mode_object_find(struct drm_device *dev, struct drm_file *file_priv, uint32_t id,
+                                             uint32_t type);
 void drm_mode_object_get(struct drm_mode_object *obj);
 void drm_mode_object_put(struct drm_mode_object *obj);
 
-int drm_object_property_set_value(struct drm_mode_object *obj,
-                  struct drm_property *property,
-                  uint64_t val);
-int drm_object_property_get_value(struct drm_mode_object *obj,
-                  struct drm_property *property,
-                  uint64_t *value);
+int drm_object_property_set_value(struct drm_mode_object *obj, struct drm_property *property, uint64_t val);
+int drm_object_property_get_value(struct drm_mode_object *obj, struct drm_property *property, uint64_t *value);
 
-void drm_object_attach_property(struct drm_mode_object *obj,
-                struct drm_property *property,
-                uint64_t init_val);
+void drm_object_attach_property(struct drm_mode_object *obj, struct drm_property *property, uint64_t init_val);
 
 bool drm_mode_object_lease_required(uint32_t type);
 #endif

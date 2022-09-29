@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -52,9 +53,7 @@ static u32 pmu_mask_current = 0;
 static u32 pd_mask_current = 0;
 
 static u16 domain_config[MALI_MAX_NUMBER_OF_DOMAINS] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1 << MALI_DOMAIN_INDEX_DUMMY
-};
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << MALI_DOMAIN_INDEX_DUMMY};
 
 /* The relative core power cost */
 #define MALI_GP_COST 3
@@ -96,15 +95,13 @@ mali_osk_errcode_t mali_pm_initialize(void)
     mali_osk_errcode_t err;
     struct mali_pmu_core *pmu;
 
-    pm_lock_state = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED,
-            _MALI_OSK_LOCK_ORDER_PM_STATE);
+    pm_lock_state = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_PM_STATE);
     if (NULL == pm_lock_state) {
         mali_pm_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
-    pm_lock_exec = _mali_osk_mutex_init(_MALI_OSK_LOCKFLAG_ORDERED,
-                        _MALI_OSK_LOCK_ORDER_PM_STATE);
+    pm_lock_exec = _mali_osk_mutex_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_PM_STATE);
     if (NULL == pm_lock_exec) {
         mali_pm_terminate();
         return MALI_OSK_ERR_FAULT;
@@ -163,16 +160,14 @@ void mali_pm_terminate(void)
     }
 }
 
-struct mali_pm_domain *mali_pm_register_l2_cache(u32 domain_index,
-        struct mali_l2_cache_core *l2_cache)
+struct mali_pm_domain *mali_pm_register_l2_cache(u32 domain_index, struct mali_l2_cache_core *l2_cache)
 {
     struct mali_pm_domain *domain;
 
     domain = mali_pm_domain_get_from_mask(domain_config[domain_index]);
     if (NULL == domain) {
         MALI_DEBUG_ASSERT(0 == domain_config[domain_index]);
-        domain = mali_pm_domain_get_from_index(
-                 MALI_DOMAIN_INDEX_DUMMY);
+        domain = mali_pm_domain_get_from_index(MALI_DOMAIN_INDEX_DUMMY);
         domain_config[domain_index] = MALI_PM_DOMAIN_DUMMY_MASK;
     } else {
         MALI_DEBUG_ASSERT(0 != domain_config[domain_index]);
@@ -185,16 +180,14 @@ struct mali_pm_domain *mali_pm_register_l2_cache(u32 domain_index,
     return domain; /* return the actual domain this was registered in */
 }
 
-struct mali_pm_domain *mali_pm_register_group(u32 domain_index,
-        struct mali_group *group)
+struct mali_pm_domain *mali_pm_register_group(u32 domain_index, struct mali_group *group)
 {
     struct mali_pm_domain *domain;
 
     domain = mali_pm_domain_get_from_mask(domain_config[domain_index]);
     if (NULL == domain) {
         MALI_DEBUG_ASSERT(0 == domain_config[domain_index]);
-        domain = mali_pm_domain_get_from_index(
-                 MALI_DOMAIN_INDEX_DUMMY);
+        domain = mali_pm_domain_get_from_index(MALI_DOMAIN_INDEX_DUMMY);
         domain_config[domain_index] = MALI_PM_DOMAIN_DUMMY_MASK;
     } else {
         MALI_DEBUG_ASSERT(0 != domain_config[domain_index]);
@@ -207,9 +200,7 @@ struct mali_pm_domain *mali_pm_register_group(u32 domain_index,
     return domain; /* return the actual domain this was registered in */
 }
 
-mali_bool mali_pm_get_domain_refs(struct mali_pm_domain **domains,
-                  struct mali_group **groups,
-                  u32 num_domains)
+mali_bool mali_pm_get_domain_refs(struct mali_pm_domain **domains, struct mali_group **groups, u32 num_domains)
 {
     mali_bool ret = MALI_TRUE; /* Assume all is powered on instantly */
     u32 i;
@@ -230,8 +221,7 @@ mali_bool mali_pm_get_domain_refs(struct mali_pm_domain **domains,
              * There is a time gap between we power on the domain and
              * set the power state of the corresponding groups to be on.
              */
-            if (NULL != groups[i] &&
-                MALI_FALSE == mali_group_power_is_on(groups[i])) {
+            if (NULL != groups[i] && MALI_FALSE == mali_group_power_is_on(groups[i])) {
                 ret = MALI_FALSE;
             }
         }
@@ -244,8 +234,7 @@ mali_bool mali_pm_get_domain_refs(struct mali_pm_domain **domains,
     return ret;
 }
 
-mali_bool mali_pm_put_domain_refs(struct mali_pm_domain **domains,
-                  u32 num_domains)
+mali_bool mali_pm_put_domain_refs(struct mali_pm_domain **domains, u32 num_domains)
 {
     u32 mask = 0;
     mali_bool ret;
@@ -466,32 +455,21 @@ void mali_pm_runtime_resume(void)
 }
 
 #if MALI_STATE_TRACKING
-u32 mali_pm_dump_state_domain(struct mali_pm_domain *domain,
-                  char *buf, u32 size)
+u32 mali_pm_dump_state_domain(struct mali_pm_domain *domain, char *buf, u32 size)
 {
     int n = 0;
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\tPower domain: id %u\n",
-                mali_pm_domain_get_id(domain));
+    n += mali_osk_snprintf(buf + n, size - n, "\tPower domain: id %u\n", mali_pm_domain_get_id(domain));
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\t\tMask: 0x%04x\n",
-                mali_pm_domain_get_mask(domain));
+    n += mali_osk_snprintf(buf + n, size - n, "\t\tMask: 0x%04x\n", mali_pm_domain_get_mask(domain));
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\t\tUse count: %u\n",
-                mali_pm_domain_get_use_count(domain));
+    n += mali_osk_snprintf(buf + n, size - n, "\t\tUse count: %u\n", mali_pm_domain_get_use_count(domain));
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\t\tCurrent power state: %s\n",
-                (mali_pm_domain_get_mask(domain) & pd_mask_current) ?
-                "On" : "Off");
+    n += mali_osk_snprintf(buf + n, size - n, "\t\tCurrent power state: %s\n",
+                           (mali_pm_domain_get_mask(domain) & pd_mask_current) ? "On" : "Off");
 
-    n += mali_osk_snprintf(buf + n, size - n,
-                "\t\tWanted power state: %s\n",
-                (mali_pm_domain_get_mask(domain) & pd_mask_wanted) ?
-                "On" : "Off");
+    n += mali_osk_snprintf(buf + n, size - n, "\t\tWanted power state: %s\n",
+                           (mali_pm_domain_get_mask(domain) & pd_mask_wanted) ? "On" : "Off");
 
     return n;
 }
@@ -517,11 +495,9 @@ void mali_pm_exec_unlock(void)
     mali_osk_mutex_signal(pm_lock_exec);
 }
 
-static void mali_pm_domain_power_up(u32 power_up_mask,
-                    struct mali_group *groups_up[MALI_MAX_NUMBER_OF_GROUPS],
-                    u32 *num_groups_up,
-                    struct mali_l2_cache_core *l2_up[MALI_MAX_NUMBER_OF_L2_CACHE_CORES],
-                    u32 *num_l2_up)
+static void mali_pm_domain_power_up(u32 power_up_mask, struct mali_group *groups_up[MALI_MAX_NUMBER_OF_GROUPS],
+                                    u32 *num_groups_up,
+                                    struct mali_l2_cache_core *l2_up[MALI_MAX_NUMBER_OF_L2_CACHE_CORES], u32 *num_l2_up)
 {
     u32 domain_bit;
     u32 notify_mask = power_up_mask;
@@ -538,17 +514,14 @@ static void mali_pm_domain_power_up(u32 power_up_mask,
     MALI_DEBUG_ASSERT_LOCK_HELD(pm_lock_state);
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
-             ("PM update:      Powering up domains: . [%s]\n",
-              mali_pm_mask_to_string(power_up_mask)));
+                     ("PM update:      Powering up domains: . [%s]\n", mali_pm_mask_to_string(power_up_mask)));
 
     pd_mask_current |= power_up_mask;
 
     domain_bit = _mali_osk_fls(notify_mask);
     while (0 != domain_bit) {
         u32 domain_id = domain_bit - 1;
-        struct mali_pm_domain *domain =
-            mali_pm_domain_get_from_index(
-                domain_id);
+        struct mali_pm_domain *domain = mali_pm_domain_get_from_index(domain_id);
         struct mali_l2_cache_core *l2_cache;
         struct mali_l2_cache_core *l2_cache_tmp;
         struct mali_group *group;
@@ -562,25 +535,18 @@ static void mali_pm_domain_power_up(u32 power_up_mask,
          * (need to release the PM state lock before doing so)
          */
 
-        MALI_OSK_LIST_FOREACHENTRY(l2_cache,
-                        l2_cache_tmp,
-                        mali_pm_domain_get_l2_cache_list(
-                            domain),
-                        struct mali_l2_cache_core,
-                        pm_domain_list) {
-            MALI_DEBUG_ASSERT(*num_l2_up <
-                      MALI_MAX_NUMBER_OF_L2_CACHE_CORES);
+        MALI_OSK_LIST_FOREACHENTRY(l2_cache, l2_cache_tmp, mali_pm_domain_get_l2_cache_list(domain),
+                                   struct mali_l2_cache_core, pm_domain_list)
+        {
+            MALI_DEBUG_ASSERT(*num_l2_up < MALI_MAX_NUMBER_OF_L2_CACHE_CORES);
             l2_up[*num_l2_up] = l2_cache;
             (*num_l2_up)++;
         }
 
-        MALI_OSK_LIST_FOREACHENTRY(group,
-                        group_tmp,
-                        mali_pm_domain_get_group_list(domain),
-                        struct mali_group,
-                        pm_domain_list) {
-            MALI_DEBUG_ASSERT(*num_groups_up <
-                      MALI_MAX_NUMBER_OF_GROUPS);
+        MALI_OSK_LIST_FOREACHENTRY(group, group_tmp, mali_pm_domain_get_group_list(domain), struct mali_group,
+                                   pm_domain_list)
+        {
+            MALI_DEBUG_ASSERT(*num_groups_up < MALI_MAX_NUMBER_OF_GROUPS);
             groups_up[*num_groups_up] = group;
 
             (*num_groups_up)++;
@@ -591,11 +557,10 @@ static void mali_pm_domain_power_up(u32 power_up_mask,
         domain_bit = _mali_osk_fls(notify_mask);
     }
 }
-static void mali_pm_domain_power_down(u32 power_down_mask,
-                      struct mali_group *groups_down[MALI_MAX_NUMBER_OF_GROUPS],
-                      u32 *num_groups_down,
-                      struct mali_l2_cache_core *l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES],
-                      u32 *num_l2_down)
+static void mali_pm_domain_power_down(u32 power_down_mask, struct mali_group *groups_down[MALI_MAX_NUMBER_OF_GROUPS],
+                                      u32 *num_groups_down,
+                                      struct mali_l2_cache_core *l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES],
+                                      u32 *num_l2_down)
 {
     u32 domain_bit;
     u32 notify_mask = power_down_mask;
@@ -612,16 +577,14 @@ static void mali_pm_domain_power_down(u32 power_down_mask,
     MALI_DEBUG_ASSERT_LOCK_HELD(pm_lock_state);
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
-             ("PM update:      Powering down domains: [%s]\n",
-              mali_pm_mask_to_string(power_down_mask)));
+                     ("PM update:      Powering down domains: [%s]\n", mali_pm_mask_to_string(power_down_mask)));
 
     pd_mask_current &= ~power_down_mask;
 
     domain_bit = _mali_osk_fls(notify_mask);
     while (0 != domain_bit) {
         u32 domain_id = domain_bit - 1;
-        struct mali_pm_domain *domain =
-            mali_pm_domain_get_from_index(domain_id);
+        struct mali_pm_domain *domain = mali_pm_domain_get_from_index(domain_id);
         struct mali_l2_cache_core *l2_cache;
         struct mali_l2_cache_core *l2_cache_tmp;
         struct mali_group *group;
@@ -635,24 +598,18 @@ static void mali_pm_domain_power_down(u32 power_down_mask,
          * (need to release the PM state lock before doing so)
          */
 
-        MALI_OSK_LIST_FOREACHENTRY(l2_cache,
-                        l2_cache_tmp,
-                        mali_pm_domain_get_l2_cache_list(domain),
-                        struct mali_l2_cache_core,
-                        pm_domain_list) {
-            MALI_DEBUG_ASSERT(*num_l2_down <
-                      MALI_MAX_NUMBER_OF_L2_CACHE_CORES);
+        MALI_OSK_LIST_FOREACHENTRY(l2_cache, l2_cache_tmp, mali_pm_domain_get_l2_cache_list(domain),
+                                   struct mali_l2_cache_core, pm_domain_list)
+        {
+            MALI_DEBUG_ASSERT(*num_l2_down < MALI_MAX_NUMBER_OF_L2_CACHE_CORES);
             l2_down[*num_l2_down] = l2_cache;
             (*num_l2_down)++;
         }
 
-        MALI_OSK_LIST_FOREACHENTRY(group,
-                        group_tmp,
-                        mali_pm_domain_get_group_list(domain),
-                        struct mali_group,
-                        pm_domain_list) {
-            MALI_DEBUG_ASSERT(*num_groups_down <
-                      MALI_MAX_NUMBER_OF_GROUPS);
+        MALI_OSK_LIST_FOREACHENTRY(group, group_tmp, mali_pm_domain_get_group_list(domain), struct mali_group,
+                                   pm_domain_list)
+        {
+            MALI_DEBUG_ASSERT(*num_groups_down < MALI_MAX_NUMBER_OF_GROUPS);
             groups_down[*num_groups_down] = group;
             (*num_groups_down)++;
         }
@@ -691,25 +648,23 @@ static void mali_pm_update_sync_internal(void)
     /* Hold PM state lock while we look at (and obey) the wanted state */
     mali_pm_state_lock();
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update pre:  Wanted domain mask: .. [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_wanted)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update pre:  Current domain mask: . [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update pre:  Current PMU mask: .... [%s]\n",
-                 mali_pm_mask_to_string(pmu_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update pre:  Group power stats: ... <%s>\n",
-                 mali_pm_group_stats_to_string()));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update pre:  Wanted domain mask: .. [%s]\n", mali_pm_mask_to_string(pd_mask_wanted)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update pre:  Current domain mask: . [%s]\n", mali_pm_mask_to_string(pd_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update pre:  Current PMU mask: .... [%s]\n", mali_pm_mask_to_string(pmu_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update pre:  Group power stats: ... <%s>\n", mali_pm_group_stats_to_string()));
 
     /* Figure out which cores we need to power on */
-    power_up_mask = pd_mask_wanted &
-            (pd_mask_wanted ^ pd_mask_current);
+    power_up_mask = pd_mask_wanted & (pd_mask_wanted ^ pd_mask_current);
 
     if (0 != power_up_mask) {
         u32 power_up_mask_pmu;
         struct mali_group *groups_up[MALI_MAX_NUMBER_OF_GROUPS];
         u32 num_groups_up = 0;
-        struct mali_l2_cache_core *
-            l2_up[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
+        struct mali_l2_cache_core *l2_up[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
         u32 num_l2_up = 0;
         u32 i;
 
@@ -728,8 +683,7 @@ static void mali_pm_update_sync_internal(void)
         power_up_mask_pmu = power_up_mask & ~MALI_PM_DOMAIN_DUMMY_MASK;
 
         /* But not those that happen to be powered on already */
-        power_up_mask_pmu &= (power_up_mask ^ pmu_mask_current) &
-                     power_up_mask;
+        power_up_mask_pmu &= (power_up_mask ^ pmu_mask_current) & power_up_mask;
 
         if (0 != power_up_mask_pmu) {
             MALI_DEBUG_ASSERT(NULL != pmu);
@@ -741,9 +695,7 @@ static void mali_pm_update_sync_internal(void)
          * Put the domains themselves in power up state.
          * We get the groups and L2s to notify in return.
          */
-        mali_pm_domain_power_up(power_up_mask,
-                    groups_up, &num_groups_up,
-                    l2_up, &num_l2_up);
+        mali_pm_domain_power_up(power_up_mask, groups_up, &num_groups_up, l2_up, &num_l2_up);
 
         /* Need to unlock PM state lock before notifying L2 + groups */
         mali_pm_state_unlock();
@@ -764,8 +716,7 @@ static void mali_pm_update_sync_internal(void)
     }
 
     /* Figure out which cores we need to power off */
-    power_down_mask = pd_mask_current &
-              (pd_mask_wanted ^ pd_mask_current);
+    power_down_mask = pd_mask_current & (pd_mask_wanted ^ pd_mask_current);
 
     /*
      * Never power down the dummy/global domain here. This is to be done
@@ -778,8 +729,7 @@ static void mali_pm_update_sync_internal(void)
         u32 power_down_mask_pmu;
         struct mali_group *groups_down[MALI_MAX_NUMBER_OF_GROUPS];
         u32 num_groups_down = 0;
-        struct mali_l2_cache_core *
-            l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
+        struct mali_l2_cache_core *l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
         u32 num_l2_down = 0;
         u32 i;
 
@@ -791,9 +741,7 @@ static void mali_pm_update_sync_internal(void)
          * Put the domains themselves in power down state.
          * We get the groups and L2s to notify in return.
          */
-        mali_pm_domain_power_down(power_down_mask,
-                      groups_down, &num_groups_down,
-                      l2_down, &num_l2_down);
+        mali_pm_domain_power_down(power_down_mask, groups_down, &num_groups_down, l2_down, &num_l2_down);
 
         /* Need to unlock PM state lock before notifying L2 + groups */
         mali_pm_state_unlock();
@@ -822,7 +770,6 @@ static void mali_pm_update_sync_internal(void)
             MALI_DEBUG_ASSERT(NULL != pmu);
             pmu_mask_current &= ~power_down_mask_pmu;
             mali_pmu_power_down(pmu, power_down_mask_pmu);
-
         }
     } else {
         /*
@@ -844,12 +791,12 @@ static void mali_pm_update_sync_internal(void)
         }
     }
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update post: Current domain mask: . [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update post: Current PMU mask: .... [%s]\n",
-                 mali_pm_mask_to_string(pmu_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM update post: Group power stats: ... <%s>\n",
-                 mali_pm_group_stats_to_string()));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update post: Current domain mask: . [%s]\n", mali_pm_mask_to_string(pd_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update post: Current PMU mask: .... [%s]\n", mali_pm_mask_to_string(pmu_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM update post: Group power stats: ... <%s>\n", mali_pm_group_stats_to_string()));
 }
 
 static mali_bool mali_pm_common_suspend(void)
@@ -862,14 +809,14 @@ static mali_bool mali_pm_common_suspend(void)
         return MALI_FALSE;
     }
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend pre: Wanted domain mask: .. [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_wanted)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend pre: Current domain mask: . [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend pre: Current PMU mask: .... [%s]\n",
-                 mali_pm_mask_to_string(pmu_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend pre: Group power stats: ... <%s>\n",
-                 mali_pm_group_stats_to_string()));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend pre: Wanted domain mask: .. [%s]\n", mali_pm_mask_to_string(pd_mask_wanted)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend pre: Current domain mask: . [%s]\n", mali_pm_mask_to_string(pd_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend pre: Current PMU mask: .... [%s]\n", mali_pm_mask_to_string(pmu_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend pre: Group power stats: ... <%s>\n", mali_pm_group_stats_to_string()));
 
     if (0 != pd_mask_current) {
         /*
@@ -882,8 +829,7 @@ static mali_bool mali_pm_common_suspend(void)
 
         struct mali_group *groups_down[MALI_MAX_NUMBER_OF_GROUPS];
         u32 num_groups_down = 0;
-        struct mali_l2_cache_core *
-            l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
+        struct mali_l2_cache_core *l2_down[MALI_MAX_NUMBER_OF_L2_CACHE_CORES];
         u32 num_l2_down = 0;
         u32 i;
 
@@ -891,11 +837,7 @@ static mali_bool mali_pm_common_suspend(void)
          * Put the domains themselves in power down state.
          * We get the groups and L2s to notify in return.
          */
-        mali_pm_domain_power_down(pd_mask_current,
-                      groups_down,
-                      &num_groups_down,
-                      l2_down,
-                      &num_l2_down);
+        mali_pm_domain_power_down(pd_mask_current, groups_down, &num_groups_down, l2_down, &num_l2_down);
 
         MALI_DEBUG_ASSERT(0 == pd_mask_current);
         MALI_DEBUG_ASSERT(MALI_TRUE == mali_pm_domain_all_unused());
@@ -925,12 +867,12 @@ static mali_bool mali_pm_common_suspend(void)
         mali_pm_state_unlock();
     }
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend post: Current domain mask:  [%s]\n",
-                 mali_pm_mask_to_string(pd_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend post: Current PMU mask: ... [%s]\n",
-                 mali_pm_mask_to_string(pmu_mask_current)));
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("PM suspend post: Group power stats: .. <%s>\n",
-                 mali_pm_group_stats_to_string()));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend post: Current domain mask:  [%s]\n", mali_pm_mask_to_string(pd_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend post: Current PMU mask: ... [%s]\n", mali_pm_mask_to_string(pmu_mask_current)));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     ("PM suspend post: Group power stats: .. <%s>\n", mali_pm_group_stats_to_string()));
 
     return MALI_TRUE;
 }
@@ -947,7 +889,9 @@ static mali_osk_errcode_t mali_pm_create_pm_domains(void)
 
     /* Create all domains (including dummy domain) */
     for (i = 0; i < MALI_MAX_NUMBER_OF_DOMAINS; i++) {
-        if (0x0 == domain_config[i]) continue;
+        if (0x0 == domain_config[i]) {
+            continue;
+        }
 
         if (NULL == mali_pm_domain_create(domain_config[i])) {
             return MALI_OSK_ERR_NOMEM;
@@ -962,14 +906,12 @@ static void mali_pm_set_default_pm_domain_config(void)
     MALI_DEBUG_ASSERT(0 != mali_osk_resource_base_address());
 
     /* GP core */
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_GP, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_GP, NULL)) {
         domain_config[MALI_DOMAIN_INDEX_GP] = 0x01;
     }
 
     /* PP0 - PP3 core */
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP0, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP0, NULL)) {
         if (mali_is_mali400()) {
             domain_config[MALI_DOMAIN_INDEX_PP0] = 0x01 << MALI_DOMAIN_INDEX_PP1;
         } else if (mali_is_mali450()) {
@@ -979,8 +921,7 @@ static void mali_pm_set_default_pm_domain_config(void)
         }
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP1, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP1, NULL)) {
         if (mali_is_mali400()) {
             domain_config[MALI_DOMAIN_INDEX_PP1] = 0x01 << MALI_DOMAIN_INDEX_PP2;
         } else if (mali_is_mali450()) {
@@ -990,8 +931,7 @@ static void mali_pm_set_default_pm_domain_config(void)
         }
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP2, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP2, NULL)) {
         if (mali_is_mali400()) {
             domain_config[MALI_DOMAIN_INDEX_PP2] = 0x01 << MALI_DOMAIN_INDEX_PP3;
         } else if (mali_is_mali450()) {
@@ -1001,8 +941,7 @@ static void mali_pm_set_default_pm_domain_config(void)
         }
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP3, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP3, NULL)) {
         if (mali_is_mali400()) {
             domain_config[MALI_DOMAIN_INDEX_PP3] = 0x01 << MALI_DOMAIN_INDEX_PP4;
         } else if (mali_is_mali450()) {
@@ -1013,50 +952,41 @@ static void mali_pm_set_default_pm_domain_config(void)
     }
 
     /* PP4 - PP7 */
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP4, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP4, NULL)) {
         domain_config[MALI_DOMAIN_INDEX_PP4] = 0x01 << MALI_DOMAIN_INDEX_PP2;
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP5, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP5, NULL)) {
         domain_config[MALI_DOMAIN_INDEX_PP5] = 0x01 << MALI_DOMAIN_INDEX_PP2;
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP6, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP6, NULL)) {
         domain_config[MALI_DOMAIN_INDEX_PP6] = 0x01 << MALI_DOMAIN_INDEX_PP2;
     }
 
-    if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-            MALI_OFFSET_PP7, NULL)) {
+    if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI_OFFSET_PP7, NULL)) {
         domain_config[MALI_DOMAIN_INDEX_PP7] = 0x01 << MALI_DOMAIN_INDEX_PP2;
     }
 
     /* L2gp/L2PP0/L2PP4 */
     if (mali_is_mali400()) {
-        if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-                MALI400_OFFSET_L2_CACHE0, NULL)) {
+        if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI400_OFFSET_L2_CACHE0, NULL)) {
             domain_config[MALI_DOMAIN_INDEX_L20] = 0x01 << MALI_DOMAIN_INDEX_PP0;
         }
     } else if (mali_is_mali450()) {
-        if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-                MALI450_OFFSET_L2_CACHE0, NULL)) {
+        if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI450_OFFSET_L2_CACHE0, NULL)) {
             domain_config[MALI_DOMAIN_INDEX_L20] = 0x01 << MALI_DOMAIN_INDEX_GP;
         }
 
-        if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-                MALI450_OFFSET_L2_CACHE1, NULL)) {
+        if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI450_OFFSET_L2_CACHE1, NULL)) {
             domain_config[MALI_DOMAIN_INDEX_L21] = 0x01 << MALI_DOMAIN_INDEX_PP0;
         }
 
-        if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-                MALI450_OFFSET_L2_CACHE2, NULL)) {
+        if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI450_OFFSET_L2_CACHE2, NULL)) {
             domain_config[MALI_DOMAIN_INDEX_L22] = 0x01 << MALI_DOMAIN_INDEX_PP2;
         }
     } else if (mali_is_mali470()) {
-        if (MALI_OSK_ERR_OK == mali_osk_resource_find(
-                MALI470_OFFSET_L2_CACHE1, NULL)) {
+        if (MALI_OSK_ERR_OK == mali_osk_resource_find(MALI470_OFFSET_L2_CACHE1, NULL)) {
             domain_config[MALI_DOMAIN_INDEX_L21] = 0x01 << MALI_DOMAIN_INDEX_GP;
         }
     }
@@ -1098,8 +1028,7 @@ static void mali_pm_set_pmu_domain_config(void)
         }
     }
     /* Can't override dummy domain mask */
-    domain_config[MALI_DOMAIN_INDEX_DUMMY] =
-        1 << MALI_DOMAIN_INDEX_DUMMY;
+    domain_config[MALI_DOMAIN_INDEX_DUMMY] = 1 << MALI_DOMAIN_INDEX_DUMMY;
 }
 
 #if defined(DEBUG)
@@ -1172,50 +1101,49 @@ static void mali_pm_stat_from_mask(u32 mask, u32 *num_pp, u32 *cost)
         }
 
         switch (i) {
-        case MALI_DOMAIN_INDEX_GP:
-            *cost += MALI_GP_COST;
+            case MALI_DOMAIN_INDEX_GP:
+                *cost += MALI_GP_COST;
 
-            break;
-        case MALI_DOMAIN_INDEX_PP0: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP1: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP2: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP3:
-            if (mali_is_mali400()) {
-                if ((domain_config[MALI_DOMAIN_INDEX_L20] & mask)
-                    || (domain_config[MALI_DOMAIN_INDEX_DUMMY]
-                    == domain_config[MALI_DOMAIN_INDEX_L20])) {
+                break;
+            case MALI_DOMAIN_INDEX_PP0: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP1: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP2: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP3:
+                if (mali_is_mali400()) {
+                    if ((domain_config[MALI_DOMAIN_INDEX_L20] & mask) ||
+                        (domain_config[MALI_DOMAIN_INDEX_DUMMY] == domain_config[MALI_DOMAIN_INDEX_L20])) {
+                        *num_pp += 1;
+                    }
+                } else {
+                    if ((domain_config[MALI_DOMAIN_INDEX_L21] & mask) ||
+                        (domain_config[MALI_DOMAIN_INDEX_DUMMY] == domain_config[MALI_DOMAIN_INDEX_L21])) {
+                        *num_pp += 1;
+                    }
+                }
+
+                *cost += MALI_PP_COST;
+                break;
+            case MALI_DOMAIN_INDEX_PP4: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP5: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP6: /* Fall through */
+            case MALI_DOMAIN_INDEX_PP7:
+                MALI_DEBUG_ASSERT(mali_is_mali450());
+
+                if ((domain_config[MALI_DOMAIN_INDEX_L22] & mask) ||
+                    (domain_config[MALI_DOMAIN_INDEX_DUMMY] == domain_config[MALI_DOMAIN_INDEX_L22])) {
                     *num_pp += 1;
                 }
-            } else {
-                if ((domain_config[MALI_DOMAIN_INDEX_L21] & mask)
-                    || (domain_config[MALI_DOMAIN_INDEX_DUMMY]
-                    == domain_config[MALI_DOMAIN_INDEX_L21])) {
-                    *num_pp += 1;
-                }
-            }
 
-            *cost += MALI_PP_COST;
-            break;
-        case MALI_DOMAIN_INDEX_PP4: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP5: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP6: /* Fall through */
-        case MALI_DOMAIN_INDEX_PP7:
-            MALI_DEBUG_ASSERT(mali_is_mali450());
+                *cost += MALI_PP_COST;
+                break;
+            case MALI_DOMAIN_INDEX_L20: /* Fall through */
+            case MALI_DOMAIN_INDEX_L21: /* Fall through */
+            case MALI_DOMAIN_INDEX_L22:
+                *cost += MALI_L2_COST;
 
-            if ((domain_config[MALI_DOMAIN_INDEX_L22] & mask)
-                || (domain_config[MALI_DOMAIN_INDEX_DUMMY]
-                == domain_config[MALI_DOMAIN_INDEX_L22])) {
-                *num_pp += 1;
-            }
-
-            *cost += MALI_PP_COST;
-            break;
-        case MALI_DOMAIN_INDEX_L20: /* Fall through */
-        case MALI_DOMAIN_INDEX_L21: /* Fall through */
-        case MALI_DOMAIN_INDEX_L22:
-            *cost += MALI_L2_COST;
-
-            break;
+                break;
+            default:
+                break;
         }
     }
 }
@@ -1227,17 +1155,17 @@ void mali_pm_power_cost_setup(void)
      * The index is the number of PP cores, E.g. Index 0 is for 1 PP option,
      * might have mask 0x2 and with cost of 1, lower cost is better
      */
-    u32 best_mask[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS] = { 0 };
-    u32 best_cost[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS] = { 0 };
+    u32 best_mask[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS] = {0};
+    u32 best_cost[MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS] = {0};
     /* Array cores_in_domain is used to store the total pp cores in each pm domain. */
-    u32 cores_in_domain[MALI_MAX_NUMBER_OF_DOMAINS] = { 0 };
+    u32 cores_in_domain[MALI_MAX_NUMBER_OF_DOMAINS] = {0};
     /* Domain_count is used to represent the max domain we have.*/
     u32 max_domain_mask = 0;
     u32 max_domain_id = 0;
     u32 always_on_pp_cores = 0;
 
     u32 num_pp, cost, mask;
-    u32 i, j , k;
+    u32 i, j, k;
 
     /* Initialize statistics */
     for (i = 0; i < MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS; i++) {
@@ -1256,8 +1184,7 @@ void mali_pm_power_cost_setup(void)
         if (0 < domain_config[i]) {
             /* Get the max domain mask value used to caculate power cost
              * and we don't count in always on pp cores. */
-            if (MALI_PM_DOMAIN_DUMMY_MASK != domain_config[i]
-                && max_domain_mask < domain_config[i]) {
+            if (MALI_PM_DOMAIN_DUMMY_MASK != domain_config[i] && max_domain_mask < domain_config[i]) {
                 max_domain_mask = domain_config[i];
             }
 
@@ -1293,11 +1220,9 @@ void mali_pm_power_cost_setup(void)
      */
     for (i = 0; i < mali_executor_get_num_cores_total(); i++) {
         if (i < always_on_pp_cores) {
-            mali_pm_domain_power_cost_result[i + 1][MALI_MAX_NUMBER_OF_DOMAINS - 1]
-                = i + 1;
+            mali_pm_domain_power_cost_result[i + 1][MALI_MAX_NUMBER_OF_DOMAINS - 1] = i + 1;
         } else {
-            mali_pm_domain_power_cost_result[i + 1][MALI_MAX_NUMBER_OF_DOMAINS - 1]
-                = always_on_pp_cores;
+            mali_pm_domain_power_cost_result[i + 1][MALI_MAX_NUMBER_OF_DOMAINS - 1] = always_on_pp_cores;
         }
     }
 
@@ -1313,8 +1238,7 @@ void mali_pm_power_cost_setup(void)
         }
 
         for (j = MALI_DOMAIN_INDEX_PP0; j <= MALI_DOMAIN_INDEX_PP7; j++) {
-            if (0 < domain_config[j]
-                && (MALI_PM_DOMAIN_DUMMY_MASK != domain_config[i])) {
+            if (0 < domain_config[j] && (MALI_PM_DOMAIN_DUMMY_MASK != domain_config[i])) {
                 cores_in_domain[_mali_osk_fls(domain_config[j]) - 1]++;
             }
         }

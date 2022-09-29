@@ -19,8 +19,7 @@
 
 #define DRIVER_NAME "dw-hdmi-qp-i2s-audio"
 
-static inline void hdmi_write(struct dw_hdmi_qp_i2s_audio_data *audio,
-                  u32 val, int offset)
+static inline void hdmi_write(struct dw_hdmi_qp_i2s_audio_data *audio, u32 val, int offset)
 {
     struct dw_hdmi_qp *hdmi = audio->hdmi;
 
@@ -34,8 +33,7 @@ static inline u32 hdmi_read(struct dw_hdmi_qp_i2s_audio_data *audio, int offset)
     return audio->read(hdmi, offset);
 }
 
-static inline void hdmi_mod(struct dw_hdmi_qp_i2s_audio_data *audio,
-                u32 data, u32 mask, u32 reg)
+static inline void hdmi_mod(struct dw_hdmi_qp_i2s_audio_data *audio, u32 data, u32 mask, u32 reg)
 {
     struct dw_hdmi_qp *hdmi = audio->hdmi;
 
@@ -49,16 +47,16 @@ static inline bool is_dw_hdmi_qp_clk_off(struct dw_hdmi_qp_i2s_audio_data *audio
     return (sta & (AUDCLK_OFF | LINKQPCLK_OFF | VIDQPCLK_OFF));
 }
 
-static int dw_hdmi_qp_i2s_hw_params(struct device *dev, void *data,
-                    struct hdmi_codec_daifmt *fmt,
-                    struct hdmi_codec_params *hparms)
+static int dw_hdmi_qp_i2s_hw_params(struct device *dev, void *data, struct hdmi_codec_daifmt *fmt,
+                                    struct hdmi_codec_params *hparms)
 {
     struct dw_hdmi_qp_i2s_audio_data *audio = data;
     struct dw_hdmi_qp *hdmi = audio->hdmi;
     u32 conf0 = 0;
 
-    if (is_dw_hdmi_qp_clk_off(audio))
+    if (is_dw_hdmi_qp_clk_off(audio)) {
         return 0;
+    }
 
     if (fmt->bit_clk_master | fmt->frame_clk_master) {
         dev_err(dev, "unsupported clock settings\n");
@@ -72,28 +70,26 @@ static int dw_hdmi_qp_i2s_hw_params(struct device *dev, void *data,
     hdmi_write(audio, AUDIO_FIFO_CLR_P, AUDIO_INTERFACE_CONTROL0);
 
     /* Disable AUDS, ACR, AUDI, AMD */
-    hdmi_mod(audio, 0,
-         PKTSCHED_ACR_TX_EN | PKTSCHED_AUDS_TX_EN |
-         PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN,
-         PKTSCHED_PKT_EN);
+    hdmi_mod(audio, 0, PKTSCHED_ACR_TX_EN | PKTSCHED_AUDS_TX_EN | PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN,
+             PKTSCHED_PKT_EN);
 
     /* Select I2S interface as the audio source */
     hdmi_mod(audio, AUD_IF_I2S, AUD_IF_SEL_MSK, AUDIO_INTERFACE_CONFIG0);
 
     /* Enable the active i2s lanes */
     switch (hparms->channels) {
-    case 7 ... 8:
-        conf0 |= I2S_LINES_EN(3);
-        fallthrough;
-    case 5 ... 6:
-        conf0 |= I2S_LINES_EN(2);
-        fallthrough;
-    case 3 ... 4:
-        conf0 |= I2S_LINES_EN(1);
-        fallthrough;
-    default:
-        conf0 |= I2S_LINES_EN(0);
-        break;
+        case 0x7 ... 0x8:
+            conf0 |= I2S_LINES_EN(0x3);
+            fallthrough;
+        case 0x5 ... 0x6:
+            conf0 |= I2S_LINES_EN(0x2);
+            fallthrough;
+        case 0x3 ... 0x4:
+            conf0 |= I2S_LINES_EN(1);
+            fallthrough;
+        default:
+            conf0 |= I2S_LINES_EN(0);
+            break;
     }
 
     hdmi_mod(audio, conf0, I2S_LINES_EN_MSK, AUDIO_INTERFACE_CONFIG0);
@@ -103,21 +99,19 @@ static int dw_hdmi_qp_i2s_hw_params(struct device *dev, void *data,
      * from stream for NLPCM/HBR.
      */
     switch (fmt->fmt) {
-    case SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE:
-        conf0 = (hparms->channels == 8) ? AUD_HBR : AUD_ASP;
-        conf0 |= I2S_BPCUV_RCV_EN;
-        break;
-    default:
-        conf0 = AUD_ASP | I2S_BPCUV_RCV_DIS;
-        break;
+        case SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE:
+            conf0 = (hparms->channels == 0x8) ? AUD_HBR : AUD_ASP;
+            conf0 |= I2S_BPCUV_RCV_EN;
+            break;
+        default:
+            conf0 = AUD_ASP | I2S_BPCUV_RCV_DIS;
+            break;
     }
 
-    hdmi_mod(audio, conf0, I2S_BPCUV_RCV_MSK | AUD_FORMAT_MSK,
-         AUDIO_INTERFACE_CONFIG0);
+    hdmi_mod(audio, conf0, I2S_BPCUV_RCV_MSK | AUD_FORMAT_MSK, AUDIO_INTERFACE_CONFIG0);
 
     /* Enable audio FIFO auto clear when overflow */
-    hdmi_mod(audio, AUD_FIFO_INIT_ON_OVF_EN, AUD_FIFO_INIT_ON_OVF_MSK,
-         AUDIO_INTERFACE_CONFIG0);
+    hdmi_mod(audio, AUD_FIFO_INIT_ON_OVF_EN, AUD_FIFO_INIT_ON_OVF_MSK, AUDIO_INTERFACE_CONFIG0);
 
     dw_hdmi_qp_set_sample_rate(hdmi, hparms->sample_rate);
     dw_hdmi_qp_set_channel_status(hdmi, hparms->iec.status);
@@ -125,10 +119,8 @@ static int dw_hdmi_qp_i2s_hw_params(struct device *dev, void *data,
     dw_hdmi_qp_set_channel_allocation(hdmi, hparms->cea.channel_allocation);
 
     /* Enable ACR, AUDI, AMD */
-    hdmi_mod(audio,
-         PKTSCHED_ACR_TX_EN | PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN,
-         PKTSCHED_ACR_TX_EN | PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN,
-         PKTSCHED_PKT_EN);
+    hdmi_mod(audio, PKTSCHED_ACR_TX_EN | PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN,
+             PKTSCHED_ACR_TX_EN | PKTSCHED_AUDI_TX_EN | PKTSCHED_AMD_TX_EN, PKTSCHED_PKT_EN);
 
     /* Enable AUDS */
     hdmi_mod(audio, PKTSCHED_AUDS_TX_EN, PKTSCHED_AUDS_TX_EN, PKTSCHED_PKT_EN);
@@ -141,8 +133,9 @@ static int dw_hdmi_qp_i2s_audio_startup(struct device *dev, void *data)
     struct dw_hdmi_qp_i2s_audio_data *audio = data;
     struct dw_hdmi_qp *hdmi = audio->hdmi;
 
-    if (is_dw_hdmi_qp_clk_off(audio))
+    if (is_dw_hdmi_qp_clk_off(audio)) {
         return 0;
+    }
 
     dw_hdmi_qp_audio_enable(hdmi);
 
@@ -154,14 +147,14 @@ static void dw_hdmi_qp_i2s_audio_shutdown(struct device *dev, void *data)
     struct dw_hdmi_qp_i2s_audio_data *audio = data;
     struct dw_hdmi_qp *hdmi = audio->hdmi;
 
-    if (is_dw_hdmi_qp_clk_off(audio))
+    if (is_dw_hdmi_qp_clk_off(audio)) {
         return;
+    }
 
     dw_hdmi_qp_audio_disable(hdmi);
 }
 
-static int dw_hdmi_qp_i2s_get_eld(struct device *dev, void *data, uint8_t *buf,
-                  size_t len)
+static int dw_hdmi_qp_i2s_get_eld(struct device *dev, void *data, uint8_t *buf, size_t len)
 {
     struct dw_hdmi_qp_i2s_audio_data *audio = data;
 
@@ -170,29 +163,29 @@ static int dw_hdmi_qp_i2s_get_eld(struct device *dev, void *data, uint8_t *buf,
     return 0;
 }
 
-static int dw_hdmi_qp_i2s_get_dai_id(struct snd_soc_component *component,
-                     struct device_node *endpoint)
+static int dw_hdmi_qp_i2s_get_dai_id(struct snd_soc_component *component, struct device_node *endpoint)
 {
     struct of_endpoint of_ep;
     int ret;
 
     ret = of_graph_parse_endpoint(endpoint, &of_ep);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
 
     /*
      * HDMI sound should be located as reg = <2>
      * Then, it is sound port 0
      */
-    if (of_ep.port == 2)
+    if (of_ep.port == 0x2) {
         return 0;
+    }
 
     return -EINVAL;
 }
 
-static int dw_hdmi_qp_i2s_hook_plugged_cb(struct device *dev, void *data,
-                      hdmi_codec_plugged_cb fn,
-                      struct device *codec_dev)
+static int dw_hdmi_qp_i2s_hook_plugged_cb(struct device *dev, void *data, hdmi_codec_plugged_cb fn,
+                                          struct device *codec_dev)
 {
     struct dw_hdmi_qp_i2s_audio_data *audio = data;
     struct dw_hdmi_qp *hdmi = audio->hdmi;
@@ -201,11 +194,11 @@ static int dw_hdmi_qp_i2s_hook_plugged_cb(struct device *dev, void *data,
 }
 
 static struct hdmi_codec_ops dw_hdmi_qp_i2s_ops = {
-    .hw_params    = dw_hdmi_qp_i2s_hw_params,
-    .audio_startup  = dw_hdmi_qp_i2s_audio_startup,
-    .audio_shutdown    = dw_hdmi_qp_i2s_audio_shutdown,
-    .get_eld    = dw_hdmi_qp_i2s_get_eld,
-    .get_dai_id    = dw_hdmi_qp_i2s_get_dai_id,
+    .hw_params = dw_hdmi_qp_i2s_hw_params,
+    .audio_startup = dw_hdmi_qp_i2s_audio_startup,
+    .audio_shutdown = dw_hdmi_qp_i2s_audio_shutdown,
+    .get_eld = dw_hdmi_qp_i2s_get_eld,
+    .get_dai_id = dw_hdmi_qp_i2s_get_dai_id,
     .hook_plugged_cb = dw_hdmi_qp_i2s_hook_plugged_cb,
 };
 
@@ -216,22 +209,23 @@ static int snd_dw_hdmi_qp_probe(struct platform_device *pdev)
     struct hdmi_codec_pdata pdata;
     struct platform_device *platform;
 
-    pdata.ops        = &dw_hdmi_qp_i2s_ops;
-    pdata.i2s        = 1;
-    pdata.max_i2s_channels    = 8;
-    pdata.data        = audio;
+    pdata.ops = &dw_hdmi_qp_i2s_ops;
+    pdata.i2s = 1;
+    pdata.max_i2s_channels = 0x8;
+    pdata.data = audio;
 
     memset(&pdevinfo, 0, sizeof(pdevinfo));
-    pdevinfo.parent        = pdev->dev.parent;
-    pdevinfo.id        = PLATFORM_DEVID_AUTO;
-    pdevinfo.name        = HDMI_CODEC_DRV_NAME;
-    pdevinfo.data        = &pdata;
-    pdevinfo.size_data    = sizeof(pdata);
-    pdevinfo.dma_mask    = DMA_BIT_MASK(32);
+    pdevinfo.parent = pdev->dev.parent;
+    pdevinfo.id = PLATFORM_DEVID_AUTO;
+    pdevinfo.name = HDMI_CODEC_DRV_NAME;
+    pdevinfo.data = &pdata;
+    pdevinfo.size_data = sizeof(pdata);
+    pdevinfo.dma_mask = DMA_BIT_MASK(0x20);
 
     platform = platform_device_register_full(&pdevinfo);
-    if (IS_ERR(platform))
+    if (IS_ERR(platform)) {
         return PTR_ERR(platform);
+    }
 
     dev_set_drvdata(&pdev->dev, platform);
 
@@ -248,11 +242,12 @@ static int snd_dw_hdmi_qp_remove(struct platform_device *pdev)
 }
 
 static struct platform_driver snd_dw_hdmi_qp_driver = {
-    .probe    = snd_dw_hdmi_qp_probe,
-    .remove    = snd_dw_hdmi_qp_remove,
-    .driver    = {
-        .name = DRIVER_NAME,
-    },
+    .probe = snd_dw_hdmi_qp_probe,
+    .remove = snd_dw_hdmi_qp_remove,
+    .driver =
+        {
+            .name = DRIVER_NAME,
+        },
 };
 module_platform_driver(snd_dw_hdmi_qp_driver);
 

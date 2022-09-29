@@ -12,6 +12,8 @@
  * @file mali_kbase_config_platform.h
  * 声明 platform_config_of_rk (platform_rk 的 platform_config).
  */
+#ifndef H_RK_MALI_KBASE_CONFIG_PLATFORM_H
+#define H_RK_MALI_KBASE_CONFIG_PLATFORM_H
 
 /**
  * Maximum frequency GPU will be clocked at.
@@ -86,3 +88,4 @@ extern struct kbase_platform_funcs_conf platform_funcs;
  */
 #define SECURE_CALLBACKS (NULL)
 
+#endif

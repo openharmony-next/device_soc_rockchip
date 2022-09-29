@@ -49,13 +49,13 @@ enum {
      * Restrict GPU to a quarter of maximum Address ID count.
      * This will reduce performance, but reduce bus load due to GPU.
      */
-    KBASE_AID_8  = 0x2,
+    KBASE_AID_8 = 0x2,
 
     /**
      * Restrict GPU to an eighth of maximum Address ID count.
      * This will reduce performance, but reduce bus load due to GPU.
      */
-    KBASE_AID_4  = 0x1
+    KBASE_AID_4 = 0x1
 };
 
 enum {
@@ -81,10 +81,10 @@ enum {
     KBASE_3BIT_AID_12 = 0x5,
 
     /* Restrict GPU to 1/4 of maximum Address ID count. */
-    KBASE_3BIT_AID_8  = 0x6,
+    KBASE_3BIT_AID_8 = 0x6,
 
     /* Restrict GPU to 1/8 of maximum Address ID count. */
-    KBASE_3BIT_AID_4  = 0x7
+    KBASE_3BIT_AID_4 = 0x7
 };
 
 /**
@@ -110,7 +110,7 @@ enum {
 /**
  * Default scheduling tick granuality
  */
-#define DEFAULT_JS_SCHEDULING_PERIOD_NS    (100000000u) /* 100ms */
+#define DEFAULT_JS_SCHEDULING_PERIOD_NS (100000000u) /* 100ms */
 
 /**
  * Default minimum number of scheduling ticks before jobs are soft-stopped.
@@ -118,28 +118,28 @@ enum {
  * This defines the time-slice for a job (which may be different from that of a
  * context)
  */
-#define DEFAULT_JS_SOFT_STOP_TICKS       (1) /* 100ms-200ms */
+#define DEFAULT_JS_SOFT_STOP_TICKS (1) /* 100ms-200ms */
 
 /**
  * Default minimum number of scheduling ticks before CL jobs are soft-stopped.
  */
-#define DEFAULT_JS_SOFT_STOP_TICKS_CL    (1) /* 100ms-200ms */
+#define DEFAULT_JS_SOFT_STOP_TICKS_CL (1) /* 100ms-200ms */
 
 /**
  * Default minimum number of scheduling ticks before jobs are hard-stopped
  */
-#define DEFAULT_JS_HARD_STOP_TICKS_SS    (50) /* 5s */
+#define DEFAULT_JS_HARD_STOP_TICKS_SS (50) /* 5s */
 
 /**
  * Default minimum number of scheduling ticks before CL jobs are hard-stopped.
  */
-#define DEFAULT_JS_HARD_STOP_TICKS_CL    (50) /* 5s */
+#define DEFAULT_JS_HARD_STOP_TICKS_CL (50) /* 5s */
 
 /**
  * Default minimum number of scheduling ticks before jobs are hard-stopped
  * during dumping
  */
-#define DEFAULT_JS_HARD_STOP_TICKS_DUMPING   (15000) /* 1500s */
+#define DEFAULT_JS_HARD_STOP_TICKS_DUMPING (15000) /* 1500s */
 
 /**
  * Default timeout for some software jobs, after which the software event wait
@@ -151,19 +151,19 @@ enum {
  * Default minimum number of scheduling ticks before the GPU is reset to clear a
  * "stuck" job
  */
-#define DEFAULT_JS_RESET_TICKS_SS           (55) /* 5.5s */
+#define DEFAULT_JS_RESET_TICKS_SS (55) /* 5.5s */
 
 /**
  * Default minimum number of scheduling ticks before the GPU is reset to clear a
  * "stuck" CL job.
  */
-#define DEFAULT_JS_RESET_TICKS_CL        (55) /* 5.5s */
+#define DEFAULT_JS_RESET_TICKS_CL (55) /* 5.5s */
 
 /**
  * Default minimum number of scheduling ticks before the GPU is reset to clear a
  * "stuck" job during dumping.
  */
-#define DEFAULT_JS_RESET_TICKS_DUMPING   (15020) /* 1502s */
+#define DEFAULT_JS_RESET_TICKS_DUMPING (15020) /* 1502s */
 
 /**
  * Default number of milliseconds given for other jobs on the GPU to be
@@ -210,4 +210,3 @@ enum {
 #define DEFAULT_IR_THRESHOLD (192)
 
 #endif /* _KBASE_CONFIG_DEFAULTS_H_ */
-

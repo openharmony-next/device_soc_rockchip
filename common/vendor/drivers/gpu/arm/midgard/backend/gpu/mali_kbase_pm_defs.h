@@ -13,14 +13,12 @@
  *
  */
 
-
-
 /*
  * Backend-specific Power Manager definitions
  */
 
-#ifndef _KBASE_PM_HWACCESS_DEFS_H_
-#define _KBASE_PM_HWACCESS_DEFS_H_
+#ifndef KBASE_PM_HWACCESS_DEFS_H_
+#define KBASE_PM_HWACCESS_DEFS_H_
 
 #include "mali_kbase_pm_ca_fixed.h"
 #include "mali_kbase_pm_ca_devfreq.h"
@@ -285,7 +283,6 @@ struct kbase_pm_backend_data {
 
     spinlock_t gpu_powered_lock;
 
-
     struct kbasep_pm_metrics_data metrics;
 
     int gpu_poweroff_pending;
@@ -318,7 +315,6 @@ struct kbase_pm_backend_data {
     void (*callback_power_runtime_off)(struct kbase_device *kbdev);
     int (*callback_power_runtime_idle)(struct kbase_device *kbdev);
 };
-
 
 /* List of policy IDs */
 enum kbase_pm_policy_id {
@@ -408,7 +404,6 @@ struct kbase_pm_policy {
     kbase_pm_policy_flags flags;
     enum kbase_pm_policy_id id;
 };
-
 
 enum kbase_pm_ca_policy_id {
     KBASE_PM_CA_POLICY_ID_FIXED = 1,
@@ -503,8 +498,7 @@ struct kbase_pm_ca_policy {
      * @cores_transitioning: The mask of cores currently transitioning
      *                       power state
      */
-    void (*update_core_status)(struct kbase_device *kbdev, u64 cores_ready,
-                        u64 cores_transitioning);
+    void (*update_core_status)(struct kbase_device *kbdev, u64 cores_ready, u64 cores_transitioning);
 
     kbase_pm_ca_policy_flags flags;
 

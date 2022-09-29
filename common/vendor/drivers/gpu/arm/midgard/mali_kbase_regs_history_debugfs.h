@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /**
  * Header file for register access history support via debugfs
  *
@@ -47,4 +45,4 @@ void kbasep_regs_history_debugfs_init(struct kbase_device *kbdev);
 
 #endif /* CONFIG_DEBUG_FS */
 
-#endif  /*_KBASE_REGS_HISTORY_DEBUGFS_H*/
+#endif /*_KBASE_REGS_HISTORY_DEBUGFS_H*/

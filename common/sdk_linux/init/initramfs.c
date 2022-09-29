@@ -15,8 +15,7 @@
 #include <linux/initramfs.h>
 #include <linux/init_syscalls.h>
 
-static ssize_t __init xwrite(struct file *file, const char *p, size_t count,
-        loff_t *pos)
+static ssize_t __init xwrite(struct file *file, const char *p, size_t count, loff_t *pos)
 {
     ssize_t out = 0;
 
@@ -25,11 +24,13 @@ static ssize_t __init xwrite(struct file *file, const char *p, size_t count,
         ssize_t rv = kernel_write(file, p, count, pos);
 
         if (rv < 0) {
-            if (rv == -EINTR || rv == -EAGAIN)
+            if (rv == -EINTR || rv == -EAGAIN) {
                 continue;
+            }
             return out ? out : rv;
-        } else if (rv == 0)
+        } else if (rv == 0) {
             break;
+        }
 
         p += rv;
         out += rv;
@@ -42,8 +43,9 @@ static ssize_t __init xwrite(struct file *file, const char *p, size_t count,
 static __initdata char *message;
 static void __init error(char *x)
 {
-    if (!message)
+    if (!message) {
         message = x;
+    }
 }
 
 /* link hash */
@@ -59,29 +61,33 @@ static __initdata struct hash {
 
 static inline int hash(int major, int minor, int ino)
 {
-    unsigned long tmp = ino + minor + (major << 3);
-    tmp += tmp >> 5;
-    return tmp & 31;
+    unsigned long tmp = ino + minor + (major << 0x3);
+    tmp += tmp >> 0x5;
+    return tmp & 0x1f;
 }
 
-static char __init *find_link(int major, int minor, int ino,
-                  umode_t mode, char *name)
+static char __init *find_link(int major, int minor, int ino, umode_t mode, char *name)
 {
     struct hash **p, *q;
     for (p = head + hash(major, minor, ino); *p; p = &(*p)->next) {
-        if ((*p)->ino != ino)
+        if ((*p)->ino != ino) {
             continue;
-        if ((*p)->minor != minor)
+        }
+        if ((*p)->minor != minor) {
             continue;
-        if ((*p)->major != major)
+        }
+        if ((*p)->major != major) {
             continue;
-        if (((*p)->mode ^ mode) & S_IFMT)
+        }
+        if (((*p)->mode ^ mode) & S_IFMT) {
             continue;
+        }
         return (*p)->name;
     }
     q = kmalloc(sizeof(struct hash), GFP_KERNEL);
-    if (!q)
+    if (!q) {
         panic("can't allocate link hash entry");
+    }
     q->major = major;
     q->minor = minor;
     q->ino = ino;
@@ -95,7 +101,7 @@ static char __init *find_link(int major, int minor, int ino,
 static void __init free_hash(void)
 {
     struct hash **p, *q;
-    for (p = head; p < head + 32; p++) {
+    for (p = head; p < head + 0x20; p++) {
         while (*p) {
             q = *p;
             *p = q->next;
@@ -125,8 +131,9 @@ struct dir_entry {
 static void __init dir_add(const char *name, time64_t mtime)
 {
     struct dir_entry *de = kmalloc(sizeof(struct dir_entry), GFP_KERNEL);
-    if (!de)
+    if (!de) {
         panic("can't allocate dir_entry buffer");
+    }
     INIT_LIST_HEAD(&de->list);
     de->name = kstrdup(name, GFP_KERNEL);
     de->mtime = mtime;
@@ -136,7 +143,8 @@ static void __init dir_add(const char *name, time64_t mtime)
 static void __init dir_utime(void)
 {
     struct dir_entry *de, *tmp;
-    list_for_each_entry_safe(de, tmp, &dir_list, list) {
+    list_for_each_entry_safe(de, tmp, &dir_list, list)
+    {
         list_del(&de->list);
         do_utime(de->name, de->mtime);
         kfree(de->name);
@@ -161,22 +169,22 @@ static void __init parse_header(char *s)
     char buf[9];
     int i;
 
-    buf[8] = '\0';
-    for (i = 0, s += 6; i < 12; i++, s += 8) {
-        memcpy(buf, s, 8);
-        parsed[i] = simple_strtoul(buf, NULL, 16);
+    buf[0x8] = '\0';
+    for (i = 0, s += 0x6; i < 0xc; i++, s += 0x8) {
+        memcpy(buf, s, 0x8);
+        parsed[i] = simple_strtoul(buf, NULL, 0x10);
     }
-    ino = parsed[0];
-    mode = parsed[1];
-    uid = parsed[2];
-    gid = parsed[3];
-    nlink = parsed[4];
-    mtime = parsed[5]; /* breaks in y2106 */
-    body_len = parsed[6];
-    major = parsed[7];
-    minor = parsed[8];
-    rdev = new_encode_dev(MKDEV(parsed[9], parsed[10]));
-    name_len = parsed[11];
+    ino = parsed[0x0];
+    mode = parsed[0x1];
+    uid = parsed[0x2];
+    gid = parsed[0x3];
+    nlink = parsed[0x4];
+    mtime = parsed[0x5]; /* breaks in y2106 */
+    body_len = parsed[0x6];
+    major = parsed[0x7];
+    minor = parsed[0x8];
+    rdev = new_encode_dev(MKDEV(parsed[0x9], parsed[0xa]));
+    name_len = parsed[0xb];
 }
 
 /* FSM */
@@ -190,7 +198,8 @@ static __initdata enum state {
     CopyFile,
     GotSymlink,
     Reset
-} state, next_state;
+} state,
+    next_state;
 
 static __initdata char *victim;
 static unsigned long byte_count __initdata;
@@ -225,51 +234,56 @@ static __initdata char *header_buf, *symlink_buf, *name_buf;
 
 static int __init do_start(void)
 {
-    read_into(header_buf, 110, GotHeader);
+    read_into(header_buf, 0x6e, GotHeader);
     return 0;
 }
 
 static int __init do_collect(void)
 {
     unsigned long n = remains;
-    if (byte_count < n)
+    if (byte_count < n) {
         n = byte_count;
+    }
     memcpy(collect, victim, n);
     eat(n);
     collect += n;
-    if ((remains -= n) != 0)
+    if ((remains -= n) != 0) {
         return 1;
+    }
     state = next_state;
     return 0;
 }
 
 static int __init do_header(void)
 {
-    if (memcmp(collected, "070707", 6)==0) {
+    if (memcmp(collected, "070707", 0x6) == 0) {
         error("incorrect cpio method used: use -H newc option");
         return 1;
     }
-    if (memcmp(collected, "070701", 6)) {
+    if (memcmp(collected, "070701", 0x6)) {
         error("no cpio magic");
         return 1;
     }
     parse_header(collected);
     next_header = this_header + N_ALIGN(name_len) + body_len;
-    next_header = (next_header + 3) & ~3;
+    next_header = (next_header + 0x3) & ~0x3;
     state = SkipIt;
-    if (name_len <= 0 || name_len > PATH_MAX)
+    if (name_len <= 0 || name_len > PATH_MAX) {
         return 0;
+    }
     if (S_ISLNK(mode)) {
-        if (body_len > PATH_MAX)
+        if (body_len > PATH_MAX) {
             return 0;
+        }
         collect = collected = symlink_buf;
         remains = N_ALIGN(name_len) + body_len;
         next_state = GotSymlink;
         state = Collect;
         return 0;
     }
-    if (S_ISREG(mode) || !body_len)
+    if (S_ISREG(mode) || !body_len) {
         read_into(name_buf, N_ALIGN(name_len), GotName);
+    }
     return 0;
 }
 
@@ -287,10 +301,12 @@ static int __init do_skip(void)
 
 static int __init do_reset(void)
 {
-    while (byte_count && *victim == '\0')
+    while (byte_count && *victim == '\0') {
         eat(1);
-    if (byte_count && (this_header & 3))
+    }
+    if (byte_count && (this_header & 0x3)) {
         error("broken padding");
+    }
     return 1;
 }
 
@@ -298,12 +314,12 @@ static void __init clean_path(char *path, umode_t fmode)
 {
     struct kstat st;
 
-    if (!init_stat(path, &st, AT_SYMLINK_NOFOLLOW) &&
-        (st.mode ^ fmode) & S_IFMT) {
-        if (S_ISDIR(st.mode))
+    if (!init_stat(path, &st, AT_SYMLINK_NOFOLLOW) && (st.mode ^ fmode) & S_IFMT) {
+        if (S_ISDIR(st.mode)) {
             init_rmdir(path);
-        else
+        } else {
             init_unlink(path);
+        }
     }
 }
 
@@ -334,18 +350,21 @@ static int __init do_name(void)
     if (S_ISREG(mode)) {
         int ml = maybe_link();
         if (ml >= 0) {
-            int openflags = O_WRONLY|O_CREAT;
-            if (ml != 1)
+            int openflags = O_WRONLY | O_CREAT;
+            if (ml != 1) {
                 openflags |= O_TRUNC;
+            }
             wfile = filp_open(collected, openflags, mode);
-            if (IS_ERR(wfile))
+            if (IS_ERR(wfile)) {
                 return 0;
+            }
             wfile_pos = 0;
 
             vfs_fchown(wfile, uid, gid);
             vfs_fchmod(wfile, mode);
-            if (body_len)
+            if (body_len) {
                 vfs_truncate(&wfile->f_path, body_len);
+            }
             state = CopyFile;
         }
     } else if (S_ISDIR(mode)) {
@@ -353,8 +372,7 @@ static int __init do_name(void)
         init_chown(collected, uid, gid, 0);
         init_chmod(collected, mode);
         dir_add(collected, mtime);
-    } else if (S_ISBLK(mode) || S_ISCHR(mode) ||
-           S_ISFIFO(mode) || S_ISSOCK(mode)) {
+    } else if (S_ISBLK(mode) || S_ISCHR(mode) || S_ISFIFO(mode) || S_ISSOCK(mode)) {
         if (maybe_link() == 0) {
             init_mknod(collected, mode, rdev);
             init_chown(collected, uid, gid, 0);
@@ -368,9 +386,10 @@ static int __init do_name(void)
 static int __init do_copy(void)
 {
     if (byte_count >= body_len) {
-        struct timespec64 t[2] = { };
-        if (xwrite(wfile, victim, body_len, &wfile_pos) != body_len)
+        struct timespec64 t[2] = {};
+        if (xwrite(wfile, victim, body_len, &wfile_pos) != body_len) {
             error("write error");
+        }
 
         t[0].tv_sec = mtime;
         t[1].tv_sec = mtime;
@@ -381,8 +400,9 @@ static int __init do_copy(void)
         state = SkipIt;
         return 0;
     } else {
-        if (xwrite(wfile, victim, byte_count, &wfile_pos) != byte_count)
+        if (xwrite(wfile, victim, byte_count, &wfile_pos) != byte_count) {
             error("write error");
+        }
         body_len -= byte_count;
         eat(byte_count);
         return 1;
@@ -402,14 +422,8 @@ static int __init do_symlink(void)
 }
 
 static __initdata int (*actions[])(void) = {
-    [Start]        = do_start,
-    [Collect]    = do_collect,
-    [GotHeader]    = do_header,
-    [SkipIt]    = do_skip,
-    [GotName]    = do_name,
-    [CopyFile]    = do_copy,
-    [GotSymlink]    = do_symlink,
-    [Reset]        = do_reset,
+    [Start] = do_start,  [Collect] = do_collect, [GotHeader] = do_header,   [SkipIt] = do_skip,
+    [GotName] = do_name, [CopyFile] = do_copy,   [GotSymlink] = do_symlink, [Reset] = do_reset,
 };
 
 static long __init write_buffer(char *buf, unsigned long len)
@@ -417,18 +431,20 @@ static long __init write_buffer(char *buf, unsigned long len)
     byte_count = len;
     victim = buf;
 
-    while (!actions[state]())
+    while (!actions[state]()) {
         ;
+    }
     return len - byte_count;
 }
 
 static long __init flush_buffer(void *bufv, unsigned long len)
 {
-    char *buf = (char *) bufv;
+    char *buf = (char *)bufv;
     long written;
     long origLen = len;
-    if (message)
+    if (message) {
         return -1;
+    }
     while ((written = write_buffer(buf, len)) < len && !message) {
         char c = buf[written];
         if (c == '0') {
@@ -439,8 +455,9 @@ static long __init flush_buffer(void *bufv, unsigned long len)
             buf += written;
             len -= written;
             state = Reset;
-        } else
+        } else {
             error("junk within compressed archive");
+        }
     }
     return origLen;
 }
@@ -449,19 +466,20 @@ static unsigned long my_inptr; /* index of next byte to be processed in inbuf */
 
 #include <linux/decompress/generic.h>
 
-static char * __init unpack_to_rootfs(char *buf, unsigned long len)
+static char *__init unpack_to_rootfs(char *buf, unsigned long len)
 {
     long written;
     decompress_fn decompress;
     const char *compress_name;
     static __initdata char msg_buf[64];
 
-    header_buf = kmalloc(110, GFP_KERNEL);
+    header_buf = kmalloc(0x6e, GFP_KERNEL);
     symlink_buf = kmalloc(PATH_MAX + N_ALIGN(PATH_MAX) + 1, GFP_KERNEL);
     name_buf = kmalloc(N_ALIGN(PATH_MAX), GFP_KERNEL);
 
-    if (!header_buf || !symlink_buf || !name_buf)
+    if (!header_buf || !symlink_buf || !name_buf) {
         panic("can't allocate buffers");
+    }
 
     state = Start;
     this_header = 0;
@@ -488,21 +506,21 @@ static char * __init unpack_to_rootfs(char *buf, unsigned long len)
         decompress = decompress_method(buf, len, &compress_name);
         pr_debug("Detected %s compressed data\n", compress_name);
         if (decompress) {
-            int res = decompress(buf, len, NULL, flush_buffer, NULL,
-                   &my_inptr, error);
-            if (res)
+            int res = decompress(buf, len, NULL, flush_buffer, NULL, &my_inptr, error);
+            if (res) {
                 error("decompressor failed");
+            }
         } else if (compress_name) {
             if (!message) {
-                snprintf(msg_buf, sizeof msg_buf,
-                     "compression method %s not configured",
-                     compress_name);
+                snprintf(msg_buf, sizeof msg_buf, "compression method %s not configured", compress_name);
                 message = msg_buf;
             }
-        } else
+        } else {
             error("invalid magic at start of compressed archive");
-        if (state != Reset)
+        }
+        if (state != Reset) {
             error("junk at the end of compressed archive");
+        }
         this_header = saved_offset + my_inptr;
         buf += my_inptr;
         len -= my_inptr;
@@ -518,8 +536,9 @@ static int __initdata do_retain_initrd;
 
 static int __init retain_initrd_param(char *str)
 {
-    if (*str)
+    if (*str) {
         return 0;
+    }
     do_retain_initrd = 1;
     return 1;
 }
@@ -534,8 +553,6 @@ static int __init keepinitrd_setup(char *__unused)
 __setup("keepinitrd", keepinitrd_setup);
 #endif
 
-extern char __initramfs_start[];
-extern unsigned long __initramfs_size;
 #include <linux/initrd.h>
 #include <linux/kexec.h>
 
@@ -548,31 +565,33 @@ void __weak __init free_initrd_mem(unsigned long start, unsigned long end)
     memblock_free(__pa(aligned_start), aligned_end - aligned_start);
 #endif
 
-    free_reserved_area((void *)start, (void *)end, POISON_FREE_INITMEM,
-            "initrd");
+    free_reserved_area((void *)start, (void *)end, POISON_FREE_INITMEM, "initrd");
 }
 
 #ifdef CONFIG_KEXEC_CORE
 static bool __init kexec_free_initrd(void)
 {
     unsigned long crashk_start = (unsigned long)__va(crashk_res.start);
-    unsigned long crashk_end   = (unsigned long)__va(crashk_res.end);
+    unsigned long crashk_end = (unsigned long)__va(crashk_res.end);
 
     /*
      * If the initrd region is overlapped with crashkernel reserved region,
      * free only memory that is not part of crashkernel region.
      */
-    if (initrd_start >= crashk_end || initrd_end <= crashk_start)
+    if (initrd_start >= crashk_end || initrd_end <= crashk_start) {
         return false;
+    }
 
     /*
      * Initialize initrd memory region since the kexec boot does not do.
      */
     memset((void *)initrd_start, 0, initrd_end - initrd_start);
-    if (initrd_start < crashk_start)
+    if (initrd_start < crashk_start) {
         free_initrd_mem(initrd_start, crashk_start);
-    if (initrd_end > crashk_end)
+    }
+    if (initrd_end > crashk_end) {
         free_initrd_mem(crashk_end, initrd_end);
+    }
     return true;
 }
 #else
@@ -591,17 +610,16 @@ static void __init populate_initrd_image(char *err)
 
     unpack_to_rootfs(__initramfs_start, __initramfs_size);
 
-    printk(KERN_INFO "rootfs image is not initramfs (%s); looks like an initrd\n",
-            err);
-    file = filp_open("/initrd.image", O_WRONLY | O_CREAT, 0700);
-    if (IS_ERR(file))
+    printk(KERN_INFO "rootfs image is not initramfs (%s); looks like an initrd\n", err);
+    file = filp_open("/initrd.image", O_WRONLY | O_CREAT, 0x1c0);
+    if (IS_ERR(file)) {
         return;
+    }
 
-    written = xwrite(file, (char *)initrd_start, initrd_end - initrd_start,
-            &pos);
-    if (written != initrd_end - initrd_start)
-        pr_err("/initrd.image: incomplete write (%zd != %ld)\n",
-               written, initrd_end - initrd_start);
+    written = xwrite(file, (char *)initrd_start, initrd_end - initrd_start, &pos);
+    if (written != initrd_end - initrd_start) {
+        pr_err("/initrd.image: incomplete write (%zd != %ld)\n", written, initrd_end - initrd_start);
+    }
     fput(file);
 }
 #endif /* CONFIG_BLK_DEV_RAM */
@@ -610,16 +628,19 @@ static int __init populate_rootfs(void)
 {
     /* Load the built in initramfs */
     char *err = unpack_to_rootfs(__initramfs_start, __initramfs_size);
-    if (err)
+    if (err) {
         panic("%s", err); /* Failed to decompress INTERNAL initramfs */
+    }
 
-    if (!initrd_start || IS_ENABLED(CONFIG_INITRAMFS_FORCE))
+    if (!initrd_start || IS_ENABLED(CONFIG_INITRAMFS_FORCE)) {
         goto done;
+    }
 
-    if (IS_ENABLED(CONFIG_BLK_DEV_RAM))
+    if (IS_ENABLED(CONFIG_BLK_DEV_RAM)) {
         printk(KERN_INFO "Trying to unpack rootfs image as initramfs...\n");
-    else
+    } else {
         printk(KERN_INFO "Unpacking initramfs...\n");
+    }
 
     err = unpack_to_rootfs((char *)initrd_start, initrd_end - initrd_start);
     if (err) {
@@ -635,8 +656,9 @@ done:
      * If the initrd region is overlapped with crashkernel reserved region,
      * free only memory that is not part of crashkernel region.
      */
-    if (!do_retain_initrd && initrd_start && !kexec_free_initrd())
+    if (!do_retain_initrd && initrd_start && !kexec_free_initrd()) {
         free_initrd_mem(initrd_start, initrd_end);
+    }
     initrd_start = 0;
     initrd_end = 0;
 

@@ -181,13 +181,13 @@ const struct
     ._tp_count = MIPE_HEADER_TRACEPOINT_LIST_SIZE,
 #define TRACEPOINT_DESC(name, desc, arg_types, arg_names)    \
     .__ ## name = {                    \
-        ._name = name,                \
+        ._name = (name),                \
         ._size_string_name = sizeof(#name),    \
         ._string_name = #name,            \
         ._size_desc = sizeof(desc),        \
-        ._desc = desc,                \
+        ._desc = (desc),                \
         ._size_arg_types = sizeof(arg_types),    \
-        ._arg_types = arg_types,        \
+        ._arg_types = (arg_types),        \
         ._size_arg_names = sizeof(arg_names),    \
         ._arg_names = arg_names            \
     },
@@ -196,7 +196,7 @@ const struct
         ._msg_id = MIPE_HEADER_ENUM_MSG_ID,        \
         ._arg_name_len = sizeof(#arg_name),        \
         ._arg_name = #arg_name,                \
-        ._value = value,                \
+        ._value = (value),                \
         ._value_str_len = sizeof(#value),        \
         ._value_str = #value                \
     },

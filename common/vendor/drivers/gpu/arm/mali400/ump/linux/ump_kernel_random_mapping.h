@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2011, 2013-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -19,7 +20,7 @@
 #include <linux/rbtree.h>
 
 #define UMP_RANDOM_MAP_DELAY 1
-#define UMP_FAILED_LOOKUP_DELAY 10 /* ms */
+#define UMP_FAILED_LOOKUP_DELAY 10    /* ms */
 #define UMP_FAILED_LOOKUPS_ALLOWED 10 /* number of allowed failed lookups */
 
 /**

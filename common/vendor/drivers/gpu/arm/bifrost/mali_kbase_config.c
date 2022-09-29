@@ -20,8 +20,6 @@
  *
  */
 
-
-
 #include <mali_kbase.h>
 #include <mali_kbase_defs.h>
 #include <mali_kbase_config_defaults.h>
@@ -31,8 +29,9 @@ int kbasep_platform_device_init(struct kbase_device *kbdev)
     struct kbase_platform_funcs_conf *platform_funcs_p;
 
     platform_funcs_p = (struct kbase_platform_funcs_conf *)PLATFORM_FUNCS;
-    if (platform_funcs_p && platform_funcs_p->platform_init_func)
+    if (platform_funcs_p && platform_funcs_p->platform_init_func) {
         return platform_funcs_p->platform_init_func(kbdev);
+    }
 
     return 0;
 }
@@ -42,7 +41,7 @@ void kbasep_platform_device_term(struct kbase_device *kbdev)
     struct kbase_platform_funcs_conf *platform_funcs_p;
 
     platform_funcs_p = (struct kbase_platform_funcs_conf *)PLATFORM_FUNCS;
-    if (platform_funcs_p && platform_funcs_p->platform_term_func)
+    if (platform_funcs_p && platform_funcs_p->platform_term_func) {
         platform_funcs_p->platform_term_func(kbdev);
+    }
 }
-

@@ -19,6 +19,10 @@
  * SPDX-License-Identifier: GPL-2.0
  *
  */
+#ifndef COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_MALI_KBASE_STRINGS_H
+#define COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_MALI_KBASE_STRINGS_H
 
 extern const char kbase_drv_name[];
 extern const char kbase_timeline_name[];
+
+#endif

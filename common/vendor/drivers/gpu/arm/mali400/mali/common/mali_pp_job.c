@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -21,11 +22,18 @@
 #include "mali_memory_swap_alloc.h"
 #include "mali_scheduler.h"
 
-static u32 pp_counter_src0 = MALI_HW_CORE_NO_COUNTER;   /**< Performance counter 0, MALI_HW_CORE_NO_COUNTER for disabled */
-static u32 pp_counter_src1 = MALI_HW_CORE_NO_COUNTER;   /**< Performance counter 1, MALI_HW_CORE_NO_COUNTER for disabled */
-static _mali_osk_atomic_t pp_counter_per_sub_job_count; /**< Number of values in the two arrays which is != MALI_HW_CORE_NO_COUNTER */
-static u32 pp_counter_per_sub_job_src0[MALI_PP_MAX_SUB_JOBS] = { MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER };
-static u32 pp_counter_per_sub_job_src1[MALI_PP_MAX_SUB_JOBS] = { MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER };
+static u32 pp_counter_src0 =
+    MALI_HW_CORE_NO_COUNTER; /**< Performance counter 0, MALI_HW_CORE_NO_COUNTER for disabled */
+static u32 pp_counter_src1 =
+    MALI_HW_CORE_NO_COUNTER; /**< Performance counter 1, MALI_HW_CORE_NO_COUNTER for disabled */
+static _mali_osk_atomic_t
+    pp_counter_per_sub_job_count; /**< Number of values in the two arrays which is != MALI_HW_CORE_NO_COUNTER */
+static u32 pp_counter_per_sub_job_src0[MALI_PP_MAX_SUB_JOBS] = {
+    MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER,
+    MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER};
+static u32 pp_counter_per_sub_job_src1[MALI_PP_MAX_SUB_JOBS] = {
+    MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER,
+    MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER, MALI_HW_CORE_NO_COUNTER};
 
 void mali_pp_job_initialize(void)
 {
@@ -37,15 +45,14 @@ void mali_pp_job_terminate(void)
     mali_osk_atomic_term(&pp_counter_per_sub_job_count);
 }
 
-struct mali_pp_job *mali_pp_job_create(struct mali_session_data *session,
-                       mali_uk_pp_start_job_s __user *uargs, u32 id)
+struct mali_pp_job *mali_pp_job_create(struct mali_session_data *session, mali_uk_pp_start_job_s __user *uargs, u32 id)
 {
     struct mali_pp_job *job;
     u32 perf_counter_flag;
 
     job = mali_osk_calloc(1, sizeof(struct mali_pp_job));
     if (NULL != job) {
-        
+
         mali_osk_list_init(&job->list);
         mali_osk_list_init(&job->session_fb_lookup_list);
         mali_osk_atomic_inc(&session->number_of_pp_jobs);
@@ -60,8 +67,11 @@ struct mali_pp_job *mali_pp_job_create(struct mali_session_data *session,
         }
 
         if (!mali_pp_job_use_no_notification(job)) {
-            job->finished_notification = _mali_osk_notification_create(MALI_NOTIFICATION_PP_FINISHED, sizeof(mali_uk_pp_job_finished_s));
-            if (NULL == job->finished_notification) goto fail;
+            job->finished_notification =
+                _mali_osk_notification_create(MALI_NOTIFICATION_PP_FINISHED, sizeof(mali_uk_pp_job_finished_s));
+            if (NULL == job->finished_notification) {
+                goto fail;
+            }
         }
 
         perf_counter_flag = mali_pp_job_get_perf_counter_flag(job);
@@ -79,8 +89,10 @@ struct mali_pp_job *mali_pp_job_create(struct mali_session_data *session,
             /* We only copy the per sub job array if it is enabled with at least one counter */
             if (0 < sub_job_count) {
                 job->perf_counter_per_sub_job_count = sub_job_count;
-                mali_osk_memcpy(job->perf_counter_per_sub_job_src0, pp_counter_per_sub_job_src0, sizeof(pp_counter_per_sub_job_src0));
-                mali_osk_memcpy(job->perf_counter_per_sub_job_src1, pp_counter_per_sub_job_src1, sizeof(pp_counter_per_sub_job_src1));
+                mali_osk_memcpy(job->perf_counter_per_sub_job_src0, pp_counter_per_sub_job_src0,
+                                sizeof(pp_counter_per_sub_job_src0));
+                mali_osk_memcpy(job->perf_counter_per_sub_job_src1, pp_counter_per_sub_job_src1,
+                                sizeof(pp_counter_per_sub_job_src1));
             }
         }
 
@@ -165,8 +177,7 @@ void mali_pp_job_delete(struct mali_pp_job *job)
     }
 
     if (job->user_notification) {
-        mali_scheduler_return_pp_job_to_user(job,
-                             job->num_pp_cores_in_virtual);
+        mali_scheduler_return_pp_job_to_user(job, job->num_pp_cores_in_virtual);
     }
 
     if (NULL != job->finished_notification) {
@@ -190,8 +201,8 @@ void mali_pp_job_list_add(struct mali_pp_job *job, _mali_osk_list_t *list)
     MALI_DEBUG_ASSERT_SCHEDULER_LOCK_HELD();
 
     /* Find position in list/queue where job should be added. */
-    MALI_OSK_LIST_FOREACHENTRY_REVERSE(iter, tmp, list,
-                        struct mali_pp_job, list) {
+    MALI_OSK_LIST_FOREACHENTRY_REVERSE(iter, tmp, list, struct mali_pp_job, list)
+    {
         /* job should be started after iter if iter is in progress. */
         if (0 < iter->sub_jobs_started) {
             break;
@@ -201,16 +212,13 @@ void mali_pp_job_list_add(struct mali_pp_job *job, _mali_osk_list_t *list)
          * job should be started after iter if it has a higher
          * job id. A span is used to handle job id wrapping.
          */
-        if ((mali_pp_job_get_id(job) -
-             mali_pp_job_get_id(iter)) <
-            MALI_SCHEDULER_JOB_ID_SPAN) {
+        if ((mali_pp_job_get_id(job) - mali_pp_job_get_id(iter)) < MALI_SCHEDULER_JOB_ID_SPAN) {
             break;
         }
     }
 
     _mali_osk_list_add(&job->list, &iter->list);
 }
-
 
 u32 mali_pp_job_get_perf_counter_src0(struct mali_pp_job *job, u32 sub_job)
 {

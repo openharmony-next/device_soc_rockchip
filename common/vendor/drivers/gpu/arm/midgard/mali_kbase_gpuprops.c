@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Base kernel property query APIs
  */
@@ -40,10 +36,9 @@
  * Return: Bits [@offset, @offset + @size) from @value.
  */
 /* from mali_cdsb.h */
-#define KBASE_UBFX32(value, offset, size) \
-    (((u32)(value) >> (u32)(offset)) & (u32)((1ULL << (u32)(size)) - 1))
+#define KBASE_UBFX32(value, offset, size) (((u32)(value) >> (u32)(offset)) & (u32)((1ULL << (u32)(size)) - 1))
 
-int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpuprops * const kbase_props)
+int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpuprops *const kbase_props)
 {
     kbase_gpu_clk_speed_func get_gpu_speed_mhz;
     u32 gpu_speed_mhz;
@@ -56,7 +51,7 @@ int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpup
      * If that function fails, or the function is not provided by the system integrator, we report the maximum
      * GPU speed as specified by GPU_FREQ_KHZ_MAX.
      */
-    get_gpu_speed_mhz = (kbase_gpu_clk_speed_func) GPU_SPEED_FUNC;
+    get_gpu_speed_mhz = (kbase_gpu_clk_speed_func)GPU_SPEED_FUNC;
     if (get_gpu_speed_mhz != NULL) {
         rc = get_gpu_speed_mhz(&gpu_speed_mhz);
 #ifdef CONFIG_MALI_DEBUG
@@ -65,33 +60,37 @@ int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpup
             u32 gpu_speed_khz = gpu_speed_mhz * 1000;
 
             if (gpu_speed_khz < kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_min ||
-                    gpu_speed_khz > kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max)
-                dev_warn(kctx->kbdev->dev, "GPU Speed is outside of min/max range (got %lu Khz, min %lu Khz, max %lu Khz)\n",
-                        (unsigned long)gpu_speed_khz,
-                        (unsigned long)kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_min,
-                        (unsigned long)kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max);
+                gpu_speed_khz > kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max) {
+                dev_warn(kctx->kbdev->dev,
+                         "GPU Speed is outside of min/max range (got %lu Khz, min %lu Khz, max %lu Khz)\n",
+                         (unsigned long)gpu_speed_khz,
+                         (unsigned long)kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_min,
+                         (unsigned long)kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max);
+            }
         }
-#endif                /* CONFIG_MALI_DEBUG */
+#endif /* CONFIG_MALI_DEBUG */
     }
     if (kctx->kbdev->clock) {
-        gpu_speed_mhz = clk_get_rate(kctx->kbdev->clock) / 1000000;
+        gpu_speed_mhz = clk_get_rate(kctx->kbdev->clock) / 0xF4240;
         rc = 0;
     }
-    if (rc != 0)
-        gpu_speed_mhz = kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max / 1000;
+    if (rc != 0) {
+        gpu_speed_mhz = kctx->kbdev->gpu_props.props.core_props.gpu_freq_khz_max / 0x3E8;
+    }
 
     kctx->kbdev->gpu_props.props.core_props.gpu_speed_mhz = gpu_speed_mhz;
 
     memcpy(&kbase_props->props, &kctx->kbdev->gpu_props.props, sizeof(kbase_props->props));
 
     /* Before API 8.2 they expect L3 cache info here, which was always 0 */
-    if (kctx->api_version < KBASE_API_VERSION(8, 2))
+    if (kctx->api_version < KBASE_API_VERSION(8, 2)) {
         kbase_props->props.raw_props.suspend_size = 0;
+    }
 
     return 0;
 }
 
-static void kbase_gpuprops_construct_coherent_groups(base_gpu_props * const props)
+static void kbase_gpuprops_construct_coherent_groups(base_gpu_props *const props)
 {
     struct mali_base_gpu_coherent_group *current_group;
     u64 group_present;
@@ -138,7 +137,7 @@ static void kbase_gpuprops_construct_coherent_groups(base_gpu_props * const prop
     first_set = group_present & ~(group_present - 1);
 
     while (group_present != 0 && num_groups < BASE_MAX_COHERENT_GROUPS) {
-        group_present -= first_set;    /* Clear the current group bit */
+        group_present -= first_set; /* Clear the current group bit */
         first_set_prev = first_set;
 
         first_set = group_present & ~(group_present - 1);
@@ -152,8 +151,9 @@ static void kbase_gpuprops_construct_coherent_groups(base_gpu_props * const prop
         current_group++;
     }
 
-    if (group_present != 0)
+    if (group_present != 0) {
         pr_warn("Too many coherent groups (keeping only %d groups).\n", BASE_MAX_COHERENT_GROUPS);
+    }
 
     props->coherency_info.num_groups = num_groups;
 }
@@ -166,7 +166,7 @@ static void kbase_gpuprops_construct_coherent_groups(base_gpu_props * const prop
  * Fill the &base_gpu_props structure with values from the GPU configuration
  * registers. Only the raw properties are filled in this function
  */
-static void kbase_gpuprops_get_props(base_gpu_props * const gpu_props, struct kbase_device *kbdev)
+static void kbase_gpuprops_get_props(base_gpu_props *const gpu_props, struct kbase_device *kbdev)
 {
     struct kbase_gpuprops_regdump regdump;
     int i;
@@ -186,28 +186,22 @@ static void kbase_gpuprops_get_props(base_gpu_props * const gpu_props, struct kb
 
     gpu_props->raw_props.as_present = regdump.as_present;
     gpu_props->raw_props.js_present = regdump.js_present;
-    gpu_props->raw_props.shader_present =
-        ((u64) regdump.shader_present_hi << 32) +
-        regdump.shader_present_lo;
-    gpu_props->raw_props.tiler_present =
-        ((u64) regdump.tiler_present_hi << 32) +
-        regdump.tiler_present_lo;
-    gpu_props->raw_props.l2_present =
-        ((u64) regdump.l2_present_hi << 32) +
-        regdump.l2_present_lo;
+    gpu_props->raw_props.shader_present = ((u64)regdump.shader_present_hi << 0x20) + regdump.shader_present_lo;
+    gpu_props->raw_props.tiler_present = ((u64)regdump.tiler_present_hi << 0x20) + regdump.tiler_present_lo;
+    gpu_props->raw_props.l2_present = ((u64)regdump.l2_present_hi << 0x20) + regdump.l2_present_lo;
 #ifdef CONFIG_MALI_CORESTACK
-    gpu_props->raw_props.stack_present =
-        ((u64) regdump.stack_present_hi << 32) +
-        regdump.stack_present_lo;
-#else /* CONFIG_MALI_CORESTACK */
+    gpu_props->raw_props.stack_present = ((u64)regdump.stack_present_hi << 0x20) + regdump.stack_present_lo;
+#else  /* CONFIG_MALI_CORESTACK */
     gpu_props->raw_props.stack_present = 0;
 #endif /* CONFIG_MALI_CORESTACK */
 
-    for (i = 0; i < GPU_MAX_JOB_SLOTS; i++)
+    for (i = 0; i < GPU_MAX_JOB_SLOTS; i++) {
         gpu_props->raw_props.js_features[i] = regdump.js_features[i];
+    }
 
-    for (i = 0; i < BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS; i++)
+    for (i = 0; i < BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS; i++) {
         gpu_props->raw_props.texture_features[i] = regdump.texture_features[i];
+    }
 
     gpu_props->raw_props.thread_max_barrier_size = regdump.thread_max_barrier_size;
     gpu_props->raw_props.thread_max_threads = regdump.thread_max_threads;
@@ -215,7 +209,7 @@ static void kbase_gpuprops_get_props(base_gpu_props * const gpu_props, struct kb
     gpu_props->raw_props.thread_features = regdump.thread_features;
 }
 
-void kbase_gpuprops_update_core_props_gpu_id(base_gpu_props * const gpu_props)
+void kbase_gpuprops_update_core_props_gpu_id(base_gpu_props *const gpu_props)
 {
     gpu_props->core_props.version_status = KBASE_UBFX32(gpu_props->raw_props.gpu_id, 0U, 4);
     gpu_props->core_props.minor_revision = KBASE_UBFX32(gpu_props->raw_props.gpu_id, 4U, 8);
@@ -231,7 +225,7 @@ void kbase_gpuprops_update_core_props_gpu_id(base_gpu_props * const gpu_props)
  * Fill the &base_gpu_props structure with values derived from the GPU
  * configuration registers
  */
-static void kbase_gpuprops_calculate_props(base_gpu_props * const gpu_props, struct kbase_device *kbdev)
+static void kbase_gpuprops_calculate_props(base_gpu_props *const gpu_props, struct kbase_device *kbdev)
 {
     int i;
 
@@ -240,8 +234,9 @@ static void kbase_gpuprops_calculate_props(base_gpu_props * const gpu_props, str
     gpu_props->core_props.log2_program_counter_size = KBASE_GPU_PC_SIZE_LOG2;
     gpu_props->core_props.gpu_available_memory_size = totalram_pages() << PAGE_SHIFT;
 
-    for (i = 0; i < BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS; i++)
+    for (i = 0; i < BASE_GPU_NUM_TEXTURE_FEATURES_REGISTERS; i++) {
         gpu_props->core_props.texture_features[i] = gpu_props->raw_props.texture_features[i];
+    }
 
     gpu_props->l2_props.log2_line_size = KBASE_UBFX32(gpu_props->raw_props.l2_features, 0U, 8);
     gpu_props->l2_props.log2_cache_size = KBASE_UBFX32(gpu_props->raw_props.l2_features, 16U, 8);
@@ -249,26 +244,28 @@ static void kbase_gpuprops_calculate_props(base_gpu_props * const gpu_props, str
     /* Field with number of l2 slices is added to MEM_FEATURES register
      * since t76x. Below code assumes that for older GPU reserved bits will
      * be read as zero. */
-    gpu_props->l2_props.num_l2_slices =
-        KBASE_UBFX32(gpu_props->raw_props.mem_features, 8U, 4) + 1;
+    gpu_props->l2_props.num_l2_slices = KBASE_UBFX32(gpu_props->raw_props.mem_features, 8U, 4) + 1;
 
     gpu_props->tiler_props.bin_size_bytes = 1 << KBASE_UBFX32(gpu_props->raw_props.tiler_features, 0U, 6);
     gpu_props->tiler_props.max_active_levels = KBASE_UBFX32(gpu_props->raw_props.tiler_features, 8U, 4);
 
-    if (gpu_props->raw_props.thread_max_threads == 0)
+    if (gpu_props->raw_props.thread_max_threads == 0) {
         gpu_props->thread_props.max_threads = THREAD_MT_DEFAULT;
-    else
+    } else {
         gpu_props->thread_props.max_threads = gpu_props->raw_props.thread_max_threads;
+    }
 
-    if (gpu_props->raw_props.thread_max_workgroup_size == 0)
+    if (gpu_props->raw_props.thread_max_workgroup_size == 0) {
         gpu_props->thread_props.max_workgroup_size = THREAD_MWS_DEFAULT;
-    else
+    } else {
         gpu_props->thread_props.max_workgroup_size = gpu_props->raw_props.thread_max_workgroup_size;
+    }
 
-    if (gpu_props->raw_props.thread_max_barrier_size == 0)
+    if (gpu_props->raw_props.thread_max_barrier_size == 0) {
         gpu_props->thread_props.max_barrier_size = THREAD_MBS_DEFAULT;
-    else
+    } else {
         gpu_props->thread_props.max_barrier_size = gpu_props->raw_props.thread_max_barrier_size;
+    }
 
     gpu_props->thread_props.max_registers = KBASE_UBFX32(gpu_props->raw_props.thread_features, 0U, 16);
     gpu_props->thread_props.max_task_queue = KBASE_UBFX32(gpu_props->raw_props.thread_features, 16U, 8);
@@ -330,8 +327,7 @@ void kbase_gpuprops_set_features(struct kbase_device *kbdev)
      * into the selected coherency mode.
      * Additionally, add non-coherent mode, as this is always supported.
      */
-    gpu_props->raw_props.coherency_mode = regdump.coherency_features |
-        COHERENCY_FEATURE_BIT(COHERENCY_NONE);
+    gpu_props->raw_props.coherency_mode = regdump.coherency_features | COHERENCY_FEATURE_BIT(COHERENCY_NONE);
 }
 
 static struct {
@@ -339,94 +335,95 @@ static struct {
     size_t offset;
     int size;
 } gpu_property_mapping[] = {
-#define PROP(name, member) \
-    {KBASE_GPUPROP_ ## name, offsetof(struct mali_base_gpu_props, member), \
-        sizeof(((struct mali_base_gpu_props *)0)->member)}
-    PROP(PRODUCT_ID,                  core_props.product_id),
-    PROP(VERSION_STATUS,              core_props.version_status),
-    PROP(MINOR_REVISION,              core_props.minor_revision),
-    PROP(MAJOR_REVISION,              core_props.major_revision),
-    PROP(GPU_SPEED_MHZ,               core_props.gpu_speed_mhz),
-    PROP(GPU_FREQ_KHZ_MAX,            core_props.gpu_freq_khz_max),
-    PROP(GPU_FREQ_KHZ_MIN,            core_props.gpu_freq_khz_min),
-    PROP(LOG2_PROGRAM_COUNTER_SIZE,   core_props.log2_program_counter_size),
-    PROP(TEXTURE_FEATURES_0,          core_props.texture_features[0]),
-    PROP(TEXTURE_FEATURES_1,          core_props.texture_features[1]),
-    PROP(TEXTURE_FEATURES_2,          core_props.texture_features[2]),
-    PROP(GPU_AVAILABLE_MEMORY_SIZE,   core_props.gpu_available_memory_size),
+#define PROP(name, member)                                                                                             \
+    {                                                                                                                  \
+        KBASE_GPUPROP_##name, offsetof(struct mali_base_gpu_props, member),                                            \
+            sizeof(((struct mali_base_gpu_props *)0)->member)                                                          \
+    }
+    PROP(PRODUCT_ID, core_props.product_id),
+    PROP(VERSION_STATUS, core_props.version_status),
+    PROP(MINOR_REVISION, core_props.minor_revision),
+    PROP(MAJOR_REVISION, core_props.major_revision),
+    PROP(GPU_SPEED_MHZ, core_props.gpu_speed_mhz),
+    PROP(GPU_FREQ_KHZ_MAX, core_props.gpu_freq_khz_max),
+    PROP(GPU_FREQ_KHZ_MIN, core_props.gpu_freq_khz_min),
+    PROP(LOG2_PROGRAM_COUNTER_SIZE, core_props.log2_program_counter_size),
+    PROP(TEXTURE_FEATURES_0, core_props.texture_features[0]),
+    PROP(TEXTURE_FEATURES_1, core_props.texture_features[1]),
+    PROP(TEXTURE_FEATURES_2, core_props.texture_features[2]),
+    PROP(GPU_AVAILABLE_MEMORY_SIZE, core_props.gpu_available_memory_size),
 
-    PROP(L2_LOG2_LINE_SIZE,           l2_props.log2_line_size),
-    PROP(L2_LOG2_CACHE_SIZE,          l2_props.log2_cache_size),
-    PROP(L2_NUM_L2_SLICES,            l2_props.num_l2_slices),
+    PROP(L2_LOG2_LINE_SIZE, l2_props.log2_line_size),
+    PROP(L2_LOG2_CACHE_SIZE, l2_props.log2_cache_size),
+    PROP(L2_NUM_L2_SLICES, l2_props.num_l2_slices),
 
-    PROP(TILER_BIN_SIZE_BYTES,        tiler_props.bin_size_bytes),
-    PROP(TILER_MAX_ACTIVE_LEVELS,     tiler_props.max_active_levels),
+    PROP(TILER_BIN_SIZE_BYTES, tiler_props.bin_size_bytes),
+    PROP(TILER_MAX_ACTIVE_LEVELS, tiler_props.max_active_levels),
 
-    PROP(MAX_THREADS,                 thread_props.max_threads),
-    PROP(MAX_WORKGROUP_SIZE,          thread_props.max_workgroup_size),
-    PROP(MAX_BARRIER_SIZE,            thread_props.max_barrier_size),
-    PROP(MAX_REGISTERS,               thread_props.max_registers),
-    PROP(MAX_TASK_QUEUE,              thread_props.max_task_queue),
-    PROP(MAX_THREAD_GROUP_SPLIT,      thread_props.max_thread_group_split),
-    PROP(IMPL_TECH,                   thread_props.impl_tech),
+    PROP(MAX_THREADS, thread_props.max_threads),
+    PROP(MAX_WORKGROUP_SIZE, thread_props.max_workgroup_size),
+    PROP(MAX_BARRIER_SIZE, thread_props.max_barrier_size),
+    PROP(MAX_REGISTERS, thread_props.max_registers),
+    PROP(MAX_TASK_QUEUE, thread_props.max_task_queue),
+    PROP(MAX_THREAD_GROUP_SPLIT, thread_props.max_thread_group_split),
+    PROP(IMPL_TECH, thread_props.impl_tech),
 
-    PROP(RAW_SHADER_PRESENT,          raw_props.shader_present),
-    PROP(RAW_TILER_PRESENT,           raw_props.tiler_present),
-    PROP(RAW_L2_PRESENT,              raw_props.l2_present),
-    PROP(RAW_STACK_PRESENT,           raw_props.stack_present),
-    PROP(RAW_L2_FEATURES,             raw_props.l2_features),
-    PROP(RAW_SUSPEND_SIZE,            raw_props.suspend_size),
-    PROP(RAW_MEM_FEATURES,            raw_props.mem_features),
-    PROP(RAW_MMU_FEATURES,            raw_props.mmu_features),
-    PROP(RAW_AS_PRESENT,              raw_props.as_present),
-    PROP(RAW_JS_PRESENT,              raw_props.js_present),
-    PROP(RAW_JS_FEATURES_0,           raw_props.js_features[0]),
-    PROP(RAW_JS_FEATURES_1,           raw_props.js_features[1]),
-    PROP(RAW_JS_FEATURES_2,           raw_props.js_features[2]),
-    PROP(RAW_JS_FEATURES_3,           raw_props.js_features[3]),
-    PROP(RAW_JS_FEATURES_4,           raw_props.js_features[4]),
-    PROP(RAW_JS_FEATURES_5,           raw_props.js_features[5]),
-    PROP(RAW_JS_FEATURES_6,           raw_props.js_features[6]),
-    PROP(RAW_JS_FEATURES_7,           raw_props.js_features[7]),
-    PROP(RAW_JS_FEATURES_8,           raw_props.js_features[8]),
-    PROP(RAW_JS_FEATURES_9,           raw_props.js_features[9]),
-    PROP(RAW_JS_FEATURES_10,          raw_props.js_features[10]),
-    PROP(RAW_JS_FEATURES_11,          raw_props.js_features[11]),
-    PROP(RAW_JS_FEATURES_12,          raw_props.js_features[12]),
-    PROP(RAW_JS_FEATURES_13,          raw_props.js_features[13]),
-    PROP(RAW_JS_FEATURES_14,          raw_props.js_features[14]),
-    PROP(RAW_JS_FEATURES_15,          raw_props.js_features[15]),
-    PROP(RAW_TILER_FEATURES,          raw_props.tiler_features),
-    PROP(RAW_TEXTURE_FEATURES_0,      raw_props.texture_features[0]),
-    PROP(RAW_TEXTURE_FEATURES_1,      raw_props.texture_features[1]),
-    PROP(RAW_TEXTURE_FEATURES_2,      raw_props.texture_features[2]),
-    PROP(RAW_GPU_ID,                  raw_props.gpu_id),
-    PROP(RAW_THREAD_MAX_THREADS,      raw_props.thread_max_threads),
-    PROP(RAW_THREAD_MAX_WORKGROUP_SIZE,
-            raw_props.thread_max_workgroup_size),
+    PROP(RAW_SHADER_PRESENT, raw_props.shader_present),
+    PROP(RAW_TILER_PRESENT, raw_props.tiler_present),
+    PROP(RAW_L2_PRESENT, raw_props.l2_present),
+    PROP(RAW_STACK_PRESENT, raw_props.stack_present),
+    PROP(RAW_L2_FEATURES, raw_props.l2_features),
+    PROP(RAW_SUSPEND_SIZE, raw_props.suspend_size),
+    PROP(RAW_MEM_FEATURES, raw_props.mem_features),
+    PROP(RAW_MMU_FEATURES, raw_props.mmu_features),
+    PROP(RAW_AS_PRESENT, raw_props.as_present),
+    PROP(RAW_JS_PRESENT, raw_props.js_present),
+    PROP(RAW_JS_FEATURES_0, raw_props.js_features[0]),
+    PROP(RAW_JS_FEATURES_1, raw_props.js_features[1]),
+    PROP(RAW_JS_FEATURES_2, raw_props.js_features[2]),
+    PROP(RAW_JS_FEATURES_3, raw_props.js_features[3]),
+    PROP(RAW_JS_FEATURES_4, raw_props.js_features[4]),
+    PROP(RAW_JS_FEATURES_5, raw_props.js_features[5]),
+    PROP(RAW_JS_FEATURES_6, raw_props.js_features[6]),
+    PROP(RAW_JS_FEATURES_7, raw_props.js_features[7]),
+    PROP(RAW_JS_FEATURES_8, raw_props.js_features[8]),
+    PROP(RAW_JS_FEATURES_9, raw_props.js_features[9]),
+    PROP(RAW_JS_FEATURES_10, raw_props.js_features[10]),
+    PROP(RAW_JS_FEATURES_11, raw_props.js_features[11]),
+    PROP(RAW_JS_FEATURES_12, raw_props.js_features[12]),
+    PROP(RAW_JS_FEATURES_13, raw_props.js_features[13]),
+    PROP(RAW_JS_FEATURES_14, raw_props.js_features[14]),
+    PROP(RAW_JS_FEATURES_15, raw_props.js_features[15]),
+    PROP(RAW_TILER_FEATURES, raw_props.tiler_features),
+    PROP(RAW_TEXTURE_FEATURES_0, raw_props.texture_features[0]),
+    PROP(RAW_TEXTURE_FEATURES_1, raw_props.texture_features[1]),
+    PROP(RAW_TEXTURE_FEATURES_2, raw_props.texture_features[2]),
+    PROP(RAW_GPU_ID, raw_props.gpu_id),
+    PROP(RAW_THREAD_MAX_THREADS, raw_props.thread_max_threads),
+    PROP(RAW_THREAD_MAX_WORKGROUP_SIZE, raw_props.thread_max_workgroup_size),
     PROP(RAW_THREAD_MAX_BARRIER_SIZE, raw_props.thread_max_barrier_size),
-    PROP(RAW_THREAD_FEATURES,         raw_props.thread_features),
-    PROP(RAW_COHERENCY_MODE,          raw_props.coherency_mode),
+    PROP(RAW_THREAD_FEATURES, raw_props.thread_features),
+    PROP(RAW_COHERENCY_MODE, raw_props.coherency_mode),
 
-    PROP(COHERENCY_NUM_GROUPS,        coherency_info.num_groups),
-    PROP(COHERENCY_NUM_CORE_GROUPS,   coherency_info.num_core_groups),
-    PROP(COHERENCY_COHERENCY,         coherency_info.coherency),
-    PROP(COHERENCY_GROUP_0,           coherency_info.group[0].core_mask),
-    PROP(COHERENCY_GROUP_1,           coherency_info.group[1].core_mask),
-    PROP(COHERENCY_GROUP_2,           coherency_info.group[2].core_mask),
-    PROP(COHERENCY_GROUP_3,           coherency_info.group[3].core_mask),
-    PROP(COHERENCY_GROUP_4,           coherency_info.group[4].core_mask),
-    PROP(COHERENCY_GROUP_5,           coherency_info.group[5].core_mask),
-    PROP(COHERENCY_GROUP_6,           coherency_info.group[6].core_mask),
-    PROP(COHERENCY_GROUP_7,           coherency_info.group[7].core_mask),
-    PROP(COHERENCY_GROUP_8,           coherency_info.group[8].core_mask),
-    PROP(COHERENCY_GROUP_9,           coherency_info.group[9].core_mask),
-    PROP(COHERENCY_GROUP_10,          coherency_info.group[10].core_mask),
-    PROP(COHERENCY_GROUP_11,          coherency_info.group[11].core_mask),
-    PROP(COHERENCY_GROUP_12,          coherency_info.group[12].core_mask),
-    PROP(COHERENCY_GROUP_13,          coherency_info.group[13].core_mask),
-    PROP(COHERENCY_GROUP_14,          coherency_info.group[14].core_mask),
-    PROP(COHERENCY_GROUP_15,          coherency_info.group[15].core_mask),
+    PROP(COHERENCY_NUM_GROUPS, coherency_info.num_groups),
+    PROP(COHERENCY_NUM_CORE_GROUPS, coherency_info.num_core_groups),
+    PROP(COHERENCY_COHERENCY, coherency_info.coherency),
+    PROP(COHERENCY_GROUP_0, coherency_info.group[0].core_mask),
+    PROP(COHERENCY_GROUP_1, coherency_info.group[1].core_mask),
+    PROP(COHERENCY_GROUP_2, coherency_info.group[2].core_mask),
+    PROP(COHERENCY_GROUP_3, coherency_info.group[3].core_mask),
+    PROP(COHERENCY_GROUP_4, coherency_info.group[4].core_mask),
+    PROP(COHERENCY_GROUP_5, coherency_info.group[5].core_mask),
+    PROP(COHERENCY_GROUP_6, coherency_info.group[6].core_mask),
+    PROP(COHERENCY_GROUP_7, coherency_info.group[7].core_mask),
+    PROP(COHERENCY_GROUP_8, coherency_info.group[8].core_mask),
+    PROP(COHERENCY_GROUP_9, coherency_info.group[9].core_mask),
+    PROP(COHERENCY_GROUP_10, coherency_info.group[10].core_mask),
+    PROP(COHERENCY_GROUP_11, coherency_info.group[11].core_mask),
+    PROP(COHERENCY_GROUP_12, coherency_info.group[12].core_mask),
+    PROP(COHERENCY_GROUP_13, coherency_info.group[13].core_mask),
+    PROP(COHERENCY_GROUP_14, coherency_info.group[14].core_mask),
+    PROP(COHERENCY_GROUP_15, coherency_info.group[15].core_mask),
 
 #undef PROP
 };
@@ -455,10 +452,22 @@ int kbase_gpuprops_populate_user_buffer(struct kbase_device *kbdev)
 
     p = kprops->prop_buffer;
 
-#define WRITE_U8(v) (*p++ = (v) & 0xFF)
-#define WRITE_U16(v) do { WRITE_U8(v); WRITE_U8((v) >> 8); } while (0)
-#define WRITE_U32(v) do { WRITE_U16(v); WRITE_U16((v) >> 16); } while (0)
-#define WRITE_U64(v) do { WRITE_U32(v); WRITE_U32((v) >> 32); } while (0)
+#define WRITE_U8(v) (*p++ = (v)&0xFF)
+#define WRITE_U16(v)                                                                                                   \
+    do {                                                                                                               \
+        WRITE_U8(v);                                                                                                   \
+        WRITE_U8((v) >> 8);                                                                                            \
+    } while (0)
+#define WRITE_U32(v)                                                                                                   \
+    do {                                                                                                               \
+        WRITE_U16(v);                                                                                                  \
+        WRITE_U16((v) >> 16);                                                                                          \
+    } while (0)
+#define WRITE_U64(v)                                                                                                   \
+    do {                                                                                                               \
+        WRITE_U32(v);                                                                                                  \
+        WRITE_U32((v) >> 32);                                                                                          \
+    } while (0)
 
     for (i = 0; i < count; i++) {
         u32 type = gpu_property_mapping[i].type;
@@ -466,43 +475,41 @@ int kbase_gpuprops_populate_user_buffer(struct kbase_device *kbdev)
         void *field = ((u8 *)props) + gpu_property_mapping[i].offset;
 
         switch (gpu_property_mapping[i].size) {
-        case KBASE_GPUPROP_VALUE_U8:
-            type_size = KBASE_GPUPROP_VALUE_SIZE_U8;
-            break;
-        case KBASE_GPUPROP_VALUE_U16:
-            type_size = KBASE_GPUPROP_VALUE_SIZE_U16;
-            break;
-        case KBASE_GPUPROP_VALUE_U32:
-            type_size = KBASE_GPUPROP_VALUE_SIZE_U32;
-            break;
-        case KBASE_GPUPROP_VALUE_U64:
-            type_size = KBASE_GPUPROP_VALUE_SIZE_U64;
-            break;
-        default:
-            dev_err(kbdev->dev,
-                "Invalid gpu_property_mapping type=%d size=%d",
-                type, gpu_property_mapping[i].size);
-            return -EINVAL;
+            case KBASE_GPUPROP_VALUE_U8:
+                type_size = KBASE_GPUPROP_VALUE_SIZE_U8;
+                break;
+            case KBASE_GPUPROP_VALUE_U16:
+                type_size = KBASE_GPUPROP_VALUE_SIZE_U16;
+                break;
+            case KBASE_GPUPROP_VALUE_U32:
+                type_size = KBASE_GPUPROP_VALUE_SIZE_U32;
+                break;
+            case KBASE_GPUPROP_VALUE_U64:
+                type_size = KBASE_GPUPROP_VALUE_SIZE_U64;
+                break;
+            default:
+                dev_err(kbdev->dev, "Invalid gpu_property_mapping type=%d size=%d", type, gpu_property_mapping[i].size);
+                return -EINVAL;
         }
 
-        WRITE_U32((type<<2) | type_size);
+        WRITE_U32((type << 2) | type_size);
 
         switch (type_size) {
-        case KBASE_GPUPROP_VALUE_SIZE_U8:
-            WRITE_U8(*((u8 *)field));
-            break;
-        case KBASE_GPUPROP_VALUE_SIZE_U16:
-            WRITE_U16(*((u16 *)field));
-            break;
-        case KBASE_GPUPROP_VALUE_SIZE_U32:
-            WRITE_U32(*((u32 *)field));
-            break;
-        case KBASE_GPUPROP_VALUE_SIZE_U64:
-            WRITE_U64(*((u64 *)field));
-            break;
-        default: /* Cannot be reached */
-            WARN_ON(1);
-            return -EINVAL;
+            case KBASE_GPUPROP_VALUE_SIZE_U8:
+                WRITE_U8(*((u8 *)field));
+                break;
+            case KBASE_GPUPROP_VALUE_SIZE_U16:
+                WRITE_U16(*((u16 *)field));
+                break;
+            case KBASE_GPUPROP_VALUE_SIZE_U32:
+                WRITE_U32(*((u32 *)field));
+                break;
+            case KBASE_GPUPROP_VALUE_SIZE_U64:
+                WRITE_U64(*((u64 *)field));
+                break;
+            default: /* Cannot be reached */
+                WARN_ON(1);
+                return -EINVAL;
         }
     }
 

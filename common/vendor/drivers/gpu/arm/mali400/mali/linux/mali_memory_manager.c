@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -46,8 +47,8 @@
 #include "mali_memory_swap_alloc.h"
 
 /*
-* New memory system interface
-*/
+ * New memory system interface
+ */
 
 /*inti idr for backend memory */
 struct idr mali_backend_idr;
@@ -70,8 +71,8 @@ int mali_memory_manager_init(struct mali_allocation_manager *mgr)
 }
 
 /* Deinit allocation manager
-* Do some check for debug
-*/
+ * Do some check for debug
+ */
 void mali_memory_manager_uninit(struct mali_allocation_manager *mgr)
 {
     /* check RB tree is empty */
@@ -102,8 +103,8 @@ static mali_mem_allocation *mali_mem_allocation_struct_create(struct mali_sessio
     mali_osk_atomic_init(&mali_allocation->mem_alloc_refcount, 1);
 
     /**
-    *add to session list
-    */
+     *add to session list
+     */
     mutex_lock(&session->allocation_mgr.list_mutex);
     list_add_tail(&mali_allocation->list, &session->allocation_mgr.head);
     session->allocation_mgr.mali_allocation_num++;
@@ -112,7 +113,7 @@ static mali_mem_allocation *mali_mem_allocation_struct_create(struct mali_sessio
     return mali_allocation;
 }
 
-void  mali_mem_allocation_struct_destory(mali_mem_allocation *alloc)
+void mali_mem_allocation_struct_destory(mali_mem_allocation *alloc)
 {
     MALI_DEBUG_ASSERT_POINTER(alloc);
     MALI_DEBUG_ASSERT_POINTER(alloc->session);
@@ -140,7 +141,6 @@ int mali_mem_backend_struct_create(mali_mem_backend **backend, u32 psize)
     INIT_LIST_HEAD(&mem_backend->list);
     mem_backend->using_count = 0;
 
-
     /* link backend with id */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 9, 0)
 again:
@@ -156,22 +156,23 @@ again:
         kfree(mem_backend);
         return -ENOSPC;
     }
-    if (-EAGAIN == ret)
+    if (-EAGAIN == ret) {
         goto again;
+    }
 #else
     mutex_lock(&mali_idr_mutex);
     ret = idr_alloc(&mali_backend_idr, mem_backend, 1, MALI_S32_MAX, GFP_KERNEL);
     mutex_unlock(&mali_idr_mutex);
     index = ret;
     if (ret < 0) {
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("mali_mem_backend_struct_create: Can't allocate idr for backend! \n"));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING,
+                         ("mali_mem_backend_struct_create: Can't allocate idr for backend! \n"));
         kfree(mem_backend);
         return -ENOSPC;
     }
 #endif
     return index;
 }
-
 
 static void mali_mem_backend_struct_destory(mali_mem_backend **backend, s32 backend_handle)
 {
@@ -191,7 +192,7 @@ mali_mem_backend *mali_mem_backend_struct_search(struct mali_session_data *sessi
     mali_mem_allocation *mali_alloc = NULL;
     MALI_DEBUG_ASSERT_POINTER(session);
     mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_address, 0);
-    if (NULL == mali_vma_node)  {
+    if (NULL == mali_vma_node) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("mali_mem_backend_struct_search:vma node was NULL\n"));
         return NULL;
     }
@@ -204,7 +205,8 @@ mali_mem_backend *mali_mem_backend_struct_search(struct mali_session_data *sessi
     return mem_bkend;
 }
 
-static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mali_mem_backend *mem_backend, u32 physical_size)
+static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mali_mem_backend *mem_backend,
+                                          u32 physical_size)
 {
     mali_osk_errcode_t ret = MALI_OSK_ERR_FAULT;
     int retval = 0;
@@ -215,7 +217,7 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
     MALI_DEBUG_ASSERT_POINTER(session);
     MALI_DEBUG_ASSERT_POINTER(mem_backend);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, (" mali_mem_resize_memory called! \n"));
-    MALI_DEBUG_ASSERT(0 == physical_size %  MALI_MMU_PAGE_SIZE);
+    MALI_DEBUG_ASSERT(0 == physical_size % MALI_MMU_PAGE_SIZE);
 
     mali_allocation = mem_backend->mali_allocation;
     MALI_DEBUG_ASSERT_POINTER(mali_allocation);
@@ -229,7 +231,7 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
     if (physical_size > mem_backend->size) {
         u32 add_size = physical_size - mem_backend->size;
 
-        MALI_DEBUG_ASSERT(0 == add_size %  MALI_MMU_PAGE_SIZE);
+        MALI_DEBUG_ASSERT(0 == add_size % MALI_MMU_PAGE_SIZE);
 
         /* Allocate new pages from os mem */
         retval = mali_mem_os_alloc_pages(&tmp_os_mem, add_size);
@@ -256,10 +258,12 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
 
         /*Resize cpu mapping */
         if (NULL != mali_allocation->cpu_mapping.vma) {
-            ret = mali_mem_os_resize_cpu_map_locked(mem_backend, mali_allocation->cpu_mapping.vma, mali_allocation->cpu_mapping.vma->vm_start  + mem_backend->size, add_size);
+            ret = mali_mem_os_resize_cpu_map_locked(mem_backend, mali_allocation->cpu_mapping.vma,
+                                                    mali_allocation->cpu_mapping.vma->vm_start + mem_backend->size,
+                                                    add_size);
             if (unlikely(ret != MALI_OSK_ERR_OK)) {
                 MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("_mali_ukk_mem_resize: cpu mapping failed !\n"));
-                goto  failed_cpu_map;
+                goto failed_cpu_map;
             }
         }
 
@@ -273,7 +277,8 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
         }
 
         ret = mali_mem_os_mali_map(&mem_backend->os_mem, session, mali_allocation->mali_vma_node.vm_node.start,
-                       mali_allocation->psize / MALI_MMU_PAGE_SIZE, add_size / MALI_MMU_PAGE_SIZE, mali_allocation->mali_mapping.properties);
+                                   mali_allocation->psize / MALI_MMU_PAGE_SIZE, add_size / MALI_MMU_PAGE_SIZE,
+                                   mali_allocation->mali_mapping.properties);
         if (ret) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("_mali_ukk_mem_resize: mali mapping failed !\n"));
             goto failed_gpu_map;
@@ -287,13 +292,14 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
         tmp_os_mem.count = 0;
 
         dec_size = mem_backend->size - physical_size;
-        MALI_DEBUG_ASSERT(0 == dec_size %  MALI_MMU_PAGE_SIZE);
+        MALI_DEBUG_ASSERT(0 == dec_size % MALI_MMU_PAGE_SIZE);
 
         page_count = dec_size / MALI_MMU_PAGE_SIZE;
         vaddr = mali_allocation->mali_vma_node.vm_node.start + physical_size;
 
         /* Resize the memory of the backend */
-        ret = mali_mem_os_resize_pages(&mem_backend->os_mem, &tmp_os_mem, physical_size / MALI_MMU_PAGE_SIZE, page_count);
+        ret =
+            mali_mem_os_resize_pages(&mem_backend->os_mem, &tmp_os_mem, physical_size / MALI_MMU_PAGE_SIZE, page_count);
 
         if (ret) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("_mali_ukk_mem_resize: mali map resize failed!\n"));
@@ -308,7 +314,8 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
         /* Zap cpu mapping */
         if (0 != mali_allocation->cpu_mapping.addr) {
             MALI_DEBUG_ASSERT(NULL != mali_allocation->cpu_mapping.vma);
-            zap_vma_ptes(mali_allocation->cpu_mapping.vma, mali_allocation->cpu_mapping.vma->vm_start + physical_size, dec_size);
+            zap_vma_ptes(mali_allocation->cpu_mapping.vma, mali_allocation->cpu_mapping.vma->vm_start + physical_size,
+                         dec_size);
         }
 
         /* Free those extra pages */
@@ -323,7 +330,8 @@ static mali_osk_errcode_t mali_mem_resize(struct mali_session_data *session, mal
 
     if (change_page_count > 0) {
         atomic_add(change_page_count, &session->mali_mem_allocated_pages);
-        if (atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE > session->max_mali_mem_allocated_size) {
+        if (atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE >
+            session->max_mali_mem_allocated_size) {
             session->max_mali_mem_allocated_size = atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE;
         }
 
@@ -338,19 +346,19 @@ failed_gpu_map:
 failed_cpu_map:
     if (physical_size > mem_backend->size) {
         mali_mem_os_resize_pages(&mem_backend->os_mem, &tmp_os_mem, mem_backend->size / MALI_MMU_PAGE_SIZE,
-                     (physical_size - mem_backend->size) / MALI_MMU_PAGE_SIZE);
+                                 (physical_size - mem_backend->size) / MALI_MMU_PAGE_SIZE);
     } else {
         mali_mem_os_resize_pages(&tmp_os_mem, &mem_backend->os_mem, 0, tmp_os_mem.count);
     }
 failed_resize_pages:
-    if (0 != tmp_os_mem.count)
+    if (0 != tmp_os_mem.count) {
         mali_mem_os_free(&tmp_os_mem.pages, tmp_os_mem.count, MALI_FALSE);
+    }
 failed_alloc_memory:
 
     mutex_unlock(&mem_backend->mutex);
     return ret;
 }
-
 
 /* Set GPU MMU properties */
 static void _mali_memory_gpu_map_property_set(u32 *properties, u32 flags)
@@ -369,12 +377,12 @@ mali_osk_errcode_t mali_mem_add_mem_size(struct mali_session_data *session, u32 
     mali_mem_allocation *mali_allocation = NULL;
     u32 new_physical_size;
     MALI_DEBUG_ASSERT_POINTER(session);
-    MALI_DEBUG_ASSERT(0 == add_size %  MALI_MMU_PAGE_SIZE);
+    MALI_DEBUG_ASSERT(0 == add_size % MALI_MMU_PAGE_SIZE);
 
     /* Get the memory backend that need to be resize. */
     mem_backend = mali_mem_backend_struct_search(session, mali_addr);
 
-    if (NULL == mem_backend)  {
+    if (NULL == mem_backend) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("_mali_ukk_mem_resize: memory backend = NULL!\n"));
         return ret;
     }
@@ -385,8 +393,9 @@ mali_osk_errcode_t mali_mem_add_mem_size(struct mali_session_data *session, u32 
 
     new_physical_size = add_size + mem_backend->size;
 
-    if (new_physical_size > (mali_allocation->mali_vma_node.vm_node.size))
+    if (new_physical_size > (mali_allocation->mali_vma_node.vm_node.size)) {
         return ret;
+    }
 
     MALI_DEBUG_ASSERT(new_physical_size != mem_backend->size);
 
@@ -396,8 +405,8 @@ mali_osk_errcode_t mali_mem_add_mem_size(struct mali_session_data *session, u32 
 }
 
 /**
-*  function@_mali_ukk_mem_allocate - allocate mali memory
-*/
+ *  function@_mali_ukk_mem_allocate - allocate mali memory
+ */
 mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
 {
     struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
@@ -407,10 +416,11 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
     mali_mem_allocation *mali_allocation = NULL;
     struct mali_vma_node *mali_vma_node = NULL;
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, (" _mali_ukk_mem_allocate, vaddr=0x%x, size =0x%x! \n", args->gpu_vaddr, args->psize));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE,
+                     (" _mali_ukk_mem_allocate, vaddr=0x%x, size =0x%x! \n", args->gpu_vaddr, args->psize));
 
     /* Check if the address is allocated
-    */
+     */
     mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, args->gpu_vaddr, 0);
 
     if (unlikely(mali_vma_node)) {
@@ -418,8 +428,8 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
         return MALI_OSK_ERR_FAULT;
     }
     /**
-    *create mali memory allocation
-    */
+     *create mali memory allocation
+     */
 
     mali_allocation = mali_mem_allocation_struct_create(session);
 
@@ -449,8 +459,8 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
     }
 
     /**
-    *add allocation node to RB tree for index
-    */
+     *add allocation node to RB tree for index
+     */
     mali_allocation->mali_vma_node.vm_node.start = args->gpu_vaddr;
     mali_allocation->mali_vma_node.vm_node.size = args->vsize;
 
@@ -462,7 +472,6 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("mali_allocation->backend_handle < 0! \n"));
         goto failed_alloc_backend;
     }
-
 
     mem_backend->mali_allocation = mali_allocation;
     mem_backend->type = mali_allocation->type;
@@ -516,8 +525,8 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
         } else {
 
             /**
-            *allocate physical memory
-            */
+             *allocate physical memory
+             */
             if (mem_backend->type == MALI_MEM_OS) {
                 retval = mali_mem_os_alloc_pages(&mem_backend->os_mem, mem_backend->size);
             } else if (mem_backend->type == MALI_MEM_BLOCK) {
@@ -528,8 +537,9 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
                     mali_allocation->type = MALI_MEM_OS;
                 }
             } else if (MALI_MEM_SWAP == mem_backend->type) {
-                retval = mali_mem_swap_alloc_pages(&mem_backend->swap_mem, mali_allocation->mali_vma_node.vm_node.size, &mem_backend->start_idx);
-            }  else {
+                retval = mali_mem_swap_alloc_pages(&mem_backend->swap_mem, mali_allocation->mali_vma_node.vm_node.size,
+                                                   &mem_backend->start_idx);
+            } else {
                 /* ONLY support mem_os type */
                 MALI_DEBUG_ASSERT(0);
             }
@@ -543,25 +553,27 @@ mali_osk_errcode_t _mali_ukk_mem_allocate(_ali_uk_alloc_mem_s *args)
     }
 
     /**
-    *map to GPU side
-    */
+     *map to GPU side
+     */
     if (!(args->flags & MALI_MEMORY_ALLOCATE_NO_BIND_GPU) && mali_allocation->psize > 0) {
         mali_osk_mutex_wait(session->memory_lock);
         /* Map on Mali */
 
         if (mem_backend->type == MALI_MEM_OS) {
-            ret = mali_mem_os_mali_map(&mem_backend->os_mem, session, args->gpu_vaddr, 0,
-                           mem_backend->size / MALI_MMU_PAGE_SIZE, mali_allocation->mali_mapping.properties);
+            ret =
+                mali_mem_os_mali_map(&mem_backend->os_mem, session, args->gpu_vaddr, 0,
+                                     mem_backend->size / MALI_MMU_PAGE_SIZE, mali_allocation->mali_mapping.properties);
 
         } else if (mem_backend->type == MALI_MEM_BLOCK) {
             mali_mem_block_mali_map(&mem_backend->block_mem, session, args->gpu_vaddr,
-                        mali_allocation->mali_mapping.properties);
+                                    mali_allocation->mali_mapping.properties);
         } else if (mem_backend->type == MALI_MEM_SWAP) {
             ret = mali_mem_swap_mali_map(&mem_backend->swap_mem, session, args->gpu_vaddr,
-                             mali_allocation->mali_mapping.properties);
+                                         mali_allocation->mali_mapping.properties);
         } else if (mem_backend->type == MALI_MEM_SECURE) {
 #if defined(CONFIG_DMA_SHARED_BUFFER)
-            ret = mali_mem_secure_mali_map(&mem_backend->secure_mem, session, args->gpu_vaddr, mali_allocation->mali_mapping.properties);
+            ret = mali_mem_secure_mali_map(&mem_backend->secure_mem, session, args->gpu_vaddr,
+                                           mali_allocation->mali_mapping.properties);
 #endif
         } else { /* unsupport type */
             MALI_DEBUG_ASSERT(0);
@@ -588,7 +600,8 @@ done:
     return MALI_OSK_ERR_OK;
 
 failed_alloc_pages:
-    mali_mem_mali_map_free(session, mali_allocation->psize, mali_allocation->mali_vma_node.vm_node.start, mali_allocation->flags);
+    mali_mem_mali_map_free(session, mali_allocation->psize, mali_allocation->mali_vma_node.vm_node.start,
+                           mali_allocation->flags);
 failed_prepare_map:
     mali_mem_backend_struct_destory(&mem_backend, mali_allocation->backend_handle);
 failed_alloc_backend:
@@ -599,10 +612,9 @@ failed_alloc_backend:
     return ret;
 }
 
-
 mali_osk_errcode_t _mali_ukk_mem_free(mali_uk_free_mem_s *args)
 {
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
     u32 vaddr = args->gpu_vaddr;
     mali_mem_allocation *mali_alloc = NULL;
     struct mali_vma_node *mali_vma_node = NULL;
@@ -616,34 +628,35 @@ mali_osk_errcode_t _mali_ukk_mem_free(mali_uk_free_mem_s *args)
     MALI_DEBUG_ASSERT(NULL != mali_vma_node);
     mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
 
-    if (mali_alloc)
+    if (mali_alloc) {
         /* check ref_count */
         args->free_pages_nr = mali_allocation_unref(&mali_alloc);
+    }
 
     return MALI_OSK_ERR_OK;
 }
 
-
 /**
-* Function _mali_ukk_mem_bind -- bind a external memory to a new GPU address
-* It will allocate a new mem allocation and bind external memory to it.
-* Supported backend type are:
-* MALI_MEMORY_BIND_BACKEND_UMP
-* MALI_MEMORY_BIND_BACKEND_DMA_BUF
-* MALI_MEMORY_BIND_BACKEND_EXTERNAL_MEMORY
-* CPU access is not supported yet
-*/
+ * Function _mali_ukk_mem_bind -- bind a external memory to a new GPU address
+ * It will allocate a new mem allocation and bind external memory to it.
+ * Supported backend type are:
+ * MALI_MEMORY_BIND_BACKEND_UMP
+ * MALI_MEMORY_BIND_BACKEND_DMA_BUF
+ * MALI_MEMORY_BIND_BACKEND_EXTERNAL_MEMORY
+ * CPU access is not supported yet
+ */
 mali_osk_errcode_t _mali_ukk_mem_bind(mali_uk_bind_mem_s *args)
 {
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
     mali_mem_backend *mem_backend = NULL;
     mali_osk_errcode_t ret = MALI_OSK_ERR_FAULT;
     mali_mem_allocation *mali_allocation = NULL;
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, (" _mali_ukk_mem_bind, vaddr=0x%x, size =0x%x! \n", args->vaddr, args->size));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
+                     (" _mali_ukk_mem_bind, vaddr=0x%x, size =0x%x! \n", args->vaddr, args->size));
 
     /**
-    * allocate mali allocation.
-    */
+     * allocate mali allocation.
+     */
     mali_allocation = mali_mem_allocation_struct_create(session);
 
     if (mali_allocation == NULL) {
@@ -673,63 +686,63 @@ mali_osk_errcode_t _mali_ukk_mem_bind(mali_uk_bind_mem_s *args)
     mem_backend->mali_allocation = mali_allocation;
 
     switch (args->flags & MALI_MEMORY_BIND_BACKEND_MASK) {
-    case  MALI_MEMORY_BIND_BACKEND_UMP:
+        case MALI_MEMORY_BIND_BACKEND_UMP:
 #if defined(CONFIG_MALI400_UMP)
-        mali_allocation->type = MALI_MEM_UMP;
-        mem_backend->type = MALI_MEM_UMP;
-        ret = mali_mem_bind_ump_buf(mali_allocation, mem_backend,
-                        args->mem_union.bind_ump.secure_id, args->mem_union.bind_ump.flags);
-        if (MALI_OSK_ERR_OK != ret) {
-            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind ump buf failed\n"));
-            goto  Failed_bind_backend;
-        }
+            mali_allocation->type = MALI_MEM_UMP;
+            mem_backend->type = MALI_MEM_UMP;
+            ret = mali_mem_bind_ump_buf(mali_allocation, mem_backend, args->mem_union.bind_ump.secure_id,
+                                        args->mem_union.bind_ump.flags);
+            if (MALI_OSK_ERR_OK != ret) {
+                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind ump buf failed\n"));
+                goto Failed_bind_backend;
+            }
 #else
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("UMP not supported\n"));
-        goto Failed_bind_backend;
+            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("UMP not supported\n"));
+            goto Failed_bind_backend;
 #endif
-        break;
-    case  MALI_MEMORY_BIND_BACKEND_DMA_BUF:
+            break;
+        case MALI_MEMORY_BIND_BACKEND_DMA_BUF:
 #if defined(CONFIG_DMA_SHARED_BUFFER)
-        mali_allocation->type = MALI_MEM_DMA_BUF;
-        mem_backend->type = MALI_MEM_DMA_BUF;
-        ret = mali_mem_bind_dma_buf(mali_allocation, mem_backend,
-                        args->mem_union.bind_dma_buf.mem_fd, args->mem_union.bind_dma_buf.flags);
-        if (MALI_OSK_ERR_OK != ret) {
-            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind dma buf failed\n"));
-            goto Failed_bind_backend;
-        }
+            mali_allocation->type = MALI_MEM_DMA_BUF;
+            mem_backend->type = MALI_MEM_DMA_BUF;
+            ret = mali_mem_bind_dma_buf(mali_allocation, mem_backend, args->mem_union.bind_dma_buf.mem_fd,
+                                        args->mem_union.bind_dma_buf.flags);
+            if (MALI_OSK_ERR_OK != ret) {
+                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind dma buf failed\n"));
+                goto Failed_bind_backend;
+            }
 #else
-        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("DMA not supported\n"));
-        goto Failed_bind_backend;
-#endif
-        break;
-    case MALI_MEMORY_BIND_BACKEND_MALI_MEMORY:
-        /* not allowed */
-        MALI_DEBUG_PRINT_ERROR(("Mali internal memory type not supported !\n"));
-        goto Failed_bind_backend;
-        break;
-
-    case MALI_MEMORY_BIND_BACKEND_EXTERNAL_MEMORY:
-        mali_allocation->type = MALI_MEM_EXTERNAL;
-        mem_backend->type = MALI_MEM_EXTERNAL;
-        ret = mali_mem_bind_ext_buf(mali_allocation, mem_backend, args->mem_union.bind_ext_memory.phys_addr,
-                        args->mem_union.bind_ext_memory.flags);
-        if (MALI_OSK_ERR_OK != ret) {
-            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind external buf failed\n"));
+            MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("DMA not supported\n"));
             goto Failed_bind_backend;
-        }
-        break;
+#endif
+            break;
+        case MALI_MEMORY_BIND_BACKEND_MALI_MEMORY:
+            /* not allowed */
+            MALI_DEBUG_PRINT_ERROR(("Mali internal memory type not supported !\n"));
+            goto Failed_bind_backend;
+            break;
 
-    case MALI_MEMORY_BIND_BACKEND_EXT_COW:
-        /* not allowed */
-        MALI_DEBUG_PRINT_ERROR(("External cow memory  type not supported !\n"));
-        goto Failed_bind_backend;
-        break;
+        case MALI_MEMORY_BIND_BACKEND_EXTERNAL_MEMORY:
+            mali_allocation->type = MALI_MEM_EXTERNAL;
+            mem_backend->type = MALI_MEM_EXTERNAL;
+            ret = mali_mem_bind_ext_buf(mali_allocation, mem_backend, args->mem_union.bind_ext_memory.phys_addr,
+                                        args->mem_union.bind_ext_memory.flags);
+            if (MALI_OSK_ERR_OK != ret) {
+                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Bind external buf failed\n"));
+                goto Failed_bind_backend;
+            }
+            break;
 
-    default:
-        MALI_DEBUG_PRINT_ERROR(("Invalid memory type  not supported !\n"));
-        goto Failed_bind_backend;
-        break;
+        case MALI_MEMORY_BIND_BACKEND_EXT_COW:
+            /* not allowed */
+            MALI_DEBUG_PRINT_ERROR(("External cow memory  type not supported !\n"));
+            goto Failed_bind_backend;
+            break;
+
+        default:
+            MALI_DEBUG_PRINT_ERROR(("Invalid memory type  not supported !\n"));
+            goto Failed_bind_backend;
+            break;
     }
     MALI_DEBUG_ASSERT(0 == mem_backend->size % MALI_MMU_PAGE_SIZE);
     atomic_add(mem_backend->size / MALI_MMU_PAGE_SIZE, &session->mali_mem_array[mem_backend->type]);
@@ -746,16 +759,15 @@ Failed_alloc_backend:
     return ret;
 }
 
-
 /*
-* Function _mali_ukk_mem_unbind -- unbind a external memory to a new GPU address
-* This function unbind the backend memory and free the allocation
-* no ref_count for this type of memory
-*/
+ * Function _mali_ukk_mem_unbind -- unbind a external memory to a new GPU address
+ * This function unbind the backend memory and free the allocation
+ * no ref_count for this type of memory
+ */
 mali_osk_errcode_t _mali_ukk_mem_unbind(mali_uk_unbind_mem_s *args)
 {
     /**/
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
     mali_mem_allocation *mali_allocation = NULL;
     struct mali_vma_node *mali_vma_node = NULL;
     u32 mali_addr = args->vaddr;
@@ -771,17 +783,18 @@ mali_osk_errcode_t _mali_ukk_mem_unbind(mali_uk_unbind_mem_s *args)
         return MALI_OSK_ERR_INVALID_ARGS;
     }
 
-    if (NULL != mali_allocation)
+    if (NULL != mali_allocation) {
         /* check ref_count */
         mali_allocation_unref(&mali_allocation);
+    }
     return MALI_OSK_ERR_OK;
 }
 
 /*
-* Function _mali_ukk_mem_cow --  COW for an allocation
-* This function allocate new pages for  a range (range, range+size) of allocation
-*  And Map it(keep use the not in range pages from target allocation ) to an GPU vaddr
-*/
+ * Function _mali_ukk_mem_cow --  COW for an allocation
+ * This function allocate new pages for  a range (range, range+size) of allocation
+ *  And Map it(keep use the not in range pages from target allocation ) to an GPU vaddr
+ */
 mali_osk_errcode_t _mali_ukk_mem_cow(mali_uk_cow_mem_s *args)
 {
     mali_osk_errcode_t ret = MALI_OSK_ERR_FAULT;
@@ -790,7 +803,7 @@ mali_osk_errcode_t _mali_ukk_mem_cow(mali_uk_cow_mem_s *args)
     struct mali_vma_node *mali_vma_node = NULL;
     mali_mem_allocation *mali_allocation = NULL;
 
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
     /* Get the target backend for cow */
     target_backend = mali_mem_backend_struct_search(session, args->target_handle);
 
@@ -855,20 +868,23 @@ mali_osk_errcode_t _mali_ukk_mem_cow(mali_uk_cow_mem_s *args)
     }
 
     /* Add the target backend's cow count, also allocate new pages for COW backend from os mem
-    *for a modified range and keep the page which not in the modified range and Add ref to it
-    */
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Cow mapping: target_addr: 0x%x;  cow_addr: 0x%x,  size: %u\n", target_backend->mali_allocation->mali_vma_node.vm_node.start,
-                 mali_allocation->mali_vma_node.vm_node.start, mali_allocation->mali_vma_node.vm_node.size));
+     *for a modified range and keep the page which not in the modified range and Add ref to it
+     */
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE,
+                     ("Cow mapping: target_addr: 0x%x;  cow_addr: 0x%x,  size: %u\n",
+                      target_backend->mali_allocation->mali_vma_node.vm_node.start,
+                      mali_allocation->mali_vma_node.vm_node.start, mali_allocation->mali_vma_node.vm_node.size));
 
-    ret = mali_memory_do_cow(target_backend, args->target_offset, args->target_size, mem_backend, args->range_start, args->range_size);
+    ret = mali_memory_do_cow(target_backend, args->target_offset, args->target_size, mem_backend, args->range_start,
+                             args->range_size);
     if (MALI_OSK_ERR_OK != ret) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("_mali_ukk_mem_cow: Failed to cow!\n"));
         goto failed_do_cow;
     }
 
     /**
-    *map to GPU side
-    */
+     *map to GPU side
+     */
     mali_allocation->mali_mapping.addr = args->vaddr;
     /* set gpu mmu propery */
     _mali_memory_gpu_map_property_set(&mali_allocation->mali_mapping.properties, args->flags);
@@ -914,7 +930,7 @@ mali_osk_errcode_t _mali_ukk_mem_cow_modify_range(mali_uk_cow_modify_range_s *ar
 {
     mali_osk_errcode_t ret = MALI_OSK_ERR_FAULT;
     mali_mem_backend *mem_backend = NULL;
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, (" _mali_ukk_mem_cow_modify_range called! \n"));
     /* Get the backend that need to be modified. */
@@ -926,12 +942,13 @@ mali_osk_errcode_t _mali_ukk_mem_cow_modify_range(mali_uk_cow_modify_range_s *ar
         return ret;
     }
 
-    MALI_DEBUG_ASSERT(MALI_MEM_COW  == mem_backend->type);
+    MALI_DEBUG_ASSERT(MALI_MEM_COW == mem_backend->type);
 
-    ret =  mali_memory_cow_modify_range(mem_backend, args->range_start, args->size);
+    ret = mali_memory_cow_modify_range(mem_backend, args->range_start, args->size);
     args->change_pages_nr = mem_backend->cow_mem.change_pages_nr;
-    if (MALI_OSK_ERR_OK != ret)
-        return  ret;
+    if (MALI_OSK_ERR_OK != ret) {
+        return ret;
+    }
     mali_osk_mutex_wait(session->memory_lock);
     if (!(mem_backend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED)) {
         mali_mem_cow_mali_map(mem_backend, args->range_start, args->size);
@@ -946,22 +963,21 @@ mali_osk_errcode_t _mali_ukk_mem_cow_modify_range(mali_uk_cow_modify_range_s *ar
     return MALI_OSK_ERR_OK;
 }
 
-
 mali_osk_errcode_t _mali_ukk_mem_resize(mali_uk_mem_resize_s *args)
 {
     mali_mem_backend *mem_backend = NULL;
     mali_osk_errcode_t ret = MALI_OSK_ERR_FAULT;
 
-    struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+    struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
 
     MALI_DEBUG_ASSERT_POINTER(session);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, (" mali_mem_resize_memory called! \n"));
-    MALI_DEBUG_ASSERT(0 == args->psize %  MALI_MMU_PAGE_SIZE);
+    MALI_DEBUG_ASSERT(0 == args->psize % MALI_MMU_PAGE_SIZE);
 
     /* Get the memory backend that need to be resize. */
     mem_backend = mali_mem_backend_struct_search(session, args->vaddr);
 
-    if (NULL == mem_backend)  {
+    if (NULL == mem_backend) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("_mali_ukk_mem_resize: memory backend = NULL!\n"));
         return ret;
     }
@@ -978,7 +994,7 @@ mali_osk_errcode_t _mali_ukk_mem_usage_get(mali_uk_profiling_memory_usage_get_s 
     args->memory_usage = _mali_ukk_report_memory_usage();
     if (0 != args->vaddr) {
         mali_mem_backend *mem_backend = NULL;
-        struct  mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
+        struct mali_session_data *session = (struct mali_session_data *)(uintptr_t)args->ctx;
         /* Get the backend that need to be modified. */
         mem_backend = mali_mem_backend_struct_search(session, args->vaddr);
         if (NULL == mem_backend) {
@@ -986,8 +1002,9 @@ mali_osk_errcode_t _mali_ukk_mem_usage_get(mali_uk_profiling_memory_usage_get_s 
             return MALI_OSK_ERR_FAULT;
         }
 
-        if (MALI_MEM_COW == mem_backend->type)
+        if (MALI_MEM_COW == mem_backend->type) {
             args->change_pages_nr = mem_backend->cow_mem.change_pages_nr;
+        }
     }
     return MALI_OSK_ERR_OK;
 }

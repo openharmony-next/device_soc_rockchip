@@ -81,24 +81,23 @@ void kbase_pm_update_cores(struct kbase_device *kbdev);
  * Return: true if the request to the HW was successfully made else false if the
  *         request is still pending.
  */
-static inline bool kbase_pm_cores_requested(struct kbase_device *kbdev,
-        bool shader_required)
+static inline bool kbase_pm_cores_requested(struct kbase_device *kbdev, bool shader_required)
 {
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     /* If the L2 & tiler are not on or pending, then the tiler is not yet
      * available, and shaders are definitely not powered.
      */
-    if (kbdev->pm.backend.l2_state != KBASE_L2_PEND_ON &&
-            kbdev->pm.backend.l2_state != KBASE_L2_ON &&
-            kbdev->pm.backend.l2_state != KBASE_L2_ON_HWCNT_ENABLE)
+    if (kbdev->pm.backend.l2_state != KBASE_L2_PEND_ON && kbdev->pm.backend.l2_state != KBASE_L2_ON &&
+        kbdev->pm.backend.l2_state != KBASE_L2_ON_HWCNT_ENABLE) {
         return false;
+    }
 
-    if (shader_required &&
-            kbdev->pm.backend.shaders_state != KBASE_SHADERS_PEND_ON_CORESTACK_ON &&
-            kbdev->pm.backend.shaders_state != KBASE_SHADERS_ON_CORESTACK_ON &&
-            kbdev->pm.backend.shaders_state != KBASE_SHADERS_ON_CORESTACK_ON_RECHECK)
+    if (shader_required && kbdev->pm.backend.shaders_state != KBASE_SHADERS_PEND_ON_CORESTACK_ON &&
+        kbdev->pm.backend.shaders_state != KBASE_SHADERS_ON_CORESTACK_ON &&
+        kbdev->pm.backend.shaders_state != KBASE_SHADERS_ON_CORESTACK_ON_RECHECK) {
         return false;
+    }
 
     return true;
 }

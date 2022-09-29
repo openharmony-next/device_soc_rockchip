@@ -43,15 +43,13 @@
 #define KBASE_KTRACE_VERSION_MINOR 1
 
 /* indicates if the trace message has valid queue-group related info. */
-#define KBASE_KTRACE_FLAG_CSF_GROUP     (((kbase_ktrace_flag_t)1) << 0)
+#define KBASE_KTRACE_FLAG_CSF_GROUP (((kbase_ktrace_flag_t)1) << 0)
 
 /* indicates if the trace message has valid queue related info. */
-#define KBASE_KTRACE_FLAG_CSF_QUEUE     (((kbase_ktrace_flag_t)1) << 1)
+#define KBASE_KTRACE_FLAG_CSF_QUEUE (((kbase_ktrace_flag_t)1) << 1)
 
 /* Collect all the flags together for debug checking */
-#define KBASE_KTRACE_FLAG_BACKEND_ALL \
-        (KBASE_KTRACE_FLAG_CSF_GROUP | KBASE_KTRACE_FLAG_CSF_QUEUE)
-
+#define KBASE_KTRACE_FLAG_BACKEND_ALL (KBASE_KTRACE_FLAG_CSF_GROUP | KBASE_KTRACE_FLAG_CSF_QUEUE)
 
 /**
  * struct kbase_ktrace_backend - backend specific part of a trace message

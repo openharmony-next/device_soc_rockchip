@@ -13,17 +13,13 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_config.h
  * Configuration API and Attributes for KBase
  */
 
-#ifndef _KBASE_CONFIG_H_
-#define _KBASE_CONFIG_H_
+#ifndef KBASE_CONFIG_H_
+#define KBASE_CONFIG_H_
 
 #include <asm/page.h>
 
@@ -97,8 +93,9 @@ struct kbase_pm_callback_conf {
      *
      * The system integrator can decide whether to either do nothing, just switch off
      * the clocks to the GPU, or to completely power down the GPU.
-     * The platform specific private pointer kbase_device::platform_context can be accessed and modified in here. It is the
-     * platform \em callbacks responsibility to initialize and terminate this pointer if used (see @ref kbase_platform_funcs_conf).
+     * The platform specific private pointer kbase_device::platform_context can be accessed and modified in here. It is
+     * the platform \em callbacks responsibility to initialize and terminate this pointer if used (see @ref
+     * kbase_platform_funcs_conf).
      */
     void (*power_off_callback)(struct kbase_device *kbdev);
 
@@ -107,8 +104,9 @@ struct kbase_pm_callback_conf {
      * This function must not return until the GPU is powered and clocked sufficiently for register access to
      * succeed.  The return value specifies whether the GPU was powered down since the call to power_off_callback.
      * If the GPU state has been lost then this function must return 1, otherwise it should return 0.
-     * The platform specific private pointer kbase_device::platform_context can be accessed and modified in here. It is the
-     * platform \em callbacks responsibility to initialize and terminate this pointer if used (see @ref kbase_platform_funcs_conf).
+     * The platform specific private pointer kbase_device::platform_context can be accessed and modified in here. It is
+     * the platform \em callbacks responsibility to initialize and terminate this pointer if used (see @ref
+     * kbase_platform_funcs_conf).
      *
      * The return value of the first call to this function is ignored.
      *
@@ -155,7 +153,7 @@ struct kbase_pm_callback_conf {
      *
      * @return 0 on success, else int error code.
      */
-     int (*power_runtime_init_callback)(struct kbase_device *kbdev);
+    int (*power_runtime_init_callback)(struct kbase_device *kbdev);
 
     /** Callback for handling runtime power management termination.
      *
@@ -217,7 +215,7 @@ struct kbase_pm_callback_conf {
  * Default implementation of CPU_SPEED_FUNC. This function sets clock_speed
  * to 100, so will be an underestimate for any real system.
  */
-int kbase_cpuprops_get_default_clock_speed(u32 * const clock_speed);
+int kbase_cpuprops_get_default_clock_speed(u32 *const clock_speed);
 
 /**
  * kbase_cpu_clk_speed_func - Type of the function pointer for CPU_SPEED_FUNC
@@ -227,7 +225,7 @@ int kbase_cpuprops_get_default_clock_speed(u32 * const clock_speed);
  *
  * This is mainly used to implement OpenCL's clGetDeviceInfo().
  */
-typedef int (*kbase_cpu_clk_speed_func) (u32 *clock_speed);
+typedef int (*kbase_cpu_clk_speed_func)(u32 *clock_speed);
 
 /**
  * kbase_gpu_clk_speed_func - Type of the function pointer for GPU_SPEED_FUNC
@@ -241,7 +239,7 @@ typedef int (*kbase_cpu_clk_speed_func) (u32 *clock_speed);
  * for the OpenCL queue profiling to return correct timing information.
  *
  */
-typedef int (*kbase_gpu_clk_speed_func) (u32 *clock_speed);
+typedef int (*kbase_gpu_clk_speed_func)(u32 *clock_speed);
 
 #ifdef CONFIG_OF
 struct kbase_platform_config {
@@ -260,9 +258,9 @@ struct kbase_io_memory_region {
  * @brief Specifies I/O related resources like IRQs and memory region for I/O operations.
  */
 struct kbase_io_resources {
-    u32                      job_irq_number;
-    u32                      mmu_irq_number;
-    u32                      gpu_irq_number;
+    u32 job_irq_number;
+    u32 mmu_irq_number;
+    u32 gpu_irq_number;
     struct kbase_io_memory_region io_memory_region;
 };
 
@@ -304,7 +302,6 @@ int kbasep_platform_device_init(struct kbase_device *kbdev);
  */
 void kbasep_platform_device_term(struct kbase_device *kbdev);
 
-
 /**
  * kbase_platform_early_init - Early initialisation of the platform code
  *
@@ -338,8 +335,8 @@ void kbase_platform_fake_unregister(void);
 #endif
 #endif
 
-      /** @} *//* end group kbase_config */
-      /** @} *//* end group base_kbase_api */
-      /** @} *//* end group base_api */
+/** @} */ /* end group kbase_config */
+/** @} */ /* end group base_kbase_api */
+/** @} */ /* end group base_api */
 
-#endif                /* _KBASE_CONFIG_H_ */
+#endif /* _KBASE_CONFIG_H_ */

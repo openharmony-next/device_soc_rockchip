@@ -13,18 +13,15 @@
  *
  */
 
-
-
 #include <mali_kbase.h>
 #include <mali_kbase_hwaccess_time.h>
 #include <backend/gpu/mali_kbase_device_internal.h>
 #include <backend/gpu/mali_kbase_pm_internal.h>
 
-#define KBASE_OFFSET_TT    (32)
+#define KBASE_OFFSET_TT (32)
 #define KBASE_COUNT_DIFFER (1000)
 
-void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
-                                u64 *system_time, struct timespec64 *ts)
+void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter, u64 *system_time, struct timespec64 *ts)
 {
     u32 hi1, hi2;
 
@@ -33,25 +30,19 @@ void kbase_backend_get_gpu_time(struct kbase_device *kbdev, u64 *cycle_counter,
     /* Read hi, lo, hi to ensure that overflow from lo to hi is handled
      * correctly */
     do {
-        hi1 = kbase_reg_read(kbdev, GPU_CONTROL_REG(CYCLE_COUNT_HI),
-                                    NULL);
-        *cycle_counter = kbase_reg_read(kbdev,
-                    GPU_CONTROL_REG(CYCLE_COUNT_LO), NULL);
-        hi2 = kbase_reg_read(kbdev, GPU_CONTROL_REG(CYCLE_COUNT_HI),
-                                    NULL);
-        *cycle_counter |= (((u64) hi1) << KBASE_OFFSET_TT);
+        hi1 = kbase_reg_read(kbdev, GPU_CONTROL_REG(CYCLE_COUNT_HI), NULL);
+        *cycle_counter = kbase_reg_read(kbdev, GPU_CONTROL_REG(CYCLE_COUNT_LO), NULL);
+        hi2 = kbase_reg_read(kbdev, GPU_CONTROL_REG(CYCLE_COUNT_HI), NULL);
+        *cycle_counter |= (((u64)hi1) << KBASE_OFFSET_TT);
     } while (hi1 != hi2);
 
     /* Read hi, lo, hi to ensure that overflow from lo to hi is handled
      * correctly */
     do {
-        hi1 = kbase_reg_read(kbdev, GPU_CONTROL_REG(TIMESTAMP_HI),
-                                    NULL);
-        *system_time = kbase_reg_read(kbdev,
-                    GPU_CONTROL_REG(TIMESTAMP_LO), NULL);
-        hi2 = kbase_reg_read(kbdev, GPU_CONTROL_REG(TIMESTAMP_HI),
-                                    NULL);
-        *system_time |= (((u64) hi1) << KBASE_OFFSET_TT);
+        hi1 = kbase_reg_read(kbdev, GPU_CONTROL_REG(TIMESTAMP_HI), NULL);
+        *system_time = kbase_reg_read(kbdev, GPU_CONTROL_REG(TIMESTAMP_LO), NULL);
+        hi2 = kbase_reg_read(kbdev, GPU_CONTROL_REG(TIMESTAMP_HI), NULL);
+        *system_time |= (((u64)hi1) << KBASE_OFFSET_TT);
     } while (hi1 != hi2);
 
     /* Record the CPU's idea of current time */
@@ -87,8 +78,7 @@ void kbase_wait_write_flush(struct kbase_context *kctx)
     while (true) {
         u32 new_count;
 
-        new_count = kbase_reg_read(kctx->kbdev,
-                    GPU_CONTROL_REG(CYCLE_COUNT_LO), NULL);
+        new_count = kbase_reg_read(kctx->kbdev, GPU_CONTROL_REG(CYCLE_COUNT_LO), NULL);
         /* First time around, just store the count. */
         if (base_count == 0) {
             base_count = new_count;
@@ -96,11 +86,12 @@ void kbase_wait_write_flush(struct kbase_context *kctx)
         }
 
         /* No need to handle wrapping, unsigned maths works for this. */
-        if ((new_count - base_count) > KBASE_COUNT_DIFFER)
+        if ((new_count - base_count) > KBASE_COUNT_DIFFER) {
             break;
+        }
     }
 
     kbase_pm_release_gpu_cycle_counter(kctx->kbdev);
     kbase_pm_context_idle(kctx->kbdev);
 }
-#endif                /* CONFIG_MALI_NO_MALI */
+#endif /* CONFIG_MALI_NO_MALI */

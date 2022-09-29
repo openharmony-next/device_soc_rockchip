@@ -41,13 +41,10 @@ enum regulator_status {
 };
 
 /* Initialize struct linear_range for regulators */
-#define REGULATOR_LINEAR_RANGE(_min_uV, _min_sel, _max_sel, _step_uV)    \
-{                                    \
-    .min        = _min_uV,                    \
-    .min_sel    = _min_sel,                    \
-    .max_sel    = _max_sel,                    \
-    .step        = _step_uV,                    \
-}
+#define REGULATOR_LINEAR_RANGE(_min_uV, _min_sel, _max_sel, _step_uV)                                                  \
+    {                                                                                                                  \
+        .min = (_min_uV), .min_sel = (_min_sel), .max_sel = (_max_sel), .step = (_step_uV),                            \
+    }
 
 /**
  * struct regulator_ops - regulator operations.
@@ -127,47 +124,42 @@ enum regulator_status {
 struct regulator_ops {
 
     /* enumerate supported voltages */
-    int (*list_voltage) (struct regulator_dev *, unsigned selector);
+    int (*list_voltage)(struct regulator_dev *, unsigned selector);
 
     /* get/set regulator voltage */
-    int (*set_voltage) (struct regulator_dev *, int min_uV, int max_uV,
-                unsigned *selector);
+    int (*set_voltage)(struct regulator_dev *, int min_uV, int max_uV, unsigned *selector);
     int (*map_voltage)(struct regulator_dev *, int min_uV, int max_uV);
-    int (*set_voltage_sel) (struct regulator_dev *, unsigned selector);
-    int (*get_voltage) (struct regulator_dev *);
-    int (*get_voltage_sel) (struct regulator_dev *);
+    int (*set_voltage_sel)(struct regulator_dev *, unsigned selector);
+    int (*get_voltage)(struct regulator_dev *);
+    int (*get_voltage_sel)(struct regulator_dev *);
 
     /* get/set regulator current  */
-    int (*set_current_limit) (struct regulator_dev *,
-                 int min_uA, int max_uA);
-    int (*get_current_limit) (struct regulator_dev *);
+    int (*set_current_limit)(struct regulator_dev *, int min_uA, int max_uA);
+    int (*get_current_limit)(struct regulator_dev *);
 
-    int (*set_input_current_limit) (struct regulator_dev *, int lim_uA);
-    int (*set_over_current_protection) (struct regulator_dev *);
-    int (*set_active_discharge) (struct regulator_dev *, bool enable);
+    int (*set_input_current_limit)(struct regulator_dev *, int lim_uA);
+    int (*set_over_current_protection)(struct regulator_dev *);
+    int (*set_active_discharge)(struct regulator_dev *, bool enable);
 
     /* enable/disable regulator */
-    int (*enable) (struct regulator_dev *);
-    int (*disable) (struct regulator_dev *);
-    int (*is_enabled) (struct regulator_dev *);
+    int (*enable)(struct regulator_dev *);
+    int (*disable)(struct regulator_dev *);
+    int (*is_enabled)(struct regulator_dev *);
 
     /* get/set regulator operating mode (defined in consumer.h) */
-    int (*set_mode) (struct regulator_dev *, unsigned int mode);
-    unsigned int (*get_mode) (struct regulator_dev *);
+    int (*set_mode)(struct regulator_dev *, unsigned int mode);
+    unsigned int (*get_mode)(struct regulator_dev *);
 
     /* retrieve current error flags on the regulator */
     int (*get_error_flags)(struct regulator_dev *, unsigned int *flags);
 
     /* Time taken to enable or set voltage on the regulator */
-    int (*enable_time) (struct regulator_dev *);
-    int (*set_ramp_delay) (struct regulator_dev *, int ramp_delay);
-    int (*set_voltage_time) (struct regulator_dev *, int old_uV,
-                 int new_uV);
-    int (*set_voltage_time_sel) (struct regulator_dev *,
-                     unsigned int old_selector,
-                     unsigned int new_selector);
+    int (*enable_time)(struct regulator_dev *);
+    int (*set_ramp_delay)(struct regulator_dev *, int ramp_delay);
+    int (*set_voltage_time)(struct regulator_dev *, int old_uV, int new_uV);
+    int (*set_voltage_time_sel)(struct regulator_dev *, unsigned int old_selector, unsigned int new_selector);
 
-    int (*set_soft_start) (struct regulator_dev *);
+    int (*set_soft_start)(struct regulator_dev *);
 
     /* report regulator status ... most other accessors report
      * control inputs, this reports results of combining inputs
@@ -177,8 +169,7 @@ struct regulator_ops {
     int (*get_status)(struct regulator_dev *);
 
     /* get most efficient regulator operating mode for load */
-    unsigned int (*get_optimum_mode) (struct regulator_dev *, int input_uV,
-                      int output_uV, int load_uA);
+    unsigned int (*get_optimum_mode)(struct regulator_dev *, int input_uV, int output_uV, int load_uA);
     /* set the load on the regulator */
     int (*set_load)(struct regulator_dev *, int load_uA);
 
@@ -190,18 +181,18 @@ struct regulator_ops {
      * its parent PMIC enters a global STANDBY/HIBERNATE state */
 
     /* set regulator suspend voltage */
-    int (*set_suspend_voltage) (struct regulator_dev *, int uV);
+    int (*set_suspend_voltage)(struct regulator_dev *, int uV);
 
     /* enable/disable regulator in suspend state */
-    int (*set_suspend_enable) (struct regulator_dev *);
-    int (*set_suspend_disable) (struct regulator_dev *);
+    int (*set_suspend_enable)(struct regulator_dev *);
+    int (*set_suspend_disable)(struct regulator_dev *);
 
     /* set regulator suspend operating mode (defined in consumer.h) */
-    int (*set_suspend_mode) (struct regulator_dev *, unsigned int mode);
+    int (*set_suspend_mode)(struct regulator_dev *, unsigned int mode);
 
     int (*resume)(struct regulator_dev *rdev);
 
-    int (*set_pull_down) (struct regulator_dev *);
+    int (*set_pull_down)(struct regulator_dev *);
 };
 
 /*
@@ -318,11 +309,9 @@ struct regulator_desc {
     const char *of_match;
     bool of_match_full_name;
     const char *regulators_node;
-    int (*of_parse_cb)(struct device_node *,
-                const struct regulator_desc *,
-                struct regulator_config *);
+    int (*of_parse_cb)(struct device_node *, const struct regulator_desc *, struct regulator_config *);
     int id;
-    unsigned int continuous_voltage_range:1;
+    unsigned int continuous_voltage_range : 1;
     unsigned n_voltages;
     unsigned int n_current_limits;
     const struct regulator_ops *ops;
@@ -456,37 +445,33 @@ struct regulator_dev {
     struct module *owner;
     struct device dev;
     struct regulation_constraints *constraints;
-    struct regulator *supply;    /* for tree */
+    struct regulator *supply; /* for tree */
     const char *supply_name;
     struct regmap *regmap;
 
     struct delayed_work disable_work;
 
-    void *reg_data;        /* regulator_dev data */
+    void *reg_data; /* regulator_dev data */
 
     struct dentry *debugfs;
 
     struct regulator_enable_gpio *ena_pin;
-    unsigned int ena_gpio_state:1;
+    unsigned int ena_gpio_state : 1;
 
-    unsigned int is_switch:1;
+    unsigned int is_switch : 1;
 
     /* time when this regulator was disabled last time */
     unsigned long last_off_jiffy;
 };
 
-struct regulator_dev *
-regulator_register(const struct regulator_desc *regulator_desc,
-           const struct regulator_config *config);
-struct regulator_dev *
-devm_regulator_register(struct device *dev,
-            const struct regulator_desc *regulator_desc,
-            const struct regulator_config *config);
+struct regulator_dev *regulator_register(const struct regulator_desc *regulator_desc,
+                                         const struct regulator_config *config);
+struct regulator_dev *devm_regulator_register(struct device *dev, const struct regulator_desc *regulator_desc,
+                                              const struct regulator_config *config);
 void regulator_unregister(struct regulator_dev *rdev);
 void devm_regulator_unregister(struct device *dev, struct regulator_dev *rdev);
 
-int regulator_notifier_call_chain(struct regulator_dev *rdev,
-                  unsigned long event, void *data);
+int regulator_notifier_call_chain(struct regulator_dev *rdev, unsigned long event, void *data);
 
 void *rdev_get_drvdata(struct regulator_dev *rdev);
 struct device *rdev_get_dev(struct regulator_dev *rdev);
@@ -495,44 +480,30 @@ int rdev_get_id(struct regulator_dev *rdev);
 
 int regulator_mode_to_status(unsigned int);
 
-int regulator_list_voltage_linear(struct regulator_dev *rdev,
-                  unsigned int selector);
-int regulator_list_voltage_pickable_linear_range(struct regulator_dev *rdev,
-                           unsigned int selector);
-int regulator_list_voltage_linear_range(struct regulator_dev *rdev,
-                    unsigned int selector);
-int regulator_list_voltage_table(struct regulator_dev *rdev,
-                  unsigned int selector);
-int regulator_map_voltage_linear(struct regulator_dev *rdev,
-                  int min_uV, int max_uV);
-int regulator_map_voltage_pickable_linear_range(struct regulator_dev *rdev,
-                          int min_uV, int max_uV);
-int regulator_map_voltage_linear_range(struct regulator_dev *rdev,
-                       int min_uV, int max_uV);
-int regulator_map_voltage_iterate(struct regulator_dev *rdev,
-                  int min_uV, int max_uV);
-int regulator_map_voltage_ascend(struct regulator_dev *rdev,
-                  int min_uV, int max_uV);
+int regulator_list_voltage_linear(struct regulator_dev *rdev, unsigned int selector);
+int regulator_list_voltage_pickable_linear_range(struct regulator_dev *rdev, unsigned int selector);
+int regulator_list_voltage_linear_range(struct regulator_dev *rdev, unsigned int selector);
+int regulator_list_voltage_table(struct regulator_dev *rdev, unsigned int selector);
+int regulator_map_voltage_linear(struct regulator_dev *rdev, int min_uV, int max_uV);
+int regulator_map_voltage_pickable_linear_range(struct regulator_dev *rdev, int min_uV, int max_uV);
+int regulator_map_voltage_linear_range(struct regulator_dev *rdev, int min_uV, int max_uV);
+int regulator_map_voltage_iterate(struct regulator_dev *rdev, int min_uV, int max_uV);
+int regulator_map_voltage_ascend(struct regulator_dev *rdev, int min_uV, int max_uV);
 int regulator_get_voltage_sel_pickable_regmap(struct regulator_dev *rdev);
-int regulator_set_voltage_sel_pickable_regmap(struct regulator_dev *rdev,
-                        unsigned int sel);
+int regulator_set_voltage_sel_pickable_regmap(struct regulator_dev *rdev, unsigned int sel);
 int regulator_get_voltage_sel_regmap(struct regulator_dev *rdev);
 int regulator_set_voltage_sel_regmap(struct regulator_dev *rdev, unsigned sel);
 int regulator_is_enabled_regmap(struct regulator_dev *rdev);
 int regulator_enable_regmap(struct regulator_dev *rdev);
 int regulator_disable_regmap(struct regulator_dev *rdev);
-int regulator_set_voltage_time_sel(struct regulator_dev *rdev,
-                   unsigned int old_selector,
-                   unsigned int new_selector);
+int regulator_set_voltage_time_sel(struct regulator_dev *rdev, unsigned int old_selector, unsigned int new_selector);
 int regulator_set_bypass_regmap(struct regulator_dev *rdev, bool enable);
 int regulator_get_bypass_regmap(struct regulator_dev *rdev, bool *enable);
 int regulator_set_soft_start_regmap(struct regulator_dev *rdev);
 int regulator_set_pull_down_regmap(struct regulator_dev *rdev);
 
-int regulator_set_active_discharge_regmap(struct regulator_dev *rdev,
-                      bool enable);
-int regulator_set_current_limit_regmap(struct regulator_dev *rdev,
-                       int min_uA, int max_uA);
+int regulator_set_active_discharge_regmap(struct regulator_dev *rdev, bool enable);
+int regulator_set_current_limit_regmap(struct regulator_dev *rdev, int min_uA, int max_uA);
 int regulator_get_current_limit_regmap(struct regulator_dev *rdev);
 void *regulator_get_init_drvdata(struct regulator_init_data *reg_init_data);
 
@@ -540,7 +511,6 @@ void *regulator_get_init_drvdata(struct regulator_init_data *reg_init_data);
  * Helper functions intended to be used by regulator drivers prior registering
  * their regulators.
  */
-int regulator_desc_list_voltage_linear_range(const struct regulator_desc *desc,
-                         unsigned int selector);
+int regulator_desc_list_voltage_linear_range(const struct regulator_desc *desc, unsigned int selector);
 
 #endif

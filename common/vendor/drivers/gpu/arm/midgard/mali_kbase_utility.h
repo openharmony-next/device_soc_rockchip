@@ -13,14 +13,10 @@
  *
  */
 
+#ifndef KBASE_UTILITY_H
+#define KBASE_UTILITY_H
 
-
-
-
-#ifndef _KBASE_UTILITY_H
-#define _KBASE_UTILITY_H
-
-#ifndef _KBASE_H_
+#ifndef KBASE_H_
 #error "Don't include this file directly, use mali_kbase.h instead"
 #endif
 
@@ -34,4 +30,4 @@
  */
 bool kbasep_list_member_of(const struct list_head *base, struct list_head *entry);
 
-#endif                /* _KBASE_UTILITY_H */
+#endif /* _KBASE_UTILITY_H */

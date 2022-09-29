@@ -9,7 +9,7 @@
 #include <linux/types.h>
 #include <linux/v4l2-controls.h>
 
-#define FEC_API_VERSION        KERNEL_VERSION(1, 0, 0)
+#define FEC_API_VERSION KERNEL_VERSION(1, 0, 0)
 struct fec_config {
     u32 mesh_density;
     u32 src_width;
@@ -19,7 +19,7 @@ struct fec_config {
     u32 mesh_size;
     s32 buf_fd;
     u32 fec_bic_mode;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 struct fec_params_cfg {
     u32 module_en_update;
@@ -28,6 +28,6 @@ struct fec_params_cfg {
 
     u32 frame_id;
     struct fec_config fec_cfg;
-} __attribute__ ((packed));
+} __attribute__((packed));
 
 #endif

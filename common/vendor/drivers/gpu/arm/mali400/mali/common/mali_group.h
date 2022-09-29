@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -41,79 +42,73 @@ enum mali_group_state {
  */
 
 struct mali_group {
-    struct mali_mmu_core        *mmu;
-    struct mali_session_data    *session;
+    struct mali_mmu_core *mmu;
+    struct mali_session_data *session;
 
-    enum mali_group_state        state;
-    mali_bool                    power_is_on;
+    enum mali_group_state state;
+    mali_bool power_is_on;
 
-    mali_bool                    is_working;
-    unsigned long                start_time; /* in ticks */
+    mali_bool is_working;
+    unsigned long start_time; /* in ticks */
 
-    struct mali_gp_core         *gp_core;
-    struct mali_gp_job          *gp_running_job;
+    struct mali_gp_core *gp_core;
+    struct mali_gp_job *gp_running_job;
 
-    struct mali_pp_core         *pp_core;
-    struct mali_pp_job          *pp_running_job;
-    u32                         pp_running_sub_job;
+    struct mali_pp_core *pp_core;
+    struct mali_pp_job *pp_running_job;
+    u32 pp_running_sub_job;
 
-    struct mali_pm_domain       *pm_domain;
+    struct mali_pm_domain *pm_domain;
 
-    struct mali_l2_cache_core   *l2_cache_core[2];
-    u32                         l2_cache_core_ref_count[2];
+    struct mali_l2_cache_core *l2_cache_core[2];
+    u32 l2_cache_core_ref_count[2];
 
     /* Parent virtual group (if any) */
-    struct mali_group           *parent_group;
+    struct mali_group *parent_group;
 
-    struct mali_dlbu_core       *dlbu_core;
-    struct mali_bcast_unit      *bcast_core;
+    struct mali_dlbu_core *dlbu_core;
+    struct mali_bcast_unit *bcast_core;
 
     /* Used for working groups which needs to be disabled */
-    mali_bool                    disable_requested;
+    mali_bool disable_requested;
 
     /* Used by group to link child groups (for virtual group) */
-    _mali_osk_list_t            group_list;
+    _mali_osk_list_t group_list;
 
     /* Used by executor module in order to link groups of same state */
-    _mali_osk_list_t            executor_list;
+    _mali_osk_list_t executor_list;
 
     /* Used by PM domains to link groups of same domain */
-    _mali_osk_list_t             pm_domain_list;
+    _mali_osk_list_t pm_domain_list;
 
-    _mali_osk_wq_work_t         *bottom_half_work_mmu;
-    _mali_osk_wq_work_t         *bottom_half_work_gp;
-    _mali_osk_wq_work_t         *bottom_half_work_pp;
+    _mali_osk_wq_work_t *bottom_half_work_mmu;
+    _mali_osk_wq_work_t *bottom_half_work_gp;
+    _mali_osk_wq_work_t *bottom_half_work_pp;
 
-    _mali_osk_timer_t           *timeout_timer;
+    _mali_osk_timer_t *timeout_timer;
 };
 
 /** @brief Create a new Mali group object
  *
  * @return A pointer to a new group object
  */
-struct mali_group *mali_group_create(struct mali_l2_cache_core *core,
-                     struct mali_dlbu_core *dlbu,
-                     struct mali_bcast_unit *bcast,
-                     u32 domain_index);
+struct mali_group *mali_group_create(struct mali_l2_cache_core *core, struct mali_dlbu_core *dlbu,
+                                     struct mali_bcast_unit *bcast, u32 domain_index);
 
 void mali_group_dump_status(struct mali_group *group);
 
 void mali_group_delete(struct mali_group *group);
 
-mali_osk_errcode_t mali_group_add_mmu_core(struct mali_group *group,
-        struct mali_mmu_core *mmu_core);
+mali_osk_errcode_t mali_group_add_mmu_core(struct mali_group *group, struct mali_mmu_core *mmu_core);
 void mali_group_remove_mmu_core(struct mali_group *group);
 
-mali_osk_errcode_t mali_group_add_gp_core(struct mali_group *group,
-        struct mali_gp_core *gp_core);
+mali_osk_errcode_t mali_group_add_gp_core(struct mali_group *group, struct mali_gp_core *gp_core);
 void mali_group_remove_gp_core(struct mali_group *group);
 
-mali_osk_errcode_t mali_group_add_pp_core(struct mali_group *group,
-        struct mali_pp_core *pp_core);
+mali_osk_errcode_t mali_group_add_pp_core(struct mali_group *group, struct mali_pp_core *pp_core);
 void mali_group_remove_pp_core(struct mali_group *group);
 
-MALI_STATIC_INLINE const char *mali_group_core_description(
-    struct mali_group *group)
+MALI_STATIC_INLINE const char *mali_group_core_description(struct mali_group *group)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     if (NULL != group->pp_core) {
@@ -158,8 +153,7 @@ MALI_STATIC_INLINE mali_bool mali_group_is_in_virtual(struct mali_group *group)
  */
 void mali_group_reset(struct mali_group *group);
 
-MALI_STATIC_INLINE struct mali_session_data *mali_group_get_session(
-    struct mali_group *group)
+MALI_STATIC_INLINE struct mali_session_data *mali_group_get_session(struct mali_group *group)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
@@ -209,8 +203,7 @@ MALI_STATIC_INLINE mali_bool mali_group_power_is_on(struct mali_group *group)
 void mali_group_power_up(struct mali_group *group);
 void mali_group_power_down(struct mali_group *group);
 
-MALI_STATIC_INLINE void mali_group_set_disable_request(
-    struct mali_group *group, mali_bool disable)
+MALI_STATIC_INLINE void mali_group_set_disable_request(struct mali_group *group, mali_bool disable)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
@@ -227,8 +220,7 @@ MALI_STATIC_INLINE void mali_group_set_disable_request(
     }
 }
 
-MALI_STATIC_INLINE mali_bool mali_group_disable_requested(
-    struct mali_group *group)
+MALI_STATIC_INLINE mali_bool mali_group_disable_requested(struct mali_group *group)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
@@ -264,8 +256,7 @@ MALI_STATIC_INLINE struct mali_gp_job *mali_group_get_running_gp_job(struct mali
  *
  * Zap TLB on group if \a session is active.
  */
-mali_bool mali_group_zap_session(struct mali_group *group,
-                 struct mali_session_data *session);
+mali_bool mali_group_zap_session(struct mali_group *group, struct mali_session_data *session);
 
 /** @brief Get pointer to GP core object
  */
@@ -287,22 +278,21 @@ MALI_STATIC_INLINE struct mali_pp_core *mali_group_get_pp_core(struct mali_group
  */
 void mali_group_start_gp_job(struct mali_group *group, struct mali_gp_job *job, mali_bool gpu_secure_mode_pre_enabled);
 
-void mali_group_start_pp_job(struct mali_group *group, struct mali_pp_job *job, u32 sub_job, mali_bool gpu_secure_mode_pre_enabled);
+void mali_group_start_pp_job(struct mali_group *group, struct mali_pp_job *job, u32 sub_job,
+                             mali_bool gpu_secure_mode_pre_enabled);
 
 /** @brief Start virtual group Job on a virtual group
-*/
-void mali_group_start_job_on_virtual(struct mali_group *group, struct mali_pp_job *job, u32 first_subjob, u32 last_subjob);
-
+ */
+void mali_group_start_job_on_virtual(struct mali_group *group, struct mali_pp_job *job, u32 first_subjob,
+                                     u32 last_subjob);
 
 /** @brief Start a subjob from a particular on a specific PP group
-*/
+ */
 void mali_group_start_job_on_group(struct mali_group *group, struct mali_pp_job *job, u32 subjob);
-
 
 /** @brief remove all the unused groups in tmp_unused group  list, so that the group is in consistent status.
  */
 void mali_group_non_dlbu_job_done_virtual(struct mali_group *group);
-
 
 /** @brief Resume GP job that suspended waiting for more heap memory
  */
@@ -394,9 +384,7 @@ MALI_STATIC_INLINE void mali_group_mask_all_interrupts_pp(struct mali_group *gro
     return mali_pp_mask_all_interrupts(group->pp_core);
 }
 
-MALI_STATIC_INLINE void mali_group_enable_interrupts_gp(
-    struct mali_group *group,
-    enum mali_interrupt_result exceptions)
+MALI_STATIC_INLINE void mali_group_enable_interrupts_gp(struct mali_group *group, enum mali_interrupt_result exceptions)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_POINTER(group->gp_core);
@@ -410,7 +398,6 @@ MALI_STATIC_INLINE void mali_group_schedule_bottom_half_gp(struct mali_group *gr
     MALI_DEBUG_ASSERT_POINTER(group->gp_core);
     mali_osk_wq_schedule_work(group->bottom_half_work_gp);
 }
-
 
 MALI_STATIC_INLINE void mali_group_schedule_bottom_half_pp(struct mali_group *group)
 {
@@ -433,9 +420,8 @@ struct mali_gp_job *mali_group_complete_gp(struct mali_group *group, mali_bool s
 #if defined(CONFIG_MALI400_PROFILING)
 MALI_STATIC_INLINE void mali_group_oom(struct mali_group *group)
 {
-    _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SUSPEND |
-                      MALI_PROFILING_MAKE_EVENT_CHANNEL_GP(0),
-                      0, 0, 0, 0, 0);
+    _mali_osk_profiling_add_event(MALI_PROFILING_EVENT_TYPE_SUSPEND | MALI_PROFILING_MAKE_EVENT_CHANNEL_GP(0), 0, 0, 0,
+                                  0, 0);
 }
 #endif
 
@@ -443,7 +429,6 @@ struct mali_group *mali_group_get_glob_group(u32 index);
 u32 mali_group_get_glob_num_groups(void);
 
 u32 mali_group_dump_state(struct mali_group *group, char *buf, u32 size);
-
 
 mali_osk_errcode_t mali_group_upper_half_mmu(void *data);
 mali_osk_errcode_t mali_group_upper_half_gp(void *data);

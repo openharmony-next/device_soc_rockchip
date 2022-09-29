@@ -50,7 +50,7 @@
 
 static int drm_name_info(struct seq_file *m, void *data)
 {
-    struct drm_info_node *node = (struct drm_info_node *) m->private;
+    struct drm_info_node *node = (struct drm_info_node *)m->private;
     struct drm_minor *minor = node->minor;
     struct drm_device *dev = minor->dev;
     struct drm_master *master;
@@ -58,12 +58,15 @@ static int drm_name_info(struct seq_file *m, void *data)
     mutex_lock(&dev->master_mutex);
     master = dev->master;
     seq_printf(m, "%s", dev->driver->name);
-    if (dev->dev)
+    if (dev->dev) {
         seq_printf(m, " dev=%s", dev_name(dev->dev));
-    if (master && master->unique)
+    }
+    if (master && master->unique) {
         seq_printf(m, " master=%s", master->unique);
-    if (dev->unique)
+    }
+    if (dev->unique) {
         seq_printf(m, " unique=%s", dev->unique);
+    }
     seq_printf(m, "\n");
     mutex_unlock(&dev->master_mutex);
 
@@ -72,37 +75,27 @@ static int drm_name_info(struct seq_file *m, void *data)
 
 static int drm_clients_info(struct seq_file *m, void *data)
 {
-    struct drm_info_node *node = (struct drm_info_node *) m->private;
+    struct drm_info_node *node = (struct drm_info_node *)m->private;
     struct drm_device *dev = node->minor->dev;
     struct drm_file *priv;
     kuid_t uid;
 
-    seq_printf(m,
-           "%20s %5s %3s master a %5s %10s\n",
-           "command",
-           "pid",
-           "dev",
-           "uid",
-           "magic");
+    seq_printf(m, "%20s %5s %3s master a %5s %10s\n", "command", "pid", "dev", "uid", "magic");
 
     /* dev->filelist is sorted youngest first, but we want to present
      * oldest first (i.e. kernel, servers, clients), so walk backwardss.
      */
     mutex_lock(&dev->filelist_mutex);
-    list_for_each_entry_reverse(priv, &dev->filelist, lhead) {
+    list_for_each_entry_reverse(priv, &dev->filelist, lhead)
+    {
         struct task_struct *task;
 
         rcu_read_lock(); /* locks pid_task()->comm */
         task = pid_task(priv->pid, PIDTYPE_PID);
         uid = task ? __task_cred(task)->euid : GLOBAL_ROOT_UID;
-        seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n",
-               task ? task->comm : "<unknown>",
-               pid_vnr(priv->pid),
-               priv->minor->index,
-               drm_is_current_master(priv) ? 'y' : 'n',
-               priv->authenticated ? 'y' : 'n',
-               from_kuid_munged(seq_user_ns(m), uid),
-               priv->magic);
+        seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n", task ? task->comm : "<unknown>", pid_vnr(priv->pid),
+                   priv->minor->index, drm_is_current_master(priv) ? 'y' : 'n', priv->authenticated ? 'y' : 'n',
+                   from_kuid_munged(seq_user_ns(m), uid), priv->magic);
         rcu_read_unlock();
     }
     mutex_unlock(&dev->filelist_mutex);
@@ -114,16 +107,13 @@ static int drm_gem_one_name_info(int id, void *ptr, void *data)
     struct drm_gem_object *obj = ptr;
     struct seq_file *m = data;
 
-    seq_printf(m, "%6d %8zd %7d %8d\n",
-           obj->name, obj->size,
-           obj->handle_count,
-           kref_read(&obj->refcount));
+    seq_printf(m, "%6d %8zd %7d %8d\n", obj->name, obj->size, obj->handle_count, kref_read(&obj->refcount));
     return 0;
 }
 
 static int drm_gem_name_info(struct seq_file *m, void *data)
 {
-    struct drm_info_node *node = (struct drm_info_node *) m->private;
+    struct drm_info_node *node = (struct drm_info_node *)m->private;
     struct drm_device *dev = node->minor->dev;
 
     seq_printf(m, "  name     size handles refcount\n");
@@ -142,14 +132,12 @@ static const struct drm_info_list drm_debugfs_list[] = {
 };
 #define DRM_DEBUGFS_ENTRIES ARRAY_SIZE(drm_debugfs_list)
 
-
 static int drm_debugfs_open(struct inode *inode, struct file *file)
 {
     struct drm_info_node *node = inode->i_private;
 
     return single_open(file, node->info_ent->show, node);
 }
-
 
 static const struct file_operations drm_debugfs_fops = {
     .owner = THIS_MODULE,
@@ -158,7 +146,6 @@ static const struct file_operations drm_debugfs_fops = {
     .llseek = seq_lseek,
     .release = single_release,
 };
-
 
 /**
  * drm_debugfs_create_files - Initialize a given set of debugfs files for DRM
@@ -172,8 +159,8 @@ static const struct file_operations drm_debugfs_fops = {
  * &struct drm_info_list in the given root directory. These files will be removed
  * automatically on drm_debugfs_cleanup().
  */
-void drm_debugfs_create_files(const struct drm_info_list *files, int count,
-                  struct dentry *root, struct drm_minor *minor)
+void drm_debugfs_create_files(const struct drm_info_list *files, int count, struct dentry *root,
+                              struct drm_minor *minor)
 {
     struct drm_device *dev = minor->dev;
     struct drm_info_node *tmp;
@@ -182,17 +169,17 @@ void drm_debugfs_create_files(const struct drm_info_list *files, int count,
     for (i = 0; i < count; i++) {
         u32 features = files[i].driver_features;
 
-        if (features && !drm_core_check_all_features(dev, features))
+        if (features && !drm_core_check_all_features(dev, features)) {
             continue;
+        }
 
         tmp = kmalloc(sizeof(struct drm_info_node), GFP_KERNEL);
-        if (tmp == NULL)
+        if (tmp == NULL) {
             continue;
+        }
 
         tmp->minor = minor;
-        tmp->dent = debugfs_create_file(files[i].name,
-                        S_IFREG | S_IRUGO, root, tmp,
-                        &drm_debugfs_fops);
+        tmp->dent = debugfs_create_file(files[i].name, S_IFREG | S_IRUGO, root, tmp, &drm_debugfs_fops);
         tmp->info_ent = &files[i];
 
         mutex_lock(&minor->debugfs_lock);
@@ -202,8 +189,7 @@ void drm_debugfs_create_files(const struct drm_info_list *files, int count,
 }
 EXPORT_SYMBOL(drm_debugfs_create_files);
 
-int drm_debugfs_init(struct drm_minor *minor, int minor_id,
-             struct dentry *root)
+int drm_debugfs_init(struct drm_minor *minor, int minor_id, struct dentry *root)
 {
     struct drm_device *dev = minor->dev;
     char name[64];
@@ -213,8 +199,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
     sprintf(name, "%d", minor_id);
     minor->debugfs_root = debugfs_create_dir(name, root);
 
-    drm_debugfs_create_files(drm_debugfs_list, DRM_DEBUGFS_ENTRIES,
-                 minor->debugfs_root, minor);
+    drm_debugfs_create_files(drm_debugfs_list, DRM_DEBUGFS_ENTRIES, minor->debugfs_root, minor);
 
     if (drm_drv_uses_atomic_modeset(dev)) {
         drm_atomic_debugfs_init(minor);
@@ -226,15 +211,14 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
         drm_client_debugfs_init(minor);
     }
 
-    if (dev->driver->debugfs_init)
+    if (dev->driver->debugfs_init) {
         dev->driver->debugfs_init(minor);
+    }
 
     return 0;
 }
 
-
-int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
-                 struct drm_minor *minor)
+int drm_debugfs_remove_files(const struct drm_info_list *files, int count, struct drm_minor *minor)
 {
     struct list_head *pos, *q;
     struct drm_info_node *tmp;
@@ -242,7 +226,8 @@ int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
 
     mutex_lock(&minor->debugfs_lock);
     for (i = 0; i < count; i++) {
-        list_for_each_safe(pos, q, &minor->debugfs_list) {
+        list_for_each_safe(pos, q, &minor->debugfs_list)
+        {
             tmp = list_entry(pos, struct drm_info_node, list);
             if (tmp->info_ent == &files[i]) {
                 debugfs_remove(tmp->dent);
@@ -261,7 +246,8 @@ static void drm_debugfs_remove_all_files(struct drm_minor *minor)
     struct drm_info_node *node, *tmp;
 
     mutex_lock(&minor->debugfs_lock);
-    list_for_each_entry_safe(node, tmp, &minor->debugfs_list, list) {
+    list_for_each_entry_safe(node, tmp, &minor->debugfs_list, list)
+    {
         debugfs_remove(node->dent);
         list_del(&node->list);
         kfree(node);
@@ -271,8 +257,9 @@ static void drm_debugfs_remove_all_files(struct drm_minor *minor)
 
 void drm_debugfs_cleanup(struct drm_minor *minor)
 {
-    if (!minor->debugfs_root)
+    if (!minor->debugfs_root) {
         return;
+    }
 
     drm_debugfs_remove_all_files(minor);
 
@@ -296,31 +283,33 @@ static int connector_open(struct inode *inode, struct file *file)
     return single_open(file, connector_show, dev);
 }
 
-static ssize_t connector_write(struct file *file, const char __user *ubuf,
-                   size_t len, loff_t *offp)
+static ssize_t connector_write(struct file *file, const char __user *ubuf, size_t len, loff_t *offp)
 {
     struct seq_file *m = file->private_data;
     struct drm_connector *connector = m->private;
     char buf[12];
 
-    if (len > sizeof(buf) - 1)
+    if (len > sizeof(buf) - 1) {
         return -EINVAL;
+    }
 
-    if (copy_from_user(buf, ubuf, len))
+    if (copy_from_user(buf, ubuf, len)) {
         return -EFAULT;
+    }
 
     buf[len] = '\0';
 
-    if (sysfs_streq(buf, "on"))
+    if (sysfs_streq(buf, "on")) {
         connector->force = DRM_FORCE_ON;
-    else if (sysfs_streq(buf, "digital"))
+    } else if (sysfs_streq(buf, "digital")) {
         connector->force = DRM_FORCE_ON_DIGITAL;
-    else if (sysfs_streq(buf, "off"))
+    } else if (sysfs_streq(buf, "off")) {
         connector->force = DRM_FORCE_OFF;
-    else if (sysfs_streq(buf, "unspecified"))
+    } else if (sysfs_streq(buf, "unspecified")) {
         connector->force = DRM_FORCE_UNSPECIFIED;
-    else
+    } else {
         return -EINVAL;
+    }
 
     return len;
 }
@@ -330,8 +319,9 @@ static int edid_show(struct seq_file *m, void *data)
     struct drm_connector *connector = m->private;
     struct drm_property_blob *edid = connector->edid_blob_ptr;
 
-    if (connector->override_edid && edid)
+    if (connector->override_edid && edid) {
         seq_write(m, edid->data, edid->length);
+    }
 
     return 0;
 }
@@ -343,8 +333,7 @@ static int edid_open(struct inode *inode, struct file *file)
     return single_open(file, edid_show, dev);
 }
 
-static ssize_t edid_write(struct file *file, const char __user *ubuf,
-              size_t len, loff_t *offp)
+static ssize_t edid_write(struct file *file, const char __user *ubuf, size_t len, loff_t *offp)
 {
     struct seq_file *m = file->private_data;
     struct drm_connector *connector = m->private;
@@ -353,22 +342,23 @@ static ssize_t edid_write(struct file *file, const char __user *ubuf,
     int ret;
 
     buf = memdup_user(ubuf, len);
-    if (IS_ERR(buf))
+    if (IS_ERR(buf)) {
         return PTR_ERR(buf);
+    }
 
-    edid = (struct edid *) buf;
+    edid = (struct edid *)buf;
 
     if (len == 5 && !strncmp(buf, "reset", 5)) {
         connector->override_edid = false;
         ret = drm_connector_update_edid_property(connector, NULL);
-    } else if (len < EDID_LENGTH ||
-           EDID_LENGTH * (1 + edid->extensions) > len)
+    } else if (len < EDID_LENGTH || EDID_LENGTH * (1 + edid->extensions) > len) {
         ret = -EINVAL;
-    else {
+    } else {
         connector->override_edid = false;
         ret = drm_connector_update_edid_property(connector, edid);
-        if (!ret)
+        if (!ret) {
             connector->override_edid = true;
+        }
     }
 
     kfree(buf);
@@ -384,8 +374,9 @@ static int vrr_range_show(struct seq_file *m, void *data)
 {
     struct drm_connector *connector = m->private;
 
-    if (connector->status != connector_status_connected)
+    if (connector->status != connector_status_connected) {
         return -ENODEV;
+    }
 
     seq_printf(m, "Min: %u\n", (u8)connector->display_info.monitor_range.min_vfreq);
     seq_printf(m, "Max: %u\n", (u8)connector->display_info.monitor_range.max_vfreq);
@@ -394,53 +385,47 @@ static int vrr_range_show(struct seq_file *m, void *data)
 }
 DEFINE_SHOW_ATTRIBUTE(vrr_range);
 
-static const struct file_operations drm_edid_fops = {
-    .owner = THIS_MODULE,
-    .open = edid_open,
-    .read = seq_read,
-    .llseek = seq_lseek,
-    .release = single_release,
-    .write = edid_write
-};
+static const struct file_operations drm_edid_fops = {.owner = THIS_MODULE,
+                                                     .open = edid_open,
+                                                     .read = seq_read,
+                                                     .llseek = seq_lseek,
+                                                     .release = single_release,
+                                                     .write = edid_write};
 
-
-static const struct file_operations drm_connector_fops = {
-    .owner = THIS_MODULE,
-    .open = connector_open,
-    .read = seq_read,
-    .llseek = seq_lseek,
-    .release = single_release,
-    .write = connector_write
-};
+static const struct file_operations drm_connector_fops = {.owner = THIS_MODULE,
+                                                          .open = connector_open,
+                                                          .read = seq_read,
+                                                          .llseek = seq_lseek,
+                                                          .release = single_release,
+                                                          .write = connector_write};
 
 void drm_debugfs_connector_add(struct drm_connector *connector)
 {
     struct drm_minor *minor = connector->dev->primary;
     struct dentry *root;
 
-    if (!minor->debugfs_root)
+    if (!minor->debugfs_root) {
         return;
+    }
 
     root = debugfs_create_dir(connector->name, minor->debugfs_root);
     connector->debugfs_entry = root;
 
     /* force */
-    debugfs_create_file("force", S_IRUGO | S_IWUSR, root, connector,
-                &drm_connector_fops);
+    debugfs_create_file("force", S_IRUGO | S_IWUSR, root, connector, &drm_connector_fops);
 
     /* edid */
-    debugfs_create_file("edid_override", S_IRUGO | S_IWUSR, root, connector,
-                &drm_edid_fops);
+    debugfs_create_file("edid_override", S_IRUGO | S_IWUSR, root, connector, &drm_edid_fops);
 
     /* vrr range */
-    debugfs_create_file("vrr_range", S_IRUGO, root, connector,
-                &vrr_range_fops);
+    debugfs_create_file("vrr_range", S_IRUGO, root, connector, &vrr_range_fops);
 }
 
 void drm_debugfs_connector_remove(struct drm_connector *connector)
 {
-    if (!connector->debugfs_entry)
+    if (!connector->debugfs_entry) {
         return;
+    }
 
     debugfs_remove_recursive(connector->debugfs_entry);
 
@@ -454,8 +439,9 @@ void drm_debugfs_crtc_add(struct drm_crtc *crtc)
     char *name;
 
     name = kasprintf(GFP_KERNEL, "crtc-%d", crtc->index);
-    if (!name)
+    if (!name) {
         return;
+    }
 
     root = debugfs_create_dir(name, minor->debugfs_root);
     kfree(name);

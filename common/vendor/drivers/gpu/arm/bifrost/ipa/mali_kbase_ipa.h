@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_IPA_H_
-#define _KBASE_IPA_H_
+#ifndef KBASE_IPA_H_
+#define KBASE_IPA_H_
 
 #if defined(CONFIG_MALI_BIFROST_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)
 
@@ -57,9 +57,8 @@ struct kbase_ipa_model {
  *
  * Return: 0 on success, or an error code
  */
-int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model,
-                  const char *name, s32 *addr,
-                  size_t num_elems, bool dt_required);
+int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model, const char *name, s32 *addr, size_t num_elems,
+                                  bool dt_required);
 
 /**
  * kbase_ipa_model_add_param_string - Add a string model parameter
@@ -74,9 +73,8 @@ int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model,
  *
  * Return: 0 on success, or an error code
  */
-int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model,
-                     const char *name, char *addr,
-                     size_t size, bool dt_required);
+int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model, const char *name, char *addr, size_t size,
+                                     bool dt_required);
 
 struct kbase_ipa_model_ops {
     char *name;
@@ -160,8 +158,7 @@ int kbase_ipa_model_recalculate(struct kbase_ipa_model *model);
  *
  * Return: Pointer to model's 'ops' structure, or NULL if the lookup failed.
  */
-const struct kbase_ipa_model_ops *kbase_ipa_model_ops_find(struct kbase_device *kbdev,
-                               const char *name);
+const struct kbase_ipa_model_ops *kbase_ipa_model_ops_find(struct kbase_device *kbdev, const char *name);
 
 /**
  * kbase_ipa_model_name_from_id - Find the best model for a given GPU ID
@@ -182,8 +179,7 @@ const char *kbase_ipa_model_name_from_id(u32 gpu_id);
  *
  * Return: pointer to kbase_ipa_model on success, NULL on error
  */
-struct kbase_ipa_model *kbase_ipa_init_model(struct kbase_device *kbdev,
-                         const struct kbase_ipa_model_ops *ops);
+struct kbase_ipa_model *kbase_ipa_init_model(struct kbase_device *kbdev, const struct kbase_ipa_model_ops *ops);
 /**
  * kbase_ipa_term_model - Terminate the particular IPA model
  * @model:      pointer to the IPA model object, already initialized
@@ -224,18 +220,14 @@ extern const struct kbase_ipa_model_ops kbase_tbax_ipa_model_ops;
  *
  * Return: 0 on success, or an error code.
  */
-int kbase_get_real_power(struct devfreq *df, u32 *power,
-                unsigned long freq,
-                unsigned long voltage);
+int kbase_get_real_power(struct devfreq *df, u32 *power, unsigned long freq, unsigned long voltage);
 
 #if MALI_UNIT_TEST
 /* Called by kbase_get_real_power() to invoke the power models.
  * Must be called with kbdev->ipa.lock held.
  * This function is only exposed for use by unit tests.
  */
-int kbase_get_real_power_locked(struct kbase_device *kbdev, u32 *power,
-                unsigned long freq,
-                unsigned long voltage);
+int kbase_get_real_power_locked(struct kbase_device *kbdev, u32 *power, unsigned long freq, unsigned long voltage);
 #endif /* MALI_UNIT_TEST */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
@@ -247,7 +239,8 @@ extern struct devfreq_cooling_power kbase_ipa_power_model_ops;
 #else /* !(defined(CONFIG_MALI_BIFROST_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)) */
 
 static inline void kbase_ipa_protection_mode_switch_event(struct kbase_device *kbdev)
-{ }
+{
+}
 
 #endif /* (defined(CONFIG_MALI_BIFROST_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)) */
 

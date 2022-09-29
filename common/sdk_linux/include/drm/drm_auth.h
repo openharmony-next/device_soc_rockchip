@@ -95,7 +95,7 @@ struct drm_master {
      */
 
     struct drm_master *lessor;
-    int    lessee_id;
+    int lessee_id;
     struct list_head lessee_list;
     struct list_head lessees;
     struct idr leases;

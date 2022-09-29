@@ -31,7 +31,7 @@
 
 static int kbase_as_fault_read(struct seq_file *sfile, void *data)
 {
-    uintptr_t as_no = (uintptr_t) sfile->private;
+    uintptr_t as_no = (uintptr_t)sfile->private;
 
     struct list_head *entry;
     const struct list_head *kbdev_list;
@@ -39,7 +39,8 @@ static int kbase_as_fault_read(struct seq_file *sfile, void *data)
 
     kbdev_list = kbase_device_get_list();
 
-    list_for_each(entry, kbdev_list) {
+    list_for_each(entry, kbdev_list)
+    {
         kbdev = list_entry(entry, struct kbase_device, entry);
 
         if (kbdev->debugfs_as_read_bitmap & (1ULL << as_no)) {
@@ -48,10 +49,8 @@ static int kbase_as_fault_read(struct seq_file *sfile, void *data)
             kbdev->debugfs_as_read_bitmap &= ~(1ULL << as_no);
 
             /* output the last page fault addr */
-            seq_printf(sfile, "%llu\n",
-                   (u64) kbdev->as[as_no].pf_data.addr);
+            seq_printf(sfile, "%llu\n", (u64)kbdev->as[as_no].pf_data.addr);
         }
-
     }
 
     kbase_device_put_list(kbdev_list);
@@ -91,20 +90,15 @@ void kbase_as_fault_debugfs_init(struct kbase_device *kbdev)
     KBASE_DEBUG_ASSERT(kbdev->nr_hw_address_spaces);
     KBASE_DEBUG_ASSERT(sizeof(kbdev->as[0].pf_data.addr) == sizeof(u64));
 
-    debugfs_directory = debugfs_create_dir("address_spaces",
-                           kbdev->mali_debugfs_directory);
+    debugfs_directory = debugfs_create_dir("address_spaces", kbdev->mali_debugfs_directory);
 
     if (debugfs_directory) {
         for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
             snprintf(as_name, ARRAY_SIZE(as_name), "as%u", i);
-            debugfs_create_file(as_name, S_IRUGO,
-                        debugfs_directory,
-                        (void *)(uintptr_t)i,
-                        &as_fault_fops);
+            debugfs_create_file(as_name, S_IRUGO, debugfs_directory, (void *)(uintptr_t)i, &as_fault_fops);
         }
     } else {
-        dev_warn(kbdev->dev,
-             "unable to create address_spaces debugfs directory");
+        dev_warn(kbdev->dev, "unable to create address_spaces debugfs directory");
     }
 
 #endif /* CONFIG_MALI_BIFROST_DEBUG */

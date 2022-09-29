@@ -6,6 +6,8 @@
  *
  *  Copyright (C) 2001 Russell King.
  */
+#ifndef COMMON_SDK_LINUX_DRIVERS_TTY_SERIAL_8250_8250_H
+#define COMMON_SDK_LINUX_DRIVERS_TTY_SERIAL_8250_8250_H
 
 #include <linux/serial_8250.h>
 #include <linux/serial_reg.h>
@@ -18,38 +20,38 @@ struct uart_8250_dma {
     int (*rx_dma)(struct uart_8250_port *p);
 
     /* Filter function */
-    dma_filter_fn        fn;
+    dma_filter_fn fn;
     /* Parameter to the filter function */
-    void            *rx_param;
-    void            *tx_param;
+    void *rx_param;
+    void *tx_param;
 
-    struct dma_slave_config    rxconf;
-    struct dma_slave_config    txconf;
+    struct dma_slave_config rxconf;
+    struct dma_slave_config txconf;
 
-    struct dma_chan        *rxchan;
-    struct dma_chan        *txchan;
+    struct dma_chan *rxchan;
+    struct dma_chan *txchan;
 
     /* Device address base for DMA operations */
-    phys_addr_t        rx_dma_addr;
-    phys_addr_t        tx_dma_addr;
+    phys_addr_t rx_dma_addr;
+    phys_addr_t tx_dma_addr;
 
     /* DMA address of the buffer in memory */
-    dma_addr_t        rx_addr;
-    dma_addr_t        tx_addr;
+    dma_addr_t rx_addr;
+    dma_addr_t tx_addr;
 
-    dma_cookie_t        rx_cookie;
-    dma_cookie_t        tx_cookie;
+    dma_cookie_t rx_cookie;
+    dma_cookie_t tx_cookie;
 
-    void            *rx_buf;
+    void *rx_buf;
 
-    size_t            rx_size;
-    size_t            tx_size;
+    size_t rx_size;
+    size_t tx_size;
 
-    unsigned char        tx_running;
-    unsigned char        tx_err;
-    unsigned char        rx_running;
+    unsigned char tx_running;
+    unsigned char tx_err;
+    unsigned char rx_running;
 #if defined(CONFIG_ARCH_ROCKCHIP) && defined(CONFIG_NO_GKI)
-    size_t            rx_index;
+    size_t rx_index;
 #endif
 };
 
@@ -58,41 +60,41 @@ struct old_serial_port {
     unsigned int baud_base;
     unsigned int port;
     unsigned int irq;
-    upf_t        flags;
+    upf_t flags;
     unsigned char io_type;
     unsigned char __iomem *iomem_base;
     unsigned short iomem_reg_shift;
 };
 
 struct serial8250_config {
-    const char    *name;
-    unsigned short    fifo_size;
-    unsigned short    tx_loadsz;
-    unsigned char    fcr;
-    unsigned char    rxtrig_bytes[UART_FCR_R_TRIG_MAX_STATE];
-    unsigned int    flags;
+    const char *name;
+    unsigned short fifo_size;
+    unsigned short tx_loadsz;
+    unsigned char fcr;
+    unsigned char rxtrig_bytes[UART_FCR_R_TRIG_MAX_STATE];
+    unsigned int flags;
 };
 
-#define UART_CAP_FIFO    (1 << 8)    /* UART has FIFO */
-#define UART_CAP_EFR    (1 << 9)    /* UART has EFR */
-#define UART_CAP_SLEEP    (1 << 10)    /* UART has IER sleep */
-#define UART_CAP_AFE    (1 << 11)    /* MCR-based hw flow control */
-#define UART_CAP_UUE    (1 << 12)    /* UART needs IER bit 6 set (Xscale) */
-#define UART_CAP_RTOIE    (1 << 13)    /* UART needs IER bit 4 set (Xscale, Tegra) */
-#define UART_CAP_HFIFO    (1 << 14)    /* UART has a "hidden" FIFO */
-#define UART_CAP_RPM    (1 << 15)    /* Runtime PM is active while idle */
-#define UART_CAP_IRDA    (1 << 16)    /* UART supports IrDA line discipline */
-#define UART_CAP_MINI    (1 << 17)    /* Mini UART on BCM283X family lacks:
-                     * STOP PARITY EPAR SPAR WLEN5 WLEN6
-                     */
+#define UART_CAP_FIFO (1 << 8)   /* UART has FIFO */
+#define UART_CAP_EFR (1 << 9)    /* UART has EFR */
+#define UART_CAP_SLEEP (1 << 10) /* UART has IER sleep */
+#define UART_CAP_AFE (1 << 11)   /* MCR-based hw flow control */
+#define UART_CAP_UUE (1 << 12)   /* UART needs IER bit 6 set (Xscale) */
+#define UART_CAP_RTOIE (1 << 13) /* UART needs IER bit 4 set (Xscale, Tegra) */
+#define UART_CAP_HFIFO (1 << 14) /* UART has a "hidden" FIFO */
+#define UART_CAP_RPM (1 << 15)   /* Runtime PM is active while idle */
+#define UART_CAP_IRDA (1 << 16)  /* UART supports IrDA line discipline */
+#define UART_CAP_MINI                                                                                                  \
+    (1 << 17) /* Mini UART on BCM283X family lacks:                                                                    \
+               * STOP PARITY EPAR SPAR WLEN5 WLEN6                                                                     \
+               */
 
-#define UART_BUG_QUOT    (1 << 0)    /* UART has buggy quot LSB */
-#define UART_BUG_TXEN    (1 << 1)    /* UART has buggy TX IIR status */
-#define UART_BUG_NOMSR    (1 << 2)    /* UART has buggy MSR status bits (Au1x00) */
-#define UART_BUG_THRE    (1 << 3)    /* UART has buggy THRE reassertion */
-#define UART_BUG_PARITY    (1 << 4)    /* UART mishandles parity if FIFO enabled */
-#define UART_BUG_TXRACE    (1 << 5)    /* UART Tx fails to set remote DR */
-
+#define UART_BUG_QUOT (1 << 0)   /* UART has buggy quot LSB */
+#define UART_BUG_TXEN (1 << 1)   /* UART has buggy TX IIR status */
+#define UART_BUG_NOMSR (1 << 2)  /* UART has buggy MSR status bits (Au1x00) */
+#define UART_BUG_THRE (1 << 3)   /* UART has buggy THRE reassertion */
+#define UART_BUG_PARITY (1 << 4) /* UART mishandles parity if FIFO enabled */
+#define UART_BUG_TXRACE (1 << 5) /* UART Tx fails to set remote DR */
 
 #ifdef CONFIG_SERIAL_8250_SHARE_IRQ
 #define SERIAL8250_SHARE_IRQS 1
@@ -100,17 +102,13 @@ struct serial8250_config {
 #define SERIAL8250_SHARE_IRQS 0
 #endif
 
-#define SERIAL8250_PORT_FLAGS(_base, _irq, _flags)        \
-    {                            \
-        .iobase        = _base,            \
-        .irq        = _irq,                \
-        .uartclk    = 1843200,            \
-        .iotype        = UPIO_PORT,            \
-        .flags        = UPF_BOOT_AUTOCONF | (_flags),    \
+#define SERIAL8250_PORT_FLAGS(_base, _irq, _flags)                                                                     \
+    {                                                                                                                  \
+        .iobase = (_base), .irq = (_irq), .uartclk = 1843200, .iotype = UPIO_PORT,                                     \
+        .flags = UPF_BOOT_AUTOCONF | (_flags),                                                                         \
     }
 
 #define SERIAL8250_PORT(_base, _irq) SERIAL8250_PORT_FLAGS(_base, _irq, 0)
-
 
 static inline int serial_in(struct uart_8250_port *up, int offset)
 {
@@ -136,8 +134,9 @@ static inline void serial_dl_write(struct uart_8250_port *up, int value)
 
 static inline bool serial8250_set_THRI(struct uart_8250_port *up)
 {
-    if (up->ier & UART_IER_THRI)
+    if (up->ier & UART_IER_THRI) {
         return false;
+    }
     up->ier |= UART_IER_THRI;
 #if defined(CONFIG_ARCH_ROCKCHIP) && defined(CONFIG_NO_GKI)
     up->ier |= UART_IER_PTIME;
@@ -148,8 +147,9 @@ static inline bool serial8250_set_THRI(struct uart_8250_port *up)
 
 static inline bool serial8250_clear_THRI(struct uart_8250_port *up)
 {
-    if (!(up->ier & UART_IER_THRI))
+    if (!(up->ier & UART_IER_THRI)) {
         return false;
+    }
     up->ier &= ~UART_IER_THRI;
     serial_out(up, UART_IER, up->ier);
     return true;
@@ -173,16 +173,21 @@ static inline int serial8250_TIOCM_to_MCR(int tiocm)
 {
     int mcr = 0;
 
-    if (tiocm & TIOCM_RTS)
+    if (tiocm & TIOCM_RTS) {
         mcr |= UART_MCR_RTS;
-    if (tiocm & TIOCM_DTR)
+    }
+    if (tiocm & TIOCM_DTR) {
         mcr |= UART_MCR_DTR;
-    if (tiocm & TIOCM_OUT1)
+    }
+    if (tiocm & TIOCM_OUT1) {
         mcr |= UART_MCR_OUT1;
-    if (tiocm & TIOCM_OUT2)
+    }
+    if (tiocm & TIOCM_OUT2) {
         mcr |= UART_MCR_OUT2;
-    if (tiocm & TIOCM_LOOP)
+    }
+    if (tiocm & TIOCM_LOOP) {
         mcr |= UART_MCR_LOOP;
+    }
 
     return mcr;
 }
@@ -191,16 +196,21 @@ static inline int serial8250_MCR_to_TIOCM(int mcr)
 {
     int tiocm = 0;
 
-    if (mcr & UART_MCR_RTS)
+    if (mcr & UART_MCR_RTS) {
         tiocm |= TIOCM_RTS;
-    if (mcr & UART_MCR_DTR)
+    }
+    if (mcr & UART_MCR_DTR) {
         tiocm |= TIOCM_DTR;
-    if (mcr & UART_MCR_OUT1)
+    }
+    if (mcr & UART_MCR_OUT1) {
         tiocm |= TIOCM_OUT1;
-    if (mcr & UART_MCR_OUT2)
+    }
+    if (mcr & UART_MCR_OUT2) {
         tiocm |= TIOCM_OUT2;
-    if (mcr & UART_MCR_LOOP)
+    }
+    if (mcr & UART_MCR_LOOP) {
         tiocm |= TIOCM_LOOP;
+    }
 
     return tiocm;
 }
@@ -210,14 +220,18 @@ static inline int serial8250_MSR_to_TIOCM(int msr)
 {
     int tiocm = 0;
 
-    if (msr & UART_MSR_DCD)
+    if (msr & UART_MSR_DCD) {
         tiocm |= TIOCM_CAR;
-    if (msr & UART_MSR_RI)
+    }
+    if (msr & UART_MSR_RI) {
         tiocm |= TIOCM_RNG;
-    if (msr & UART_MSR_DSR)
+    }
+    if (msr & UART_MSR_DSR) {
         tiocm |= TIOCM_DSR;
-    if (msr & UART_MSR_CTS)
+    }
+    if (msr & UART_MSR_CTS) {
         tiocm |= TIOCM_CTS;
+    }
 
     return tiocm;
 }
@@ -226,8 +240,9 @@ static inline void serial8250_out_MCR(struct uart_8250_port *up, int value)
 {
     serial_out(up, UART_MCR, value);
 
-    if (up->gpios)
+    if (up->gpios) {
         mctrl_gpio_set(up->gpios, serial8250_MCR_to_TIOCM(value));
+    }
 }
 
 static inline int serial8250_in_MCR(struct uart_8250_port *up)
@@ -252,7 +267,7 @@ static inline int serial8250_in_MCR(struct uart_8250_port *up)
  * lines on at least some ALPHA's.  The failure mode is that if either
  * is cleared, the machine locks up with endless interrupts.
  */
-#define ALPHA_KLUDGE_MCR  (UART_MCR_OUT2 | UART_MCR_OUT1)
+#define ALPHA_KLUDGE_MCR (UART_MCR_OUT2 | UART_MCR_OUT1)
 #else
 #define ALPHA_KLUDGE_MCR 0
 #endif
@@ -261,14 +276,22 @@ static inline int serial8250_in_MCR(struct uart_8250_port *up)
 int serial8250_pnp_init(void);
 void serial8250_pnp_exit(void);
 #else
-static inline int serial8250_pnp_init(void) { return 0; }
-static inline void serial8250_pnp_exit(void) { }
+static inline int serial8250_pnp_init(void)
+{
+    return 0;
+}
+static inline void serial8250_pnp_exit(void)
+{
+}
 #endif
 
 #ifdef CONFIG_SERIAL_8250_FINTEK
 int fintek_8250_probe(struct uart_8250_port *uart);
 #else
-static inline int fintek_8250_probe(struct uart_8250_port *uart) { return 0; }
+static inline int fintek_8250_probe(struct uart_8250_port *uart)
+{
+    return 0;
+}
 #endif
 
 #ifdef CONFIG_ARCH_OMAP1
@@ -277,14 +300,14 @@ static inline int is_omap1_8250(struct uart_8250_port *pt)
     int res;
 
     switch (pt->port.mapbase) {
-    case OMAP1_UART1_BASE:
-    case OMAP1_UART2_BASE:
-    case OMAP1_UART3_BASE:
-        res = 1;
-        break;
-    default:
-        res = 0;
-        break;
+        case OMAP1_UART1_BASE:
+        case OMAP1_UART2_BASE:
+        case OMAP1_UART3_BASE:
+            res = 1;
+            break;
+        default:
+            res = 0;
+            break;
     }
 
     return res;
@@ -292,8 +315,9 @@ static inline int is_omap1_8250(struct uart_8250_port *pt)
 
 static inline int is_omap1510_8250(struct uart_8250_port *pt)
 {
-    if (!cpu_is_omap1510())
+    if (!cpu_is_omap1510()) {
         return 0;
+    }
 
     return is_omap1_8250(pt);
 }
@@ -332,12 +356,16 @@ static inline int serial8250_start_rx_dma(struct uart_8250_port *p)
     return -1;
 }
 #endif
-static inline void serial8250_rx_dma_flush(struct uart_8250_port *p) { }
+static inline void serial8250_rx_dma_flush(struct uart_8250_port *p)
+{
+}
 static inline int serial8250_request_dma(struct uart_8250_port *p)
 {
     return -1;
 }
-static inline void serial8250_release_dma(struct uart_8250_port *p) { }
+static inline void serial8250_release_dma(struct uart_8250_port *p)
+{
+}
 #endif
 
 static inline int ns16550a_goto_highspeed(struct uart_8250_port *up)
@@ -345,7 +373,7 @@ static inline int ns16550a_goto_highspeed(struct uart_8250_port *up)
     unsigned char status;
 
     status = serial_in(up, 0x04); /* EXCR2 */
-#define PRESL(x) ((x) & 0x30)
+#define PRESL(x) ((x)&0x30)
     if (PRESL(status) == 0x10) {
         /* already in high speed mode */
         return 0;
@@ -359,5 +387,6 @@ static inline int ns16550a_goto_highspeed(struct uart_8250_port *up)
 
 static inline int serial_index(struct uart_port *port)
 {
-    return port->minor - 64;
+    return port->minor - 0x40;
 }
+#endif

@@ -13,10 +13,10 @@
 #include <linux/kernel.h>
 #include <linux/rfkill-wlan.h>
 
-/* 
+/*
  * Set Firmware Path
  */
- 
+
 #define VENDOR_ETC_FIRMWARE "/vendor/etc/firmware/"
 
 int rkwifi_set_firmware(char *fw, char *nvram)

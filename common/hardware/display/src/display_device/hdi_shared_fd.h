@@ -19,47 +19,51 @@
 #include <memory>
 #include "display_common.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class HdiFd {
-public:
-    HdiFd()
+namespace OHOS
+{
+    namespace HDI
     {
-        DISPLAY_DEBUGLOG();
-    }
-    explicit HdiFd(int fd) : mFd(fd)
-    {
-        DISPLAY_DEBUGLOG("mFd %{public}d", mFd);
-    }
-    int GetFd() const
-    {
-        return mFd;
-    };
+        namespace DISPLAY
+        {
+            class HdiFd
+            {
+            public:
+                HdiFd()
+                {
+                    DISPLAY_DEBUGLOG();
+                }
+                explicit HdiFd(int fd) : mFd(fd)
+                {
+                    DISPLAY_DEBUGLOG("mFd %{public}d", mFd);
+                }
+                int GetFd() const
+                {
+                    return mFd;
+                };
 
-    HdiFd &operator = (int fd)
-    {
-        if (mFd >= 0) {
-            close(mFd);
-        }
-        mFd = fd;
-        return *this;
-    }
+                HdiFd &operator=(int fd)
+                {
+                    if (mFd >= 0) {
+                        close(mFd);
+                    }
+                    mFd = fd;
+                    return *this;
+                }
 
-    virtual ~HdiFd()
-    {
-        if (mFd >= 0) {
-            close(mFd);
-        }
-    }
+                virtual ~HdiFd()
+                {
+                    if (mFd >= 0) {
+                        close(mFd);
+                    }
+                }
 
-private:
-    int mFd = -1;
-};
+            private:
+                int mFd = -1;
+            };
 
-using FdPtr = std::shared_ptr<HdiFd>;
-} // OHOS
-} // HDIO
+            using FdPtr = std::shared_ptr<HdiFd>;
+        } // OHOS
+    }     // HDIO
 } // DISPLAY
 
 #endif // HDI_SHARED_FD

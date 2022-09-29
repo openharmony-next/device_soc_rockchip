@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CSF_KCPU_H_
-#define _KBASE_CSF_KCPU_H_
+#ifndef KBASE_CSF_KCPU_H
+#define KBASE_CSF_KCPU_H
 
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
 #include <linux/fence.h>
@@ -252,8 +252,7 @@ struct kbase_kcpu_command_queue {
  * @newq:    Pointer to the structure which contains information about
  *        the new KCPU command queue to be created.
  */
-int kbase_csf_kcpu_queue_new(struct kbase_context *kctx,
-             struct kbase_ioctl_kcpu_queue_new *newq);
+int kbase_csf_kcpu_queue_new(struct kbase_context *kctx, struct kbase_ioctl_kcpu_queue_new *newq);
 
 /**
  * kbase_csf_kcpu_queue_delete - Delete KCPU command queue.
@@ -265,8 +264,7 @@ int kbase_csf_kcpu_queue_new(struct kbase_context *kctx,
  * @del:    Pointer to the structure which specifies the KCPU command
  *        queue to be deleted.
  */
-int kbase_csf_kcpu_queue_delete(struct kbase_context *kctx,
-                struct kbase_ioctl_kcpu_queue_delete *del);
+int kbase_csf_kcpu_queue_delete(struct kbase_context *kctx, struct kbase_ioctl_kcpu_queue_delete *del);
 
 /**
  * kbase_csf_kcpu_queue_enqueue - Enqueue a KCPU command into a KCPU command
@@ -278,8 +276,7 @@ int kbase_csf_kcpu_queue_delete(struct kbase_context *kctx,
  *        as well as the KCPU command queue into which the command
  *        is to be enqueued.
  */
-int kbase_csf_kcpu_queue_enqueue(struct kbase_context *kctx,
-                 struct kbase_ioctl_kcpu_queue_enqueue *enq);
+int kbase_csf_kcpu_queue_enqueue(struct kbase_context *kctx, struct kbase_ioctl_kcpu_queue_enqueue *enq);
 
 /**
  * kbase_csf_kcpu_queue_context_init - Initialize the kernel CPU queues context

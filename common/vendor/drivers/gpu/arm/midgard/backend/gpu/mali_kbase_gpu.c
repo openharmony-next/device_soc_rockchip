@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /*
  * Register-based HW access backend APIs
  */
@@ -31,8 +28,9 @@ int kbase_backend_early_init(struct kbase_device *kbdev)
     int err;
 
     err = kbasep_platform_device_init(kbdev);
-    if (err)
+    if (err) {
         return err;
+    }
 
     /* Ensure we can access the GPU registers */
     kbase_pm_register_access_enable(kbdev);
@@ -44,12 +42,14 @@ int kbase_backend_early_init(struct kbase_device *kbdev)
     kbase_pm_register_access_disable(kbdev);
 
     err = kbase_hwaccess_pm_init(kbdev);
-    if (err)
+    if (err) {
         goto fail_pm;
+    }
 
     err = kbase_install_interrupts(kbdev);
-    if (err)
+    if (err) {
         goto fail_interrupts;
+    }
 
     return 0;
 
@@ -73,12 +73,14 @@ int kbase_backend_late_init(struct kbase_device *kbdev)
     int err;
 
     err = kbase_hwaccess_pm_powerup(kbdev, PM_HW_ISSUES_DETECT);
-    if (err)
+    if (err) {
         return err;
+    }
 
     err = kbase_backend_timer_init(kbdev);
-    if (err)
+    if (err) {
         goto fail_timer;
+    }
 
 #ifdef CONFIG_MALI_DEBUG
 #ifndef CONFIG_MALI_NO_MALI
@@ -91,8 +93,9 @@ int kbase_backend_late_init(struct kbase_device *kbdev)
 #endif /* CONFIG_MALI_DEBUG */
 
     err = kbase_job_slot_init(kbdev);
-    if (err)
+    if (err) {
         goto fail_job_slot;
+    }
 
     init_waitqueue_head(&kbdev->hwaccess.backend.reset_wait);
 
@@ -120,4 +123,3 @@ void kbase_backend_late_term(struct kbase_device *kbdev)
     kbase_backend_timer_term(kbdev);
     kbase_hwaccess_pm_halt(kbdev);
 }
-

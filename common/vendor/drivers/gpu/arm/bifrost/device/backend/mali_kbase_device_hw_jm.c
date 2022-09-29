@@ -41,31 +41,31 @@
 static void kbase_report_gpu_fault(struct kbase_device *kbdev, int multiple)
 {
     u32 status = kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTSTATUS));
-    u64 address = (u64) kbase_reg_read(kbdev,
-            GPU_CONTROL_REG(GPU_FAULTADDRESS_HI)) << 32;
+    u64 address = (u64)kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTADDRESS_HI)) << 32;
 
-    address |= kbase_reg_read(kbdev,
-            GPU_CONTROL_REG(GPU_FAULTADDRESS_LO));
+    address |= kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTADDRESS_LO));
 
-    dev_warn(kbdev->dev, "GPU Fault 0x%08x (%s) at 0x%016llx",
-        status,
-        kbase_gpu_exception_name(status & 0xFF),
-        address);
-    if (multiple)
+    dev_warn(kbdev->dev, "GPU Fault 0x%08x (%s) at 0x%016llx", status, kbase_gpu_exception_name(status & 0xFF),
+             address);
+    if (multiple) {
         dev_warn(kbdev->dev, "There were multiple GPU faults - some have not been reported\n");
+    }
 }
 
 void kbase_gpu_interrupt(struct kbase_device *kbdev, u32 val)
 {
     KBASE_KTRACE_ADD(kbdev, CORE_GPU_IRQ, NULL, val);
-    if (val & GPU_FAULT)
+    if (val & GPU_FAULT) {
         kbase_report_gpu_fault(kbdev, val & MULTIPLE_GPU_FAULTS);
+    }
 
-    if (val & RESET_COMPLETED)
+    if (val & RESET_COMPLETED) {
         kbase_pm_reset_done(kbdev);
+    }
 
-    if (val & PRFCNT_SAMPLE_COMPLETED)
+    if (val & PRFCNT_SAMPLE_COMPLETED) {
         kbase_instr_hwcnt_sample_done(kbdev);
+    }
 
     KBASE_KTRACE_ADD(kbdev, CORE_GPU_IRQ_CLEAR, NULL, val);
     kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_CLEAR), val);
@@ -79,8 +79,9 @@ void kbase_gpu_interrupt(struct kbase_device *kbdev, u32 val)
      * generate another interrupt which shouldn't be missed.
      */
 
-    if (val & CLEAN_CACHES_COMPLETED)
+    if (val & CLEAN_CACHES_COMPLETED) {
         kbase_clean_caches_done(kbdev);
+    }
 
     if (val & POWER_CHANGED_ALL) {
         kbase_pm_power_changed(kbdev);
@@ -91,9 +92,9 @@ void kbase_gpu_interrupt(struct kbase_device *kbdev, u32 val)
          * machine needs to be re-invoked to proceed with powering down
          * cores.
          */
-        if (kbdev->pm.backend.l2_always_on ||
-            kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_TTRX_921))
+        if (kbdev->pm.backend.l2_always_on || kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_TTRX_921)) {
             kbase_pm_power_changed(kbdev);
+        }
     }
 
     KBASE_KTRACE_ADD(kbdev, CORE_GPU_IRQ_DONE, NULL, val);

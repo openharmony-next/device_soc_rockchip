@@ -13,7 +13,8 @@
  *
  */
 
-
+#ifndef H_DEVICETREE_MALI_KBASE_CONFIG_PLATFORM_H
+#define H_DEVICETREE_MALI_KBASE_CONFIG_PLATFORM_H
 
 /**
  * Maximum frequency GPU will be clocked at. Given in kHz.
@@ -71,3 +72,5 @@
 #define PLATFORM_FUNCS (NULL)
 
 extern struct kbase_pm_callback_conf pm_callbacks;
+
+#endif

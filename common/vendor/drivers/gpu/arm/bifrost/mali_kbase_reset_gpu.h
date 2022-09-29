@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_RESET_GPU_H_
-#define _KBASE_RESET_GPU_H_
+#ifndef KBASE_RESET_GPU_H_
+#define KBASE_RESET_GPU_H_
 
 /**
  * kbase_prepare_to_reset_gpu_locked - Prepare for resetting the GPU.

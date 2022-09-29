@@ -10,8 +10,8 @@
 
 #include "../ebc_dev.h"
 
-#define VCOM_MIN_MV        0
-#define VCOM_MAX_MV        5110
+#define VCOM_MIN_MV 0
+#define VCOM_MAX_MV 5110
 
 struct ebc_pmic {
     struct device *dev;

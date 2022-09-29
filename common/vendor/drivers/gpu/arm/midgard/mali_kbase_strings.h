@@ -13,7 +13,10 @@
  *
  */
 
-
+#ifndef COMMON_VENDOR_DRIVERS_GPU_ARM_MIDGARD_MALI_KBASE_STRINGS_H
+#define COMMON_VENDOR_DRIVERS_GPU_ARM_MIDGARD_MALI_KBASE_STRINGS_H
 
 extern const char kbase_drv_name[];
 extern const char kbase_timeline_name[];
+
+#endif

@@ -9,9 +9,8 @@
 #include <linux/kfifo.h>
 #include "common.h"
 
-#define RKISP_LUMA_READOUT_WORK_SIZE    \
-    (9 * sizeof(struct rkisp_luma_readout_work))
-#define RKISP_LUMA_YSTAT_ISR_NUM    4
+#define RKISP_LUMA_READOUT_WORK_SIZE (9 * sizeof(struct rkisp_luma_readout_work))
+#define RKISP_LUMA_YSTAT_ISR_NUM 4
 
 struct rkisp_luma_vdev;
 
@@ -44,12 +43,12 @@ struct rkisp_luma_vdev {
     struct rkisp_vdev_node vnode;
     struct rkisp_device *dev;
 
-    spinlock_t irq_lock;    /* tasklet queue lock */
+    spinlock_t irq_lock; /* tasklet queue lock */
     struct list_head stat;
     struct v4l2_format vdev_fmt;
     bool streamon;
 
-    spinlock_t rd_lock;    /* buffer queue lock */
+    spinlock_t rd_lock; /* buffer queue lock */
     struct kfifo rd_kfifo;
     struct tasklet_struct rd_tasklet;
 
@@ -61,16 +60,15 @@ struct rkisp_luma_vdev {
 #if IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISP_VERSION_V20)
 void rkisp_luma_isr(struct rkisp_luma_vdev *luma_vdev, u32 isp_stat);
 
-int rkisp_register_luma_vdev(struct rkisp_luma_vdev *luma_vdev,
-                 struct v4l2_device *v4l2_dev,
-                 struct rkisp_device *dev);
+int rkisp_register_luma_vdev(struct rkisp_luma_vdev *luma_vdev, struct v4l2_device *v4l2_dev, struct rkisp_device *dev);
 
 void rkisp_unregister_luma_vdev(struct rkisp_luma_vdev *luma_vdev);
 #else
-static inline void rkisp_unregister_luma_vdev(struct rkisp_luma_vdev *luma_vdev) {}
-static inline int rkisp_register_luma_vdev(struct rkisp_luma_vdev *luma_vdev,
-                       struct v4l2_device *v4l2_dev,
-                       struct rkisp_device *dev)
+static inline void rkisp_unregister_luma_vdev(struct rkisp_luma_vdev *luma_vdev)
+{
+}
+static inline int rkisp_register_luma_vdev(struct rkisp_luma_vdev *luma_vdev, struct v4l2_device *v4l2_dev,
+                                           struct rkisp_device *dev)
 {
     return 0;
 }

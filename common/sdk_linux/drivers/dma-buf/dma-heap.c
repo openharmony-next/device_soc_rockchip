@@ -56,7 +56,8 @@ struct dma_heap *dma_heap_find(const char *name)
     struct dma_heap *h;
 
     mutex_lock(&heap_list_lock);
-    list_for_each_entry(h, &heap_list, list) {
+    list_for_each_entry(h, &heap_list, list)
+    {
         if (!strcmp(h->name, name)) {
             kref_get(&h->refcount);
             mutex_unlock(&heap_list_lock);
@@ -68,45 +69,44 @@ struct dma_heap *dma_heap_find(const char *name)
 }
 EXPORT_SYMBOL_GPL(dma_heap_find);
 
-
 void dma_heap_buffer_free(struct dma_buf *dmabuf)
 {
     dma_buf_put(dmabuf);
 }
 EXPORT_SYMBOL_GPL(dma_heap_buffer_free);
 
-struct dma_buf *dma_heap_buffer_alloc(struct dma_heap *heap, size_t len,
-                      unsigned int fd_flags,
-                      unsigned int heap_flags)
+struct dma_buf *dma_heap_buffer_alloc(struct dma_heap *heap, size_t len, unsigned int fd_flags, unsigned int heap_flags)
 {
-    if (fd_flags & ~DMA_HEAP_VALID_FD_FLAGS)
+    if (fd_flags & ~DMA_HEAP_VALID_FD_FLAGS) {
         return ERR_PTR(-EINVAL);
+    }
 
-    if (heap_flags & ~DMA_HEAP_VALID_HEAP_FLAGS)
+    if (heap_flags & ~DMA_HEAP_VALID_HEAP_FLAGS) {
         return ERR_PTR(-EINVAL);
+    }
     /*
      * Allocations from all heaps have to begin
      * and end on page boundaries.
      */
     len = PAGE_ALIGN(len);
-    if (!len)
+    if (!len) {
         return ERR_PTR(-EINVAL);
+    }
 
     return heap->ops->allocate(heap, len, fd_flags, heap_flags);
 }
 EXPORT_SYMBOL_GPL(dma_heap_buffer_alloc);
 
-int dma_heap_bufferfd_alloc(struct dma_heap *heap, size_t len,
-                unsigned int fd_flags,
-                unsigned int heap_flags)
+int dma_heap_bufferfd_alloc(struct dma_heap *heap, size_t len, unsigned int fd_flags, unsigned int heap_flags)
 {
     struct dma_buf *dmabuf;
     int fd;
 
     dmabuf = dma_heap_buffer_alloc(heap, len, fd_flags, heap_flags);
 
-    if (IS_ERR(dmabuf))
+    if (IS_ERR(dmabuf)) {
         return PTR_ERR(dmabuf);
+    }
 
     fd = dma_buf_fd(dmabuf, fd_flags);
     if (fd < 0) {
@@ -114,7 +114,6 @@ int dma_heap_bufferfd_alloc(struct dma_heap *heap, size_t len,
         /* just return, as put will call release and that will free */
     }
     return fd;
-
 }
 EXPORT_SYMBOL_GPL(dma_heap_bufferfd_alloc);
 
@@ -141,14 +140,14 @@ static long dma_heap_ioctl_allocate(struct file *file, void *data)
     struct dma_heap *heap = file->private_data;
     int fd;
 
-    if (heap_allocation->fd)
+    if (heap_allocation->fd) {
         return -EINVAL;
+    }
 
-    fd = dma_heap_bufferfd_alloc(heap, heap_allocation->len,
-                     heap_allocation->fd_flags,
-                     heap_allocation->heap_flags);
-    if (fd < 0)
+    fd = dma_heap_bufferfd_alloc(heap, heap_allocation->len, heap_allocation->fd_flags, heap_allocation->heap_flags);
+    if (fd < 0) {
         return fd;
+    }
 
     heap_allocation->fd = fd;
 
@@ -159,8 +158,7 @@ static unsigned int dma_heap_ioctl_cmds[] = {
     DMA_HEAP_IOCTL_ALLOC,
 };
 
-static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
-               unsigned long arg)
+static long dma_heap_ioctl(struct file *file, unsigned int ucmd, unsigned long arg)
 {
     char stack_kdata[128];
     char *kdata = stack_kdata;
@@ -169,8 +167,9 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
     int nr = _IOC_NR(ucmd);
     int ret = 0;
 
-    if (nr >= ARRAY_SIZE(dma_heap_ioctl_cmds))
+    if (nr >= ARRAY_SIZE(dma_heap_ioctl_cmds)) {
         return -EINVAL;
+    }
 
     /* Get the kernel ioctl cmd that matches */
     kcmd = dma_heap_ioctl_cmds[nr];
@@ -179,17 +178,20 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
     drv_size = _IOC_SIZE(kcmd);
     out_size = _IOC_SIZE(ucmd);
     in_size = out_size;
-    if ((ucmd & kcmd & IOC_IN) == 0)
+    if ((ucmd & kcmd & IOC_IN) == 0) {
         in_size = 0;
-    if ((ucmd & kcmd & IOC_OUT) == 0)
+    }
+    if ((ucmd & kcmd & IOC_OUT) == 0) {
         out_size = 0;
+    }
     ksize = max(max(in_size, out_size), drv_size);
 
     /* If necessary, allocate buffer for ioctl argument */
     if (ksize > sizeof(stack_kdata)) {
         kdata = kmalloc(ksize, GFP_KERNEL);
-        if (!kdata)
+        if (!kdata) {
             return -ENOMEM;
+        }
     }
 
     if (copy_from_user(kdata, (void __user *)arg, in_size) != 0) {
@@ -198,32 +200,35 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
     }
 
     /* zero out any difference between the kernel/user structure size */
-    if (ksize > in_size)
+    if (ksize > in_size) {
         memset(kdata + in_size, 0, ksize - in_size);
-
-    switch (kcmd) {
-    case DMA_HEAP_IOCTL_ALLOC:
-        ret = dma_heap_ioctl_allocate(file, kdata);
-        break;
-    default:
-        ret = -ENOTTY;
-        goto err;
     }
 
-    if (copy_to_user((void __user *)arg, kdata, out_size) != 0)
+    switch (kcmd) {
+        case DMA_HEAP_IOCTL_ALLOC:
+            ret = dma_heap_ioctl_allocate(file, kdata);
+            break;
+        default:
+            ret = -ENOTTY;
+            goto err;
+    }
+
+    if (copy_to_user((void __user *)arg, kdata, out_size) != 0) {
         ret = -EFAULT;
+    }
 err:
-    if (kdata != stack_kdata)
+    if (kdata != stack_kdata) {
         kfree(kdata);
+    }
     return ret;
 }
 
 static const struct file_operations dma_heap_fops = {
-    .owner          = THIS_MODULE,
-    .open        = dma_heap_open,
+    .owner = THIS_MODULE,
+    .open = dma_heap_open,
     .unlocked_ioctl = dma_heap_ioctl,
 #ifdef CONFIG_COMPAT
-    .compat_ioctl    = dma_heap_ioctl,
+    .compat_ioctl = dma_heap_ioctl,
 #endif
 };
 
@@ -312,15 +317,15 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
     /* check the name is unique */
     heap = dma_heap_find(exp_info->name);
     if (heap) {
-        pr_err("dma_heap: Already registered heap named %s\n",
-               exp_info->name);
+        pr_err("dma_heap: Already registered heap named %s\n", exp_info->name);
         dma_heap_put(heap);
         return ERR_PTR(-EINVAL);
     }
 
     heap = kzalloc(sizeof(*heap), GFP_KERNEL);
-    if (!heap)
+    if (!heap) {
         return ERR_PTR(-ENOMEM);
+    }
 
     kref_init(&heap->refcount);
     heap->name = exp_info->name;
@@ -328,8 +333,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
     heap->priv = exp_info->priv;
 
     /* Find unused minor number */
-    ret = xa_alloc(&dma_heap_minors, &minor, heap,
-               XA_LIMIT(0, NUM_HEAP_MINORS - 1), GFP_KERNEL);
+    ret = xa_alloc(&dma_heap_minors, &minor, heap, XA_LIMIT(0, NUM_HEAP_MINORS - 1), GFP_KERNEL);
     if (ret < 0) {
         pr_err("dma_heap: Unable to get minor number for heap\n");
         err_ret = ERR_PTR(ret);
@@ -347,11 +351,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
         goto err1;
     }
 
-    heap->heap_dev = device_create(dma_heap_class,
-                       NULL,
-                       heap->heap_devt,
-                       NULL,
-                       heap->name);
+    heap->heap_dev = device_create(dma_heap_class, NULL, heap->heap_devt, NULL, heap->name);
     if (IS_ERR(heap->heap_dev)) {
         pr_err("dma_heap: Unable to create device\n");
         err_ret = ERR_CAST(heap->heap_dev);
@@ -383,24 +383,24 @@ static char *dma_heap_devnode(struct device *dev, umode_t *mode)
     return kasprintf(GFP_KERNEL, "dma_heap/%s", dev_name(dev));
 }
 
-static ssize_t total_pools_kb_show(struct kobject *kobj,
-                   struct kobj_attribute *attr, char *buf)
+static ssize_t total_pools_kb_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     struct dma_heap *heap;
     u64 total_pool_size = 0;
 
     mutex_lock(&heap_list_lock);
-    list_for_each_entry(heap, &heap_list, list) {
-        if (heap->ops->get_pool_size)
+    list_for_each_entry(heap, &heap_list, list)
+    {
+        if (heap->ops->get_pool_size) {
             total_pool_size += heap->ops->get_pool_size(heap);
+        }
     }
     mutex_unlock(&heap_list_lock);
 
-    return sysfs_emit(buf, "%llu\n", total_pool_size / 1024);
+    return sysfs_emit(buf, "%llu\n", total_pool_size / 0x400);
 }
 
-static struct kobj_attribute total_pools_kb_attr =
-    __ATTR_RO(total_pools_kb);
+static struct kobj_attribute total_pools_kb_attr = __ATTR_RO(total_pools_kb);
 
 static struct attribute *dma_heap_sysfs_attrs[] = {
     &total_pools_kb_attr.attr,
@@ -416,8 +416,9 @@ static int dma_heap_sysfs_setup(void)
     int ret;
 
     dma_heap_kobject = kobject_create_and_add("dma_heap", kernel_kobj);
-    if (!dma_heap_kobject)
+    if (!dma_heap_kobject) {
         return -ENOMEM;
+    }
 
     ret = sysfs_create_groups(dma_heap_kobject, dma_heap_sysfs_groups);
     if (ret) {
@@ -438,12 +439,14 @@ static int dma_heap_init(void)
     int ret;
 
     ret = dma_heap_sysfs_setup();
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     ret = alloc_chrdev_region(&dma_heap_devt, 0, NUM_HEAP_MINORS, DEVNAME);
-    if (ret)
+    if (ret) {
         goto err_chrdev;
+    }
 
     dma_heap_class = class_create(THIS_MODULE, DEVNAME);
     if (IS_ERR(dma_heap_class)) {

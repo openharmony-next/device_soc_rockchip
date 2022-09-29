@@ -32,8 +32,8 @@
  * - regs_history: return the information about last accesses to the registers.
  */
 
-#ifndef _KBASE_REGS_HISTORY_DEBUGFS_H
-#define _KBASE_REGS_HISTORY_DEBUGFS_H
+#ifndef KBASE_REGS_HISTORY_DEBUGFS_H
+#define KBASE_REGS_HISTORY_DEBUGFS_H
 
 struct kbase_device;
 
@@ -82,4 +82,4 @@ void kbasep_regs_history_debugfs_init(struct kbase_device *kbdev);
 
 #endif /* defined(CONFIG_DEBUG_FS) && !defined(CONFIG_MALI_BIFROST_NO_MALI) */
 
-#endif  /*_KBASE_REGS_HISTORY_DEBUGFS_H*/
+#endif /*_KBASE_REGS_HISTORY_DEBUGFS_H*/

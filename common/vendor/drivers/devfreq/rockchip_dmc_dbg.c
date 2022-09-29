@@ -20,36 +20,36 @@
 /*
  * DMCDBG share memory request 4KB for delivery parameter
  */
-#define DMCDBG_PAGE_NUMS            (1)
-#define DMCDBG_SHARE_MEM_SIZE            ((DMCDBG_PAGE_NUMS) * 4096)
+#define DMCDBG_PAGE_NUMS (1)
+#define DMCDBG_SHARE_MEM_SIZE ((DMCDBG_PAGE_NUMS)*4096)
 
-#define PROC_DMCDBG_DIR_NAME            "dmcdbg"
-#define PROC_DMCDBG_DRAM_INFO            "dmcinfo"
-#define PROC_DMCDBG_POWERSAVE            "powersave"
-#define PROC_DMCDBG_DRVODT            "drvodt"
-#define PROC_DMCDBG_DESKEW            "deskew"
-#define PROC_DMCDBG_REGS_INFO            "regsinfo"
+#define PROC_DMCDBG_DIR_NAME "dmcdbg"
+#define PROC_DMCDBG_DRAM_INFO "dmcinfo"
+#define PROC_DMCDBG_POWERSAVE "powersave"
+#define PROC_DMCDBG_DRVODT "drvodt"
+#define PROC_DMCDBG_DESKEW "deskew"
+#define PROC_DMCDBG_REGS_INFO "regsinfo"
 
-#define DDRDBG_FUNCGET_VERSION            (0x01)
-#define DDRDBG_FUNC_GET_SUPPORTED        (0x02)
-#define DDRDBG_FUNC_GET_DRAM_INFO        (0x03)
-#define DDRDBG_FUNC_GET_DESKEW_INFO        (0x04)
-#define DDRDBG_FUNC_UPDATE_DESKEW        (0x05)
-#define DDRDBG_FUNC_DATA_TRAINING        (0x06)
-#define DDRDBG_FUNC_UPDATE_DESKEW_TR        (0x07)
-#define DDRDBG_FUNC_GET_POWERSAVE_INFO        (0x08)
-#define DDRDBG_FUNC_UPDATE_POWERSAVE        (0x09)
-#define DDRDBG_FUNC_GET_DRVODT_INFO        (0x0a)
-#define DDRDBG_FUNC_UPDATE_DRVODT        (0x0b)
-#define DDRDBG_FUNC_GET_REGISTERS_INFO        (0x0c)
+#define DDRDBG_FUNCGET_VERSION (0x01)
+#define DDRDBG_FUNC_GET_SUPPORTED (0x02)
+#define DDRDBG_FUNC_GET_DRAM_INFO (0x03)
+#define DDRDBG_FUNC_GET_DESKEW_INFO (0x04)
+#define DDRDBG_FUNC_UPDATE_DESKEW (0x05)
+#define DDRDBG_FUNC_DATA_TRAINING (0x06)
+#define DDRDBG_FUNC_UPDATE_DESKEW_TR (0x07)
+#define DDRDBG_FUNC_GET_POWERSAVE_INFO (0x08)
+#define DDRDBG_FUNC_UPDATE_POWERSAVE (0x09)
+#define DDRDBG_FUNC_GET_DRVODT_INFO (0x0a)
+#define DDRDBG_FUNC_UPDATE_DRVODT (0x0b)
+#define DDRDBG_FUNC_GET_REGISTERS_INFO (0x0c)
 
-#define DRV_ODT_UNKNOWN                (0xffff)
-#define DRV_ODT_UNSUSPEND_FIX            (0x0)
-#define DRV_ODT_SUSPEND_FIX            (0x1)
+#define DRV_ODT_UNKNOWN (0xffff)
+#define DRV_ODT_UNSUSPEND_FIX (0x0)
+#define DRV_ODT_SUSPEND_FIX (0x1)
 
-#define REGS_NAME_LEN_MAX            (20)
-#define SKEW_GROUP_NUM_MAX            (6)
-#define SKEW_TIMING_NUM_MAX            (50)
+#define REGS_NAME_LEN_MAX (20)
+#define SKEW_GROUP_NUM_MAX (6)
+#define SKEW_TIMING_NUM_MAX (50)
 
 struct rockchip_dmcdbg {
     struct device *dev;
@@ -80,7 +80,7 @@ struct dram_info {
     struct dram_cap_info ch[2];
 };
 
-static const char * const power_save_msg[] = {
+static const char *const power_save_msg[] = {
     "auto power down enable",
     "auto power down idle cycle",
     "auto self refresh enable",
@@ -100,25 +100,16 @@ struct power_save_info {
     unsigned int standby_idle;
 };
 
-static const char * const drv_odt_msg[] = {
-    "dram side drv pull-up",
-    "dram side drv pull-down",
-    "dram side dq odt pull-up",
-    "dram side dq odt pull-down",
-    "dram side ca odt pull-up",
-    "dram side ca odt pull-down",
-    "soc side ca drv pull-up",
-    "soc side ca drv pull-down",
-    "soc side ck drv pull-up",
-    "soc side ck drv pull-down",
-    "soc side cs drv pull-up",
-    "soc side cs drv pull-down",
-    "soc side dq drv pull-up",
-    "soc side dq drv pull-down",
-    "soc side odt pull-up",
-    "soc side odt pull-down",
-    "phy vref inner",
-    "phy vref out",
+static const char *const drv_odt_msg[] = {
+    "dram side drv pull-up",    "dram side drv pull-down",
+    "dram side dq odt pull-up", "dram side dq odt pull-down",
+    "dram side ca odt pull-up", "dram side ca odt pull-down",
+    "soc side ca drv pull-up",  "soc side ca drv pull-down",
+    "soc side ck drv pull-up",  "soc side ck drv pull-down",
+    "soc side cs drv pull-up",  "soc side cs drv pull-down",
+    "soc side dq drv pull-up",  "soc side dq drv pull-down",
+    "soc side odt pull-up",     "soc side odt pull-down",
+    "phy vref inner",           "phy vref out",
 };
 
 struct drv_odt {
@@ -192,17 +183,15 @@ static int dmcinfo_proc_show(struct seq_file *m, void *v)
 {
     struct arm_smccc_res res;
     struct dram_info *p_dram_info;
-    struct file *fp  = NULL;
+    struct file *fp = NULL;
     char cur_freq[20] = {0};
     char governor[20] = {0};
     loff_t pos;
     u32 i;
 
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRAM_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRAM_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
-        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n",
-               res.a0);
+        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         return -ENOMEM;
     }
 
@@ -213,57 +202,39 @@ static int dmcinfo_proc_show(struct seq_file *m, void *v)
     p_dram_info = (struct dram_info *)dmcdbg_data.share_memory;
 
     /* dram type information */
-    seq_printf(m,
-           "DramType:    %s\n"
-           ,
-           p_dram_info->dramtype
-           );
+    seq_printf(m, "DramType:    %s\n", p_dram_info->dramtype);
 
     /* dram capacity information */
-    seq_printf(m,
-           "\n"
-           "DramCapacity:\n"
-           );
+    seq_printf(m, "\n"
+                  "DramCapacity:\n");
 
     for (i = 0; i < p_dram_info->channel_num; i++) {
-        if (p_dram_info->channel_num == 2)
-            seq_printf(m,
-                   "Channel [%d]:\n"
-                   ,
-                   i
-                   );
+        if (p_dram_info->channel_num == 0x2) {
+            seq_printf(m, "Channel [%d]:\n", i);
+        }
 
         seq_printf(m,
-               "CS Count:    %d\n"
-               "Bus Width:    %d bit\n"
-               "Column:        %d\n"
-               "Bank:        %d\n"
-               "CS0_Row:    %d\n"
-               "CS1_Row:    %d\n"
-               "DieBusWidth:    %d bit\n"
-               "TotalSize:    %d MB\n"
-               ,
-               p_dram_info->ch[i].rank,
-               p_dram_info->ch[i].buswidth,
-               p_dram_info->ch[i].col,
-               p_dram_info->ch[i].bank,
-               p_dram_info->ch[i].cs0_row,
-               p_dram_info->ch[i].cs1_row,
-               p_dram_info->ch[i].die_buswidth,
-               p_dram_info->ch[i].size
-               );
+                   "CS Count:    %d\n"
+                   "Bus Width:    %d bit\n"
+                   "Column:        %d\n"
+                   "Bank:        %d\n"
+                   "CS0_Row:    %d\n"
+                   "CS1_Row:    %d\n"
+                   "DieBusWidth:    %d bit\n"
+                   "TotalSize:    %d MB\n",
+                   p_dram_info->ch[i].rank, p_dram_info->ch[i].buswidth, p_dram_info->ch[i].col,
+                   p_dram_info->ch[i].bank, p_dram_info->ch[i].cs0_row, p_dram_info->ch[i].cs1_row,
+                   p_dram_info->ch[i].die_buswidth, p_dram_info->ch[i].size);
     }
 
     /* check devfreq/dmc device */
     fp = filp_open("/sys/class/devfreq/dmc/cur_freq", O_RDONLY, 0);
     if (IS_ERR(fp)) {
         seq_printf(m,
-               "\n"
-               "devfreq/dmc:    Disable\n"
-               "DramFreq:    %d\n"
-               ,
-               p_dram_info->dramfreq
-               );
+                   "\n"
+                   "devfreq/dmc:    Disable\n"
+                   "DramFreq:    %d\n",
+                   p_dram_info->dramfreq);
     } else {
         pos = 0;
         kernel_read(fp, cur_freq, sizeof(cur_freq), &pos);
@@ -279,18 +250,13 @@ static int dmcinfo_proc_show(struct seq_file *m, void *v)
         }
 
         seq_printf(m,
-               "\n"
-               "devfreq/dmc:    Enable\n"
-               "governor:    %s\n"
-               "cur_freq:    %s\n"
-               ,
-               governor,
-               cur_freq
-               );
-        seq_printf(m,
-               "NOTE:\n"
-               "more information about dmc can get from /sys/class/devfreq/dmc.\n"
-               );
+                   "\n"
+                   "devfreq/dmc:    Enable\n"
+                   "governor:    %s\n"
+                   "cur_freq:    %s\n",
+                   governor, cur_freq);
+        seq_printf(m, "NOTE:\n"
+                      "more information about dmc can get from /sys/class/devfreq/dmc.\n");
     }
 
     return 0;
@@ -302,17 +268,16 @@ static int dmcinfo_proc_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations dmcinfo_proc_fops = {
-    .open        = dmcinfo_proc_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
+    .open = dmcinfo_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
 };
 
 static int proc_dmcinfo_init(void)
 {
     /* create dmcinfo file */
-    proc_create(PROC_DMCDBG_DRAM_INFO, 0644, proc_dmcdbg_dir,
-            &dmcinfo_proc_fops);
+    proc_create(PROC_DMCDBG_DRAM_INFO, 0x1a4, proc_dmcdbg_dir, &dmcinfo_proc_fops);
 
     return 0;
 }
@@ -325,12 +290,9 @@ static int powersave_proc_show(struct seq_file *m, void *v)
     unsigned int i = 0;
 
     /* get low power information */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG,
-               DDRDBG_FUNC_GET_POWERSAVE_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_POWERSAVE_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
-        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n",
-               res.a0);
+        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         return -ENOMEM;
     }
 
@@ -340,32 +302,25 @@ static int powersave_proc_show(struct seq_file *m, void *v)
     }
     p_power = (struct power_save_info *)dmcdbg_data.share_memory;
 
-    seq_printf(m,
-           "low power information:\n"
-           "\n"
-           "[number]name: value\n"
-           );
+    seq_printf(m, "low power information:\n"
+                  "\n"
+                  "[number]name: value\n");
 
     p_uint = (unsigned int *)p_power;
-    for (i = 0; i < ARRAY_SIZE(power_save_msg); i++)
-        seq_printf(m,
-               "[%d]%s: %d\n"
-               ,
-               i, power_save_msg[i], *(p_uint + i)
-               );
+    for (i = 0; i < ARRAY_SIZE(power_save_msg); i++) {
+        seq_printf(m, "[%d]%s: %d\n", i, power_save_msg[i], *(p_uint + i));
+    }
 
-    seq_printf(m,
-           "\n"
-           "power save setting:\n"
-           "echo number=value > /proc/dmcdbg/powersave\n"
-           "eg: set auto power down enable to 1\n"
-           "  echo 0=1 > /proc/dmcdbg/powersave\n"
-           "\n"
-           "Support for setting multiple parameters at the same time.\n"
-           "echo number=value,number=value,... > /proc/dmcdbg/powersave\n"
-           "eg:\n"
-           "  echo 0=1,1=32 > /proc/dmcdbg/powersave\n"
-           );
+    seq_printf(m, "\n"
+                  "power save setting:\n"
+                  "echo number=value > /proc/dmcdbg/powersave\n"
+                  "eg: set auto power down enable to 1\n"
+                  "  echo 0=1 > /proc/dmcdbg/powersave\n"
+                  "\n"
+                  "Support for setting multiple parameters at the same time.\n"
+                  "echo number=value,number=value,... > /proc/dmcdbg/powersave\n"
+                  "eg:\n"
+                  "  echo 0=1,1=32 > /proc/dmcdbg/powersave\n");
 
     return 0;
 }
@@ -375,9 +330,7 @@ static int powersave_proc_open(struct inode *inode, struct file *file)
     return single_open(file, powersave_proc_show, NULL);
 }
 
-static ssize_t powersave_proc_write(struct file *file,
-                     const char __user *buffer,
-                     size_t count, loff_t *ppos)
+static ssize_t powersave_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos)
 {
     struct arm_smccc_res res;
     struct power_save_info *p_power;
@@ -390,8 +343,9 @@ static ssize_t powersave_proc_write(struct file *file,
     /* get buffer data */
     buf = vzalloc(count);
     cookie_pot = buf;
-    if (!cookie_pot)
+    if (!cookie_pot) {
         return -ENOMEM;
+    }
 
     if (copy_from_user(cookie_pot, buffer, count)) {
         ret = -EFAULT;
@@ -399,9 +353,7 @@ static ssize_t powersave_proc_write(struct file *file,
     }
 
     /* get power save setting information */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG,
-               DDRDBG_FUNC_GET_POWERSAVE_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_POWERSAVE_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -417,26 +369,30 @@ static ssize_t powersave_proc_write(struct file *file,
 
     loop = 0;
     for (i = 0; i < count; i++) {
-        if (*(cookie_pot + i) == '=')
+        if (*(cookie_pot + i) == '=') {
             loop++;
+        }
     }
 
     p_uint = (unsigned int *)p_power;
     for (i = 0; i < loop; i++) {
         p_char = strsep(&cookie_pot, "=");
         ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        if (ret) {
             goto err;
+        }
         offset = long_val;
 
-        if (i == (loop - 1))
+        if (i == (loop - 1)) {
             p_char = strsep(&cookie_pot, "\0");
-        else
+        } else {
             p_char = strsep(&cookie_pot, ",");
+        }
 
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         value = long_val;
 
         if (offset >= ARRAY_SIZE(power_save_msg)) {
@@ -449,8 +405,7 @@ static ssize_t powersave_proc_write(struct file *file,
     }
 
     /* update power save setting */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_POWERSAVE,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_POWERSAVE, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -464,18 +419,17 @@ err:
 }
 
 static const struct file_operations powersave_proc_fops = {
-    .open        = powersave_proc_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
-    .write        = powersave_proc_write,
+    .open = powersave_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
+    .write = powersave_proc_write,
 };
 
 static int proc_powersave_init(void)
 {
     /* create dmcinfo file */
-    proc_create(PROC_DMCDBG_POWERSAVE, 0644, proc_dmcdbg_dir,
-            &powersave_proc_fops);
+    proc_create(PROC_DMCDBG_POWERSAVE, 0x1a4, proc_dmcdbg_dir, &powersave_proc_fops);
 
     return 0;
 }
@@ -488,11 +442,9 @@ static int drvodt_proc_show(struct seq_file *m, void *v)
     unsigned int i;
 
     /* get drive strength and odt information */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRVODT_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRVODT_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
-        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n",
-               res.a0);
+        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         return -ENOMEM;
     }
 
@@ -502,64 +454,39 @@ static int drvodt_proc_show(struct seq_file *m, void *v)
     }
     p_drvodt = (struct drv_odt_info *)dmcdbg_data.share_memory;
 
-    seq_printf(m,
-           "drv and odt information:\n"
-           "\n"
-           "[number]name: value (ohm)\n"
-    );
+    seq_printf(m, "drv and odt information:\n"
+                  "\n"
+                  "[number]name: value (ohm)\n");
 
     p_uint = (unsigned int *)p_drvodt;
     for (i = 0; i < ARRAY_SIZE(drv_odt_msg); i++) {
-        if (*(p_uint + (i * 3)) == DRV_ODT_UNKNOWN)
-            seq_printf(m,
-                   "[%2d]%s: NULL (unknown) %c\n"
-                   ,
-                   i, drv_odt_msg[i],
-                   (*(p_uint + (i * 3) + 2) ==
-                    DRV_ODT_SUSPEND_FIX) ? '\0' : '*'
-            );
-        else if (*(p_uint + (i * 3) + 1) == DRV_ODT_UNKNOWN)
-            seq_printf(m,
-                   "[%2d]%s: %d (unknown) %c\n"
-                   ,
-                   i, drv_odt_msg[i], *(p_uint + (i * 3)),
-                   (*(p_uint + (i * 3) + 2) ==
-                    DRV_ODT_SUSPEND_FIX) ? '\0' : '*'
-            );
-        else if (i < (ARRAY_SIZE(drv_odt_msg) - 2))
-            seq_printf(m,
-                   "[%2d]%s: %d (%d ohm) %c\n"
-                   ,
-                   i, drv_odt_msg[i], *(p_uint + (i * 3)),
-                   *(p_uint + (i * 3) + 1),
-                   (*(p_uint + (i * 3) + 2) ==
-                    DRV_ODT_SUSPEND_FIX) ? '\0' : '*'
-            );
-        else
-            seq_printf(m,
-                   "[%2d]%s: %d (%d %%) %c\n"
-                   ,
-                   i, drv_odt_msg[i], *(p_uint + (i * 3)),
-                   *(p_uint + (i * 3) + 1),
-                   (*(p_uint + (i * 3) + 2) ==
-                    DRV_ODT_SUSPEND_FIX) ? '\0' : '*'
-            );
+        if (*(p_uint + (i * 0x3)) == DRV_ODT_UNKNOWN) {
+            seq_printf(m, "[%2d]%s: NULL (unknown) %c\n", i, drv_odt_msg[i],
+                       (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
+        } else if (*(p_uint + (i * 0x3) + 0x1) == DRV_ODT_UNKNOWN) {
+            seq_printf(m, "[%2d]%s: %d (unknown) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 3)),
+                       (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
+        } else if (i < (ARRAY_SIZE(drv_odt_msg) - 0x2)) {
+            seq_printf(m, "[%2d]%s: %d (%d ohm) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 0x3)),
+                       *(p_uint + (i * 0x3) + 1), (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
+        } else {
+            seq_printf(m, "[%2d]%s: %d (%d %%) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 0x3)),
+                       *(p_uint + (i * 0x3) + 1), (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
+        }
     }
 
-    seq_printf(m,
-           "\n"
-           "drvodt setting:\n"
-           "echo number=value > /proc/dmcdbg/drvodt\n"
-           "eg: set soc side ca drv up to 20\n"
-           "  echo 6=20 > /proc/dmcdbg/drvodt\n"
-           "\n"
-           "Support for setting multiple parameters at the same time.\n"
-           "echo number=value,number=value,... > /proc/dmcdbg/drvodt\n"
-           "eg: set soc side ca drv up and down to 20\n"
-           "  echo 6=20,7=20 > /proc/dmcdbg/drvodt\n"
-           "Note: Please update both up and down at the same time.\n"
-           "      (*) mean unsupported setting value\n"
-    );
+    seq_printf(m, "\n"
+                  "drvodt setting:\n"
+                  "echo number=value > /proc/dmcdbg/drvodt\n"
+                  "eg: set soc side ca drv up to 20\n"
+                  "  echo 6=20 > /proc/dmcdbg/drvodt\n"
+                  "\n"
+                  "Support for setting multiple parameters at the same time.\n"
+                  "echo number=value,number=value,... > /proc/dmcdbg/drvodt\n"
+                  "eg: set soc side ca drv up and down to 20\n"
+                  "  echo 6=20,7=20 > /proc/dmcdbg/drvodt\n"
+                  "Note: Please update both up and down at the same time.\n"
+                  "      (*) mean unsupported setting value\n");
 
     return 0;
 }
@@ -569,9 +496,7 @@ static int drvodt_proc_open(struct inode *inode, struct file *file)
     return single_open(file, drvodt_proc_show, NULL);
 }
 
-static ssize_t drvodt_proc_write(struct file *file,
-                 const char __user *buffer,
-                 size_t count, loff_t *ppos)
+static ssize_t drvodt_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos)
 {
     struct arm_smccc_res res;
     struct drv_odt_info *p_drvodt;
@@ -584,8 +509,9 @@ static ssize_t drvodt_proc_write(struct file *file,
     /* get buffer data */
     buf = vzalloc(count);
     cookie_pot = buf;
-    if (!cookie_pot)
+    if (!cookie_pot) {
         return -ENOMEM;
+    }
 
     if (copy_from_user(cookie_pot, buffer, count)) {
         ret = -EFAULT;
@@ -593,8 +519,7 @@ static ssize_t drvodt_proc_write(struct file *file,
     }
 
     /* get drv and odt setting  */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRVODT_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DRVODT_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -610,26 +535,30 @@ static ssize_t drvodt_proc_write(struct file *file,
 
     loop = 0;
     for (i = 0; i < count; i++) {
-        if (*(cookie_pot + i) == '=')
+        if (*(cookie_pot + i) == '=') {
             loop++;
+        }
     }
 
     p_uint = (unsigned int *)p_drvodt;
     for (i = 0; i < loop; i++) {
         p_char = strsep(&cookie_pot, "=");
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         offset = long_val;
 
-        if (i == (loop - 1))
+        if (i == (loop - 1)) {
             p_char = strsep(&cookie_pot, "\0");
-        else
+        } else {
             p_char = strsep(&cookie_pot, ",");
+        }
 
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         value = long_val;
 
         if (offset >= ARRAY_SIZE(drv_odt_msg)) {
@@ -643,8 +572,7 @@ static ssize_t drvodt_proc_write(struct file *file,
     }
 
     /* update power save setting */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_DRVODT,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_DRVODT, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -658,18 +586,17 @@ err:
 }
 
 static const struct file_operations drvodt_proc_fops = {
-    .open        = drvodt_proc_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
-    .write        = drvodt_proc_write,
+    .open = drvodt_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
+    .write = drvodt_proc_write,
 };
 
 static int proc_drvodt_init(void)
 {
     /* create dmcinfo file */
-    proc_create(PROC_DMCDBG_DRVODT, 0644, proc_dmcdbg_dir,
-            &drvodt_proc_fops);
+    proc_create(PROC_DMCDBG_DRVODT, 0x1a4, proc_dmcdbg_dir, &drvodt_proc_fops);
 
     return 0;
 }
@@ -681,11 +608,9 @@ static int skew_proc_show(struct seq_file *m, void *v)
     u32 group, i;
 
     /* get deskew information */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DESKEW_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DESKEW_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
-        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n",
-               res.a0);
+        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         return -ENOMEM;
     }
 
@@ -694,42 +619,31 @@ static int skew_proc_show(struct seq_file *m, void *v)
         return -EPERM;
     }
 
-    seq_printf(m,
-           "de-skew information:\n"
-           "\n"
-           "[group_number]name: value\n"
-    );
+    seq_printf(m, "de-skew information:\n"
+                  "\n"
+                  "[group_number]name: value\n");
 
     for (group = 0; group < dmcdbg_data.skew_group_num; group++) {
-        if (dmcdbg_data.skew_group[group].note != NULL)
-            seq_printf(m,
-                "%s\n"
-                ,
-                dmcdbg_data.skew_group[group].note
-            );
+        if (dmcdbg_data.skew_group[group].note != NULL) {
+            seq_printf(m, "%s\n", dmcdbg_data.skew_group[group].note);
+        }
         p_uint = (unsigned int *)dmcdbg_data.skew_group[group].p_skew_info;
-        for (i = 0; i < dmcdbg_data.skew_group[group].skew_num; i++)
-            seq_printf(m,
-                "[%c%d_%d]%s: %d\n"
-                ,
-                (i < 10) ? ' ' : '\0', group, i,
-                dmcdbg_data.skew_group[group].p_skew_timing[i],
-                *(p_uint + i)
-            );
+        for (i = 0; i < dmcdbg_data.skew_group[group].skew_num; i++) {
+            seq_printf(m, "[%c%d_%d]%s: %d\n", (i < 0xa) ? ' ' : '\0', group, i,
+                       dmcdbg_data.skew_group[group].p_skew_timing[i], *(p_uint + i));
+        }
     }
 
-    seq_printf(m,
-           "\n"
-           "de-skew setting:\n"
-           "echo group_number=value > /proc/dmcdbg/deskew\n"
-           "eg: set a1_ddr3a14_de-skew to 8\n"
-           "  echo 0_1=8 > /proc/dmcdbg/deskew\n"
-           "\n"
-           "Support for setting multiple parameters simultaneously.\n"
-           "echo group_number=value,group_number=value,... > /proc/dmcdbg/deskew\n"
-           "eg:\n"
-           "  echo 0_1=8,1_2=8 > /proc/dmcdbg/deskew\n"
-    );
+    seq_printf(m, "\n"
+                  "de-skew setting:\n"
+                  "echo group_number=value > /proc/dmcdbg/deskew\n"
+                  "eg: set a1_ddr3a14_de-skew to 8\n"
+                  "  echo 0_1=8 > /proc/dmcdbg/deskew\n"
+                  "\n"
+                  "Support for setting multiple parameters simultaneously.\n"
+                  "echo group_number=value,group_number=value,... > /proc/dmcdbg/deskew\n"
+                  "eg:\n"
+                  "  echo 0_1=8,1_2=8 > /proc/dmcdbg/deskew\n");
 
     return 0;
 }
@@ -739,9 +653,7 @@ static int skew_proc_open(struct inode *inode, struct file *file)
     return single_open(file, skew_proc_show, NULL);
 }
 
-static ssize_t skew_proc_write(struct file *file,
-                   const char __user *buffer,
-                   size_t count, loff_t *ppos)
+static ssize_t skew_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos)
 {
     struct arm_smccc_res res;
     unsigned int *p_uint;
@@ -753,8 +665,9 @@ static ssize_t skew_proc_write(struct file *file,
     /* get buffer data */
     buf = vzalloc(count);
     cookie_pot = buf;
-    if (!cookie_pot)
+    if (!cookie_pot) {
         return -ENOMEM;
+    }
 
     if (copy_from_user(cookie_pot, buffer, count)) {
         ret = -EFAULT;
@@ -762,8 +675,7 @@ static ssize_t skew_proc_write(struct file *file,
     }
 
     /* get skew setting  */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DESKEW_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_DESKEW_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -778,31 +690,36 @@ static ssize_t skew_proc_write(struct file *file,
 
     loop = 0;
     for (i = 0; i < count; i++) {
-        if (*(cookie_pot + i) == '=')
+        if (*(cookie_pot + i) == '=') {
             loop++;
+        }
     }
 
     for (i = 0; i < loop; i++) {
         p_char = strsep(&cookie_pot, "_");
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         group = long_val;
 
         p_char = strsep(&cookie_pot, "=");
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         offset = long_val;
 
-        if (i == (loop - 1))
+        if (i == (loop - 1)) {
             p_char = strsep(&cookie_pot, "\0");
-        else
+        } else {
             p_char = strsep(&cookie_pot, ",");
+        }
 
-        ret = kstrtol(p_char, 10, &long_val);
-        if (ret)
+        ret = kstrtol(p_char, 0xa, &long_val);
+        if (ret) {
             goto err;
+        }
         value = long_val;
 
         if (group >= dmcdbg_data.skew_group_num) {
@@ -824,8 +741,7 @@ static ssize_t skew_proc_write(struct file *file,
     }
 
     /* update power save setting */
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_DESKEW,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_UPDATE_DESKEW, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         ret = -ENOMEM;
@@ -839,18 +755,17 @@ err:
 }
 
 static const struct file_operations skew_proc_fops = {
-    .open        = skew_proc_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
-    .write        = skew_proc_write,
+    .open = skew_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
+    .write = skew_proc_write,
 };
 
 static int proc_skew_init(void)
 {
     /* create dmcinfo file */
-    proc_create(PROC_DMCDBG_DESKEW, 0644, proc_dmcdbg_dir,
-            &skew_proc_fops);
+    proc_create(PROC_DMCDBG_DESKEW, 0x1a4, proc_dmcdbg_dir, &skew_proc_fops);
 
     return 0;
 }
@@ -861,12 +776,9 @@ static int regsinfo_proc_show(struct seq_file *m, void *v)
     struct registers_info *p_regsinfo;
     u32 i;
 
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG,
-               DDRDBG_FUNC_GET_REGISTERS_INFO,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDRDBG, DDRDBG_FUNC_GET_REGISTERS_INFO, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
     if (res.a0) {
-        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n",
-               res.a0);
+        seq_printf(m, "rockchip_sip_config_dram_debug error:%lx\n", res.a0);
         return -ENOMEM;
     }
 
@@ -876,18 +788,11 @@ static int regsinfo_proc_show(struct seq_file *m, void *v)
     }
     p_regsinfo = (struct registers_info *)dmcdbg_data.share_memory;
 
-    seq_printf(m,
-           "registers base address information:\n"
-           "\n"
-    );
+    seq_printf(m, "registers base address information:\n"
+                  "\n");
 
     for (i = 0; i < p_regsinfo->regs_num; i++) {
-        seq_printf(m,
-               "%s=0x%x\n"
-               ,
-               p_regsinfo->regs[i].regs_name,
-               p_regsinfo->regs[i].regs_addr
-               );
+        seq_printf(m, "%s=0x%x\n", p_regsinfo->regs[i].regs_name, p_regsinfo->regs[i].regs_addr);
     }
 
     return 0;
@@ -899,17 +804,16 @@ static int regsinfo_proc_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations regsinfo_proc_fops = {
-    .open        = regsinfo_proc_open,
-    .read        = seq_read,
-    .llseek        = seq_lseek,
-    .release    = single_release,
+    .open = regsinfo_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
 };
 
 static int proc_regsinfo_init(void)
 {
     /* create dmcinfo file */
-    proc_create(PROC_DMCDBG_REGS_INFO, 0644, proc_dmcdbg_dir,
-            &regsinfo_proc_fops);
+    proc_create(PROC_DMCDBG_REGS_INFO, 0x1a4, proc_dmcdbg_dir, &regsinfo_proc_fops);
 
     return 0;
 }
@@ -921,73 +825,67 @@ static void rv1126_get_skew_parameter(void)
 
     /* get skew parameters */
     p_skew = (struct skew_info_rv1126 *)dmcdbg_data.share_memory;
-    dmcdbg_data.skew_group_num = 5;
+    dmcdbg_data.skew_group_num = 0x5;
 
     /* ca_skew parameters */
     dmcdbg_data.skew_group[0].p_skew_info = (unsigned int *)p_skew->ca_skew;
     dmcdbg_data.skew_group[0].skew_num = ARRAY_SIZE(rv1126_dts_ca_timing);
-    for (i = 0; i < dmcdbg_data.skew_group[0].skew_num; i++)
-        dmcdbg_data.skew_group[0].p_skew_timing[i] =
-            (char *)rv1126_dts_ca_timing[i];
-    dmcdbg_data.skew_group[0].note =
-        "(ca_skew: ddr4(pad_name)_ddr3_lpddr3_lpddr4_de-skew)";
+    for (i = 0; i < dmcdbg_data.skew_group[0].skew_num; i++) {
+        dmcdbg_data.skew_group[0].p_skew_timing[i] = (char *)rv1126_dts_ca_timing[i];
+    }
+    dmcdbg_data.skew_group[0].note = "(ca_skew: ddr4(pad_name)_ddr3_lpddr3_lpddr4_de-skew)";
 
     /* cs0_a_skew parameters */
     dmcdbg_data.skew_group[1].p_skew_info = (unsigned int *)p_skew->cs0_a_skew;
     dmcdbg_data.skew_group[1].skew_num = ARRAY_SIZE(rv1126_dts_cs0_a_timing);
-    for (i = 0; i < dmcdbg_data.skew_group[1].skew_num; i++)
-        dmcdbg_data.skew_group[1].p_skew_timing[i] =
-            (char *)rv1126_dts_cs0_a_timing[i];
+    for (i = 0; i < dmcdbg_data.skew_group[1].skew_num; i++) {
+        dmcdbg_data.skew_group[1].p_skew_timing[i] = (char *)rv1126_dts_cs0_a_timing[i];
+    }
     dmcdbg_data.skew_group[1].note = "(cs0_a_skew)";
 
     /* cs0_b_skew parameters */
-    dmcdbg_data.skew_group[2].p_skew_info = (unsigned int *)p_skew->cs0_b_skew;
-    dmcdbg_data.skew_group[2].skew_num = ARRAY_SIZE(rv1126_dts_cs0_b_timing);
-    for (i = 0; i < dmcdbg_data.skew_group[2].skew_num; i++)
-        dmcdbg_data.skew_group[2].p_skew_timing[i] =
-            (char *)rv1126_dts_cs0_b_timing[i];
-    dmcdbg_data.skew_group[2].note = "(cs0_b_skew)";
+    dmcdbg_data.skew_group[0x2].p_skew_info = (unsigned int *)p_skew->cs0_b_skew;
+    dmcdbg_data.skew_group[0x2].skew_num = ARRAY_SIZE(rv1126_dts_cs0_b_timing);
+    for (i = 0; i < dmcdbg_data.skew_group[0x2].skew_num; i++) {
+        dmcdbg_data.skew_group[0x2].p_skew_timing[i] = (char *)rv1126_dts_cs0_b_timing[i];
+    }
+    dmcdbg_data.skew_group[0x2].note = "(cs0_b_skew)";
 
     /* cs1_a_skew parameters */
-    dmcdbg_data.skew_group[3].p_skew_info = (unsigned int *)p_skew->cs1_a_skew;
-    dmcdbg_data.skew_group[3].skew_num = ARRAY_SIZE(rv1126_dts_cs1_a_timing);
-    for (i = 0; i < dmcdbg_data.skew_group[3].skew_num; i++)
-        dmcdbg_data.skew_group[3].p_skew_timing[i] =
-            (char *)rv1126_dts_cs1_a_timing[i];
-    dmcdbg_data.skew_group[3].note = "(cs1_a_skew)";
+    dmcdbg_data.skew_group[0x3].p_skew_info = (unsigned int *)p_skew->cs1_a_skew;
+    dmcdbg_data.skew_group[0x3].skew_num = ARRAY_SIZE(rv1126_dts_cs1_a_timing);
+    for (i = 0; i < dmcdbg_data.skew_group[0x3].skew_num; i++) {
+        dmcdbg_data.skew_group[0x3].p_skew_timing[i] = (char *)rv1126_dts_cs1_a_timing[i];
+    }
+    dmcdbg_data.skew_group[0x3].note = "(cs1_a_skew)";
 
     /* cs1_b_skew parameters */
-    dmcdbg_data.skew_group[4].p_skew_info = (unsigned int *)p_skew->cs1_b_skew;
-    dmcdbg_data.skew_group[4].skew_num = ARRAY_SIZE(rv1126_dts_cs1_b_timing);
-    for (i = 0; i < dmcdbg_data.skew_group[3].skew_num; i++)
-        dmcdbg_data.skew_group[4].p_skew_timing[i] =
-            (char *)rv1126_dts_cs1_b_timing[i];
-    dmcdbg_data.skew_group[4].note = "(cs1_b_skew)";
+    dmcdbg_data.skew_group[0x4].p_skew_info = (unsigned int *)p_skew->cs1_b_skew;
+    dmcdbg_data.skew_group[0x4].skew_num = ARRAY_SIZE(rv1126_dts_cs1_b_timing);
+    for (i = 0; i < dmcdbg_data.skew_group[0x3].skew_num; i++) {
+        dmcdbg_data.skew_group[0x4].p_skew_timing[i] = (char *)rv1126_dts_cs1_b_timing[i];
+    }
+    dmcdbg_data.skew_group[0x4].note = "(cs1_b_skew)";
 }
 
-static __maybe_unused int rv1126_dmcdbg_init(struct platform_device *pdev,
-                         struct rockchip_dmcdbg *dmcdbg)
+static __maybe_unused int rv1126_dmcdbg_init(struct platform_device *pdev, struct rockchip_dmcdbg *dmcdbg)
 {
     struct arm_smccc_res res;
 
     /* check ddr_debug_func version */
-    res = sip_smc_dram(0, DDRDBG_FUNCGET_VERSION,
-               ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
-    dev_notice(&pdev->dev, "current ATF ddr_debug_func version 0x%lx.\n",
-           res.a1);
+    res = sip_smc_dram(0, DDRDBG_FUNCGET_VERSION, ROCKCHIP_SIP_CONFIG_DRAM_DEBUG);
+    dev_notice(&pdev->dev, "current ATF ddr_debug_func version 0x%lx.\n", res.a1);
     /*
      * [15:8] major version, [7:0] minor version
      * major version must match both kernel dmcdbg and ATF ddr_debug_func.
      */
     if (res.a0 || res.a1 < 0x101 || ((res.a1 & 0xff00) != 0x100)) {
-        dev_err(&pdev->dev,
-            "version invalid,need update,the major version unmatch!\n");
+        dev_err(&pdev->dev, "version invalid,need update,the major version unmatch!\n");
         return -ENXIO;
     }
 
     /* request share memory for pass parameter */
-    res = sip_smc_request_share_mem(DMCDBG_PAGE_NUMS,
-                    SHARE_PAGE_TYPE_DDRDBG);
+    res = sip_smc_request_share_mem(DMCDBG_PAGE_NUMS, SHARE_PAGE_TYPE_DDRDBG);
     if (res.a0 != 0) {
         dev_err(&pdev->dev, "request share mem error\n");
         return -ENOMEM;
@@ -1014,8 +912,8 @@ static __maybe_unused int rv1126_dmcdbg_init(struct platform_device *pdev,
 }
 
 static const struct of_device_id rockchip_dmcdbg_of_match[] = {
-    { .compatible = "rockchip,rv1126-dmcdbg", .data = rv1126_dmcdbg_init},
-    { },
+    {.compatible = "rockchip,rv1126-dmcdbg", .data = rv1126_dmcdbg_init},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_dmcdbg_of_match);
 
@@ -1024,13 +922,13 @@ static int rockchip_dmcdbg_probe(struct platform_device *pdev)
     struct device *dev = &pdev->dev;
     struct rockchip_dmcdbg *data;
     const struct of_device_id *match;
-    int (*init)(struct platform_device *pdev,
-            struct rockchip_dmcdbg *data);
+    int (*init)(struct platform_device * pdev, struct rockchip_dmcdbg * data);
     int ret = 0;
 
     data = devm_kzalloc(dev, sizeof(struct rockchip_dmcdbg), GFP_KERNEL);
-    if (!data)
+    if (!data) {
         return -ENOMEM;
+    }
 
     data->dev = dev;
 
@@ -1039,8 +937,9 @@ static int rockchip_dmcdbg_probe(struct platform_device *pdev)
     if (match) {
         init = match->data;
         if (init) {
-            if (init(pdev, data))
+            if (init(pdev, data)) {
                 return -EINVAL;
+            }
         }
     }
 
@@ -1048,11 +947,12 @@ static int rockchip_dmcdbg_probe(struct platform_device *pdev)
 }
 
 static struct platform_driver rockchip_dmcdbg_driver = {
-    .probe    = rockchip_dmcdbg_probe,
-    .driver = {
-        .name    = "rockchip,dmcdbg",
-        .of_match_table = rockchip_dmcdbg_of_match,
-    },
+    .probe = rockchip_dmcdbg_probe,
+    .driver =
+        {
+            .name = "rockchip,dmcdbg",
+            .of_match_table = rockchip_dmcdbg_of_match,
+        },
 };
 module_platform_driver(rockchip_dmcdbg_driver);
 

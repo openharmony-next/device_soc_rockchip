@@ -41,16 +41,16 @@
 #include "capture_v3x.h"
 #include "isp_ispp.h"
 
-#define SP_VDEV_NAME DRIVER_NAME    "_selfpath"
-#define MP_VDEV_NAME DRIVER_NAME    "_mainpath"
-#define FBC_VDEV_NAME DRIVER_NAME    "_fbcpath"
-#define BP_VDEV_NAME DRIVER_NAME    "_fullpath"
-#define VIR_VDEV_NAME DRIVER_NAME    "_iqtool"
+#define SP_VDEV_NAME DRIVER_NAME "_selfpath"
+#define MP_VDEV_NAME DRIVER_NAME "_mainpath"
+#define FBC_VDEV_NAME DRIVER_NAME "_fbcpath"
+#define BP_VDEV_NAME DRIVER_NAME "_fullpath"
+#define VIR_VDEV_NAME DRIVER_NAME "_iqtool"
 
-#define DMATX0_VDEV_NAME DRIVER_NAME    "_rawwr0"
-#define DMATX1_VDEV_NAME DRIVER_NAME    "_rawwr1"
-#define DMATX2_VDEV_NAME DRIVER_NAME    "_rawwr2"
-#define DMATX3_VDEV_NAME DRIVER_NAME    "_rawwr3"
+#define DMATX0_VDEV_NAME DRIVER_NAME "_rawwr0"
+#define DMATX1_VDEV_NAME DRIVER_NAME "_rawwr1"
+#define DMATX2_VDEV_NAME DRIVER_NAME "_rawwr2"
+#define DMATX3_VDEV_NAME DRIVER_NAME "_rawwr3"
 
 struct rkisp_stream;
 
@@ -99,11 +99,7 @@ struct capture_fmt {
     u8 bpp[VIDEO_MAX_PLANES];
 };
 
-enum rkisp_sp_inp {
-    RKISP_SP_INP_ISP,
-    RKISP_SP_INP_DMA_SP,
-    RKISP_SP_INP_MAX
-};
+enum rkisp_sp_inp { RKISP_SP_INP_ISP, RKISP_SP_INP_DMA_SP, RKISP_SP_INP_MAX };
 
 enum rkisp_field {
     RKISP_FIELD_ODD,
@@ -229,7 +225,7 @@ struct streams_ops {
  */
 struct rkisp_stream {
     unsigned int id;
-    unsigned interlaced:1;
+    unsigned interlaced : 1;
     struct rkisp_device *ispdev;
     struct rkisp_vdev_node vnode;
     struct capture_fmt out_isp_fmt;
@@ -286,8 +282,7 @@ int rkisp_register_stream_vdev(struct rkisp_stream *stream);
 void rkisp_unregister_stream_vdevs(struct rkisp_device *dev);
 int rkisp_register_stream_vdevs(struct rkisp_device *dev);
 void rkisp_mi_isr(u32 mis_val, struct rkisp_device *dev);
-void rkisp_set_stream_def_fmt(struct rkisp_device *dev, u32 id,
-                  u32 width, u32 height, u32 pixelformat);
+void rkisp_set_stream_def_fmt(struct rkisp_device *dev, u32 id, u32 width, u32 height, u32 pixelformat);
 int rkisp_fcc_xysubs(u32 fcc, u32 *xsubs, u32 *ysubs);
 int rkisp_mbus_code_xysubs(u32 code, u32 *xsubs, u32 *ysubs);
 int rkisp_fh_open(struct file *filp);

@@ -22,33 +22,37 @@
 #include "display_device.h"
 #include "hdi_device_common.h"
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class DrmVsyncWorker {
-public:
-    DrmVsyncWorker();
-    virtual ~DrmVsyncWorker();
-    int32_t Init(int fd);
-    static DrmVsyncWorker &GetInstance();
+namespace OHOS
+{
+    namespace HDI
+    {
+        namespace DISPLAY
+        {
+            class DrmVsyncWorker
+            {
+            public:
+                DrmVsyncWorker();
+                virtual ~DrmVsyncWorker();
+                int32_t Init(int fd);
+                static DrmVsyncWorker &GetInstance();
 
-    void EnableVsync(bool enable);
-    void WorkThread();
-    uint64_t WaitNextVBlank(unsigned int &sq);
-    bool WaitSignalAndCheckRuning();
-    void ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb);
+                void EnableVsync(bool enable);
+                void WorkThread();
+                uint64_t WaitNextVBlank(unsigned int &sq);
+                bool WaitSignalAndCheckRuning();
+                void ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb);
 
-private:
-    int mDrmFd = 0;
-    std::unique_ptr<std::thread> mThread;
-    bool mEnable = false;
-    std::mutex mMutex;
-    std::condition_variable mCondition;
-    std::shared_ptr<VsyncCallBack> mCallBack;
-    bool mRunning = false;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                int mDrmFd = 0;
+                std::unique_ptr<std::thread> mThread;
+                bool mEnable = false;
+                std::mutex mMutex;
+                std::condition_variable mCondition;
+                std::shared_ptr<VsyncCallBack> mCallBack;
+                bool mRunning = false;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // DRM_VSYNC_WORKER_H

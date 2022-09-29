@@ -13,12 +13,9 @@
  *
  */
 
+#ifndef BASE_VENDOR_SPEC_FUNC_H_
+#define BASE_VENDOR_SPEC_FUNC_H_
 
+int kbase_get_vendor_specific_cpu_clock_speed(u32 *const);
 
-
-#ifndef _BASE_VENDOR_SPEC_FUNC_H_
-#define _BASE_VENDOR_SPEC_FUNC_H_
-
-int kbase_get_vendor_specific_cpu_clock_speed(u32 * const);
-
-#endif    /*_BASE_VENDOR_SPEC_FUNC_H_*/
+#endif /*_BASE_VENDOR_SPEC_FUNC_H_*/

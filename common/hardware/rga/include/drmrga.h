@@ -20,31 +20,31 @@
 #define _rk_drm_rga_
 
 /* flip source image horizontally (around the vertical axis) */
-#define HAL_TRANSFORM_FLIP_H     0x01
+#define HAL_TRANSFORM_FLIP_H 0x01
 /* flip source image vertically (around the horizontal axis) */
-#define HAL_TRANSFORM_FLIP_V     0x02
+#define HAL_TRANSFORM_FLIP_V 0x02
 /* rotate source image 90 degrees clockwise */
-#define HAL_TRANSFORM_ROT_90     0x04
+#define HAL_TRANSFORM_ROT_90 0x04
 /* rotate source image 180 degrees */
-#define HAL_TRANSFORM_ROT_180    0x03
+#define HAL_TRANSFORM_ROT_180 0x03
 /* rotate source image 270 degrees clockwise */
-#define HAL_TRANSFORM_ROT_270    0x07
+#define HAL_TRANSFORM_ROT_270 0x07
 
-#define HAL_TRANSFORM_FLIP_H_V   0x08
+#define HAL_TRANSFORM_FLIP_H_V 0x08
 
 /*****************************************************************************/
 
 /* for compatibility */
 
-#define DRM_RGA_TRANSFORM_ROT_MASK      0x0000000F
-#define DRM_RGA_TRANSFORM_ROT_0         0x00000000
-#define DRM_RGA_TRANSFORM_ROT_90        HAL_TRANSFORM_ROT_90
-#define DRM_RGA_TRANSFORM_ROT_180       HAL_TRANSFORM_ROT_180
-#define DRM_RGA_TRANSFORM_ROT_270       HAL_TRANSFORM_ROT_270
+#define DRM_RGA_TRANSFORM_ROT_MASK 0x0000000F
+#define DRM_RGA_TRANSFORM_ROT_0 0x00000000
+#define DRM_RGA_TRANSFORM_ROT_90 HAL_TRANSFORM_ROT_90
+#define DRM_RGA_TRANSFORM_ROT_180 HAL_TRANSFORM_ROT_180
+#define DRM_RGA_TRANSFORM_ROT_270 HAL_TRANSFORM_ROT_270
 
-#define DRM_RGA_TRANSFORM_FLIP_MASK     0x00000003
-#define DRM_RGA_TRANSFORM_FLIP_H        HAL_TRANSFORM_FLIP_H
-#define DRM_RGA_TRANSFORM_FLIP_V        HAL_TRANSFORM_FLIP_V
+#define DRM_RGA_TRANSFORM_FLIP_MASK 0x00000003
+#define DRM_RGA_TRANSFORM_FLIP_H HAL_TRANSFORM_FLIP_H
+#define DRM_RGA_TRANSFORM_FLIP_V HAL_TRANSFORM_FLIP_V
 
 enum {
     AWIDTH = 0,
@@ -59,14 +59,13 @@ enum {
 /* memory type definitions. */
 enum drm_rockchip_gem_mem_type {
     /* Physically Continuous memory and used as default. */
-    ROCKCHIP_BO_CONTIG  = 1 << 0,
+    ROCKCHIP_BO_CONTIG = 1 << 0,
     /* cachable mapping. */
-    ROCKCHIP_BO_CACHABLE    = 1 << 1,
+    ROCKCHIP_BO_CACHABLE = 1 << 1,
     /* write-combine mapping. */
-    ROCKCHIP_BO_WC      = 1 << 2,
-    ROCKCHIP_BO_SECURE  = 1 << 3,
-    ROCKCHIP_BO_MASK    = ROCKCHIP_BO_CONTIG | ROCKCHIP_BO_CACHABLE |
-                ROCKCHIP_BO_WC | ROCKCHIP_BO_SECURE
+    ROCKCHIP_BO_WC = 1 << 2,
+    ROCKCHIP_BO_SECURE = 1 << 3,
+    ROCKCHIP_BO_MASK = ROCKCHIP_BO_CONTIG | ROCKCHIP_BO_CACHABLE | ROCKCHIP_BO_WC | ROCKCHIP_BO_SECURE
 };
 
 typedef struct bo {
@@ -142,7 +141,6 @@ typedef struct rga_info {
     int rop_code;
     int reserve[127];
 } rga_info_t;
-
 
 typedef struct drm_rga {
     rga_rect_t src;

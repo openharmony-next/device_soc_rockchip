@@ -18,10 +18,10 @@
 
 #include "mpp_device.h"
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

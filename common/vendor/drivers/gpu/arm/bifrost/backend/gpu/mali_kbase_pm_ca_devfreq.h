@@ -57,4 +57,3 @@ extern const struct kbase_pm_ca_policy kbase_pm_ca_devfreq_policy_ops;
 void kbase_devfreq_set_core_mask(struct kbase_device *kbdev, u64 core_mask);
 
 #endif /* MALI_KBASE_PM_CA_DEVFREQ_H */
-

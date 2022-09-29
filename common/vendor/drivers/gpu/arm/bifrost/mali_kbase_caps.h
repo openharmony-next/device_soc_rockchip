@@ -20,7 +20,6 @@
  *
  */
 
-
 /**
  * @file mali_kbase_caps.h
  *
@@ -62,4 +61,4 @@ static inline bool mali_kbase_supports_mem_protected(unsigned long api_version)
     return mali_kbase_supports_cap(api_version, MALI_KBASE_CAP_MEM_PROTECTED);
 }
 
-#endif    /* __KBASE_CAPS_H_ */
+#endif /* __KBASE_CAPS_H_ */

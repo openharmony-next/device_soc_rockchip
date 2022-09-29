@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /**
  * @file mali_kbase_profiling_gator_api.h
  * Model interface
@@ -37,4 +35,4 @@
 
 void mali_profiling_control(u32 action, u32 value);
 
-#endif                /* _KBASE_PROFILING_GATOR_API */
+#endif /* _KBASE_PROFILING_GATOR_API */

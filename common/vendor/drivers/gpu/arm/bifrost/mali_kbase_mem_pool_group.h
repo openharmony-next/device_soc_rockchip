@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_MEM_POOL_GROUP_H_
-#define _KBASE_MEM_POOL_GROUP_H_
+#ifndef KBASE_MEM_POOL_GROUP_H_
+#define KBASE_MEM_POOL_GROUP_H_
 
 #include <mali_kbase_defs.h>
 
@@ -37,8 +37,7 @@
  * @configs:  Initial configuration for the set of memory pools
  * @max_size: Maximum number of free 4 KiB pages each pool can hold
  */
-void kbase_mem_pool_group_config_set_max_size(
-    struct kbase_mem_pool_group_config *configs, size_t max_size);
+void kbase_mem_pool_group_config_set_max_size(struct kbase_mem_pool_group_config *configs, size_t max_size);
 
 /**
  * kbase_mem_pool_group_init - Initialize a set of memory pools
@@ -63,10 +62,9 @@ void kbase_mem_pool_group_config_set_max_size(
  *
  * Return: 0 on success, otherwise a negative error code
  */
-int kbase_mem_pool_group_init(struct kbase_mem_pool_group *mem_pools,
-    struct kbase_device *kbdev,
-    const struct kbase_mem_pool_group_config *configs,
-    struct kbase_mem_pool_group *next_pools);
+int kbase_mem_pool_group_init(struct kbase_mem_pool_group *const mem_pools, struct kbase_device *const kbdev,
+                              const struct kbase_mem_pool_group_config *const configs,
+                              struct kbase_mem_pool_group *next_pools);
 
 /**
  * kbase_mem_pool_group_term - Mark a set of memory pools as dying
@@ -77,7 +75,7 @@ int kbase_mem_pool_group_init(struct kbase_mem_pool_group *mem_pools,
  *
  * @mem_pools: Set of memory pools to mark
  */
-void kbase_mem_pool_group_mark_dying(struct kbase_mem_pool_group *mem_pools);
+void kbase_mem_pool_group_mark_dying(struct kbase_mem_pool_group *const mem_pools);
 
 /**
  * kbase_mem_pool_group_term - Terminate a set of memory pools
@@ -87,6 +85,6 @@ void kbase_mem_pool_group_mark_dying(struct kbase_mem_pool_group *mem_pools);
  *
  * @mem_pools: Set of memory pools to terminate
  */
-void kbase_mem_pool_group_term(struct kbase_mem_pool_group *mem_pools);
+void kbase_mem_pool_group_term(struct kbase_mem_pool_group *const mem_pools);
 
 #endif /* _KBASE_MEM_POOL_GROUP_H_ */

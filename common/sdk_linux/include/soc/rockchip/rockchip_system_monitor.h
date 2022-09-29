@@ -7,19 +7,19 @@
 #define __SOC_ROCKCHIP_SYSTEM_MONITOR_H
 
 enum monitor_dev_type {
-    MONITOR_TPYE_CPU = 0,    /* CPU */
-    MONITOR_TPYE_DEV,    /* GPU, NPU, DMC, and so on */
+    MONITOR_TPYE_CPU = 0, /* CPU */
+    MONITOR_TPYE_DEV,     /* GPU, NPU, DMC, and so on */
 };
 
 struct volt_adjust_table {
-    unsigned int min;    /* Minimum frequency in MHz */
-    unsigned int max;    /* Maximum frequency in MHz */
-    int volt;        /* Voltage in microvolt */
+    unsigned int min; /* Minimum frequency in MHz */
+    unsigned int max; /* Maximum frequency in MHz */
+    int volt;         /* Voltage in microvolt */
 };
 
 struct temp_freq_table {
-    int temp;        /* millicelsius */
-    unsigned int freq;    /* KHz */
+    int temp;          /* millicelsius */
+    unsigned int freq; /* KHz */
 };
 
 /**
@@ -123,74 +123,56 @@ struct monitor_dev_profile {
 };
 
 #if IS_ENABLED(CONFIG_ROCKCHIP_SYSTEM_MONITOR)
-struct monitor_dev_info *
-rockchip_system_monitor_register(struct device *dev,
-                 struct monitor_dev_profile *devp);
+struct monitor_dev_info *rockchip_system_monitor_register(struct device *dev, struct monitor_dev_profile *devp);
 void rockchip_system_monitor_unregister(struct monitor_dev_info *info);
-int rockchip_monitor_cpu_low_temp_adjust(struct monitor_dev_info *info,
-                     bool is_low);
-int rockchip_monitor_cpu_high_temp_adjust(struct monitor_dev_info *info,
-                      bool is_high);
+int rockchip_monitor_cpu_low_temp_adjust(struct monitor_dev_info *info, bool is_low);
+int rockchip_monitor_cpu_high_temp_adjust(struct monitor_dev_info *info, bool is_high);
 void rockchip_monitor_volt_adjust_lock(struct monitor_dev_info *info);
 void rockchip_monitor_volt_adjust_unlock(struct monitor_dev_info *info);
-int rockchip_monitor_check_rate_volt(struct monitor_dev_info *info,
-                     bool is_set_clk);
-int rockchip_monitor_dev_low_temp_adjust(struct monitor_dev_info *info,
-                     bool is_low);
-int rockchip_monitor_dev_high_temp_adjust(struct monitor_dev_info *info,
-                      bool is_high);
+int rockchip_monitor_check_rate_volt(struct monitor_dev_info *info, bool is_set_clk);
+int rockchip_monitor_dev_low_temp_adjust(struct monitor_dev_info *info, bool is_low);
+int rockchip_monitor_dev_high_temp_adjust(struct monitor_dev_info *info, bool is_high);
 int rockchip_monitor_suspend_low_temp_adjust(int cpu);
 #else
-static inline struct monitor_dev_info *
-rockchip_system_monitor_register(struct device *dev,
-                 struct monitor_dev_profile *devp)
+static inline struct monitor_dev_info *rockchip_system_monitor_register(struct device *dev,
+                                                                        struct monitor_dev_profile *devp)
 {
     return ERR_PTR(-ENOTSUPP);
 };
 
-static inline void
-rockchip_system_monitor_unregister(struct monitor_dev_info *info)
+static inline void rockchip_system_monitor_unregister(struct monitor_dev_info *info)
 {
 }
 
-static inline int
-rockchip_monitor_cpu_low_temp_adjust(struct monitor_dev_info *info, bool is_low)
+static inline int rockchip_monitor_cpu_low_temp_adjust(struct monitor_dev_info *info, bool is_low)
 {
     return 0;
 };
 
-static inline int
-rockchip_monitor_cpu_high_temp_adjust(struct monitor_dev_info *info,
-                      bool is_high)
+static inline int rockchip_monitor_cpu_high_temp_adjust(struct monitor_dev_info *info, bool is_high)
 {
     return 0;
 };
 
-static inline void
-rockchip_monitor_volt_adjust_lock(struct monitor_dev_info *info)
+static inline void rockchip_monitor_volt_adjust_lock(struct monitor_dev_info *info)
 {
 }
 
-static inline void
-rockchip_monitor_volt_adjust_unlock(struct monitor_dev_info *info)
+static inline void rockchip_monitor_volt_adjust_unlock(struct monitor_dev_info *info)
 {
 }
 
-static inline int
-rockchip_monitor_check_rate_volt(struct monitor_dev_info *info, bool is_set_clk)
+static inline int rockchip_monitor_check_rate_volt(struct monitor_dev_info *info, bool is_set_clk)
 {
     return 0;
 }
 
-static inline int
-rockchip_monitor_dev_low_temp_adjust(struct monitor_dev_info *info, bool is_low)
+static inline int rockchip_monitor_dev_low_temp_adjust(struct monitor_dev_info *info, bool is_low)
 {
     return 0;
 };
 
-static inline int
-rockchip_monitor_dev_high_temp_adjust(struct monitor_dev_info *info,
-                      bool is_high)
+static inline int rockchip_monitor_dev_high_temp_adjust(struct monitor_dev_info *info, bool is_high)
 {
     return 0;
 };

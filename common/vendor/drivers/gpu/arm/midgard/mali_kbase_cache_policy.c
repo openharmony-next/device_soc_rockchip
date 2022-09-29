@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /*
  * Cache Policy API.
  */
@@ -33,32 +29,32 @@ u32 kbase_cache_enabled(u32 flags, u32 nr_pages)
 
     CSTD_UNUSED(nr_pages);
 
-    if (flags & BASE_MEM_CACHED_CPU)
+    if (flags & BASE_MEM_CACHED_CPU) {
         cache_flags |= KBASE_REG_CPU_CACHED;
+    }
 
     return cache_flags;
 }
 
-
-void kbase_sync_single_for_device(struct kbase_device *kbdev, dma_addr_t handle,
-        size_t size, enum dma_data_direction dir)
+void kbase_sync_single_for_device(struct kbase_device *kbdev, dma_addr_t handle, size_t size,
+                                  enum dma_data_direction dir)
 {
 /* Check if kernel is using coherency with GPU */
 #ifdef CONFIG_MALI_COH_KERN
-    if (kbdev->system_coherency == COHERENCY_ACE)
+    if (kbdev->system_coherency == COHERENCY_ACE) {
         return;
+    }
 #endif /* CONFIG_MALI_COH_KERN */
     dma_sync_single_for_device(kbdev->dev, handle, size, dir);
 }
 
-
-void kbase_sync_single_for_cpu(struct kbase_device *kbdev, dma_addr_t handle,
-        size_t size, enum dma_data_direction dir)
+void kbase_sync_single_for_cpu(struct kbase_device *kbdev, dma_addr_t handle, size_t size, enum dma_data_direction dir)
 {
 /* Check if kernel is using coherency with GPU */
 #ifdef CONFIG_MALI_COH_KERN
-    if (kbdev->system_coherency == COHERENCY_ACE)
+    if (kbdev->system_coherency == COHERENCY_ACE) {
         return;
+    }
 #endif /* CONFIG_MALI_COH_KERN */
     dma_sync_single_for_cpu(kbdev->dev, handle, size, dir);
 }

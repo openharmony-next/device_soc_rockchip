@@ -15,12 +15,11 @@
 #define HDR_DMA1 1
 #define HDR_DMA2 2
 
-#define IS_HDR_RDBK(x) ({ \
-    typeof(x) __x = (x); \
-    (__x == HDR_RDBK_FRAME1 || \
-     __x == HDR_RDBK_FRAME2 || \
-     __x == HDR_RDBK_FRAME3); \
-})
+#define IS_HDR_RDBK(x)                                                                                                 \
+    ({                                                                                                                 \
+        typeof(x) __x = (x);                                                                                           \
+        (__x == HDR_RDBK_FRAME1 || __x == HDR_RDBK_FRAME2 || __x == HDR_RDBK_FRAME3);                                  \
+    })
 
 enum {
     T_CMD_QUEUE,
@@ -41,15 +40,7 @@ enum hdr_op_mode {
     HDR_LINEX3_DDR = 13,
 };
 
-enum rkisp_csi_pad {
-    CSI_SINK = 0,
-    CSI_SRC_CH0,
-    CSI_SRC_CH1,
-    CSI_SRC_CH2,
-    CSI_SRC_CH3,
-    CSI_SRC_CH4,
-    CSI_PAD_MAX
-};
+enum rkisp_csi_pad { CSI_SINK = 0, CSI_SRC_CH0, CSI_SRC_CH1, CSI_SRC_CH2, CSI_SRC_CH3, CSI_SRC_CH4, CSI_PAD_MAX };
 
 struct sink_info {
     u8 index;
@@ -74,8 +65,7 @@ struct rkisp_csi_device {
     u8 tx_first[HDR_DMA_MAX];
 };
 
-int rkisp_register_csi_subdev(struct rkisp_device *dev,
-                  struct v4l2_device *v4l2_dev);
+int rkisp_register_csi_subdev(struct rkisp_device *dev, struct v4l2_device *v4l2_dev);
 void rkisp_unregister_csi_subdev(struct rkisp_device *dev);
 
 int rkisp_csi_config_patch(struct rkisp_device *dev);

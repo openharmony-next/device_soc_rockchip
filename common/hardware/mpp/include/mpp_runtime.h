@@ -26,7 +26,7 @@ extern "C" {
  * Runtime function detection is to support different binary on different
  * runtime environment. This is usefull on product environemnt.
  */
-RK_U32 mpp_rt_allcator_is_valid(MppBufferType type);
+unsigned int mpp_rt_allcator_is_valid(MppBufferType type);
 
 #ifdef __cplusplus
 }

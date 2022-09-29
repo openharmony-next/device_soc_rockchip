@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #ifndef KBASE_FENCE_DEFS_H
 #define KBASE_FENCE_DEFS_H
 

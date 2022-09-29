@@ -16,7 +16,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 #ifndef __RFKILL_GPIO_H
 #define __RFKILL_GPIO_H
 
@@ -24,26 +23,20 @@
 #include <linux/rfkill.h>
 #include <linux/clk.h>
 
-#define RFKILL_RK_GPIO_NAME_SIZE   64
-
-//struct rfkill_rk_iomux {
-//    char    *name;
-//    int     fgpio;
-//    int     fmux;
-//};
+#define RFKILL_RK_GPIO_NAME_SIZE 64
 
 struct rfkill_rk_gpio {
-    int     io;
-    char    name[RFKILL_RK_GPIO_NAME_SIZE];
-    int     enable; // disable = !enable
-    struct  pinctrl_state    *gpio_state;
-    struct  pinctrl_state    *default_state;
+    int io;
+    char name[RFKILL_RK_GPIO_NAME_SIZE];
+    int enable; // disable = !enable
+    struct pinctrl_state *gpio_state;
+    struct pinctrl_state *default_state;
 };
 
 struct rfkill_rk_irq {
-    char                    name[RFKILL_RK_GPIO_NAME_SIZE];
-    struct rfkill_rk_gpio   gpio;
-    int                     irq;
+    char name[RFKILL_RK_GPIO_NAME_SIZE];
+    struct rfkill_rk_gpio gpio;
+    int irq;
 };
 
 /**
@@ -55,19 +48,18 @@ struct rfkill_rk_irq {
  */
 
 struct rfkill_rk_platform_data {
-    char                    *name;
-    enum rfkill_type        type;
-    bool                    power_toggle;
-    struct pinctrl          *pinctrl;
-    struct rfkill_rk_gpio   poweron_gpio;
-    struct rfkill_rk_gpio   reset_gpio;
-    struct rfkill_rk_gpio   wake_gpio;      // Host wake or sleep BT
-    struct rfkill_rk_irq    wake_host_irq;  // BT wakeup host
-    struct rfkill_rk_gpio   rts_gpio;
-    struct clk              *ext_clk;
+    char *name;
+    enum rfkill_type type;
+    bool power_toggle;
+    struct pinctrl *pinctrl;
+    struct rfkill_rk_gpio poweron_gpio;
+    struct rfkill_rk_gpio reset_gpio;
+    struct rfkill_rk_gpio wake_gpio;    // Host wake or sleep BT
+    struct rfkill_rk_irq wake_host_irq; // BT wakeup host
+    struct rfkill_rk_gpio rts_gpio;
+    struct clk *ext_clk;
 };
 
 int rfkill_get_bt_power_state(int *power, bool *toggle);
 
 #endif /* __RFKILL_GPIO_H */
-

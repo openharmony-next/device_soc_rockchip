@@ -13,7 +13,7 @@
  */
 /* Rock-chips rfkill driver for bluetooth
  *
-*/
+ */
 
 #include <linux/kernel.h>
 #include <linux/platform_device.h>
@@ -121,15 +121,13 @@ static irqreturn_t rfkill_rk_wake_host_irq(int irq, void *dev)
 
     DBG("BT IRQ wakeup, request %dms wakelock\n", BT_IRQ_WAKELOCK_TIMEOUT);
 
-    wake_lock_timeout(&rfkill->bt_irq_wl,
-              msecs_to_jiffies(BT_IRQ_WAKELOCK_TIMEOUT));
+    wake_lock_timeout(&rfkill->bt_irq_wl, msecs_to_jiffies(BT_IRQ_WAKELOCK_TIMEOUT));
 
     return IRQ_HANDLED;
 }
 
-static int rfkill_rk_setup_gpio(struct platform_device *pdev,
-                struct rfkill_rk_gpio *gpio, const char *prefix,
-                const char *name)
+static int rfkill_rk_setup_gpio(struct platform_device *pdev, struct rfkill_rk_gpio *gpio, const char *prefix,
+                                const char *name)
 {
     if (gpio_is_valid(gpio->io)) {
         int ret = 0;
@@ -152,10 +150,10 @@ static int rfkill_rk_setup_wake_irq(struct rfkill_rk_data *rfkill, int flag)
 
     if (!flag) {
         rfkill->irq_req = 0;
-        ret = rfkill_rk_setup_gpio(rfkill->pdev, &irq->gpio,
-                       rfkill->pdata->name, "wake_host");
-        if (ret)
+        ret = rfkill_rk_setup_gpio(rfkill->pdev, &irq->gpio, rfkill->pdata->name, "wake_host");
+        if (ret) {
             goto fail1;
+        }
     }
     if (gpio_is_valid(irq->gpio.io)) {
         if (rfkill->irq_req) {
@@ -166,18 +164,18 @@ static int rfkill_rk_setup_wake_irq(struct rfkill_rk_data *rfkill, int flag)
         irq->irq = gpio_to_irq(irq->gpio.io);
         sprintf(irq->name, "%s_irq", irq->gpio.name);
         ret = request_irq(irq->irq, rfkill_rk_wake_host_irq,
-                  (irq->gpio.enable == GPIO_ACTIVE_LOW) ?
-                      IRQF_TRIGGER_FALLING :
-                      IRQF_TRIGGER_RISING,
-                  irq->name, rfkill);
-        if (ret)
+                          (irq->gpio.enable == GPIO_ACTIVE_LOW) ? IRQF_TRIGGER_FALLING : IRQF_TRIGGER_RISING, irq->name,
+                          rfkill);
+        if (ret) {
             goto fail2;
+        }
         rfkill->irq_req = 1;
         LOG("** disable irq\n");
         disable_irq(irq->irq);
         ret = enable_irq_wake(irq->irq);
-        if (ret)
+        if (ret) {
             goto fail3;
+        }
     }
 
     return ret;
@@ -190,8 +188,7 @@ fail1:
     return ret;
 }
 
-static inline void rfkill_rk_sleep_bt_internal(struct rfkill_rk_data *rfkill,
-                           bool sleep)
+static inline void rfkill_rk_sleep_bt_internal(struct rfkill_rk_data *rfkill, bool sleep)
 {
     struct rfkill_rk_gpio *wake = &rfkill->pdata->wake_gpio;
 
@@ -201,8 +198,7 @@ static inline void rfkill_rk_sleep_bt_internal(struct rfkill_rk_data *rfkill,
 #else
     if (!sleep) {
         DBG("HOST_UART0_TX pull down 10us\n");
-        if (rfkill_rk_setup_gpio(rfkill->pdev, wake,
-                     rfkill->pdata->name, "wake") != 0) {
+        if (rfkill_rk_setup_gpio(rfkill->pdev, wake, rfkill->pdata->name, "wake") != 0) {
             return;
         }
 
@@ -221,8 +217,7 @@ static void rfkill_rk_delay_sleep_bt(struct work_struct *work)
 
     DBG("Enter %s\n", __func__);
 
-    rfkill = container_of(work, struct rfkill_rk_data,
-                  bt_sleep_delay_work.work);
+    rfkill = container_of(work, struct rfkill_rk_data, bt_sleep_delay_work.work);
 
     rfkill_rk_sleep_bt_internal(rfkill, BT_SLEEP);
 }
@@ -252,8 +247,7 @@ void rfkill_rk_sleep_bt(bool sleep)
 
 #ifdef CONFIG_BT_AUTOSLEEP
     if (sleep == BT_WAKEUP) {
-        schedule_delayed_work(&rfkill->bt_sleep_delay_work,
-                      msecs_to_jiffies(BT_WAKEUP_TIMEOUT));
+        schedule_delayed_work(&rfkill->bt_sleep_delay_work, msecs_to_jiffies(BT_WAKEUP_TIMEOUT));
     }
 #endif
 }
@@ -265,8 +259,7 @@ int rfkill_get_bt_power_state(int *power, bool *toggle)
     struct rfkill_rk_data *mrfkill = g_rfkill;
 
     if (!mrfkill) {
-        LOG("%s: rfkill-bt driver has not Successful initialized\n",
-            __func__);
+        LOG("%s: rfkill-bt driver has not Successful initialized\n", __func__);
         return -1;
     }
 
@@ -318,21 +311,19 @@ static int rfkill_rk_set_power(void *data, bool blocked)
 
         if (gpio_is_valid(poweron->io)) {
             if (gpio_get_value(poweron->io) == !poweron->enable) {
-                gpio_direction_output(poweron->io,
-                              !poweron->enable);
+                gpio_direction_output(poweron->io, !poweron->enable);
                 msleep(20);
-                gpio_direction_output(poweron->io,
-                              poweron->enable);
+                gpio_direction_output(poweron->io, poweron->enable);
                 msleep(20);
-                if (gpio_is_valid(wake_host->io))
+                if (gpio_is_valid(wake_host->io)) {
                     gpio_direction_input(wake_host->io);
+                }
             }
         }
 
         if (gpio_is_valid(reset->io)) {
             if (gpio_get_value(reset->io) == !reset->enable) {
-                gpio_direction_output(reset->io,
-                              !reset->enable);
+                gpio_direction_output(reset->io, !reset->enable);
                 msleep(20);
                 gpio_direction_output(reset->io, reset->enable);
             }
@@ -354,8 +345,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
     } else {
         if (gpio_is_valid(poweron->io)) {
             if (gpio_get_value(poweron->io) == poweron->enable) {
-                gpio_direction_output(poweron->io,
-                              !poweron->enable);
+                gpio_direction_output(poweron->io, !poweron->enable);
                 msleep(20);
             }
         }
@@ -364,8 +354,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
         LOG("bt shut off power\n");
         if (gpio_is_valid(reset->io)) {
             if (gpio_get_value(reset->io) == reset->enable) {
-                gpio_direction_output(reset->io,
-                              !reset->enable);
+                gpio_direction_output(reset->io, !reset->enable);
                 msleep(20);
             }
         }
@@ -391,13 +380,14 @@ static int rfkill_rk_pm_prepare(struct device *dev)
 
     DBG("Enter %s\n", __func__);
 
-    if (!rfkill)
+    if (!rfkill) {
         return 0;
+    }
 
     rts = &rfkill->pdata->rts_gpio;
     wake_host_irq = &rfkill->pdata->wake_host_irq;
 
-    //To prevent uart to receive bt data when suspended
+    // To prevent uart to receive bt data when suspended
     if (pinctrl && gpio_is_valid(rts->io)) {
         DBG("Disable UART_RTS\n");
         pinctrl_select_state(pinctrl, rts->gpio_state);
@@ -431,8 +421,9 @@ static void rfkill_rk_pm_complete(struct device *dev)
 
     DBG("Enter %s\n", __func__);
 
-    if (!rfkill)
+    if (!rfkill) {
         return;
+    }
 
     wake_host_irq = &rfkill->pdata->wake_host_irq;
     rts = &rfkill->pdata->rts_gpio;
@@ -457,58 +448,54 @@ static const struct rfkill_ops rfkill_rk_ops = {
 
 static struct proc_dir_entry *bluetooth_dir, *sleep_dir;
 
-static ssize_t bluesleep_read_proc_lpm(struct file *file, char __user *buffer,
-                       size_t count, loff_t *data)
+static ssize_t bluesleep_read_proc_lpm(struct file *file, char __user *buffer, size_t count, loff_t *data)
 {
     return sprintf(buffer, "unsupported to read\n");
 }
 
-static ssize_t bluesleep_write_proc_lpm(struct file *file,
-                    const char __user *buffer, size_t count,
-                    loff_t *data)
+static ssize_t bluesleep_write_proc_lpm(struct file *file, const char __user *buffer, size_t count, loff_t *data)
 {
     return count;
 }
 
-static ssize_t bluesleep_read_proc_btwrite(struct file *file,
-                       char __user *buffer, size_t count,
-                       loff_t *data)
+static ssize_t bluesleep_read_proc_btwrite(struct file *file, char __user *buffer, size_t count, loff_t *data)
 {
     return sprintf(buffer, "unsupported to read\n");
 }
 
-static ssize_t bluesleep_write_proc_btwrite(struct file *file,
-                        const char __user *buffer,
-                        size_t count, loff_t *data)
+static ssize_t bluesleep_write_proc_btwrite(struct file *file, const char __user *buffer, size_t count, loff_t *data)
 {
     char b;
 
-    if (count < 1)
+    if (count < 1) {
         return -EINVAL;
+    }
 
-    if (copy_from_user(&b, buffer, 1))
+    if (copy_from_user(&b, buffer, 1)) {
         return -EFAULT;
+    }
 
     DBG("btwrite %c\n", b);
     /* HCI_DEV_WRITE */
-    if (b != '0')
+    if (b != '0') {
         rfkill_rk_sleep_bt(BT_WAKEUP);
-    else
+    } else {
         rfkill_rk_sleep_bt(BT_SLEEP);
+    }
 
     return count;
 }
 
 #ifdef CONFIG_OF
-static int bluetooth_platdata_parse_dt(struct device *dev,
-                       struct rfkill_rk_platform_data *data)
+static int bluetooth_platdata_parse_dt(struct device *dev, struct rfkill_rk_platform_data *data)
 {
     struct device_node *node = dev->of_node;
     int gpio;
     enum of_gpio_flags flags;
 
-    if (!node)
+    if (!node) {
         return -ENODEV;
+    }
 
     memset(data, 0, sizeof(*data));
 
@@ -526,14 +513,11 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
         LOG("%s: get property: uart_rts_gpios = %d.\n", __func__, gpio);
         data->pinctrl = devm_pinctrl_get(dev);
         if (!IS_ERR(data->pinctrl)) {
-            data->rts_gpio.default_state =
-                pinctrl_lookup_state(data->pinctrl, "default");
-            data->rts_gpio.gpio_state =
-                pinctrl_lookup_state(data->pinctrl, "rts_gpio");
+            data->rts_gpio.default_state = pinctrl_lookup_state(data->pinctrl, "default");
+            data->rts_gpio.gpio_state = pinctrl_lookup_state(data->pinctrl, "rts_gpio");
         } else {
             data->pinctrl = NULL;
-            LOG("%s: dts does't define the uart rts iomux.\n",
-                __func__);
+            LOG("%s: dts does't define the uart rts iomux.\n", __func__);
             return -EINVAL;
         }
     } else {
@@ -570,8 +554,7 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
     if (gpio_is_valid(gpio)) {
         data->wake_host_irq.gpio.io = gpio;
         data->wake_host_irq.gpio.enable = flags;
-        LOG("%s: get property: BT,wake_host_irq = %d.\n", __func__,
-            gpio);
+        LOG("%s: get property: BT,wake_host_irq = %d.\n", __func__, gpio);
     } else {
         data->wake_host_irq.gpio.io = -1;
     }
@@ -584,7 +567,7 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
     }
     return 0;
 }
-#endif //CONFIG_OF
+#endif // CONFIG_OF
 
 static const struct file_operations bluesleep_lpm = {
     .owner = THIS_MODULE,
@@ -609,11 +592,10 @@ static int rfkill_rk_probe(struct platform_device *pdev)
 
     if (!pdata) {
 #ifdef CONFIG_OF
-        pdata = devm_kzalloc(&pdev->dev,
-                     sizeof(struct rfkill_rk_platform_data),
-                     GFP_KERNEL);
-        if (!pdata)
+        pdata = devm_kzalloc(&pdev->dev, sizeof(struct rfkill_rk_platform_data), GFP_KERNEL);
+        if (!pdata) {
             return -ENOMEM;
+        }
 
         ret = bluetooth_platdata_parse_dt(&pdev->dev, pdata);
         if (ret < 0) {
@@ -629,8 +611,9 @@ static int rfkill_rk_probe(struct platform_device *pdev)
     pdata->type = RFKILL_TYPE_BLUETOOTH;
 
     rfkill = devm_kzalloc(&pdev->dev, sizeof(*rfkill), GFP_KERNEL);
-    if (!rfkill)
+    if (!rfkill) {
         return -ENOMEM;
+    }
 
     rfkill->pdata = pdata;
     rfkill->pdev = pdev;
@@ -666,56 +649,54 @@ static int rfkill_rk_probe(struct platform_device *pdev)
 
     DBG("init gpio\n");
 
-    ret = rfkill_rk_setup_gpio(pdev, &pdata->poweron_gpio, pdata->name,
-                   "poweron");
-    if (ret)
+    ret = rfkill_rk_setup_gpio(pdev, &pdata->poweron_gpio, pdata->name, "poweron");
+    if (ret) {
         goto fail_gpio;
+    }
 
-    ret = rfkill_rk_setup_gpio(pdev, &pdata->reset_gpio, pdata->name,
-                   "reset");
-    if (ret)
+    ret = rfkill_rk_setup_gpio(pdev, &pdata->reset_gpio, pdata->name, "reset");
+    if (ret) {
         goto fail_gpio;
+    }
 
-    ret = rfkill_rk_setup_gpio(pdev, &pdata->wake_gpio, pdata->name,
-                   "wake");
-    if (ret)
+    ret = rfkill_rk_setup_gpio(pdev, &pdata->wake_gpio, pdata->name, "wake");
+    if (ret) {
         goto fail_gpio;
+    }
 
-    ret = rfkill_rk_setup_gpio(pdev, &pdata->rts_gpio, rfkill->pdata->name,
-                   "rts");
-    if (ret)
+    ret = rfkill_rk_setup_gpio(pdev, &pdata->rts_gpio, rfkill->pdata->name, "rts");
+    if (ret) {
         goto fail_gpio;
+    }
 
-    wake_lock_init(&rfkill->bt_irq_wl, WAKE_LOCK_SUSPEND,
-               "rfkill_rk_irq_wl");
+    wake_lock_init(&rfkill->bt_irq_wl, WAKE_LOCK_SUSPEND, "rfkill_rk_irq_wl");
 
     ret = rfkill_rk_setup_wake_irq(rfkill, 0);
-    if (ret)
+    if (ret) {
         goto fail_setup_wake_irq;
+    }
 
     DBG("setup rfkill\n");
-    rfkill->rfkill_dev = rfkill_alloc(pdata->name, &pdev->dev, pdata->type,
-                      &rfkill_rk_ops, rfkill);
-    if (!rfkill->rfkill_dev)
+    rfkill->rfkill_dev = rfkill_alloc(pdata->name, &pdev->dev, pdata->type, &rfkill_rk_ops, rfkill);
+    if (!rfkill->rfkill_dev) {
         goto fail_alloc;
+    }
 
     rfkill_set_states(rfkill->rfkill_dev, BT_BLOCKED, false);
     ret = rfkill_register(rfkill->rfkill_dev);
-    if (ret < 0)
+    if (ret < 0) {
         goto fail_rfkill;
+    }
 
-    INIT_DELAYED_WORK(&rfkill->bt_sleep_delay_work,
-              rfkill_rk_delay_sleep_bt);
+    INIT_DELAYED_WORK(&rfkill->bt_sleep_delay_work, rfkill_rk_delay_sleep_bt);
 
-    //rfkill_rk_set_power(rfkill, BT_BLOCKED);
-    // bt turn off power
+    // rfkill_rk_set_power(rfkill, BT_BLOCKED);
+    //  bt turn off power
     if (gpio_is_valid(pdata->poweron_gpio.io)) {
-        gpio_direction_output(pdata->poweron_gpio.io,
-                      !pdata->poweron_gpio.enable);
+        gpio_direction_output(pdata->poweron_gpio.io, !pdata->poweron_gpio.enable);
     }
     if (gpio_is_valid(pdata->reset_gpio.io)) {
-        gpio_direction_output(pdata->reset_gpio.io,
-                      !pdata->reset_gpio.enable);
+        gpio_direction_output(pdata->reset_gpio.io, !pdata->reset_gpio.enable);
     }
 
     platform_set_drvdata(pdev, rfkill);
@@ -750,8 +731,9 @@ static int rfkill_rk_remove(struct platform_device *pdev)
     cancel_delayed_work_sync(&rfkill->bt_sleep_delay_work);
 
     // free gpio
-    if (gpio_is_valid(rfkill->pdata->rts_gpio.io))
+    if (gpio_is_valid(rfkill->pdata->rts_gpio.io)) {
         gpio_free(rfkill->pdata->rts_gpio.io);
+    }
 
     if (gpio_is_valid(rfkill->pdata->wake_host_irq.gpio.io)) {
         free_irq(rfkill->pdata->wake_host_irq.irq, rfkill);
@@ -761,15 +743,18 @@ static int rfkill_rk_remove(struct platform_device *pdev)
     }
 
 #ifndef CONFIG_BK3515A_COMBO
-    if (gpio_is_valid(rfkill->pdata->wake_gpio.io))
+    if (gpio_is_valid(rfkill->pdata->wake_gpio.io)) {
         gpio_free(rfkill->pdata->wake_gpio.io);
+    }
 #endif
 
-    if (gpio_is_valid(rfkill->pdata->reset_gpio.io))
+    if (gpio_is_valid(rfkill->pdata->reset_gpio.io)) {
         gpio_free(rfkill->pdata->reset_gpio.io);
+    }
 
-    if (gpio_is_valid(rfkill->pdata->poweron_gpio.io))
+    if (gpio_is_valid(rfkill->pdata->poweron_gpio.io)) {
         gpio_free(rfkill->pdata->poweron_gpio.io);
+    }
     clk_disable_unprepare(rfkill->pdata->ext_clk);
     wake_lock_destroy(&rfkill->bt_irq_wl);
     g_rfkill = NULL;
@@ -783,22 +768,20 @@ static const struct dev_pm_ops rfkill_rk_pm_ops = {
 };
 
 #ifdef CONFIG_OF
-static struct of_device_id bt_platdata_of_match[] = {
-    { .compatible = "bluetooth-platdata" },
-    {}
-};
+static struct of_device_id bt_platdata_of_match[] = {{.compatible = "bluetooth-platdata"}, {}};
 MODULE_DEVICE_TABLE(of, bt_platdata_of_match);
-#endif //CONFIG_OF
+#endif // CONFIG_OF
 
 static struct platform_driver rfkill_rk_driver = {
     .probe = rfkill_rk_probe,
     .remove = rfkill_rk_remove,
-    .driver = {
-        .name = "rfkill_bt",
-        .owner = THIS_MODULE,
-        .pm = &rfkill_rk_pm_ops,
-        .of_match_table = of_match_ptr(bt_platdata_of_match),
-    },
+    .driver =
+        {
+            .name = "rfkill_bt",
+            .owner = THIS_MODULE,
+            .pm = &rfkill_rk_pm_ops,
+            .of_match_table = of_match_ptr(bt_platdata_of_match),
+        },
 };
 
 static int __init rfkill_rk_init(void)
@@ -807,8 +790,9 @@ static int __init rfkill_rk_init(void)
 
     LOG("Enter %s\n", __func__);
     err = rfkill_wlan_init();
-    if (err)
+    if (err) {
         return err;
+    }
     return platform_driver_register(&rfkill_rk_driver);
 }
 

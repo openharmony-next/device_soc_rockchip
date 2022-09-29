@@ -59,8 +59,7 @@ static inline struct sync_timeline *sync_pt_parent(struct sync_pt *pt)
 }
 #endif
 
-static struct mali_sync_timeline *to_mali_sync_timeline(
-                        struct sync_timeline *timeline)
+static struct mali_sync_timeline *to_mali_sync_timeline(struct sync_timeline *timeline)
 {
     return container_of(timeline, struct mali_sync_timeline, timeline);
 }
@@ -74,11 +73,11 @@ static struct sync_pt *timeline_dup(struct sync_pt *pt)
 {
     struct mali_sync_pt *mpt = to_mali_sync_pt(pt);
     struct mali_sync_pt *new_mpt;
-    struct sync_pt *new_pt = sync_pt_create(sync_pt_parent(pt),
-                        sizeof(struct mali_sync_pt));
+    struct sync_pt *new_pt = sync_pt_create(sync_pt_parent(pt), sizeof(struct mali_sync_pt));
 
-    if (!new_pt)
+    if (!new_pt) {
         return NULL;
+    }
 
     new_mpt = to_mali_sync_pt(new_pt);
     new_mpt->order = mpt->order;
@@ -90,14 +89,14 @@ static struct sync_pt *timeline_dup(struct sync_pt *pt)
 static int timeline_has_signaled(struct sync_pt *pt)
 {
     struct mali_sync_pt *mpt = to_mali_sync_pt(pt);
-    struct mali_sync_timeline *mtl = to_mali_sync_timeline(
-                            sync_pt_parent(pt));
+    struct mali_sync_timeline *mtl = to_mali_sync_timeline(sync_pt_parent(pt));
     int result = mpt->result;
 
     int diff = atomic_read(&mtl->signaled) - mpt->order;
 
-    if (diff >= 0)
+    if (diff >= 0) {
         return (result < 0) ? result : 1;
+    }
 
     return 0;
 }
@@ -109,14 +108,14 @@ static int timeline_compare(struct sync_pt *a, struct sync_pt *b)
 
     int diff = ma->order - mb->order;
 
-    if (diff == 0)
+    if (diff == 0) {
         return 0;
+    }
 
     return (diff < 0) ? -1 : 1;
 }
 
-static void timeline_value_str(struct sync_timeline *timeline, char *str,
-                   int size)
+static void timeline_value_str(struct sync_timeline *timeline, char *str, int size)
 {
     struct mali_sync_timeline *mtl = to_mali_sync_timeline(timeline);
 
@@ -136,7 +135,7 @@ static struct sync_timeline_ops mali_timeline_ops = {
     .has_signaled = timeline_has_signaled,
     .compare = timeline_compare,
     .timeline_value_str = timeline_value_str,
-    .pt_value_str       = pt_value_str,
+    .pt_value_str = pt_value_str,
 };
 
 /* Allocates a timeline for Mali
@@ -148,10 +147,10 @@ static struct sync_timeline *mali_sync_timeline_alloc(const char *name)
     struct sync_timeline *tl;
     struct mali_sync_timeline *mtl;
 
-    tl = sync_timeline_create(&mali_timeline_ops,
-                  sizeof(struct mali_sync_timeline), name);
-    if (!tl)
+    tl = sync_timeline_create(&mali_timeline_ops, sizeof(struct mali_sync_timeline), name);
+    if (!tl) {
         return NULL;
+    }
 
     /* Set the counter in our private struct */
     mtl = to_mali_sync_timeline(tl);
@@ -179,14 +178,16 @@ int kbase_sync_fence_stream_create(const char *name, int *const out_fd)
 {
     struct sync_timeline *tl;
 
-    if (!out_fd)
+    if (!out_fd) {
         return -EINVAL;
+    }
 
     tl = mali_sync_timeline_alloc(name);
-    if (!tl)
+    if (!tl) {
         return -EINVAL;
+    }
 
-    *out_fd = anon_inode_getfd(name, &stream_fops, tl, O_RDONLY|O_CLOEXEC);
+    *out_fd = anon_inode_getfd(name, &stream_fops, tl, O_RDONLY | O_CLOEXEC);
 
     if (*out_fd < 0) {
         sync_timeline_destroy(tl);
@@ -205,13 +206,13 @@ int kbase_sync_fence_stream_create(const char *name, int *const out_fd)
  */
 static struct sync_pt *kbase_sync_pt_alloc(struct sync_timeline *parent)
 {
-    struct sync_pt *pt = sync_pt_create(parent,
-                        sizeof(struct mali_sync_pt));
+    struct sync_pt *pt = sync_pt_create(parent, sizeof(struct mali_sync_pt));
     struct mali_sync_timeline *mtl = to_mali_sync_timeline(parent);
     struct mali_sync_pt *mpt;
 
-    if (!pt)
+    if (!pt) {
         return NULL;
+    }
 
     mpt = to_mali_sync_pt(pt);
     mpt->order = atomic_inc_return(&mtl->counter);
@@ -233,8 +234,9 @@ int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int tl_fd)
     struct file *tl_file;
 
     tl_file = fget(tl_fd);
-    if (tl_file == NULL)
+    if (tl_file == NULL) {
         return -EBADF;
+    }
 
     if (tl_file->f_op != &stream_fops) {
         fd = -EBADF;
@@ -281,7 +283,7 @@ int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int tl_fd)
     FD_SET(fd, fdt->close_on_exec);
 #endif
     spin_unlock(&files->file_lock);
-#endif  /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 7, 0) */
+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 7, 0) */
 
     /* bind fence to the new fd */
     sync_fence_install(fence, fd);
@@ -311,8 +313,9 @@ int kbase_sync_fence_validate(int fd)
     struct sync_fence *fence;
 
     fence = sync_fence_fdget(fd);
-    if (!fence)
+    if (!fence) {
         return -EINVAL;
+    }
 
     sync_fence_put(fence);
     return 0;
@@ -338,8 +341,7 @@ static int kbase_sync_timeline_is_ours(struct sync_timeline *timeline)
 static void kbase_sync_signal_pt(struct sync_pt *pt, int result)
 {
     struct mali_sync_pt *mpt = to_mali_sync_pt(pt);
-    struct mali_sync_timeline *mtl = to_mali_sync_timeline(
-                            sync_pt_parent(pt));
+    struct mali_sync_timeline *mtl = to_mali_sync_timeline(sync_pt_parent(pt));
     int signaled;
     int diff;
 
@@ -360,21 +362,20 @@ static void kbase_sync_signal_pt(struct sync_pt *pt, int result)
              */
 #ifdef CONFIG_MALI_BIFROST_DEBUG
             pr_err("Fences were triggered in a different order to allocation!");
-#endif                /* CONFIG_MALI_BIFROST_DEBUG */
+#endif /* CONFIG_MALI_BIFROST_DEBUG */
             return;
         }
-    } while (atomic_cmpxchg(&mtl->signaled,
-                signaled, mpt->order) != signaled);
+    } while (atomic_cmpxchg(&mtl->signaled, signaled, mpt->order) != signaled);
 }
 
-enum base_jd_event_code
-kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
+enum base_jd_event_code kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 {
     struct sync_pt *pt;
     struct sync_timeline *timeline;
 
-    if (!katom->fence)
+    if (!katom->fence) {
         return BASE_JD_EVENT_JOB_CANCELLED;
+    }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
     if (!list_is_singular(&katom->fence->pt_list_head)) {
@@ -387,8 +388,7 @@ kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
     }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
-    pt = list_first_entry(&katom->fence->pt_list_head,
-                  struct sync_pt, pt_list);
+    pt = list_first_entry(&katom->fence->pt_list_head, struct sync_pt, pt_list);
 #else
     pt = container_of(katom->fence->cbs[0].sync_pt, struct sync_pt, base);
 #endif
@@ -410,8 +410,9 @@ kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 
 static inline int kbase_fence_get_status(struct sync_fence *fence)
 {
-    if (!fence)
+    if (!fence) {
         return -ENOENT;
+    }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
     return fence->status;
@@ -420,18 +421,17 @@ static inline int kbase_fence_get_status(struct sync_fence *fence)
 #endif
 }
 
-static void kbase_fence_wait_callback(struct sync_fence *fence,
-                      struct sync_fence_waiter *waiter)
+static void kbase_fence_wait_callback(struct sync_fence *fence, struct sync_fence_waiter *waiter)
 {
-    struct kbase_jd_atom *katom = container_of(waiter,
-                    struct kbase_jd_atom, sync_waiter);
+    struct kbase_jd_atom *katom = container_of(waiter, struct kbase_jd_atom, sync_waiter);
     struct kbase_context *kctx = katom->kctx;
 
     /* Propagate the fence status to the atom.
      * If negative then cancel this atom and its dependencies.
      */
-    if (kbase_fence_get_status(fence) < 0)
+    if (kbase_fence_get_status(fence) < 0) {
         katom->event_code = BASE_JD_EVENT_JOB_CANCELLED;
+    }
 
     /* To prevent a potential deadlock we schedule the work onto the
      * job_done_wq workqueue
@@ -483,8 +483,9 @@ void kbase_sync_fence_in_cancel_wait(struct kbase_jd_atom *katom)
     kbasep_remove_waiting_soft_job(katom);
     kbase_finish_soft_job(katom);
 
-    if (jd_done_nolock(katom, NULL))
+    if (jd_done_nolock(katom, NULL)) {
         kbase_js_sched_all(katom->kctx->kbdev);
+    }
 }
 
 void kbase_sync_fence_out_remove(struct kbase_jd_atom *katom)
@@ -503,11 +504,11 @@ void kbase_sync_fence_in_remove(struct kbase_jd_atom *katom)
     }
 }
 
-int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
-                 struct kbase_sync_fence_info *info)
+int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info)
 {
-    if (!katom->fence)
+    if (!katom->fence) {
         return -ENOENT;
+    }
 
     info->fence = katom->fence;
     info->status = kbase_fence_get_status(katom->fence);
@@ -516,11 +517,11 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
     return 0;
 }
 
-int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
-                 struct kbase_sync_fence_info *info)
+int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info)
 {
-    if (!katom->fence)
+    if (!katom->fence) {
         return -ENOENT;
+    }
 
     info->fence = katom->fence;
     info->status = kbase_fence_get_status(katom->fence);
@@ -536,7 +537,8 @@ void kbase_sync_fence_in_dump(struct kbase_jd_atom *katom)
      * The function sync_dump() isn't exported to modules, so force
      * sync_fence_wait() to time out to trigger sync_dump().
      */
-    if (katom->fence)
+    if (katom->fence) {
         sync_fence_wait(katom->fence, 1);
+    }
 }
 #endif

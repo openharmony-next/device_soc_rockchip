@@ -6,7 +6,7 @@
 #define _ROCKCHIP_DEBUG
 
 struct fiq_debugger_output;
-#define IO_MEM  __iomem
+#define IO_MEM __iomem
 #if IS_ENABLED(CONFIG_FIQ_DEBUGGER)
 int rockchip_debug_dump_pcsr(struct fiq_debugger_output *output);
 #endif

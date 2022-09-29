@@ -38,9 +38,9 @@ void kbase_reg_write(struct kbase_device *kbdev, u32 offset, u32 value)
     writel(value, kbdev->reg + offset);
 
 #ifdef CONFIG_DEBUG_FS
-    if (unlikely(kbdev->io_history.enabled))
-        kbase_io_history_add(&kbdev->io_history, kbdev->reg + offset,
-                value, 1);
+    if (unlikely(kbdev->io_history.enabled)) {
+        kbase_io_history_add(&kbdev->io_history, kbdev->reg + offset, value, 1);
+    }
 #endif /* CONFIG_DEBUG_FS */
     dev_dbg(kbdev->dev, "w: reg %08x val %08x", offset, value);
 }
@@ -57,9 +57,9 @@ u32 kbase_reg_read(struct kbase_device *kbdev, u32 offset)
     val = readl(kbdev->reg + offset);
 
 #ifdef CONFIG_DEBUG_FS
-    if (unlikely(kbdev->io_history.enabled))
-        kbase_io_history_add(&kbdev->io_history, kbdev->reg + offset,
-                val, 0);
+    if (unlikely(kbdev->io_history.enabled)) {
+        kbase_io_history_add(&kbdev->io_history, kbdev->reg + offset, val, 0);
+    }
 #endif /* CONFIG_DEBUG_FS */
     dev_dbg(kbdev->dev, "r: reg %08x val %08x", offset, val);
 
@@ -96,12 +96,10 @@ void kbase_gpu_start_cache_clean_nolock(struct kbase_device *kbdev)
 
     /* Enable interrupt */
     irq_mask = kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK));
-    kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK),
-                irq_mask | CLEAN_CACHES_COMPLETED);
+    kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK), irq_mask | CLEAN_CACHES_COMPLETED);
 
     KBASE_KTRACE_ADD(kbdev, CORE_GPU_CLEAN_INV_CACHES, NULL, 0);
-    kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND),
-                    GPU_COMMAND_CLEAN_INV_CACHES);
+    kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CLEAN_INV_CACHES);
 
     kbdev->cache_clean_in_progress = true;
 }
@@ -135,13 +133,11 @@ void kbase_clean_caches_done(struct kbase_device *kbdev)
         kbdev->cache_clean_queued = false;
 
         KBASE_KTRACE_ADD(kbdev, CORE_GPU_CLEAN_INV_CACHES, NULL, 0);
-        kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND),
-                GPU_COMMAND_CLEAN_INV_CACHES);
+        kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CLEAN_INV_CACHES);
     } else {
         /* Disable interrupt */
         irq_mask = kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK));
-        kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK),
-                irq_mask & ~CLEAN_CACHES_COMPLETED);
+        kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_IRQ_MASK), irq_mask & ~CLEAN_CACHES_COMPLETED);
 
         kbase_gpu_cache_clean_wait_complete(kbdev);
     }
@@ -164,20 +160,16 @@ static inline bool get_cache_clean_flag(struct kbase_device *kbdev)
 void kbase_gpu_wait_cache_clean(struct kbase_device *kbdev)
 {
     while (get_cache_clean_flag(kbdev)) {
-        wait_event_interruptible(kbdev->cache_clean_wait,
-                !kbdev->cache_clean_in_progress);
+        wait_event_interruptible(kbdev->cache_clean_wait, !kbdev->cache_clean_in_progress);
     }
 }
 
-int kbase_gpu_wait_cache_clean_timeout(struct kbase_device *kbdev,
-                unsigned int wait_timeout_ms)
+int kbase_gpu_wait_cache_clean_timeout(struct kbase_device *kbdev, unsigned int wait_timeout_ms)
 {
     long remaining = msecs_to_jiffies(wait_timeout_ms);
 
     while (remaining && get_cache_clean_flag(kbdev)) {
-        remaining = wait_event_timeout(kbdev->cache_clean_wait,
-                    !kbdev->cache_clean_in_progress,
-                    remaining);
+        remaining = wait_event_timeout(kbdev->cache_clean_wait, !kbdev->cache_clean_in_progress, remaining);
     }
 
     return (remaining ? 0 : -ETIMEDOUT);

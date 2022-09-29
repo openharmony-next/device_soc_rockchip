@@ -20,8 +20,8 @@
  *
  */
 
-#if !defined(_KBASE_GWT_H)
-#define _KBASE_GWT_H
+#if !defined(KBASE_GWT_H)
+#define KBASE_GWT_H
 
 #include <mali_kbase.h>
 #include <mali_kbase_ioctl.h>
@@ -49,7 +49,6 @@ int kbase_gpu_gwt_stop(struct kbase_context *kctx);
  *
  * @return 0 on success, error on failure.
  */
-int kbase_gpu_gwt_dump(struct kbase_context *kctx,
-            union kbase_ioctl_cinstr_gwt_dump *gwt_dump);
+int kbase_gpu_gwt_dump(struct kbase_context *kctx, union kbase_ioctl_cinstr_gwt_dump *gwt_dump);
 
 #endif /* _KBASE_GWT_H */

@@ -13,21 +13,17 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_gpuprops_types.h
  * Base kernel property query APIs
  */
 
-#ifndef _KBASE_GPUPROPS_TYPES_H_
-#define _KBASE_GPUPROPS_TYPES_H_
+#ifndef KBASE_GPUPROPS_TYPES_H_
+#define KBASE_GPUPROPS_TYPES_H_
 
 #include "mali_base_kernel.h"
 
-#define KBASE_GPU_SPEED_MHZ    123
+#define KBASE_GPU_SPEED_MHZ 123
 #define KBASE_GPU_PC_SIZE_LOG2 24U
 
 struct kbase_gpuprops_regdump {
@@ -89,4 +85,4 @@ struct kbase_gpu_props {
     void *prop_buffer;
 };
 
-#endif                /* _KBASE_GPUPROPS_TYPES_H_ */
+#endif /* _KBASE_GPUPROPS_TYPES_H_ */

@@ -28,6 +28,9 @@
  * of such GNU licence.
  */
 
+#ifndef BIFROST_CONTEXT_MALI_KBASE_CONTEXT_INTERNAL_H
+#define BIFROST_CONTEXT_MALI_KBASE_CONTEXT_INTERNAL_H
+
 #include <mali_kbase.h>
 
 typedef int kbase_context_init_method(struct kbase_context *kctx);
@@ -58,3 +61,4 @@ int kbase_context_mem_alloc_page(struct kbase_context *kctx);
 void kbase_context_mem_pool_free(struct kbase_context *kctx);
 
 void kbase_context_sticky_resource_term(struct kbase_context *kctx);
+#endif

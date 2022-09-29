@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -33,8 +34,8 @@ typedef enum mali_mem_type {
 
 typedef struct mali_block_item {
     /* for block type, the block_phy is alway page size align
-    * so use low 12bit used for ref_cout.
-    */
+     * so use low 12bit used for ref_cout.
+     */
     unsigned long phy_addr;
 } mali_block_item;
 
@@ -125,15 +126,14 @@ typedef struct mali_vma_node {
     struct rb_node vm_rb;
 } mali_vma_node;
 
-
 typedef struct mali_mem_allocation {
     MALI_DEBUG_CODE(u32 magic);
-    mali_mem_type type;                /**< Type of memory */
-    u32 flags;                         /**< Flags for this allocation */
+    mali_mem_type type; /**< Type of memory */
+    u32 flags;          /**< Flags for this allocation */
 
     struct mali_session_data *session; /**< Pointer to session that owns the allocation */
 
-    mali_mem_virt_cpu_mapping cpu_mapping; /**< CPU mapping */
+    mali_mem_virt_cpu_mapping cpu_mapping;   /**< CPU mapping */
     mali_mem_virt_mali_mapping mali_mapping; /**< Mali mapping */
 
     /* add for new memory system */
@@ -162,9 +162,9 @@ extern struct mali_mem_os_allocator mali_mem_os_allocator;
 
 /* COW backend memory type */
 typedef struct mali_mem_cow {
-    struct list_head pages;  /**< all pages for this cow backend allocation,
-                                                                including new allocated pages for modified range*/
-    u32 count;               /**< number of pages */
+    struct list_head pages; /**< all pages for this cow backend allocation,
+                                                               including new allocated pages for modified range*/
+    u32 count;              /**< number of pages */
     s32 change_pages_nr;
 } mali_mem_cow;
 
@@ -182,18 +182,19 @@ typedef struct mali_mem_secure {
     u32 count;
 } mali_mem_secure;
 
-#define MALI_MEM_BACKEND_FLAG_COWED                   (0x1)  /* COW has happen on this backend */
-#define MALI_MEM_BACKEND_FLAG_COW_CPU_NO_WRITE        (0x2)  /* This is an COW backend, mapped as not allowed cpu to write */
-#define MALI_MEM_BACKEND_FLAG_SWAP_COWED              (0x4)  /* Mark the given backend is cowed from swappable memory. */
+#define MALI_MEM_BACKEND_FLAG_COWED (0x1)            /* COW has happen on this backend */
+#define MALI_MEM_BACKEND_FLAG_COW_CPU_NO_WRITE (0x2) /* This is an COW backend, mapped as not allowed cpu to write */
+#define MALI_MEM_BACKEND_FLAG_SWAP_COWED (0x4)       /* Mark the given backend is cowed from swappable memory. */
 /* Mark this backend is not swapped_in in MALI driver, and before using it,
  * we should swap it in and set up corresponding page table. */
-#define MALI_MEM_BACKEND_FLAG_UNSWAPPED_IN            (0x8)
-#define MALI_MEM_BACKEND_FLAG_NOT_BINDED              (0x1 << 5) /* this backend it not back with physical memory, used for defer bind */
-#define MALI_MEM_BACKEND_FLAG_BINDED              (0x1 << 6) /* this backend it back with physical memory, used for defer bind */
+#define MALI_MEM_BACKEND_FLAG_UNSWAPPED_IN (0x8)
+#define MALI_MEM_BACKEND_FLAG_NOT_BINDED                                                                               \
+    (0x1 << 5)                                  /* this backend it not back with physical memory, used for defer bind */
+#define MALI_MEM_BACKEND_FLAG_BINDED (0x1 << 6) /* this backend it back with physical memory, used for defer bind */
 
 typedef struct mali_mem_backend {
-    mali_mem_type type;                /**< Type of backend memory */
-    u32 flags;                         /**< Flags for this allocation */
+    mali_mem_type type; /**< Type of backend memory */
+    u32 flags;          /**< Flags for this allocation */
     u32 size;
     /* Union selected by type. */
     union {
@@ -210,12 +211,13 @@ typedef struct mali_mem_backend {
     struct mutex mutex;
     mali_mem_type cow_type;
 
-    struct list_head list;           /**< Used to link swappable memory backend to the global swappable list */
-    int using_count;                 /**< Mark how many PP jobs are using this memory backend */
-    u32 start_idx;                   /**< If the correspondign vma of this backend is linear, this value will be used to set vma->vm_pgoff */
+    struct list_head list; /**< Used to link swappable memory backend to the global swappable list */
+    int using_count;       /**< Mark how many PP jobs are using this memory backend */
+    u32 start_idx; /**< If the correspondign vma of this backend is linear, this value will be used to set vma->vm_pgoff
+                    */
 } mali_mem_backend;
 
 #define MALI_MEM_FLAG_MALI_GUARD_PAGE (MALI_MAP_EXTERNAL_MAP_GUARD_PAGE)
-#define MALI_MEM_FLAG_DONT_CPU_MAP    (1 << 1)
-#define MALI_MEM_FLAG_CAN_RESIZE  (MALI_MEMORY_ALLOCATE_RESIZEABLE)
+#define MALI_MEM_FLAG_DONT_CPU_MAP (1 << 1)
+#define MALI_MEM_FLAG_CAN_RESIZE (MALI_MEMORY_ALLOCATE_RESIZEABLE)
 #endif /* __MALI_MEMORY_TYPES__ */

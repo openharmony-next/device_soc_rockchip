@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -35,17 +36,20 @@ static u64 accumulated_work_time_gpu = 0;
 static u64 accumulated_work_time_gp = 0;
 static u64 accumulated_work_time_pp = 0;
 
-static u32 last_utilization_gpu = 0 ;
-static u32 last_utilization_gp = 0 ;
-static u32 last_utilization_pp = 0 ;
+static u32 last_utilization_gpu = 0;
+static u32 last_utilization_gp = 0;
+static u32 last_utilization_pp = 0;
 
 void (*mali_utilization_callback)(struct mali_gpu_utilization_data *data) = NULL;
 
 /* Define the first timer control timer timeout in milliseconds */
 static u32 mali_control_first_timeout = 100;
-static struct mali_gpu_utilization_data mali_util_data = {0, };
+static struct mali_gpu_utilization_data mali_util_data = {
+    0,
+};
 
-struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u64 *time_period, mali_bool *need_add_timer)
+struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u64 *time_period,
+                                                             mali_bool *need_add_timer)
 {
     u64 time_now;
     u32 leading_zeroes;
@@ -85,9 +89,9 @@ struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u6
 
         mali_executor_hint_disable(MALI_EXECUTOR_HINT_GP_BOUND);
 
-        MALI_DEBUG_PRINT(4, ("last_utilization_gpu = %d \n", last_utilization_gpu));
-        MALI_DEBUG_PRINT(4, ("last_utilization_gp = %d \n", last_utilization_gp));
-        MALI_DEBUG_PRINT(4, ("last_utilization_pp = %d \n", last_utilization_pp));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_gpu = %d \n", last_utilization_gpu));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_gp = %d \n", last_utilization_gp));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_pp = %d \n", last_utilization_pp));
 
         return &mali_util_data;
     }
@@ -118,8 +122,8 @@ struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u6
      */
 
     /* Shift the 64-bit values down so they fit inside a 32-bit integer */
-    leading_zeroes = _mali_osk_clz((u32)(*time_period >> 32));
-    shift_val = 32 - leading_zeroes;
+    leading_zeroes = _mali_osk_clz((u32)(*time_period >> 0x20));
+    shift_val = 0x20 - leading_zeroes;
     work_normalized_gpu = (u32)(accumulated_work_time_gpu >> shift_val);
     work_normalized_gp = (u32)(accumulated_work_time_gp >> shift_val);
     work_normalized_pp = (u32)(accumulated_work_time_pp >> shift_val);
@@ -133,15 +137,15 @@ struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u6
      */
     if (period_normalized > 0x00FFFFFF) {
         /* The divisor is so big that it is safe to shift it down */
-        period_normalized >>= 8;
+        period_normalized >>= 0x8;
     } else {
         /*
          * The divisor is so small that we can shift up the dividend, without loosing any data.
          * (dividend is always smaller than the divisor)
          */
-        work_normalized_gpu <<= 8;
-        work_normalized_gp <<= 8;
-        work_normalized_pp <<= 8;
+        work_normalized_gpu <<= 0x8;
+        work_normalized_gp <<= 0x8;
+        work_normalized_pp <<= 0x8;
     }
 
     utilization_gpu = work_normalized_gpu / period_normalized;
@@ -174,9 +178,9 @@ struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u6
 
     *need_add_timer = MALI_TRUE;
 
-    MALI_DEBUG_PRINT(4, ("last_utilization_gpu = %d \n", last_utilization_gpu));
-    MALI_DEBUG_PRINT(4, ("last_utilization_gp = %d \n", last_utilization_gp));
-    MALI_DEBUG_PRINT(4, ("last_utilization_pp = %d \n", last_utilization_pp));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_gpu = %d \n", last_utilization_gpu));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_gp = %d \n", last_utilization_gp));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("last_utilization_pp = %d \n", last_utilization_pp));
 
     return &mali_util_data;
 }
@@ -235,7 +239,7 @@ void mali_utilization_gp_start(void)
              */
             work_start_time_gpu = time_now;
 
-            is_resume  = mali_control_timer_resume(time_now);
+            is_resume = mali_control_timer_resume(time_now);
 
             mali_utilization_data_unlock();
 

@@ -35,8 +35,8 @@
  *    8. Close the file descriptor
  */
 
-#ifndef _KBASE_KINSTR_JM_READER_H_
-#define _KBASE_KINSTR_JM_READER_H_
+#ifndef KBASE_KINSTR_JM_READER_H_
+#define KBASE_KINSTR_JM_READER_H_
 
 /**
  * enum kbase_kinstr_jm_reader_atom_state - Determines the work state of an atom

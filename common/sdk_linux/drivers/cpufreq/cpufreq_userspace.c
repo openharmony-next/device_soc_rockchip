@@ -33,13 +33,14 @@ static int cpufreq_set(struct cpufreq_policy *policy, unsigned int freq)
     pr_debug("cpufreq_set for cpu %u, freq %u kHz\n", policy->cpu, freq);
 
     mutex_lock(&userspace_mutex);
-    if (!per_cpu(cpu_is_managed, policy->cpu))
+    if (!per_cpu(cpu_is_managed, policy->cpu)) {
         goto err;
+    }
 
     *setspeed = freq;
 
     ret = __cpufreq_driver_target(policy, freq, CPUFREQ_RELATION_L);
- err:
+err:
     mutex_unlock(&userspace_mutex);
     return ret;
 }
@@ -54,8 +55,9 @@ static int cpufreq_userspace_policy_init(struct cpufreq_policy *policy)
     unsigned int *setspeed;
 
     setspeed = kzalloc(sizeof(*setspeed), GFP_KERNEL);
-    if (!setspeed)
+    if (!setspeed) {
         return -ENOMEM;
+    }
 
     policy->governor_data = setspeed;
     return 0;
@@ -78,8 +80,9 @@ static int cpufreq_userspace_policy_start(struct cpufreq_policy *policy)
 
     mutex_lock(&userspace_mutex);
     per_cpu(cpu_is_managed, policy->cpu) = 1;
-    if (!*setspeed)
+    if (!*setspeed) {
         *setspeed = policy->cur;
+    }
     mutex_unlock(&userspace_mutex);
     return 0;
 }
@@ -99,33 +102,34 @@ static void cpufreq_userspace_policy_limits(struct cpufreq_policy *policy)
 
     mutex_lock(&userspace_mutex);
 
-    pr_debug("limit event for cpu %u: %u - %u kHz, currently %u kHz, last set to %u kHz\n",
-         policy->cpu, policy->min, policy->max, policy->cur, *setspeed);
+    pr_debug("limit event for cpu %u: %u - %u kHz, currently %u kHz, last set to %u kHz\n", policy->cpu, policy->min,
+             policy->max, policy->cur, *setspeed);
 
-    if (policy->max < *setspeed)
+    if (policy->max < *setspeed) {
         __cpufreq_driver_target(policy, policy->max, CPUFREQ_RELATION_H);
-    else if (policy->min > *setspeed)
+    } else if (policy->min > *setspeed) {
         __cpufreq_driver_target(policy, policy->min, CPUFREQ_RELATION_L);
-    else
+    } else {
         __cpufreq_driver_target(policy, *setspeed, CPUFREQ_RELATION_L);
+    }
 
     mutex_unlock(&userspace_mutex);
 }
 
 static struct cpufreq_governor cpufreq_gov_userspace = {
-    .name        = "userspace",
-    .init        = cpufreq_userspace_policy_init,
-    .exit        = cpufreq_userspace_policy_exit,
-    .start        = cpufreq_userspace_policy_start,
-    .stop        = cpufreq_userspace_policy_stop,
-    .limits        = cpufreq_userspace_policy_limits,
-    .store_setspeed    = cpufreq_set,
-    .show_setspeed    = show_speed,
-    .owner        = THIS_MODULE,
+    .name = "userspace",
+    .init = cpufreq_userspace_policy_init,
+    .exit = cpufreq_userspace_policy_exit,
+    .start = cpufreq_userspace_policy_start,
+    .stop = cpufreq_userspace_policy_stop,
+    .limits = cpufreq_userspace_policy_limits,
+    .store_setspeed = cpufreq_set,
+    .show_setspeed = show_speed,
+    .owner = THIS_MODULE,
 };
 
 MODULE_AUTHOR("Dominik Brodowski <linux@brodo.de>, "
-        "Russell King <rmk@arm.linux.org.uk>");
+              "Russell King <rmk@arm.linux.org.uk>");
 MODULE_DESCRIPTION("CPUfreq policy governor 'userspace'");
 MODULE_LICENSE("GPL");
 

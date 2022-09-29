@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_gpuprops.h
  * Base kernel property query APIs
@@ -59,7 +55,7 @@ void kbase_gpuprops_set_features(struct kbase_device *kbdev);
  *
  * @return 0 on success. Any other value indicates failure.
  */
-int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpuprops * const kbase_props);
+int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpuprops *const kbase_props);
 
 /**
  * kbase_gpuprops_populate_user_buffer - Populate the GPU properties buffer
@@ -78,7 +74,6 @@ int kbase_gpuprops_populate_user_buffer(struct kbase_device *kbdev);
  * separate fields (version_status, minor_revision, major_revision, product_id)
  * stored in base_gpu_props::core_props.
  */
-void kbase_gpuprops_update_core_props_gpu_id(base_gpu_props * const gpu_props);
+void kbase_gpuprops_update_core_props_gpu_id(base_gpu_props *const gpu_props);
 
-
-#endif                /* _KBASE_GPUPROPS_H_ */
+#endif /* _KBASE_GPUPROPS_H_ */

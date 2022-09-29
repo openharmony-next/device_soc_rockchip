@@ -11,46 +11,48 @@
 #include "8250_dwlib.h"
 
 /* Offsets for the DesignWare specific registers */
-#define DW_UART_DLF    0xc0 /* Divisor Latch Fraction Register */
-#define DW_UART_CPR    0xf4 /* Component Parameter Register */
-#define DW_UART_UCV    0xf8 /* UART Component Version */
+#define DW_UART_DLF 0xc0 /* Divisor Latch Fraction Register */
+#define DW_UART_CPR 0xf4 /* Component Parameter Register */
+#define DW_UART_UCV 0xf8 /* UART Component Version */
 
 /* Component Parameter Register bits */
-#define DW_UART_CPR_ABP_DATA_WIDTH    (3 << 0)
-#define DW_UART_CPR_AFCE_MODE        (1 << 4)
-#define DW_UART_CPR_THRE_MODE        (1 << 5)
-#define DW_UART_CPR_SIR_MODE        (1 << 6)
-#define DW_UART_CPR_SIR_LP_MODE        (1 << 7)
-#define DW_UART_CPR_ADDITIONAL_FEATURES    (1 << 8)
-#define DW_UART_CPR_FIFO_ACCESS        (1 << 9)
-#define DW_UART_CPR_FIFO_STAT        (1 << 10)
-#define DW_UART_CPR_SHADOW        (1 << 11)
-#define DW_UART_CPR_ENCODED_PARMS    (1 << 12)
-#define DW_UART_CPR_DMA_EXTRA        (1 << 13)
-#define DW_UART_CPR_FIFO_MODE        (0xff << 16)
+#define DW_UART_CPR_ABP_DATA_WIDTH (3 << 0)
+#define DW_UART_CPR_AFCE_MODE (1 << 4)
+#define DW_UART_CPR_THRE_MODE (1 << 5)
+#define DW_UART_CPR_SIR_MODE (1 << 6)
+#define DW_UART_CPR_SIR_LP_MODE (1 << 7)
+#define DW_UART_CPR_ADDITIONAL_FEATURES (1 << 8)
+#define DW_UART_CPR_FIFO_ACCESS (1 << 9)
+#define DW_UART_CPR_FIFO_STAT (1 << 10)
+#define DW_UART_CPR_SHADOW (1 << 11)
+#define DW_UART_CPR_ENCODED_PARMS (1 << 12)
+#define DW_UART_CPR_DMA_EXTRA (1 << 13)
+#define DW_UART_CPR_FIFO_MODE (0xff << 16)
 
 /* Helper for FIFO size calculation */
-#define DW_UART_CPR_FIFO_SIZE(a)    (((a >> 16) & 0xff) * 16)
+#define DW_UART_CPR_FIFO_SIZE(a) ((((a) >> 16) & 0xff) * 16)
 
-#define DWLIB_THREE                     3
-#define DWLIB_FOUR                      4
-#define DWLIB_EIGHT                     8
-#define DWLIB_SIXTEEN                   16
-#define DWLIB_EIGHT_TWENTYFOUR          24
+#define DWLIB_THREE 3
+#define DWLIB_FOUR 4
+#define DWLIB_EIGHT 8
+#define DWLIB_SIXTEEN 16
+#define DWLIB_EIGHT_TWENTYFOUR 24
 
 static inline u32 dw8250_readl_ext(struct uart_port *p, int offset)
 {
-    if (p->iotype == UPIO_MEM32BE)
+    if (p->iotype == UPIO_MEM32BE) {
         return ioread32be(p->membase + offset);
+    }
     return readl(p->membase + offset);
 }
 
 static inline void dw8250_writel_ext(struct uart_port *p, int offset, u32 reg)
 {
-    if (p->iotype == UPIO_MEM32BE)
+    if (p->iotype == UPIO_MEM32BE) {
         iowrite32be(reg, p->membase + offset);
-    else
+    } else {
         writel(reg, p->membase + offset);
+    }
 }
 
 /*
@@ -63,8 +65,7 @@ static inline void dw8250_writel_ext(struct uart_port *p, int offset, u32 reg)
  * we have: div(F) * (16 * baud) = rem
  * so frac = 2^dlf_size * rem / (16 * baud) = (rem << dlf_size) / (16 * baud)
  */
-static unsigned int dw8250_get_divisor(struct uart_port *p, unsigned int baud,
-                       unsigned int *frac)
+static unsigned int dw8250_get_divisor(struct uart_port *p, unsigned int baud, unsigned int *frac)
 {
     unsigned int quot, rem, base_baud = baud * 16;
     struct dw8250_port_data *d = p->private_data;
@@ -76,8 +77,7 @@ static unsigned int dw8250_get_divisor(struct uart_port *p, unsigned int baud,
     return quot;
 }
 
-static void dw8250_set_divisor(struct uart_port *p, unsigned int baud,
-                   unsigned int quot, unsigned int quot_frac)
+static void dw8250_set_divisor(struct uart_port *p, unsigned int baud, unsigned int quot, unsigned int quot_frac)
 {
     dw8250_writel_ext(p, DW_UART_DLF, quot_frac);
     serial8250_do_set_divisor(p, baud, quot, quot_frac);
@@ -93,11 +93,12 @@ void dw8250_setup_port(struct uart_port *p)
      * ADDITIONAL_FEATURES are not enabled. No need to go any further.
      */
     reg = dw8250_readl_ext(p, DW_UART_UCV);
-    if (!reg)
+    if (!reg) {
         return;
+    }
 
-    dev_dbg(p->dev, "Designware UART version %c.%c%c\n",
-        (reg >> DWLIB_EIGHT_TWENTYFOUR) & 0xff, (reg >> DWLIB_SIXTEEN) & 0xff, (reg >> DWLIB_EIGHT) & 0xff);
+    dev_dbg(p->dev, "Designware UART version %c.%c%c\n", (reg >> DWLIB_EIGHT_TWENTYFOUR) & 0xff,
+            (reg >> DWLIB_SIXTEEN) & 0xff, (reg >> DWLIB_EIGHT) & 0xff);
 
     dw8250_writel_ext(p, DW_UART_DLF, ~0U);
     reg = dw8250_readl_ext(p, DW_UART_DLF);
@@ -118,11 +119,13 @@ void dw8250_setup_port(struct uart_port *p)
      * The UART CPR may be 0 of some rockchip soc,
      * but it supports fifo and AFC, fifo entry is 32 default.
      */
-    if (reg == 0)
+    if (reg == 0) {
         reg = 0x00023ff2;
+    }
 #endif
-    if (!reg)
+    if (!reg) {
         return;
+    }
 
     /* Select the type based on FIFO */
     if (reg & DW_UART_CPR_FIFO_MODE) {
@@ -135,10 +138,12 @@ void dw8250_setup_port(struct uart_port *p)
         up->capabilities = UART_CAP_FIFO;
     }
 
-    if (reg & DW_UART_CPR_AFCE_MODE)
+    if (reg & DW_UART_CPR_AFCE_MODE) {
         up->capabilities |= UART_CAP_AFE;
+    }
 
-    if (reg & DW_UART_CPR_SIR_MODE)
+    if (reg & DW_UART_CPR_SIR_MODE) {
         up->capabilities |= UART_CAP_IRDA;
+    }
 }
 EXPORT_SYMBOL_GPL(dw8250_setup_port);

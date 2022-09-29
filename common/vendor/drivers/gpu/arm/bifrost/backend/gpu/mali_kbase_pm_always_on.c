@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * "Always on" power management policy
  */
@@ -56,12 +54,12 @@ static void always_on_term(struct kbase_device *kbdev)
  * and name.
  */
 const struct kbase_pm_policy kbase_pm_always_on_policy_ops = {
-    "always_on",            /* name */
-    always_on_init,            /* init */
-    always_on_term,            /* term */
-    always_on_shaders_needed,    /* shaders_needed */
+    "always_on",                  /* name */
+    always_on_init,               /* init */
+    always_on_term,               /* term */
+    always_on_shaders_needed,     /* shaders_needed */
     always_on_get_core_active,    /* get_core_active */
-    KBASE_PM_POLICY_ID_ALWAYS_ON,    /* id */
+    KBASE_PM_POLICY_ID_ALWAYS_ON, /* id */
 };
 
 KBASE_EXPORT_TEST_API(kbase_pm_always_on_policy_ops);

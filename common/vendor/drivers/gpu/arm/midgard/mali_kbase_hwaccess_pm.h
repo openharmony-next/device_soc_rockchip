@@ -13,9 +13,6 @@
  *
  */
 
-
-
-
 /**
  * @file mali_kbase_hwaccess_pm.h
  * HW access power manager common APIs
@@ -68,8 +65,7 @@ void kbase_hwaccess_pm_term(struct kbase_device *kbdev);
  *
  * Return: 0 if powerup was successful.
  */
-int kbase_hwaccess_pm_powerup(struct kbase_device *kbdev,
-        unsigned int flags);
+int kbase_hwaccess_pm_powerup(struct kbase_device *kbdev, unsigned int flags);
 
 /**
  * Halt the power management framework.
@@ -118,7 +114,6 @@ void kbase_hwaccess_pm_gpu_active(struct kbase_device *kbdev);
  */
 void kbase_hwaccess_pm_gpu_idle(struct kbase_device *kbdev);
 
-
 /**
  * Set the debug core mask.
  *
@@ -130,10 +125,8 @@ void kbase_hwaccess_pm_gpu_idle(struct kbase_device *kbdev);
  * @param new_core_mask_js0 The core mask to use for job slot 1
  * @param new_core_mask_js0 The core mask to use for job slot 2
  */
-void kbase_pm_set_debug_core_mask(struct kbase_device *kbdev,
-        u64 new_core_mask_js0, u64 new_core_mask_js1,
-        u64 new_core_mask_js2);
-
+void kbase_pm_set_debug_core_mask(struct kbase_device *kbdev, u64 new_core_mask_js0, u64 new_core_mask_js1,
+                                  u64 new_core_mask_js2);
 
 /**
  * Get the current policy.
@@ -145,8 +138,7 @@ void kbase_pm_set_debug_core_mask(struct kbase_device *kbdev,
  *
  * @return The current policy
  */
-const struct kbase_pm_ca_policy
-*kbase_pm_ca_get_policy(struct kbase_device *kbdev);
+const struct kbase_pm_ca_policy *kbase_pm_ca_get_policy(struct kbase_device *kbdev);
 
 /**
  * Change the policy to the one specified.
@@ -156,8 +148,7 @@ const struct kbase_pm_ca_policy
  * @param policy The policy to change to (valid pointer returned from
  *               @ref kbase_pm_ca_list_policies)
  */
-void kbase_pm_ca_set_policy(struct kbase_device *kbdev,
-                const struct kbase_pm_ca_policy *policy);
+void kbase_pm_ca_set_policy(struct kbase_device *kbdev, const struct kbase_pm_ca_policy *policy);
 
 /**
  * Retrieve a static list of the available policies.
@@ -168,9 +159,7 @@ void kbase_pm_ca_set_policy(struct kbase_device *kbdev,
  *
  * @return The number of policies
  */
-int
-kbase_pm_ca_list_policies(const struct kbase_pm_ca_policy * const **policies);
-
+int kbase_pm_ca_list_policies(const struct kbase_pm_ca_policy *const **policies);
 
 /**
  * Get the current policy.
@@ -192,8 +181,7 @@ const struct kbase_pm_policy *kbase_pm_get_policy(struct kbase_device *kbdev);
  * @param policy The policy to change to (valid pointer returned from
  *               @ref kbase_pm_list_policies)
  */
-void kbase_pm_set_policy(struct kbase_device *kbdev,
-                    const struct kbase_pm_policy *policy);
+void kbase_pm_set_policy(struct kbase_device *kbdev, const struct kbase_pm_policy *policy);
 
 /**
  * Retrieve a static list of the available policies.
@@ -204,6 +192,6 @@ void kbase_pm_set_policy(struct kbase_device *kbdev,
  *
  * @return The number of policies
  */
-int kbase_pm_list_policies(const struct kbase_pm_policy * const **policies);
+int kbase_pm_list_policies(const struct kbase_pm_policy *const **policies);
 
 #endif /* _KBASE_HWACCESS_PM_H_ */

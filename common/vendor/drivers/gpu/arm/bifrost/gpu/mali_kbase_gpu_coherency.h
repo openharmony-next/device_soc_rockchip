@@ -24,8 +24,8 @@
 #define KBASE_GPU_COHERENCY_H
 
 #define COHERENCY_ACE_LITE 0
-#define COHERENCY_ACE      1
-#define COHERENCY_NONE     31
+#define COHERENCY_ACE 1
+#define COHERENCY_NONE 31
 #define COHERENCY_FEATURE_BIT(x) (1 << (x))
 
 #endif /* _KBASE_GPU_COHERENCY_H_ */

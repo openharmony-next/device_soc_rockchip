@@ -9,19 +9,15 @@
 #include <linux/types.h>
 #include <linux/v4l2-controls.h>
 
-#define RKCIF_API_VERSION        KERNEL_VERSION(0, 1, 0xa)
+#define RKCIF_API_VERSION KERNEL_VERSION(0, 1, 0xa)
 
-#define RKCIF_CMD_GET_CSI_MEMORY_MODE \
-    _IOR('V', BASE_VIDIOC_PRIVATE + 0, int)
+#define RKCIF_CMD_GET_CSI_MEMORY_MODE _IOR('V', BASE_VIDIOC_PRIVATE + 0, int)
 
-#define RKCIF_CMD_SET_CSI_MEMORY_MODE \
-    _IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
+#define RKCIF_CMD_SET_CSI_MEMORY_MODE _IOW('V', BASE_VIDIOC_PRIVATE + 1, int)
 
-#define RKCIF_CMD_GET_SCALE_BLC \
-    _IOR('V', BASE_VIDIOC_PRIVATE + 2, struct bayer_blc)
+#define RKCIF_CMD_GET_SCALE_BLC _IOR('V', BASE_VIDIOC_PRIVATE + 2, struct bayer_blc)
 
-#define RKCIF_CMD_SET_SCALE_BLC \
-    _IOW('V', BASE_VIDIOC_PRIVATE + 3, struct bayer_blc)
+#define RKCIF_CMD_SET_SCALE_BLC _IOW('V', BASE_VIDIOC_PRIVATE + 3, struct bayer_blc)
 
 /* cif memory mode
  * 0: raw12/raw10/raw8 8bit memory compact

@@ -37,7 +37,7 @@ struct mpp_dma_buffer {
     struct device *dev;
 };
 
-#define MPP_SESSION_MAX_BUFFERS        60
+#define MPP_SESSION_MAX_BUFFERS 60
 
 struct mpp_dma_session {
     /* the buffer used in session */
@@ -75,28 +75,20 @@ struct mpp_iommu_info {
     iommu_fault_handler_t hdl;
 };
 
-struct mpp_dma_session *
-mpp_dma_session_create(struct device *dev, u32 max_buffers);
+struct mpp_dma_session *mpp_dma_session_create(struct device *dev, u32 max_buffers);
 int mpp_dma_session_destroy(struct mpp_dma_session *dma);
 
-struct mpp_dma_buffer *
-mpp_dma_alloc(struct device *dev, size_t size);
+struct mpp_dma_buffer *mpp_dma_alloc(struct device *dev, size_t size);
 int mpp_dma_free(struct mpp_dma_buffer *buffer);
 
-struct mpp_dma_buffer *
-mpp_dma_import_fd(struct mpp_iommu_info *iommu_info,
-          struct mpp_dma_session *dma, int fd);
-int mpp_dma_release(struct mpp_dma_session *dma,
-            struct mpp_dma_buffer *buffer);
+struct mpp_dma_buffer *mpp_dma_import_fd(struct mpp_iommu_info *iommu_info, struct mpp_dma_session *dma, int fd);
+int mpp_dma_release(struct mpp_dma_session *dma, struct mpp_dma_buffer *buffer);
 int mpp_dma_release_fd(struct mpp_dma_session *dma, int fd);
 
-int mpp_dma_unmap_kernel(struct mpp_dma_session *dma,
-             struct mpp_dma_buffer *buffer);
-int mpp_dma_map_kernel(struct mpp_dma_session *dma,
-               struct mpp_dma_buffer *buffer);
+int mpp_dma_unmap_kernel(struct mpp_dma_session *dma, struct mpp_dma_buffer *buffer);
+int mpp_dma_map_kernel(struct mpp_dma_session *dma, struct mpp_dma_buffer *buffer);
 
-struct mpp_iommu_info *
-mpp_iommu_probe(struct device *dev);
+struct mpp_iommu_info *mpp_iommu_probe(struct device *dev);
 int mpp_iommu_remove(struct mpp_iommu_info *info);
 
 int mpp_iommu_attach(struct mpp_iommu_info *info);
@@ -107,32 +99,36 @@ int mpp_iommu_flush_tlb(struct mpp_iommu_info *info);
 
 static inline int mpp_iommu_down_read(struct mpp_iommu_info *info)
 {
-    if (info)
+    if (info) {
         down_read(&info->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_iommu_up_read(struct mpp_iommu_info *info)
 {
-    if (info)
+    if (info) {
         up_read(&info->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_iommu_down_write(struct mpp_iommu_info *info)
 {
-    if (info)
+    if (info) {
         down_write(&info->rw_sem);
+    }
 
     return 0;
 }
 
 static inline int mpp_iommu_up_write(struct mpp_iommu_info *info)
 {
-    if (info)
+    if (info) {
         up_write(&info->rw_sem);
+    }
 
     return 0;
 }

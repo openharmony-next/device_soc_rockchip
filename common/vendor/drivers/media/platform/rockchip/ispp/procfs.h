@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2020 Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_PROCFS_H
-#define _RKISPP_PROCFS_H
+#ifndef H_RKISPP_PROCFS_H
+#define H_RKISPP_PROCFS_H
 
 #ifdef CONFIG_PROC_FS
 int rkispp_proc_init(struct rkispp_device *dev);
@@ -14,7 +14,6 @@ static inline int rkispp_proc_init(struct rkispp_device *dev)
 }
 static inline void rkispp_proc_cleanup(struct rkispp_device *dev)
 {
-
 }
 #endif
 

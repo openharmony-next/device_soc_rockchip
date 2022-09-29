@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010, 2012-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -23,7 +24,6 @@
 #include <linux/hardirq.h>
 #include <linux/uaccess.h>
 #include <linux/syscalls.h>
-
 
 #include "mali_osk_types.h"
 #include "mali_kernel_linux.h"
@@ -51,13 +51,12 @@ static inline unsigned int mali_get_cpu_cyclecount(void)
 {
     unsigned int value;
     /* Reading the CCNT Register - CPU clock counter */
-    asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n": "=r"(value));
+    asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n" : "=r"(value));
     return value;
 }
 
 void mali_init_cpu_time_counters(int reset, int enable_divide_by_64);
 #endif
-
 
 MALI_STATIC_INLINE u32 _mali_osk_copy_from_user(void *to, void *from, u32 n)
 {

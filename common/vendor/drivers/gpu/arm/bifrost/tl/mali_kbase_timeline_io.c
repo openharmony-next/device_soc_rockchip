@@ -27,11 +27,7 @@
 #include <linux/poll.h>
 
 /* The timeline stream file operations functions. */
-static ssize_t kbasep_timeline_io_read(
-        struct file *filp,
-        char __user *buffer,
-        size_t      size,
-        loff_t      *f_pos);
+static ssize_t kbasep_timeline_io_read(struct file *filp, char __user *buffer, size_t size, loff_t *f_pos);
 static unsigned int kbasep_timeline_io_poll(struct file *filp, poll_table *wait);
 static int kbasep_timeline_io_release(struct inode *inode, struct file *filp);
 
@@ -39,8 +35,8 @@ static int kbasep_timeline_io_release(struct inode *inode, struct file *filp);
 const struct file_operations kbasep_tlstream_fops = {
     .owner = THIS_MODULE,
     .release = kbasep_timeline_io_release,
-    .read    = kbasep_timeline_io_read,
-    .poll    = kbasep_timeline_io_poll,
+    .read = kbasep_timeline_io_read,
+    .poll = kbasep_timeline_io_poll,
 };
 
 /**
@@ -56,10 +52,8 @@ const struct file_operations kbasep_tlstream_fops = {
  *
  * Return: non-zero if any of timeline streams has at last one packet ready
  */
-static int kbasep_timeline_io_packet_pending(
-        struct kbase_timeline  *timeline,
-        struct kbase_tlstream **ready_stream,
-        unsigned int           *rb_idx_raw)
+static int kbasep_timeline_io_packet_pending(struct kbase_timeline *timeline, struct kbase_tlstream **ready_stream,
+                                             unsigned int *rb_idx_raw)
 {
     enum tl_stream_type i;
 
@@ -78,7 +72,6 @@ static int kbasep_timeline_io_packet_pending(
             *ready_stream = stream;
             return 1;
         }
-
     }
 
     return 0;
@@ -92,13 +85,11 @@ static int kbasep_timeline_io_packet_pending(
  *
  * Return: non-zero if any of timeline headers has at last one packet ready.
  */
-static int kbasep_timeline_has_header_data(
-    struct kbase_timeline *timeline)
+static int kbasep_timeline_has_header_data(struct kbase_timeline *timeline)
 {
-    return timeline->obj_header_btc
-        || timeline->aux_header_btc
+    return timeline->obj_header_btc || timeline->aux_header_btc
 #if MALI_USE_CSF
-        || timeline->csf_tl_reader.tl_header.btc
+           || timeline->csf_tl_reader.tl_header.btc
 #endif
         ;
 }
@@ -116,23 +107,23 @@ static int kbasep_timeline_has_header_data(
  *
  * Returns: 0 if success, -1 otherwise.
  */
-static inline int copy_stream_header(
-    char __user *buffer, size_t size, ssize_t *copy_len,
-    const char *hdr,
-    size_t hdr_size,
-    size_t *hdr_btc)
+static inline int copy_stream_header(char __user *buffer, size_t size, ssize_t *copy_len, const char *hdr,
+                                     size_t hdr_size, size_t *hdr_btc)
 {
     const size_t offset = hdr_size - *hdr_btc;
     const size_t copy_size = MIN(size - *copy_len, *hdr_btc);
 
-    if (!*hdr_btc)
+    if (!*hdr_btc) {
         return 0;
+    }
 
-    if (WARN_ON(*hdr_btc > hdr_size))
+    if (WARN_ON(*hdr_btc > hdr_size)) {
         return -1;
+    }
 
-    if (copy_to_user(&buffer[*copy_len], &hdr[offset], copy_size))
+    if (copy_to_user(&buffer[*copy_len], &hdr[offset], copy_size)) {
         return -1;
+    }
 
     *hdr_btc -= copy_size;
     *copy_len += copy_size;
@@ -154,33 +145,24 @@ static inline int copy_stream_header(
  *
  * Returns: 0 if success, -1 if copy_to_user has failed.
  */
-static inline int kbasep_timeline_copy_headers(
-    struct kbase_timeline *timeline,
-    char __user *buffer,
-    size_t size,
-    ssize_t *copy_len)
+static inline int kbasep_timeline_copy_headers(struct kbase_timeline *timeline, char __user *buffer, size_t size,
+                                               ssize_t *copy_len)
 {
-    if (copy_stream_header(buffer, size, copy_len,
-            obj_desc_header,
-            obj_desc_header_size,
-            &timeline->obj_header_btc))
+    if (copy_stream_header(buffer, size, copy_len, obj_desc_header, obj_desc_header_size, &timeline->obj_header_btc)) {
         return -1;
+    }
 
-    if (copy_stream_header(buffer, size, copy_len,
-            aux_desc_header,
-            aux_desc_header_size,
-            &timeline->aux_header_btc))
+    if (copy_stream_header(buffer, size, copy_len, aux_desc_header, aux_desc_header_size, &timeline->aux_header_btc)) {
         return -1;
+    }
 #if MALI_USE_CSF
-    if (copy_stream_header(buffer, size, copy_len,
-            timeline->csf_tl_reader.tl_header.data,
-            timeline->csf_tl_reader.tl_header.size,
-            &timeline->csf_tl_reader.tl_header.btc))
+    if (copy_stream_header(buffer, size, copy_len, timeline->csf_tl_reader.tl_header.data,
+                           timeline->csf_tl_reader.tl_header.size, &timeline->csf_tl_reader.tl_header.btc)) {
         return -1;
+    }
 #endif
     return 0;
 }
-
 
 /**
  * kbasep_timeline_io_read - copy data from streams to buffer provided by user
@@ -191,11 +173,7 @@ static inline int kbasep_timeline_copy_headers(
  *
  * Return: number of bytes stored in the buffer
  */
-static ssize_t kbasep_timeline_io_read(
-        struct file *filp,
-        char __user *buffer,
-        size_t      size,
-        loff_t      *f_pos)
+static ssize_t kbasep_timeline_io_read(struct file *filp, char __user *buffer, size_t size, loff_t *f_pos)
 {
     ssize_t copy_len = 0;
     struct kbase_timeline *timeline;
@@ -203,28 +181,30 @@ static ssize_t kbasep_timeline_io_read(
     KBASE_DEBUG_ASSERT(filp);
     KBASE_DEBUG_ASSERT(f_pos);
 
-    if (WARN_ON(!filp->private_data))
+    if (WARN_ON(!filp->private_data)) {
         return -EFAULT;
+    }
 
-    timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *)filp->private_data;
 
-    if (!buffer)
+    if (!buffer) {
         return -EINVAL;
+    }
 
-    if ((*f_pos < 0) || (size < PACKET_SIZE))
+    if ((*f_pos < 0) || (size < PACKET_SIZE)) {
         return -EINVAL;
+    }
 
     mutex_lock(&timeline->reader_lock);
 
     while (copy_len < size) {
         struct kbase_tlstream *stream = NULL;
-        unsigned int        rb_idx_raw = 0;
-        unsigned int        wb_idx_raw;
-        unsigned int        rb_idx;
-        size_t              rb_size;
+        unsigned int rb_idx_raw = 0;
+        unsigned int wb_idx_raw;
+        unsigned int rb_idx;
+        size_t rb_size;
 
-        if (kbasep_timeline_copy_headers(
-                timeline, buffer, size, &copy_len)) {
+        if (kbasep_timeline_copy_headers(timeline, buffer, size, &copy_len)) {
             copy_len = -EFAULT;
             break;
         }
@@ -235,18 +215,12 @@ static ssize_t kbasep_timeline_io_read(
          * submitted.
          */
         if (copy_len > 0) {
-            if (!kbasep_timeline_io_packet_pending(
-                        timeline,
-                        &stream,
-                        &rb_idx_raw))
+            if (!kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx_raw)) {
                 break;
+            }
         } else {
-            if (wait_event_interruptible(
-                        timeline->event_queue,
-                        kbasep_timeline_io_packet_pending(
-                            timeline,
-                            &stream,
-                            &rb_idx_raw))) {
+            if (wait_event_interruptible(timeline->event_queue,
+                                         kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx_raw))) {
                 copy_len = -ERESTARTSYS;
                 break;
             }
@@ -262,12 +236,10 @@ static ssize_t kbasep_timeline_io_read(
          */
         rb_idx = rb_idx_raw % PACKET_COUNT;
         rb_size = atomic_read(&stream->buffer[rb_idx].size);
-        if (rb_size > size - copy_len)
+        if (rb_size > size - copy_len) {
             break;
-        if (copy_to_user(
-                    &buffer[copy_len],
-                    stream->buffer[rb_idx].data,
-                    rb_size)) {
+        }
+        if (copy_to_user(&buffer[copy_len], stream->buffer[rb_idx].data, rb_size)) {
             copy_len = -EFAULT;
             break;
         }
@@ -288,8 +260,7 @@ static ssize_t kbasep_timeline_io_read(
 #endif /* MALI_UNIT_TEST */
 
         } else {
-            const unsigned int new_rb_idx_raw =
-                wb_idx_raw - PACKET_COUNT + 1;
+            const unsigned int new_rb_idx_raw = wb_idx_raw - PACKET_COUNT + 1;
             /* Adjust read buffer index to the next valid buffer */
             atomic_set(&stream->rbi, new_rb_idx_raw);
         }
@@ -309,24 +280,27 @@ static ssize_t kbasep_timeline_io_read(
 static unsigned int kbasep_timeline_io_poll(struct file *filp, poll_table *wait)
 {
     struct kbase_tlstream *stream;
-    unsigned int        rb_idx;
+    unsigned int rb_idx;
     struct kbase_timeline *timeline;
 
     KBASE_DEBUG_ASSERT(filp);
     KBASE_DEBUG_ASSERT(wait);
 
-    if (WARN_ON(!filp->private_data))
+    if (WARN_ON(!filp->private_data)) {
         return -EFAULT;
+    }
 
-    timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *)filp->private_data;
 
     /* If there are header bytes to copy, read will not block */
-    if (kbasep_timeline_has_header_data(timeline))
+    if (kbasep_timeline_has_header_data(timeline)) {
         return POLLIN;
+    }
 
     poll_wait(filp, &timeline->event_queue, wait);
-    if (kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx))
+    if (kbasep_timeline_io_packet_pending(timeline, &stream, &rb_idx)) {
         return POLLIN;
+    }
     return 0;
 }
 
@@ -347,7 +321,7 @@ static int kbasep_timeline_io_release(struct inode *inode, struct file *filp)
 
     CSTD_UNUSED(inode);
 
-    timeline = (struct kbase_timeline *) filp->private_data;
+    timeline = (struct kbase_timeline *)filp->private_data;
 
 #if MALI_USE_CSF
     kbase_csf_tl_reader_stop(&timeline->csf_tl_reader);

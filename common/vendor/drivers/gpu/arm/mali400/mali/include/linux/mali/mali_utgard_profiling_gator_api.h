@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2013, 2015-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -21,37 +22,23 @@ extern "C" {
 #define MAX_NUM_FP_CORES 8
 #define MAX_NUM_VP_CORES 1
 
-#define MALI_SPCIAL_COUNTER_DESCRIPTIONS \
-    {                                           \
-        "Filmstrip_cnt0",                 \
-        "Frequency",       \
-        "Voltage",       \
-        "vertex",     \
-        "fragment",         \
-        "Total_alloc_pages",        \
+#define MALI_SPCIAL_COUNTER_DESCRIPTIONS                                                                               \
+    {                                                                                                                  \
+        "Filmstrip_cnt0", "Frequency", "Voltage", "vertex", "fragment", "Total_alloc_pages",                           \
     };
 
-#define MALI_MEM_COUTNER_DESCRIPTIONS \
-    {                                           \
-        "untyped_memory",                 \
-        "vertex_index_buffer",       \
-        "texture_buffer",       \
-        "varying_buffer",     \
-        "render_target",         \
-        "pbuffer_buffer",        \
-        "plbu_heap",            \
-        "pointer_array_buffer",             \
-        "slave_tilelist",          \
-        "untyped_gp_cmdlist",     \
-        "polygon_cmdlist",               \
-        "texture_descriptor",               \
-        "render_state_word",               \
-        "shader",               \
-        "stream_buffer",               \
-        "fragment_stack",               \
-        "uniform",               \
-        "untyped_frame_pool",               \
-        "untyped_surface",               \
+#define MALI_MEM_COUTNER_DESCRIPTIONS                                                                                  \
+    {                                                                                                                  \
+        "untyped_memory",    "vertex_index_buffer",                                                                    \
+        "texture_buffer",    "varying_buffer",                                                                         \
+        "render_target",     "pbuffer_buffer",                                                                         \
+        "plbu_heap",         "pointer_array_buffer",                                                                   \
+        "slave_tilelist",    "untyped_gp_cmdlist",                                                                     \
+        "polygon_cmdlist",   "texture_descriptor",                                                                     \
+        "render_state_word", "shader",                                                                                 \
+        "stream_buffer",     "fragment_stack",                                                                         \
+        "uniform",           "untyped_frame_pool",                                                                     \
+        "untyped_surface",                                                                                             \
     };
 
 /** The list of events supported by the Mali DDK. */
@@ -188,44 +175,45 @@ typedef enum {
     NUMBER_OF_EVENTS
 } mali_osk_counter_id;
 
-#define FIRST_ACTIVITY_EVENT    ACTIVITY_VP_0
-#define LAST_ACTIVITY_EVENT     ACTIVITY_FP_7
+#define FIRST_ACTIVITY_EVENT ACTIVITY_VP_0
+#define LAST_ACTIVITY_EVENT ACTIVITY_FP_7
 
-#define FIRST_HW_COUNTER        COUNTER_L2_0_C0
-#define LAST_HW_COUNTER         COUNTER_FP_7_C1
+#define FIRST_HW_COUNTER COUNTER_L2_0_C0
+#define LAST_HW_COUNTER COUNTER_FP_7_C1
 
-#define FIRST_SW_COUNTER        COUNTER_EGL_BLIT_TIME
-#define LAST_SW_COUNTER         COUNTER_GLES_LOOP_LINES_COUNT
+#define FIRST_SW_COUNTER COUNTER_EGL_BLIT_TIME
+#define LAST_SW_COUNTER COUNTER_GLES_LOOP_LINES_COUNT
 
-#define FIRST_SPECIAL_COUNTER   COUNTER_FILMSTRIP
-#define LAST_SPECIAL_COUNTER    COUNTER_TOTAL_ALLOC_PAGES
+#define FIRST_SPECIAL_COUNTER COUNTER_FILMSTRIP
+#define LAST_SPECIAL_COUNTER COUNTER_TOTAL_ALLOC_PAGES
 
-#define FIRST_MEM_COUNTER               COUNTER_MEM_UNTYPED
-#define LAST_MEM_COUNTER                COUNTER_MEM_UNTYPE_SURFACE
+#define FIRST_MEM_COUNTER COUNTER_MEM_UNTYPED
+#define LAST_MEM_COUNTER COUNTER_MEM_UNTYPE_SURFACE
 
 #define MALI_PROFILING_MEM_COUNTERS_NUM (LAST_MEM_COUNTER - FIRST_MEM_COUNTER + 1)
-#define MALI_PROFILING_SPECIAL_COUNTERS_NUM     (LAST_SPECIAL_COUNTER - FIRST_SPECIAL_COUNTER + 1)
-#define MALI_PROFILING_SW_COUNTERS_NUM  (LAST_SW_COUNTER - FIRST_SW_COUNTER + 1)
+#define MALI_PROFILING_SPECIAL_COUNTERS_NUM (LAST_SPECIAL_COUNTER - FIRST_SPECIAL_COUNTER + 1)
+#define MALI_PROFILING_SW_COUNTERS_NUM (LAST_SW_COUNTER - FIRST_SW_COUNTER + 1)
 
 /**
  * Define the stream header type for porfiling stream.
  */
-#define  STREAM_HEADER_FRAMEBUFFER 0x05         /* The stream packet header type for framebuffer dumping. */
-#define STREAM_HEADER_COUNTER_VALUE  0x09       /* The stream packet header type for hw/sw/memory counter sampling. */
-#define STREAM_HEADER_CORE_ACTIVITY 0x0a                /* The stream packet header type for activity counter sampling. */
-#define STREAM_HEADER_SIZE      5
+#define STREAM_HEADER_FRAMEBUFFER 0x05   /* The stream packet header type for framebuffer dumping. */
+#define STREAM_HEADER_COUNTER_VALUE 0x09 /* The stream packet header type for hw/sw/memory counter sampling. */
+#define STREAM_HEADER_CORE_ACTIVITY 0x0a /* The stream packet header type for activity counter sampling. */
+#define STREAM_HEADER_SIZE 5
 
 /**
  * Define the packet header type of profiling control packet.
  */
-#define PACKET_HEADER_ERROR            0x80             /* The response packet header type if error. */
-#define PACKET_HEADER_ACK              0x81             /* The response packet header type if OK. */
-#define PACKET_HEADER_COUNTERS_REQUEST 0x82             /* The control packet header type to request counter information from ddk. */
-#define PACKET_HEADER_COUNTERS_ACK         0x83         /* The response packet header type to send out counter information. */
-#define PACKET_HEADER_COUNTERS_ENABLE  0x84             /* The control packet header type to enable counters. */
-#define PACKET_HEADER_START_CAPTURE_VALUE            0x85               /* The control packet header type to start capture values. */
+#define PACKET_HEADER_ERROR 0x80 /* The response packet header type if error. */
+#define PACKET_HEADER_ACK 0x81   /* The response packet header type if OK. */
+#define PACKET_HEADER_COUNTERS_REQUEST                                                                                 \
+    0x82                                   /* The control packet header type to request counter information from ddk. */
+#define PACKET_HEADER_COUNTERS_ACK 0x83    /* The response packet header type to send out counter information. */
+#define PACKET_HEADER_COUNTERS_ENABLE 0x84 /* The control packet header type to enable counters. */
+#define PACKET_HEADER_START_CAPTURE_VALUE 0x85 /* The control packet header type to start capture values. */
 
-#define PACKET_HEADER_SIZE      5
+#define PACKET_HEADER_SIZE 5
 
 /**
  * Structure to pass performance counter data of a Mali core

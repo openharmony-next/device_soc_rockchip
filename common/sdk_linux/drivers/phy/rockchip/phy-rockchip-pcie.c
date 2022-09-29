@@ -23,40 +23,39 @@
  * The higher 16-bit of this register is used for write protection
  * only if BIT(x + 16) set to 1 the BIT(x) can be written.
  */
-#define HIWORD_UPDATE(val, mask, shift) \
-        ((val) << (shift) | (mask) << ((shift) + 16))
+#define HIWORD_UPDATE(val, mask, shift) ((val) << (shift) | (mask) << ((shift) + 16))
 
-#define PHY_MAX_LANE_NUM      4
-#define PHY_CFG_DATA_SHIFT    7
-#define PHY_CFG_ADDR_SHIFT    1
-#define PHY_CFG_DATA_MASK     0xf
-#define PHY_CFG_ADDR_MASK     0x3f
-#define PHY_CFG_RD_MASK       0x3ff
-#define PHY_CFG_WR_ENABLE     1
-#define PHY_CFG_WR_DISABLE    1
-#define PHY_CFG_WR_SHIFT      0
-#define PHY_CFG_WR_MASK       1
-#define PHY_CFG_PLL_LOCK      0x10
-#define PHY_CFG_CLK_TEST      0x10
-#define PHY_CFG_CLK_SCC       0x12
-#define PHY_CFG_SEPE_RATE     BIT(3)
-#define PHY_CFG_PLL_100M      BIT(3)
-#define PHY_PLL_LOCKED        BIT(9)
-#define PHY_PLL_OUTPUT        BIT(10)
-#define PHY_LANE_A_STATUS     0x30
-#define PHY_LANE_B_STATUS     0x31
-#define PHY_LANE_C_STATUS     0x32
-#define PHY_LANE_D_STATUS     0x33
+#define PHY_MAX_LANE_NUM 4
+#define PHY_CFG_DATA_SHIFT 7
+#define PHY_CFG_ADDR_SHIFT 1
+#define PHY_CFG_DATA_MASK 0xf
+#define PHY_CFG_ADDR_MASK 0x3f
+#define PHY_CFG_RD_MASK 0x3ff
+#define PHY_CFG_WR_ENABLE 1
+#define PHY_CFG_WR_DISABLE 1
+#define PHY_CFG_WR_SHIFT 0
+#define PHY_CFG_WR_MASK 1
+#define PHY_CFG_PLL_LOCK 0x10
+#define PHY_CFG_CLK_TEST 0x10
+#define PHY_CFG_CLK_SCC 0x12
+#define PHY_CFG_SEPE_RATE BIT(3)
+#define PHY_CFG_PLL_100M BIT(3)
+#define PHY_PLL_LOCKED BIT(9)
+#define PHY_PLL_OUTPUT BIT(10)
+#define PHY_LANE_A_STATUS 0x30
+#define PHY_LANE_B_STATUS 0x31
+#define PHY_LANE_C_STATUS 0x32
+#define PHY_LANE_D_STATUS 0x33
 #define PHY_LANE_RX_DET_SHIFT 11
-#define PHY_LANE_RX_DET_TH    0x1
-#define PHY_LANE_IDLE_OFF     0x1
-#define PHY_LANE_IDLE_MASK    0x1
+#define PHY_LANE_RX_DET_TH 0x1
+#define PHY_LANE_IDLE_OFF 0x1
+#define PHY_LANE_IDLE_MASK 0x1
 #define PHY_LANE_IDLE_A_SHIFT 3
 #define PHY_LANE_IDLE_B_SHIFT 4
 #define PHY_LANE_IDLE_C_SHIFT 5
 #define PHY_LANE_IDLE_D_SHIFT 6
-#define MSLEEP_TWENTY         20
-#define MSECS_TO_JIFFIES      1000
+#define MSLEEP_TWENTY 20
+#define MSECS_TO_JIFFIES 1000
 
 struct rockchip_pcie_data {
     unsigned int pcie_conf;
@@ -80,59 +79,44 @@ struct rockchip_pcie_phy {
 
 static struct rockchip_pcie_phy *to_pcie_phy(struct phy_pcie_instance *inst)
 {
-    return container_of(inst, struct rockchip_pcie_phy,
-                    phys[inst->index]);
+    return container_of(inst, struct rockchip_pcie_phy, phys[inst->index]);
 }
 
-static struct phy *rockchip_pcie_phy_of_xlate(struct device *dev,
-                          struct of_phandle_args *args)
+static struct phy *rockchip_pcie_phy_of_xlate(struct device *dev, struct of_phandle_args *args)
 {
     struct rockchip_pcie_phy *rk_phy = dev_get_drvdata(dev);
 
-    if (args->args_count == 0)
+    if (args->args_count == 0) {
         return rk_phy->phys[0].phy;
+    }
 
-    if (WARN_ON(args->args[0] >= PHY_MAX_LANE_NUM))
+    if (WARN_ON(args->args[0] >= PHY_MAX_LANE_NUM)) {
         return ERR_PTR(-ENODEV);
+    }
 
     return rk_phy->phys[args->args[0]].phy;
 }
 
-
-static inline void phy_wr_cfg(struct rockchip_pcie_phy *rk_phy,
-                  u32 addr, u32 data)
+static inline void phy_wr_cfg(struct rockchip_pcie_phy *rk_phy, u32 addr, u32 data)
 {
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(data,
-                   PHY_CFG_DATA_MASK,
-                   PHY_CFG_DATA_SHIFT) |
-             HIWORD_UPDATE(addr,
-                   PHY_CFG_ADDR_MASK,
-                   PHY_CFG_ADDR_SHIFT));
+                 HIWORD_UPDATE(data, PHY_CFG_DATA_MASK, PHY_CFG_DATA_SHIFT) |
+                     HIWORD_UPDATE(addr, PHY_CFG_ADDR_MASK, PHY_CFG_ADDR_SHIFT));
     udelay(1);
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(PHY_CFG_WR_ENABLE,
-                   PHY_CFG_WR_MASK,
-                   PHY_CFG_WR_SHIFT));
+                 HIWORD_UPDATE(PHY_CFG_WR_ENABLE, PHY_CFG_WR_MASK, PHY_CFG_WR_SHIFT));
     udelay(1);
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(PHY_CFG_WR_DISABLE,
-                   PHY_CFG_WR_MASK,
-                   PHY_CFG_WR_SHIFT));
+                 HIWORD_UPDATE(PHY_CFG_WR_DISABLE, PHY_CFG_WR_MASK, PHY_CFG_WR_SHIFT));
 }
 
-static inline u32 phy_rd_cfg(struct rockchip_pcie_phy *rk_phy,
-                 u32 addr)
+static inline u32 phy_rd_cfg(struct rockchip_pcie_phy *rk_phy, u32 addr)
 {
     u32 val;
 
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(addr,
-                   PHY_CFG_RD_MASK,
-                   PHY_CFG_ADDR_SHIFT));
-    regmap_read(rk_phy->reg_base,
-            rk_phy->phy_data->pcie_status,
-            &val);
+                 HIWORD_UPDATE(addr, PHY_CFG_RD_MASK, PHY_CFG_ADDR_SHIFT));
+    regmap_read(rk_phy->reg_base, rk_phy->phy_data->pcie_status, &val);
     return val;
 }
 
@@ -144,14 +128,12 @@ static int rockchip_pcie_phy_power_off(struct phy *phy)
 
     mutex_lock(&rk_phy->pcie_mutex);
 
-    regmap_write(rk_phy->reg_base,
-             rk_phy->phy_data->pcie_laneoff,
-             HIWORD_UPDATE(PHY_LANE_IDLE_OFF,
-                   PHY_LANE_IDLE_MASK,
-                   PHY_LANE_IDLE_A_SHIFT + inst->index));
+    regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
+                 HIWORD_UPDATE(PHY_LANE_IDLE_OFF, PHY_LANE_IDLE_MASK, PHY_LANE_IDLE_A_SHIFT + inst->index));
 
-    if (--rk_phy->pwr_cnt)
+    if (--rk_phy->pwr_cnt) {
         goto err_out;
+    }
 
     err = reset_control_assert(rk_phy->phy_rst);
     if (err) {
@@ -165,11 +147,8 @@ err_out:
 
 err_restore:
     rk_phy->pwr_cnt++;
-    regmap_write(rk_phy->reg_base,
-             rk_phy->phy_data->pcie_laneoff,
-             HIWORD_UPDATE(!PHY_LANE_IDLE_OFF,
-                   PHY_LANE_IDLE_MASK,
-                   PHY_LANE_IDLE_A_SHIFT + inst->index));
+    regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
+                 HIWORD_UPDATE(!PHY_LANE_IDLE_OFF, PHY_LANE_IDLE_MASK, PHY_LANE_IDLE_A_SHIFT + inst->index));
     mutex_unlock(&rk_phy->pcie_mutex);
     return err;
 }
@@ -184,14 +163,12 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
 
     mutex_lock(&rk_phy->pcie_mutex);
 
-    regmap_write(rk_phy->reg_base,
-             rk_phy->phy_data->pcie_laneoff,
-             HIWORD_UPDATE(!PHY_LANE_IDLE_OFF,
-                   PHY_LANE_IDLE_MASK,
-                   PHY_LANE_IDLE_A_SHIFT + inst->index));
+    regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
+                 HIWORD_UPDATE(!PHY_LANE_IDLE_OFF, PHY_LANE_IDLE_MASK, PHY_LANE_IDLE_A_SHIFT + inst->index));
 
-    if (rk_phy->pwr_cnt++)
+    if (rk_phy->pwr_cnt++) {
         goto err_out;
+    }
 
     err = reset_control_deassert(rk_phy->phy_rst);
     if (err) {
@@ -200,9 +177,7 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
     }
 
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(PHY_CFG_PLL_LOCK,
-                   PHY_CFG_ADDR_MASK,
-                   PHY_CFG_ADDR_SHIFT));
+                 HIWORD_UPDATE(PHY_CFG_PLL_LOCK, PHY_CFG_ADDR_MASK, PHY_CFG_ADDR_SHIFT));
 
     /*
      * No documented timeout value for phy operation below,
@@ -213,9 +188,7 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
 
     err = -EINVAL;
     while (time_before(jiffies, timeout)) {
-        regmap_read(rk_phy->reg_base,
-                rk_phy->phy_data->pcie_status,
-                &status);
+        regmap_read(rk_phy->reg_base, rk_phy->phy_data->pcie_status, &status);
         if (status & PHY_PLL_LOCKED) {
             dev_dbg(&phy->dev, "pll locked!\n");
             err = 0;
@@ -234,9 +207,7 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
 
     err = -ETIMEDOUT;
     while (time_before(jiffies, timeout)) {
-        regmap_read(rk_phy->reg_base,
-                rk_phy->phy_data->pcie_status,
-                &status);
+        regmap_read(rk_phy->reg_base, rk_phy->phy_data->pcie_status, &status);
         if (!(status & PHY_PLL_OUTPUT)) {
             dev_dbg(&phy->dev, "pll output enable done!\n");
             err = 0;
@@ -251,14 +222,10 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
     }
 
     regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
-             HIWORD_UPDATE(PHY_CFG_PLL_LOCK,
-                   PHY_CFG_ADDR_MASK,
-                   PHY_CFG_ADDR_SHIFT));
+                 HIWORD_UPDATE(PHY_CFG_PLL_LOCK, PHY_CFG_ADDR_MASK, PHY_CFG_ADDR_SHIFT));
     err = -EINVAL;
     while (time_before(jiffies, timeout)) {
-        regmap_read(rk_phy->reg_base,
-                rk_phy->phy_data->pcie_status,
-                &status);
+        regmap_read(rk_phy->reg_base, rk_phy->phy_data->pcie_status, &status);
         if (status & PHY_PLL_LOCKED) {
             dev_dbg(&phy->dev, "pll relocked!\n");
             err = 0;
@@ -292,8 +259,9 @@ static int rockchip_pcie_phy_init(struct phy *phy)
 
     mutex_lock(&rk_phy->pcie_mutex);
 
-    if (rk_phy->init_cnt++)
+    if (rk_phy->init_cnt++) {
         goto err_out;
+    }
 
     err = clk_prepare_enable(rk_phy->clk_pciephy_ref);
     if (err) {
@@ -327,8 +295,9 @@ static int rockchip_pcie_phy_exit(struct phy *phy)
 
     mutex_lock(&rk_phy->pcie_mutex);
 
-    if (--rk_phy->init_cnt)
+    if (--rk_phy->init_cnt) {
         goto err_init_cnt;
+    }
 
     clk_disable_unprepare(rk_phy->clk_pciephy_ref);
 
@@ -338,11 +307,11 @@ err_init_cnt:
 }
 
 static const struct phy_ops ops = {
-    .init        = rockchip_pcie_phy_init,
-    .exit        = rockchip_pcie_phy_exit,
-    .power_on    = rockchip_pcie_phy_power_on,
-    .power_off    = rockchip_pcie_phy_power_off,
-    .owner        = THIS_MODULE,
+    .init = rockchip_pcie_phy_init,
+    .exit = rockchip_pcie_phy_exit,
+    .power_on = rockchip_pcie_phy_power_on,
+    .power_off = rockchip_pcie_phy_power_off,
+    .owner = THIS_MODULE,
 };
 
 static const struct rockchip_pcie_data rk3399_pcie_data = {
@@ -351,13 +320,11 @@ static const struct rockchip_pcie_data rk3399_pcie_data = {
     .pcie_laneoff = 0xe214,
 };
 
-static const struct of_device_id rockchip_pcie_phy_dt_ids[] = {
-    {
-        .compatible = "rockchip,rk3399-pcie-phy",
-        .data = &rk3399_pcie_data,
-    },
-    {}
-};
+static const struct of_device_id rockchip_pcie_phy_dt_ids[] = {{
+                                                                   .compatible = "rockchip,rk3399-pcie-phy",
+                                                                   .data = &rk3399_pcie_data,
+                                                               },
+                                                               {}};
 
 MODULE_DEVICE_TABLE(of, rockchip_pcie_phy_dt_ids);
 
@@ -378,12 +345,14 @@ static int rockchip_pcie_phy_probe(struct platform_device *pdev)
     }
 
     rk_phy = devm_kzalloc(dev, sizeof(*rk_phy), GFP_KERNEL);
-    if (!rk_phy)
+    if (!rk_phy) {
         return -ENOMEM;
+    }
 
     of_id = of_match_device(rockchip_pcie_phy_dt_ids, &pdev->dev);
-    if (!of_id)
+    if (!of_id) {
         return -EINVAL;
+    }
 
     rk_phy->phy_data = (struct rockchip_pcie_data *)of_id->data;
     rk_phy->reg_base = grf;
@@ -392,9 +361,9 @@ static int rockchip_pcie_phy_probe(struct platform_device *pdev)
 
     rk_phy->phy_rst = devm_reset_control_get(dev, "phy");
     if (IS_ERR(rk_phy->phy_rst)) {
-        if (PTR_ERR(rk_phy->phy_rst) != -EPROBE_DEFER)
-            dev_err(dev,
-                "missing phy property for reset controller\n");
+        if (PTR_ERR(rk_phy->phy_rst) != -EPROBE_DEFER) {
+            dev_err(dev, "missing phy property for reset controller\n");
+        }
         return PTR_ERR(rk_phy->phy_rst);
     }
 
@@ -405,8 +374,9 @@ static int rockchip_pcie_phy_probe(struct platform_device *pdev)
     }
 
     /* parse #phy-cells to see if it's legacy PHY model */
-    if (of_property_read_u32(dev->of_node, "#phy-cells", &phy_num))
+    if (of_property_read_u32(dev->of_node, "#phy-cells", &phy_num)) {
         return -ENOENT;
+    }
 
     phy_num = (phy_num == 0) ? 1 : PHY_MAX_LANE_NUM;
     dev_dbg(dev, "phy number is %d\n", phy_num);
@@ -422,18 +392,18 @@ static int rockchip_pcie_phy_probe(struct platform_device *pdev)
     }
 
     platform_set_drvdata(pdev, rk_phy);
-    phy_provider = devm_of_phy_provider_register(dev,
-                    rockchip_pcie_phy_of_xlate);
+    phy_provider = devm_of_phy_provider_register(dev, rockchip_pcie_phy_of_xlate);
 
     return PTR_ERR_OR_ZERO(phy_provider);
 }
 
 static struct platform_driver rockchip_pcie_driver = {
-    .probe        = rockchip_pcie_phy_probe,
-    .driver        = {
-        .name    = "rockchip-pcie-phy",
-        .of_match_table = rockchip_pcie_phy_dt_ids,
-    },
+    .probe = rockchip_pcie_phy_probe,
+    .driver =
+        {
+            .name = "rockchip-pcie-phy",
+            .of_match_table = rockchip_pcie_phy_dt_ids,
+        },
 };
 
 module_platform_driver(rockchip_pcie_driver);

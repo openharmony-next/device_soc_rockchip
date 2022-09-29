@@ -86,13 +86,15 @@ static int kbase_device_all_as_init(struct kbase_device *kbdev)
 
     for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
         err = kbase_mmu_as_init(kbdev, i);
-        if (err)
+        if (err) {
             break;
+        }
     }
 
     if (err) {
-        while (i-- > 0)
+        while (i-- > 0) {
             kbase_mmu_as_term(kbdev, i);
+        }
     }
 
     return err;
@@ -102,11 +104,12 @@ static void kbase_device_all_as_term(struct kbase_device *kbdev)
 {
     int i;
 
-    for (i = 0; i < kbdev->nr_hw_address_spaces; i++)
+    for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
         kbase_mmu_as_term(kbdev, i);
+    }
 }
 
-int kbase_device_misc_init(struct kbase_device * const kbdev)
+int kbase_device_misc_init(struct kbase_device *const kbdev)
 {
     int err;
 #ifdef CONFIG_ARM64
@@ -119,17 +122,15 @@ int kbase_device_misc_init(struct kbase_device * const kbdev)
     kbdev->cci_snoop_enabled = false;
     np = kbdev->dev->of_node;
     if (np != NULL) {
-        if (of_property_read_u32(np, "snoop_enable_smc",
-                    &kbdev->snoop_enable_smc))
+        if (of_property_read_u32(np, "snoop_enable_smc", &kbdev->snoop_enable_smc)) {
             kbdev->snoop_enable_smc = 0;
-        if (of_property_read_u32(np, "snoop_disable_smc",
-                    &kbdev->snoop_disable_smc))
+        }
+        if (of_property_read_u32(np, "snoop_disable_smc", &kbdev->snoop_disable_smc)) {
             kbdev->snoop_disable_smc = 0;
+        }
         /* Either both or none of the calls should be provided. */
-        if (!((kbdev->snoop_disable_smc == 0
-            && kbdev->snoop_enable_smc == 0)
-            || (kbdev->snoop_disable_smc != 0
-            && kbdev->snoop_enable_smc != 0))) {
+        if (!((kbdev->snoop_disable_smc == 0 && kbdev->snoop_enable_smc == 0) ||
+              (kbdev->snoop_disable_smc != 0 && kbdev->snoop_enable_smc != 0))) {
             WARN_ON(1);
             err = -EINVAL;
             goto fail;
@@ -140,8 +141,9 @@ int kbase_device_misc_init(struct kbase_device * const kbdev)
      * (identified by the GPU_ID register)
      */
     err = kbase_hw_set_issues_mask(kbdev);
-    if (err)
+    if (err) {
         goto fail;
+    }
 
     /* Set the list of features available on the current HW
      * (identified by the GPU_ID register)
@@ -149,8 +151,9 @@ int kbase_device_misc_init(struct kbase_device * const kbdev)
     kbase_hw_set_features_mask(kbdev);
 
     err = kbase_gpuprops_set_features(kbdev);
-    if (err)
+    if (err) {
         goto fail;
+    }
 
     /* On Linux 4.0+, dma coherency is determined from device tree */
 #if defined(CONFIG_ARM64) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0)
@@ -160,30 +163,33 @@ int kbase_device_misc_init(struct kbase_device * const kbdev)
     /* Workaround a pre-3.13 Linux issue, where dma_mask is NULL when our
      * device structure was created by device-tree
      */
-    if (!kbdev->dev->dma_mask)
+    if (!kbdev->dev->dma_mask) {
         kbdev->dev->dma_mask = &kbdev->dev->coherent_dma_mask;
+    }
 
-    err = dma_set_mask(kbdev->dev,
-            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-    if (err)
+    err = dma_set_mask(kbdev->dev, DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err) {
         goto dma_set_mask_failed;
+    }
 
-    err = dma_set_coherent_mask(kbdev->dev,
-            DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
-    if (err)
+    err = dma_set_coherent_mask(kbdev->dev, DMA_BIT_MASK(kbdev->gpu_props.mmu.pa_bits));
+    if (err) {
         goto dma_set_mask_failed;
+    }
 
     kbdev->nr_hw_address_spaces = kbdev->gpu_props.num_address_spaces;
 
     err = kbase_device_all_as_init(kbdev);
-    if (err)
+    if (err) {
         goto dma_set_mask_failed;
+    }
 
     spin_lock_init(&kbdev->hwcnt.lock);
 
     err = kbase_ktrace_init(kbdev);
-    if (err)
+    if (err) {
         goto term_as;
+    }
 
     init_waitqueue_head(&kbdev->cache_clean_wait);
 
@@ -192,17 +198,19 @@ int kbase_device_misc_init(struct kbase_device * const kbdev)
     atomic_set(&kbdev->ctx_num, 0);
 
     err = kbase_instr_backend_init(kbdev);
-    if (err)
+    if (err) {
         goto term_trace;
+    }
 
     kbdev->pm.dvfs_period = DEFAULT_PM_DVFS_PERIOD;
 
     kbdev->reset_timeout_ms = DEFAULT_RESET_TIMEOUT_MS;
 
-    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU))
+    if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU)) {
         kbdev->mmu_mode = kbase_mmu_mode_get_aarch64();
-    else
+    } else {
         kbdev->mmu_mode = kbase_mmu_mode_get_lpae();
+    }
 
     mutex_init(&kbdev->kctx_list_lock);
     INIT_LIST_HEAD(&kbdev->kctx_list);
@@ -243,8 +251,7 @@ void kbase_device_free(struct kbase_device *kbdev)
 
 void kbase_device_id_init(struct kbase_device *kbdev)
 {
-    scnprintf(kbdev->devname, DEVNAME_SIZE, "%s%d", kbase_drv_name,
-            kbase_dev_nr);
+    scnprintf(kbdev->devname, DEVNAME_SIZE, "%s%d", kbase_drv_name, kbase_dev_nr);
     kbdev->id = kbase_dev_nr;
 }
 
@@ -265,8 +272,7 @@ void kbase_device_hwcnt_backend_jm_term(struct kbase_device *kbdev)
 
 int kbase_device_hwcnt_context_init(struct kbase_device *kbdev)
 {
-    return kbase_hwcnt_context_init(&kbdev->hwcnt_gpu_iface,
-            &kbdev->hwcnt_gpu_ctx);
+    return kbase_hwcnt_context_init(&kbdev->hwcnt_gpu_iface, &kbdev->hwcnt_gpu_ctx);
 }
 
 void kbase_device_hwcnt_context_term(struct kbase_device *kbdev)
@@ -276,9 +282,8 @@ void kbase_device_hwcnt_context_term(struct kbase_device *kbdev)
 
 int kbase_device_hwcnt_virtualizer_init(struct kbase_device *kbdev)
 {
-    return kbase_hwcnt_virtualizer_init(kbdev->hwcnt_gpu_ctx,
-            KBASE_HWCNT_GPU_VIRTUALIZER_DUMP_THRESHOLD_NS,
-            &kbdev->hwcnt_gpu_virt);
+    return kbase_hwcnt_virtualizer_init(kbdev->hwcnt_gpu_ctx, KBASE_HWCNT_GPU_VIRTUALIZER_DUMP_THRESHOLD_NS,
+                                        &kbdev->hwcnt_gpu_virt);
 }
 
 void kbase_device_hwcnt_virtualizer_term(struct kbase_device *kbdev)
@@ -309,8 +314,7 @@ void kbase_device_vinstr_term(struct kbase_device *kbdev)
 
 int kbase_device_io_history_init(struct kbase_device *kbdev)
 {
-    return kbase_io_history_init(&kbdev->io_history,
-            KBASEP_DEFAULT_REGISTER_HISTORY_SIZE);
+    return kbase_io_history_init(&kbdev->io_history, KBASEP_DEFAULT_REGISTER_HISTORY_SIZE);
 }
 
 void kbase_device_io_history_term(struct kbase_device *kbdev)
@@ -366,12 +370,14 @@ int kbase_device_early_init(struct kbase_device *kbdev)
     int err;
 
     err = kbasep_platform_device_init(kbdev);
-    if (err)
+    if (err) {
         return err;
+    }
 
     err = kbase_pm_runtime_init(kbdev);
-    if (err)
+    if (err) {
         goto fail_runtime_pm;
+    }
 
     /* Ensure we can access the GPU registers */
     kbase_pm_register_access_enable(kbdev);
@@ -383,8 +389,9 @@ int kbase_device_early_init(struct kbase_device *kbdev)
     kbase_pm_register_access_disable(kbdev);
 
     err = kbase_install_interrupts(kbdev);
-    if (err)
+    if (err) {
         goto fail_interrupts;
+    }
 
     return 0;
 
@@ -399,10 +406,11 @@ fail_runtime_pm:
 void kbase_device_early_term(struct kbase_device *kbdev)
 {
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbdev->arb.arb_if)
+    if (kbdev->arb.arb_if) {
         kbase_arbiter_pm_release_interrupts(kbdev);
-    else
+    } else {
         kbase_release_interrupts(kbdev);
+    }
 #else
     kbase_release_interrupts(kbdev);
 #endif /* CONFIG_MALI_ARBITER_SUPPORT */

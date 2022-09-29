@@ -20,10 +20,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_SMC_H_
-#define _KBASE_SMC_H_
+#ifndef KBASE_SMC_H_
+#define KBASE_SMC_H_
 
 #ifdef CONFIG_ARM64
 
@@ -37,35 +35,33 @@
 #define SMC_OEN_SIP (2 << SMC_OEN_OFFSET)
 #define SMC_OEN_STD (4 << SMC_OEN_OFFSET)
 
-
 /**
-  * kbase_invoke_smc_fid - Perform a secure monitor call
-  * @fid: The SMC function to call, see SMC Calling convention.
-  * @arg0: First argument to the SMC.
-  * @arg1: Second argument to the SMC.
-  * @arg2: Third argument to the SMC.
-  *
-  * See SMC Calling Convention for details.
-  *
-  * Return: the return value from the SMC.
-  */
+ * kbase_invoke_smc_fid - Perform a secure monitor call
+ * @fid: The SMC function to call, see SMC Calling convention.
+ * @arg0: First argument to the SMC.
+ * @arg1: Second argument to the SMC.
+ * @arg2: Third argument to the SMC.
+ *
+ * See SMC Calling Convention for details.
+ *
+ * Return: the return value from the SMC.
+ */
 u64 kbase_invoke_smc_fid(u32 fid, u64 arg0, u64 arg1, u64 arg2);
 
 /**
-  * kbase_invoke_smc_fid - Perform a secure monitor call
-  * @oen: Owning Entity number (SIP, STD etc).
-  * @function_number: The function number within the OEN.
-  * @smc64: use SMC64 calling convention instead of SMC32.
-  * @arg0: First argument to the SMC.
-  * @arg1: Second argument to the SMC.
-  * @arg2: Third argument to the SMC.
-  *
-  * See SMC Calling Convention for details.
-  *
-  * Return: the return value from the SMC call.
-  */
-u64 kbase_invoke_smc(u32 oen, u16 function_number, bool smc64,
-        u64 arg0, u64 arg1, u64 arg2);
+ * kbase_invoke_smc_fid - Perform a secure monitor call
+ * @oen: Owning Entity number (SIP, STD etc).
+ * @function_number: The function number within the OEN.
+ * @smc64: use SMC64 calling convention instead of SMC32.
+ * @arg0: First argument to the SMC.
+ * @arg1: Second argument to the SMC.
+ * @arg2: Third argument to the SMC.
+ *
+ * See SMC Calling Convention for details.
+ *
+ * Return: the return value from the SMC call.
+ */
+u64 kbase_invoke_smc(u32 oen, u16 function_number, bool smc64, u64 arg0, u64 arg1, u64 arg2);
 
 #endif /* CONFIG_ARM64 */
 

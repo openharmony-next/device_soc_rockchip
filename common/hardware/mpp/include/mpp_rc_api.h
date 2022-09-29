@@ -84,30 +84,30 @@ typedef enum GopMode_e {
  * output frame rate denorminator, if 0 then default 1
  */
 typedef struct RcFpsCfg_t {
-    RK_S32      fps_in_flex;
-    RK_S32      fps_in_num;
-    RK_S32      fps_in_denorm;
-    RK_S32      fps_out_flex;
-    RK_S32      fps_out_num;
-    RK_S32      fps_out_denorm;
+    signed int fps_in_flex;
+    signed int fps_in_num;
+    signed int fps_in_denorm;
+    signed int fps_out_flex;
+    signed int fps_out_num;
+    signed int fps_out_denorm;
 } RcFpsCfg;
 
 typedef struct RcSuperframeCfg_t {
-    MppEncRcSuperFrameMode  super_mode;
-    RK_U32                  super_i_thd;
-    RK_U32                  super_p_thd;
-    MppEncRcPriority        rc_priority;
+    MppEncRcSuperFrameMode super_mode;
+    unsigned int super_i_thd;
+    unsigned int super_p_thd;
+    MppEncRcPriority rc_priority;
 } RcSuperframeCfg;
 
 typedef struct RcDebreathCfg_t {
-    RK_U32      enable;
-    RK_U32      strength;
+    unsigned int enable;
+    unsigned int strength;
 } RcDebreathCfg;
 
 typedef struct RcHierQPCfg_t {
-    RK_S32      hier_qp_en;
-    RK_S32      hier_qp_delta[4];
-    RK_S32      hier_frame_num[4];
+    signed int hier_qp_en;
+    signed int hier_qp_delta[4];
+    signed int hier_frame_num[4];
 } RcHierQPCfg;
 
 /*
@@ -117,50 +117,50 @@ typedef struct RcHierQPCfg_t {
  */
 typedef struct RcCfg_s {
     /* encode image size */
-    RK_S32      width;
-    RK_S32      height;
+    signed int width;
+    signed int height;
 
     /* Use rc_mode to find different api */
-    RcMode      mode;
+    RcMode mode;
 
-    RcFpsCfg    fps;
+    RcFpsCfg fps;
 
-    GopMode     gop_mode;
+    GopMode gop_mode;
     /* I frame gop len */
-    RK_S32      igop;
+    signed int igop;
     /* visual gop len */
-    RK_S32      vgop;
+    signed int vgop;
 
     /* bitrate parameter */
-    RK_S32      bps_min;
-    RK_S32      bps_target;
-    RK_S32      bps_max;
-    RK_S32      stats_time;
+    signed int bps_min;
+    signed int bps_target;
+    signed int bps_max;
+    signed int stats_time;
 
     /* max I frame bit ratio to P frame bit */
-    RK_S32      max_i_bit_prop;
-    RK_S32      min_i_bit_prop;
-    RK_S32      init_ip_ratio;
+    signed int max_i_bit_prop;
+    signed int min_i_bit_prop;
+    signed int init_ip_ratio;
     /* layer bitrate proportion */
-    RK_S32      layer_bit_prop[4];
+    signed int layer_bit_prop[4];
 
     /* quality parameter */
-    RK_S32      init_quality;
-    RK_S32      max_quality;
-    RK_S32      min_quality;
-    RK_S32      max_i_quality;
-    RK_S32      min_i_quality;
-    RK_S32      i_quality_delta;
-    RK_S32      vi_quality_delta;
+    signed int init_quality;
+    signed int max_quality;
+    signed int min_quality;
+    signed int max_i_quality;
+    signed int min_i_quality;
+    signed int i_quality_delta;
+    signed int vi_quality_delta;
     /* layer quality proportion */
-    RK_S32      layer_quality_delta[4];
+    signed int layer_quality_delta[4];
 
     /* reencode parameter */
-    RK_S32      max_reencode_times;
+    signed int max_reencode_times;
 
     /* still / motion desision parameter */
-    RK_S32      min_still_prop;
-    RK_S32      max_still_quality;
+    signed int min_still_prop;
+    signed int max_still_quality;
 
     /*
      * vbr parameter
@@ -168,31 +168,31 @@ typedef struct RcCfg_s {
      * vbr_hi_prop  - high proportion bitrate for reduce quality
      * vbr_lo_prop  - low proportion bitrate for increase quality
      */
-    RK_S32      vbr_hi_prop;
-    RK_S32      vbr_lo_prop;
+    signed int vbr_hi_prop;
+    signed int vbr_lo_prop;
 
     MppEncRcDropFrmMode drop_mode;
-    RK_U32      drop_thd;
-    RK_U32      drop_gap;
+    unsigned int drop_thd;
+    unsigned int drop_gap;
 
     RcSuperframeCfg super_cfg;
-    RcDebreathCfg   debreath_cfg;
-    RcHierQPCfg     hier_qp_cfg;
+    RcDebreathCfg debreath_cfg;
+    RcHierQPCfg hier_qp_cfg;
 } RcCfg;
 
 /*
  * Different rate control strategy will be implemented by different API config
  */
 typedef struct RcImplApi_t {
-    char            *name;
-    MppCodingType   type;
-    RK_U32          ctx_size;
+    char *name;
+    MppCodingType type;
+    unsigned int ctx_size;
 
-    MPP_RET         (*init)(void *ctx, RcCfg *cfg);
-    MPP_RET         (*deinit)(void *ctx);
+    MPP_RET (*init)(void *ctx, RcCfg *cfg);
+    MPP_RET (*deinit)(void *ctx);
 
-    MPP_RET         (*check_drop)(void *ctx, EncRcTask *task);
-    MPP_RET         (*check_reenc)(void *ctx, EncRcTask *task);
+    MPP_RET (*check_drop)(void *ctx, EncRcTask *task);
+    MPP_RET (*check_reenc)(void *ctx, EncRcTask *task);
 
     /*
      * frm_start -  frame level rate control frm_start.
@@ -200,8 +200,8 @@ typedef struct RcImplApi_t {
      * frm_end   -  frame level rate control frm_end.
      *              The EncRcTaskInfo is returned for real quality and bitrate.
      */
-    MPP_RET         (*frm_start)(void *ctx, EncRcTask *task);
-    MPP_RET         (*frm_end)(void *ctx, EncRcTask *task);
+    MPP_RET (*frm_start)(void *ctx, EncRcTask *task);
+    MPP_RET (*frm_end)(void *ctx, EncRcTask *task);
 
     /*
      * hal_start -  hardware level rate control start.
@@ -209,35 +209,35 @@ typedef struct RcImplApi_t {
      * hal_end   -  hardware level rate control end.
      *              The EncRcTaskInfo is returned for real quality and bitrate.
      */
-    MPP_RET         (*hal_start)(void *ctx, EncRcTask *task);
-    MPP_RET         (*hal_end)(void *ctx, EncRcTask *task);
+    MPP_RET (*hal_start)(void *ctx, EncRcTask *task);
+    MPP_RET (*hal_end)(void *ctx, EncRcTask *task);
 } RcImplApi;
 
 /*
  * structures for RC API register and query
  */
 typedef struct RcApiBrief_t {
-    const char      *name;
-    MppCodingType   type;
+    const char *name;
+    MppCodingType type;
 } RcApiBrief;
 
 typedef struct RcApiQueryAll_t {
     /* input param for query */
-    RcApiBrief      *brief;
-    RK_S32          max_count;
+    RcApiBrief *brief;
+    signed int max_count;
 
     /* output query count */
-    RK_S32          count;
+    signed int count;
 } RcApiQueryAll;
 
 typedef struct RcApiQueryType_t {
     /* input param for query */
-    RcApiBrief      *brief;
-    RK_S32          max_count;
-    MppCodingType   type;
+    RcApiBrief *brief;
+    signed int max_count;
+    MppCodingType type;
 
     /* output query count */
-    RK_S32          count;
+    signed int count;
 } RcApiQueryType;
 
 #ifdef __cplusplus

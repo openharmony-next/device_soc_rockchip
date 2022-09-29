@@ -25,8 +25,8 @@
  * counters.
  */
 
-#ifndef _KBASE_VINSTR_H_
-#define _KBASE_VINSTR_H_
+#ifndef KBASE_VINSTR_H_
+#define KBASE_VINSTR_H_
 
 struct kbase_vinstr_context;
 struct kbase_hwcnt_virtualizer;
@@ -42,9 +42,7 @@ struct kbase_ioctl_hwcnt_reader_setup;
  *
  * Return: 0 on success, else error code.
  */
-int kbase_vinstr_init(
-    struct kbase_hwcnt_virtualizer *hvirt,
-    struct kbase_vinstr_context **out_vctx);
+int kbase_vinstr_init(struct kbase_hwcnt_virtualizer *hvirt, struct kbase_vinstr_context **out_vctx);
 
 /**
  * kbase_vinstr_term() - Terminate a vinstr context.
@@ -84,8 +82,6 @@ void kbase_vinstr_resume(struct kbase_vinstr_context *vctx);
  *
  * Return: file descriptor on success, else a (negative) error code.
  */
-int kbase_vinstr_hwcnt_reader_setup(
-    struct kbase_vinstr_context *vinstr_ctx,
-    struct kbase_ioctl_hwcnt_reader_setup *setup);
+int kbase_vinstr_hwcnt_reader_setup(struct kbase_vinstr_context *vctx, struct kbase_ioctl_hwcnt_reader_setup *setup);
 
 #endif /* _KBASE_VINSTR_H_ */

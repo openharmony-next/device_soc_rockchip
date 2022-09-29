@@ -9,9 +9,8 @@
 #include <linux/kfifo.h>
 #include "common.h"
 
-#define RKISP_STATS_DDR_BUF_NUM        1
-#define RKISP_READOUT_WORK_SIZE    \
-    (8 * sizeof(struct rkisp_isp_readout_work))
+#define RKISP_STATS_DDR_BUF_NUM 1
+#define RKISP_READOUT_WORK_SIZE (8 * sizeof(struct rkisp_isp_readout_work))
 
 struct rkisp_isp_stats_vdev;
 
@@ -29,10 +28,8 @@ struct rkisp_isp_readout_work {
 };
 
 struct rkisp_isp_stats_ops {
-    void (*isr_hdl)(struct rkisp_isp_stats_vdev *stats_vdev,
-            u32 isp_mis, u32 isp3a_ris);
-    void (*send_meas)(struct rkisp_isp_stats_vdev *stats_vdev,
-              struct rkisp_isp_readout_work *meas_work);
+    void (*isr_hdl)(struct rkisp_isp_stats_vdev *stats_vdev, u32 isp_mis, u32 isp3a_ris);
+    void (*send_meas)(struct rkisp_isp_stats_vdev *stats_vdev, struct rkisp_isp_readout_work *meas_work);
     void (*rdbk_enable)(struct rkisp_isp_stats_vdev *stats_vdev, bool en);
 };
 
@@ -77,12 +74,10 @@ void rkisp_stats_rdbk_enable(struct rkisp_isp_stats_vdev *stats_vdev, bool en);
 
 void rkisp_stats_first_ddr_config(struct rkisp_isp_stats_vdev *stats_vdev);
 
-void rkisp_stats_isr(struct rkisp_isp_stats_vdev *stats_vdev,
-             u32 isp_ris, u32 isp3a_ris);
+void rkisp_stats_isr(struct rkisp_isp_stats_vdev *stats_vdev, u32 isp_ris, u32 isp3a_ris);
 
-int rkisp_register_stats_vdev(struct rkisp_isp_stats_vdev *stats_vdev,
-                   struct v4l2_device *v4l2_dev,
-                   struct rkisp_device *dev);
+int rkisp_register_stats_vdev(struct rkisp_isp_stats_vdev *stats_vdev, struct v4l2_device *v4l2_dev,
+                              struct rkisp_device *dev);
 
 void rkisp_unregister_stats_vdev(struct rkisp_isp_stats_vdev *stats_vdev);
 

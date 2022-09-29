@@ -47,23 +47,18 @@ struct vop_dump_list {
     struct vop_dump_info dump_info;
 };
 
-enum vop_dump_status {
-    DUMP_DISABLE = 0,
-    DUMP_KEEP
-};
+enum vop_dump_status { DUMP_DISABLE = 0, DUMP_KEEP };
 
 #if defined(CONFIG_ROCKCHIP_DRM_DEBUG)
 int rockchip_drm_add_dump_buffer(struct drm_crtc *crtc, struct dentry *root);
 int rockchip_drm_dump_plane_buffer(struct vop_dump_info *dump_info, int frame_count);
 #else
-static inline int
-rockchip_drm_add_dump_buffer(struct drm_crtc *crtc, struct dentry *root)
+static inline int rockchip_drm_add_dump_buffer(struct drm_crtc *crtc, struct dentry *root)
 {
     return 0;
 }
 
-static inline int
-rockchip_drm_dump_plane_buffer(struct vop_dump_info *dump_info, int frame_count)
+static inline int rockchip_drm_dump_plane_buffer(struct vop_dump_info *dump_info, int frame_count)
 {
     return 0;
 }

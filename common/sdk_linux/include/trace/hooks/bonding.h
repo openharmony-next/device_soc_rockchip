@@ -13,17 +13,13 @@
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM bonding
 
-#define TRACE_INCLUDE_PATH trace/hooks
+#define TRACE_INCLUDE_PATH trace / hooks
 #if !defined(_TRACE_HOOK_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _TRACE_HOOK_BONDING_H
 #include <linux/tracepoint.h>
 #include <trace/hooks/vendor_hooks.h>
 
-//struct bonding;
-//struct slave;
-DECLARE_HOOK(vendor_bond_check_dev_link,
-    TP_PROTO(uint16_t intGpioNum, void *data),
-    TP_ARGS(intGpioNum, data)); 
+DECLARE_HOOK(vendor_bond_check_dev_link, TP_PROTO(uint16_t intGpioNum, void *data), TP_ARGS(intGpioNum, data));
 
 #endif
 /* This part must be outside protection */

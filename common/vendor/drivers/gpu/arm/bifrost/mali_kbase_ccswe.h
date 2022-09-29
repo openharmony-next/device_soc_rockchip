@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CCSWE_H_
-#define _KBASE_CCSWE_H_
+#ifndef KBASE_CCSWE_H_
+#define KBASE_CCSWE_H_
 
 #include <linux/spinlock.h>
 
@@ -51,7 +51,6 @@ struct kbase_ccswe {
  * @self: Cycles count software estimator instance.
  */
 void kbase_ccswe_init(struct kbase_ccswe *self);
-
 
 /**
  * kbase_ccswe_cycle_at() - Estimate cycle count at given timestamp.
@@ -84,8 +83,7 @@ u64 kbase_ccswe_cycle_at(struct kbase_ccswe *self, u64 timestamp_ns);
  * frequency change. The function is to be called at the frequency
  * change moment (not later).
  */
-void kbase_ccswe_freq_change(
-    struct kbase_ccswe *self, u64 timestamp_ns, u32 gpu_freq);
+void kbase_ccswe_freq_change(struct kbase_ccswe *self, u64 timestamp_ns, u32 gpu_freq);
 
 /**
  * kbase_ccswe_reset() - reset estimator state

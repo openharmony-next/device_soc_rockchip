@@ -49,24 +49,24 @@
  * @fence:    return the fd of the new sync_file with the created fence
  */
 struct sw_sync_create_fence_data {
-    __u32    value;
-    char    name[32];
-    __s32    fence; /* fd of new fence */
+    __u32 value;
+    char name[32];
+    __s32 fence; /* fd of new fence */
 };
 
-#define SW_SYNC_IOC_MAGIC    'W'
+#define SW_SYNC_IOC_MAGIC 'W'
 
-#define SW_SYNC_IOC_CREATE_FENCE    _IOWR(SW_SYNC_IOC_MAGIC, 0,\
-        struct sw_sync_create_fence_data)
+#define SW_SYNC_IOC_CREATE_FENCE _IOWR(SW_SYNC_IOC_MAGIC, 0, struct sw_sync_create_fence_data)
 
-#define SW_SYNC_IOC_INC            _IOW(SW_SYNC_IOC_MAGIC, 1, __u32)
+#define SW_SYNC_IOC_INC _IOW(SW_SYNC_IOC_MAGIC, 1, __u32)
 
 static const struct dma_fence_ops timeline_fence_ops;
 
 static inline struct sync_pt *dma_fence_to_sync_pt(struct dma_fence *fence)
 {
-    if (fence->ops != &timeline_fence_ops)
+    if (fence->ops != &timeline_fence_ops) {
         return NULL;
+    }
     return container_of(fence, struct sync_pt, base);
 }
 
@@ -82,8 +82,9 @@ static struct sync_timeline *sync_timeline_create(const char *name)
     struct sync_timeline *obj;
 
     obj = kzalloc(sizeof(*obj), GFP_KERNEL);
-    if (!obj)
+    if (!obj) {
         return NULL;
+    }
 
     kref_init(&obj->kref);
     obj->context = dma_fence_context_alloc(1);
@@ -100,8 +101,7 @@ static struct sync_timeline *sync_timeline_create(const char *name)
 
 static void sync_timeline_free(struct kref *kref)
 {
-    struct sync_timeline *obj =
-        container_of(kref, struct sync_timeline, kref);
+    struct sync_timeline *obj = container_of(kref, struct sync_timeline, kref);
 
     sync_timeline_debug_remove(obj);
 
@@ -159,14 +159,12 @@ static bool timeline_fence_enable_signaling(struct dma_fence *fence)
     return true;
 }
 
-static void timeline_fence_value_str(struct dma_fence *fence,
-                    char *str, int size)
+static void timeline_fence_value_str(struct dma_fence *fence, char *str, int size)
 {
     snprintf(str, size, "%lld", fence->seqno);
 }
 
-static void timeline_fence_timeline_value_str(struct dma_fence *fence,
-                         char *str, int size)
+static void timeline_fence_timeline_value_str(struct dma_fence *fence, char *str, int size)
 {
     struct sync_timeline *parent = dma_fence_parent(fence);
 
@@ -201,9 +199,11 @@ static void sync_timeline_signal(struct sync_timeline *obj, unsigned int inc)
 
     obj->value += inc;
 
-    list_for_each_entry_safe(pt, next, &obj->pt_list, link) {
-        if (!timeline_fence_signaled(&pt->base))
+    list_for_each_entry_safe(pt, next, &obj->pt_list, link)
+    {
+        if (!timeline_fence_signaled(&pt->base)) {
             break;
+        }
 
         list_del_init(&pt->link);
         rb_erase(&pt->node, &obj->pt_tree);
@@ -232,18 +232,17 @@ static void sync_timeline_signal(struct sync_timeline *obj, unsigned int inc)
  * the generic sync_timeline struct. Returns the sync_pt object or
  * NULL in case of error.
  */
-static struct sync_pt *sync_pt_create(struct sync_timeline *obj,
-                      unsigned int value)
+static struct sync_pt *sync_pt_create(struct sync_timeline *obj, unsigned int value)
 {
     struct sync_pt *pt;
 
     pt = kzalloc(sizeof(*pt), GFP_KERNEL);
-    if (!pt)
+    if (!pt) {
         return NULL;
+    }
 
     sync_timeline_get(obj);
-    dma_fence_init(&pt->base, &timeline_fence_ops, &obj->lock,
-               obj->context, value);
+    dma_fence_init(&pt->base, &timeline_fence_ops, &obj->lock, obj->context, value);
     INIT_LIST_HEAD(&pt->link);
 
     spin_lock_irq(&obj->lock);
@@ -276,8 +275,7 @@ static struct sync_pt *sync_pt_create(struct sync_timeline *obj,
         rb_insert_color(&pt->node, &obj->pt_tree);
 
         parent = rb_next(&pt->node);
-        list_add_tail(&pt->link,
-                  parent ? &rb_entry(parent, typeof(*pt), node)->link : &obj->pt_list);
+        list_add_tail(&pt->link, parent ? &rb_entry(parent, typeof(*pt), node)->link : &obj->pt_list);
     }
 unlock:
     spin_unlock_irq(&obj->lock);
@@ -300,8 +298,9 @@ static int sw_sync_debugfs_open(struct inode *inode, struct file *file)
     get_task_comm(task_comm, current);
 
     obj = sync_timeline_create(task_comm);
-    if (!obj)
+    if (!obj) {
         return -ENOMEM;
+    }
 
     file->private_data = obj;
 
@@ -315,7 +314,8 @@ static int sw_sync_debugfs_release(struct inode *inode, struct file *file)
 
     spin_lock_irq(&obj->lock);
 
-    list_for_each_entry_safe(pt, next, &obj->pt_list, link) {
+    list_for_each_entry_safe(pt, next, &obj->pt_list, link)
+    {
         dma_fence_set_error(&pt->base, -ENOENT);
         dma_fence_signal_locked(&pt->base);
     }
@@ -326,8 +326,7 @@ static int sw_sync_debugfs_release(struct inode *inode, struct file *file)
     return 0;
 }
 
-static long sw_sync_ioctl_create_fence(struct sync_timeline *obj,
-                       unsigned long arg)
+static long sw_sync_ioctl_create_fence(struct sync_timeline *obj, unsigned long arg)
 {
     int fd = get_unused_fd_flags(O_CLOEXEC);
     int err;
@@ -335,8 +334,9 @@ static long sw_sync_ioctl_create_fence(struct sync_timeline *obj,
     struct sync_file *sync_file;
     struct sw_sync_create_fence_data data;
 
-    if (fd < 0)
+    if (fd < 0) {
         return fd;
+    }
 
     if (copy_from_user(&data, (void __user *)arg, sizeof(data))) {
         err = -EFAULT;
@@ -376,10 +376,11 @@ static long sw_sync_ioctl_inc(struct sync_timeline *obj, unsigned long arg)
 {
     u32 value;
 
-    if (copy_from_user(&value, (void __user *)arg, sizeof(value)))
+    if (copy_from_user(&value, (void __user *)arg, sizeof(value))) {
         return -EFAULT;
+    }
 
-    while (value > INT_MAX)  {
+    while (value > INT_MAX) {
         sync_timeline_signal(obj, INT_MAX);
         value -= INT_MAX;
     }
@@ -389,34 +390,33 @@ static long sw_sync_ioctl_inc(struct sync_timeline *obj, unsigned long arg)
     return 0;
 }
 
-static long sw_sync_ioctl(struct file *file, unsigned int cmd,
-              unsigned long arg)
+static long sw_sync_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
     struct sync_timeline *obj = file->private_data;
 
     switch (cmd) {
-    case SW_SYNC_IOC_CREATE_FENCE:
-        return sw_sync_ioctl_create_fence(obj, arg);
+        case SW_SYNC_IOC_CREATE_FENCE:
+            return sw_sync_ioctl_create_fence(obj, arg);
 
-    case SW_SYNC_IOC_INC:
-        return sw_sync_ioctl_inc(obj, arg);
+        case SW_SYNC_IOC_INC:
+            return sw_sync_ioctl_inc(obj, arg);
 
-    default:
-        return -ENOTTY;
+        default:
+            return -ENOTTY;
     }
 }
 
 const struct file_operations sw_sync_debugfs_fops = {
-    .open           = sw_sync_debugfs_open,
-    .release        = sw_sync_debugfs_release,
+    .open = sw_sync_debugfs_open,
+    .release = sw_sync_debugfs_release,
     .unlocked_ioctl = sw_sync_ioctl,
-    .compat_ioctl    = compat_ptr_ioctl,
+    .compat_ioctl = compat_ptr_ioctl,
 };
 
 static struct miscdevice sw_sync_dev = {
-    .minor    = MISC_DYNAMIC_MINOR,
-    .name    = "sw_sync",
-    .fops    = &sw_sync_debugfs_fops,
+    .minor = MISC_DYNAMIC_MINOR,
+    .name = "sw_sync",
+    .fops = &sw_sync_debugfs_fops,
 };
 
 module_misc_device(sw_sync_dev);

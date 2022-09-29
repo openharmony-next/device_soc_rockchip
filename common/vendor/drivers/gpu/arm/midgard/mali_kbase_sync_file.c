@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /*
  * Code for supporting explicit Linux fences (CONFIG_SYNC_FILE)
  * Introduced in kernel 4.9.
@@ -37,19 +35,18 @@
 #include "mali_kbase_fence.h"
 #include "mali_kbase.h"
 
-static const struct file_operations stream_fops = {
-    .owner = THIS_MODULE
-};
+static const struct file_operations stream_fops = {.owner = THIS_MODULE};
 
 int kbase_sync_fence_stream_create(const char *name, int *const out_fd)
 {
-    if (!out_fd)
+    if (!out_fd) {
         return -EINVAL;
+    }
 
-    *out_fd = anon_inode_getfd(name, &stream_fops, NULL,
-                   O_RDONLY | O_CLOEXEC);
-    if (*out_fd < 0)
+    *out_fd = anon_inode_getfd(name, &stream_fops, NULL, O_RDONLY | O_CLOEXEC);
+    if (*out_fd < 0) {
         return -EINVAL;
+    }
 
     return 0;
 }
@@ -65,8 +62,9 @@ int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int stream_fd)
     int fd;
 
     fence = kbase_fence_out_new(katom);
-    if (!fence)
+    if (!fence) {
         return -ENOMEM;
+    }
 
 #if (KERNEL_VERSION(4, 9, 67) >= LINUX_VERSION_CODE)
     /* Take an extra reference to the fence on behalf of the sync_file.
@@ -105,8 +103,9 @@ int kbase_sync_fence_in_from_fd(struct kbase_jd_atom *katom, int fd)
     struct dma_fence *fence = sync_file_get_fence(fd);
 #endif
 
-    if (!fence)
+    if (!fence) {
         return -ENOENT;
+    }
 
     kbase_fence_fence_in_set(katom, fence);
 
@@ -121,16 +120,16 @@ int kbase_sync_fence_validate(int fd)
     struct dma_fence *fence = sync_file_get_fence(fd);
 #endif
 
-    if (!fence)
+    if (!fence) {
         return -EINVAL;
+    }
 
     dma_fence_put(fence);
 
     return 0; /* valid */
 }
 
-enum base_jd_event_code
-kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
+enum base_jd_event_code kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 {
     int res;
 
@@ -141,8 +140,7 @@ kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 
     res = kbase_fence_out_signal(katom, result);
     if (unlikely(res < 0)) {
-        dev_warn(katom->kctx->kbdev->dev,
-                "fence_signal() failed with %d\n", res);
+        dev_warn(katom->kctx->kbdev->dev, "fence_signal() failed with %d\n", res);
     }
 
     kbase_sync_fence_out_remove(katom);
@@ -151,23 +149,18 @@ kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-static void kbase_fence_wait_callback(struct fence *fence,
-                      struct fence_cb *cb)
+static void kbase_fence_wait_callback(struct fence *fence, struct fence_cb *cb)
 #else
-static void kbase_fence_wait_callback(struct dma_fence *fence,
-                      struct dma_fence_cb *cb)
+static void kbase_fence_wait_callback(struct dma_fence *fence, struct dma_fence_cb *cb)
 #endif
 {
-    struct kbase_fence_cb *kcb = container_of(cb,
-                struct kbase_fence_cb,
-                fence_cb);
+    struct kbase_fence_cb *kcb = container_of(cb, struct kbase_fence_cb, fence_cb);
     struct kbase_jd_atom *katom = kcb->katom;
     struct kbase_context *kctx = katom->kctx;
 
     /* Cancel atom if fence is erroneous */
-#if (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE || \
-     (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE && \
-      KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE))
+#if (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE ||                                                                 \
+     (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE && KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE))
     if (dma_fence_is_signaled(kcb->fence) && kcb->fence->error)
 #else
     if (dma_fence_is_signaled(kcb->fence) && kcb->fence->status < 0)
@@ -200,8 +193,9 @@ int kbase_sync_fence_in_wait(struct kbase_jd_atom *katom)
 #endif
 
     fence = kbase_fence_in_get(katom);
-    if (!fence)
+    if (!fence) {
         return 0; /* no input fence to wait for, good to go! */
+    }
 
     kbase_fence_dep_count_set(katom, 1);
 
@@ -252,8 +246,9 @@ void kbase_sync_fence_in_cancel_wait(struct kbase_jd_atom *katom)
     kbasep_remove_waiting_soft_job(katom);
     kbase_finish_soft_job(katom);
 
-    if (jd_done_nolock(katom, NULL))
+    if (jd_done_nolock(katom, NULL)) {
         kbase_js_sched_all(katom->kctx->kbdev);
+    }
 }
 
 void kbase_sync_fence_out_remove(struct kbase_jd_atom *katom)
@@ -268,11 +263,9 @@ void kbase_sync_fence_in_remove(struct kbase_jd_atom *katom)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-static void kbase_sync_fence_info_get(struct fence *fence,
-                      struct kbase_sync_fence_info *info)
+static void kbase_sync_fence_info_get(struct fence *fence, struct kbase_sync_fence_info *info)
 #else
-static void kbase_sync_fence_info_get(struct dma_fence *fence,
-                      struct kbase_sync_fence_info *info)
+static void kbase_sync_fence_info_get(struct dma_fence *fence, struct kbase_sync_fence_info *info)
 #endif
 {
     info->fence = fence;
@@ -283,35 +276,31 @@ static void kbase_sync_fence_info_get(struct dma_fence *fence,
      * 1 : signaled
      */
     if (dma_fence_is_signaled(fence)) {
-#if (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE || \
-     (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE && \
-      KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE))
+#if (KERNEL_VERSION(4, 11, 0) <= LINUX_VERSION_CODE ||                                                                 \
+     (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE && KERNEL_VERSION(4, 9, 68) <= LINUX_VERSION_CODE))
         int status = fence->error;
 #else
         int status = fence->status;
 #endif
-        if (status < 0)
+        if (status < 0) {
             info->status = status; /* signaled with error */
-        else
+        } else {
             info->status = 1; /* signaled with success */
-    } else  {
+        }
+    } else {
         info->status = 0; /* still active (unsignaled) */
     }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
-    scnprintf(info->name, sizeof(info->name), "%u#%u",
-          fence->context, fence->seqno);
+    scnprintf(info->name, sizeof(info->name), "%u#%u", fence->context, fence->seqno);
 #elif (LINUX_VERSION_CODE < KERNEL_VERSION(5, 1, 0))
-    scnprintf(info->name, sizeof(info->name), "%llu#%u",
-          fence->context, fence->seqno);
+    scnprintf(info->name, sizeof(info->name), "%llu#%u", fence->context, fence->seqno);
 #else
-    scnprintf(info->name, sizeof(info->name), "%llu#%llu",
-          fence->context, fence->seqno);
+    scnprintf(info->name, sizeof(info->name), "%llu#%llu", fence->context, fence->seqno);
 #endif
 }
 
-int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
-                 struct kbase_sync_fence_info *info)
+int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info)
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
     struct fence *fence;
@@ -320,8 +309,9 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
 #endif
 
     fence = kbase_fence_in_get(katom);
-    if (!fence)
+    if (!fence) {
         return -ENOENT;
+    }
 
     kbase_sync_fence_info_get(fence, info);
 
@@ -330,8 +320,7 @@ int kbase_sync_fence_in_info_get(struct kbase_jd_atom *katom,
     return 0;
 }
 
-int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
-                  struct kbase_sync_fence_info *info)
+int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom, struct kbase_sync_fence_info *info)
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
     struct fence *fence;
@@ -340,8 +329,9 @@ int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
 #endif
 
     fence = kbase_fence_out_get(katom);
-    if (!fence)
+    if (!fence) {
         return -ENOENT;
+    }
 
     kbase_sync_fence_info_get(fence, info);
 
@@ -349,7 +339,6 @@ int kbase_sync_fence_out_info_get(struct kbase_jd_atom *katom,
 
     return 0;
 }
-
 
 #ifdef CONFIG_MALI_FENCE_DEBUG
 void kbase_sync_fence_in_dump(struct kbase_jd_atom *katom)

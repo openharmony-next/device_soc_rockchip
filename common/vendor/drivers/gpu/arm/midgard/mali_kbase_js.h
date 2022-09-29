@@ -13,17 +13,13 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_js.h
  * Job Scheduler APIs.
  */
 
-#ifndef _KBASE_JS_H_
-#define _KBASE_JS_H_
+#ifndef KBASE_JS_H_
+#define KBASE_JS_H_
 
 #include "mali_kbase_js_defs.h"
 #include "mali_kbase_context.h"
@@ -56,7 +52,7 @@
  * initialized before passing to the kbasep_js_devdata_init() function. This is
  * to give efficient error path code.
  */
-int kbasep_js_devdata_init(struct kbase_device * const kbdev);
+int kbasep_js_devdata_init(struct kbase_device *const kbdev);
 
 /**
  * @brief Halt the Job Scheduler.
@@ -102,7 +98,7 @@ void kbasep_js_devdata_term(struct kbase_device *kbdev);
  * The struct kbase_context must be zero intitialized before passing to the
  * kbase_js_init() function. This is to give efficient error path code.
  */
-int kbasep_js_kctx_init(struct kbase_context * const kctx);
+int kbasep_js_kctx_init(struct kbase_context *const kctx);
 
 /**
  * @brief Terminate the Scheduling Component of a struct kbase_context on the Job Scheduler
@@ -173,9 +169,11 @@ bool kbasep_js_add_job(struct kbase_context *kctx, struct kbase_jd_atom *atom);
  * - kbasep_js_runpool_release_ctx_and_katom_retained_state(), to release the
  *   remaining state held as part of the job having been run.
  *
- * In the common case of atoms completing normally, this set of actions is more optimal for spinlock purposes than having kbasep_js_remove_job() handle all of the actions.
+ * In the common case of atoms completing normally, this set of actions is more optimal for spinlock purposes than
+ * having kbasep_js_remove_job() handle all of the actions.
  *
- * In the case of cancelling atoms, it is easier to call kbasep_js_remove_cancelled_job(), which handles all the necessary actions.
+ * In the case of cancelling atoms, it is easier to call kbasep_js_remove_cancelled_job(), which handles all the
+ * necessary actions.
  *
  * It is a programming error to call this when:
  * - \a atom is not a job belonging to kctx.
@@ -216,9 +214,8 @@ void kbasep_js_remove_job(struct kbase_device *kbdev, struct kbase_context *kctx
  * should call kbase_js_sched_all() to try to run more jobs
  * @return false otherwise
  */
-bool kbasep_js_remove_cancelled_job(struct kbase_device *kbdev,
-                        struct kbase_context *kctx,
-                        struct kbase_jd_atom *katom);
+bool kbasep_js_remove_cancelled_job(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                    struct kbase_jd_atom *katom);
 
 /**
  * @brief Refcount a context as being busy, preventing it from being scheduled
@@ -362,7 +359,8 @@ void kbasep_js_runpool_release_ctx(struct kbase_device *kbdev, struct kbase_cont
  * The locking conditions of this function are the same as those for
  * kbasep_js_runpool_release_ctx()
  */
-void kbasep_js_runpool_release_ctx_and_katom_retained_state(struct kbase_device *kbdev, struct kbase_context *kctx, struct kbasep_js_atom_retained_state *katom_retained_state);
+void kbasep_js_runpool_release_ctx_and_katom_retained_state(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                                            struct kbasep_js_atom_retained_state *katom_retained_state);
 
 /**
  * @brief Variant of kbase_js_runpool_release_ctx() that assumes that
@@ -370,8 +368,7 @@ void kbasep_js_runpool_release_ctx_and_katom_retained_state(struct kbase_device 
  * kbasep_js_kctx_info::ctx::jsctx_mutex are held by the caller, and does not
  * attempt to schedule new contexts.
  */
-void kbasep_js_runpool_release_ctx_nolock(struct kbase_device *kbdev,
-                        struct kbase_context *kctx);
+void kbasep_js_runpool_release_ctx_nolock(struct kbase_device *kbdev, struct kbase_context *kctx);
 
 /**
  * @brief Schedule in a privileged context
@@ -463,20 +460,19 @@ void kbasep_js_resume(struct kbase_device *kbdev);
  * @param[in] atom  Pointer to the atom to submit
  *
  * @return Whether the context requires to be enqueued. */
-bool kbase_js_dep_resolved_submit(struct kbase_context *kctx,
-                    struct kbase_jd_atom *katom);
+bool kbase_js_dep_resolved_submit(struct kbase_context *kctx, struct kbase_jd_atom *katom);
 
 /**
-  * jsctx_ll_flush_to_rb() - Pushes atoms from the linked list to ringbuffer.
-  * @kctx:  Context Pointer
-  * @prio:  Priority (specifies the queue together with js).
-  * @js:    Job slot (specifies the queue together with prio).
-  *
-  * Pushes all possible atoms from the linked list to the ringbuffer.
-  * Number of atoms are limited to free space in the ringbuffer and
-  * number of available atoms in the linked list.
-  *
-  */
+ * jsctx_ll_flush_to_rb() - Pushes atoms from the linked list to ringbuffer.
+ * @kctx:  Context Pointer
+ * @prio:  Priority (specifies the queue together with js).
+ * @js:    Job slot (specifies the queue together with prio).
+ *
+ * Pushes all possible atoms from the linked list to the ringbuffer.
+ * Number of atoms are limited to free space in the ringbuffer and
+ * number of available atoms in the linked list.
+ *
+ */
 void jsctx_ll_flush_to_rb(struct kbase_context *kctx, int prio, int js);
 /**
  * @brief Pull an atom from a context in the job scheduler for execution.
@@ -522,8 +518,7 @@ void kbase_js_unpull(struct kbase_context *kctx, struct kbase_jd_atom *katom);
  * @return true if the context is now idle (no jobs pulled)
  *         false otherwise
  */
-bool kbase_js_complete_atom_wq(struct kbase_context *kctx,
-                struct kbase_jd_atom *katom);
+bool kbase_js_complete_atom_wq(struct kbase_context *kctx, struct kbase_jd_atom *katom);
 
 /**
  * @brief Complete an atom.
@@ -538,8 +533,7 @@ bool kbase_js_complete_atom_wq(struct kbase_context *kctx,
  *
  * Return: Atom that has now been unblocked and can now be run, or NULL if none
  */
-struct kbase_jd_atom *kbase_js_complete_atom(struct kbase_jd_atom *katom,
-        ktime_t *end_timestamp);
+struct kbase_jd_atom *kbase_js_complete_atom(struct kbase_jd_atom *katom, ktime_t *end_timestamp);
 
 /**
  * @brief Submit atoms from all available contexts.
@@ -578,8 +572,7 @@ void kbase_js_zap_context(struct kbase_context *kctx);
  * @return           true if atom is valid
  *                   false otherwise
  */
-bool kbase_js_is_atom_valid(struct kbase_device *kbdev,
-                struct kbase_jd_atom *katom);
+bool kbase_js_is_atom_valid(struct kbase_device *kbdev, struct kbase_jd_atom *katom);
 
 /**
  * kbase_js_set_timeouts - update all JS timeouts with user specified data
@@ -613,9 +606,9 @@ static inline bool kbasep_js_is_submit_allowed(struct kbasep_js_device_data *js_
     KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
     KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-    test_bit = (u16) (1u << kctx->as_nr);
+    test_bit = (u16)(1u << kctx->as_nr);
 
-    return (bool) (js_devdata->runpool_irq.submit_allowed & test_bit);
+    return (bool)(js_devdata->runpool_irq.submit_allowed & test_bit);
 }
 
 /**
@@ -634,7 +627,7 @@ static inline void kbasep_js_set_submit_allowed(struct kbasep_js_device_data *js
     KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
     KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-    set_bit = (u16) (1u << kctx->as_nr);
+    set_bit = (u16)(1u << kctx->as_nr);
 
     dev_dbg(kctx->kbdev->dev, "JS: Setting Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
 
@@ -658,7 +651,7 @@ static inline void kbasep_js_clear_submit_allowed(struct kbasep_js_device_data *
     KBASE_DEBUG_ASSERT(kctx->as_nr != KBASEP_AS_NR_INVALID);
     KBASE_DEBUG_ASSERT(kbase_ctx_flag(kctx, KCTX_SCHEDULED));
 
-    clear_bit = (u16) (1u << kctx->as_nr);
+    clear_bit = (u16)(1u << kctx->as_nr);
     clear_mask = ~clear_bit;
 
     dev_dbg(kctx->kbdev->dev, "JS: Clearing Submit Allowed on %p (as=%d)", kctx, kctx->as_nr);
@@ -690,9 +683,8 @@ static inline void kbasep_js_clear_job_retry_submit(struct kbase_jd_atom *atom)
 static inline void kbasep_js_set_job_retry_submit_slot(struct kbase_jd_atom *atom, int js)
 {
     KBASE_DEBUG_ASSERT(0 <= js && js <= BASE_JM_MAX_NR_SLOTS);
-    KBASE_DEBUG_ASSERT((atom->retry_submit_on_slot ==
-                    KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID)
-                || (atom->retry_submit_on_slot == js));
+    KBASE_DEBUG_ASSERT((atom->retry_submit_on_slot == KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID) ||
+                       (atom->retry_submit_on_slot == js));
 
     atom->retry_submit_on_slot = js;
 }
@@ -713,7 +705,8 @@ static inline void kbasep_js_atom_retained_state_init_invalid(struct kbasep_js_a
  * Copy atom state that can be made available after jd_done_nolock() is called
  * on that atom.
  */
-static inline void kbasep_js_atom_retained_state_copy(struct kbasep_js_atom_retained_state *retained_state, const struct kbase_jd_atom *katom)
+static inline void kbasep_js_atom_retained_state_copy(struct kbasep_js_atom_retained_state *retained_state,
+                                                      const struct kbase_jd_atom *katom)
 {
     retained_state->event_code = katom->event_code;
     retained_state->core_req = katom->core_req;
@@ -735,7 +728,8 @@ static inline void kbasep_js_atom_retained_state_copy(struct kbasep_js_atom_reta
  */
 static inline bool kbasep_js_has_atom_finished(const struct kbasep_js_atom_retained_state *katom_retained_state)
 {
-    return (bool) (katom_retained_state->event_code != BASE_JD_EVENT_STOPPED && katom_retained_state->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT);
+    return (bool)(katom_retained_state->event_code != BASE_JD_EVENT_STOPPED &&
+                  katom_retained_state->event_code != BASE_JD_EVENT_REMOVED_FROM_NEXT);
 }
 
 /**
@@ -748,17 +742,19 @@ static inline bool kbasep_js_has_atom_finished(const struct kbasep_js_atom_retai
  * @return    false if the retained state is invalid, and can be ignored
  * @return    !=false if the retained state is valid
  */
-static inline bool kbasep_js_atom_retained_state_is_valid(const struct kbasep_js_atom_retained_state *katom_retained_state)
+static inline bool
+kbasep_js_atom_retained_state_is_valid(const struct kbasep_js_atom_retained_state *katom_retained_state)
 {
-    return (bool) (katom_retained_state->core_req != KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID);
+    return (bool)(katom_retained_state->core_req != KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID);
 }
 
-static inline bool kbasep_js_get_atom_retry_submit_slot(const struct kbasep_js_atom_retained_state *katom_retained_state, int *res)
+static inline bool
+kbasep_js_get_atom_retry_submit_slot(const struct kbasep_js_atom_retained_state *katom_retained_state, int *res)
 {
     int js = katom_retained_state->retry_submit_on_slot;
 
     *res = js;
-    return (bool) (js >= 0);
+    return (bool)(js >= 0);
 }
 
 /**
@@ -784,8 +780,7 @@ static inline struct kbase_context *kbasep_js_runpool_lookup_ctx_noretain(struct
     KBASE_DEBUG_ASSERT(0 <= as_nr && as_nr < BASE_MAX_NR_AS);
 
     found_kctx = kbdev->as_to_kctx[as_nr];
-    KBASE_DEBUG_ASSERT(found_kctx == NULL ||
-            atomic_read(&found_kctx->refcount) > 0);
+    KBASE_DEBUG_ASSERT(found_kctx == NULL || atomic_read(&found_kctx->refcount) > 0);
 
     return found_kctx;
 }
@@ -795,9 +790,7 @@ static inline struct kbase_context *kbasep_js_runpool_lookup_ctx_noretain(struct
  * - The caller must hold the kbasep_js_kctx_info::ctx::jsctx_mutex.
  * - The caller must hold the kbasep_js_device_data::runpool_mutex
  */
-static inline void kbase_js_runpool_inc_context_count(
-                        struct kbase_device *kbdev,
-                        struct kbase_context *kctx)
+static inline void kbase_js_runpool_inc_context_count(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbasep_js_kctx_info *js_kctx_info;
@@ -817,8 +810,7 @@ static inline void kbase_js_runpool_inc_context_count(
 
     if (!kbase_ctx_flag(kctx, KCTX_SUBMIT_DISABLED)) {
         /* Track contexts that can submit jobs */
-        KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running <
-                                    S8_MAX);
+        KBASE_DEBUG_ASSERT(js_devdata->nr_user_contexts_running < S8_MAX);
         ++(js_devdata->nr_user_contexts_running);
     }
 }
@@ -828,9 +820,7 @@ static inline void kbase_js_runpool_inc_context_count(
  * - The caller must hold the kbasep_js_kctx_info::ctx::jsctx_mutex.
  * - The caller must hold the kbasep_js_device_data::runpool_mutex
  */
-static inline void kbase_js_runpool_dec_context_count(
-                        struct kbase_device *kbdev,
-                        struct kbase_context *kctx)
+static inline void kbase_js_runpool_dec_context_count(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbasep_js_kctx_info *js_kctx_info;
@@ -855,7 +845,6 @@ static inline void kbase_js_runpool_dec_context_count(
     }
 }
 
-
 /**
  * @brief Submit atoms from all available contexts to all job slots.
  *
@@ -869,11 +858,9 @@ static inline void kbase_js_sched_all(struct kbase_device *kbdev)
     kbase_js_sched(kbdev, (1 << kbdev->gpu_props.num_job_slots) - 1);
 }
 
-extern const int
-kbasep_js_atom_priority_to_relative[BASE_JD_NR_PRIO_LEVELS];
+extern const int kbasep_js_atom_priority_to_relative[BASE_JD_NR_PRIO_LEVELS];
 
-extern const base_jd_prio
-kbasep_js_relative_priority_to_atom[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+extern const base_jd_prio kbasep_js_relative_priority_to_atom[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
 
 /**
  * kbasep_js_atom_prio_to_sched_prio(): - Convert atom priority (base_jd_prio)
@@ -900,8 +887,9 @@ kbasep_js_relative_priority_to_atom[KBASE_JS_ATOM_SCHED_PRIO_COUNT];
  */
 static inline int kbasep_js_atom_prio_to_sched_prio(base_jd_prio atom_prio)
 {
-    if (atom_prio >= BASE_JD_NR_PRIO_LEVELS)
+    if (atom_prio >= BASE_JD_NR_PRIO_LEVELS) {
         return KBASE_JS_ATOM_SCHED_PRIO_INVALID;
+    }
 
     return kbasep_js_atom_priority_to_relative[atom_prio];
 }
@@ -910,16 +898,15 @@ static inline base_jd_prio kbasep_js_sched_prio_to_atom_prio(int sched_prio)
 {
     unsigned int prio_idx;
 
-    KBASE_DEBUG_ASSERT(0 <= sched_prio
-            && sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
+    KBASE_DEBUG_ASSERT(0 <= sched_prio && sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
 
     prio_idx = (unsigned int)sched_prio;
 
     return kbasep_js_relative_priority_to_atom[prio_idx];
 }
 
-      /** @} *//* end group kbase_js */
-      /** @} *//* end group base_kbase_api */
-      /** @} *//* end group base_api */
+/** @} */ /* end group kbase_js */
+/** @} */ /* end group base_kbase_api */
+/** @} */ /* end group base_api */
 
-#endif                /* _KBASE_JS_H_ */
+#endif /* _KBASE_JS_H_ */

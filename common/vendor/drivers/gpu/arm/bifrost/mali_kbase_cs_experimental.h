@@ -30,10 +30,8 @@
  *
  */
 
-#ifndef _KBASE_CS_EXPERIMENTAL_H_
-#define _KBASE_CS_EXPERIMENTAL_H_
-
-#include <linux/kernel.h>
+#ifndef KBASE_CS_EXPERIMENTAL_H_
+#define KBASE_CS_EXPERIMENTAL_H_
 
 /**
  * mali_kbase_print_cs_experimental() - Print a string for every Core Services
@@ -47,5 +45,3 @@ static inline void mali_kbase_print_cs_experimental(void)
 }
 
 #endif /* _KBASE_CS_EXPERIMENTAL_H_ */
-
-

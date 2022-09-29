@@ -13,14 +13,10 @@
  *
  */
 
+#ifndef KBASE_MEM_LOWLEVEL_H
+#define KBASE_MEM_LOWLEVEL_H
 
-
-
-
-#ifndef _KBASE_MEM_LOWLEVEL_H
-#define _KBASE_MEM_LOWLEVEL_H
-
-#ifndef _KBASE_H_
+#ifndef KBASE_H_
 #error "Don't include this file directly, use mali_kbase.h instead"
 #endif
 
@@ -29,17 +25,15 @@
 /**
  * @brief Flags for kbase_phy_allocator_pages_alloc
  */
-#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)    /** Default allocation flag */
-#define KBASE_PHY_PAGES_FLAG_CLEAR   (1 << 0)    /** Clear the pages after allocation */
-#define KBASE_PHY_PAGES_FLAG_POISON  (1 << 1)    /** Fill the memory with a poison value */
+#define KBASE_PHY_PAGES_FLAG_DEFAULT (0)     /** Default allocation flag */
+#define KBASE_PHY_PAGES_FLAG_CLEAR (1 << 0)  /** Clear the pages after allocation */
+#define KBASE_PHY_PAGES_FLAG_POISON (1 << 1) /** Fill the memory with a poison value */
 
-#define KBASE_PHY_PAGES_SUPPORTED_FLAGS (KBASE_PHY_PAGES_FLAG_DEFAULT|KBASE_PHY_PAGES_FLAG_CLEAR|KBASE_PHY_PAGES_FLAG_POISON)
+#define KBASE_PHY_PAGES_SUPPORTED_FLAGS                                                                                \
+    (KBASE_PHY_PAGES_FLAG_DEFAULT | KBASE_PHY_PAGES_FLAG_CLEAR | KBASE_PHY_PAGES_FLAG_POISON)
 
-#define KBASE_PHY_PAGES_POISON_VALUE  0xFD /** Value to fill the memory with when KBASE_PHY_PAGES_FLAG_POISON is set */
+#define KBASE_PHY_PAGES_POISON_VALUE 0xFD /** Value to fill the memory with when KBASE_PHY_PAGES_FLAG_POISON is set */
 
-enum kbase_sync_type {
-    KBASE_SYNC_TO_CPU,
-    KBASE_SYNC_TO_DEVICE
-};
+enum kbase_sync_type { KBASE_SYNC_TO_CPU, KBASE_SYNC_TO_DEVICE };
 
-#endif                /* _KBASE_LOWLEVEL_H */
+#endif /* _KBASE_LOWLEVEL_H */

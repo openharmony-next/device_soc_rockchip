@@ -16,11 +16,9 @@
 #include "rga2_mmu_info.h"
 #include "rga2_debugger.h"
 
-#define RGA_DEBUGGER_ROOT_NAME  "rkrga"
+#define RGA_DEBUGGER_ROOT_NAME "rkrga"
 
-#define STR_ENABLE(en) (en ? "EN" : "DIS")
-
-extern struct rga2_drvdata_t *rga2_drvdata;
+#define STR_ENABLE(en) ((en) ? "EN" : "DIS")
 
 void rga2_slt(void);
 
@@ -33,15 +31,15 @@ int RGA2_INT_FLAG;
 
 static int rga_debug_show(struct seq_file *m, void *data)
 {
-    seq_printf(m, "REG   [%s]\n"
-              "MSG   [%s]\n"
-              "TIME  [%s]\n"
-              "INT   [%s]\n"
-              "CHECK [%s]\n"
-              "STOP  [%s]\n",
-           STR_ENABLE(RGA2_TEST_REG), STR_ENABLE(RGA2_TEST_MSG),
-           STR_ENABLE(RGA2_TEST_TIME), STR_ENABLE(RGA2_CHECK_MODE),
-           STR_ENABLE(RGA2_NONUSE), STR_ENABLE(RGA2_INT_FLAG));
+    seq_printf(m,
+               "REG   [%s]\n"
+               "MSG   [%s]\n"
+               "TIME  [%s]\n"
+               "INT   [%s]\n"
+               "CHECK [%s]\n"
+               "STOP  [%s]\n",
+               STR_ENABLE(RGA2_TEST_REG), STR_ENABLE(RGA2_TEST_MSG), STR_ENABLE(RGA2_TEST_TIME),
+               STR_ENABLE(RGA2_CHECK_MODE), STR_ENABLE(RGA2_NONUSE), STR_ENABLE(RGA2_INT_FLAG));
 
     seq_puts(m, "\nhelp:\n");
     seq_puts(m, "  'echo reg   > debug' to enable/disable register log printing.\n");
@@ -54,15 +52,16 @@ static int rga_debug_show(struct seq_file *m, void *data)
     return 0;
 }
 
-static ssize_t rga_debug_write(struct file *file, const char __user *ubuf,
-                  size_t len, loff_t *offp)
+static ssize_t rga_debug_write(struct file *file, const char __user *ubuf, size_t len, loff_t *offp)
 {
     char buf[14];
 
-    if (len > sizeof(buf) - 1)
+    if (len > sizeof(buf) - 1) {
         return -EINVAL;
-    if (copy_from_user(buf, ubuf, len))
+    }
+    if (copy_from_user(buf, ubuf, len)) {
         return -EFAULT;
+    }
     buf[len - 1] = '\0';
 
     if (strncmp(buf, "reg", 4) == 0) {
@@ -128,20 +127,20 @@ static int rga_version_show(struct seq_file *m, void *data)
 }
 
 struct rga_debugger_list rga_root_list[] = {
-    { "debug", rga_debug_show, rga_debug_write, NULL },
-    { "driver_version", rga_version_show, NULL, NULL },
+    {"debug", rga_debug_show, rga_debug_write, NULL},
+    {"driver_version", rga_version_show, NULL, NULL},
 };
 
-static ssize_t rga_debugger_write(struct file *file, const char __user *ubuf,
-                  size_t len, loff_t *offp)
+static ssize_t rga_debugger_write(struct file *file, const char __user *ubuf, size_t len, loff_t *offp)
 {
     struct seq_file *priv = file->private_data;
     struct rga_debugger_node *node = priv->private;
 
-    if (node->info_ent->write)
+    if (node->info_ent->write) {
         return node->info_ent->write(file, ubuf, len, offp);
-    else
+    } else {
         return len;
+    }
 }
 
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUG_FS
@@ -153,12 +152,12 @@ static int rga_debugfs_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations rga_debugfs_fops = {
-    .owner     = THIS_MODULE,
-    .open     = rga_debugfs_open,
-    .read     = seq_read,
-    .llseek  = seq_lseek,
+    .owner = THIS_MODULE,
+    .open = rga_debugfs_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
     .release = single_release,
-    .write     = rga_debugger_write,
+    .write = rga_debugger_write,
 };
 
 static int rga_debugfs_remove_files(struct rga_debugger *debugger)
@@ -170,9 +169,11 @@ static int rga_debugfs_remove_files(struct rga_debugger *debugger)
 
     /* Delete debugfs entry list */
     entry_list = &debugger->debugfs_entry_list;
-    list_for_each_entry_safe(pos, q, entry_list, list) {
-        if (pos->dent == NULL)
+    list_for_each_entry_safe(pos, q, entry_list, list)
+    {
+        if (pos->dent == NULL) {
             continue;
+        }
         list_del(&pos->list);
         kfree(pos);
         pos = NULL;
@@ -187,8 +188,8 @@ static int rga_debugfs_remove_files(struct rga_debugger *debugger)
     return 0;
 }
 
-static int rga_debugfs_create_files(const struct rga_debugger_list *files, int count,
-                 struct dentry *root, struct rga_debugger *debugger)
+static int rga_debugfs_create_files(const struct rga_debugger_list *files, int count, struct dentry *root,
+                                    struct rga_debugger *debugger)
 {
     int i;
     struct dentry *ent;
@@ -197,16 +198,14 @@ static int rga_debugfs_create_files(const struct rga_debugger_list *files, int c
     for (i = 0; i < count; i++) {
         tmp = kmalloc(sizeof(struct rga_debugger_node), GFP_KERNEL);
         if (tmp == NULL) {
-            ERR("Cannot alloc rga_debugger_node for /sys/kernel/debug/%pd/%s\n",
-                root, files[i].name);
+            ERR("Cannot alloc rga_debugger_node for /sys/kernel/debug/%pd/%s\n", root, files[i].name);
             goto MALLOC_FAIL;
         }
 
         tmp->info_ent = &files[i];
         tmp->debugger = debugger;
 
-        ent = debugfs_create_file(files[i].name, S_IFREG | S_IRUGO,
-                      root, tmp, &rga_debugfs_fops);
+        ent = debugfs_create_file(files[i].name, S_IFREG | S_IRUGO, root, tmp, &rga_debugfs_fops);
         if (!ent) {
             ERR("Cannot create /sys/kernel/debug/%pd/%s\n", root, files[i].name);
             goto CREATE_FAIL;
@@ -254,8 +253,7 @@ int rga2_debugfs_init(void)
         return -EIO;
     }
 
-    ret = rga_debugfs_create_files(rga_root_list, ARRAY_SIZE(rga_root_list),
-                       debugger->debugfs_dir, debugger);
+    ret = rga_debugfs_create_files(rga_root_list, ARRAY_SIZE(rga_root_list), debugger->debugfs_dir, debugger);
     if (ret) {
         ERR("Could not install rga_root_list debugfs\n");
         goto CREATE_FAIL;
@@ -279,12 +277,12 @@ static int rga_procfs_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations rga_procfs_fops = {
-    .owner   = THIS_MODULE,
-    .open    = rga_procfs_open,
-    .read    = seq_read,
-    .llseek  = seq_lseek,
+    .owner = THIS_MODULE,
+    .open = rga_procfs_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
     .release = single_release,
-    .write   = rga_debugger_write,
+    .write = rga_debugger_write,
 };
 
 static int rga_procfs_remove_files(struct rga_debugger *debugger)
@@ -296,9 +294,11 @@ static int rga_procfs_remove_files(struct rga_debugger *debugger)
 
     /* Delete procfs entry list */
     entry_list = &debugger->procfs_entry_list;
-    list_for_each_entry_safe(pos, q, entry_list, list) {
-        if (pos->pent == NULL)
+    list_for_each_entry_safe(pos, q, entry_list, list)
+    {
+        if (pos->pent == NULL) {
             continue;
+        }
         list_del(&pos->list);
         kfree(pos);
         pos = NULL;
@@ -313,8 +313,8 @@ static int rga_procfs_remove_files(struct rga_debugger *debugger)
     return 0;
 }
 
-static int rga_procfs_create_files(const struct rga_debugger_list *files, int count,
-                struct proc_dir_entry *root, struct rga_debugger *debugger)
+static int rga_procfs_create_files(const struct rga_debugger_list *files, int count, struct proc_dir_entry *root,
+                                   struct rga_debugger *debugger)
 {
     int i;
     struct proc_dir_entry *ent;
@@ -323,16 +323,14 @@ static int rga_procfs_create_files(const struct rga_debugger_list *files, int co
     for (i = 0; i < count; i++) {
         tmp = kmalloc(sizeof(struct rga_debugger_node), GFP_KERNEL);
         if (tmp == NULL) {
-            ERR("Cannot alloc rga_debugger_node for /proc/%s/%s\n",
-                RGA_DEBUGGER_ROOT_NAME, files[i].name);
+            ERR("Cannot alloc rga_debugger_node for /proc/%s/%s\n", RGA_DEBUGGER_ROOT_NAME, files[i].name);
             goto MALLOC_FAIL;
         }
 
         tmp->info_ent = &files[i];
         tmp->debugger = debugger;
 
-        ent = proc_create_data(files[i].name, S_IFREG | S_IRUGO,
-                       root, &rga_procfs_fops, tmp);
+        ent = proc_create_data(files[i].name, S_IFREG | S_IRUGO, root, &rga_procfs_fops, tmp);
         if (!ent) {
             ERR("Cannot create /proc/%s/%s\n", RGA_DEBUGGER_ROOT_NAME, files[i].name);
             goto CREATE_FAIL;
@@ -379,8 +377,7 @@ int rga2_procfs_init(void)
         return -EIO;
     }
 
-    ret = rga_procfs_create_files(rga_root_list, ARRAY_SIZE(rga_root_list),
-                      debugger->procfs_dir, debugger);
+    ret = rga_procfs_create_files(rga_root_list, ARRAY_SIZE(rga_root_list), debugger->procfs_dir, debugger);
     if (ret) {
         ERR("Could not install rga_root_list procfs\n");
         goto CREATE_FAIL;

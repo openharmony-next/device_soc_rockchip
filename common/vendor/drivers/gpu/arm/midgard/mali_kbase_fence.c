@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #include <linux/atomic.h>
 #include <linux/list.h>
 #include <linux/spinlock.h>
@@ -70,24 +68,19 @@ kbase_fence_fence_value_str(struct dma_fence *fence, char *str, int size)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-const struct fence_ops kbase_fence_ops = {
-    .wait = fence_default_wait,
+const struct fence_ops kbase_fence_ops = {.wait = fence_default_wait,
 #else
-const struct dma_fence_ops kbase_fence_ops = {
-    .wait = dma_fence_default_wait,
+const struct dma_fence_ops kbase_fence_ops = {.wait = dma_fence_default_wait,
 #endif
-    .get_driver_name = kbase_fence_get_driver_name,
-    .get_timeline_name = kbase_fence_get_timeline_name,
-    .enable_signaling = kbase_fence_enable_signaling,
-    .fence_value_str = kbase_fence_fence_value_str
-};
+                                          .get_driver_name = kbase_fence_get_driver_name,
+                                          .get_timeline_name = kbase_fence_get_timeline_name,
+                                          .enable_signaling = kbase_fence_enable_signaling,
+                                          .fence_value_str = kbase_fence_fence_value_str};
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-struct fence *
-kbase_fence_out_new(struct kbase_jd_atom *katom)
+struct fence *kbase_fence_out_new(struct kbase_jd_atom *katom)
 #else
-struct dma_fence *
-kbase_fence_out_new(struct kbase_jd_atom *katom)
+struct dma_fence *kbase_fence_out_new(struct kbase_jd_atom *katom)
 #endif
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
@@ -99,22 +92,19 @@ kbase_fence_out_new(struct kbase_jd_atom *katom)
     WARN_ON(katom->dma_fence.fence);
 
     fence = kzalloc(sizeof(*fence), GFP_KERNEL);
-    if (!fence)
+    if (!fence) {
         return NULL;
+    }
 
-    dma_fence_init(fence,
-               &kbase_fence_ops,
-               &kbase_fence_lock,
-               katom->dma_fence.context,
-               atomic_inc_return(&katom->dma_fence.seqno));
+    dma_fence_init(fence, &kbase_fence_ops, &kbase_fence_lock, katom->dma_fence.context,
+                   atomic_inc_return(&katom->dma_fence.seqno));
 
     katom->dma_fence.fence = fence;
 
     return fence;
 }
 
-bool
-kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
+bool kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
 {
     struct kbase_fence_cb *cb, *tmp;
     bool res = false;
@@ -122,7 +112,8 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
     lockdep_assert_held(&katom->kctx->jctx.lock);
 
     /* Clean up and free callbacks. */
-    list_for_each_entry_safe(cb, tmp, &katom->dma_fence.callbacks, node) {
+    list_for_each_entry_safe(cb, tmp, &katom->dma_fence.callbacks, node)
+    {
         bool ret;
 
         /* Cancel callbacks that hasn't been called yet. */
@@ -135,8 +126,9 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
              */
             ret = atomic_dec_return(&katom->dma_fence.dep_count);
 
-            if (unlikely(ret == 0))
+            if (unlikely(ret == 0)) {
                 res = true;
+            }
         }
 
         /*
@@ -152,33 +144,28 @@ kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-int
-kbase_fence_add_callback(struct kbase_jd_atom *katom,
-             struct fence *fence,
-             fence_func_t callback)
+int kbase_fence_add_callback(struct kbase_jd_atom *katom, struct fence *fence, fence_func_t callback)
 #else
-int
-kbase_fence_add_callback(struct kbase_jd_atom *katom,
-             struct dma_fence *fence,
-             dma_fence_func_t callback)
+int kbase_fence_add_callback(struct kbase_jd_atom *katom, struct dma_fence *fence, dma_fence_func_t callback)
 #endif
 {
     int err = 0;
     struct kbase_fence_cb *kbase_fence_cb;
 
-    if (!fence)
+    if (!fence) {
         return -EINVAL;
+    }
 
     kbase_fence_cb = kmalloc(sizeof(*kbase_fence_cb), GFP_KERNEL);
-    if (!kbase_fence_cb)
+    if (!kbase_fence_cb) {
         return -ENOMEM;
+    }
 
     kbase_fence_cb->fence = fence;
     kbase_fence_cb->katom = katom;
     INIT_LIST_HEAD(&kbase_fence_cb->node);
 
-    err = dma_fence_add_callback(fence, &kbase_fence_cb->fence_cb,
-                     callback);
+    err = dma_fence_add_callback(fence, &kbase_fence_cb->fence_cb, callback);
     if (err == -ENOENT) {
         /* Fence signaled, clear the error and return */
         err = 0;

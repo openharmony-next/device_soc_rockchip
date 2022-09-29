@@ -13,8 +13,6 @@
  *
  */
 
-
-
 /*
  * Interface file for the direct implementation for MMU hardware access
  *
@@ -39,4 +37,4 @@
  */
 void kbase_mmu_interrupt(struct kbase_device *kbdev, u32 irq_stat);
 
-#endif    /* _MALI_KBASE_MMU_HW_DIRECT_H_ */
+#endif /* _MALI_KBASE_MMU_HW_DIRECT_H_ */

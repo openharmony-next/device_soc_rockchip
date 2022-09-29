@@ -65,8 +65,7 @@ static const struct file_operations kbasep_mem_profile_debugfs_fops = {
     .release = single_release,
 };
 
-int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data,
-                    size_t size)
+int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data, size_t size)
 {
 #if (KERNEL_VERSION(4, 7, 0) <= LINUX_VERSION_CODE)
     const mode_t mode = 0444;
@@ -77,19 +76,16 @@ int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data,
 
     mutex_lock(&kctx->mem_profile_lock);
 
-    dev_dbg(kctx->kbdev->dev, "initialised: %d",
-        kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
+    dev_dbg(kctx->kbdev->dev, "initialised: %d", kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
 
     if (!kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED)) {
         if (IS_ERR_OR_NULL(kctx->kctx_dentry)) {
-            err  = -ENOMEM;
-        } else if (!debugfs_create_file("mem_profile", mode,
-                    kctx->kctx_dentry, kctx,
-                    &kbasep_mem_profile_debugfs_fops)) {
+            err = -ENOMEM;
+        } else if (!debugfs_create_file("mem_profile", mode, kctx->kctx_dentry, kctx,
+                                        &kbasep_mem_profile_debugfs_fops)) {
             err = -EAGAIN;
         } else {
-            kbase_ctx_flag_set(kctx,
-                       KCTX_MEM_PROFILE_INITIALIZED);
+            kbase_ctx_flag_set(kctx, KCTX_MEM_PROFILE_INITIALIZED);
         }
     }
 
@@ -101,8 +97,8 @@ int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data,
         kfree(data);
     }
 
-    dev_dbg(kctx->kbdev->dev, "returning: %d, initialised: %d",
-        err, kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
+    dev_dbg(kctx->kbdev->dev, "returning: %d, initialised: %d", err,
+            kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
 
     mutex_unlock(&kctx->mem_profile_lock);
 
@@ -113,8 +109,7 @@ void kbasep_mem_profile_debugfs_remove(struct kbase_context *kctx)
 {
     mutex_lock(&kctx->mem_profile_lock);
 
-    dev_dbg(kctx->kbdev->dev, "initialised: %d",
-                kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
+    dev_dbg(kctx->kbdev->dev, "initialised: %d", kbase_ctx_flag(kctx, KCTX_MEM_PROFILE_INITIALIZED));
 
     kfree(kctx->mem_profile_data);
     kctx->mem_profile_data = NULL;
@@ -123,10 +118,9 @@ void kbasep_mem_profile_debugfs_remove(struct kbase_context *kctx)
     mutex_unlock(&kctx->mem_profile_lock);
 }
 
-#else /* CONFIG_DEBUG_FS */
+#else  /* CONFIG_DEBUG_FS */
 
-int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data,
-                    size_t size)
+int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data, size_t size)
 {
     kfree(data);
     return 0;

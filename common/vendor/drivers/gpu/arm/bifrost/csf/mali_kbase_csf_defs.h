@@ -571,8 +571,7 @@ struct kbase_csf_scheduler_context {
 struct kbase_csf_context {
     struct list_head event_pages_head;
     DECLARE_BITMAP(cookies, KBASE_CSF_NUM_USER_IO_PAGES_HANDLE);
-    struct kbase_queue *user_pages_info[
-        KBASE_CSF_NUM_USER_IO_PAGES_HANDLE];
+    struct kbase_queue *user_pages_info[KBASE_CSF_NUM_USER_IO_PAGES_HANDLE];
     struct mutex lock;
     struct kbase_queue_group *queue_groups[MAX_QUEUE_GROUP_NUM];
     struct list_head queue_list;
@@ -752,10 +751,8 @@ struct kbase_csf_scheduler {
 /**
  * Maximum value of the global progress timeout.
  */
-#define GLB_PROGRESS_TIMER_TIMEOUT_MAX \
-    ((GLB_PROGRESS_TIMER_TIMEOUT_MASK >> \
-        GLB_PROGRESS_TIMER_TIMEOUT_SHIFT) * \
-    GLB_PROGRESS_TIMER_TIMEOUT_SCALE)
+#define GLB_PROGRESS_TIMER_TIMEOUT_MAX                                                                                 \
+    ((GLB_PROGRESS_TIMER_TIMEOUT_MASK >> GLB_PROGRESS_TIMER_TIMEOUT_SHIFT) * GLB_PROGRESS_TIMER_TIMEOUT_SCALE)
 
 /**
  * struct kbase_csf      -  Object representing command-stream front-end for an

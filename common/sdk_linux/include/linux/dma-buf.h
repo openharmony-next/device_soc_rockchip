@@ -34,12 +34,12 @@ struct dma_buf_attachment;
  */
 struct dma_buf_ops {
     /**
-      * @cache_sgt_mapping:
-      *
-      * If true the framework will cache the first mapping made for each
-      * attachment. This avoids creating mappings for attachments multiple
-      * times.
-      */
+     * @cache_sgt_mapping:
+     *
+     * If true the framework will cache the first mapping made for each
+     * attachment. This avoids creating mappings for attachments multiple
+     * times.
+     */
     bool cache_sgt_mapping;
 
     /**
@@ -151,8 +151,7 @@ struct dma_buf_ops {
      * May also return -EINTR when a signal was received while being
      * blocked.
      */
-    struct sg_table * (*map_dma_buf)(struct dma_buf_attachment *,
-                     enum dma_data_direction);
+    struct sg_table *(*map_dma_buf)(struct dma_buf_attachment *, enum dma_data_direction);
     /**
      * @unmap_dma_buf:
      *
@@ -161,9 +160,7 @@ struct dma_buf_ops {
      * For static dma_buf handling this might also unpins the backing
      * storage if this is the last mapping of the DMA buffer.
      */
-    void (*unmap_dma_buf)(struct dma_buf_attachment *,
-                  struct sg_table *,
-                  enum dma_data_direction);
+    void (*unmap_dma_buf)(struct dma_buf_attachment *, struct sg_table *, enum dma_data_direction);
 
     /* TODO: Add try_map_dma_buf version, to return immed with -EBUSY
      * if the call would block.
@@ -240,9 +237,8 @@ struct dma_buf_ops {
      * return -ERESTARTSYS or -EINTR when the call has been interrupted and
      * needs to be restarted.
      */
-    int (*begin_cpu_access_partial)(struct dma_buf *dmabuf,
-                    enum dma_data_direction,
-                    unsigned int offset, unsigned int len);
+    int (*begin_cpu_access_partial)(struct dma_buf *dmabuf, enum dma_data_direction, unsigned int offset,
+                                    unsigned int len);
 
     /**
      * @end_cpu_access:
@@ -281,9 +277,8 @@ struct dma_buf_ops {
      * -ERESTARTSYS or -EINTR when the call has been interrupted and needs
      * to be restarted.
      */
-    int (*end_cpu_access_partial)(struct dma_buf *dmabuf,
-                      enum dma_data_direction,
-                      unsigned int offset, unsigned int len);
+    int (*end_cpu_access_partial)(struct dma_buf *dmabuf, enum dma_data_direction, unsigned int offset,
+                                  unsigned int len);
 
     /**
      * @mmap:
@@ -545,9 +540,8 @@ struct dma_buf_export_info {
  * DEFINE_DMA_BUF_EXPORT_INFO macro defines the &struct dma_buf_export_info,
  * zeroes it out and pre-populates exp_name in it.
  */
-#define DEFINE_DMA_BUF_EXPORT_INFO(name)    \
-    struct dma_buf_export_info name = { .exp_name = KBUILD_MODNAME, \
-                     .owner = THIS_MODULE }
+#define DEFINE_DMA_BUF_EXPORT_INFO(name)                                                                               \
+    struct dma_buf_export_info name = {.exp_name = KBUILD_MODNAME, .owner = THIS_MODULE}
 
 /**
  * get_dma_buf - convenience wrapper for get_file.
@@ -584,23 +578,17 @@ static inline bool dma_buf_is_dynamic(struct dma_buf *dmabuf)
  * Returns true if a DMA-buf importer wants to call the map/unmap functions with
  * the dma_resv lock held.
  */
-static inline bool
-dma_buf_attachment_is_dynamic(struct dma_buf_attachment *attach)
+static inline bool dma_buf_attachment_is_dynamic(struct dma_buf_attachment *attach)
 {
     return !!attach->importer_ops;
 }
 
-int get_each_dmabuf(int (*callback)(const struct dma_buf *dmabuf,
-            void *private), void *private);
+int get_each_dmabuf(int (*callback)(const struct dma_buf *dmabuf, void *private), void *private);
 int is_dma_buf_file(struct file *file);
-struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf,
-                      struct device *dev);
-struct dma_buf_attachment *
-dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
-               const struct dma_buf_attach_ops *importer_ops,
-               void *importer_priv);
-void dma_buf_detach(struct dma_buf *dmabuf,
-            struct dma_buf_attachment *attach);
+struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf, struct device *dev);
+struct dma_buf_attachment *dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
+                                                  const struct dma_buf_attach_ops *importer_ops, void *importer_priv);
+void dma_buf_detach(struct dma_buf *dmabuf, struct dma_buf_attachment *attach);
 int dma_buf_pin(struct dma_buf_attachment *attach);
 void dma_buf_unpin(struct dma_buf_attachment *attach);
 
@@ -610,24 +598,17 @@ int dma_buf_fd(struct dma_buf *dmabuf, int flags);
 struct dma_buf *dma_buf_get(int fd);
 void dma_buf_put(struct dma_buf *dmabuf);
 
-struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
-                    enum dma_data_direction);
-void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
-                enum dma_data_direction);
+struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *, enum dma_data_direction);
+void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *, enum dma_data_direction);
 void dma_buf_move_notify(struct dma_buf *dma_buf);
-int dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
-                 enum dma_data_direction dir);
-int dma_buf_begin_cpu_access_partial(struct dma_buf *dma_buf,
-                     enum dma_data_direction dir,
-                     unsigned int offset, unsigned int len);
-int dma_buf_end_cpu_access(struct dma_buf *dma_buf,
-               enum dma_data_direction dir);
-int dma_buf_end_cpu_access_partial(struct dma_buf *dma_buf,
-                     enum dma_data_direction dir,
-                     unsigned int offset, unsigned int len);
+int dma_buf_begin_cpu_access(struct dma_buf *dma_buf, enum dma_data_direction dir);
+int dma_buf_begin_cpu_access_partial(struct dma_buf *dma_buf, enum dma_data_direction dir, unsigned int offset,
+                                     unsigned int len);
+int dma_buf_end_cpu_access(struct dma_buf *dma_buf, enum dma_data_direction dir);
+int dma_buf_end_cpu_access_partial(struct dma_buf *dma_buf, enum dma_data_direction dir, unsigned int offset,
+                                   unsigned int len);
 
-int dma_buf_mmap(struct dma_buf *, struct vm_area_struct *,
-         unsigned long);
+int dma_buf_mmap(struct dma_buf *, struct vm_area_struct *, unsigned long);
 void *dma_buf_vmap(struct dma_buf *);
 void dma_buf_vunmap(struct dma_buf *, void *vaddr);
 int dma_buf_get_flags(struct dma_buf *dmabuf, unsigned long *flags);

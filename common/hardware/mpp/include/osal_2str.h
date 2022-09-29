@@ -18,13 +18,13 @@
 
 #include "mpp_dev_defs.h"
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 const char *strof_client_type(MppClientType type);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

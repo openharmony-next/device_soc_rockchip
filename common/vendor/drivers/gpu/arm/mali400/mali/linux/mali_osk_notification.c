@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -27,22 +28,24 @@
  * When a new notification is posted a single thread is resumed.
  */
 struct _mali_osk_notification_queue_t_struct {
-    spinlock_t mutex; /**< Mutex protecting the list */
+    spinlock_t mutex;                /**< Mutex protecting the list */
     wait_queue_head_t receive_queue; /**< Threads waiting for new entries to the queue */
-    struct list_head head; /**< List of notifications waiting to be picked up */
+    struct list_head head;           /**< List of notifications waiting to be picked up */
 };
 
 typedef struct _mali_osk_notification_wrapper_t_struct {
-    struct list_head list;           /**< Internal linked list variable */
-    _mali_osk_notification_t data;   /**< Notification data */
+    struct list_head list;         /**< Internal linked list variable */
+    _mali_osk_notification_t data; /**< Notification data */
 } _mali_osk_notification_wrapper_t;
 
 _mali_osk_notification_queue_t *_mali_osk_notification_queue_init(void)
 {
-    _mali_osk_notification_queue_t         *result;
+    _mali_osk_notification_queue_t *result;
 
     result = (_mali_osk_notification_queue_t *)kmalloc(sizeof(_mali_osk_notification_queue_t), GFP_KERNEL);
-    if (NULL == result) return NULL;
+    if (NULL == result) {
+        return NULL;
+    }
 
     spin_lock_init(&result->mutex);
     init_waitqueue_head(&result->receive_queue);
@@ -57,7 +60,7 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size)
     _mali_osk_notification_wrapper_t *notification;
 
     notification = (_mali_osk_notification_wrapper_t *)kmalloc(sizeof(_mali_osk_notification_wrapper_t) + size,
-            GFP_KERNEL | __GFP_HIGH | __GFP_RETRY_MAYFAIL);
+                                                               GFP_KERNEL | __GFP_HIGH | __GFP_RETRY_MAYFAIL);
     if (NULL == notification) {
         MALI_DEBUG_PRINT(1, ("Failed to create a notification object\n"));
         return NULL;
@@ -133,7 +136,8 @@ void mali_osk_notification_queue_send(_mali_osk_notification_queue_t *queue, _ma
     wake_up(&queue->receive_queue);
 }
 
-mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result)
+mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_queue_t *queue,
+                                                        _mali_osk_notification_t **result)
 {
 #if defined(MALI_UPPER_HALF_SCHEDULING)
     unsigned long irq_flags;
@@ -164,7 +168,8 @@ mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_q
     return ret;
 }
 
-mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue, _mali_osk_notification_t **result)
+mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_queue_t *queue,
+                                                        _mali_osk_notification_t **result)
 {
     /* check input */
     MALI_DEBUG_ASSERT_POINTER(queue);
@@ -174,7 +179,7 @@ mali_osk_errcode_t _mali_osk_notification_queue_receive(_mali_osk_notification_q
     *result = NULL;
 
     if (wait_event_interruptible(queue->receive_queue,
-                     MALI_OSK_ERR_OK == _mali_osk_notification_queue_dequeue(queue, result))) {
+                                 MALI_OSK_ERR_OK == _mali_osk_notification_queue_dequeue(queue, result))) {
         return MALI_OSK_ERR_RESTARTSYSCALL;
     }
 

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -57,7 +58,7 @@ MALI_STATIC_INLINE void __mali_osk_list_del(_mali_osk_list_t *prev, _mali_osk_li
 
 /** @brief Define a list variable, which is initialized.
  * @param exp the name of the variable that the list will be defined as. */
-#define MALI_OSK_LIST_HEAD_STATIC_INIT(exp) _mali_osk_list_t exp = { &exp, &exp }
+#define MALI_OSK_LIST_HEAD_STATIC_INIT(exp) _mali_osk_list_t exp = {&(exp), &(exp)}
 
 /** @brief Initialize a list element.
  *
@@ -205,8 +206,7 @@ MALI_STATIC_INLINE void mali_osk_list_move_list(_mali_osk_list_t *old_list, _mal
  * @return a pointer to a \a type object which contains the _mali_osk_list_t
  * \a member, as pointed to by the _mali_osk_list_t \a *ptr.
  */
-#define MALI_OSK_LIST_ENTRY(ptr, type, member) \
-    MALI_OSK_CONTAINER_OF(ptr, type, member)
+#define MALI_OSK_LIST_ENTRY(ptr, type, member) MALI_OSK_CONTAINER_OF(ptr, type, member)
 
 /** @brief Enumerate a list safely
  *
@@ -234,12 +234,10 @@ MALI_STATIC_INLINE void mali_osk_list_move_list(_mali_osk_list_t *old_list, _mal
  * @param member the _mali_osk_list_t member of the structure that is part of
  * the list to be enumerated.
  */
-#define MALI_OSK_LIST_FOREACHENTRY(ptr, tmp, list, type, member)         \
-    for (ptr = MALI_OSK_LIST_ENTRY((list)->next, type, member),      \
-         tmp = MALI_OSK_LIST_ENTRY(ptr->member.next, type, member);  \
-         &ptr->member != (list);                                      \
-         ptr = tmp,                                                   \
-         tmp = MALI_OSK_LIST_ENTRY(tmp->member.next, type, member))
+#define MALI_OSK_LIST_FOREACHENTRY(ptr, tmp, list, type, member)                                                       \
+    for (ptr = MALI_OSK_LIST_ENTRY((list)->next, type, member),                                                        \
+        tmp = MALI_OSK_LIST_ENTRY((ptr)->member.next, type, member);                                                   \
+         &(ptr)->member != (list); ptr = (tmp), tmp = MALI_OSK_LIST_ENTRY((tmp)->member.next, type, member))
 
 /** @brief Enumerate a list in reverse order safely
  *
@@ -257,12 +255,10 @@ MALI_STATIC_INLINE void mali_osk_list_move_list(_mali_osk_list_t *old_list, _mal
  * @param member the _mali_osk_list_t member of the structure that is part of
  * the list to be enumerated.
  */
-#define MALI_OSK_LIST_FOREACHENTRY_REVERSE(ptr, tmp, list, type, member) \
-    for (ptr = MALI_OSK_LIST_ENTRY((list)->prev, type, member),      \
-         tmp = MALI_OSK_LIST_ENTRY(ptr->member.prev, type, member);  \
-         &ptr->member != (list);                                      \
-         ptr = tmp,                                                   \
-         tmp = MALI_OSK_LIST_ENTRY(tmp->member.prev, type, member))
+#define MALI_OSK_LIST_FOREACHENTRY_REVERSE(ptr, tmp, list, type, member)                                               \
+    for (ptr = MALI_OSK_LIST_ENTRY((list)->prev, type, member),                                                        \
+        tmp = MALI_OSK_LIST_ENTRY((ptr)->member.prev, type, member);                                                   \
+         &(ptr)->member != (list); ptr = tmp, tmp = MALI_OSK_LIST_ENTRY((tmp)->member.prev, type, member))
 
 /** @} */ /* end group _mali_osk_list */
 

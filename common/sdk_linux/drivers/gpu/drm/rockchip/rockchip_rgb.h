@@ -4,18 +4,16 @@
  * Author:
  *      Sandy Huang <hjc@rock-chips.com>
  */
+#ifndef COMMON_SDK_LINUX_DRIVERS_GPU_DRM_ROCKCHIP_ROCKCHIP_RGB_H
+#define COMMON_SDK_LINUX_DRIVERS_GPU_DRM_ROCKCHIP_ROCKCHIP_RGB_H
 
 #ifdef CONFIG_ROCKCHIP_RGB
-struct rockchip_rgb *rockchip_rgb_init(struct device *dev,
-                       struct drm_crtc *crtc,
-                       struct drm_device *drm_dev,
-                       u32 port_id);
+struct rockchip_rgb *rockchip_rgb_init(struct device *dev, struct drm_crtc *crtc, struct drm_device *drm_dev,
+                                       u32 port_id);
 void rockchip_rgb_fini(struct rockchip_rgb *rgb);
 #else
-static inline struct rockchip_rgb *rockchip_rgb_init(struct device *dev,
-                             struct drm_crtc *crtc,
-                             struct drm_device *drm_dev,
-                             u32 port_id)
+static inline struct rockchip_rgb *rockchip_rgb_init(struct device *dev, struct drm_crtc *crtc,
+                                                     struct drm_device *drm_dev, u32 port_id)
 {
     return NULL;
 }
@@ -23,4 +21,5 @@ static inline struct rockchip_rgb *rockchip_rgb_init(struct device *dev,
 static inline void rockchip_rgb_fini(struct rockchip_rgb *rgb)
 {
 }
+#endif
 #endif

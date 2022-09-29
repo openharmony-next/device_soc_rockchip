@@ -12,32 +12,32 @@
 #include "dev.h"
 #include "regs.h"
 
-#define RKISP1_ISP_PARAMS_REQ_BUFS_MIN    2
-#define RKISP1_ISP_PARAMS_REQ_BUFS_MAX    8
+#define RKISP1_ISP_PARAMS_REQ_BUFS_MIN 2
+#define RKISP1_ISP_PARAMS_REQ_BUFS_MAX 8
 
-static int rkispp_params_enum_fmt_meta_out(struct file *file, void *priv,
-                       struct v4l2_fmtdesc *f)
+static int rkispp_params_enum_fmt_meta_out(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 {
     struct video_device *video = video_devdata(file);
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(video);
 
-    if (f->index > 0 || f->type != video->queue->type)
+    if (f->index > 0 || f->type != video->queue->type) {
         return -EINVAL;
+    }
 
     f->pixelformat = params_vdev->vdev_fmt.fmt.meta.dataformat;
 
     return 0;
 }
 
-static int rkispp_params_g_fmt_meta_out(struct file *file, void *fh,
-                    struct v4l2_format *f)
+static int rkispp_params_g_fmt_meta_out(struct file *file, void *fh, struct v4l2_format *f)
 {
     struct video_device *video = video_devdata(file);
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(video);
     struct v4l2_meta_format *meta = &f->fmt.meta;
 
-    if (f->type != video->queue->type)
+    if (f->type != video->queue->type) {
         return -EINVAL;
+    }
 
     memset(meta, 0, sizeof(*meta));
     meta->dataformat = params_vdev->vdev_fmt.fmt.meta.dataformat;
@@ -46,41 +46,37 @@ static int rkispp_params_g_fmt_meta_out(struct file *file, void *fh,
     return 0;
 }
 
-static int rkispp_params_querycap(struct file *file,
-                  void *priv, struct v4l2_capability *cap)
+static int rkispp_params_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
     struct video_device *vdev = video_devdata(file);
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(vdev);
 
-    snprintf(cap->driver, sizeof(cap->driver),
-         "%s_v%d", DRIVER_NAME,
-         params_vdev->dev->ispp_ver >> 4);
+    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, params_vdev->dev->ispp_ver >> 4);
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
     strlcpy(cap->bus_info, "platform: " DRIVER_NAME, sizeof(cap->bus_info));
 
     return 0;
 }
 
-static int rkispp_params_subs_evt(struct v4l2_fh *fh,
-                  const struct v4l2_event_subscription *sub)
+static int rkispp_params_subs_evt(struct v4l2_fh *fh, const struct v4l2_event_subscription *sub)
 {
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(fh->vdev);
 
-    if (sub->id != 0)
+    if (sub->id != 0) {
         return -EINVAL;
+    }
 
     switch (sub->type) {
-    case CIFISP_V4L2_EVENT_STREAM_START:
-    case CIFISP_V4L2_EVENT_STREAM_STOP:
-        params_vdev->is_subs_evt = true;
-        return v4l2_event_subscribe(fh, sub, 0, NULL);
-    default:
-        return -EINVAL;
+        case CIFISP_V4L2_EVENT_STREAM_START:
+        case CIFISP_V4L2_EVENT_STREAM_STOP:
+            params_vdev->is_subs_evt = true;
+            return v4l2_event_subscribe(fh, sub, 0, NULL);
+        default:
+            return -EINVAL;
     }
 }
 
-static int rkispp_params_unsubs_evt(struct v4l2_fh *fh,
-                    const struct v4l2_event_subscription *sub)
+static int rkispp_params_unsubs_evt(struct v4l2_fh *fh, const struct v4l2_event_subscription *sub)
 {
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(fh->vdev);
 
@@ -107,9 +103,7 @@ static const struct v4l2_ioctl_ops rkispp_params_ioctl = {
     .vidioc_unsubscribe_event = rkispp_params_unsubs_evt,
 };
 
-static int
-rkispp_param_init_fecbuf(struct rkispp_params_vdev *params,
-             struct rkispp_fecbuf_size *fecsize)
+static int rkispp_param_init_fecbuf(struct rkispp_params_vdev *params, struct rkispp_fecbuf_size *fecsize)
 {
     struct rkispp_device *pp_dev = params->dev;
     struct rkispp_fec_head *fec_data;
@@ -154,43 +148,38 @@ rkispp_param_init_fecbuf(struct rkispp_params_vdev *params,
             rkispp_write(pp_dev, RKISPP_FEC_MESH_YINT_BASE, val);
         }
         v4l2_dbg(1, rkispp_debug, &pp_dev->v4l2_dev,
-             "%s idx:%d fd:%d dma:%pad offset xf:0x%x yf:0x%x xi:0x%x yi:0x%x\n",
-             __func__, i, params->buf_fec[i].dma_fd, &params->buf_fec[i].dma_addr,
-             fec_data->meshxf_oft, fec_data->meshyf_oft,
-             fec_data->meshxi_oft, fec_data->meshyi_oft);
+                 "%s idx:%d fd:%d dma:%pad offset xf:0x%x yf:0x%x xi:0x%x yi:0x%x\n", __func__, i,
+                 params->buf_fec[i].dma_fd, &params->buf_fec[i].dma_addr, fec_data->meshxf_oft, fec_data->meshyf_oft,
+                 fec_data->meshxi_oft, fec_data->meshyi_oft);
     }
 
     return 0;
 }
 
-static void
-rkispp_param_deinit_fecbuf(struct rkispp_params_vdev *params)
+static void rkispp_param_deinit_fecbuf(struct rkispp_params_vdev *params)
 {
     int i;
 
     params->buf_fec_idx = 0;
-    for (i = 0; i < FEC_MESH_BUF_NUM; i++)
+    for (i = 0; i < FEC_MESH_BUF_NUM; i++) {
         rkispp_free_buffer(params->dev, &params->buf_fec[i]);
+    }
 }
 
-static int rkispp_params_vb2_queue_setup(struct vb2_queue *vq,
-                     unsigned int *num_buffers,
-                     unsigned int *num_planes,
-                     unsigned int sizes[],
-                     struct device *alloc_ctxs[])
+static int rkispp_params_vb2_queue_setup(struct vb2_queue *vq, unsigned int *num_buffers, unsigned int *num_planes,
+                                         unsigned int sizes[], struct device *alloc_ctxs[])
 {
     struct rkispp_params_vdev *params_vdev = vq->drv_priv;
     struct rkispp_device *dev = params_vdev->dev;
 
-    *num_buffers = clamp_t(u32, *num_buffers,
-                   RKISP1_ISP_PARAMS_REQ_BUFS_MIN,
-                   RKISP1_ISP_PARAMS_REQ_BUFS_MAX);
+    *num_buffers = clamp_t(u32, *num_buffers, RKISP1_ISP_PARAMS_REQ_BUFS_MIN, RKISP1_ISP_PARAMS_REQ_BUFS_MAX);
 
     *num_planes = 1;
-    if (dev->ispp_ver == ISPP_V10)
+    if (dev->ispp_ver == ISPP_V10) {
         sizes[0] = sizeof(struct rkispp_params_cfg);
-    else if (dev->ispp_ver == ISPP_V20)
+    } else if (dev->ispp_ver == ISPP_V20) {
         sizes[0] = sizeof(struct fec_params_cfg);
+    }
 
     INIT_LIST_HEAD(&params_vdev->params);
     params_vdev->first_params = true;
@@ -222,25 +211,22 @@ static void rkispp_params_vb2_stop_streaming(struct vb2_queue *vq)
     for (i = 0; i < RKISP1_ISP_PARAMS_REQ_BUFS_MAX; i++) {
         spin_lock_irqsave(&params_vdev->config_lock, flags);
         if (!list_empty(&params_vdev->params)) {
-            buf = list_first_entry(&params_vdev->params,
-                           struct rkispp_buffer, queue);
+            buf = list_first_entry(&params_vdev->params, struct rkispp_buffer, queue);
             list_del(&buf->queue);
-            spin_unlock_irqrestore(&params_vdev->config_lock,
-                           flags);
+            spin_unlock_irqrestore(&params_vdev->config_lock, flags);
         } else {
-            spin_unlock_irqrestore(&params_vdev->config_lock,
-                           flags);
+            spin_unlock_irqrestore(&params_vdev->config_lock, flags);
             break;
         }
 
-        if (buf)
+        if (buf) {
             vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
+        }
         buf = NULL;
     }
 
     if (params_vdev->cur_buf) {
-        vb2_buffer_done(&params_vdev->cur_buf->vb.vb2_buf,
-                VB2_BUF_STATE_ERROR);
+        vb2_buffer_done(&params_vdev->cur_buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
         params_vdev->cur_buf = NULL;
     }
 
@@ -249,8 +235,7 @@ static void rkispp_params_vb2_stop_streaming(struct vb2_queue *vq)
     params_vdev->cur_params->module_en_update = 0;
 }
 
-static int
-rkispp_params_vb2_start_streaming(struct vb2_queue *queue, unsigned int count)
+static int rkispp_params_vb2_start_streaming(struct vb2_queue *queue, unsigned int count)
 {
     struct rkispp_params_vdev *params_vdev = queue->drv_priv;
     unsigned long flags;
@@ -262,8 +247,7 @@ rkispp_params_vb2_start_streaming(struct vb2_queue *queue, unsigned int count)
     return 0;
 }
 
-static int
-rkispp_param_fh_open(struct file *filp)
+static int rkispp_param_fh_open(struct file *filp)
 {
     struct rkispp_params_vdev *params = video_drvdata(filp);
     struct rkispp_device *isppdev = params->dev;
@@ -273,8 +257,7 @@ rkispp_param_fh_open(struct file *filp)
     if (!ret) {
         ret = v4l2_pipeline_pm_get(&params->vnode.vdev.entity);
         if (ret < 0) {
-            v4l2_err(&isppdev->v4l2_dev,
-                 "pipeline power on failed %d\n", ret);
+            v4l2_err(&isppdev->v4l2_dev, "pipeline power on failed %d\n", ret);
             goto ERR;
         }
     }
@@ -286,19 +269,20 @@ ERR:
     return ret;
 }
 
-static int
-rkispp_param_fh_release(struct file *filp)
+static int rkispp_param_fh_release(struct file *filp)
 {
     struct rkispp_params_vdev *params = video_drvdata(filp);
     struct video_device *vdev = video_devdata(filp);
     int ret;
 
-    if (filp->private_data == vdev->queue->owner)
+    if (filp->private_data == vdev->queue->owner) {
         rkispp_param_deinit_fecbuf(params);
+    }
 
     ret = vb2_fop_release(filp);
-    if (!ret)
+    if (!ret) {
         v4l2_pipeline_pm_put(&params->vnode.vdev.entity);
+    }
     return ret;
 }
 
@@ -320,9 +304,7 @@ struct v4l2_file_operations rkispp_params_fops = {
     .release = rkispp_param_fh_release,
 };
 
-static int
-rkispp_params_init_vb2_queue(struct vb2_queue *q,
-                 struct rkispp_params_vdev *params_vdev)
+static int rkispp_params_init_vb2_queue(struct vb2_queue *q, struct rkispp_params_vdev *params_vdev)
 {
     q->type = V4L2_BUF_TYPE_META_OUTPUT;
     q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_USERPTR;
@@ -337,8 +319,7 @@ rkispp_params_init_vb2_queue(struct vb2_queue *q,
     return vb2_queue_init(q);
 }
 
-void rkispp_params_get_fecbuf_inf(struct rkispp_params_vdev *params_vdev,
-                  struct rkispp_fecbuf_info *fecbuf)
+void rkispp_params_get_fecbuf_inf(struct rkispp_params_vdev *params_vdev, struct rkispp_fecbuf_info *fecbuf)
 {
     int i;
 
@@ -348,8 +329,7 @@ void rkispp_params_get_fecbuf_inf(struct rkispp_params_vdev *params_vdev,
     }
 }
 
-void rkispp_params_set_fecbuf_size(struct rkispp_params_vdev *params_vdev,
-                   struct rkispp_fecbuf_size *fecsize)
+void rkispp_params_set_fecbuf_size(struct rkispp_params_vdev *params_vdev, struct rkispp_fecbuf_size *fecsize)
 {
     rkispp_param_deinit_fecbuf(params_vdev);
     rkispp_param_init_fecbuf(params_vdev, fecsize);
@@ -365,15 +345,18 @@ int rkispp_register_params_vdev(struct rkispp_device *dev)
     params_vdev->dev = dev;
     params_vdev->is_subs_evt = false;
     params_vdev->cur_params = vmalloc(sizeof(*params_vdev->cur_params));
-    if (!params_vdev->cur_params)
+    if (!params_vdev->cur_params) {
         return -ENOMEM;
+    }
 
     params_vdev->cur_params->module_cfg_update = 0;
     params_vdev->cur_params->module_en_update = 0;
-    if (dev->ispp_ver == ISPP_V10)
+    if (dev->ispp_ver == ISPP_V10) {
         rkispp_params_init_ops_v10(params_vdev);
-    if (dev->ispp_ver == ISPP_V20)
+    }
+    if (dev->ispp_ver == ISPP_V20) {
         rkispp_params_init_ops_v20(params_vdev);
+    }
     spin_lock_init(&params_vdev->config_lock);
     strlcpy(vdev->name, "rkispp_input_params", sizeof(vdev->name));
 
@@ -391,17 +374,16 @@ int rkispp_register_params_vdev(struct rkispp_device *dev)
     vdev->device_caps = V4L2_CAP_STREAMING | V4L2_CAP_META_OUTPUT;
     vdev->vfl_dir = VFL_DIR_TX;
     rkispp_params_init_vb2_queue(vdev->queue, params_vdev);
-    params_vdev->vdev_fmt.fmt.meta.dataformat =
-        V4L2_META_FMT_RK_ISPP_PARAMS;
+    params_vdev->vdev_fmt.fmt.meta.dataformat = V4L2_META_FMT_RK_ISPP_PARAMS;
 
     node->pad.flags = MEDIA_PAD_FL_SOURCE;
     ret = media_entity_pads_init(&vdev->entity, 1, &node->pad);
-    if (ret < 0)
+    if (ret < 0) {
         goto err_release_queue;
+    }
     ret = video_register_device(vdev, VFL_TYPE_VIDEO, -1);
     if (ret < 0) {
-        dev_err(&vdev->dev,
-            "could not register Video for Linux device\n");
+        dev_err(&vdev->dev, "could not register Video for Linux device\n");
         goto err_cleanup_media_entity;
     }
     return 0;

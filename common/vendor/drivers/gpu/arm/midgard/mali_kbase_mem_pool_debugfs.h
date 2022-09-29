@@ -13,8 +13,6 @@
  *
  */
 
-
-
 #ifndef KBASE_MEM_POOL_DEBUGFS_H
 #define KBASE_MEM_POOL_DEBUGFS_H
 
@@ -29,8 +27,6 @@
  * - mem_pool_size: get/set the current size of @pool
  * - mem_pool_max_size: get/set the max size of @pool
  */
-void kbase_mem_pool_debugfs_init(struct dentry *parent,
-        struct kbase_mem_pool *pool);
+void kbase_mem_pool_debugfs_init(struct dentry *parent, struct kbase_mem_pool *pool);
 
-#endif  /*_KBASE_MEM_POOL_DEBUGFS_H*/
-
+#endif /*_KBASE_MEM_POOL_DEBUGFS_H*/

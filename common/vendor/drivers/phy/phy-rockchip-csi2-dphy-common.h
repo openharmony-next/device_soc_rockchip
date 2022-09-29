@@ -40,8 +40,8 @@ struct csi2dphy_reg {
     u32 offset;
 };
 
-#define MAX_DPHY_SENSORS    (2)
-#define MAX_NUM_CSI2_DPHY    (0x2)
+#define MAX_DPHY_SENSORS (2)
+#define MAX_NUM_CSI2_DPHY (0x2)
 
 struct csi2_sensor {
     struct v4l2_subdev *sd;
@@ -96,8 +96,8 @@ struct csi2_dphy_hw {
     const struct csi2dphy_reg *csi2dphy_regs;
     const struct dphy_hw_drv_data *drv_data;
     void __iomem *hw_base_addr;
-    struct clk_bulk_data    *clks_bulk;
-    struct reset_control    *rsts_bulk;
+    struct clk_bulk_data *clks_bulk;
+    struct reset_control *rsts_bulk;
     struct csi2_dphy *dphy_dev[MAX_NUM_CSI2_DPHY];
     struct v4l2_subdev sd;
     struct mutex mutex; /* lock for updating protection */

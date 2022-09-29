@@ -130,11 +130,9 @@ struct kbase_ioctl_version_check {
     __u16 minor;
 };
 
-#define KBASE_IOCTL_VERSION_CHECK \
-    _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
+#define KBASE_IOCTL_VERSION_CHECK _IOWR(KBASE_IOCTL_TYPE, 0, struct kbase_ioctl_version_check)
 
-#define KBASE_IOCTL_VERSION_CHECK_RESERVED \
-    _IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
+#define KBASE_IOCTL_VERSION_CHECK_RESERVED _IOWR(KBASE_IOCTL_TYPE, 52, struct kbase_ioctl_version_check)
 
 /**
  * struct kbase_ioctl_job_submit - Submit jobs/atoms to the kernel
@@ -149,11 +147,9 @@ struct kbase_ioctl_job_submit {
     __u32 stride;
 };
 
-#define KBASE_IOCTL_JOB_SUBMIT \
-    _IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
+#define KBASE_IOCTL_JOB_SUBMIT _IOW(KBASE_IOCTL_TYPE, 2, struct kbase_ioctl_job_submit)
 
-#define KBASE_IOCTL_POST_TERM \
-    _IO(KBASE_IOCTL_TYPE, 4)
+#define KBASE_IOCTL_POST_TERM _IO(KBASE_IOCTL_TYPE, 4)
 
 /**
  * struct kbase_ioctl_soft_event_update - Update the status of a soft-event
@@ -167,8 +163,7 @@ struct kbase_ioctl_soft_event_update {
     __u32 flags;
 };
 
-#define KBASE_IOCTL_SOFT_EVENT_UPDATE \
-    _IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
+#define KBASE_IOCTL_SOFT_EVENT_UPDATE _IOW(KBASE_IOCTL_TYPE, 28, struct kbase_ioctl_soft_event_update)
 
 /**
  * struct kbase_kinstr_jm_fd_out - Explains the compatibility information for
@@ -210,7 +205,6 @@ union kbase_kinstr_jm_fd {
     struct kbase_kinstr_jm_fd_out out;
 };
 
-#define KBASE_IOCTL_KINSTR_JM_FD \
-    _IOWR(KBASE_IOCTL_TYPE, 51, union kbase_kinstr_jm_fd)
+#define KBASE_IOCTL_KINSTR_JM_FD _IOWR(KBASE_IOCTL_TYPE, 51, union kbase_kinstr_jm_fd)
 
 #endif /* _KBASE_JM_IOCTL_H_ */

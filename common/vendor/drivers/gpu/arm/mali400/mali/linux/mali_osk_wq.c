@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -59,11 +60,15 @@ mali_osk_errcode_t mali_osk_wq_init(void)
     if (NULL == mali_wq_normal || NULL == mali_wq_high) {
         MALI_PRINT_ERROR(("Unable to create Mali workqueues\n"));
 
-        if (mali_wq_normal) destroy_workqueue(mali_wq_normal);
-        if (mali_wq_high)   destroy_workqueue(mali_wq_high);
+        if (mali_wq_normal) {
+            destroy_workqueue(mali_wq_normal);
+        }
+        if (mali_wq_high) {
+            destroy_workqueue(mali_wq_high);
+        }
 
         mali_wq_normal = NULL;
-        mali_wq_high   = NULL;
+        mali_wq_high = NULL;
 
         return MALI_OSK_ERR_FAULT;
     }
@@ -95,7 +100,7 @@ void mali_osk_wq_term(void)
     destroy_workqueue(mali_wq_high);
 
     mali_wq_normal = NULL;
-    mali_wq_high   = NULL;
+    mali_wq_high = NULL;
 #else
     flush_scheduled_work();
 #endif
@@ -105,7 +110,9 @@ _mali_osk_wq_work_t *mali_osk_wq_create_work(_mali_osk_wq_work_handler_t handler
 {
     mali_osk_wq_work_object_t *work = kmalloc(sizeof(mali_osk_wq_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) return NULL;
+    if (NULL == work) {
+        return NULL;
+    }
 
     work->handler = handler;
     work->data = data;
@@ -120,7 +127,9 @@ _mali_osk_wq_work_t *_mali_osk_wq_create_work_high_pri(_mali_osk_wq_work_handler
 {
     mali_osk_wq_work_object_t *work = kmalloc(sizeof(mali_osk_wq_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) return NULL;
+    if (NULL == work) {
+        return NULL;
+    }
 
     work->handler = handler;
     work->data = data;
@@ -171,7 +180,7 @@ static void _mali_osk_wq_work_func(struct work_struct *work)
     work_object = MALI_OSK_CONTAINER_OF(work, mali_osk_wq_work_object_t, work_handle);
 
 #if MALI_LICENSE_IS_GPL
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,36)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 36)
     /* We want highest Dynamic priority of the thread so that the Jobs depending
     ** on this thread could be scheduled in time. Without this, this thread might
     ** sometimes need to wait for some threads in user mode to finish its round-robin
@@ -179,7 +188,7 @@ static void _mali_osk_wq_work_func(struct work_struct *work)
     ** of high-priority workqueue in new kernel, this only happens in older kernel.
     */
     if (MALI_TRUE == work_object->high_pri) {
-        set_user_nice(current, -19);
+        set_user_nice(current, -0x13);
     }
 #endif
 #endif /* MALI_LICENSE_IS_GPL */
@@ -199,7 +208,9 @@ mali_osk_wq_delayed_work_object_t *_mali_osk_wq_delayed_create_work(_mali_osk_wq
 {
     mali_osk_wq_delayed_work_object_t *work = kmalloc(sizeof(mali_osk_wq_delayed_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) return NULL;
+    if (NULL == work) {
+        return NULL;
+    }
 
     work->handler = handler;
     work->data = data;
@@ -236,5 +247,4 @@ void _mali_osk_wq_delayed_schedule_work(_mali_osk_wq_delayed_work_t *work, u32 d
 #else
     schedule_delayed_work(&work_object->work, delay);
 #endif
-
 }

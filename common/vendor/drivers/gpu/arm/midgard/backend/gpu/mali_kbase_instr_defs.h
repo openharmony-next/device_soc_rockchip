@@ -13,14 +13,12 @@
  *
  */
 
-
-
 /*
  * Backend-specific instrumentation definitions
  */
 
-#ifndef H_KBASE_INSTR_DEFS_H_
-#define H_KBASE_INSTR_DEFS_H_
+#ifndef H_KBASE_INSTR_DEFS_H
+#define H_KBASE_INSTR_DEFS_H
 
 /*
  * Instrumentation State Machine States
@@ -51,8 +49,7 @@ struct kbase_instr_backend {
     enum kbase_instr_state state;
     wait_queue_head_t cache_clean_wait;
     struct workqueue_struct *cache_clean_wq;
-    struct work_struct  cache_clean_work;
+    struct work_struct cache_clean_work;
 };
 
 #endif /* _KBASE_INSTR_DEFS_H_ */
-

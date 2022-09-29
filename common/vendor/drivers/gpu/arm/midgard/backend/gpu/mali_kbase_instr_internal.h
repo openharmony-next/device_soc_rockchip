@@ -13,16 +13,12 @@
  *
  */
 
-
-
-
-
 /*
  * Backend-specific HW access instrumentation APIs
  */
 
-#ifndef _KBASE_INSTR_INTERNAL_H_
-#define _KBASE_INSTR_INTERNAL_H_
+#ifndef KBASE_INSTR_INTERNAL_H_
+#define KBASE_INSTR_INTERNAL_H_
 
 /**
  * kbasep_cache_clean_worker() - Workqueue for handling cache cleaning

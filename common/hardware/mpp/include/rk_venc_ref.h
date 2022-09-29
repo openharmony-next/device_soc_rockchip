@@ -62,9 +62,9 @@
  */
 
 /* max 4 temporal layer */
-#define MPP_ENC_MAX_TEMPORAL_LAYER_NUM      4
+#define MPP_ENC_MAX_TEMPORAL_LAYER_NUM 4
 /* max 4 long-term reference frame */
-#define MPP_ENC_MAX_LT_REF_NUM              16
+#define MPP_ENC_MAX_LT_REF_NUM 16
 
 /*
  * Group Of Picture (GOP) config is separated into three parts:
@@ -147,22 +147,22 @@
  *
  */
 
-#define REF_MODE_MODE_MASK              (0x1F)
-#define REF_MODE_ARG_MASK               (0xFFFF0000)
+#define REF_MODE_MODE_MASK (0x1F)
+#define REF_MODE_ARG_MASK (0xFFFF0000)
 
 typedef enum MppEncRefMode_e {
     /* max 32 mode in 32-bit */
     /* for default ref global config */
     REF_MODE_GLOBAL,
-    REF_TO_PREV_REF_FRM                 = REF_MODE_GLOBAL,
+    REF_TO_PREV_REF_FRM = REF_MODE_GLOBAL,
     REF_TO_PREV_ST_REF,
     REF_TO_PREV_LT_REF,
     REF_TO_PREV_INTRA,
 
     /* for global config with args */
-    REF_MODE_GLOBAL_WITH_ARG            = 0x4,
+    REF_MODE_GLOBAL_WITH_ARG = 0x4,
     /* with ref arg as temporal layer id */
-    REF_TO_TEMPORAL_LAYER               = REF_MODE_GLOBAL_WITH_ARG,
+    REF_TO_TEMPORAL_LAYER = REF_MODE_GLOBAL_WITH_ARG,
     /* with ref arg as long-term reference picture index */
     REF_TO_LT_REF_IDX,
     /* with ref arg as short-term reference picture difference frame_num */
@@ -170,47 +170,47 @@ typedef enum MppEncRefMode_e {
     REF_MODE_GLOBAL_BUTT,
 
     /* for lt-ref */
-    REF_MODE_LT                         = 0x18,
+    REF_MODE_LT = 0x18,
     REF_TO_ST_REF_SETUP,
     REF_MODE_LT_BUTT,
 
     /* for st-ref */
-    REF_MODE_ST                         = 0x1C,
+    REF_MODE_ST = 0x1C,
     REF_TO_LT_REF_SETUP,
     REF_MODE_ST_BUTT,
 } MppEncRefMode;
 
 typedef struct MppEncRefLtFrmCfg_t {
-    RK_S32              lt_idx;         /* lt_idx of the reference frame */
-    RK_S32              temporal_id;    /* temporal_id of the reference frame */
-    MppEncRefMode       ref_mode;
-    RK_S32              ref_arg;
-    RK_S32              lt_gap;         /* gap between two lt-ref with same lt_idx */
-    RK_S32              lt_delay;       /* delay offset to igop start frame */
+    signed int lt_idx;      /* lt_idx of the reference frame */
+    signed int temporal_id; /* temporal_id of the reference frame */
+    MppEncRefMode ref_mode;
+    signed int ref_arg;
+    signed int lt_gap;   /* gap between two lt-ref with same lt_idx */
+    signed int lt_delay; /* delay offset to igop start frame */
 } MppEncRefLtFrmCfg;
 
 typedef struct MppEncRefStFrmCfg_t {
-    RK_S32              is_non_ref;
-    RK_S32              temporal_id;
-    MppEncRefMode       ref_mode;
-    RK_S32              ref_arg;
-    RK_S32              repeat;         /* repeat times */
+    signed int is_non_ref;
+    signed int temporal_id;
+    MppEncRefMode ref_mode;
+    signed int ref_arg;
+    signed int repeat; /* repeat times */
 } MppEncRefStFrmCfg;
 
 typedef struct MppEncRefPreset_t {
     /* input parameter for query */
-    const char          *name;
-    RK_S32              max_lt_cnt;
-    RK_S32              max_st_cnt;
-    MppEncRefLtFrmCfg   *lt_cfg;
-    MppEncRefStFrmCfg   *st_cfg;
+    const char *name;
+    signed int max_lt_cnt;
+    signed int max_st_cnt;
+    MppEncRefLtFrmCfg *lt_cfg;
+    MppEncRefStFrmCfg *st_cfg;
 
     /* output parameter */
-    RK_S32              lt_cnt;
-    RK_S32              st_cnt;
+    signed int lt_cnt;
+    signed int st_cnt;
 } MppEncRefPreset;
 
-typedef void* MppEncRefCfg;
+typedef void *MppEncRefCfg;
 
 #ifdef __cplusplus
 extern "C" {
@@ -220,9 +220,9 @@ MPP_RET mpp_enc_ref_cfg_init(MppEncRefCfg *ref);
 MPP_RET mpp_enc_ref_cfg_deinit(MppEncRefCfg *ref);
 
 MPP_RET mpp_enc_ref_cfg_reset(MppEncRefCfg ref);
-MPP_RET mpp_enc_ref_cfg_set_cfg_cnt(MppEncRefCfg ref, RK_S32 lt_cnt, RK_S32 st_cnt);
-MPP_RET mpp_enc_ref_cfg_add_lt_cfg(MppEncRefCfg ref, RK_S32 cnt, MppEncRefLtFrmCfg *frm);
-MPP_RET mpp_enc_ref_cfg_add_st_cfg(MppEncRefCfg ref, RK_S32 cnt, MppEncRefStFrmCfg *frm);
+MPP_RET mpp_enc_ref_cfg_set_cfg_cnt(MppEncRefCfg ref, signed int lt_cnt, signed int st_cnt);
+MPP_RET mpp_enc_ref_cfg_add_lt_cfg(MppEncRefCfg ref, signed int cnt, MppEncRefLtFrmCfg *frm);
+MPP_RET mpp_enc_ref_cfg_add_st_cfg(MppEncRefCfg ref, signed int cnt, MppEncRefStFrmCfg *frm);
 MPP_RET mpp_enc_ref_cfg_check(MppEncRefCfg ref);
 
 /*
@@ -230,7 +230,7 @@ MPP_RET mpp_enc_ref_cfg_check(MppEncRefCfg ref);
  * The keep cpb function will let encoder keeps the current cpb status and do NOT
  * reset all the reference frame in cpb.
  */
-MPP_RET mpp_enc_ref_cfg_set_keep_cpb(MppEncRefCfg ref, RK_S32 keep);
+MPP_RET mpp_enc_ref_cfg_set_keep_cpb(MppEncRefCfg ref, signed int keep);
 MPP_RET mpp_enc_ref_cfg_get_preset(MppEncRefPreset *preset);
 MPP_RET mpp_enc_ref_cfg_show(MppEncRefCfg ref);
 

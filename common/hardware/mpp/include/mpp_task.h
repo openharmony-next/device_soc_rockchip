@@ -101,10 +101,10 @@ typedef enum {
  * small than MPP_POLL_BUTT or larger than MPP_POLL_MAX is invalid value
  */
 typedef enum {
-    MPP_POLL_BUTT       = -2,
-    MPP_POLL_BLOCK      = -1,
-    MPP_POLL_NON_BLOCK  = 0,
-    MPP_POLL_MAX        = 8000,
+    MPP_POLL_BUTT = -2,
+    MPP_POLL_BLOCK = -1,
+    MPP_POLL_NON_BLOCK = 0,
+    MPP_POLL_MAX = 8000,
 } MppPollType;
 
 /*
@@ -114,10 +114,10 @@ typedef enum {
  * small than MPP_TIMEOUT_MAX   - for poll with timeout in ms
  * small than MPP_TIMEOUT_BUTT or larger than MPP_TIMEOUT_MAX is invalid value
  */
-#define MPP_TIMEOUT_BUTT        (-2L)
-#define MPP_TIMEOUT_BLOCK       (-1L)
-#define MPP_TIMEOUT_NON_BLOCK   (0L)
-#define MPP_TIMEOUT_MAX         (8000L)
+#define MPP_TIMEOUT_BUTT (-2L)
+#define MPP_TIMEOUT_BLOCK (-1L)
+#define MPP_TIMEOUT_NON_BLOCK (0L)
+#define MPP_TIMEOUT_MAX (8000L)
 
 /*
  * MppTask is descriptor of a task which send to mpp for process
@@ -215,17 +215,17 @@ typedef enum {
 extern "C" {
 #endif
 
-MPP_RET mpp_task_meta_set_s32(MppTask task, MppMetaKey key, RK_S32 val);
+MPP_RET mpp_task_meta_set_s32(MppTask task, MppMetaKey key, signed int val);
 MPP_RET mpp_task_meta_set_s64(MppTask task, MppMetaKey key, RK_S64 val);
-MPP_RET mpp_task_meta_set_ptr(MppTask task, MppMetaKey key, void  *val);
-MPP_RET mpp_task_meta_set_frame (MppTask task, MppMetaKey key, MppFrame  frame);
+MPP_RET mpp_task_meta_set_ptr(MppTask task, MppMetaKey key, void *val);
+MPP_RET mpp_task_meta_set_frame(MppTask task, MppMetaKey key, MppFrame frame);
 MPP_RET mpp_task_meta_set_packet(MppTask task, MppMetaKey key, MppPacket packet);
 MPP_RET mpp_task_meta_set_buffer(MppTask task, MppMetaKey key, MppBuffer buffer);
 
-MPP_RET mpp_task_meta_get_s32(MppTask task, MppMetaKey key, RK_S32 *val, RK_S32 default_val);
+MPP_RET mpp_task_meta_get_s32(MppTask task, MppMetaKey key, signed int *val, signed int default_val);
 MPP_RET mpp_task_meta_get_s64(MppTask task, MppMetaKey key, RK_S64 *val, RK_S64 default_val);
-MPP_RET mpp_task_meta_get_ptr(MppTask task, MppMetaKey key, void  **val, void  *default_val);
-MPP_RET mpp_task_meta_get_frame (MppTask task, MppMetaKey key, MppFrame  *frame);
+MPP_RET mpp_task_meta_get_ptr(MppTask task, MppMetaKey key, void **val, void *default_val);
+MPP_RET mpp_task_meta_get_frame(MppTask task, MppMetaKey key, MppFrame *frame);
 MPP_RET mpp_task_meta_get_packet(MppTask task, MppMetaKey key, MppPacket *packet);
 MPP_RET mpp_task_meta_get_buffer(MppTask task, MppMetaKey key, MppBuffer *buffer);
 

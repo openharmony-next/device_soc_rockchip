@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _KBASE_VINSTR_H_
-#define _KBASE_VINSTR_H_
+#ifndef KBASE_VINSTR_H_
+#define KBASE_VINSTR_H_
 
 #include <mali_kbase.h>
 #include <mali_kbase_hwcnt_reader.h>
@@ -49,9 +47,7 @@ void kbase_vinstr_term(struct kbase_vinstr_context *vinstr_ctx);
  *
  * Return: zero on success
  */
-int kbase_vinstr_hwcnt_reader_setup(
-        struct kbase_vinstr_context        *vinstr_ctx,
-        struct kbase_uk_hwcnt_reader_setup *setup);
+int kbase_vinstr_hwcnt_reader_setup(struct kbase_vinstr_context *vinstr_ctx, struct kbase_uk_hwcnt_reader_setup *setup);
 
 /**
  * kbase_vinstr_legacy_hwc_setup - configure hw counters for dumping
@@ -61,10 +57,8 @@ int kbase_vinstr_hwcnt_reader_setup(
  *
  * Return: zero on success
  */
-int kbase_vinstr_legacy_hwc_setup(
-        struct kbase_vinstr_context *vinstr_ctx,
-        struct kbase_vinstr_client  **cli,
-        struct kbase_uk_hwcnt_setup *setup);
+int kbase_vinstr_legacy_hwc_setup(struct kbase_vinstr_context *vinstr_ctx, struct kbase_vinstr_client **cli,
+                                  struct kbase_uk_hwcnt_setup *setup);
 
 /**
  * kbase_vinstr_hwcnt_kernel_setup - configure hw counters for kernel side
@@ -77,10 +71,9 @@ int kbase_vinstr_legacy_hwc_setup(
  *
  * Return: pointer to client structure, or NULL on failure
  */
-struct kbase_vinstr_client *kbase_vinstr_hwcnt_kernel_setup(
-        struct kbase_vinstr_context *vinstr_ctx,
-        struct kbase_uk_hwcnt_reader_setup *setup,
-        void *kernel_buffer);
+struct kbase_vinstr_client *kbase_vinstr_hwcnt_kernel_setup(struct kbase_vinstr_context *vinstr_ctx,
+                                                            struct kbase_uk_hwcnt_reader_setup *setup,
+                                                            void *kernel_buffer);
 
 /**
  * kbase_vinstr_hwc_dump - issue counter dump for vinstr client
@@ -89,9 +82,7 @@ struct kbase_vinstr_client *kbase_vinstr_hwcnt_kernel_setup(
  *
  * Return: zero on success
  */
-int kbase_vinstr_hwc_dump(
-        struct kbase_vinstr_client   *cli,
-        enum base_hwcnt_reader_event event_id);
+int kbase_vinstr_hwc_dump(struct kbase_vinstr_client *cli, enum base_hwcnt_reader_event event_id);
 
 /**
  * kbase_vinstr_hwc_clear - performs a reset of the hardware counters for
@@ -152,4 +143,3 @@ size_t kbase_vinstr_dump_size(struct kbase_device *kbdev);
 void kbase_vinstr_detach_client(struct kbase_vinstr_client *cli);
 
 #endif /* _KBASE_VINSTR_H_ */
-

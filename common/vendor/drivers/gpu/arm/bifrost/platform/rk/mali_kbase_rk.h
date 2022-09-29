@@ -52,11 +52,9 @@ struct rk_context {
 
 /*---------------------------------------------------------------------------*/
 
-static inline struct rk_context *get_rk_context(
-        const struct kbase_device *kbdev)
+static inline struct rk_context *get_rk_context(const struct kbase_device *kbdev)
 {
     return (struct rk_context *)(kbdev->platform_context);
 }
 
-#endif                /* _MALI_KBASE_RK_H_ */
-
+#endif /* _MALI_KBASE_RK_H_ */

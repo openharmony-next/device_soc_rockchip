@@ -22,4 +22,3 @@ int dwmac_rk_search_rgmii_delayline(struct stmmac_priv *priv);
 #endif
 
 #endif /* __DWMAC_RK_TOOL_H__ */
-

@@ -22,10 +22,8 @@ wait_queue_head_t freelist_waitqueue;
 struct task_struct *freelist_task;
 static DEFINE_SPINLOCK(free_list_lock);
 
-void deferred_free(struct deferred_freelist_item *item,
-           void (*free)(struct deferred_freelist_item*,
-                enum df_reason),
-           size_t nr_pages)
+void deferred_free(struct deferred_freelist_item *item, void (*free)(struct deferred_freelist_item *, enum df_reason),
+                   size_t nr_pages)
 {
     unsigned long flags;
 
@@ -73,25 +71,25 @@ static unsigned long get_freelist_nr_pages(void)
     return nr_pages;
 }
 
-static unsigned long freelist_shrink_count(struct shrinker *shrinker,
-                       struct shrink_control *sc)
+static unsigned long freelist_shrink_count(struct shrinker *shrinker, struct shrink_control *sc)
 {
     return get_freelist_nr_pages();
 }
 
-static unsigned long freelist_shrink_scan(struct shrinker *shrinker,
-                      struct shrink_control *sc)
+static unsigned long freelist_shrink_scan(struct shrinker *shrinker, struct shrink_control *sc)
 {
     unsigned long total_freed = 0;
 
-    if (sc->nr_to_scan == 0)
+    if (sc->nr_to_scan == 0) {
         return 0;
+    }
 
     while (total_freed < sc->nr_to_scan) {
         size_t pages_freed = free_one_item(DF_UNDER_PRESSURE);
 
-        if (!pages_freed)
+        if (!pages_freed) {
             break;
+        }
 
         total_freed += pages_freed;
     }
@@ -109,8 +107,7 @@ static struct shrinker freelist_shrinker = {
 static int deferred_free_thread(void *data)
 {
     while (true) {
-        wait_event_freezable(freelist_waitqueue,
-                     get_freelist_nr_pages() > 0);
+        wait_event_freezable(freelist_waitqueue, get_freelist_nr_pages() > 0);
 
         free_one_item(DF_NORMAL);
     }
@@ -123,16 +120,14 @@ static int deferred_freelist_init(void)
     list_nr_pages = 0;
 
     init_waitqueue_head(&freelist_waitqueue);
-    freelist_task = kthread_run(deferred_free_thread, NULL,
-                    "%s", "dmabuf-deferred-free-worker");
+    freelist_task = kthread_run(deferred_free_thread, NULL, "%s", "dmabuf-deferred-free-worker");
     if (IS_ERR(freelist_task)) {
         pr_err("Creating thread for deferred free failed\n");
         return -1;
     }
-    sched_set_normal(freelist_task, 19);
+    sched_set_normal(freelist_task, 0x13);
 
     return register_shrinker(&freelist_shrinker);
 }
 module_init(deferred_freelist_init);
 MODULE_LICENSE("GPL v2");
-

@@ -23,13 +23,13 @@ typedef void *MppAllocator;
 
 typedef struct MppAllocatorCfg_t {
     // input
-    size_t          alignment;
-    RK_U32          flags;
+    size_t alignment;
+    unsigned int flags;
 } MppAllocatorCfg;
 
 typedef struct MppAllocatorApi_t {
-    RK_U32  size;
-    RK_U32  version;
+    unsigned int size;
+    unsigned int version;
 
     MPP_RET (*alloc)(MppAllocator allocator, MppBufferInfo *data);
     MPP_RET (*free)(MppAllocator allocator, MppBufferInfo *data);
@@ -42,8 +42,7 @@ typedef struct MppAllocatorApi_t {
 extern "C" {
 #endif
 
-MPP_RET mpp_allocator_get(MppAllocator *allocator,
-                          MppAllocatorApi **api, MppBufferType type);
+MPP_RET mpp_allocator_get(MppAllocator *allocator, MppAllocatorApi **api, MppBufferType type);
 MPP_RET mpp_allocator_put(MppAllocator *allocator);
 
 #ifdef __cplusplus
@@ -51,4 +50,3 @@ MPP_RET mpp_allocator_put(MppAllocator *allocator);
 #endif
 
 #endif /* __MPP_ALLOCATOR_H__ */
-

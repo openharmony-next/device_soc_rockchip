@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -72,10 +73,10 @@ static int mali_mem_ump_map(mali_mem_backend *mem_backend)
     for (i = 0; i < nr_blocks; ++i) {
         u32 virt = alloc->mali_vma_node.vm_node.start + offset;
 
-        MALI_DEBUG_PRINT(7, ("Mapping in 0x%08x size %d\n", ump_blocks[i].addr , ump_blocks[i].size));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_ENABLE_ALL,
+                         ("Mapping in 0x%08x size %d\n", ump_blocks[i].addr, ump_blocks[i].size));
 
-        mali_mmu_pagedir_update(pagedir, virt, ump_blocks[i].addr,
-                    ump_blocks[i].size, MALI_MMU_FLAGS_DEFAULT);
+        mali_mmu_pagedir_update(pagedir, virt, ump_blocks[i].addr, ump_blocks[i].size, MALI_MMU_FLAGS_DEFAULT);
 
         offset += ump_blocks[i].size;
     }
@@ -84,7 +85,7 @@ static int mali_mem_ump_map(mali_mem_backend *mem_backend)
         u32 virt = alloc->mali_vma_node.vm_node.start + offset;
 
         /* Map in an extra virtual guard page at the end of the VMA */
-        MALI_DEBUG_PRINT(6, ("Mapping in extra guard page\n"));
+        MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MATE, ("Mapping in extra guard page\n"));
 
         mali_mmu_pagedir_update(pagedir, virt, ump_blocks[0].addr, MALI_OSK_MALI_PAGE_SIZE, MALI_MMU_FLAGS_DEFAULT);
 
@@ -102,12 +103,11 @@ static void mali_mem_ump_unmap(mali_mem_allocation *alloc)
     session = alloc->session;
     MALI_DEBUG_ASSERT_POINTER(session);
     mali_session_memory_lock(session);
-    mali_mem_mali_map_free(session, alloc->psize, alloc->mali_vma_node.vm_node.start,
-                   alloc->flags);
+    mali_mem_mali_map_free(session, alloc->psize, alloc->mali_vma_node.vm_node.start, alloc->flags);
     mali_session_memory_unlock(session);
 }
 
-int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_backend, u32  secure_id, u32 flags)
+int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_backend, u32 secure_id, u32 flags)
 {
     ump_dd_handle ump_mem;
     int ret;
@@ -115,12 +115,14 @@ int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_back
     MALI_DEBUG_ASSERT_POINTER(mem_backend);
     MALI_DEBUG_ASSERT(MALI_MEM_UMP == mem_backend->type);
 
-    MALI_DEBUG_PRINT(3,
-             ("Requested to map ump memory with secure id %d into virtual memory 0x%08X, size 0x%08X\n",
-              secure_id, alloc->mali_vma_node.vm_node.start, alloc->mali_vma_node.vm_node.size));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE,
+                     ("Requested to map ump memory with secure id %d into virtual memory 0x%08X, size 0x%08X\n",
+                      secure_id, alloc->mali_vma_node.vm_node.start, alloc->mali_vma_node.vm_node.size));
 
     ump_mem = ump_dd_handle_create_from_secure_id(secure_id);
-    if (UMP_DD_HANDLE_INVALID == ump_mem) MALI_ERROR(MALI_OSK_ERR_FAULT);
+    if (UMP_DD_HANDLE_INVALID == ump_mem) {
+        MALI_ERROR(MALI_OSK_ERR_FAULT);
+    }
     alloc->flags |= MALI_MEM_FLAG_DONT_CPU_MAP;
     if (flags & MALI_MAP_EXTERNAL_MAP_GUARD_PAGE) {
         alloc->flags |= MALI_MEM_FLAG_MALI_GUARD_PAGE;
@@ -133,7 +135,7 @@ int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_back
         ump_dd_reference_release(ump_mem);
         return MALI_OSK_ERR_FAULT;
     }
-    MALI_DEBUG_PRINT(3, ("Returning from UMP bind\n"));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Returning from UMP bind\n"));
     return MALI_OSK_ERR_OK;
 }
 
@@ -151,4 +153,3 @@ void mali_mem_unbind_ump_buf(mali_mem_backend *mem_backend)
     mali_mem_ump_unmap(alloc);
     ump_dd_reference_release(ump_mem);
 }
-

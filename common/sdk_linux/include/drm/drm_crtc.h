@@ -60,11 +60,11 @@ struct edid;
 
 static inline int64_t U642I64(uint64_t val)
 {
-    return (int64_t)*((int64_t *)&val);
+    return (int64_t) * ((int64_t *)&val);
 }
 static inline uint64_t I642U64(int64_t val)
 {
-    return (uint64_t)*((uint64_t *)&val);
+    return (uint64_t) * ((uint64_t *)&val);
 }
 
 struct drm_crtc;
@@ -440,8 +440,8 @@ struct drm_crtc_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*cursor_set)(struct drm_crtc *crtc, struct drm_file *file_priv,
-              uint32_t handle, uint32_t width, uint32_t height);
+    int (*cursor_set)(struct drm_crtc *crtc, struct drm_file *file_priv, uint32_t handle, uint32_t width,
+                      uint32_t height);
 
     /**
      * @cursor_set2:
@@ -462,9 +462,8 @@ struct drm_crtc_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*cursor_set2)(struct drm_crtc *crtc, struct drm_file *file_priv,
-               uint32_t handle, uint32_t width, uint32_t height,
-               int32_t hot_x, int32_t hot_y);
+    int (*cursor_set2)(struct drm_crtc *crtc, struct drm_file *file_priv, uint32_t handle, uint32_t width,
+                       uint32_t height, int32_t hot_x, int32_t hot_y);
 
     /**
      * @cursor_move:
@@ -497,9 +496,7 @@ struct drm_crtc_funcs {
      * interface through the drm_atomic_helper_legacy_gamma_set()
      * compatibility implementation.
      */
-    int (*gamma_set)(struct drm_crtc *crtc, u16 *r, u16 *g, u16 *b,
-             uint32_t size,
-             struct drm_modeset_acquire_ctx *ctx);
+    int (*gamma_set)(struct drm_crtc *crtc, u16 *r, u16 *g, u16 *b, uint32_t size, struct drm_modeset_acquire_ctx *ctx);
 
     /**
      * @destroy:
@@ -524,8 +521,7 @@ struct drm_crtc_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*set_config)(struct drm_mode_set *set,
-              struct drm_modeset_acquire_ctx *ctx);
+    int (*set_config)(struct drm_mode_set *set, struct drm_modeset_acquire_ctx *ctx);
 
     /**
      * @page_flip:
@@ -580,11 +576,8 @@ struct drm_crtc_funcs {
      * "ACTIVE" state) should result in an -EINVAL error code. Note that
      * drm_atomic_helper_page_flip() checks this already for atomic drivers.
      */
-    int (*page_flip)(struct drm_crtc *crtc,
-             struct drm_framebuffer *fb,
-             struct drm_pending_vblank_event *event,
-             uint32_t flags,
-             struct drm_modeset_acquire_ctx *ctx);
+    int (*page_flip)(struct drm_crtc *crtc, struct drm_framebuffer *fb, struct drm_pending_vblank_event *event,
+                     uint32_t flags, struct drm_modeset_acquire_ctx *ctx);
 
     /**
      * @page_flip_target:
@@ -599,11 +592,8 @@ struct drm_crtc_funcs {
      * drm_crtc_vblank_put after this entry point returns 0, typically when
      * the flip completes.
      */
-    int (*page_flip_target)(struct drm_crtc *crtc,
-                struct drm_framebuffer *fb,
-                struct drm_pending_vblank_event *event,
-                uint32_t flags, uint32_t target,
-                struct drm_modeset_acquire_ctx *ctx);
+    int (*page_flip_target)(struct drm_crtc *crtc, struct drm_framebuffer *fb, struct drm_pending_vblank_event *event,
+                            uint32_t flags, uint32_t target, struct drm_modeset_acquire_ctx *ctx);
 
     /**
      * @set_property:
@@ -619,8 +609,7 @@ struct drm_crtc_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*set_property)(struct drm_crtc *crtc,
-                struct drm_property *property, uint64_t val);
+    int (*set_property)(struct drm_crtc *crtc, struct drm_property *property, uint64_t val);
 
     /**
      * @atomic_duplicate_state:
@@ -663,8 +652,7 @@ struct drm_crtc_funcs {
      *
      * This callback is mandatory for atomic drivers.
      */
-    void (*atomic_destroy_state)(struct drm_crtc *crtc,
-                     struct drm_crtc_state *state);
+    void (*atomic_destroy_state)(struct drm_crtc *crtc, struct drm_crtc_state *state);
 
     /**
      * @atomic_set_property:
@@ -708,10 +696,8 @@ struct drm_crtc_funcs {
      * value is within the range (integer, valid enum value, ...) the driver
      * set when registering the property.
      */
-    int (*atomic_set_property)(struct drm_crtc *crtc,
-                   struct drm_crtc_state *state,
-                   struct drm_property *property,
-                   uint64_t val);
+    int (*atomic_set_property)(struct drm_crtc *crtc, struct drm_crtc_state *state, struct drm_property *property,
+                               uint64_t val);
     /**
      * @atomic_get_property:
      *
@@ -730,10 +716,8 @@ struct drm_crtc_funcs {
      * driver (which should never happen, the core only asks for
      * properties attached to this CRTC).
      */
-    int (*atomic_get_property)(struct drm_crtc *crtc,
-                   const struct drm_crtc_state *state,
-                   struct drm_property *property,
-                   uint64_t *val);
+    int (*atomic_get_property)(struct drm_crtc *crtc, const struct drm_crtc_state *state, struct drm_property *property,
+                               uint64_t *val);
 
     /**
      * @late_register:
@@ -804,8 +788,7 @@ struct drm_crtc_funcs {
      *
      * 0 on success or a negative error code on failure.
      */
-    int (*verify_crc_source)(struct drm_crtc *crtc, const char *source,
-                 size_t *values_cnt);
+    int (*verify_crc_source)(struct drm_crtc *crtc, const char *source, size_t *values_cnt);
     /**
      * @get_crc_sources:
      *
@@ -826,8 +809,7 @@ struct drm_crtc_funcs {
      * updated with number of sources in list. if zero we don't process any
      * source from the list.
      */
-    const char *const *(*get_crc_sources)(struct drm_crtc *crtc,
-                          size_t *count);
+    const char *const *(*get_crc_sources)(struct drm_crtc *crtc, size_t *count);
 
     /**
      * @atomic_print_state:
@@ -838,8 +820,7 @@ struct drm_crtc_funcs {
      * Do not call this directly, use drm_atomic_crtc_print_state()
      * instead.
      */
-    void (*atomic_print_state)(struct drm_printer *p,
-                   const struct drm_crtc_state *state);
+    void (*atomic_print_state)(struct drm_printer *p, const struct drm_crtc_state *state);
 
     /**
      * @get_vblank_counter:
@@ -924,10 +905,7 @@ struct drm_crtc_funcs {
      * True on success, false on failure, which means the core should
      * fallback to a simple timestamp taken in drm_crtc_handle_vblank().
      */
-    bool (*get_vblank_timestamp)(struct drm_crtc *crtc,
-                     int *max_error,
-                     ktime_t *vblank_time,
-                     bool in_vblank_irq);
+    bool (*get_vblank_timestamp)(struct drm_crtc *crtc, int *max_error, ktime_t *vblank_time, bool in_vblank_irq);
 };
 
 /**
@@ -1201,13 +1179,9 @@ struct drm_mode_set {
 
 #define obj_to_crtc(x) container_of(x, struct drm_crtc, base)
 
-__printf(6, 7)
-int drm_crtc_init_with_planes(struct drm_device *dev,
-                  struct drm_crtc *crtc,
-                  struct drm_plane *primary,
-                  struct drm_plane *cursor,
-                  const struct drm_crtc_funcs *funcs,
-                  const char *name, ...);
+__printf(6, 7) int drm_crtc_init_with_planes(struct drm_device *dev, struct drm_crtc *crtc, struct drm_plane *primary,
+                                             struct drm_plane *cursor, const struct drm_crtc_funcs *funcs,
+                                             const char *name, ...);
 void drm_crtc_cleanup(struct drm_crtc *crtc);
 
 /**
@@ -1247,9 +1221,7 @@ struct drm_crtc *drm_crtc_from_index(struct drm_device *dev, int idx);
  * drivers for legacy IOCTLs and interface, nowadays extensions to the KMS
  * userspace interface should be done using &drm_property.
  */
-static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev,
-        struct drm_file *file_priv,
-        uint32_t id)
+static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev, struct drm_file *file_priv, uint32_t id)
 {
     struct drm_mode_object *mo;
     mo = drm_mode_object_find(dev, file_priv, id, DRM_MODE_OBJECT_CRTC);
@@ -1263,7 +1235,6 @@ static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev,
  *
  * Iterate over all CRTCs of @dev.
  */
-#define drm_for_each_crtc(crtc, dev) \
-    list_for_each_entry(crtc, &(dev)->mode_config.crtc_list, head)
+#define drm_for_each_crtc(crtc, dev) list_for_each_entry(crtc, &(dev)->mode_config.crtc_list, head)
 
 #endif /* __DRM_CRTC_H__ */

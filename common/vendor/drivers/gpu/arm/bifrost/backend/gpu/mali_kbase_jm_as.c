@@ -20,7 +20,6 @@
  *
  */
 
-
 /*
  * Register backend context / address space management
  */
@@ -48,9 +47,8 @@
  *   AS transaction mutex held,
  *   Runpool IRQ lock held
  */
-static void assign_and_activate_kctx_addr_space(struct kbase_device *kbdev,
-                        struct kbase_context *kctx,
-                        struct kbase_as *current_as)
+static void assign_and_activate_kctx_addr_space(struct kbase_device *kbdev, struct kbase_context *kctx,
+                                                struct kbase_as *current_as)
 {
     struct kbasep_js_device_data *js_devdata = &kbdev->js_data;
 
@@ -69,9 +67,7 @@ static void assign_and_activate_kctx_addr_space(struct kbase_device *kbdev,
     kbase_js_runpool_inc_context_count(kbdev, kctx);
 }
 
-bool kbase_backend_use_ctx_sched(struct kbase_device *kbdev,
-                        struct kbase_context *kctx,
-                        int js)
+bool kbase_backend_use_ctx_sched(struct kbase_device *kbdev, struct kbase_context *kctx, int js)
 {
     int i;
 
@@ -91,8 +87,7 @@ bool kbase_backend_use_ctx_sched(struct kbase_device *kbdev,
     return false;
 }
 
-void kbase_backend_release_ctx_irq(struct kbase_device *kbdev,
-                        struct kbase_context *kctx)
+void kbase_backend_release_ctx_irq(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     int as_nr = kctx->as_nr;
 
@@ -114,13 +109,11 @@ void kbase_backend_release_ctx_irq(struct kbase_device *kbdev,
     kbase_js_runpool_dec_context_count(kbdev, kctx);
 }
 
-void kbase_backend_release_ctx_noirq(struct kbase_device *kbdev,
-                        struct kbase_context *kctx)
+void kbase_backend_release_ctx_noirq(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
 }
 
-int kbase_backend_find_and_release_free_address_space(
-        struct kbase_device *kbdev, struct kbase_context *kctx)
+int kbase_backend_find_and_release_free_address_space(struct kbase_device *kbdev, struct kbase_context *kctx)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbasep_js_kctx_info *js_kctx_info;
@@ -148,13 +141,11 @@ int kbase_backend_find_and_release_free_address_space(
          * was previously taken by kbasep_js_schedule_ctx()) until
          * descheduled.
          */
-        if (as_kctx && !kbase_ctx_flag(as_kctx, KCTX_PRIVILEGED) &&
-            atomic_read(&as_kctx->refcount) == 1) {
+        if (as_kctx && !kbase_ctx_flag(as_kctx, KCTX_PRIVILEGED) && atomic_read(&as_kctx->refcount) == 1) {
             if (!kbase_ctx_sched_inc_refcount_nolock(as_kctx)) {
                 WARN(1, "Failed to retain active context\n");
 
-                spin_unlock_irqrestore(&kbdev->hwaccess_lock,
-                        flags);
+                spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
                 mutex_unlock(&js_devdata->runpool_mutex);
                 mutex_unlock(&js_kctx_info->ctx.jsctx_mutex);
 
@@ -171,7 +162,6 @@ int kbase_backend_find_and_release_free_address_space(
             mutex_unlock(&js_devdata->runpool_mutex);
             mutex_unlock(&js_kctx_info->ctx.jsctx_mutex);
 
-
             /* Release context from address space */
             mutex_lock(&as_js_kctx_info->ctx.jsctx_mutex);
             mutex_lock(&js_devdata->runpool_mutex);
@@ -179,9 +169,7 @@ int kbase_backend_find_and_release_free_address_space(
             kbasep_js_runpool_release_ctx_nolock(kbdev, as_kctx);
 
             if (!kbase_ctx_flag(as_kctx, KCTX_SCHEDULED)) {
-                kbasep_js_runpool_requeue_or_kill_ctx(kbdev,
-                                as_kctx,
-                                true);
+                kbasep_js_runpool_requeue_or_kill_ctx(kbdev, as_kctx, true);
 
                 mutex_unlock(&js_devdata->runpool_mutex);
                 mutex_unlock(&as_js_kctx_info->ctx.jsctx_mutex);
@@ -209,9 +197,7 @@ int kbase_backend_find_and_release_free_address_space(
     return KBASEP_AS_NR_INVALID;
 }
 
-bool kbase_backend_use_ctx(struct kbase_device *kbdev,
-                struct kbase_context *kctx,
-                int as_nr)
+bool kbase_backend_use_ctx(struct kbase_device *kbdev, struct kbase_context *kctx, int as_nr)
 {
     struct kbasep_js_device_data *js_devdata;
     struct kbase_as *new_address_space = NULL;
@@ -242,4 +228,3 @@ bool kbase_backend_use_ctx(struct kbase_device *kbdev,
 
     return true;
 }
-

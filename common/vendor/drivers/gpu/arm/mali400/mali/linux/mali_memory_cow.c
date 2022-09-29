@@ -1,11 +1,15 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
  * 
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
+ * This program is free software and is provided to you
+ * under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation, and any
+ * use by you of this program is subject to the terms of such GNU licence.
  * 
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is included with
+ * the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 #include <linux/mm.h>
 #include <linux/list.h>
@@ -30,8 +34,8 @@
 #include "mali_memory_swap_alloc.h"
 
 /**
-* allocate pages for COW backend and flush cache
-*/
+ * allocate pages for COW backend and flush cache
+ */
 static struct page *mali_mem_cow_alloc_page(void)
 
 {
@@ -58,13 +62,10 @@ static struct page *mali_mem_cow_alloc_page(void)
     return new_page;
 }
 
-
-static struct list_head *_mali_memory_cow_get_node_list(mali_mem_backend *target_bk,
-        u32 target_offset,
-        u32 target_size)
+static struct list_head *_mali_memory_cow_get_node_list(mali_mem_backend *target_bk, u32 target_offset, u32 target_size)
 {
     MALI_DEBUG_ASSERT(MALI_MEM_OS == target_bk->type || MALI_MEM_COW == target_bk->type ||
-              MALI_MEM_BLOCK == target_bk->type || MALI_MEM_SWAP == target_bk->type);
+                      MALI_MEM_BLOCK == target_bk->type || MALI_MEM_SWAP == target_bk->type);
 
     if (MALI_MEM_OS == target_bk->type) {
         MALI_DEBUG_ASSERT(&target_bk->os_mem);
@@ -73,40 +74,37 @@ static struct list_head *_mali_memory_cow_get_node_list(mali_mem_backend *target
     } else if (MALI_MEM_COW == target_bk->type) {
         MALI_DEBUG_ASSERT(&target_bk->cow_mem);
         MALI_DEBUG_ASSERT(((target_size + target_offset) / MALI_OSK_MALI_PAGE_SIZE) <= target_bk->cow_mem.count);
-        return  &target_bk->cow_mem.pages;
+        return &target_bk->cow_mem.pages;
     } else if (MALI_MEM_BLOCK == target_bk->type) {
         MALI_DEBUG_ASSERT(&target_bk->block_mem);
         MALI_DEBUG_ASSERT(((target_size + target_offset) / MALI_OSK_MALI_PAGE_SIZE) <= target_bk->block_mem.count);
-        return  &target_bk->block_mem.pfns;
+        return &target_bk->block_mem.pfns;
     } else if (MALI_MEM_SWAP == target_bk->type) {
         MALI_DEBUG_ASSERT(&target_bk->swap_mem);
         MALI_DEBUG_ASSERT(((target_size + target_offset) / MALI_OSK_MALI_PAGE_SIZE) <= target_bk->swap_mem.count);
-        return  &target_bk->swap_mem.pages;
+        return &target_bk->swap_mem.pages;
     }
 
     return NULL;
 }
 
 /**
-* Do COW for os memory - support do COW for memory from bank memory
-* The range_start/size can be zero, which means it will call cow_modify_range
-* latter.
-* This function allocate new pages for COW backend from os mem for a modified range
-* It will keep the page which not in the modified range and Add ref to it
-*
-* @target_bk - target allocation's backend(the allocation need to do COW)
-* @target_offset - the offset in target allocation to do COW(for support COW  a memory allocated from memory_bank, 4K align)
-* @target_size - size of target allocation to do COW (for support memory bank)
-* @backend -COW backend
-* @range_start - offset of modified range (4K align)
-* @range_size - size of modified range
-*/
-mali_osk_errcode_t mali_memory_cow_os_memory(mali_mem_backend *target_bk,
-        u32 target_offset,
-        u32 target_size,
-        mali_mem_backend *backend,
-        u32 range_start,
-        u32 range_size)
+ * Do COW for os memory - support do COW for memory from bank memory
+ * The range_start/size can be zero, which means it will call cow_modify_range
+ * latter.
+ * This function allocate new pages for COW backend from os mem for a modified range
+ * It will keep the page which not in the modified range and Add ref to it
+ *
+ * @target_bk - target allocation's backend(the allocation need to do COW)
+ * @target_offset - the offset in target allocation to do COW(for support COW  a memory allocated from memory_bank, 4K
+ * align)
+ * @target_size - size of target allocation to do COW (for support memory bank)
+ * @backend -COW backend
+ * @range_start - offset of modified range (4K align)
+ * @range_size - size of modified range
+ */
+mali_osk_errcode_t mali_memory_cow_os_memory(mali_mem_backend *target_bk, u32 target_offset, u32 target_size,
+                                             mali_mem_backend *backend, u32 range_start, u32 range_size)
 {
     mali_mem_cow *cow = &backend->cow_mem;
     struct mali_page_node *m_page, *m_tmp, *page_node;
@@ -125,7 +123,8 @@ mali_osk_errcode_t mali_memory_cow_os_memory(mali_mem_backend *target_bk,
 
     INIT_LIST_HEAD(&cow->pages);
     mutex_lock(&target_bk->mutex);
-    list_for_each_entry_safe(m_page, m_tmp, pages, list) {
+    list_for_each_entry_safe(m_page, m_tmp, pages, list)
+    {
         /* add page from (target_offset,target_offset+size) to cow backend */
         if ((target_page >= target_offset / MALI_OSK_MALI_PAGE_SIZE) &&
             (target_page < ((target_size + target_offset) / MALI_OSK_MALI_PAGE_SIZE))) {
@@ -180,12 +179,8 @@ error:
     return MALI_OSK_ERR_FAULT;
 }
 
-mali_osk_errcode_t mali_memory_cow_swap_memory(mali_mem_backend *target_bk,
-        u32 target_offset,
-        u32 target_size,
-        mali_mem_backend *backend,
-        u32 range_start,
-        u32 range_size)
+mali_osk_errcode_t mali_memory_cow_swap_memory(mali_mem_backend *target_bk, u32 target_offset, u32 target_size,
+                                               mali_mem_backend *backend, u32 range_start, u32 range_size)
 {
     mali_mem_cow *cow = &backend->cow_mem;
     struct mali_page_node *m_page, *m_tmp, *page_node;
@@ -206,7 +201,8 @@ mali_osk_errcode_t mali_memory_cow_swap_memory(mali_mem_backend *target_bk,
 
     backend->flags |= MALI_MEM_BACKEND_FLAG_UNSWAPPED_IN;
 
-    list_for_each_entry_safe(m_page, m_tmp, pages, list) {
+    list_for_each_entry_safe(m_page, m_tmp, pages, list)
+    {
         /* add page from (target_offset,target_offset+size) to cow backend */
         if ((target_page >= target_offset / MALI_OSK_MALI_PAGE_SIZE) &&
             (target_page < ((target_size + target_offset) / MALI_OSK_MALI_PAGE_SIZE))) {
@@ -234,7 +230,7 @@ mali_osk_errcode_t mali_memory_cow_swap_memory(mali_mem_backend *target_bk,
 
                 swap_item->idx = mali_mem_swap_idx_alloc();
 
-                if (_MALI_OSK_BITMAP_INVALIDATE_INDEX == swap_item->idx) {
+                if (MALI_OSK_BITMAP_INVALIDATE_INDEX == swap_item->idx) {
                     MALI_DEBUG_PRINT(1, ("Failed to allocate swap index in swap CoW.\n"));
                     kfree(page_node);
                     kfree(swap_item);
@@ -261,9 +257,7 @@ mali_osk_errcode_t mali_memory_cow_swap_memory(mali_mem_backend *target_bk,
 error:
     mali_mem_swap_release(backend, MALI_FALSE);
     return MALI_OSK_ERR_FAULT;
-
 }
-
 
 mali_osk_errcode_t _mali_mem_put_page_node(mali_page_node *node)
 {
@@ -273,21 +267,19 @@ mali_osk_errcode_t _mali_mem_put_page_node(mali_page_node *node)
         return mali_mem_block_unref_node(node);
     } else if (node->type == MALI_PAGE_NODE_SWAP) {
         return mali_mem_swap_put_page_node(node);
-    } else
+    } else {
         MALI_DEBUG_ASSERT(0);
+    }
     return MALI_OSK_ERR_FAULT;
 }
 
-
 /**
-* Modify a range of a exist COW backend
-* @backend -COW backend
-* @range_start - offset of modified range (4K align)
-* @range_size - size of modified range(in byte)
-*/
-mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
-        u32 range_start,
-        u32 range_size)
+ * Modify a range of a exist COW backend
+ * @backend -COW backend
+ * @range_start - offset of modified range (4K align)
+ * @range_size - size of modified range(in byte)
+ */
+mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend, u32 range_start, u32 range_size)
 {
     mali_mem_allocation *alloc = NULL;
     struct mali_session_data *session;
@@ -299,8 +291,12 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
     s32 change_pages_nr = 0;
     mali_osk_errcode_t ret = MALI_OSK_ERR_OK;
 
-    if (range_start % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
-    if (range_size % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    if (range_start % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
+    if (range_size % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
 
     alloc = backend->mali_allocation;
     MALI_DEBUG_ASSERT_POINTER(alloc);
@@ -314,7 +310,8 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
     mutex_lock(&backend->mutex);
 
     /* free pages*/
-    list_for_each_entry_safe(m_page, m_tmp, &cow->pages, list) {
+    list_for_each_entry_safe(m_page, m_tmp, &cow->pages, list)
+    {
 
         /* check if in the modified range*/
         if ((count >= range_start / MALI_OSK_MALI_PAGE_SIZE) &&
@@ -325,8 +322,9 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
                 if (NULL == new_page) {
                     goto error;
                 }
-                if (1 != mali_page_node_get_ref_count(m_page))
+                if (1 != mali_page_node_get_ref_count(m_page)) {
                     change_pages_nr++;
+                }
                 /* unref old page*/
                 mali_osk_mutex_wait(session->cow_lock);
                 if (_mali_mem_put_page_node(m_page)) {
@@ -350,7 +348,7 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
 
                 swap_item->idx = mali_mem_swap_idx_alloc();
 
-                if (_MALI_OSK_BITMAP_INVALIDATE_INDEX == swap_item->idx) {
+                if (MALI_OSK_BITMAP_INVALIDATE_INDEX == swap_item->idx) {
                     MALI_DEBUG_PRINT(1, ("Failed to allocate swap index in swap CoW modify range.\n"));
                     kfree(swap_item);
                     goto error;
@@ -370,7 +368,7 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
         }
         count++;
     }
-    cow->change_pages_nr  = change_pages_nr;
+    cow->change_pages_nr = change_pages_nr;
 
     MALI_DEBUG_ASSERT(MALI_MEM_COW == alloc->type);
 
@@ -383,11 +381,14 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
         if (MALI_MEM_BACKEND_FLAG_SWAP_COWED != (backend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED)) {
             zap_vma_ptes(alloc->cpu_mapping.vma, alloc->cpu_mapping.vma->vm_start + range_start, range_size);
 
-            ret = mali_mem_cow_cpu_map_pages_locked(backend, alloc->cpu_mapping.vma, alloc->cpu_mapping.vma->vm_start  + range_start, range_size / MALI_OSK_MALI_PAGE_SIZE);
+            ret = mali_mem_cow_cpu_map_pages_locked(backend, alloc->cpu_mapping.vma,
+                                                    alloc->cpu_mapping.vma->vm_start + range_start,
+                                                    range_size / MALI_OSK_MALI_PAGE_SIZE);
 
             if (unlikely(ret != MALI_OSK_ERR_OK)) {
-                MALI_DEBUG_PRINT(2, ("mali_memory_cow_modify_range: cpu mapping failed !\n"));
-                ret =  MALI_OSK_ERR_FAULT;
+                MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
+                                 ("mali_memory_cow_modify_range: cpu mapping failed !\n"));
+                ret = MALI_OSK_ERR_FAULT;
             }
         } else {
             /* used to trigger page fault for swappable cowed memory. */
@@ -404,84 +405,88 @@ mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
 error:
     mutex_unlock(&backend->mutex);
     return ret;
-
 }
 
-
 /**
-* Allocate pages for COW backend
-* @alloc  -allocation for COW allocation
-* @target_bk - target allocation's backend(the allocation need to do COW)
-* @target_offset - the offset in target allocation to do COW(for support COW  a memory allocated from memory_bank, 4K align)
-* @target_size - size of target allocation to do COW (for support memory bank)(in byte)
-* @backend -COW backend
-* @range_start - offset of modified range (4K align)
-* @range_size - size of modified range(in byte)
-*/
-mali_osk_errcode_t mali_memory_do_cow(mali_mem_backend *target_bk,
-                       u32 target_offset,
-                       u32 target_size,
-                       mali_mem_backend *backend,
-                       u32 range_start,
-                       u32 range_size)
+ * Allocate pages for COW backend
+ * @alloc  -allocation for COW allocation
+ * @target_bk - target allocation's backend(the allocation need to do COW)
+ * @target_offset - the offset in target allocation to do COW(for support COW  a memory allocated from memory_bank, 4K
+ * align)
+ * @target_size - size of target allocation to do COW (for support memory bank)(in byte)
+ * @backend -COW backend
+ * @range_start - offset of modified range (4K align)
+ * @range_size - size of modified range(in byte)
+ */
+mali_osk_errcode_t mali_memory_do_cow(mali_mem_backend *target_bk, u32 target_offset, u32 target_size,
+                                      mali_mem_backend *backend, u32 range_start, u32 range_size)
 {
     struct mali_session_data *session = backend->mali_allocation->session;
 
     MALI_CHECK_NON_NULL(session, MALI_OSK_ERR_INVALID_ARGS);
 
     /* size & offset must be a multiple of the system page size */
-    if (target_size % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
-    if (range_size % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
-    if (target_offset % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
-    if (range_start % MALI_OSK_MALI_PAGE_SIZE) MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    if (target_size % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
+    if (range_size % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
+    if (target_offset % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
+    if (range_start % MALI_OSK_MALI_PAGE_SIZE) {
+        MALI_ERROR(MALI_OSK_ERR_INVALID_ARGS);
+    }
 
     /* check backend type */
     MALI_DEBUG_ASSERT(MALI_MEM_COW == backend->type);
 
     switch (target_bk->type) {
-    case MALI_MEM_OS:
-    case MALI_MEM_BLOCK:
-        return mali_memory_cow_os_memory(target_bk, target_offset, target_size, backend, range_start, range_size);
-        break;
-    case MALI_MEM_COW:
-        if (backend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED) {
-            return mali_memory_cow_swap_memory(target_bk, target_offset, target_size, backend, range_start, range_size);
-        } else {
+        case MALI_MEM_OS:
+        case MALI_MEM_BLOCK:
             return mali_memory_cow_os_memory(target_bk, target_offset, target_size, backend, range_start, range_size);
-        }
-        break;
-    case MALI_MEM_SWAP:
-        return mali_memory_cow_swap_memory(target_bk, target_offset, target_size, backend, range_start, range_size);
-        break;
-    case MALI_MEM_EXTERNAL:
-        /*NOT support yet*/
-        MALI_DEBUG_PRINT_ERROR(("External physical memory not supported ! \n"));
-        return _MALI_OSK_ERR_UNSUPPORTED;
-        break;
-    case MALI_MEM_DMA_BUF:
-        /*NOT support yet*/
-        MALI_DEBUG_PRINT_ERROR(("DMA buffer not supported ! \n"));
-        return _MALI_OSK_ERR_UNSUPPORTED;
-        break;
-    case MALI_MEM_UMP:
-        /*NOT support yet*/
-        MALI_DEBUG_PRINT_ERROR(("UMP buffer not supported ! \n"));
-        return _MALI_OSK_ERR_UNSUPPORTED;
-        break;
-    default:
-        /*Not support yet*/
-        MALI_DEBUG_PRINT_ERROR(("Invalid memory type not supported ! \n"));
-        return _MALI_OSK_ERR_UNSUPPORTED;
-        break;
+            break;
+        case MALI_MEM_COW:
+            if (backend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED) {
+                return mali_memory_cow_swap_memory(target_bk, target_offset, target_size, backend, range_start,
+                                                   range_size);
+            } else {
+                return mali_memory_cow_os_memory(target_bk, target_offset, target_size, backend, range_start,
+                                                 range_size);
+            }
+            break;
+        case MALI_MEM_SWAP:
+            return mali_memory_cow_swap_memory(target_bk, target_offset, target_size, backend, range_start, range_size);
+            break;
+        case MALI_MEM_EXTERNAL:
+            /*NOT support yet*/
+            MALI_DEBUG_PRINT_ERROR(("External physical memory not supported ! \n"));
+            return _MALI_OSK_ERR_UNSUPPORTED;
+            break;
+        case MALI_MEM_DMA_BUF:
+            /*NOT support yet*/
+            MALI_DEBUG_PRINT_ERROR(("DMA buffer not supported ! \n"));
+            return _MALI_OSK_ERR_UNSUPPORTED;
+            break;
+        case MALI_MEM_UMP:
+            /*NOT support yet*/
+            MALI_DEBUG_PRINT_ERROR(("UMP buffer not supported ! \n"));
+            return _MALI_OSK_ERR_UNSUPPORTED;
+            break;
+        default:
+            /*Not support yet*/
+            MALI_DEBUG_PRINT_ERROR(("Invalid memory type not supported ! \n"));
+            return _MALI_OSK_ERR_UNSUPPORTED;
+            break;
     }
     return MALI_OSK_ERR_OK;
 }
 
-
 /**
-* Map COW backend memory to mali
-* Support OS/BLOCK for mali_page_node
-*/
+ * Map COW backend memory to mali
+ * Support OS/BLOCK for mali_page_node
+ */
 int mali_mem_cow_mali_map(mali_mem_backend *mem_bkend, u32 range_start, u32 range_size)
 {
     mali_mem_allocation *cow_alloc;
@@ -501,14 +506,14 @@ int mali_mem_cow_mali_map(mali_mem_backend *mem_bkend, u32 range_start, u32 rang
     session = cow_alloc->session;
     pagedir = session->page_directory;
     MALI_CHECK_NON_NULL(session, MALI_OSK_ERR_INVALID_ARGS);
-    list_for_each_entry(m_page, &mem_bkend->cow_mem.pages, list) {
+    list_for_each_entry(m_page, &mem_bkend->cow_mem.pages, list)
+    {
         if ((virt - start >= range_start) && (virt - start < range_start + range_size)) {
             dma_addr_t phys = _mali_page_node_get_dma_addr(m_page);
 #if defined(CONFIG_ARCH_DMA_ADDR_T_64BIT)
-            MALI_DEBUG_ASSERT(0 == (phys >> 32));
+            MALI_DEBUG_ASSERT(0 == (phys >> 0x20));
 #endif
-            mali_mmu_pagedir_update(pagedir, virt, (mali_dma_addr)phys,
-                        MALI_MMU_PAGE_SIZE, MALI_MMU_FLAGS_DEFAULT);
+            mali_mmu_pagedir_update(pagedir, virt, (mali_dma_addr)phys, MALI_MMU_PAGE_SIZE, MALI_MMU_FLAGS_DEFAULT);
         }
         virt += MALI_MMU_PAGE_SIZE;
     }
@@ -516,9 +521,9 @@ int mali_mem_cow_mali_map(mali_mem_backend *mem_bkend, u32 range_start, u32 rang
 }
 
 /**
-* Map COW backend to cpu
-* support OS/BLOCK memory
-*/
+ * Map COW backend to cpu
+ * support OS/BLOCK memory
+ */
 int mali_mem_cow_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *vma)
 {
     mali_mem_cow *cow = &mem_bkend->cow_mem;
@@ -527,7 +532,8 @@ int mali_mem_cow_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *vma
     unsigned long addr = vma->vm_start;
     MALI_DEBUG_ASSERT(mem_bkend->type == MALI_MEM_COW);
 
-    list_for_each_entry(m_page, &cow->pages, list) {
+    list_for_each_entry(m_page, &cow->pages, list)
+    {
         /* We should use vm_insert_page, but it does a dcache
          * flush which makes it way slower than remap_pfn_range or vmf_insert_pfn.
         ret = vm_insert_page(vma, addr, page);
@@ -544,22 +550,20 @@ int mali_mem_cow_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *vma
 }
 
 /**
-* Map some pages(COW backend) to CPU vma@vaddr
-*@ mem_bkend - COW backend
-*@ vma
-*@ vaddr -start CPU vaddr mapped to
-*@ num - max number of pages to map to CPU vaddr
-*/
-mali_osk_errcode_t mali_mem_cow_cpu_map_pages_locked(mali_mem_backend *mem_bkend,
-        struct vm_area_struct *vma,
-        unsigned long vaddr,
-        int num)
+ * Map some pages(COW backend) to CPU vma@vaddr
+ *@ mem_bkend - COW backend
+ *@ vma
+ *@ vaddr -start CPU vaddr mapped to
+ *@ num - max number of pages to map to CPU vaddr
+ */
+mali_osk_errcode_t mali_mem_cow_cpu_map_pages_locked(mali_mem_backend *mem_bkend, struct vm_area_struct *vma,
+                                                     unsigned long vaddr, int num)
 {
     mali_mem_cow *cow = &mem_bkend->cow_mem;
     struct mali_page_node *m_page;
     int ret;
     int offset;
-    int count ;
+    int count;
     unsigned long vstart = vma->vm_start;
     count = 0;
     MALI_DEBUG_ASSERT(mem_bkend->type == MALI_MEM_COW);
@@ -567,7 +571,8 @@ mali_osk_errcode_t mali_mem_cow_cpu_map_pages_locked(mali_mem_backend *mem_bkend
     MALI_DEBUG_ASSERT(0 == vstart % MALI_OSK_MALI_PAGE_SIZE);
     offset = (vaddr - vstart) / MALI_OSK_MALI_PAGE_SIZE;
 
-    list_for_each_entry(m_page, &cow->pages, list) {
+    list_for_each_entry(m_page, &cow->pages, list)
+    {
         if ((count >= offset) && (count < offset + num)) {
             ret = vmf_insert_pfn(vma, vaddr, _mali_page_node_get_pfn(m_page));
 
@@ -587,9 +592,9 @@ mali_osk_errcode_t mali_mem_cow_cpu_map_pages_locked(mali_mem_backend *mem_bkend
 }
 
 /**
-* Release COW backend memory
-* free it directly(put_page--unref page), not put into pool
-*/
+ * Release COW backend memory
+ * free it directly(put_page--unref page), not put into pool
+ */
 u32 mali_mem_cow_release(mali_mem_backend *mem_bkend, mali_bool is_mali_mapped)
 {
     mali_mem_allocation *alloc;
@@ -605,8 +610,9 @@ u32 mali_mem_cow_release(mali_mem_backend *mem_bkend, mali_bool is_mali_mapped)
 
     if (MALI_MEM_BACKEND_FLAG_SWAP_COWED != (MALI_MEM_BACKEND_FLAG_SWAP_COWED & mem_bkend->flags)) {
         /* Unmap the memory from the mali virtual address space. */
-        if (MALI_TRUE == is_mali_mapped)
+        if (MALI_TRUE == is_mali_mapped) {
             mali_mem_os_mali_unmap(alloc);
+        }
         /* free cow backend list*/
         mali_osk_mutex_wait(session->cow_lock);
         free_pages_nr = mali_mem_os_free(&mem_bkend->cow_mem.pages, mem_bkend->cow_mem.count, MALI_TRUE);
@@ -619,14 +625,12 @@ u32 mali_mem_cow_release(mali_mem_backend *mem_bkend, mali_bool is_mali_mapped)
         free_pages_nr = mali_mem_swap_release(mem_bkend, is_mali_mapped);
     }
 
-
-    MALI_DEBUG_PRINT(4, ("COW Mem free : allocated size = 0x%x, free size = 0x%x\n", mem_bkend->cow_mem.count * MALI_OSK_MALI_PAGE_SIZE,
-                 free_pages_nr * MALI_OSK_MALI_PAGE_SIZE));
+    MALI_DEBUG_PRINT(4, ("COW Mem free : allocated size = 0x%x, free size = 0x%x\n",
+                         mem_bkend->cow_mem.count * MALI_OSK_MALI_PAGE_SIZE, free_pages_nr * MALI_OSK_MALI_PAGE_SIZE));
 
     mem_bkend->cow_mem.count = 0;
     return free_pages_nr;
 }
-
 
 /* Dst node could os node or swap node. */
 void _mali_mem_cow_copy_page(mali_page_node *src_node, mali_page_node *dst_node)
@@ -637,8 +641,7 @@ void _mali_mem_cow_copy_page(mali_page_node *src_node, mali_page_node *dst_node)
 
     MALI_DEBUG_ASSERT(src_node != NULL);
     MALI_DEBUG_ASSERT(dst_node != NULL);
-    MALI_DEBUG_ASSERT(dst_node->type == MALI_PAGE_NODE_OS
-              || dst_node->type == MALI_PAGE_NODE_SWAP);
+    MALI_DEBUG_ASSERT(dst_node->type == MALI_PAGE_NODE_OS || dst_node->type == MALI_PAGE_NODE_SWAP);
 
     if (dst_node->type == MALI_PAGE_NODE_OS) {
         dst_page = dst_node->page;
@@ -646,14 +649,13 @@ void _mali_mem_cow_copy_page(mali_page_node *src_node, mali_page_node *dst_node)
         dst_page = dst_node->swap_it->page;
     }
 
-    dma_unmap_page(&mali_platform_device->dev, _mali_page_node_get_dma_addr(dst_node),
-               MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
+    dma_unmap_page(&mali_platform_device->dev, _mali_page_node_get_dma_addr(dst_node), MALI_OSK_MALI_PAGE_SIZE,
+                   DMA_BIDIRECTIONAL);
 
     /* map it , and copy the content*/
     dst = kmap_atomic(dst_page);
 
-    if (src_node->type == MALI_PAGE_NODE_OS ||
-        src_node->type == MALI_PAGE_NODE_SWAP) {
+    if (src_node->type == MALI_PAGE_NODE_OS || src_node->type == MALI_PAGE_NODE_SWAP) {
         struct page *src_page;
 
         if (src_node->type == MALI_PAGE_NODE_OS) {
@@ -666,48 +668,45 @@ void _mali_mem_cow_copy_page(mali_page_node *src_node, mali_page_node *dst_node)
         /* In ARM architecture, speculative read may pull stale data into L1 cache
          * for kernel linear mapping page table. DMA_BIDIRECTIONAL could
          * invalidate the L1 cache so that following read get the latest data
-        */
-        dma_unmap_page(&mali_platform_device->dev, _mali_page_node_get_dma_addr(src_node),
-                   MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
+         */
+        dma_unmap_page(&mali_platform_device->dev, _mali_page_node_get_dma_addr(src_node), MALI_OSK_MALI_PAGE_SIZE,
+                       DMA_BIDIRECTIONAL);
 
         src = kmap_atomic(src_page);
-        memcpy(dst, src , MALI_OSK_MALI_PAGE_SIZE);
+        memcpy(dst, src, MALI_OSK_MALI_PAGE_SIZE);
         kunmap_atomic(src);
-        dma_addr = dma_map_page(&mali_platform_device->dev, src_page,
-                    0, MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
+        dma_addr = dma_map_page(&mali_platform_device->dev, src_page, 0, MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
 
         if (src_node->type == MALI_PAGE_NODE_SWAP) {
             src_node->swap_it->dma_addr = dma_addr;
         }
     } else if (src_node->type == MALI_PAGE_NODE_BLOCK) {
         /*
-        * use ioremap to map src for BLOCK memory
-        */
+         * use ioremap to map src for BLOCK memory
+         */
         src = ioremap(_mali_page_node_get_dma_addr(src_node), MALI_OSK_MALI_PAGE_SIZE);
-        memcpy(dst, src , MALI_OSK_MALI_PAGE_SIZE);
+        memcpy(dst, src, MALI_OSK_MALI_PAGE_SIZE);
         iounmap(src);
     }
     kunmap_atomic(dst);
-    dma_addr = dma_map_page(&mali_platform_device->dev, dst_page,
-                0, MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
+    dma_addr = dma_map_page(&mali_platform_device->dev, dst_page, 0, MALI_OSK_MALI_PAGE_SIZE, DMA_BIDIRECTIONAL);
 
     if (dst_node->type == MALI_PAGE_NODE_SWAP) {
         dst_node->swap_it->dma_addr = dma_addr;
     }
 }
 
-
 /*
-* allocate page on demand when CPU access it,
-* THis used in page fault handler
-*/
+ * allocate page on demand when CPU access it,
+ * THis used in page fault handler
+ */
 mali_osk_errcode_t mali_mem_cow_allocate_on_demand(mali_mem_backend *mem_bkend, u32 offset_page)
 {
     struct page *new_page = NULL;
     struct mali_page_node *new_node = NULL;
     int i = 0;
     struct mali_page_node *m_page, *found_node = NULL;
-    struct  mali_session_data *session = NULL;
+    struct mali_session_data *session = NULL;
     mali_mem_cow *cow = &mem_bkend->cow_mem;
     MALI_DEBUG_ASSERT(MALI_MEM_COW == mem_bkend->type);
     MALI_DEBUG_ASSERT(offset_page < mem_bkend->size / MALI_OSK_MALI_PAGE_SIZE);
@@ -715,8 +714,9 @@ mali_osk_errcode_t mali_mem_cow_allocate_on_demand(mali_mem_backend *mem_bkend, 
 
     /* allocate new page here */
     new_page = mali_mem_cow_alloc_page();
-    if (!new_page)
+    if (!new_page) {
         return MALI_OSK_ERR_NOMEM;
+    }
 
     new_node = _mali_page_node_allocate(MALI_PAGE_NODE_OS);
     if (!new_node) {
@@ -725,7 +725,8 @@ mali_osk_errcode_t mali_mem_cow_allocate_on_demand(mali_mem_backend *mem_bkend, 
     }
 
     /* find the page in backend*/
-    list_for_each_entry(m_page, &cow->pages, list) {
+    list_for_each_entry(m_page, &cow->pages, list)
+    {
         if (i == offset_page) {
             found_node = m_page;
             break;
@@ -749,7 +750,8 @@ mali_osk_errcode_t mali_mem_cow_allocate_on_demand(mali_mem_backend *mem_bkend, 
     MALI_DEBUG_ASSERT_POINTER(session);
     if (1 != mali_page_node_get_ref_count(found_node)) {
         atomic_add(1, &session->mali_mem_allocated_pages);
-        if (atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE > session->max_mali_mem_allocated_size) {
+        if (atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE >
+            session->max_mali_mem_allocated_size) {
             session->max_mali_mem_allocated_size = atomic_read(&session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE;
         }
         mem_bkend->cow_mem.change_pages_nr++;

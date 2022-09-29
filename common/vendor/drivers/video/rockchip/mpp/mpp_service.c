@@ -24,24 +24,25 @@
 #include "mpp_common.h"
 #include "mpp_iommu.h"
 
-#define MPP_CLASS_NAME        "mpp_class"
-#define MPP_SERVICE_NAME    "mpp_service"
+#define MPP_CLASS_NAME "mpp_class"
+#define MPP_SERVICE_NAME "mpp_service"
 
-#define HAS_RKVDEC    IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVDEC)
-#define HAS_RKVENC    IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVENC)
-#define HAS_VDPU1    IS_ENABLED(CONFIG_ROCKCHIP_MPP_VDPU1)
-#define HAS_VEPU1    IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU1)
-#define HAS_VDPU2    IS_ENABLED(CONFIG_ROCKCHIP_MPP_VDPU2)
-#define HAS_VEPU2    IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU2)
-#define HAS_VEPU22    IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU22)
-#define HAS_IEP2    IS_ENABLED(CONFIG_ROCKCHIP_MPP_IEP2)
-#define HAS_JPGDEC    IS_ENABLED(CONFIG_ROCKCHIP_MPP_JPGDEC)
-#define HAS_RKVDEC2    IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVDEC2)
-#define HAS_RKVENC2    IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVENC2)
+#define HAS_RKVDEC IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVDEC)
+#define HAS_RKVENC IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVENC)
+#define HAS_VDPU1 IS_ENABLED(CONFIG_ROCKCHIP_MPP_VDPU1)
+#define HAS_VEPU1 IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU1)
+#define HAS_VDPU2 IS_ENABLED(CONFIG_ROCKCHIP_MPP_VDPU2)
+#define HAS_VEPU2 IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU2)
+#define HAS_VEPU22 IS_ENABLED(CONFIG_ROCKCHIP_MPP_VEPU22)
+#define HAS_IEP2 IS_ENABLED(CONFIG_ROCKCHIP_MPP_IEP2)
+#define HAS_JPGDEC IS_ENABLED(CONFIG_ROCKCHIP_MPP_JPGDEC)
+#define HAS_RKVDEC2 IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVDEC2)
+#define HAS_RKVENC2 IS_ENABLED(CONFIG_ROCKCHIP_MPP_RKVENC2)
 
-#define MPP_REGISTER_DRIVER(srv, flag, X, x) {\
-    if (flag)\
-        mpp_add_driver(srv, MPP_DRIVER_##X, &rockchip_##x##_driver, "grf_"#x);\
+#define MPP_REGISTER_DRIVER(srv, flag, X, x)                                                                           \
+    {                                                                                                                  \
+        if (flag)                                                                                                      \
+            mpp_add_driver(srv, MPP_DRIVER_##X, &rockchip_##x##_driver, "grf_" #x);                                    \
     }
 
 unsigned int mpp_dev_debug;
@@ -50,9 +51,7 @@ MODULE_PARM_DESC(mpp_dev_debug, "bit switch for mpp debug information");
 
 static const char mpp_version[] = MPP_VERSION;
 
-static int mpp_init_grf(struct device_node *np,
-            struct mpp_grf_info *grf_info,
-            const char *grf_name)
+static int mpp_init_grf(struct device_node *np, struct mpp_grf_info *grf_info, const char *grf_name)
 {
     int ret;
     int index;
@@ -61,21 +60,24 @@ static int mpp_init_grf(struct device_node *np,
     struct regmap *grf;
 
     grf = syscon_regmap_lookup_by_phandle(np, "rockchip,grf");
-    if (IS_ERR_OR_NULL(grf))
+    if (IS_ERR_OR_NULL(grf)) {
         return -EINVAL;
+    }
 
     ret = of_property_read_u32(np, "rockchip,grf-offset", &grf_offset);
-    if (ret)
+    if (ret) {
         return -ENODATA;
+    }
 
     index = of_property_match_string(np, "rockchip,grf-names", grf_name);
-    if (index < 0)
+    if (index < 0) {
         return -ENODATA;
+    }
 
-    ret = of_property_read_u32_index(np, "rockchip,grf-values",
-                     index, &grf_value);
-    if (ret)
+    ret = of_property_read_u32_index(np, "rockchip,grf-values", index, &grf_value);
+    if (ret) {
         return -ENODATA;
+    }
 
     grf_info->grf = grf;
     grf_info->offset = grf_offset;
@@ -86,20 +88,17 @@ static int mpp_init_grf(struct device_node *np,
     return 0;
 }
 
-static int mpp_add_driver(struct mpp_service *srv,
-              enum MPP_DRIVER_TYPE type,
-              struct platform_driver *driver,
-              const char *grf_name)
+static int mpp_add_driver(struct mpp_service *srv, enum MPP_DRIVER_TYPE type, struct platform_driver *driver,
+                          const char *grf_name)
 {
     int ret;
 
-    mpp_init_grf(srv->dev->of_node,
-             &srv->grf_infos[type],
-             grf_name);
+    mpp_init_grf(srv->dev->of_node, &srv->grf_infos[type], grf_name);
 
     ret = platform_driver_register(driver);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     srv->sub_drivers[type] = driver;
 
@@ -117,8 +116,7 @@ static int mpp_remove_driver(struct mpp_service *srv, int i)
     return 0;
 }
 
-static int mpp_register_service(struct mpp_service *srv,
-                const char *service_name)
+static int mpp_register_service(struct mpp_service *srv, const char *service_name)
 {
     int ret;
     struct device *dev = srv->dev;
@@ -141,8 +139,7 @@ static int mpp_register_service(struct mpp_service *srv,
         return ret;
     }
 
-    srv->child_dev = device_create(srv->cls, dev, srv->dev_id,
-                       NULL, "%s", service_name);
+    srv->child_dev = device_create(srv->cls, dev, srv->dev_id, NULL, "%s", service_name);
 
     return 0;
 }
@@ -180,20 +177,22 @@ static int mpp_show_session_summary(struct seq_file *seq, void *offset)
     struct mpp_service *srv = seq->private;
 
     mutex_lock(&srv->session_lock);
-    list_for_each_entry_safe(session, n,
-                 &srv->session_list,
-                 service_link) {
-        struct  mpp_dev *mpp;
+    list_for_each_entry_safe(session, n, &srv->session_list, service_link)
+    {
+        struct mpp_dev *mpp;
 
-        if (!session->priv)
+        if (!session->priv) {
             continue;
+        }
 
-        if (!session->mpp)
+        if (!session->mpp) {
             continue;
+        }
         mpp = session->mpp;
 
-        if (mpp->dev_ops->dump_session)
+        if (mpp->dev_ops->dump_session) {
             mpp->dev_ops->dump_session(session, seq);
+        }
     }
     mutex_unlock(&srv->session_lock);
 
@@ -241,13 +240,15 @@ static int mpp_show_support_device(struct seq_file *file, void *v)
 
         if (test_bit(i, &srv->hw_support)) {
             mpp = srv->sub_devices[array_index_nospec(i, MPP_DEVICE_BUTT)];
-            if (!mpp)
+            if (!mpp) {
                 continue;
+            }
 
             seq_printf(file, "DEVICE[%2d]:%-10s", i, mpp_device_name[i]);
             hw_info = mpp->var->hw_info;
-            if (hw_info->hw_id)
+            if (hw_info->hw_id) {
                 seq_printf(file, "HW_ID:0x%08x", hw_info->hw_id);
+            }
             seq_puts(file, "\n");
         }
     }
@@ -266,13 +267,11 @@ static int mpp_procfs_init(struct mpp_service *srv)
     /* show version */
     proc_create_single("version", 0444, srv->procfs, mpp_show_version);
     /* for show session info */
-    proc_create_single_data("sessions-summary", 0444,
-                srv->procfs, mpp_show_session_summary, srv);
+    proc_create_single_data("sessions-summary", 0444, srv->procfs, mpp_show_session_summary, srv);
     /* show support dev cmd */
     proc_create_single("supports-cmd", 0444, srv->procfs, mpp_show_support_cmd);
     /* show support devices */
-    proc_create_single_data("supports-device", 0444,
-                srv->procfs, mpp_show_support_device, srv);
+    proc_create_single_data("supports-device", 0444, srv->procfs, mpp_show_support_device, srv);
 
     return 0;
 }
@@ -299,41 +298,39 @@ static int mpp_service_probe(struct platform_device *pdev)
     dev_info(dev, "%s\n", mpp_version);
     dev_info(dev, "probe start\n");
     srv = devm_kzalloc(dev, sizeof(*srv), GFP_KERNEL);
-    if (!srv)
+    if (!srv) {
         return -ENOMEM;
+    }
 
     srv->dev = dev;
     atomic_set(&srv->shutdown_request, 0);
     platform_set_drvdata(pdev, srv);
 
     srv->cls = class_create(THIS_MODULE, MPP_CLASS_NAME);
-    if (PTR_ERR_OR_ZERO(srv->cls))
+    if (PTR_ERR_OR_ZERO(srv->cls)) {
         return PTR_ERR(srv->cls);
+    }
 
-    of_property_read_u32(np, "rockchip,taskqueue-count",
-                 &srv->taskqueue_cnt);
+    of_property_read_u32(np, "rockchip,taskqueue-count", &srv->taskqueue_cnt);
     if (srv->taskqueue_cnt > MPP_DEVICE_BUTT) {
-        dev_err(dev, "rockchip,taskqueue-count %d must less than %d\n",
-            srv->taskqueue_cnt, MPP_DEVICE_BUTT);
+        dev_err(dev, "rockchip,taskqueue-count %d must less than %d\n", srv->taskqueue_cnt, MPP_DEVICE_BUTT);
         return -EINVAL;
     }
 
     for (i = 0; i < srv->taskqueue_cnt; i++) {
         queue = mpp_taskqueue_init(dev);
-        if (!queue)
+        if (!queue) {
             continue;
+        }
 
         kthread_init_worker(&queue->worker);
-        queue->kworker_task = kthread_run(kthread_worker_fn, &queue->worker,
-                          "queue_work%d", i);
+        queue->kworker_task = kthread_run(kthread_worker_fn, &queue->worker, "queue_work%d", i);
         srv->task_queues[i] = queue;
     }
 
-    of_property_read_u32(np, "rockchip,resetgroup-count",
-                 &srv->reset_group_cnt);
+    of_property_read_u32(np, "rockchip,resetgroup-count", &srv->reset_group_cnt);
     if (srv->reset_group_cnt > MPP_DEVICE_BUTT) {
-        dev_err(dev, "rockchip,resetgroup-count %d must less than %d\n",
-            srv->reset_group_cnt, MPP_DEVICE_BUTT);
+        dev_err(dev, "rockchip,resetgroup-count %d must less than %d\n", srv->reset_group_cnt, MPP_DEVICE_BUTT);
         return -EINVAL;
     }
 
@@ -343,8 +340,9 @@ static int mpp_service_probe(struct platform_device *pdev)
 
         for (i = 0; i < srv->reset_group_cnt; i++) {
             group = devm_kzalloc(dev, sizeof(*group), GFP_KERNEL);
-            if (!group)
+            if (!group) {
                 continue;
+            }
 
             init_rwsem(&group->rw_sem);
             srv->reset_groups[i] = group;
@@ -402,8 +400,9 @@ static int mpp_service_remove(struct platform_device *pdev)
     }
 
     /* remove sub drivers */
-    for (i = 0; i < MPP_DRIVER_BUTT; i++)
+    for (i = 0; i < MPP_DRIVER_BUTT; i++) {
         mpp_remove_driver(srv, i);
+    }
 
     mpp_remove_service(srv);
     class_destroy(srv->cls);
@@ -416,16 +415,17 @@ static const struct of_device_id mpp_dt_ids[] = {
     {
         .compatible = "rockchip,mpp-service",
     },
-    { },
+    {},
 };
 
 static struct platform_driver mpp_service_driver = {
     .probe = mpp_service_probe,
     .remove = mpp_service_remove,
-    .driver = {
-        .name = "mpp_service",
-        .of_match_table = of_match_ptr(mpp_dt_ids),
-    },
+    .driver =
+        {
+            .name = "mpp_service",
+            .of_match_table = of_match_ptr(mpp_dt_ids),
+        },
 };
 
 module_platform_driver(mpp_service_driver);

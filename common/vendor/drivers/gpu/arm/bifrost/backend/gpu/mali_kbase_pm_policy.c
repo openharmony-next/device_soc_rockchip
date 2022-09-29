@@ -36,7 +36,7 @@ static const struct kbase_pm_policy *const all_policy_list[] = {
 #if !MALI_CUSTOMER_RELEASE
     &kbase_pm_always_on_demand_policy_ops,
 #endif
-#else                /* CONFIG_MALI_BIFROST_NO_MALI */
+#else /* CONFIG_MALI_BIFROST_NO_MALI */
     &kbase_pm_coarse_demand_policy_ops,
 #if !MALI_CUSTOMER_RELEASE
     &kbase_pm_always_on_demand_policy_ops,
@@ -72,13 +72,12 @@ void kbase_pm_update_active(struct kbase_device *kbdev)
 
     active = backend->pm_current_policy->get_core_active(kbdev);
     WARN((kbase_pm_is_active(kbdev) && !active),
-        "GPU is active but policy '%s' is indicating that it can be powered off",
-        kbdev->pm.backend.pm_current_policy->name);
+         "GPU is active but policy '%s' is indicating that it can be powered off",
+         kbdev->pm.backend.pm_current_policy->name);
 
     if (active) {
         /* Power on the GPU and any cores requested by the policy */
-        if (!pm->backend.invoke_poweroff_wait_wq_when_l2_off &&
-                pm->backend.poweroff_wait_in_progress) {
+        if (!pm->backend.invoke_poweroff_wait_wq_when_l2_off && pm->backend.poweroff_wait_in_progress) {
             KBASE_DEBUG_ASSERT(kbdev->pm.backend.gpu_powered);
             pm->backend.poweron_required = true;
             spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
@@ -134,15 +133,18 @@ void kbase_pm_update_dynamic_cores_onoff(struct kbase_device *kbdev)
      */
     return;
 #endif
-    if (kbdev->pm.backend.pm_current_policy == NULL)
+    if (kbdev->pm.backend.pm_current_policy == NULL) {
         return;
-    if (kbdev->pm.backend.poweroff_wait_in_progress)
+    }
+    if (kbdev->pm.backend.poweroff_wait_in_progress) {
         return;
+    }
     /* In protected transition, don't allow outside shader core request
      * affect transition, return directly
      */
-    if (kbdev->pm.backend.protected_transition_override)
+    if (kbdev->pm.backend.protected_transition_override) {
         return;
+    }
 
     shaders_desired = kbdev->pm.backend.pm_current_policy->shaders_needed(kbdev);
 
@@ -157,17 +159,20 @@ void kbase_pm_update_cores_state_nolock(struct kbase_device *kbdev)
 
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
-    if (kbdev->pm.backend.pm_current_policy == NULL)
+    if (kbdev->pm.backend.pm_current_policy == NULL) {
         return;
-    if (kbdev->pm.backend.poweroff_wait_in_progress)
+    }
+    if (kbdev->pm.backend.poweroff_wait_in_progress) {
         return;
+    }
 
-    if (kbdev->pm.backend.protected_transition_override)
+    if (kbdev->pm.backend.protected_transition_override) {
         /* We are trying to change in/out of protected mode - force all
          * cores off so that the L2 powers down */
         shaders_desired = false;
-    else
+    } else {
         shaders_desired = kbdev->pm.backend.pm_current_policy->shaders_needed(kbdev);
+    }
 
 #if MALI_USE_CSF
     /* On CSF GPUs, Host driver isn't supposed to do the power management
@@ -196,11 +201,11 @@ void kbase_pm_update_cores_state(struct kbase_device *kbdev)
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 }
 
-int kbase_pm_list_policies(struct kbase_device *kbdev,
-    const struct kbase_pm_policy * const **list)
+int kbase_pm_list_policies(struct kbase_device *kbdev, const struct kbase_pm_policy *const **list)
 {
-    if (list)
+    if (list) {
         *list = all_policy_list;
+    }
 
     return ARRAY_SIZE(all_policy_list);
 }
@@ -216,8 +221,7 @@ const struct kbase_pm_policy *kbase_pm_get_policy(struct kbase_device *kbdev)
 
 KBASE_EXPORT_TEST_API(kbase_pm_get_policy);
 
-void kbase_pm_set_policy(struct kbase_device *kbdev,
-                const struct kbase_pm_policy *new_policy)
+void kbase_pm_set_policy(struct kbase_device *kbdev, const struct kbase_pm_policy *new_policy)
 {
     const struct kbase_pm_policy *old_policy;
     unsigned long flags;
@@ -241,12 +245,14 @@ void kbase_pm_set_policy(struct kbase_device *kbdev,
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 
     KBASE_KTRACE_ADD(kbdev, PM_CURRENT_POLICY_TERM, NULL, old_policy->id);
-    if (old_policy->term)
+    if (old_policy->term) {
         old_policy->term(kbdev);
+    }
 
     KBASE_KTRACE_ADD(kbdev, PM_CURRENT_POLICY_INIT, NULL, new_policy->id);
-    if (new_policy->init)
+    if (new_policy->init) {
         new_policy->init(kbdev);
+    }
 
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
     kbdev->pm.backend.pm_current_policy = new_policy;

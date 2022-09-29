@@ -23,21 +23,21 @@
  * like _DRM_VBLANK_EVENT
  */
 #define _DRM_ROCKCHIP_VCNT_EVENT 0x80000000
-#define DRM_EVENT_ROCKCHIP_CRTC_VCNT   0xf
+#define DRM_EVENT_ROCKCHIP_CRTC_VCNT 0xf
 
 /* memory type definitions. */
 enum drm_rockchip_gem_mem_type {
     /* Physically Continuous memory. */
-    ROCKCHIP_BO_CONTIG    = 1 << 0,
+    ROCKCHIP_BO_CONTIG = 1 << 0,
     /* cachable mapping. */
-    ROCKCHIP_BO_CACHABLE    = 1 << 1,
+    ROCKCHIP_BO_CACHABLE = 1 << 1,
     /* write-combine mapping. */
-    ROCKCHIP_BO_WC        = 1 << 2,
-    ROCKCHIP_BO_SECURE    = 1 << 3,
+    ROCKCHIP_BO_WC = 1 << 2,
+    ROCKCHIP_BO_SECURE = 1 << 3,
     /* keep kmap for cma buffer or alloc kmap for other type memory */
-    ROCKCHIP_BO_ALLOC_KMAP    = 1 << 4,
-    ROCKCHIP_BO_MASK    = ROCKCHIP_BO_CONTIG | ROCKCHIP_BO_CACHABLE |
-                ROCKCHIP_BO_WC | ROCKCHIP_BO_SECURE | ROCKCHIP_BO_ALLOC_KMAP,
+    ROCKCHIP_BO_ALLOC_KMAP = 1 << 4,
+    ROCKCHIP_BO_MASK =
+        ROCKCHIP_BO_CONTIG | ROCKCHIP_BO_CACHABLE | ROCKCHIP_BO_WC | ROCKCHIP_BO_SECURE | ROCKCHIP_BO_ALLOC_KMAP,
 };
 
 /**
@@ -103,32 +103,32 @@ enum rockchip_cabc_mode {
 };
 
 struct drm_rockchip_vcnt_event {
-    struct drm_pending_event    base;
+    struct drm_pending_event base;
 };
 
-#define DRM_ROCKCHIP_GEM_CREATE        0x00
-#define DRM_ROCKCHIP_GEM_MAP_OFFSET    0x01
-#define DRM_ROCKCHIP_GEM_CPU_ACQUIRE    0x02
-#define DRM_ROCKCHIP_GEM_CPU_RELEASE    0x03
-#define DRM_ROCKCHIP_GEM_GET_PHYS    0x04
-#define DRM_ROCKCHIP_GET_VCNT_EVENT    0x05
+#define DRM_ROCKCHIP_GEM_CREATE 0x00
+#define DRM_ROCKCHIP_GEM_MAP_OFFSET 0x01
+#define DRM_ROCKCHIP_GEM_CPU_ACQUIRE 0x02
+#define DRM_ROCKCHIP_GEM_CPU_RELEASE 0x03
+#define DRM_ROCKCHIP_GEM_GET_PHYS 0x04
+#define DRM_ROCKCHIP_GET_VCNT_EVENT 0x05
 
-#define DRM_IOCTL_ROCKCHIP_GEM_CREATE    DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GEM_CREATE, struct drm_rockchip_gem_create)
+#define DRM_IOCTL_ROCKCHIP_GEM_CREATE                                                                                  \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GEM_CREATE, struct drm_rockchip_gem_create)
 
-#define DRM_IOCTL_ROCKCHIP_GEM_MAP_OFFSET    DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GEM_MAP_OFFSET, struct drm_rockchip_gem_map_off)
+#define DRM_IOCTL_ROCKCHIP_GEM_MAP_OFFSET                                                                              \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GEM_MAP_OFFSET, struct drm_rockchip_gem_map_off)
 
-#define DRM_IOCTL_ROCKCHIP_GEM_CPU_ACQUIRE    DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GEM_CPU_ACQUIRE, struct drm_rockchip_gem_cpu_acquire)
+#define DRM_IOCTL_ROCKCHIP_GEM_CPU_ACQUIRE                                                                             \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GEM_CPU_ACQUIRE, struct drm_rockchip_gem_cpu_acquire)
 
-#define DRM_IOCTL_ROCKCHIP_GEM_CPU_RELEASE    DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GEM_CPU_RELEASE, struct drm_rockchip_gem_cpu_release)
+#define DRM_IOCTL_ROCKCHIP_GEM_CPU_RELEASE                                                                             \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GEM_CPU_RELEASE, struct drm_rockchip_gem_cpu_release)
 
-#define DRM_IOCTL_ROCKCHIP_GEM_GET_PHYS        DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GEM_GET_PHYS, struct drm_rockchip_gem_phys)
+#define DRM_IOCTL_ROCKCHIP_GEM_GET_PHYS                                                                                \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GEM_GET_PHYS, struct drm_rockchip_gem_phys)
 
-#define DRM_IOCTL_ROCKCHIP_GET_VCNT_EVENT    DRM_IOWR(DRM_COMMAND_BASE + \
-        DRM_ROCKCHIP_GET_VCNT_EVENT, union drm_wait_vblank)
+#define DRM_IOCTL_ROCKCHIP_GET_VCNT_EVENT                                                                              \
+    DRM_IOWR(DRM_COMMAND_BASE + DRM_ROCKCHIP_GET_VCNT_EVENT, union drm_wait_vblank)
 
 #endif /* _UAPI_ROCKCHIP_DRM_H */

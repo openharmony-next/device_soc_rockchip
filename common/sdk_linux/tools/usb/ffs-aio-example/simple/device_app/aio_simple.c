@@ -41,12 +41,12 @@
 #include <sys/eventfd.h>
 
 #include "libaio.h"
-#define IOCB_FLAG_RESFD         (1 << 0)
+#define IOCB_FLAG_RESFD (1 << 0)
 
 #include <linux/usb/functionfs.h>
 
-#define BUF_LEN                 8192
-#define AIO_PARAMS_MAX          2
+#define BUF_LEN 8192
+#define AIO_PARAMS_MAX 2
 
 /******************** Descriptors and Strings *******************************/
 
@@ -60,124 +60,139 @@ static const struct {
         struct usb_interface_descriptor intf;
         struct usb_endpoint_descriptor_no_audio bulk_sink;
         struct usb_endpoint_descriptor_no_audio bulk_source;
-    } __attribute__ ((__packed__)) fs_descs, hs_descs;
+    } __attribute__((__packed__)) fs_descs, hs_descs;
     struct {
         struct usb_interface_descriptor intf;
         struct usb_endpoint_descriptor_no_audio sink;
         struct usb_ss_ep_comp_descriptor sink_comp;
         struct usb_endpoint_descriptor_no_audio source;
         struct usb_ss_ep_comp_descriptor source_comp;
-    } __attribute__ ((__packed__)) ss_descs;
+    } __attribute__((__packed__)) ss_descs;
     struct usb_os_desc_header os_header;
     struct usb_ext_compat_desc os_desc;
 
-} __attribute__ ((__packed__)) descriptors = {
-    .header = {
-        .magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC_V2),
-        .flags = htole32(FUNCTIONFS_HAS_FS_DESC |
-                 FUNCTIONFS_HAS_HS_DESC |
-                 FUNCTIONFS_HAS_SS_DESC |
-                 FUNCTIONFS_HAS_MS_OS_DESC),
-        .length = htole32(sizeof(descriptors)),
-    },
-    .fs_count = htole32(3),
-    .fs_descs = {
-        .intf = {
-            .bLength = sizeof(descriptors.fs_descs.intf),
-            .bDescriptorType = USB_DT_INTERFACE,
-            .bNumEndpoints = 2,
-            .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
-            .iInterface = 1,
-        },
-        .bulk_sink = {
-            .bLength = sizeof(descriptors.fs_descs.bulk_sink),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 1 | USB_DIR_IN,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-        },
-        .bulk_source = {
-            .bLength = sizeof(descriptors.fs_descs.bulk_source),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 2 | USB_DIR_OUT,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-        },
-    },
-    .hs_count = htole32(3),
-    .hs_descs = {
-        .intf = {
-            .bLength = sizeof(descriptors.hs_descs.intf),
-            .bDescriptorType = USB_DT_INTERFACE,
-            .bNumEndpoints = 2,
-            .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
-            .iInterface = 1,
-        },
-        .bulk_sink = {
-            .bLength = sizeof(descriptors.hs_descs.bulk_sink),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 1 | USB_DIR_IN,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-            .wMaxPacketSize = htole16(512),
-        },
-        .bulk_source = {
-            .bLength = sizeof(descriptors.hs_descs.bulk_source),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 2 | USB_DIR_OUT,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-            .wMaxPacketSize = htole16(512),
-        },
-    },
-    .ss_count = htole32(5),
-    .ss_descs = {
-        .intf = {
-            .bLength = sizeof(descriptors.ss_descs.intf),
-            .bDescriptorType = USB_DT_INTERFACE,
-            .bInterfaceNumber = 0,
-            .bNumEndpoints = 2,
-            .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
-            .iInterface = 1,
-        },
-        .sink = {
-            .bLength = sizeof(descriptors.ss_descs.sink),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 1 | USB_DIR_IN,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-            .wMaxPacketSize = htole16(1024),
-        },
-        .sink_comp = {
-            .bLength = sizeof(descriptors.ss_descs.sink_comp),
-            .bDescriptorType = USB_DT_SS_ENDPOINT_COMP,
-            .bMaxBurst = 4,
-        },
-        .source = {
-            .bLength = sizeof(descriptors.ss_descs.source),
-            .bDescriptorType = USB_DT_ENDPOINT,
-            .bEndpointAddress = 2 | USB_DIR_OUT,
-            .bmAttributes = USB_ENDPOINT_XFER_BULK,
-            .wMaxPacketSize = htole16(1024),
-        },
-        .source_comp = {
-            .bLength = sizeof(descriptors.ss_descs.source_comp),
-            .bDescriptorType = USB_DT_SS_ENDPOINT_COMP,
-            .bMaxBurst = 4,
-        },
-    },
-    .os_count = htole32(1),
-    .os_header = {
-        .interface = htole32(1),
-        .dwLength = htole32(sizeof(descriptors.os_header) +
-                sizeof(descriptors.os_desc)),
-        .bcdVersion = htole32(1),
-        .wIndex = htole32(4),
-        .bCount = htole32(1),
-        .Reserved = htole32(0),
-    },
-    .os_desc = {
-        .bFirstInterfaceNumber = 0,
-        .Reserved1 = htole32(1),
-        .CompatibleID = {0},
-        .SubCompatibleID = {0},
-        .Reserved2 = {0},
-    },
+} __attribute__((__packed__)) descriptors =
+    {
+        .header =
+            {
+                .magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC_V2),
+                .flags = htole32(FUNCTIONFS_HAS_FS_DESC | FUNCTIONFS_HAS_HS_DESC | FUNCTIONFS_HAS_SS_DESC |
+                                 FUNCTIONFS_HAS_MS_OS_DESC),
+                .length = htole32(sizeof(descriptors)),
+            },
+        .fs_count = htole32(3),
+        .fs_descs =
+            {
+                .intf =
+                    {
+                        .bLength = sizeof(descriptors.fs_descs.intf),
+                        .bDescriptorType = USB_DT_INTERFACE,
+                        .bNumEndpoints = 2,
+                        .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+                        .iInterface = 1,
+                    },
+                .bulk_sink =
+                    {
+                        .bLength = sizeof(descriptors.fs_descs.bulk_sink),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 1 | USB_DIR_IN,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                    },
+                .bulk_source =
+                    {
+                        .bLength = sizeof(descriptors.fs_descs.bulk_source),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 2 | USB_DIR_OUT,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                    },
+            },
+        .hs_count = htole32(3),
+        .hs_descs =
+            {
+                .intf =
+                    {
+                        .bLength = sizeof(descriptors.hs_descs.intf),
+                        .bDescriptorType = USB_DT_INTERFACE,
+                        .bNumEndpoints = 2,
+                        .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+                        .iInterface = 1,
+                    },
+                .bulk_sink =
+                    {
+                        .bLength = sizeof(descriptors.hs_descs.bulk_sink),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 1 | USB_DIR_IN,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                        .wMaxPacketSize = htole16(512),
+                    },
+                .bulk_source =
+                    {
+                        .bLength = sizeof(descriptors.hs_descs.bulk_source),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 2 | USB_DIR_OUT,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                        .wMaxPacketSize = htole16(512),
+                    },
+            },
+        .ss_count = htole32(5),
+        .ss_descs =
+            {
+                .intf =
+                    {
+                        .bLength = sizeof(descriptors.ss_descs.intf),
+                        .bDescriptorType = USB_DT_INTERFACE,
+                        .bInterfaceNumber = 0,
+                        .bNumEndpoints = 2,
+                        .bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+                        .iInterface = 1,
+                    },
+                .sink =
+                    {
+                        .bLength = sizeof(descriptors.ss_descs.sink),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 1 | USB_DIR_IN,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                        .wMaxPacketSize = htole16(1024),
+                    },
+                .sink_comp =
+                    {
+                        .bLength = sizeof(descriptors.ss_descs.sink_comp),
+                        .bDescriptorType = USB_DT_SS_ENDPOINT_COMP,
+                        .bMaxBurst = 4,
+                    },
+                .source =
+                    {
+                        .bLength = sizeof(descriptors.ss_descs.source),
+                        .bDescriptorType = USB_DT_ENDPOINT,
+                        .bEndpointAddress = 2 | USB_DIR_OUT,
+                        .bmAttributes = USB_ENDPOINT_XFER_BULK,
+                        .wMaxPacketSize = htole16(1024),
+                    },
+                .source_comp =
+                    {
+                        .bLength = sizeof(descriptors.ss_descs.source_comp),
+                        .bDescriptorType = USB_DT_SS_ENDPOINT_COMP,
+                        .bMaxBurst = 4,
+                    },
+            },
+        .os_count = htole32(1),
+        .os_header =
+            {
+                .interface = htole32(1),
+                .dwLength = htole32(sizeof(descriptors.os_header) + sizeof(descriptors.os_desc)),
+                .bcdVersion = htole32(1),
+                .wIndex = htole32(4),
+                .bCount = htole32(1),
+                .Reserved = htole32(0),
+            },
+        .os_desc =
+            {
+                .bFirstInterfaceNumber = 0,
+                .Reserved1 = htole32(1),
+                .CompatibleID = {0},
+                .SubCompatibleID = {0},
+                .Reserved2 = {0},
+            },
 };
 
 #define STR_INTERFACE "AIO Test"
@@ -187,18 +202,20 @@ static const struct {
     struct {
         __le16 code;
         const char str1[sizeof(STR_INTERFACE)];
-    } __attribute__ ((__packed__)) lang0;
-} __attribute__ ((__packed__)) strings = {
-    .header = {
-        .magic = htole32(FUNCTIONFS_STRINGS_MAGIC),
-        .length = htole32(sizeof(strings)),
-        .str_count = htole32(1),
-        .lang_count = htole32(1),
-    },
-    .lang0 = {
-        htole16(0x0409), /* en-us */
-        STR_INTERFACE,
-    },
+    } __attribute__((__packed__)) lang0;
+} __attribute__((__packed__)) strings = {
+    .header =
+        {
+            .magic = htole32(FUNCTIONFS_STRINGS_MAGIC),
+            .length = htole32(sizeof(strings)),
+            .str_count = htole32(1),
+            .lang_count = htole32(1),
+        },
+    .lang0 =
+        {
+            htole16(0x0409), /* en-us */
+            STR_INTERFACE,
+        },
 };
 
 /******************** Endpoints handling *******************************/
@@ -206,27 +223,23 @@ static const struct {
 static void display_event(struct usb_functionfs_event *event)
 {
     static const char *const names[] = {
-        [FUNCTIONFS_BIND] = "BIND",
-        [FUNCTIONFS_UNBIND] = "UNBIND",
-        [FUNCTIONFS_ENABLE] = "ENABLE",
-        [FUNCTIONFS_DISABLE] = "DISABLE",
-        [FUNCTIONFS_SETUP] = "SETUP",
-        [FUNCTIONFS_SUSPEND] = "SUSPEND",
+        [FUNCTIONFS_BIND] = "BIND",       [FUNCTIONFS_UNBIND] = "UNBIND", [FUNCTIONFS_ENABLE] = "ENABLE",
+        [FUNCTIONFS_DISABLE] = "DISABLE", [FUNCTIONFS_SETUP] = "SETUP",   [FUNCTIONFS_SUSPEND] = "SUSPEND",
         [FUNCTIONFS_RESUME] = "RESUME",
     };
     switch (event->type) {
-    case FUNCTIONFS_BIND:
-    case FUNCTIONFS_UNBIND:
-    case FUNCTIONFS_ENABLE:
-    case FUNCTIONFS_DISABLE:
-    case FUNCTIONFS_SETUP:
-    case FUNCTIONFS_SUSPEND:
-    case FUNCTIONFS_RESUME:
-        printf("Event %s\n", names[event->type]);
-        break;
-    default:
-        printf("Event unknown\n");
-        break;
+        case FUNCTIONFS_BIND:
+        case FUNCTIONFS_UNBIND:
+        case FUNCTIONFS_ENABLE:
+        case FUNCTIONFS_DISABLE:
+        case FUNCTIONFS_SETUP:
+        case FUNCTIONFS_SUSPEND:
+        case FUNCTIONFS_RESUME:
+            printf("Event %s\n", names[event->type]);
+            break;
+        default:
+            printf("Event unknown\n");
+            break;
     }
 }
 
@@ -249,23 +262,24 @@ static void handle_ep0(int ep0, bool *ready)
         }
         display_event(&event);
         switch (event.type) {
-        case FUNCTIONFS_SETUP:
-            if (event.u.setup.bRequestType & USB_DIR_IN)
-                write(ep0, NULL, 0);
-            else
-                read(ep0, NULL, 0);
-            break;
+            case FUNCTIONFS_SETUP:
+                if (event.u.setup.bRequestType & USB_DIR_IN) {
+                    write(ep0, NULL, 0);
+                } else {
+                    read(ep0, NULL, 0);
+                }
+                break;
 
-        case FUNCTIONFS_ENABLE:
-            *ready = true;
-            break;
+            case FUNCTIONFS_ENABLE:
+                *ready = true;
+                break;
 
-        case FUNCTIONFS_DISABLE:
-            *ready = false;
-            break;
+            case FUNCTIONFS_DISABLE:
+                *ready = false;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }
@@ -315,11 +329,10 @@ int main(int argc, char *argv[])
         return EPERM;
     }
     for (i = 0; i < AIO_PARAMS_MAX; ++i) {
-        sprintf(ep_path, "%s/ep%d", argv[1], i+1);
+        sprintf(ep_path, "%s/ep%d", argv[1], i + 1);
         ep[i] = open(ep_path, O_RDWR);
         if (ep[i] < 0) {
-            printf("unable to open ep%d: %s\n", i+1,
-                   strerror(errno));
+            printf("unable to open ep%d: %s\n", i + 1, strerror(errno));
             return EPERM;
         }
     }
@@ -350,21 +363,23 @@ int main(int argc, char *argv[])
         FD_SET(ep0, &rfds);
         FD_SET(evfd, &rfds);
 
-        ret = select(((ep0 > evfd) ? ep0 : evfd)+1,
-                 &rfds, NULL, NULL, NULL);
+        ret = select(((ep0 > evfd) ? ep0 : evfd) + 1, &rfds, NULL, NULL, NULL);
         if (ret < 0) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
+            }
             perror("select");
             break;
         }
 
-        if (FD_ISSET(ep0, &rfds))
+        if (FD_ISSET(ep0, &rfds)) {
             handle_ep0(ep0, &ready);
+        }
 
         /* we are waiting for function ENABLE */
-        if (!ready)
+        if (!ready) {
             continue;
+        }
 
         /* if something was submitted we wait for event */
         if (FD_ISSET(evfd, &rfds)) {
@@ -401,8 +416,9 @@ int main(int argc, char *argv[])
             if (ret >= 0) { /* if ret > 0 request is queued */
                 req_in = 1;
                 printf("submit: in\n");
-            } else
+            } else {
                 perror("unable to submit request");
+            }
         }
         if (!req_out) { /* if OUT transfer not requested */
             /* prepare read request */
@@ -415,8 +431,9 @@ int main(int argc, char *argv[])
             if (ret >= 0) { /* if ret > 0 request is queued */
                 req_out = 1;
                 printf("submit: out\n");
-            } else
+            } else {
                 perror("unable to submit request");
+            }
         }
     }
 
@@ -429,8 +446,9 @@ int main(int argc, char *argv[])
     free(iocb_in);
     free(iocb_out);
 
-    for (i = 0; i < AIO_PARAMS_MAX; ++i)
+    for (i = 0; i < AIO_PARAMS_MAX; ++i) {
         close(ep[i]);
+    }
     close(ep0);
 
     return OK;

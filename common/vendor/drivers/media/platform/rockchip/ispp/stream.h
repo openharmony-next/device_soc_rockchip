@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_STREAM_H
-#define _RKISPP_STREAM_H
+#ifndef H_RKISPP_STREAM_H
+#define H_RKISPP_STREAM_H
 
 #include "common.h"
 #include "params.h"
@@ -17,15 +17,7 @@ struct rkispp_stream;
  * STREAM_S2: scale2 output
  * STREAM_VIR: virtual output for debug
  */
-enum rkispp_stream_id {
-    STREAM_II = 0,
-    STREAM_MB,
-    STREAM_VIR,
-    STREAM_S0,
-    STREAM_S1,
-    STREAM_S2,
-    STREAM_MAX
-};
+enum rkispp_stream_id { STREAM_II = 0, STREAM_MB, STREAM_VIR, STREAM_S0, STREAM_S1, STREAM_S2, STREAM_MAX };
 
 /*
  * fourcc: pixel format
@@ -66,8 +58,7 @@ struct streams_ops {
     void (*stop)(struct rkispp_stream *stream);
     int (*start)(struct rkispp_stream *stream);
     int (*is_stopped)(struct rkispp_stream *stream);
-    int (*limit_check)(struct rkispp_stream *stream,
-               struct v4l2_pix_format_mplane *try_fmt);
+    int (*limit_check)(struct rkispp_stream *stream, struct v4l2_pix_format_mplane *try_fmt);
 };
 
 /* stream input/out flag */
@@ -203,19 +194,15 @@ struct rkispp_monitor {
     bool is_en;
 };
 
-
 struct rkispp_stream_ops {
     int (*config_modules)(struct rkispp_device *dev);
     void (*destroy_buf)(struct rkispp_stream *stream);
-    void (*fec_work_event)(struct rkispp_device *dev, void *buf_rd,
-                   bool is_isr, bool is_quick);
+    void (*fec_work_event)(struct rkispp_device *dev, void *buf_rd, bool is_isr, bool is_quick);
     int (*start_isp)(struct rkispp_device *dev);
     void (*check_to_force_update)(struct rkispp_device *dev, u32 mis_val);
     void (*update_mi)(struct rkispp_stream *stream);
     enum hrtimer_restart (*rkispp_frame_done_early)(struct hrtimer *timer);
-    void (*rkispp_module_work_event)(struct rkispp_device *dev,
-                     void *buf_rd, void *buf_wr,
-                     u32 module, bool is_isr);
+    void (*rkispp_module_work_event)(struct rkispp_device *dev, void *buf_rd, void *buf_wr, u32 module, bool is_isr);
 };
 
 struct rkispp_vir_cpy {
@@ -247,10 +234,8 @@ struct rkispp_stream_vdev {
 };
 
 int rkispp_get_tnrbuf_fd(struct rkispp_device *dev, struct rkispp_buf_idxfd *idxfd);
-void rkispp_sendbuf_to_nr(struct rkispp_device *dev,
-              struct rkispp_tnr_inf *tnr_inf);
-void rkispp_set_trigger_mode(struct rkispp_device *dev,
-                 struct rkispp_trigger_mode *mode);
+void rkispp_sendbuf_to_nr(struct rkispp_device *dev, struct rkispp_tnr_inf *tnr_inf);
+void rkispp_set_trigger_mode(struct rkispp_device *dev, struct rkispp_trigger_mode *mode);
 void rkispp_isr(u32 mis_val, struct rkispp_device *dev);
 void rkispp_unregister_stream_vdevs(struct rkispp_device *dev);
 int rkispp_register_stream_vdevs(struct rkispp_device *dev);
@@ -264,16 +249,24 @@ void secure_config_mb(struct rkispp_stream *stream);
 void rkispp_stream_init_ops_v10(struct rkispp_stream_vdev *stream_vdev);
 void rkispp_params_init_ops_v10(struct rkispp_params_vdev *params_vdev);
 #else
-static inline void rkispp_stream_init_ops_v10(struct rkispp_stream_vdev *stream_vdev) {}
-static inline void rkispp_params_init_ops_v10(struct rkispp_params_vdev *params_vdev) {}
+static inline void rkispp_stream_init_ops_v10(struct rkispp_stream_vdev *stream_vdev)
+{
+}
+static inline void rkispp_params_init_ops_v10(struct rkispp_params_vdev *params_vdev)
+{
+}
 #endif
 
 #if IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISPP_VERSION_V20)
 void rkispp_stream_init_ops_v20(struct rkispp_stream_vdev *stream_vdev);
 void rkispp_params_init_ops_v20(struct rkispp_params_vdev *params_vdev);
 #else
-static inline void rkispp_stream_init_ops_v20(struct rkispp_stream_vdev *stream_vdev) {}
-static inline void rkispp_params_init_ops_v20(struct rkispp_params_vdev *params_vdev) {}
+static inline void rkispp_stream_init_ops_v20(struct rkispp_stream_vdev *stream_vdev)
+{
+}
+static inline void rkispp_params_init_ops_v20(struct rkispp_params_vdev *params_vdev)
+{
+}
 #endif
 int rkispp_frame_end(struct rkispp_stream *stream, u32 state);
 void rkispp_start_3a_run(struct rkispp_device *dev);

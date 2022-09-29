@@ -14,7 +14,7 @@
 #include <linux/slab.h>
 
 #include <linux/scatterlist.h>
-#include <linux/swap.h>        /* For nr_free_buffer_pages() */
+#include <linux/swap.h> /* For nr_free_buffer_pages() */
 #include <linux/list.h>
 
 #include <linux/debugfs.h>
@@ -28,7 +28,7 @@
 #include "core/mmc_ops.h"
 #include "rk_sdmmc_ops.h"
 
-#define BLKSZ        512
+#define BLKSZ 512
 
 enum emmc_area_type {
     MMC_DATA_AREA_MAIN,
@@ -45,9 +45,7 @@ static int rk_emmc_set_areatype(enum emmc_area_type areatype)
     part_config = this_card->ext_csd.part_config;
     part_config &= ~EXT_CSD_PART_CONFIG_ACC_MASK;
     part_config |= (u8)areatype;
-    err = mmc_switch(this_card, EXT_CSD_CMD_SET_NORMAL,
-             EXT_CSD_PART_CONFIG, part_config,
-             this_card->ext_csd.part_time);
+    err = mmc_switch(this_card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_PART_CONFIG, part_config, this_card->ext_csd.part_time);
 
     return err;
 }
@@ -55,28 +53,27 @@ static int rk_emmc_set_areatype(enum emmc_area_type areatype)
 /*
  * Fill in the mmc_request structure given a set of transfer parameters.
  */
-static void rk_emmc_prepare_mrq(struct mmc_request *mrq, struct scatterlist *sg, 
-        unsigned sg_len, unsigned dev_addr, unsigned blocks, unsigned blksz, int write)
+static void rk_emmc_prepare_mrq(struct mmc_request *mrq, struct scatterlist *sg, unsigned sg_len, unsigned dev_addr,
+                                unsigned blocks, unsigned blksz, int write)
 {
     BUG_ON(!mrq || !mrq->cmd || !mrq->data || !mrq->stop);
 
     if (blocks > 1) {
-        mrq->cmd->opcode = write ?
-            MMC_WRITE_MULTIPLE_BLOCK : MMC_READ_MULTIPLE_BLOCK;
+        mrq->cmd->opcode = write ? MMC_WRITE_MULTIPLE_BLOCK : MMC_READ_MULTIPLE_BLOCK;
     } else {
-        mrq->cmd->opcode = write ?
-            MMC_WRITE_BLOCK : MMC_READ_SINGLE_BLOCK;
+        mrq->cmd->opcode = write ? MMC_WRITE_BLOCK : MMC_READ_SINGLE_BLOCK;
     }
 
     mrq->cmd->arg = dev_addr;
-    if (!mmc_card_blockaddr(this_card))
+    if (!mmc_card_blockaddr(this_card)) {
         mrq->cmd->arg <<= 9;
+    }
 
     mrq->cmd->flags = MMC_RSP_R1 | MMC_CMD_ADTC;
 
-    if (blocks == 1)
+    if (blocks == 1) {
         mrq->stop = NULL;
-    else {
+    } else {
         mrq->stop->opcode = MMC_STOP_TRANSMISSION;
         mrq->stop->arg = 0;
         mrq->stop->flags = MMC_RSP_R1B | MMC_CMD_AC;
@@ -92,8 +89,7 @@ static void rk_emmc_prepare_mrq(struct mmc_request *mrq, struct scatterlist *sg,
 
 static int rk_emmc_busy(struct mmc_command *cmd)
 {
-    return !(cmd->resp[0] & R1_READY_FOR_DATA) ||
-        (R1_CURRENT_STATE(cmd->resp[0]) == 7);
+    return !(cmd->resp[0] & R1_READY_FOR_DATA) || (R1_CURRENT_STATE(cmd->resp[0]) == 7);
 }
 
 /*
@@ -113,15 +109,17 @@ static int rk_emmc_wait_busy(void)
         cmd.flags = MMC_RSP_R1 | MMC_CMD_AC;
 
         ret = mmc_wait_for_cmd(this_card->host, &cmd, 0);
-        if (ret)
+        if (ret) {
             break;
+        }
 
         if (!busy && rk_emmc_busy(&cmd)) {
             busy = 1;
-            if (this_card->host->caps & MMC_CAP_WAIT_WHILE_BUSY)
+            if (this_card->host->caps & MMC_CAP_WAIT_WHILE_BUSY) {
                 pr_info("%s: Warning: Host did not "
-                    "wait for busy state to end.\n",
-                    mmc_hostname(this_card->host));
+                        "wait for busy state to end.\n",
+                        mmc_hostname(this_card->host));
+            }
         }
     } while (rk_emmc_busy(&cmd));
 
@@ -143,8 +141,9 @@ int rk_emmc_transfer(u8 *buffer, unsigned addr, unsigned blksz, int write)
 
     struct scatterlist sg;
 
-    if(!this_card)
+    if (!this_card) {
         return -EIO;
+    }
 
     mrq.cmd = &cmd;
     mrq.data = &data;
@@ -156,8 +155,7 @@ int rk_emmc_transfer(u8 *buffer, unsigned addr, unsigned blksz, int write)
 
     mmc_claim_host(this_card->host);
 
-    areatype = (enum emmc_area_type)this_card->ext_csd.part_config
-            & EXT_CSD_PART_CONFIG_ACC_MASK;
+    areatype = (enum emmc_area_type)this_card->ext_csd.part_config & EXT_CSD_PART_CONFIG_ACC_MASK;
     if (areatype != MMC_DATA_AREA_MAIN) {
         ret = rk_emmc_set_areatype(MMC_DATA_AREA_MAIN);
         if (ret) {
@@ -168,12 +166,12 @@ int rk_emmc_transfer(u8 *buffer, unsigned addr, unsigned blksz, int write)
 
     mmc_wait_for_req(this_card->host, &mrq);
 
-    if (cmd.error){
+    if (cmd.error) {
         ret = cmd.error;
         goto exit;
     }
-    if (data.error){
-        ret =  data.error;
+    if (data.error) {
+        ret = data.error;
         goto exit;
     }
 
@@ -181,8 +179,9 @@ int rk_emmc_transfer(u8 *buffer, unsigned addr, unsigned blksz, int write)
 
     if (areatype != MMC_DATA_AREA_MAIN) {
         ret = rk_emmc_set_areatype(areatype);
-        if (ret)
+        if (ret) {
             pr_err("rk_emmc_set_areatype error!.\n");
+        }
     }
 
 exit:

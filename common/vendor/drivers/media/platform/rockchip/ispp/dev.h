@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_DEV_H
-#define _RKISPP_DEV_H
+#ifndef H_RKISPP_DEV_H
+#define H_RKISPP_DEV_H
 
 #include "ispp.h"
 #include "params.h"
@@ -11,20 +11,20 @@
 #include "hw.h"
 #include "procfs.h"
 
-#define DRIVER_NAME            "rkispp"
-#define II_VDEV_NAME DRIVER_NAME    "_input_image"
-#define MB_VDEV_NAME DRIVER_NAME    "_m_bypass"
-#define S0_VDEV_NAME DRIVER_NAME    "_scale0"
-#define S1_VDEV_NAME DRIVER_NAME    "_scale1"
-#define S2_VDEV_NAME DRIVER_NAME    "_scale2"
-#define VIR_VDEV_NAME DRIVER_NAME    "_iqtool"
+#define DRIVER_NAME "rkispp"
+#define II_VDEV_NAME DRIVER_NAME "_input_image"
+#define MB_VDEV_NAME DRIVER_NAME "_m_bypass"
+#define S0_VDEV_NAME DRIVER_NAME "_scale0"
+#define S1_VDEV_NAME DRIVER_NAME "_scale1"
+#define S2_VDEV_NAME DRIVER_NAME "_scale2"
+#define VIR_VDEV_NAME DRIVER_NAME "_iqtool"
 
-#define IO_MEM                      __iomem
-#define ISPP_VALUE_TW               2
-#define ISPP_DEBUG_LEVELT           3
-#define ISPP_VALUE_SI               16
-#define ISPP_STREAM_DIVIDE          1000
-#define ISPP_STREAM_WIDTH           1920
+#define IO_MEM __iomem
+#define ISPP_VALUE_TW 2
+#define ISPP_DEBUG_LEVELT 3
+#define ISPP_VALUE_SI 16
+#define ISPP_STREAM_DIVIDE 1000
+#define ISPP_STREAM_WIDTH 1920
 
 enum rkispp_input {
     INP_INVAL = 0,
@@ -48,7 +48,7 @@ struct rkispp_device {
     struct proc_dir_entry *procfs;
 
     struct work_struct irq_work;
-    enum rkispp_ver    ispp_ver;
+    enum rkispp_ver ispp_ver;
     /* mutex to serialize the calls from user */
     struct mutex apilock;
     /* mutex to serialize the calls of iq */

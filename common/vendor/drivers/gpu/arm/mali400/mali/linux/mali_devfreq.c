@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2011-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -47,8 +48,7 @@ static struct monitor_dev_profile mali_mdevp = {
 
 static struct devfreq_simple_ondemand_data ondemand_data;
 
-static int
-mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
+static int mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
 {
     struct mali_device *mdev = dev_get_drvdata(dev);
     struct dev_pm_opp *opp;
@@ -67,7 +67,8 @@ mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
     voltage = dev_pm_opp_get_voltage(opp);
     dev_pm_opp_put(opp);
 
-    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali_devfreq_target:set_freq = %lld flags = 0x%x\n", freq, flags));
+    MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
+                     ("mali_devfreq_target:set_freq = %lld flags = 0x%x\n", freq, flags));
     /*
      * Only update if there is a change of frequency
      */
@@ -75,8 +76,9 @@ mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
         *target_freq = freq;
         mali_pm_reset_dvfs_utilisation(mdev);
 #ifdef CONFIG_REGULATOR
-        if (mdev->current_voltage == voltage)
+        if (mdev->current_voltage == voltage) {
             return 0;
+        }
         err = regulator_set_voltage(mdev->regulator, voltage, INT_MAX);
         if (err) {
             dev_err(dev, "Failed to set voltage (%d)\n", err);
@@ -88,8 +90,7 @@ mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
     }
 
 #ifdef CONFIG_REGULATOR
-    if (mdev->regulator && mdev->current_voltage != voltage &&
-        old_freq < freq) {
+    if (mdev->regulator && mdev->current_voltage != voltage && old_freq < freq) {
         err = regulator_set_voltage(mdev->regulator, voltage, INT_MAX);
         if (err) {
             MALI_PRINT_ERROR(("Failed to increase voltage (%d)\n", err));
@@ -105,12 +106,12 @@ mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
     }
     *target_freq = freq;
     mdev->current_freq = freq;
-    if (mdev->devfreq)
+    if (mdev->devfreq) {
         mdev->devfreq->last_status.current_frequency = freq;
+    }
 
 #ifdef CONFIG_REGULATOR
-    if (mdev->regulator && mdev->current_voltage != voltage &&
-        old_freq > freq) {
+    if (mdev->regulator && mdev->current_voltage != voltage && old_freq > freq) {
         err = regulator_set_voltage(mdev->regulator, voltage, INT_MAX);
         if (err) {
             MALI_PRINT_ERROR(("Failed to decrease voltage (%d)\n", err));
@@ -126,8 +127,7 @@ mali_devfreq_target(struct device *dev, unsigned long *target_freq, u32 flags)
     return err;
 }
 
-static int
-mali_devfreq_cur_freq(struct device *dev, unsigned long *freq)
+static int mali_devfreq_cur_freq(struct device *dev, unsigned long *freq)
 {
     struct mali_device *mdev = dev_get_drvdata(dev);
 
@@ -137,15 +137,13 @@ mali_devfreq_cur_freq(struct device *dev, unsigned long *freq)
     return 0;
 }
 
-static int
-mali_devfreq_status(struct device *dev, struct devfreq_dev_status *stat)
+static int mali_devfreq_status(struct device *dev, struct devfreq_dev_status *stat)
 {
     struct mali_device *mdev = dev_get_drvdata(dev);
 
     stat->current_frequency = mdev->current_freq;
 
-    mali_pm_get_dvfs_utilisation(mdev,
-                     &stat->total_time, &stat->busy_time);
+    mali_pm_get_dvfs_utilisation(mdev, &stat->total_time, &stat->busy_time);
 
     stat->private_data = NULL;
 
@@ -168,8 +166,7 @@ int __weak term_opps(struct device *dev)
     return 0;
 }
 
-static int mali_devfreq_init_freq_table(struct mali_device *mdev,
-                    struct devfreq_dev_profile *dp)
+static int mali_devfreq_init_freq_table(struct mali_device *mdev, struct devfreq_dev_profile *dp)
 {
     int err, count;
     int i = 0;
@@ -177,8 +174,9 @@ static int mali_devfreq_init_freq_table(struct mali_device *mdev,
     struct dev_pm_opp *opp;
 
     err = setup_opps();
-    if (err)
+    if (err) {
         return err;
+    }
 
     count = dev_pm_opp_get_opp_count(mdev->dev);
     if (count < 0) {
@@ -187,24 +185,25 @@ static int mali_devfreq_init_freq_table(struct mali_device *mdev,
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali devfreq table count %d\n", count));
 
-    dp->freq_table = kmalloc_array(count, sizeof(dp->freq_table[0]),
-                       GFP_KERNEL);
-    if (!dp->freq_table)
+    dp->freq_table = kmalloc_array(count, sizeof(dp->freq_table[0]), GFP_KERNEL);
+    if (!dp->freq_table) {
         return -ENOMEM;
+    }
 
     for (i = 0; i < count; i++, freq++) {
         opp = dev_pm_opp_find_freq_ceil(mdev->dev, &freq);
-        if (IS_ERR(opp))
+        if (IS_ERR(opp)) {
             break;
+        }
         dev_pm_opp_put(opp);
 
         dp->freq_table[i] = freq;
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali devfreq table array[%d] = %d\n", i, freq));
     }
 
-    if (count != i)
-        MALI_PRINT_ERROR(("Unable to enumerate all OPPs (%d!=%d)\n",
-                  count, i));
+    if (count != i) {
+        MALI_PRINT_ERROR(("Unable to enumerate all OPPs (%d!=%d)\n", count, i));
+    }
 
     dp->max_state = i;
 
@@ -240,30 +239,29 @@ int mali_devfreq_init(struct mali_device *mdev)
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Init Mali devfreq\n"));
 
-    if (!mdev->clock)
+    if (!mdev->clock) {
         return -ENODEV;
+    }
 
     mdev->current_freq = clk_get_rate(mdev->clock);
 
     dp = &mdev->devfreq_profile;
 
     dp->initial_freq = mdev->current_freq;
-    dp->polling_ms = 100;
+    dp->polling_ms = 0x64;
     dp->target = mali_devfreq_target;
     dp->get_dev_status = mali_devfreq_status;
     dp->get_cur_freq = mali_devfreq_cur_freq;
     dp->exit = mali_devfreq_exit;
 
-    if (mali_devfreq_init_freq_table(mdev, dp))
+    if (mali_devfreq_init_freq_table(mdev, dp)) {
         return -EFAULT;
+    }
 
-    of_property_read_u32(np, "upthreshold",
-                 &ondemand_data.upthreshold);
-    of_property_read_u32(np, "downdifferential",
-                 &ondemand_data.downdifferential);
+    of_property_read_u32(np, "upthreshold", &ondemand_data.upthreshold);
+    of_property_read_u32(np, "downdifferential", &ondemand_data.downdifferential);
 
-    mdev->devfreq = devfreq_add_device(mdev->dev, dp,
-                       "simple_ondemand", &ondemand_data);
+    mdev->devfreq = devfreq_add_device(mdev->dev, dp, "simple_ondemand", &ondemand_data);
     if (IS_ERR(mdev->devfreq)) {
         mali_devfreq_term_freq_table(mdev);
         return PTR_ERR(mdev->devfreq);
@@ -277,20 +275,21 @@ int mali_devfreq_init(struct mali_device *mdev)
 
     opp_rate = mdev->current_freq;
     opp = devfreq_recommended_opp(mdev->dev, &opp_rate, 0);
-    if (!IS_ERR(opp))
+    if (!IS_ERR(opp)) {
         dev_pm_opp_put(opp);
+    }
     mdev->devfreq->last_status.current_frequency = opp_rate;
 
     mali_mdevp.data = mdev->devfreq;
-    mdev->mdev_info = rockchip_system_monitor_register(mdev->dev,
-                               &mali_mdevp);
+    mdev->mdev_info = rockchip_system_monitor_register(mdev->dev, &mali_mdevp);
     if (IS_ERR(mdev->mdev_info)) {
         dev_dbg(mdev->dev, "without system monitor\n");
         mdev->mdev_info = NULL;
     }
 #ifdef CONFIG_DEVFREQ_THERMAL
-    if (of_machine_is_compatible("rockchip,rk3036"))
+    if (of_machine_is_compatible("rockchip,rk3036")) {
         return 0;
+    }
 
     /* Initilization last_status it will be used when first power allocate called */
     mdev->devfreq->last_status.current_frequency = mdev->current_freq;
@@ -303,10 +302,7 @@ int mali_devfreq_init(struct mali_device *mdev)
     }
 
     if (callbacks) {
-        mdev->devfreq_cooling = of_devfreq_cooling_register_power(
-                        mdev->dev->of_node,
-                        mdev->devfreq,
-                        callbacks);
+        mdev->devfreq_cooling = of_devfreq_cooling_register_power(mdev->dev->of_node, mdev->devfreq, callbacks);
         if (IS_ERR_OR_NULL(mdev->devfreq_cooling)) {
             err = PTR_ERR(mdev->devfreq_cooling);
             MALI_PRINT_ERROR(("Failed to register cooling device (%d)\n", err));
@@ -325,10 +321,11 @@ cooling_failed:
 #endif /* CONFIG_DEVFREQ_THERMAL */
 opp_notifier_failed:
     err = devfreq_remove_device(mdev->devfreq);
-    if (err)
+    if (err) {
         MALI_PRINT_ERROR(("Failed to terminate devfreq (%d)\n", err));
-    else
+    } else {
         mdev->devfreq = NULL;
+    }
 
     return err;
 }
@@ -347,8 +344,9 @@ void mali_devfreq_term(struct mali_device *mdev)
     devfreq_unregister_opp_notifier(mdev->dev, mdev->devfreq);
 
     err = devfreq_remove_device(mdev->devfreq);
-    if (err)
+    if (err) {
         MALI_PRINT_ERROR(("Failed to terminate devfreq (%d)\n", err));
-    else
+    } else {
         mdev->devfreq = NULL;
+    }
 }

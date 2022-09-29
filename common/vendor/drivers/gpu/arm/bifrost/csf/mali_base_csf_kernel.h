@@ -147,8 +147,7 @@
  * a base_mem_alloc_flags value.
  */
 #define BASEP_MEM_GROUP_ID_SHIFT 22
-#define BASE_MEM_GROUP_ID_MASK \
-    ((base_mem_alloc_flags)0xF << BASEP_MEM_GROUP_ID_SHIFT)
+#define BASE_MEM_GROUP_ID_MASK ((base_mem_alloc_flags)0xF << BASEP_MEM_GROUP_ID_SHIFT)
 
 /* Must do CPU cache maintenance when imported memory is mapped/unmapped
  * on GPU. Currently applicable to dma-buf type only.
@@ -168,8 +167,7 @@
 /* A mask of all the flags which are only valid for allocations within kbase,
  * and may not be passed from user space.
  */
-#define BASEP_MEM_FLAGS_KERNEL_ONLY \
-    (BASEP_MEM_PERMANENT_KERNEL_MAPPING | BASEP_MEM_NO_USER_FREE)
+#define BASEP_MEM_FLAGS_KERNEL_ONLY (BASEP_MEM_PERMANENT_KERNEL_MAPPING | BASEP_MEM_NO_USER_FREE)
 
 /* A mask for all output bits, excluding IN/OUT bits.
  */
@@ -177,29 +175,25 @@
 
 /* A mask for all input bits, including IN/OUT bits.
  */
-#define BASE_MEM_FLAGS_INPUT_MASK \
-    (((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
+#define BASE_MEM_FLAGS_INPUT_MASK (((1 << BASE_MEM_FLAGS_NR_BITS) - 1) & ~BASE_MEM_FLAGS_OUTPUT_MASK)
 
 /* A mask of all currently reserved flags
  */
-#define BASE_MEM_FLAGS_RESERVED \
-    BASE_MEM_RESERVED_BIT_8 | BASE_MEM_RESERVED_BIT_20
+#define BASE_MEM_FLAGS_RESERVED (BASE_MEM_RESERVED_BIT_8 | BASE_MEM_RESERVED_BIT_20)
 
-#define BASEP_MEM_INVALID_HANDLE               (0ull  << 12)
-#define BASE_MEM_MMU_DUMP_HANDLE               (1ull  << 12)
-#define BASE_MEM_TRACE_BUFFER_HANDLE           (2ull  << 12)
-#define BASE_MEM_MAP_TRACKING_HANDLE           (3ull  << 12)
-#define BASEP_MEM_WRITE_ALLOC_PAGES_HANDLE     (4ull  << 12)
+#define BASEP_MEM_INVALID_HANDLE (0ull << 12)
+#define BASE_MEM_MMU_DUMP_HANDLE (1ull << 12)
+#define BASE_MEM_TRACE_BUFFER_HANDLE (2ull << 12)
+#define BASE_MEM_MAP_TRACKING_HANDLE (3ull << 12)
+#define BASEP_MEM_WRITE_ALLOC_PAGES_HANDLE (4ull << 12)
 /* reserved handles ..-47<<PAGE_SHIFT> for future special handles */
-#define BASEP_MEM_CSF_USER_REG_PAGE_HANDLE     (47ul  << 12)
-#define BASEP_MEM_CSF_USER_IO_PAGES_HANDLE     (48ul  << 12)
-#define BASE_MEM_COOKIE_BASE                   (64ul  << 12)
-#define BASE_MEM_FIRST_FREE_ADDRESS            ((BITS_PER_LONG << 12) + \
-                        BASE_MEM_COOKIE_BASE)
+#define BASEP_MEM_CSF_USER_REG_PAGE_HANDLE (47ul << 12)
+#define BASEP_MEM_CSF_USER_IO_PAGES_HANDLE (48ul << 12)
+#define BASE_MEM_COOKIE_BASE (64ul << 12)
+#define BASE_MEM_FIRST_FREE_ADDRESS ((BITS_PER_LONG << 12) + BASE_MEM_COOKIE_BASE)
 
-#define KBASE_CSF_NUM_USER_IO_PAGES_HANDLE \
-    ((BASE_MEM_COOKIE_BASE - BASEP_MEM_CSF_USER_IO_PAGES_HANDLE) >> \
-     LOCAL_PAGE_SHIFT)
+#define KBASE_CSF_NUM_USER_IO_PAGES_HANDLE                                                                             \
+    ((BASE_MEM_COOKIE_BASE - BASEP_MEM_CSF_USER_IO_PAGES_HANDLE) >> LOCAL_PAGE_SHIFT)
 
 /**
  * Valid set of just-in-time memory allocation flags
@@ -226,8 +220,7 @@ typedef u32 base_context_create_flags;
  *
  * One important side effect of this is that job submission is disabled.
  */
-#define BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED \
-    ((base_context_create_flags)1 << 1)
+#define BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED ((base_context_create_flags)1 << 1)
 
 /* Create CSF event thread.
  *
@@ -243,23 +236,19 @@ typedef u32 base_context_create_flags;
 
 /* Bitmask used to encode a memory group ID in base_context_create_flags
  */
-#define BASEP_CONTEXT_MMU_GROUP_ID_MASK \
-    ((base_context_create_flags)0xF << BASEP_CONTEXT_MMU_GROUP_ID_SHIFT)
+#define BASEP_CONTEXT_MMU_GROUP_ID_MASK ((base_context_create_flags)0xF << BASEP_CONTEXT_MMU_GROUP_ID_SHIFT)
 
 /* Bitpattern describing the base_context_create_flags that can be
  * passed to the kernel
  */
-#define BASEP_CONTEXT_CREATE_KERNEL_FLAGS \
-    (BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED | \
-     BASEP_CONTEXT_MMU_GROUP_ID_MASK)
+#define BASEP_CONTEXT_CREATE_KERNEL_FLAGS                                                                              \
+    (BASE_CONTEXT_SYSTEM_MONITOR_SUBMIT_DISABLED | BASEP_CONTEXT_MMU_GROUP_ID_MASK)
 
 /* Bitpattern describing the ::base_context_create_flags that can be
  * passed to base_context_init()
  */
-#define BASEP_CONTEXT_CREATE_ALLOWED_FLAGS \
-    (BASE_CONTEXT_CCTX_EMBEDDED | \
-     BASE_CONTEXT_CSF_EVENT_THREAD | \
-     BASEP_CONTEXT_CREATE_KERNEL_FLAGS)
+#define BASEP_CONTEXT_CREATE_ALLOWED_FLAGS                                                                             \
+    (BASE_CONTEXT_CCTX_EMBEDDED | BASE_CONTEXT_CSF_EVENT_THREAD | BASEP_CONTEXT_CREATE_KERNEL_FLAGS)
 
 /* Enable additional tracepoints for latency measurements (TL_ATOM_READY,
  * TL_ATOM_DONE, TL_ATOM_PRIO_CHANGE, TL_ATOM_EVENT_POST)
@@ -277,10 +266,9 @@ typedef u32 base_context_create_flags;
 /* Enable additional CSF Firmware side tracepoints */
 #define BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS (1 << 3)
 
-#define BASE_TLSTREAM_FLAGS_MASK (BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS | \
-        BASE_TLSTREAM_JOB_DUMPING_ENABLED | \
-        BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS | \
-        BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)
+#define BASE_TLSTREAM_FLAGS_MASK                                                                                       \
+    (BASE_TLSTREAM_ENABLE_LATENCY_TRACEPOINTS | BASE_TLSTREAM_JOB_DUMPING_ENABLED |                                    \
+     BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS | BASE_TLSTREAM_ENABLE_CSFFW_TRACEPOINTS)
 
 /* Number of pages mapped into the process address space for a bound GPU
  * command queue. A pair of input/output pages and a Hw doorbell page

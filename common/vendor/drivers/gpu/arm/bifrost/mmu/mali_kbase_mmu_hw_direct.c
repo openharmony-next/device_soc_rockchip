@@ -46,11 +46,11 @@
 static int lock_region(u64 pfn, u32 num_pages, u64 *lockaddr)
 {
     const u64 lockaddr_base = pfn << PAGE_SHIFT;
-    u64 lockaddr_size_log2, region_frame_number_start,
-        region_frame_number_end;
+    u64 lockaddr_size_log2, region_frame_number_start, region_frame_number_end;
 
-    if (num_pages == 0)
+    if (num_pages == 0) {
         return -EINVAL;
+    }
 
     /* The size is expressed as a logarithm and should take into account
      * the possibility that some pages might spill into the next region.
@@ -58,23 +58,24 @@ static int lock_region(u64 pfn, u32 num_pages, u64 *lockaddr)
     lockaddr_size_log2 = fls(num_pages) + PAGE_SHIFT - 1;
 
     /* Round up if the number of pages is not a power of 2. */
-    if (num_pages != ((u32)1 << (lockaddr_size_log2 - PAGE_SHIFT)))
+    if (num_pages != ((u32)1 << (lockaddr_size_log2 - PAGE_SHIFT))) {
         lockaddr_size_log2 += 1;
+    }
 
     /* Round up if some memory pages spill into the next region. */
     region_frame_number_start = pfn >> (lockaddr_size_log2 - PAGE_SHIFT);
-    region_frame_number_end =
-        (pfn + num_pages - 1) >> (lockaddr_size_log2 - PAGE_SHIFT);
+    region_frame_number_end = (pfn + num_pages - 1) >> (lockaddr_size_log2 - PAGE_SHIFT);
 
-    if (region_frame_number_start < region_frame_number_end)
+    if (region_frame_number_start < region_frame_number_end) {
         lockaddr_size_log2 += 1;
+    }
 
     /* Represent the size according to the HW specification. */
-    lockaddr_size_log2 = MAX(lockaddr_size_log2,
-        KBASE_LOCK_REGION_MIN_SIZE_LOG2);
+    lockaddr_size_log2 = MAX(lockaddr_size_log2, KBASE_LOCK_REGION_MIN_SIZE_LOG2);
 
-    if (lockaddr_size_log2 > KBASE_LOCK_REGION_MAX_SIZE_LOG2)
+    if (lockaddr_size_log2 > KBASE_LOCK_REGION_MAX_SIZE_LOG2) {
         return -EINVAL;
+    }
 
     /* The lowest bits are cleared and then set to size - 1 to represent
      * the size in a way that is compatible with the HW specification.
@@ -85,8 +86,7 @@ static int lock_region(u64 pfn, u32 num_pages, u64 *lockaddr)
     return 0;
 }
 
-static int wait_ready(struct kbase_device *kbdev,
-        unsigned int as_nr)
+static int wait_ready(struct kbase_device *kbdev, unsigned int as_nr)
 {
     unsigned int max_loops = KBASE_AS_INACTIVE_MAX_LOOPS;
     u32 val = kbase_reg_read(kbdev, MMU_AS_REG(as_nr, AS_STATUS));
@@ -94,17 +94,20 @@ static int wait_ready(struct kbase_device *kbdev,
     /* Wait for the MMU status to indicate there is no active command, in
      * case one is pending. Do not log remaining register accesses.
      */
-    while (--max_loops && (val & AS_STATUS_AS_ACTIVE))
+    while (--max_loops && (val & AS_STATUS_AS_ACTIVE)) {
         val = kbase_reg_read(kbdev, MMU_AS_REG(as_nr, AS_STATUS));
+    }
 
     if (max_loops == 0) {
-        dev_err(kbdev->dev, "AS_ACTIVE bit stuck, might be caused by slow/unstable GPU clock or possible faulty FPGA connector\n");
+        dev_err(kbdev->dev,
+                "AS_ACTIVE bit stuck, might be caused by slow/unstable GPU clock or possible faulty FPGA connector\n");
         return -1;
     }
 
     /* If waiting in loop was performed, log last read value. */
-    if (KBASE_AS_INACTIVE_MAX_LOOPS - 1 > max_loops)
+    if (KBASE_AS_INACTIVE_MAX_LOOPS - 1 > max_loops) {
         kbase_reg_read(kbdev, MMU_AS_REG(as_nr, AS_STATUS));
+    }
 
     return 0;
 }
@@ -115,8 +118,9 @@ static int write_cmd(struct kbase_device *kbdev, int as_nr, u32 cmd)
 
     /* write AS_COMMAND when MMU is ready to accept another command */
     status = wait_ready(kbdev, as_nr);
-    if (status == 0)
+    if (status == 0) {
         kbase_reg_write(kbdev, MMU_AS_REG(as_nr, AS_COMMAND), cmd);
+    }
 
     return status;
 }
@@ -149,36 +153,27 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev, struct kbase_as *as)
             transcfg = (transcfg | AS_TRANSCFG_PTW_SH_OS);
         }
 
-        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_LO),
-                transcfg);
-        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_HI),
-                (transcfg >> 32) & 0xFFFFFFFFUL);
+        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_LO), transcfg);
+        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_HI), (transcfg >> 0x20) & 0xFFFFFFFFUL);
     } else {
-        if (kbdev->system_coherency == COHERENCY_ACE)
+        if (kbdev->system_coherency == COHERENCY_ACE) {
             current_setup->transtab |= AS_TRANSTAB_LPAE_SHARE_OUTER;
+        }
     }
 
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_LO),
-            current_setup->transtab & 0xFFFFFFFFUL);
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_HI),
-            (current_setup->transtab >> 32) & 0xFFFFFFFFUL);
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_LO), current_setup->transtab & 0xFFFFFFFFUL);
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_HI), (current_setup->transtab >> 0x20) & 0xFFFFFFFFUL);
 
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_LO),
-            current_setup->memattr & 0xFFFFFFFFUL);
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_HI),
-            (current_setup->memattr >> 32) & 0xFFFFFFFFUL);
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_LO), current_setup->memattr & 0xFFFFFFFFUL);
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_HI), (current_setup->memattr >> 0x20) & 0xFFFFFFFFUL);
 
-    KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(kbdev, as,
-            current_setup->transtab,
-            current_setup->memattr,
-            transcfg);
+    KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(kbdev, as, current_setup->transtab, current_setup->memattr, transcfg);
 
     write_cmd(kbdev, as->number, AS_COMMAND_UPDATE);
 }
 
-int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
-        u64 vpfn, u32 nr, u32 op,
-        unsigned int handling_irq)
+int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as, u64 vpfn, u32 nr, u32 op,
+                              unsigned int handling_irq)
 {
     int ret;
 
@@ -194,12 +189,8 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
 
         if (!ret) {
             /* Lock the region that needs to be updated */
-            kbase_reg_write(kbdev,
-                MMU_AS_REG(as->number, AS_LOCKADDR_LO),
-                lock_addr & 0xFFFFFFFFUL);
-            kbase_reg_write(kbdev,
-                MMU_AS_REG(as->number, AS_LOCKADDR_HI),
-                (lock_addr >> 32) & 0xFFFFFFFFUL);
+            kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_LO), lock_addr & 0xFFFFFFFFUL);
+            kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_HI), (lock_addr >> 0x20) & 0xFFFFFFFFUL);
             write_cmd(kbdev, as->number, AS_COMMAND_LOCK);
 
             /* Run the MMU operation */
@@ -213,8 +204,7 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as,
     return ret;
 }
 
-void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        enum kbase_mmu_fault_type type)
+void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as, enum kbase_mmu_fault_type type)
 {
     unsigned long flags;
     u32 pf_bf_mask;
@@ -225,15 +215,16 @@ void kbase_mmu_hw_clear_fault(struct kbase_device *kbdev, struct kbase_as *as,
      * A reset is in-flight and we're flushing the IRQ + bottom half
      * so don't update anything as it could race with the reset code.
      */
-    if (kbdev->irq_reset_flush)
+    if (kbdev->irq_reset_flush) {
         goto unlock;
+    }
 
     /* Clear the page (and bus fault IRQ as well in case one occurred) */
     pf_bf_mask = MMU_PAGE_FAULT(as->number);
 #if !MALI_USE_CSF
-    if (type == KBASE_MMU_FAULT_TYPE_BUS ||
-            type == KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED)
+    if (type == KBASE_MMU_FAULT_TYPE_BUS || type == KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED) {
         pf_bf_mask |= MMU_BUS_ERROR(as->number);
+    }
 #endif
     kbase_reg_write(kbdev, MMU_REG(MMU_IRQ_CLEAR), pf_bf_mask);
 
@@ -241,8 +232,7 @@ unlock:
     spin_unlock_irqrestore(&kbdev->mmu_mask_change, flags);
 }
 
-void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as,
-        enum kbase_mmu_fault_type type)
+void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as, enum kbase_mmu_fault_type type)
 {
     unsigned long flags;
     u32 irq_mask;
@@ -256,16 +246,16 @@ void kbase_mmu_hw_enable_fault(struct kbase_device *kbdev, struct kbase_as *as,
      * A reset is in-flight and we're flushing the IRQ + bottom half
      * so don't update anything as it could race with the reset code.
      */
-    if (kbdev->irq_reset_flush)
+    if (kbdev->irq_reset_flush) {
         goto unlock;
+    }
 
-    irq_mask = kbase_reg_read(kbdev, MMU_REG(MMU_IRQ_MASK)) |
-            MMU_PAGE_FAULT(as->number);
+    irq_mask = kbase_reg_read(kbdev, MMU_REG(MMU_IRQ_MASK)) | MMU_PAGE_FAULT(as->number);
 
 #if !MALI_USE_CSF
-    if (type == KBASE_MMU_FAULT_TYPE_BUS ||
-            type == KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED)
+    if (type == KBASE_MMU_FAULT_TYPE_BUS || type == KBASE_MMU_FAULT_TYPE_BUS_UNEXPECTED) {
         irq_mask |= MMU_BUS_ERROR(as->number);
+    }
 #endif
     kbase_reg_write(kbdev, MMU_REG(MMU_IRQ_MASK), irq_mask);
 

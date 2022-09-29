@@ -10,98 +10,98 @@
 #include <linux/compiler.h>
 #include <linux/types.h>
 
-#define GUC_CLIENT_PRIORITY_KMD_HIGH    0
-#define GUC_CLIENT_PRIORITY_HIGH    1
-#define GUC_CLIENT_PRIORITY_KMD_NORMAL    2
-#define GUC_CLIENT_PRIORITY_NORMAL    3
-#define GUC_CLIENT_PRIORITY_NUM        4
+#define GUC_CLIENT_PRIORITY_KMD_HIGH 0
+#define GUC_CLIENT_PRIORITY_HIGH 1
+#define GUC_CLIENT_PRIORITY_KMD_NORMAL 2
+#define GUC_CLIENT_PRIORITY_NORMAL 3
+#define GUC_CLIENT_PRIORITY_NUM 4
 
-#define GUC_MAX_STAGE_DESCRIPTORS    1024
-#define    GUC_INVALID_STAGE_ID        GUC_MAX_STAGE_DESCRIPTORS
+#define GUC_MAX_STAGE_DESCRIPTORS 1024
+#define GUC_INVALID_STAGE_ID GUC_MAX_STAGE_DESCRIPTORS
 
-#define GUC_RENDER_ENGINE        0
-#define GUC_VIDEO_ENGINE        1
-#define GUC_BLITTER_ENGINE        2
-#define GUC_VIDEOENHANCE_ENGINE        3
-#define GUC_VIDEO_ENGINE2        4
-#define GUC_MAX_ENGINES_NUM        (GUC_VIDEO_ENGINE2 + 1)
+#define GUC_RENDER_ENGINE 0
+#define GUC_VIDEO_ENGINE 1
+#define GUC_BLITTER_ENGINE 2
+#define GUC_VIDEOENHANCE_ENGINE 3
+#define GUC_VIDEO_ENGINE2 4
+#define GUC_MAX_ENGINES_NUM (GUC_VIDEO_ENGINE2 + 1)
 
-#define GUC_MAX_ENGINE_CLASSES        5
-#define GUC_MAX_INSTANCES_PER_CLASS    16
+#define GUC_MAX_ENGINE_CLASSES 5
+#define GUC_MAX_INSTANCES_PER_CLASS 16
 
-#define GUC_DOORBELL_INVALID        256
+#define GUC_DOORBELL_INVALID 256
 
-#define GUC_WQ_SIZE            (PAGE_SIZE * 2)
+#define GUC_WQ_SIZE (PAGE_SIZE * 2)
 
 /* Work queue item header definitions */
-#define WQ_STATUS_ACTIVE        1
-#define WQ_STATUS_SUSPENDED        2
-#define WQ_STATUS_CMD_ERROR        3
-#define WQ_STATUS_ENGINE_ID_NOT_USED    4
-#define WQ_STATUS_SUSPENDED_FROM_RESET    5
-#define WQ_TYPE_SHIFT            0
-#define   WQ_TYPE_BATCH_BUF        (0x1 << WQ_TYPE_SHIFT)
-#define   WQ_TYPE_PSEUDO        (0x2 << WQ_TYPE_SHIFT)
-#define   WQ_TYPE_INORDER        (0x3 << WQ_TYPE_SHIFT)
-#define   WQ_TYPE_NOOP            (0x4 << WQ_TYPE_SHIFT)
-#define WQ_TARGET_SHIFT            10
-#define WQ_LEN_SHIFT            16
-#define WQ_NO_WCFLUSH_WAIT        (1 << 27)
-#define WQ_PRESENT_WORKLOAD        (1 << 28)
+#define WQ_STATUS_ACTIVE 1
+#define WQ_STATUS_SUSPENDED 2
+#define WQ_STATUS_CMD_ERROR 3
+#define WQ_STATUS_ENGINE_ID_NOT_USED 4
+#define WQ_STATUS_SUSPENDED_FROM_RESET 5
+#define WQ_TYPE_SHIFT 0
+#define WQ_TYPE_BATCH_BUF (0x1 << WQ_TYPE_SHIFT)
+#define WQ_TYPE_PSEUDO (0x2 << WQ_TYPE_SHIFT)
+#define WQ_TYPE_INORDER (0x3 << WQ_TYPE_SHIFT)
+#define WQ_TYPE_NOOP (0x4 << WQ_TYPE_SHIFT)
+#define WQ_TARGET_SHIFT 10
+#define WQ_LEN_SHIFT 16
+#define WQ_NO_WCFLUSH_WAIT (1 << 27)
+#define WQ_PRESENT_WORKLOAD (1 << 28)
 
-#define WQ_RING_TAIL_SHIFT        20
-#define WQ_RING_TAIL_MAX        0x7FF    /* 2^11 QWords */
-#define WQ_RING_TAIL_MASK        (WQ_RING_TAIL_MAX << WQ_RING_TAIL_SHIFT)
+#define WQ_RING_TAIL_SHIFT 20
+#define WQ_RING_TAIL_MAX 0x7FF /* 2^11 QWords */
+#define WQ_RING_TAIL_MASK (WQ_RING_TAIL_MAX << WQ_RING_TAIL_SHIFT)
 
-#define GUC_STAGE_DESC_ATTR_ACTIVE    BIT(0)
-#define GUC_STAGE_DESC_ATTR_PENDING_DB    BIT(1)
-#define GUC_STAGE_DESC_ATTR_KERNEL    BIT(2)
-#define GUC_STAGE_DESC_ATTR_PREEMPT    BIT(3)
-#define GUC_STAGE_DESC_ATTR_RESET    BIT(4)
-#define GUC_STAGE_DESC_ATTR_WQLOCKED    BIT(5)
-#define GUC_STAGE_DESC_ATTR_PCH        BIT(6)
-#define GUC_STAGE_DESC_ATTR_TERMINATED    BIT(7)
+#define GUC_STAGE_DESC_ATTR_ACTIVE BIT(0)
+#define GUC_STAGE_DESC_ATTR_PENDING_DB BIT(1)
+#define GUC_STAGE_DESC_ATTR_KERNEL BIT(2)
+#define GUC_STAGE_DESC_ATTR_PREEMPT BIT(3)
+#define GUC_STAGE_DESC_ATTR_RESET BIT(4)
+#define GUC_STAGE_DESC_ATTR_WQLOCKED BIT(5)
+#define GUC_STAGE_DESC_ATTR_PCH BIT(6)
+#define GUC_STAGE_DESC_ATTR_TERMINATED BIT(7)
 
 /* New GuC control data */
-#define GUC_CTL_CTXINFO            0
-#define   GUC_CTL_CTXNUM_IN16_SHIFT    0
-#define   GUC_CTL_BASE_ADDR_SHIFT    12
+#define GUC_CTL_CTXINFO 0
+#define GUC_CTL_CTXNUM_IN16_SHIFT 0
+#define GUC_CTL_BASE_ADDR_SHIFT 12
 
-#define GUC_CTL_LOG_PARAMS        1
-#define   GUC_LOG_VALID            (1 << 0)
-#define   GUC_LOG_NOTIFY_ON_HALF_FULL    (1 << 1)
-#define   GUC_LOG_ALLOC_IN_MEGABYTE    (1 << 3)
-#define   GUC_LOG_CRASH_SHIFT        4
-#define   GUC_LOG_CRASH_MASK        (0x3 << GUC_LOG_CRASH_SHIFT)
-#define   GUC_LOG_DPC_SHIFT        6
-#define   GUC_LOG_DPC_MASK            (0x7 << GUC_LOG_DPC_SHIFT)
-#define   GUC_LOG_ISR_SHIFT        9
-#define   GUC_LOG_ISR_MASK            (0x7 << GUC_LOG_ISR_SHIFT)
-#define   GUC_LOG_BUF_ADDR_SHIFT    12
+#define GUC_CTL_LOG_PARAMS 1
+#define GUC_LOG_VALID (1 << 0)
+#define GUC_LOG_NOTIFY_ON_HALF_FULL (1 << 1)
+#define GUC_LOG_ALLOC_IN_MEGABYTE (1 << 3)
+#define GUC_LOG_CRASH_SHIFT 4
+#define GUC_LOG_CRASH_MASK (0x3 << GUC_LOG_CRASH_SHIFT)
+#define GUC_LOG_DPC_SHIFT 6
+#define GUC_LOG_DPC_MASK (0x7 << GUC_LOG_DPC_SHIFT)
+#define GUC_LOG_ISR_SHIFT 9
+#define GUC_LOG_ISR_MASK (0x7 << GUC_LOG_ISR_SHIFT)
+#define GUC_LOG_BUF_ADDR_SHIFT 12
 
-#define GUC_CTL_WA            2
-#define GUC_CTL_FEATURE            3
-#define   GUC_CTL_DISABLE_SCHEDULER    (1 << 14)
+#define GUC_CTL_WA 2
+#define GUC_CTL_FEATURE 3
+#define GUC_CTL_DISABLE_SCHEDULER (1 << 14)
 
-#define GUC_CTL_DEBUG            4
-#define   GUC_LOG_VERBOSITY_SHIFT    0
-#define   GUC_LOG_VERBOSITY_LOW        (0 << GUC_LOG_VERBOSITY_SHIFT)
-#define   GUC_LOG_VERBOSITY_MED        (1 << GUC_LOG_VERBOSITY_SHIFT)
-#define   GUC_LOG_VERBOSITY_HIGH    (2 << GUC_LOG_VERBOSITY_SHIFT)
-#define   GUC_LOG_VERBOSITY_ULTRA    (3 << GUC_LOG_VERBOSITY_SHIFT)
+#define GUC_CTL_DEBUG 4
+#define GUC_LOG_VERBOSITY_SHIFT 0
+#define GUC_LOG_VERBOSITY_LOW (0 << GUC_LOG_VERBOSITY_SHIFT)
+#define GUC_LOG_VERBOSITY_MED (1 << GUC_LOG_VERBOSITY_SHIFT)
+#define GUC_LOG_VERBOSITY_HIGH (2 << GUC_LOG_VERBOSITY_SHIFT)
+#define GUC_LOG_VERBOSITY_ULTRA (3 << GUC_LOG_VERBOSITY_SHIFT)
 /* Verbosity range-check limits, without the shift */
-#define      GUC_LOG_VERBOSITY_MIN        0
-#define      GUC_LOG_VERBOSITY_MAX        3
-#define      GUC_LOG_VERBOSITY_MASK    0x0000000f
-#define      GUC_LOG_DESTINATION_MASK    (3 << 4)
-#define   GUC_LOG_DISABLED        (1 << 6)
-#define   GUC_PROFILE_ENABLED        (1 << 7)
+#define GUC_LOG_VERBOSITY_MIN 0
+#define GUC_LOG_VERBOSITY_MAX 3
+#define GUC_LOG_VERBOSITY_MASK 0x0000000f
+#define GUC_LOG_DESTINATION_MASK (3 << 4)
+#define GUC_LOG_DISABLED (1 << 6)
+#define GUC_PROFILE_ENABLED (1 << 7)
 
-#define GUC_CTL_ADS            5
-#define   GUC_ADS_ADDR_SHIFT        1
-#define   GUC_ADS_ADDR_MASK        (0xFFFFF << GUC_ADS_ADDR_SHIFT)
+#define GUC_CTL_ADS 5
+#define GUC_ADS_ADDR_SHIFT 1
+#define GUC_ADS_ADDR_MASK (0xFFFFF << GUC_ADS_ADDR_SHIFT)
 
-#define GUC_CTL_MAX_DWORDS        (SOFT_SCRATCH_COUNT - 2) /* [1..14] */
+#define GUC_CTL_MAX_DWORDS (SOFT_SCRATCH_COUNT - 2) /* [1..14] */
 
 /* Work item for submitting workloads into work queue of GuC. */
 struct guc_wq_item {
@@ -126,8 +126,8 @@ struct guc_process_desc {
 } __packed;
 
 /* engine id and context id is packed into guc_execlist_context.context_id*/
-#define GUC_ELC_CTXID_OFFSET        0
-#define GUC_ELC_ENGINE_OFFSET        29
+#define GUC_ELC_CTXID_OFFSET 0
+#define GUC_ELC_ENGINE_OFFSET 29
 
 /* The execlist context including software and HW information */
 struct guc_execlist_context {
@@ -244,22 +244,22 @@ struct guc_stage_desc {
  * Used by both guc-master and clients.
  */
 struct guc_ct_buffer_desc {
-    u32 addr;        /* gfx address */
-    u64 host_private;    /* host private data */
-    u32 size;        /* size in bytes */
-    u32 head;        /* offset updated by GuC*/
-    u32 tail;        /* offset updated by owner */
-    u32 is_in_error;    /* error indicator */
+    u32 addr;         /* gfx address */
+    u64 host_private; /* host private data */
+    u32 size;         /* size in bytes */
+    u32 head;         /* offset updated by GuC*/
+    u32 tail;         /* offset updated by owner */
+    u32 is_in_error;  /* error indicator */
     u32 fence;        /* fence updated by GuC */
-    u32 status;        /* status updated by GuC */
+    u32 status;       /* status updated by GuC */
     u32 owner;        /* id of the channel owner */
-    u32 owner_sub_id;    /* owner-defined field for extra tracking */
+    u32 owner_sub_id; /* owner-defined field for extra tracking */
     u32 reserved[5];
 } __packed;
 
 /* Type of command transport buffer */
-#define INTEL_GUC_CT_BUFFER_TYPE_SEND    0x0u
-#define INTEL_GUC_CT_BUFFER_TYPE_RECV    0x1u
+#define INTEL_GUC_CT_BUFFER_TYPE_SEND 0x0u
+#define INTEL_GUC_CT_BUFFER_TYPE_RECV 0x1u
 
 /*
  * Definition of the command transport message header (DW0)
@@ -273,30 +273,30 @@ struct guc_ct_buffer_desc {
  * bit[15..11]    reserved
  * bit[31..16]    action code
  */
-#define GUC_CT_MSG_LEN_SHIFT            0
-#define GUC_CT_MSG_LEN_MASK            0x1F
-#define GUC_CT_MSG_IS_RESPONSE            (1 << 8)
-#define GUC_CT_MSG_WRITE_FENCE_TO_DESC        (1 << 8)
-#define GUC_CT_MSG_WRITE_STATUS_TO_BUFF        (1 << 9)
-#define GUC_CT_MSG_SEND_STATUS            (1 << 10)
-#define GUC_CT_MSG_ACTION_SHIFT            16
-#define GUC_CT_MSG_ACTION_MASK            0xFFFF
+#define GUC_CT_MSG_LEN_SHIFT 0
+#define GUC_CT_MSG_LEN_MASK 0x1F
+#define GUC_CT_MSG_IS_RESPONSE (1 << 8)
+#define GUC_CT_MSG_WRITE_FENCE_TO_DESC (1 << 8)
+#define GUC_CT_MSG_WRITE_STATUS_TO_BUFF (1 << 9)
+#define GUC_CT_MSG_SEND_STATUS (1 << 10)
+#define GUC_CT_MSG_ACTION_SHIFT 16
+#define GUC_CT_MSG_ACTION_MASK 0xFFFF
 
-#define GUC_FORCEWAKE_RENDER    (1 << 0)
-#define GUC_FORCEWAKE_MEDIA    (1 << 1)
+#define GUC_FORCEWAKE_RENDER (1 << 0)
+#define GUC_FORCEWAKE_MEDIA (1 << 1)
 
-#define GUC_POWER_UNSPECIFIED    0
-#define GUC_POWER_D0        1
-#define GUC_POWER_D1        2
-#define GUC_POWER_D2        3
-#define GUC_POWER_D3        4
+#define GUC_POWER_UNSPECIFIED 0
+#define GUC_POWER_D0 1
+#define GUC_POWER_D1 2
+#define GUC_POWER_D2 3
+#define GUC_POWER_D3 4
 
 /* Scheduling policy settings */
 
 /* Reset engine upon preempt failure */
-#define POLICY_RESET_ENGINE        (1<<0)
+#define POLICY_RESET_ENGINE (1 << 0)
 /* Preempt to idle on quantum expiry */
-#define POLICY_PREEMPT_TO_IDLE        (1<<1)
+#define POLICY_PREEMPT_TO_IDLE (1 << 1)
 
 #define POLICY_MAX_NUM_WI 15
 #define POLICY_DEFAULT_DPC_PROMOTE_TIME_US 500000
@@ -337,15 +337,14 @@ struct guc_policies {
 
 /* GuC MMIO reg state struct */
 
-
-#define GUC_REGSET_MAX_REGISTERS    64
-#define GUC_S3_SAVE_SPACE_PAGES        10
+#define GUC_REGSET_MAX_REGISTERS 64
+#define GUC_S3_SAVE_SPACE_PAGES 10
 
 struct guc_mmio_reg {
     u32 offset;
     u32 value;
     u32 flags;
-#define GUC_REGSET_MASKED        (1 << 0)
+#define GUC_REGSET_MASKED (1 << 0)
 } __packed;
 
 struct guc_mmio_regset {
@@ -378,7 +377,7 @@ struct guc_ct_pool_entry {
     u32 reserved[7];
 } __packed;
 
-#define GUC_CT_POOL_SIZE    2
+#define GUC_CT_POOL_SIZE 2
 
 struct guc_clients_info {
     u32 clients_num;
@@ -403,12 +402,7 @@ struct guc_ads {
 
 /* GuC logging structures */
 
-enum guc_log_buffer_type {
-    GUC_ISR_LOG_BUFFER,
-    GUC_DPC_LOG_BUFFER,
-    GUC_CRASH_DUMP_LOG_BUFFER,
-    GUC_MAX_LOG_BUFFER
-};
+enum guc_log_buffer_type { GUC_ISR_LOG_BUFFER, GUC_DPC_LOG_BUFFER, GUC_CRASH_DUMP_LOG_BUFFER, GUC_MAX_LOG_BUFFER };
 
 /**
  * struct guc_log_buffer_state - GuC log buffer state
@@ -439,9 +433,9 @@ struct guc_log_buffer_state {
     u32 sampled_write_ptr;
     union {
         struct {
-            u32 flush_to_file:1;
-            u32 buffer_full_cnt:4;
-            u32 reserved:27;
+            u32 flush_to_file : 1;
+            u32 buffer_full_cnt : 4;
+            u32 reserved : 27;
         };
         u32 flags;
     };
@@ -515,30 +509,28 @@ struct guc_shared_ctx_data {
  *   field.
  */
 
-#define GUC_MAX_MMIO_MSG_LEN        8
+#define GUC_MAX_MMIO_MSG_LEN 8
 
-#define INTEL_GUC_MSG_TYPE_SHIFT    28
-#define INTEL_GUC_MSG_TYPE_MASK        (0xF << INTEL_GUC_MSG_TYPE_SHIFT)
-#define INTEL_GUC_MSG_DATA_SHIFT    16
-#define INTEL_GUC_MSG_DATA_MASK        (0xFFF << INTEL_GUC_MSG_DATA_SHIFT)
-#define INTEL_GUC_MSG_CODE_SHIFT    0
-#define INTEL_GUC_MSG_CODE_MASK        (0xFFFF << INTEL_GUC_MSG_CODE_SHIFT)
+#define INTEL_GUC_MSG_TYPE_SHIFT 28
+#define INTEL_GUC_MSG_TYPE_MASK (0xF << INTEL_GUC_MSG_TYPE_SHIFT)
+#define INTEL_GUC_MSG_DATA_SHIFT 16
+#define INTEL_GUC_MSG_DATA_MASK (0xFFF << INTEL_GUC_MSG_DATA_SHIFT)
+#define INTEL_GUC_MSG_CODE_SHIFT 0
+#define INTEL_GUC_MSG_CODE_MASK (0xFFFF << INTEL_GUC_MSG_CODE_SHIFT)
 
-#define __INTEL_GUC_MSG_GET(T, m) \
-    (((m) & INTEL_GUC_MSG_ ## T ## _MASK) >> INTEL_GUC_MSG_ ## T ## _SHIFT)
-#define INTEL_GUC_MSG_TO_TYPE(m)    __INTEL_GUC_MSG_GET(TYPE, m)
-#define INTEL_GUC_MSG_TO_DATA(m)    __INTEL_GUC_MSG_GET(DATA, m)
-#define INTEL_GUC_MSG_TO_CODE(m)    __INTEL_GUC_MSG_GET(CODE, m)
+#define __INTEL_GUC_MSG_GET(T, m) (((m)&INTEL_GUC_MSG_##T##_MASK) >> INTEL_GUC_MSG_##T##_SHIFT)
+#define INTEL_GUC_MSG_TO_TYPE(m) __INTEL_GUC_MSG_GET(TYPE, m)
+#define INTEL_GUC_MSG_TO_DATA(m) __INTEL_GUC_MSG_GET(DATA, m)
+#define INTEL_GUC_MSG_TO_CODE(m) __INTEL_GUC_MSG_GET(CODE, m)
 
 enum intel_guc_msg_type {
     INTEL_GUC_MSG_TYPE_REQUEST = 0x0,
     INTEL_GUC_MSG_TYPE_RESPONSE = 0xF,
 };
 
-#define __INTEL_GUC_MSG_TYPE_IS(T, m) \
-    (INTEL_GUC_MSG_TO_TYPE(m) == INTEL_GUC_MSG_TYPE_ ## T)
-#define INTEL_GUC_MSG_IS_REQUEST(m)    __INTEL_GUC_MSG_TYPE_IS(REQUEST, m)
-#define INTEL_GUC_MSG_IS_RESPONSE(m)    __INTEL_GUC_MSG_TYPE_IS(RESPONSE, m)
+#define __INTEL_GUC_MSG_TYPE_IS(T, m) (INTEL_GUC_MSG_TO_TYPE(m) == INTEL_GUC_MSG_TYPE_##T)
+#define INTEL_GUC_MSG_IS_REQUEST(m) __INTEL_GUC_MSG_TYPE_IS(REQUEST, m)
+#define INTEL_GUC_MSG_IS_RESPONSE(m) __INTEL_GUC_MSG_TYPE_IS(RESPONSE, m)
 
 enum intel_guc_action {
     INTEL_GUC_ACTION_DEFAULT = 0x0,
@@ -578,21 +570,20 @@ enum intel_guc_sleep_state_status {
 #define INTEL_GUC_SLEEP_STATE_INVALID_MASK 0x80000000
 };
 
-#define GUC_LOG_CONTROL_LOGGING_ENABLED    (1 << 0)
-#define GUC_LOG_CONTROL_VERBOSITY_SHIFT    4
-#define GUC_LOG_CONTROL_VERBOSITY_MASK    (0xF << GUC_LOG_CONTROL_VERBOSITY_SHIFT)
-#define GUC_LOG_CONTROL_DEFAULT_LOGGING    (1 << 8)
+#define GUC_LOG_CONTROL_LOGGING_ENABLED (1 << 0)
+#define GUC_LOG_CONTROL_VERBOSITY_SHIFT 4
+#define GUC_LOG_CONTROL_VERBOSITY_MASK (0xF << GUC_LOG_CONTROL_VERBOSITY_SHIFT)
+#define GUC_LOG_CONTROL_DEFAULT_LOGGING (1 << 8)
 
 enum intel_guc_response_status {
     INTEL_GUC_RESPONSE_STATUS_SUCCESS = 0x0,
     INTEL_GUC_RESPONSE_STATUS_GENERIC_FAIL = 0xF000,
 };
 
-#define INTEL_GUC_MSG_IS_RESPONSE_SUCCESS(m) \
-     (typecheck(u32, (m)) && \
-      ((m) & (INTEL_GUC_MSG_TYPE_MASK | INTEL_GUC_MSG_CODE_MASK)) == \
-      ((INTEL_GUC_MSG_TYPE_RESPONSE << INTEL_GUC_MSG_TYPE_SHIFT) | \
-       (INTEL_GUC_RESPONSE_STATUS_SUCCESS << INTEL_GUC_MSG_CODE_SHIFT)))
+#define INTEL_GUC_MSG_IS_RESPONSE_SUCCESS(m)                                                                           \
+    (typecheck(u32, (m)) && ((m) & (INTEL_GUC_MSG_TYPE_MASK | INTEL_GUC_MSG_CODE_MASK)) ==                             \
+                                ((INTEL_GUC_MSG_TYPE_RESPONSE << INTEL_GUC_MSG_TYPE_SHIFT) |                           \
+                                 (INTEL_GUC_RESPONSE_STATUS_SUCCESS << INTEL_GUC_MSG_CODE_SHIFT)))
 
 /* This action will be programmed in C1BC - SOFT_SCRATCH_15_REG */
 enum intel_guc_recv_message {

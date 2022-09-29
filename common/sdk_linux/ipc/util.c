@@ -98,10 +98,10 @@ static int __init ipc_init(void)
 device_initcall(ipc_init);
 
 static const struct rhashtable_params ipc_kht_params = {
-    .head_offset        = offsetof(struct kern_ipc_perm, khtnode),
-    .key_offset        = offsetof(struct kern_ipc_perm, key),
-    .key_len        = sizeof_field(struct kern_ipc_perm, key),
-    .automatic_shrinking    = true,
+    .head_offset = offsetof(struct kern_ipc_perm, khtnode),
+    .key_offset = offsetof(struct kern_ipc_perm, key),
+    .key_len = sizeof_field(struct kern_ipc_perm, key),
+    .automatic_shrinking = true,
 };
 
 /**
@@ -134,27 +134,27 @@ static const struct proc_ops sysvipc_proc_ops;
  * @ids: ipc id table to iterate.
  * @show: show routine.
  */
-void __init ipc_init_proc_interface(const char *path, const char *header,
-        int ids, int (*show)(struct seq_file *, void *))
+void __init ipc_init_proc_interface(const char *path, const char *header, int ids,
+                                    int (*show)(struct seq_file *, void *))
 {
     struct proc_dir_entry *pde;
     struct ipc_proc_iface *iface;
 
     iface = kmalloc(sizeof(*iface), GFP_KERNEL);
-    if (!iface)
+    if (!iface) {
         return;
-    iface->path    = path;
-    iface->header    = header;
-    iface->ids    = ids;
-    iface->show    = show;
+    }
+    iface->path = path;
+    iface->header = header;
+    iface->ids = ids;
+    iface->show = show;
 
-    pde = proc_create_data(path,
-                   S_IRUGO,        /* world readable */
-                   NULL,           /* parent dir */
-                   &sysvipc_proc_ops,
-                   iface);
-    if (!pde)
+    pde = proc_create_data(path, S_IRUGO, /* world readable */
+                           NULL,          /* parent dir */
+                           &sysvipc_proc_ops, iface);
+    if (!pde) {
         kfree(iface);
+    }
 }
 #endif
 
@@ -172,10 +172,10 @@ static struct kern_ipc_perm *ipc_findkey(struct ipc_ids *ids, key_t key)
 {
     struct kern_ipc_perm *ipcp;
 
-    ipcp = rhashtable_lookup_fast(&ids->key_ht, &key,
-                          ipc_kht_params);
-    if (!ipcp)
+    ipcp = rhashtable_lookup_fast(&ids->key_ht, &key, ipc_kht_params);
+    if (!ipcp) {
         return NULL;
+    }
 
     rcu_read_lock();
     ipc_lock_object(ipcp);
@@ -222,12 +222,11 @@ static inline int ipc_idr_alloc(struct ipc_ids *ids, struct kern_ipc_perm *new)
     if (next_id < 0) { /* !CHECKPOINT_RESTORE or next_id is unset */
         int max_idx;
 
-        max_idx = max(ids->in_use*3/2, ipc_min_cycle);
+        max_idx = max(ids->in_use * 0x3 / 0x2, ipc_min_cycle);
         max_idx = min(max_idx, ipc_mni);
 
         /* allocate the idx, with a NULL struct kern_ipc_perm */
-        idx = idr_alloc_cyclic(&ids->ipcs_idr, NULL, 0, max_idx,
-                    GFP_NOWAIT);
+        idx = idr_alloc_cyclic(&ids->ipcs_idr, NULL, 0, max_idx, GFP_NOWAIT);
 
         if (idx >= 0) {
             /*
@@ -237,8 +236,9 @@ static inline int ipc_idr_alloc(struct ipc_ids *ids, struct kern_ipc_perm *new)
              */
             if (idx <= ids->last_idx) {
                 ids->seq++;
-                if (ids->seq >= ipcid_seq_max())
+                if (ids->seq >= ipcid_seq_max()) {
                     ids->seq = 0;
+                }
             }
             ids->last_idx = idx;
 
@@ -251,11 +251,11 @@ static inline int ipc_idr_alloc(struct ipc_ids *ids, struct kern_ipc_perm *new)
         }
     } else {
         new->seq = ipcid_to_seqx(next_id);
-        idx = idr_alloc(&ids->ipcs_idr, new, ipcid_to_idx(next_id),
-                0, GFP_NOWAIT);
+        idx = idr_alloc(&ids->ipcs_idr, new, ipcid_to_idx(next_id), 0, GFP_NOWAIT);
     }
-    if (idx >= 0)
+    if (idx >= 0) {
         new->id = (new->seq << ipcmni_seq_shift()) + idx;
+    }
     return idx;
 }
 
@@ -283,11 +283,13 @@ int ipc_addid(struct ipc_ids *ids, struct kern_ipc_perm *new, int limit)
     /* 1) Initialize the refcount so that ipc_rcu_putref works */
     refcount_set(&new->refcount, 1);
 
-    if (limit > ipc_mni)
+    if (limit > ipc_mni) {
         limit = ipc_mni;
+    }
 
-    if (ids->in_use >= limit)
+    if (ids->in_use >= limit) {
         return -ENOSPC;
+    }
 
     idr_preload(GFP_KERNEL);
 
@@ -305,8 +307,7 @@ int ipc_addid(struct ipc_ids *ids, struct kern_ipc_perm *new, int limit)
     idr_preload_end();
 
     if (idx >= 0 && new->key != IPC_PRIVATE) {
-        err = rhashtable_insert_fast(&ids->key_ht, &new->khtnode,
-                         ipc_kht_params);
+        err = rhashtable_insert_fast(&ids->key_ht, &new->khtnode, ipc_kht_params);
         if (err < 0) {
             idr_remove(&ids->ipcs_idr, idx);
             idx = err;
@@ -320,8 +321,9 @@ int ipc_addid(struct ipc_ids *ids, struct kern_ipc_perm *new, int limit)
     }
 
     ids->in_use++;
-    if (idx > ids->max_idx)
+    if (idx > ids->max_idx) {
         ids->max_idx = idx;
+    }
     return idx;
 }
 
@@ -335,8 +337,8 @@ int ipc_addid(struct ipc_ids *ids, struct kern_ipc_perm *new, int limit)
  * This routine is called by sys_msgget, sys_semget() and sys_shmget()
  * when the key is IPC_PRIVATE.
  */
-static int ipcget_new(struct ipc_namespace *ns, struct ipc_ids *ids,
-        const struct ipc_ops *ops, struct ipc_params *params)
+static int ipcget_new(struct ipc_namespace *ns, struct ipc_ids *ids, const struct ipc_ops *ops,
+                      struct ipc_params *params)
 {
     int err;
 
@@ -361,19 +363,18 @@ static int ipcget_new(struct ipc_namespace *ns, struct ipc_ids *ids,
  *
  * It is called with ipc_ids.rwsem and ipcp->lock held.
  */
-static int ipc_check_perms(struct ipc_namespace *ns,
-               struct kern_ipc_perm *ipcp,
-               const struct ipc_ops *ops,
-               struct ipc_params *params)
+static int ipc_check_perms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, const struct ipc_ops *ops,
+                           struct ipc_params *params)
 {
     int err;
 
-    if (ipcperms(ns, ipcp, params->flg))
+    if (ipcperms(ns, ipcp, params->flg)) {
         err = -EACCES;
-    else {
+    } else {
         err = ops->associate(ipcp, params->flg);
-        if (!err)
+        if (!err) {
             err = ipcp->id;
+        }
     }
 
     return err;
@@ -393,8 +394,8 @@ static int ipc_check_perms(struct ipc_namespace *ns,
  *
  * On success, the ipc id is returned.
  */
-static int ipcget_public(struct ipc_namespace *ns, struct ipc_ids *ids,
-        const struct ipc_ops *ops, struct ipc_params *params)
+static int ipcget_public(struct ipc_namespace *ns, struct ipc_ids *ids, const struct ipc_ops *ops,
+                         struct ipc_params *params)
 {
     struct kern_ipc_perm *ipcp;
     int flg = params->flg;
@@ -408,25 +409,28 @@ static int ipcget_public(struct ipc_namespace *ns, struct ipc_ids *ids,
     ipcp = ipc_findkey(ids, params->key);
     if (ipcp == NULL) {
         /* key not used */
-        if (!(flg & IPC_CREAT))
+        if (!(flg & IPC_CREAT)) {
             err = -ENOENT;
-        else
+        } else {
             err = ops->getnew(ns, params);
+        }
     } else {
         /* ipc object has been locked by ipc_findkey() */
 
-        if (flg & IPC_CREAT && flg & IPC_EXCL)
+        if (flg & IPC_CREAT && flg & IPC_EXCL) {
             err = -EEXIST;
-        else {
+        } else {
             err = 0;
-            if (ops->more_checks)
+            if (ops->more_checks) {
                 err = ops->more_checks(ipcp, params);
-            if (!err)
+            }
+            if (!err) {
                 /*
                  * ipc_check_perms returns the IPC id on
                  * success
                  */
                 err = ipc_check_perms(ns, ipcp, ops, params);
+            }
         }
         ipc_unlock(ipcp);
     }
@@ -445,9 +449,9 @@ static int ipcget_public(struct ipc_namespace *ns, struct ipc_ids *ids,
  */
 static void ipc_kht_remove(struct ipc_ids *ids, struct kern_ipc_perm *ipcp)
 {
-    if (ipcp->key != IPC_PRIVATE)
-        rhashtable_remove_fast(&ids->key_ht, &ipcp->khtnode,
-                       ipc_kht_params);
+    if (ipcp->key != IPC_PRIVATE) {
+        rhashtable_remove_fast(&ids->key_ht, &ipcp->khtnode, ipc_kht_params);
+    }
 }
 
 /**
@@ -470,8 +474,9 @@ void ipc_rmid(struct ipc_ids *ids, struct kern_ipc_perm *ipcp)
     if (unlikely(idx == ids->max_idx)) {
         do {
             idx--;
-            if (idx == -1)
+            if (idx == -1) {
                 break;
+            }
         } while (!idr_find(&ids->ipcs_idr, idx));
         ids->max_idx = idx;
     }
@@ -496,11 +501,11 @@ bool ipc_rcu_getref(struct kern_ipc_perm *ptr)
     return refcount_inc_not_zero(&ptr->refcount);
 }
 
-void ipc_rcu_putref(struct kern_ipc_perm *ptr,
-            void (*func)(struct rcu_head *head))
+void ipc_rcu_putref(struct kern_ipc_perm *ptr, void (*func)(struct rcu_head *head))
 {
-    if (!refcount_dec_and_test(&ptr->refcount))
+    if (!refcount_dec_and_test(&ptr->refcount)) {
         return;
+    }
 
     call_rcu(&ptr->rcu, func);
 }
@@ -522,17 +527,17 @@ int ipcperms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, short flag)
     int requested_mode, granted_mode;
 
     audit_ipc_obj(ipcp);
-    requested_mode = (flag >> 6) | (flag >> 3) | flag;
+    requested_mode = (flag >> 0x6) | (flag >> 0x3) | flag;
     granted_mode = ipcp->mode;
-    if (uid_eq(euid, ipcp->cuid) ||
-        uid_eq(euid, ipcp->uid))
-        granted_mode >>= 6;
-    else if (in_group_p(ipcp->cgid) || in_group_p(ipcp->gid))
-        granted_mode >>= 3;
+    if (uid_eq(euid, ipcp->cuid) || uid_eq(euid, ipcp->uid)) {
+        granted_mode >>= 0x6;
+    } else if (in_group_p(ipcp->cgid) || in_group_p(ipcp->gid)) {
+        granted_mode >>= 0x3;
+    }
     /* is there some bit set in requested_mode but not in granted_mode? */
-    if ((requested_mode & ~granted_mode & 0007) &&
-        !ns_capable(ns->user_ns, CAP_IPC_OWNER))
+    if ((requested_mode & ~granted_mode & 0007) && !ns_capable(ns->user_ns, CAP_IPC_OWNER)) {
         return -1;
+    }
 
     return security_ipc_permission(ipcp, flag);
 }
@@ -552,13 +557,13 @@ int ipcperms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, short flag)
  */
 void kernel_to_ipc64_perm(struct kern_ipc_perm *in, struct ipc64_perm *out)
 {
-    out->key    = in->key;
-    out->uid    = from_kuid_munged(current_user_ns(), in->uid);
-    out->gid    = from_kgid_munged(current_user_ns(), in->gid);
-    out->cuid    = from_kuid_munged(current_user_ns(), in->cuid);
-    out->cgid    = from_kgid_munged(current_user_ns(), in->cgid);
-    out->mode    = in->mode;
-    out->seq    = in->seq;
+    out->key = in->key;
+    out->uid = from_kuid_munged(current_user_ns(), in->uid);
+    out->gid = from_kgid_munged(current_user_ns(), in->gid);
+    out->cuid = from_kuid_munged(current_user_ns(), in->cuid);
+    out->cgid = from_kgid_munged(current_user_ns(), in->cgid);
+    out->mode = in->mode;
+    out->seq = in->seq;
 }
 
 /**
@@ -571,13 +576,13 @@ void kernel_to_ipc64_perm(struct kern_ipc_perm *in, struct ipc64_perm *out)
  */
 void ipc64_perm_to_ipc_perm(struct ipc64_perm *in, struct ipc_perm *out)
 {
-    out->key    = in->key;
+    out->key = in->key;
     SET_UID(out->uid, in->uid);
     SET_GID(out->gid, in->gid);
     SET_UID(out->cuid, in->cuid);
     SET_GID(out->cgid, in->cgid);
-    out->mode    = in->mode;
-    out->seq    = in->seq;
+    out->mode = in->mode;
+    out->seq = in->seq;
 }
 
 /**
@@ -596,8 +601,9 @@ struct kern_ipc_perm *ipc_obtain_object_idr(struct ipc_ids *ids, int id)
     int idx = ipcid_to_idx(id);
 
     out = idr_find(&ids->ipcs_idr, idx);
-    if (!out)
+    if (!out) {
         return ERR_PTR(-EINVAL);
+    }
 
     return out;
 }
@@ -617,11 +623,13 @@ struct kern_ipc_perm *ipc_obtain_object_check(struct ipc_ids *ids, int id)
 {
     struct kern_ipc_perm *out = ipc_obtain_object_idr(ids, id);
 
-    if (IS_ERR(out))
+    if (IS_ERR(out)) {
         goto out;
+    }
 
-    if (ipc_checkid(out, id))
+    if (ipc_checkid(out, id)) {
         return ERR_PTR(-EINVAL);
+    }
 out:
     return out;
 }
@@ -636,13 +644,13 @@ out:
  *
  * Common routine called by sys_msgget(), sys_semget() and sys_shmget().
  */
-int ipcget(struct ipc_namespace *ns, struct ipc_ids *ids,
-            const struct ipc_ops *ops, struct ipc_params *params)
+int ipcget(struct ipc_namespace *ns, struct ipc_ids *ids, const struct ipc_ops *ops, struct ipc_params *params)
 {
-    if (params->key == IPC_PRIVATE)
+    if (params->key == IPC_PRIVATE) {
         return ipcget_new(ns, ids, ops, params);
-    else
+    } else {
         return ipcget_public(ns, ids, ops, params);
+    }
 }
 
 /**
@@ -654,13 +662,13 @@ int ipc_update_perm(struct ipc64_perm *in, struct kern_ipc_perm *out)
 {
     kuid_t uid = make_kuid(current_user_ns(), in->uid);
     kgid_t gid = make_kgid(current_user_ns(), in->gid);
-    if (!uid_valid(uid) || !gid_valid(gid))
+    if (!uid_valid(uid) || !gid_valid(gid)) {
         return -EINVAL;
+    }
 
     out->uid = uid;
     out->gid = gid;
-    out->mode = (out->mode & ~S_IRWXUGO)
-        | (in->mode & S_IRWXUGO);
+    out->mode = (out->mode & ~S_IRWXUGO) | (in->mode & S_IRWXUGO);
 
     return 0;
 }
@@ -685,9 +693,8 @@ int ipc_update_perm(struct ipc64_perm *in, struct kern_ipc_perm *out)
  *
  * Call holding the both the rwsem and the rcu read lock.
  */
-struct kern_ipc_perm *ipcctl_obtain_check(struct ipc_namespace *ns,
-                    struct ipc_ids *ids, int id, int cmd,
-                    struct ipc64_perm *perm, int extra_perm)
+struct kern_ipc_perm *ipcctl_obtain_check(struct ipc_namespace *ns, struct ipc_ids *ids, int id, int cmd,
+                                          struct ipc64_perm *perm, int extra_perm)
 {
     kuid_t euid;
     int err = -EPERM;
@@ -700,20 +707,19 @@ struct kern_ipc_perm *ipcctl_obtain_check(struct ipc_namespace *ns,
     }
 
     audit_ipc_obj(ipcp);
-    if (cmd == IPC_SET)
-        audit_ipc_set_perm(extra_perm, perm->uid,
-                   perm->gid, perm->mode);
+    if (cmd == IPC_SET) {
+        audit_ipc_set_perm(extra_perm, perm->uid, perm->gid, perm->mode);
+    }
 
     euid = current_euid();
-    if (uid_eq(euid, ipcp->cuid) || uid_eq(euid, ipcp->uid)  ||
-        ns_capable(ns->user_ns, CAP_SYS_ADMIN))
+    if (uid_eq(euid, ipcp->cuid) || uid_eq(euid, ipcp->uid) || ns_capable(ns->user_ns, CAP_SYS_ADMIN)) {
         return ipcp; /* successful lookup */
+    }
 err:
     return ERR_PTR(err);
 }
 
 #ifdef CONFIG_ARCH_WANT_IPC_PARSE_VERSION
-
 
 /**
  * ipc_parse_version - ipc call version
@@ -751,8 +757,7 @@ struct pid_namespace *ipc_seq_pid_ns(struct seq_file *s)
 /*
  * This routine locks the ipc structure found at least at position pos.
  */
-static struct kern_ipc_perm *sysvipc_find_ipc(struct ipc_ids *ids, loff_t pos,
-                          loff_t *new_pos)
+static struct kern_ipc_perm *sysvipc_find_ipc(struct ipc_ids *ids, loff_t pos, loff_t *new_pos)
 {
     struct kern_ipc_perm *ipc;
     int total, id;
@@ -760,13 +765,15 @@ static struct kern_ipc_perm *sysvipc_find_ipc(struct ipc_ids *ids, loff_t pos,
     total = 0;
     for (id = 0; id < pos && total < ids->in_use; id++) {
         ipc = idr_find(&ids->ipcs_idr, id);
-        if (ipc != NULL)
+        if (ipc != NULL) {
             total++;
+        }
     }
 
     ipc = NULL;
-    if (total >= ids->in_use)
+    if (total >= ids->in_use) {
         goto out;
+    }
 
     for (; pos < ipc_mni; pos++) {
         ipc = idr_find(&ids->ipcs_idr, pos);
@@ -788,8 +795,9 @@ static void *sysvipc_proc_next(struct seq_file *s, void *it, loff_t *pos)
     struct kern_ipc_perm *ipc = it;
 
     /* If we had an ipc id locked before, unlock it */
-    if (ipc && ipc != SEQ_START_TOKEN)
+    if (ipc && ipc != SEQ_START_TOKEN) {
         ipc_unlock(ipc);
+    }
 
     return sysvipc_find_ipc(&iter->ns->ids[iface->ids], *pos, pos);
 }
@@ -813,12 +821,14 @@ static void *sysvipc_proc_start(struct seq_file *s, loff_t *pos)
     down_read(&ids->rwsem);
 
     /* pos < 0 is invalid */
-    if (*pos < 0)
+    if (*pos < 0) {
         return NULL;
+    }
 
     /* pos == 0 means header */
-    if (*pos == 0)
+    if (*pos == 0) {
         return SEQ_START_TOKEN;
+    }
 
     /* Find the (pos-1)th ipc */
     return sysvipc_find_ipc(ids, *pos - 1, pos);
@@ -832,8 +842,9 @@ static void sysvipc_proc_stop(struct seq_file *s, void *it)
     struct ipc_ids *ids;
 
     /* If we had a locked structure, release it */
-    if (ipc && ipc != SEQ_START_TOKEN)
+    if (ipc && ipc != SEQ_START_TOKEN) {
         ipc_unlock(ipc);
+    }
 
     ids = &iter->ns->ids[iface->ids];
     /* Release the lock we took in start() */
@@ -855,9 +866,9 @@ static int sysvipc_proc_show(struct seq_file *s, void *it)
 
 static const struct seq_operations sysvipc_proc_seqops = {
     .start = sysvipc_proc_start,
-    .stop  = sysvipc_proc_stop,
-    .next  = sysvipc_proc_next,
-    .show  = sysvipc_proc_show,
+    .stop = sysvipc_proc_stop,
+    .next = sysvipc_proc_next,
+    .show = sysvipc_proc_show,
 };
 
 static int sysvipc_proc_open(struct inode *inode, struct file *file)
@@ -865,11 +876,12 @@ static int sysvipc_proc_open(struct inode *inode, struct file *file)
     struct ipc_proc_iter *iter;
 
     iter = __seq_open_private(file, &sysvipc_proc_seqops, sizeof(*iter));
-    if (!iter)
+    if (!iter) {
         return -ENOMEM;
+    }
 
     iter->iface = PDE_DATA(inode);
-    iter->ns    = get_ipc_ns(current->nsproxy->ipc_ns);
+    iter->ns = get_ipc_ns(current->nsproxy->ipc_ns);
     iter->pid_ns = get_pid_ns(task_active_pid_ns(current));
 
     return 0;
@@ -885,10 +897,10 @@ static int sysvipc_proc_release(struct inode *inode, struct file *file)
 }
 
 static const struct proc_ops sysvipc_proc_ops = {
-    .proc_flags    = PROC_ENTRY_PERMANENT,
-    .proc_open    = sysvipc_proc_open,
-    .proc_read    = seq_read,
-    .proc_lseek    = seq_lseek,
-    .proc_release    = sysvipc_proc_release,
+    .proc_flags = PROC_ENTRY_PERMANENT,
+    .proc_open = sysvipc_proc_open,
+    .proc_read = seq_read,
+    .proc_lseek = seq_lseek,
+    .proc_release = sysvipc_proc_release,
 };
 #endif /* CONFIG_PROC_FS */

@@ -110,10 +110,11 @@ static void noinstr __cpu_do_idle_irqprio(void)
  */
 void noinstr cpu_do_idle(void)
 {
-    if (system_uses_irq_prio_masking())
+    if (system_uses_irq_prio_masking()) {
         __cpu_do_idle_irqprio();
-    else
+    } else {
         __cpu_do_idle();
+    }
 }
 
 /*
@@ -132,7 +133,7 @@ void noinstr arch_cpu_idle(void)
 #ifdef CONFIG_HOTPLUG_CPU
 void arch_cpu_idle_dead(void)
 {
-       cpu_die();
+    cpu_die();
 }
 #endif
 
@@ -159,7 +160,9 @@ void machine_halt(void)
 {
     local_irq_disable();
     smp_send_stop();
-    while (1);
+    while (1) {
+        ;
+    }
 }
 
 /*
@@ -172,8 +175,9 @@ void machine_power_off(void)
 {
     local_irq_disable();
     smp_send_stop();
-    if (pm_power_off)
+    if (pm_power_off) {
         pm_power_off();
+    }
 }
 
 /*
@@ -197,29 +201,28 @@ void machine_restart(char *cmd)
      * UpdateCapsule() depends on the system being reset via
      * ResetSystem().
      */
-    if (efi_enabled(EFI_RUNTIME_SERVICES))
+    if (efi_enabled(EFI_RUNTIME_SERVICES)) {
         efi_reboot(reboot_mode, NULL);
+    }
 
     /* Now call the architecture specific reboot code. */
-    if (arm_pm_restart)
+    if (arm_pm_restart) {
         arm_pm_restart(reboot_mode, cmd);
-    else
+    } else {
         do_kernel_restart(cmd);
+    }
 
     /*
      * Whoops - the architecture was unable to reboot.
      */
     printk("Reboot failed -- System halted\n");
-    while (1);
+    while (1) {
+        ;
+    }
 }
 
-#define bstr(suffix, str) [PSR_BTYPE_ ## suffix >> PSR_BTYPE_SHIFT] = str
-static const char *const btypes[] = {
-    bstr(NONE, "--"),
-    bstr(  JC, "jc"),
-    bstr(   C, "-c"),
-    bstr(  J , "j-")
-};
+#define bstr(suffix, str) [PSR_BTYPE_##suffix >> PSR_BTYPE_SHIFT] = (str)
+static const char *const btypes[] = {bstr(NONE, "--"), bstr(JC, "jc"), bstr(C, "-c"), bstr(J, "j-")};
 #undef bstr
 
 static void print_pstate(struct pt_regs *regs)
@@ -227,36 +230,20 @@ static void print_pstate(struct pt_regs *regs)
     u64 pstate = regs->pstate;
 
     if (compat_user_mode(regs)) {
-        printk("pstate: %08llx (%c%c%c%c %c %s %s %c%c%c)\n",
-            pstate,
-            pstate & PSR_AA32_N_BIT ? 'N' : 'n',
-            pstate & PSR_AA32_Z_BIT ? 'Z' : 'z',
-            pstate & PSR_AA32_C_BIT ? 'C' : 'c',
-            pstate & PSR_AA32_V_BIT ? 'V' : 'v',
-            pstate & PSR_AA32_Q_BIT ? 'Q' : 'q',
-            pstate & PSR_AA32_T_BIT ? "T32" : "A32",
-            pstate & PSR_AA32_E_BIT ? "BE" : "LE",
-            pstate & PSR_AA32_A_BIT ? 'A' : 'a',
-            pstate & PSR_AA32_I_BIT ? 'I' : 'i',
-            pstate & PSR_AA32_F_BIT ? 'F' : 'f');
+        printk("pstate: %08llx (%c%c%c%c %c %s %s %c%c%c)\n", pstate, pstate & PSR_AA32_N_BIT ? 'N' : 'n',
+               pstate & PSR_AA32_Z_BIT ? 'Z' : 'z', pstate & PSR_AA32_C_BIT ? 'C' : 'c',
+               pstate & PSR_AA32_V_BIT ? 'V' : 'v', pstate & PSR_AA32_Q_BIT ? 'Q' : 'q',
+               pstate & PSR_AA32_T_BIT ? "T32" : "A32", pstate & PSR_AA32_E_BIT ? "BE" : "LE",
+               pstate & PSR_AA32_A_BIT ? 'A' : 'a', pstate & PSR_AA32_I_BIT ? 'I' : 'i',
+               pstate & PSR_AA32_F_BIT ? 'F' : 'f');
     } else {
-        const char *btype_str = btypes[(pstate & PSR_BTYPE_MASK) >>
-                           PSR_BTYPE_SHIFT];
+        const char *btype_str = btypes[(pstate & PSR_BTYPE_MASK) >> PSR_BTYPE_SHIFT];
 
-        printk("pstate: %08llx (%c%c%c%c %c%c%c%c %cPAN %cUAO %cTCO BTYPE=%s)\n",
-            pstate,
-            pstate & PSR_N_BIT ? 'N' : 'n',
-            pstate & PSR_Z_BIT ? 'Z' : 'z',
-            pstate & PSR_C_BIT ? 'C' : 'c',
-            pstate & PSR_V_BIT ? 'V' : 'v',
-            pstate & PSR_D_BIT ? 'D' : 'd',
-            pstate & PSR_A_BIT ? 'A' : 'a',
-            pstate & PSR_I_BIT ? 'I' : 'i',
-            pstate & PSR_F_BIT ? 'F' : 'f',
-            pstate & PSR_PAN_BIT ? '+' : '-',
-            pstate & PSR_UAO_BIT ? '+' : '-',
-            pstate & PSR_TCO_BIT ? '+' : '-',
-            btype_str);
+        printk("pstate: %08llx (%c%c%c%c %c%c%c%c %cPAN %cUAO %cTCO BTYPE=%s)\n", pstate,
+               pstate & PSR_N_BIT ? 'N' : 'n', pstate & PSR_Z_BIT ? 'Z' : 'z', pstate & PSR_C_BIT ? 'C' : 'c',
+               pstate & PSR_V_BIT ? 'V' : 'v', pstate & PSR_D_BIT ? 'D' : 'd', pstate & PSR_A_BIT ? 'A' : 'a',
+               pstate & PSR_I_BIT ? 'I' : 'i', pstate & PSR_F_BIT ? 'F' : 'f', pstate & PSR_PAN_BIT ? '+' : '-',
+               pstate & PSR_UAO_BIT ? '+' : '-', pstate & PSR_TCO_BIT ? '+' : '-', btype_str);
     }
 }
 
@@ -268,11 +255,11 @@ void __show_regs(struct pt_regs *regs)
     if (compat_user_mode(regs)) {
         lr = regs->compat_lr;
         sp = regs->compat_sp;
-        top_reg = 12;
+        top_reg = 0x0c;
     } else {
-        lr = regs->regs[30];
+        lr = regs->regs[0x1e];
         sp = regs->sp;
-        top_reg = 29;
+        top_reg = 0x1d;
     }
 
     show_regs_print_info(KERN_DEFAULT);
@@ -288,8 +275,9 @@ void __show_regs(struct pt_regs *regs)
 
     printk("sp : %016llx\n", sp);
 
-    if (system_uses_irq_prio_masking())
+    if (system_uses_irq_prio_masking()) {
         printk("pmr_save: %08llx\n", regs->pmr_save);
+    }
 
     i = top_reg;
 
@@ -297,7 +285,7 @@ void __show_regs(struct pt_regs *regs)
         printk("x%-2d: %016llx ", i, regs->regs[i]);
         i--;
 
-        if (i % 2 == 0) {
+        if (i % 0x02 == 0) {
             pr_cont("x%-2d: %016llx ", i, regs->regs[i]);
             i--;
         }
@@ -306,7 +294,7 @@ void __show_regs(struct pt_regs *regs)
     }
 }
 
-void show_regs(struct pt_regs * regs)
+void show_regs(struct pt_regs *regs)
 {
     __show_regs(regs);
     dump_backtrace(regs, NULL, KERN_DEFAULT);
@@ -331,8 +319,9 @@ static void tls_thread_flush(void)
 
 static void flush_tagged_addr_state(void)
 {
-    if (IS_ENABLED(CONFIG_ARM64_TAGGED_ADDR_ABI))
+    if (IS_ENABLED(CONFIG_ARM64_TAGGED_ADDR_ABI)) {
         clear_thread_flag(TIF_TAGGED_ADDR);
+    }
 }
 
 void flush_thread(void)
@@ -355,8 +344,9 @@ void arch_release_task_struct(struct task_struct *tsk)
 
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
-    if (current->mm)
+    if (current->mm) {
         fpsimd_preserve_current_state();
+    }
     *dst = *src;
 
     /* We rely on the above assignment to initialize dst's thread_flags: */
@@ -382,8 +372,8 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 
 asmlinkage void ret_from_fork(void) asm("ret_from_fork");
 
-int copy_thread(unsigned long clone_flags, unsigned long stack_start,
-        unsigned long stk_sz, struct task_struct *p, unsigned long tls)
+int copy_thread(unsigned long clone_flags, unsigned long stack_start, unsigned long stk_sz, struct task_struct *p,
+                unsigned long tls)
 {
     struct pt_regs *childregs = task_pt_regs(p);
 
@@ -411,29 +401,32 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
         *task_user_tls(p) = read_sysreg(tpidr_el0);
 
         if (stack_start) {
-            if (is_compat_thread(task_thread_info(p)))
+            if (is_compat_thread(task_thread_info(p))) {
                 childregs->compat_sp = stack_start;
-            else
+            } else {
                 childregs->sp = stack_start;
+            }
         }
 
         /*
          * If a TLS pointer was passed to clone, use it for the new
          * thread.
          */
-        if (clone_flags & CLONE_SETTLS)
+        if (clone_flags & CLONE_SETTLS) {
             p->thread.uw.tp_value = tls;
+        }
     } else {
         memset(childregs, 0, sizeof(struct pt_regs));
         childregs->pstate = PSR_MODE_EL1h;
-        if (IS_ENABLED(CONFIG_ARM64_UAO) &&
-            cpus_have_const_cap(ARM64_HAS_UAO))
+        if (IS_ENABLED(CONFIG_ARM64_UAO) && cpus_have_const_cap(ARM64_HAS_UAO)) {
             childregs->pstate |= PSR_UAO_BIT;
+        }
 
         spectre_v4_enable_task_mitigation(p);
 
-        if (system_uses_irq_prio_masking())
+        if (system_uses_irq_prio_masking()) {
             childregs->pmr_save = GIC_PRIO_IRQON;
+        }
 
         p->thread.cpu_context.x19 = stack_start;
         p->thread.cpu_context.x20 = stk_sz;
@@ -455,10 +448,11 @@ static void tls_thread_switch(struct task_struct *next)
 {
     tls_preserve_current_state();
 
-    if (is_compat_thread(task_thread_info(next)))
+    if (is_compat_thread(task_thread_info(next))) {
         write_sysreg(next->thread.uw.tp_value, tpidrro_el0);
-    else if (!arm64_kernel_unmapped_at_el0())
+    } else if (!arm64_kernel_unmapped_at_el0()) {
         write_sysreg(0, tpidrro_el0);
+    }
 
     write_sysreg(*task_user_tls(next), tpidr_el0);
 }
@@ -467,10 +461,11 @@ static void tls_thread_switch(struct task_struct *next)
 void uao_thread_switch(struct task_struct *next)
 {
     if (IS_ENABLED(CONFIG_ARM64_UAO)) {
-        if (task_thread_info(next)->addr_limit == KERNEL_DS)
+        if (task_thread_info(next)->addr_limit == KERNEL_DS) {
             asm(ALTERNATIVE("nop", SET_PSTATE_UAO(1), ARM64_HAS_UAO));
-        else
+        } else {
             asm(ALTERNATIVE("nop", SET_PSTATE_UAO(0), ARM64_HAS_UAO));
+        }
     }
 }
 
@@ -484,15 +479,17 @@ static void ssbs_thread_switch(struct task_struct *next)
      * Nothing to do for kernel threads, but 'regs' may be junk
      * (e.g. idle task) so check the flags and bail early.
      */
-    if (unlikely(next->flags & PF_KTHREAD))
+    if (unlikely(next->flags & PF_KTHREAD)) {
         return;
+    }
 
     /*
      * If all CPUs implement the SSBS extension, then we just need to
      * context-switch the PSTATE field.
      */
-    if (cpus_have_const_cap(ARM64_SSBS))
+    if (cpus_have_const_cap(ARM64_SSBS)) {
         return;
+    }
 
     spectre_v4_enable_task_mitigation(next);
 }
@@ -518,27 +515,29 @@ static void entry_task_switch(struct task_struct *next)
  * - disable access when switching from a 64bit task to a 32bit task
  * - enable access when switching from a 32bit task to a 64bit task
  */
-static void erratum_1418040_thread_switch(struct task_struct *prev,
-                      struct task_struct *next)
+static void erratum_1418040_thread_switch(struct task_struct *prev, struct task_struct *next)
 {
     bool prev32, next32;
     u64 val;
 
-    if (!IS_ENABLED(CONFIG_ARM64_ERRATUM_1418040))
+    if (!IS_ENABLED(CONFIG_ARM64_ERRATUM_1418040)) {
         return;
+    }
 
     prev32 = is_compat_thread(task_thread_info(prev));
     next32 = is_compat_thread(task_thread_info(next));
 
-    if (prev32 == next32 || !this_cpu_has_cap(ARM64_WORKAROUND_1418040))
+    if (prev32 == next32 || !this_cpu_has_cap(ARM64_WORKAROUND_1418040)) {
         return;
+    }
 
     val = read_sysreg(cntkctl_el1);
 
-    if (!next32)
+    if (!next32) {
         val |= ARCH_TIMER_USR_VCT_ACCESS_EN;
-    else
+    } else {
         val &= ~ARCH_TIMER_USR_VCT_ACCESS_EN;
+    }
 
     write_sysreg(val, cntkctl_el1);
 }
@@ -546,8 +545,7 @@ static void erratum_1418040_thread_switch(struct task_struct *prev,
 /*
  * Thread switching.
  */
-__notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
-                struct task_struct *next)
+__notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev, struct task_struct *next)
 {
     struct task_struct *last;
 
@@ -586,23 +584,26 @@ unsigned long get_wchan(struct task_struct *p)
     struct stackframe frame;
     unsigned long stack_page, ret = 0;
     int count = 0;
-    if (!p || p == current || p->state == TASK_RUNNING)
+    if (!p || p == current || p->state == TASK_RUNNING) {
         return 0;
+    }
 
     stack_page = (unsigned long)try_get_task_stack(p);
-    if (!stack_page)
+    if (!stack_page) {
         return 0;
+    }
 
     start_backtrace(&frame, thread_saved_fp(p), thread_saved_pc(p));
 
     do {
-        if (unwind_frame(p, &frame))
+        if (unwind_frame(p, &frame)) {
             goto out;
+        }
         if (!in_sched_functions(frame.pc)) {
             ret = frame.pc;
             goto out;
         }
-    } while (count ++ < 16);
+    } while (count++ < 0x10);
 
 out:
     put_task_stack(p);
@@ -611,8 +612,9 @@ out:
 
 unsigned long arch_align_stack(unsigned long sp)
 {
-    if (!(current->personality & ADDR_NO_RANDOMIZE) && randomize_va_space)
+    if (!(current->personality & ADDR_NO_RANDOMIZE) && randomize_va_space) {
         sp -= get_random_int() & ~PAGE_MASK;
+    }
     return sp & ~0xf;
 }
 
@@ -626,8 +628,7 @@ void arch_setup_new_exec(void)
     ptrauth_thread_init_user(current);
 
     if (task_spec_ssb_noexec(current)) {
-        arch_prctl_spec_ctrl_set(current, PR_SPEC_STORE_BYPASS,
-                     PR_SPEC_ENABLE);
+        arch_prctl_spec_ctrl_set(current, PR_SPEC_STORE_BYPASS, PR_SPEC_ENABLE);
     }
 }
 
@@ -642,24 +643,29 @@ long set_tagged_addr_ctrl(struct task_struct *task, unsigned long arg)
     unsigned long valid_mask = PR_TAGGED_ADDR_ENABLE;
     struct thread_info *ti = task_thread_info(task);
 
-    if (is_compat_thread(ti))
+    if (is_compat_thread(ti)) {
         return -EINVAL;
+    }
 
-    if (system_supports_mte())
+    if (system_supports_mte()) {
         valid_mask |= PR_MTE_TCF_MASK | PR_MTE_TAG_MASK;
+    }
 
-    if (arg & ~valid_mask)
+    if (arg & ~valid_mask) {
         return -EINVAL;
+    }
 
     /*
      * Do not allow the enabling of the tagged address ABI if globally
      * disabled via sysctl abi.tagged_addr_disabled.
      */
-    if (arg & PR_TAGGED_ADDR_ENABLE && tagged_addr_disabled)
+    if (arg & PR_TAGGED_ADDR_ENABLE && tagged_addr_disabled) {
         return -EINVAL;
+    }
 
-    if (set_mte_ctrl(task, arg) != 0)
+    if (set_mte_ctrl(task, arg) != 0) {
         return -EINVAL;
+    }
 
     update_ti_thread_flag(ti, TIF_TAGGED_ADDR, arg & PR_TAGGED_ADDR_ENABLE);
 
@@ -671,11 +677,13 @@ long get_tagged_addr_ctrl(struct task_struct *task)
     long ret = 0;
     struct thread_info *ti = task_thread_info(task);
 
-    if (is_compat_thread(ti))
+    if (is_compat_thread(ti)) {
         return -EINVAL;
+    }
 
-    if (test_ti_thread_flag(ti, TIF_TAGGED_ADDR))
+    if (test_ti_thread_flag(ti, TIF_TAGGED_ADDR)) {
         ret = PR_TAGGED_ADDR_ENABLE;
+    }
 
     ret |= get_mte_ctrl(task);
 
@@ -688,28 +696,27 @@ long get_tagged_addr_ctrl(struct task_struct *task)
  * disable it for tasks that already opted in to the relaxed ABI.
  */
 
-static struct ctl_table tagged_addr_sysctl_table[] = {
-    {
-        .procname    = "tagged_addr_disabled",
-        .mode        = 0644,
-        .data        = &tagged_addr_disabled,
-        .maxlen        = sizeof(int),
-        .proc_handler    = proc_dointvec_minmax,
-        .extra1        = SYSCTL_ZERO,
-        .extra2        = SYSCTL_ONE,
-    },
-    { }
-};
+static struct ctl_table tagged_addr_sysctl_table[] = {{
+                                                          .procname = "tagged_addr_disabled",
+                                                          .mode = 0644,
+                                                          .data = &tagged_addr_disabled,
+                                                          .maxlen = sizeof(int),
+                                                          .proc_handler = proc_dointvec_minmax,
+                                                          .extra1 = SYSCTL_ZERO,
+                                                          .extra2 = SYSCTL_ONE,
+                                                      },
+                                                      {}};
 
 static int __init tagged_addr_init(void)
 {
-    if (!register_sysctl("abi", tagged_addr_sysctl_table))
+    if (!register_sysctl("abi", tagged_addr_sysctl_table)) {
         return -EINVAL;
+    }
     return 0;
 }
 
 core_initcall(tagged_addr_init);
-#endif    /* CONFIG_ARM64_TAGGED_ADDR_ABI */
+#endif /* CONFIG_ARM64_TAGGED_ADDR_ABI */
 
 asmlinkage void __sched arm64_preempt_schedule_irq(void)
 {
@@ -723,27 +730,30 @@ asmlinkage void __sched arm64_preempt_schedule_irq(void)
      * Only allow a task to be preempted once cpufeatures have been
      * enabled.
      */
-    if (system_capabilities_finalized())
+    if (system_capabilities_finalized()) {
         preempt_schedule_irq();
+    }
 }
 
 #ifdef CONFIG_BINFMT_ELF
-int arch_elf_adjust_prot(int prot, const struct arch_elf_state *state,
-             bool has_interp, bool is_interp)
+int arch_elf_adjust_prot(int prot, const struct arch_elf_state *state, bool has_interp, bool is_interp)
 {
     /*
      * For dynamically linked executables the interpreter is
      * responsible for setting PROT_BTI on everything except
      * itself.
      */
-    if (is_interp != has_interp)
+    if (is_interp != has_interp) {
         return prot;
+    }
 
-    if (!(state->flags & ARM64_ELF_BTI))
+    if (!(state->flags & ARM64_ELF_BTI)) {
         return prot;
+    }
 
-    if (prot & PROT_EXEC)
+    if (prot & PROT_EXEC) {
         prot |= PROT_BTI;
+    }
 
     return prot;
 }

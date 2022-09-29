@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2012-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -38,14 +39,12 @@ static const char *mali_dma_fence_get_timeline_name(struct dma_fence *fence)
     return "mali_dma_fence";
 }
 
-static const struct dma_fence_ops mali_dma_fence_ops = {
-    .get_driver_name = mali_dma_fence_get_driver_name,
-    .get_timeline_name = mali_dma_fence_get_timeline_name,
-    .enable_signaling = mali_dma_fence_enable_signaling,
-    .signaled = NULL,
-    .wait = dma_fence_default_wait,
-    .release = NULL
-};
+static const struct dma_fence_ops mali_dma_fence_ops = {.get_driver_name = mali_dma_fence_get_driver_name,
+                                                        .get_timeline_name = mali_dma_fence_get_timeline_name,
+                                                        .enable_signaling = mali_dma_fence_enable_signaling,
+                                                        .signaled = NULL,
+                                                        .wait = dma_fence_default_wait,
+                                                        .release = NULL};
 #else
 static bool mali_dma_fence_enable_signaling(struct fence *fence)
 {
@@ -65,14 +64,12 @@ static const char *mali_dma_fence_get_timeline_name(struct fence *fence)
     return "mali_dma_fence";
 }
 
-static const struct fence_ops mali_dma_fence_ops = {
-    .get_driver_name = mali_dma_fence_get_driver_name,
-    .get_timeline_name = mali_dma_fence_get_timeline_name,
-    .enable_signaling = mali_dma_fence_enable_signaling,
-    .signaled = NULL,
-    .wait = fence_default_wait,
-    .release = NULL
-};
+static const struct fence_ops mali_dma_fence_ops = {.get_driver_name = mali_dma_fence_get_driver_name,
+                                                    .get_timeline_name = mali_dma_fence_get_timeline_name,
+                                                    .enable_signaling = mali_dma_fence_enable_signaling,
+                                                    .signaled = NULL,
+                                                    .wait = fence_default_wait,
+                                                    .release = NULL};
 #endif
 
 static void mali_dma_fence_context_cleanup(struct mali_dma_fence_context *dma_fence_context)
@@ -85,12 +82,12 @@ static void mali_dma_fence_context_cleanup(struct mali_dma_fence_context *dma_fe
         if (dma_fence_context->mali_dma_fence_waiters[i]) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
             dma_fence_remove_callback(dma_fence_context->mali_dma_fence_waiters[i]->fence,
-                          &dma_fence_context->mali_dma_fence_waiters[i]->base);
+                                      &dma_fence_context->mali_dma_fence_waiters[i]->base);
             dma_fence_put(dma_fence_context->mali_dma_fence_waiters[i]->fence);
 
 #else
             fence_remove_callback(dma_fence_context->mali_dma_fence_waiters[i]->fence,
-                          &dma_fence_context->mali_dma_fence_waiters[i]->base);
+                                  &dma_fence_context->mali_dma_fence_waiters[i]->base);
             fence_put(dma_fence_context->mali_dma_fence_waiters[i]->fence);
 #endif
             kfree(dma_fence_context->mali_dma_fence_waiters[i]);
@@ -98,8 +95,9 @@ static void mali_dma_fence_context_cleanup(struct mali_dma_fence_context *dma_fe
         }
     }
 
-    if (NULL != dma_fence_context->mali_dma_fence_waiters)
+    if (NULL != dma_fence_context->mali_dma_fence_waiters) {
         kfree(dma_fence_context->mali_dma_fence_waiters);
+    }
 
     dma_fence_context->mali_dma_fence_waiters = NULL;
     dma_fence_context->num_dma_fence_waiter = 0;
@@ -135,14 +133,17 @@ static void mali_dma_fence_callback(struct fence *fence, struct fence_cb *cb)
 
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
 
-    if (atomic_dec_and_test(&dma_fence_context->count))
+    if (atomic_dec_and_test(&dma_fence_context->count)) {
         schedule_work(&dma_fence_context->work_handle);
+    }
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_context *dma_fence_context, struct dma_fence *fence)
+static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_context *dma_fence_context,
+                                                      struct dma_fence *fence)
 #else
-static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_context *dma_fence_context, struct fence *fence)
+static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_context *dma_fence_context,
+                                                      struct fence *fence)
 #endif
 {
     int ret = 0;
@@ -152,10 +153,9 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
     MALI_DEBUG_ASSERT_POINTER(fence);
 
-    dma_fence_waiters = krealloc(dma_fence_context->mali_dma_fence_waiters,
-                     (dma_fence_context->num_dma_fence_waiter + 1)
-                     * sizeof(struct mali_dma_fence_waiter *),
-                     GFP_KERNEL);
+    dma_fence_waiters =
+        krealloc(dma_fence_context->mali_dma_fence_waiters,
+                 (dma_fence_context->num_dma_fence_waiter + 1) * sizeof(struct mali_dma_fence_waiter *), GFP_KERNEL);
 
     if (NULL == dma_fence_waiters) {
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to realloc the dma fence waiters.\n"));
@@ -180,11 +180,9 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
     dma_fence_waiter->parent = dma_fence_context;
     atomic_inc(&dma_fence_context->count);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-    ret = dma_fence_add_callback(fence, &dma_fence_waiter->base,
-                     mali_dma_fence_callback);
+    ret = dma_fence_add_callback(fence, &dma_fence_waiter->base, mali_dma_fence_callback);
 #else
-    ret = fence_add_callback(fence, &dma_fence_waiter->base,
-                 mali_dma_fence_callback);
+    ret = fence_add_callback(fence, &dma_fence_waiter->base, mali_dma_fence_callback);
 #endif
     if (0 > ret) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
@@ -209,11 +207,10 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
     return MALI_OSK_ERR_OK;
 }
 
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-struct dma_fence *mali_dma_fence_new(u32  context, u32 seqno)
+struct dma_fence *mali_dma_fence_new(u32 context, u32 seqno)
 #else
-struct fence *mali_dma_fence_new(u32  context, u32 seqno)
+struct fence *mali_dma_fence_new(u32 context, u32 seqno)
 #endif
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
@@ -228,15 +225,9 @@ struct fence *mali_dma_fence_new(u32  context, u32 seqno)
         return fence;
     }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-    dma_fence_init(fence,
-               &mali_dma_fence_ops,
-               &mali_dma_fence_lock,
-               context, seqno);
+    dma_fence_init(fence, &mali_dma_fence_ops, &mali_dma_fence_lock, context, seqno);
 #else
-    fence_init(fence,
-           &mali_dma_fence_ops,
-           &mali_dma_fence_lock,
-           context, seqno);
+    fence_init(fence, &mali_dma_fence_ops, &mali_dma_fence_lock, context, seqno);
 #endif
     return fence;
 }
@@ -260,8 +251,7 @@ void mali_dma_fence_signal_and_put(struct fence **fence)
 }
 
 void mali_dma_fence_context_init(struct mali_dma_fence_context *dma_fence_context,
-                 mali_dma_fence_context_callback_func_t  cb_func,
-                 void *pp_job_ptr)
+                                 mali_dma_fence_context_callback_func_t cb_func, void *pp_job_ptr)
 {
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
 
@@ -274,7 +264,7 @@ void mali_dma_fence_context_init(struct mali_dma_fence_context *dma_fence_contex
 }
 
 mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_context *dma_fence_context,
-        struct reservation_object *dma_reservation_object)
+                                                      struct reservation_object *dma_reservation_object)
 {
     mali_osk_errcode_t ret = MALI_OSK_ERR_OK;
     u32 shared_count = 0, i;
@@ -289,10 +279,10 @@ mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_cont
     MALI_DEBUG_ASSERT_POINTER(dma_reservation_object);
 
     /* Get all the shared/exclusive fences in the reservation object of dma buf*/
-    ret = reservation_object_get_fences_rcu(dma_reservation_object, &exclusive_fence,
-                        &shared_count, &shared_fences);
+    ret = reservation_object_get_fences_rcu(dma_reservation_object, &exclusive_fence, &shared_count, &shared_fences);
     if (ret < 0) {
-        MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to get  shared or exclusive_fence dma fences from  the reservation object of dma buf.\n"));
+        MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to get  shared or exclusive_fence dma fences from  the "
+                             "reservation object of dma buf.\n"));
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -304,7 +294,6 @@ mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_cont
             goto ended;
         }
     }
-
 
     for (i = 0; i < shared_count; i++) {
         ret = mali_dma_fence_add_callback(dma_fence_context, shared_fences[i]);
@@ -338,7 +327,6 @@ ended:
     return ret;
 }
 
-
 void mali_dma_fence_context_term(struct mali_dma_fence_context *dma_fence_context)
 {
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
@@ -353,14 +341,14 @@ void mali_dma_fence_context_dec_count(struct mali_dma_fence_context *dma_fence_c
 {
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
 
-    if (atomic_dec_and_test(&dma_fence_context->count))
+    if (atomic_dec_and_test(&dma_fence_context->count)) {
         schedule_work(&dma_fence_context->work_handle);
+    }
 }
 
-
 void mali_dma_fence_add_reservation_object_list(struct reservation_object *dma_reservation_object,
-        struct reservation_object **dma_reservation_object_list,
-        u32 *num_dma_reservation_object)
+                                                struct reservation_object **dma_reservation_object_list,
+                                                u32 *num_dma_reservation_object)
 {
     u32 i;
 
@@ -369,8 +357,9 @@ void mali_dma_fence_add_reservation_object_list(struct reservation_object *dma_r
     MALI_DEBUG_ASSERT_POINTER(num_dma_reservation_object);
 
     for (i = 0; i < *num_dma_reservation_object; i++) {
-        if (dma_reservation_object_list[i] == dma_reservation_object)
+        if (dma_reservation_object_list[i] == dma_reservation_object) {
             return;
+        }
     }
 
     dma_reservation_object_list[*num_dma_reservation_object] = dma_reservation_object;
@@ -378,7 +367,7 @@ void mali_dma_fence_add_reservation_object_list(struct reservation_object *dma_r
 }
 
 int mali_dma_fence_lock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-        u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx)
+                                                u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx)
 {
     u32 i;
 
@@ -401,7 +390,7 @@ again:
         ret = ww_mutex_lock(&dma_reservation_object_list[i]->lock, ww_actx);
 
         if (ret < 0) {
-            u32  slow_lock_index = i;
+            u32 slow_lock_index = i;
 
             /* unlock all pre locks we have already locked.*/
             while (i > 0) {
@@ -409,8 +398,9 @@ again:
                 ww_mutex_unlock(&dma_reservation_object_list[i]->lock);
             }
 
-            if (NULL != reservation_object_to_slow_lock)
+            if (NULL != reservation_object_to_slow_lock) {
                 ww_mutex_unlock(&reservation_object_to_slow_lock->lock);
+            }
 
             if (ret == -EDEADLK) {
                 reservation_object_to_slow_lock = dma_reservation_object_list[slow_lock_index];
@@ -428,12 +418,13 @@ again:
 }
 
 void mali_dma_fence_unlock_reservation_object_list(struct reservation_object **dma_reservation_object_list,
-        u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx)
+                                                   u32 num_dma_reservation_object, struct ww_acquire_ctx *ww_actx)
 {
     u32 i;
 
-    for (i = 0; i < num_dma_reservation_object; i++)
+    for (i = 0; i < num_dma_reservation_object; i++) {
         ww_mutex_unlock(&dma_reservation_object_list[i]->lock);
+    }
 
     ww_acquire_fini(ww_actx);
 }

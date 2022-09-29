@@ -23,9 +23,9 @@
 #define FIQ_DEBUGGER_NO_CHAR NO_POLL_CHAR
 #define FIQ_DEBUGGER_BREAK 0x00ff0100
 
-#define FIQ_DEBUGGER_FIQ_IRQ_NAME    "fiq"
-#define FIQ_DEBUGGER_SIGNAL_IRQ_NAME    "signal"
-#define FIQ_DEBUGGER_WAKEUP_IRQ_NAME    "wakeup"
+#define FIQ_DEBUGGER_FIQ_IRQ_NAME "fiq"
+#define FIQ_DEBUGGER_SIGNAL_IRQ_NAME "signal"
+#define FIQ_DEBUGGER_WAKEUP_IRQ_NAME "wakeup"
 
 /**
  * struct fiq_debugger_pdata - fiq debugger platform data
@@ -53,16 +53,14 @@ struct fiq_debugger_pdata {
     int (*uart_dev_suspend)(struct platform_device *pdev);
     int (*uart_dev_resume)(struct platform_device *pdev);
 
-    void (*fiq_enable)(struct platform_device *pdev, unsigned int fiq,
-                                bool enable);
+    void (*fiq_enable)(struct platform_device *pdev, unsigned int fiq, bool enable);
     void (*fiq_ack)(struct platform_device *pdev, unsigned int fiq);
 
     void (*force_irq)(struct platform_device *pdev, unsigned int irq);
     void (*force_irq_ack)(struct platform_device *pdev, unsigned int irq);
 
 #ifdef CONFIG_RK_CONSOLE_THREAD
-    void (*console_write)(struct platform_device *pdev, const char *s,
-                  unsigned int count);
+    void (*console_write)(struct platform_device *pdev, const char *s, unsigned int count);
 #endif
 #ifdef CONFIG_FIQ_DEBUGGER_TRUST_ZONE
     void (*switch_cpu)(struct platform_device *pdev, u32 cpu);

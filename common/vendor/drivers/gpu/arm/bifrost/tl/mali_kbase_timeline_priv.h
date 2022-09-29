@@ -52,15 +52,15 @@
 struct kbase_timeline {
     struct kbase_tlstream streams[TL_STREAM_TYPE_COUNT];
     struct timer_list autoflush_timer;
-    atomic_t          autoflush_timer_active;
-    struct mutex      reader_lock;
+    atomic_t autoflush_timer_active;
+    struct mutex reader_lock;
     wait_queue_head_t event_queue;
 #if MALI_UNIT_TEST
-    atomic_t          bytes_collected;
+    atomic_t bytes_collected;
 #endif /* MALI_UNIT_TEST */
-    atomic_t         *timeline_flags;
-    size_t            obj_header_btc;
-    size_t            aux_header_btc;
+    atomic_t *timeline_flags;
+    size_t obj_header_btc;
+    size_t aux_header_btc;
 #if MALI_USE_CSF
     struct kbase_csf_tl_reader csf_tl_reader;
 #endif

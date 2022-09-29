@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_DEBUG_KTRACE_INTERNAL_H_
-#define _KBASE_DEBUG_KTRACE_INTERNAL_H_
+#ifndef KBASE_DEBUG_KTRACE_INTERNAL_H_
+#define KBASE_DEBUG_KTRACE_INTERNAL_H_
 
 #if KBASE_KTRACE_TARGET_RBUF
 
@@ -54,9 +54,7 @@ void kbasep_ktrace_backend_format_header(char *buffer, int sz, s32 *written);
  * %KBASE_KTRACE_FLAG_BACKEND clear. The backend must handle that setting
  * appropriately.
  */
-void kbasep_ktrace_backend_format_msg(struct kbase_ktrace_msg *trace_msg,
-        char *buffer, int sz, s32 *written);
-
+void kbasep_ktrace_backend_format_msg(struct kbase_ktrace_msg *trace_msg, char *buffer, int sz, s32 *written);
 
 /**
  * kbasep_ktrace_reserve - internal function to reserve space for a ktrace
@@ -79,10 +77,9 @@ struct kbase_ktrace_msg *kbasep_ktrace_reserve(struct kbase_ktrace *ktrace);
  *
  * The common part includes the mandatory parts of the backend part
  */
-void kbasep_ktrace_msg_init(struct kbase_ktrace *ktrace,
-        struct kbase_ktrace_msg *trace_msg, enum kbase_ktrace_code code,
-        struct kbase_context *kctx, kbase_ktrace_flag_t flags,
-        u64 info_val);
+void kbasep_ktrace_msg_init(struct kbase_ktrace *ktrace, struct kbase_ktrace_msg *trace_msg,
+                            enum kbase_ktrace_code code, struct kbase_context *kctx, kbase_ktrace_flag_t flags,
+                            u64 info_val);
 
 #endif /* KBASE_KTRACE_TARGET_RBUF */
 

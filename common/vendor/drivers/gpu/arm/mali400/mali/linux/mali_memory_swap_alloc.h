@@ -1,11 +1,15 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
  * 
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
+ * This program is free software and is provided to you
+ * under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation, and any
+ * use by you of this program is subject to the terms of such GNU licence.
  * 
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is included with
+ * the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 
 #ifndef MALI_MEMORY_SWAP_ALLOC_H
@@ -17,7 +21,7 @@
 #include "mali_memory_types.h"
 #include "mali_pp_job.h"
 
-#define PAGE_SIZE_RANGE               12
+#define PAGE_SIZE_RANGE 12
 #define MALI_MEM_SWAP_THRESHOLD_SHFIT 2
 /**
  * Initialize memory swapping module.
@@ -92,7 +96,8 @@ mali_bool mali_mem_swap_in_page_node(struct mali_page_node *page_node);
 
 int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx);
 
-mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_session_data *session, u32 vaddr, u32 props);
+mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_session_data *session, u32 vaddr,
+                                          u32 props);
 
 void mali_mem_swap_mali_unmap(mali_mem_allocation *alloc);
 
@@ -109,7 +114,7 @@ int mali_mem_swap_out_pages(struct mali_pp_job *job);
 /**
  * This will be called in page fault to process CPU read&write.
  */
-int mali_mem_swap_allocate_page_on_demand(mali_mem_backend *mem_bkend, u32 offset, struct page **pagep) ;
+int mali_mem_swap_allocate_page_on_demand(mali_mem_backend *mem_bkend, u32 offset, struct page **pagep);
 
 /**
  * Used to process cow on demand for swappable memory backend.
@@ -120,4 +125,3 @@ int mali_mem_swap_cow_page_on_demand(mali_mem_backend *mem_bkend, u32 offset, st
 void mali_mem_swap_tracking(u32 *swap_pool_size, u32 *unlock_size);
 #endif
 #endif /* __MALI_MEMORY_SWAP_ALLOC_H__ */
-

@@ -22,38 +22,44 @@
 #include <display_type.h>
 #include <drm_crtc.h>
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class DrmEncoder {
-public:
-    explicit DrmEncoder(drmModeEncoder e);
-    virtual ~DrmEncoder() {}
-    uint32_t GetCrtcId() const
+namespace OHOS
+{
+    namespace HDI
     {
-        return mCrtcId;
-    }
-    void SetCrtcId(uint32_t id)
-    {
-        mCrtcId = id;
-    }
-    uint32_t GetPossibleCrtcs() const
-    {
-        return mPossibleCrtcs;
-    }
-    int32_t PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId);
-    uint32_t GetId() const
-    {
-        return mEncoderId;
-    }
+        namespace DISPLAY
+        {
+            class DrmEncoder
+            {
+            public:
+                explicit DrmEncoder(drmModeEncoder e);
+                virtual ~DrmEncoder()
+                {
+                }
+                uint32_t GetCrtcId() const
+                {
+                    return mCrtcId;
+                }
+                void SetCrtcId(uint32_t id)
+                {
+                    mCrtcId = id;
+                }
+                uint32_t GetPossibleCrtcs() const
+                {
+                    return mPossibleCrtcs;
+                }
+                int32_t PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId);
+                uint32_t GetId() const
+                {
+                    return mEncoderId;
+                }
 
-private:
-    uint32_t mEncoderId;
-    uint32_t mCrtcId;
-    uint32_t mPossibleCrtcs;
-};
-} // namespace OHOS
-} // namespace HDI
+            private:
+                uint32_t mEncoderId;
+                uint32_t mCrtcId;
+                uint32_t mPossibleCrtcs;
+            };
+        } // namespace OHOS
+    }     // namespace HDI
 } // namespace DISPLAY
 
 #endif // DRM_ENCODER_H

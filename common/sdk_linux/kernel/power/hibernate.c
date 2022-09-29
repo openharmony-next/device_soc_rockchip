@@ -35,16 +35,16 @@
 
 #include "power.h"
 
-#define HIBERNATE_TWO                      2
-#define HIBERNATE_EIGHT                    8
-#define HIBERNATE_TEN                      10
-#define HIBERNATE_THIRTEEN                 13
-#define HIBERNATE_ONEHUNDRED               100
-#define HIBERNATE_TWOHUNDREDFIFTYFIVE      255
-#define HIBERNATE_TWOHUNDREDFIFTYSIX       256
-#define HIBERNATE_ONETHOUSAND              1000
-#define HIBERNATE_ONETHOUSANDTWENTYFOUR    1024
-#define HIBERNATE_FIVETHOUSAND             5000
+#define HIBERNATE_TWO 2
+#define HIBERNATE_EIGHT 8
+#define HIBERNATE_TEN 10
+#define HIBERNATE_THIRTEEN 13
+#define HIBERNATE_ONEHUNDRED 100
+#define HIBERNATE_TWOHUNDREDFIFTYFIVE 255
+#define HIBERNATE_TWOHUNDREDFIFTYSIX 256
+#define HIBERNATE_ONETHOUSAND 1000
+#define HIBERNATE_ONETHOUSANDTWENTYFOUR 1024
+#define HIBERNATE_FIVETHOUSAND 5000
 
 static int nocompress;
 static int noresume;
@@ -68,7 +68,7 @@ enum {
     /* keep last */
     __HIBERNATION_AFTER_LAST
 };
-#define HIBERNATION_MAX (__HIBERNATION_AFTER_LAST-1)
+#define HIBERNATION_MAX (__HIBERNATION_AFTER_LAST - 1)
 #define HIBERNATION_FIRST (HIBERNATION_INVALID + 1)
 
 static int hibernation_mode = HIBERNATION_SHUTDOWN;
@@ -100,18 +100,18 @@ bool hibernation_available(void)
  */
 void hibernation_set_ops(const struct platform_hibernation_ops *ops)
 {
-    if (ops && !(ops->begin && ops->end &&  ops->pre_snapshot
-        && ops->prepare && ops->finish && ops->enter && ops->pre_restore
-        && ops->restore_cleanup && ops->leave)) {
+    if (ops && !(ops->begin && ops->end && ops->pre_snapshot && ops->prepare && ops->finish && ops->enter &&
+                 ops->pre_restore && ops->restore_cleanup && ops->leave)) {
         WARN_ON(1);
         return;
     }
     lock_system_sleep();
     hibernation_ops = ops;
-    if (ops)
+    if (ops) {
         hibernation_mode = HIBERNATION_PLATFORM;
-    else if (hibernation_mode == HIBERNATION_PLATFORM)
+    } else if (hibernation_mode == HIBERNATION_PLATFORM) {
         hibernation_mode = HIBERNATION_SHUTDOWN;
+    }
 
     unlock_system_sleep();
 }
@@ -140,8 +140,11 @@ static int hibernation_test(int level)
     }
     return 0;
 }
-#else /* !CONFIG_PM_DEBUG */
-static int hibernation_test(int level) { return 0; }
+#else  /* !CONFIG_PM_DEBUG */
+static int hibernation_test(int level)
+{
+    return 0;
+}
 #endif /* !CONFIG_PM_DEBUG */
 
 /**
@@ -150,8 +153,7 @@ static int hibernation_test(int level) { return 0; }
  */
 static int platform_begin(int platform_mode)
 {
-    return (platform_mode && hibernation_ops) ?
-        hibernation_ops->begin(PMSG_FREEZE) : 0;
+    return (platform_mode && hibernation_ops) ? hibernation_ops->begin(PMSG_FREEZE) : 0;
 }
 
 /**
@@ -160,8 +162,9 @@ static int platform_begin(int platform_mode)
  */
 static void platform_end(int platform_mode)
 {
-    if (platform_mode && hibernation_ops)
+    if (platform_mode && hibernation_ops) {
         hibernation_ops->end();
+    }
 }
 
 /**
@@ -174,8 +177,7 @@ static void platform_end(int platform_mode)
 
 static int platform_pre_snapshot(int platform_mode)
 {
-    return (platform_mode && hibernation_ops) ?
-        hibernation_ops->pre_snapshot() : 0;
+    return (platform_mode && hibernation_ops) ? hibernation_ops->pre_snapshot() : 0;
 }
 
 /**
@@ -189,8 +191,9 @@ static int platform_pre_snapshot(int platform_mode)
  */
 static void platform_leave(int platform_mode)
 {
-    if (platform_mode && hibernation_ops)
+    if (platform_mode && hibernation_ops) {
         hibernation_ops->leave();
+    }
 }
 
 /**
@@ -204,8 +207,9 @@ static void platform_leave(int platform_mode)
  */
 static void platform_finish(int platform_mode)
 {
-    if (platform_mode && hibernation_ops)
+    if (platform_mode && hibernation_ops) {
         hibernation_ops->finish();
+    }
 }
 
 /**
@@ -220,8 +224,7 @@ static void platform_finish(int platform_mode)
  */
 static int platform_pre_restore(int platform_mode)
 {
-    return (platform_mode && hibernation_ops) ?
-        hibernation_ops->pre_restore() : 0;
+    return (platform_mode && hibernation_ops) ? hibernation_ops->pre_restore() : 0;
 }
 
 /**
@@ -237,8 +240,9 @@ static int platform_pre_restore(int platform_mode)
  */
 static void platform_restore_cleanup(int platform_mode)
 {
-    if (platform_mode && hibernation_ops)
+    if (platform_mode && hibernation_ops) {
         hibernation_ops->restore_cleanup();
+    }
 }
 
 /**
@@ -247,8 +251,9 @@ static void platform_restore_cleanup(int platform_mode)
  */
 static void platform_recover(int platform_mode)
 {
-    if (platform_mode && hibernation_ops && hibernation_ops->recover)
+    if (platform_mode && hibernation_ops && hibernation_ops->recover) {
         hibernation_ops->recover();
+    }
 }
 
 /**
@@ -258,8 +263,7 @@ static void platform_recover(int platform_mode)
  * @nr_pages: Number of memory pages processed between @start and @stop.
  * @msg: Additional diagnostic message to print.
  */
-void swsusp_show_speed(ktime_t start, ktime_t stop,
-              unsigned nr_pages, char *msg)
+void swsusp_show_speed(ktime_t start, ktime_t stop, unsigned nr_pages, char *msg)
 {
     ktime_t diff;
     u64 elapsed_centisecs64;
@@ -268,15 +272,16 @@ void swsusp_show_speed(ktime_t start, ktime_t stop,
     unsigned int kps;
 
     diff = ktime_sub(stop, start);
-    elapsed_centisecs64 = ktime_divns(diff, HIBERNATE_TEN*NSEC_PER_MSEC);
+    elapsed_centisecs64 = ktime_divns(diff, HIBERNATE_TEN * NSEC_PER_MSEC);
     centisecs = elapsed_centisecs64;
-    if (centisecs == 0)
-        centisecs = 1;    /* avoid div-by-zero */
+    if (centisecs == 0) {
+        centisecs = 1; /* avoid div-by-zero */
+    }
     k = nr_pages * (PAGE_SIZE / HIBERNATE_ONETHOUSANDTWENTYFOUR);
     kps = (k * HIBERNATE_ONEHUNDRED) / centisecs;
-    pr_info("%s %u kbytes in %u.%02u seconds (%u.%02u MB/s)\n",
-        msg, k, centisecs / HIBERNATE_ONEHUNDRED, centisecs % HIBERNATE_ONEHUNDRED, kps / HIBERNATE_ONETHOUSAND,
-        (kps % HIBERNATE_ONETHOUSAND) / HIBERNATE_TEN);
+    pr_info("%s %u kbytes in %u.%02u seconds (%u.%02u MB/s)\n", msg, k, centisecs / HIBERNATE_ONEHUNDRED,
+            centisecs % HIBERNATE_ONEHUNDRED, kps / HIBERNATE_ONETHOUSAND,
+            (kps % HIBERNATE_ONETHOUSAND) / HIBERNATE_TEN);
 }
 
 __weak int arch_resume_nosmt(void)
@@ -304,12 +309,14 @@ static int create_image(int platform_mode)
     }
 
     error = platform_pre_snapshot(platform_mode);
-    if (error || hibernation_test(TEST_PLATFORM))
+    if (error || hibernation_test(TEST_PLATFORM)) {
         goto Platform_finish;
+    }
 
     error = suspend_disable_secondary_cpus();
-    if (error || hibernation_test(TEST_CPUS))
+    if (error || hibernation_test(TEST_CPUS)) {
         goto Enable_cpus;
+    }
 
     local_irq_disable();
 
@@ -321,8 +328,9 @@ static int create_image(int platform_mode)
         goto Enable_irqs;
     }
 
-    if (hibernation_test(TEST_CORE) || pm_wakeup_pending())
+    if (hibernation_test(TEST_CORE) || pm_wakeup_pending()) {
         goto Power_up;
+    }
 
     in_suspend = 1;
     save_processor_state();
@@ -331,8 +339,9 @@ static int create_image(int platform_mode)
     /* Restore control flow magically appears here */
     restore_processor_state();
     trace_suspend_resume(TPS("machine_suspend"), PM_EVENT_HIBERNATE, false);
-    if (error)
+    if (error) {
         pr_err("Error %d creating image\n", error);
+    }
 
     if (!in_suspend) {
         events_check_enabled = false;
@@ -341,25 +350,25 @@ static int create_image(int platform_mode)
 
     platform_leave(platform_mode);
 
- Power_up:
+Power_up:
     syscore_resume();
 
- Enable_irqs:
+Enable_irqs:
     system_state = SYSTEM_RUNNING;
     local_irq_enable();
 
- Enable_cpus:
+Enable_cpus:
     suspend_enable_secondary_cpus();
 
     /* Allow architectures to do nosmt-specific post-resume dances */
-    if (!in_suspend)
+    if (!in_suspend) {
         error = arch_resume_nosmt();
+    }
 
- Platform_finish:
+Platform_finish:
     platform_finish(platform_mode);
 
-    dpm_resume_start(in_suspend ?
-        (error ? PMSG_RECOVER : PMSG_THAW) : PMSG_RESTORE);
+    dpm_resume_start(in_suspend ? (error ? PMSG_RECOVER : PMSG_THAW) : PMSG_RESTORE);
 
     return error;
 }
@@ -377,17 +386,20 @@ int hibernation_snapshot(int platform_mode)
 
     pm_suspend_clear_flags();
     error = platform_begin(platform_mode);
-    if (error)
+    if (error) {
         goto Close;
+    }
 
     /* Preallocate image memory before shutting down devices. */
     error = hibernate_preallocate_memory();
-    if (error)
+    if (error) {
         goto Close;
+    }
 
     error = freeze_kernel_threads();
-    if (error)
+    if (error) {
         goto Cleanup;
+    }
 
     if (hibernation_test(TEST_FREEZER)) {
 
@@ -410,10 +422,11 @@ int hibernation_snapshot(int platform_mode)
 
     error = dpm_suspend(PMSG_FREEZE);
 
-    if (error || hibernation_test(TEST_DEVICES))
+    if (error || hibernation_test(TEST_DEVICES)) {
         platform_recover(platform_mode);
-    else
+    } else {
         error = create_image(platform_mode);
+    }
 
     /*
      * In the case that we call create_image() above, the control
@@ -422,27 +435,30 @@ int hibernation_snapshot(int platform_mode)
      */
 
     /* We may need to release the preallocated image pages here. */
-    if (error || !in_suspend)
+    if (error || !in_suspend) {
         swsusp_free();
+    }
 
     msg = in_suspend ? (error ? PMSG_RECOVER : PMSG_THAW) : PMSG_RESTORE;
     dpm_resume(msg);
 
-    if (error || !in_suspend)
+    if (error || !in_suspend) {
         pm_restore_gfp_mask();
+    }
 
     resume_console();
     dpm_complete(msg);
 
- Close:
+Close:
     platform_end(platform_mode);
     return error;
 
- Thaw:
+Thaw:
     thaw_kernel_threads();
- Cleanup:
+Cleanup:
     swsusp_free();
-    goto Close;
+    platform_end(platform_mode);
+    return error;
 }
 
 int __weak hibernate_resume_nonboot_cpu_disable(void)
@@ -470,19 +486,22 @@ static int resume_target_kernel(bool platform_mode)
     }
 
     error = platform_pre_restore(platform_mode);
-    if (error)
+    if (error) {
         goto Cleanup;
+    }
 
     error = hibernate_resume_nonboot_cpu_disable();
-    if (error)
+    if (error) {
         goto Enable_cpus;
+    }
 
     local_irq_disable();
     system_state = SYSTEM_SUSPEND;
 
     error = syscore_suspend();
-    if (error)
+    if (error) {
         goto Enable_irqs;
+    }
 
     save_processor_state();
     error = restore_highmem();
@@ -511,14 +530,14 @@ static int resume_target_kernel(bool platform_mode)
 
     syscore_resume();
 
- Enable_irqs:
+Enable_irqs:
     system_state = SYSTEM_RUNNING;
     local_irq_enable();
 
- Enable_cpus:
+Enable_cpus:
     suspend_enable_secondary_cpus();
 
- Cleanup:
+Cleanup:
     platform_restore_cleanup(platform_mode);
 
     dpm_resume_start(PMSG_RECOVER);
@@ -565,8 +584,9 @@ int hibernation_platform_enter(void)
 {
     int error;
 
-    if (!hibernation_ops)
+    if (!hibernation_ops) {
         return -ENOSYS;
+    }
 
     /*
      * We have cancelled the power transition by running
@@ -574,29 +594,34 @@ int hibernation_platform_enter(void)
      * the firmware know that we're going to enter the sleep state after all
      */
     error = hibernation_ops->begin(PMSG_HIBERNATE);
-    if (error)
+    if (error) {
         goto Close;
+    }
 
     entering_platform_hibernation = true;
     suspend_console();
     error = dpm_suspend_start(PMSG_HIBERNATE);
     if (error) {
-        if (hibernation_ops->recover)
+        if (hibernation_ops->recover) {
             hibernation_ops->recover();
+        }
         goto Resume_devices;
     }
 
     error = dpm_suspend_end(PMSG_HIBERNATE);
-    if (error)
+    if (error) {
         goto Resume_devices;
+    }
 
     error = hibernation_ops->prepare();
-    if (error)
+    if (error) {
         goto Platform_finish;
+    }
 
     error = suspend_disable_secondary_cpus();
-    if (error)
+    if (error) {
         goto Enable_cpus;
+    }
 
     local_irq_disable();
     system_state = SYSTEM_SUSPEND;
@@ -608,27 +633,29 @@ int hibernation_platform_enter(void)
 
     hibernation_ops->enter();
     /* We should never get here */
-    while (1);
+    while (1) {
+        ;
+    }
 
- Power_up:
+Power_up:
     syscore_resume();
     system_state = SYSTEM_RUNNING;
     local_irq_enable();
 
- Enable_cpus:
+Enable_cpus:
     suspend_enable_secondary_cpus();
 
- Platform_finish:
+Platform_finish:
     hibernation_ops->finish();
 
     dpm_resume_start(PMSG_RESTORE);
 
- Resume_devices:
+Resume_devices:
     entering_platform_hibernation = false;
     dpm_resume_end(PMSG_RESTORE);
     resume_console();
 
- Close:
+Close:
     hibernation_ops->end();
 
     return error;
@@ -649,14 +676,13 @@ static void power_down(void)
     if (hibernation_mode == HIBERNATION_SUSPEND) {
         error = suspend_devices_and_enter(PM_SUSPEND_MEM);
         if (error) {
-            hibernation_mode = hibernation_ops ?
-                        HIBERNATION_PLATFORM :
-                        HIBERNATION_SHUTDOWN;
+            hibernation_mode = hibernation_ops ? HIBERNATION_PLATFORM : HIBERNATION_SHUTDOWN;
         } else {
             /* Restore swap signature. */
             error = swsusp_unmark();
-            if (error)
+            if (error) {
                 pr_err("Swap will be unusable! Try swapon -a.\n");
+            }
 
             return;
         }
@@ -664,16 +690,17 @@ static void power_down(void)
 #endif
 
     switch (hibernation_mode) {
-    case HIBERNATION_REBOOT:
-        kernel_restart(NULL);
-        break;
-    case HIBERNATION_PLATFORM:
-        hibernation_platform_enter();
-        fallthrough;
-    case HIBERNATION_SHUTDOWN:
-        if (pm_power_off)
-            kernel_power_off();
-        break;
+        case HIBERNATION_REBOOT:
+            kernel_restart(NULL);
+            break;
+        case HIBERNATION_PLATFORM:
+            hibernation_platform_enter();
+            fallthrough;
+        case HIBERNATION_SHUTDOWN:
+            if (pm_power_off) {
+                kernel_power_off();
+            }
+            break;
     }
     kernel_halt();
     /*
@@ -681,8 +708,9 @@ static void power_down(void)
      * corruption after resume.
      */
     pr_crit("Power down manually\n");
-    while (1)
+    while (1) {
         cpu_relax();
+    }
 }
 
 static int load_image_and_restore(void)
@@ -694,18 +722,20 @@ static int load_image_and_restore(void)
 
     lock_device_hotplug();
     error = create_basic_memory_bitmaps();
-    if (error)
+    if (error) {
         goto Unlock;
+    }
 
     error = swsusp_read(&flags);
     swsusp_close(FMODE_READ);
-    if (!error)
+    if (!error) {
         error = hibernation_restore(flags & SF_PLATFORM_MODE);
+    }
 
     pr_err("Failed to load image, recovering.\n");
     swsusp_free();
     free_basic_memory_bitmaps();
- Unlock:
+Unlock:
     unlock_device_hotplug();
 
     return error;
@@ -734,43 +764,50 @@ int hibernate(void)
     pr_info("hibernation entry\n");
     pm_prepare_console();
     error = pm_notifier_call_chain_robust(PM_HIBERNATION_PREPARE, PM_POST_HIBERNATION);
-    if (error)
+    if (error) {
         goto Restore;
+    }
 
     ksys_sync_helper();
 
     error = freeze_processes();
-    if (error)
+    if (error) {
         goto Exit;
+    }
 
     lock_device_hotplug();
     /* Allocate memory management structures */
     error = create_basic_memory_bitmaps();
-    if (error)
+    if (error) {
         goto Thaw;
+    }
 
     error = hibernation_snapshot(hibernation_mode == HIBERNATION_PLATFORM);
-    if (error || freezer_test_done)
+    if (error || freezer_test_done) {
         goto Free_bitmaps;
+    }
 
     if (in_suspend) {
         unsigned int flags = 0;
 
-        if (hibernation_mode == HIBERNATION_PLATFORM)
+        if (hibernation_mode == HIBERNATION_PLATFORM) {
             flags |= SF_PLATFORM_MODE;
-        if (nocompress)
+        }
+        if (nocompress) {
             flags |= SF_NOCOMPRESS_MODE;
-        else
-                flags |= SF_CRC32_MODE;
+        } else {
+            flags |= SF_CRC32_MODE;
+        }
 
         pm_pr_dbg("Writing hibernation image.\n");
         error = swsusp_write(flags);
         swsusp_free();
         if (!error) {
-            if (hibernation_mode == HIBERNATION_TEST_RESUME)
+            if (hibernation_mode == HIBERNATION_TEST_RESUME) {
                 snapshot_test = true;
-            else
+            } else {
                 power_down();
+            }
         }
         in_suspend = 0;
         pm_restore_gfp_mask();
@@ -778,26 +815,27 @@ int hibernate(void)
         pm_pr_dbg("Hibernation image restored successfully.\n");
     }
 
- Free_bitmaps:
+Free_bitmaps:
     free_basic_memory_bitmaps();
- Thaw:
+Thaw:
     unlock_device_hotplug();
     if (snapshot_test) {
         pm_pr_dbg("Checking hibernation image\n");
         error = swsusp_check();
-        if (!error)
+        if (!error) {
             error = load_image_and_restore();
+        }
     }
     thaw_processes();
 
     /* Don't bother checking whether freezer_test_done is true */
     freezer_test_done = false;
- Exit:
+Exit:
     pm_notifier_call_chain(PM_POST_HIBERNATION);
- Restore:
+Restore:
     pm_restore_console();
     hibernate_release();
- Unlock:
+Unlock:
     unlock_system_sleep();
     pr_info("hibernation exit\n");
 
@@ -825,42 +863,50 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data)
     pm_prepare_console();
 
     error = pm_notifier_call_chain_robust(PM_HIBERNATION_PREPARE, PM_POST_HIBERNATION);
-    if (error)
+    if (error) {
         goto restore;
+    }
 
     error = freeze_processes();
-    if (error)
+    if (error) {
         goto exit;
+    }
 
     lock_device_hotplug();
 
     pm_suspend_clear_flags();
 
     error = platform_begin(true);
-    if (error)
+    if (error) {
         goto thaw;
+    }
 
     error = freeze_kernel_threads();
-    if (error)
+    if (error) {
         goto thaw;
+    }
 
     error = dpm_prepare(PMSG_FREEZE);
-    if (error)
+    if (error) {
         goto dpm_complete;
+    }
 
     suspend_console();
 
     error = dpm_suspend(PMSG_FREEZE);
-    if (error)
+    if (error) {
         goto dpm_resume;
+    }
 
     error = dpm_suspend_end(PMSG_FREEZE);
-    if (error)
+    if (error) {
         goto dpm_resume;
+    }
 
     error = platform_pre_snapshot(true);
-    if (error)
+    if (error) {
         goto skip;
+    }
 
     error = func(data);
 
@@ -923,8 +969,9 @@ static int software_resume(void)
     /*
      * If the user said "noresume".. bail out early.
      */
-    if (noresume || !hibernation_available())
+    if (noresume || !hibernation_available()) {
         return 0;
+    }
 
     /*
      * name_to_dev_t() below takes a sysfs buffer mutex when sysfs
@@ -938,8 +985,9 @@ static int software_resume(void)
      */
     mutex_lock_nested(&system_transition_mutex, SINGLE_DEPTH_NESTING);
 
-    if (swsusp_resume_device)
+    if (swsusp_resume_device) {
         goto Check_image;
+    }
 
     if (!strlen(resume_file)) {
         error = -ENOENT;
@@ -949,8 +997,7 @@ static int software_resume(void)
     pm_pr_dbg("Checking hibernation image partition %s\n", resume_file);
 
     if (resume_delay) {
-        pr_info("Waiting %dsec before reading resume device ...\n",
-            resume_delay);
+        pr_info("Waiting %dsec before reading resume device ...\n", resume_delay);
         ssleep(resume_delay);
     }
 
@@ -964,8 +1011,9 @@ static int software_resume(void)
         wait_for_device_probe();
 
         if (resume_wait) {
-            while ((swsusp_resume_device = name_to_dev_t(resume_file)) == 0)
+            while ((swsusp_resume_device = name_to_dev_t(resume_file)) == 0) {
                 msleep(HIBERNATE_TEN);
+            }
             async_synchronize_full();
         }
 
@@ -976,14 +1024,14 @@ static int software_resume(void)
         }
     }
 
- Check_image:
-    pm_pr_dbg("Hibernation image partition %d:%d present\n",
-        MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
+Check_image:
+    pm_pr_dbg("Hibernation image partition %d:%d present\n", MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
 
     pm_pr_dbg("Looking for hibernation image.\n");
     error = swsusp_check();
-    if (error)
+    if (error) {
         goto Unlock;
+    }
 
     /* The snapshot device should not be opened while we're running */
     if (!hibernate_acquire()) {
@@ -995,49 +1043,47 @@ static int software_resume(void)
     pr_info("resume from hibernation\n");
     pm_prepare_console();
     error = pm_notifier_call_chain_robust(PM_RESTORE_PREPARE, PM_POST_RESTORE);
-    if (error)
+    if (error) {
         goto Restore;
+    }
 
     pm_pr_dbg("Preparing processes for hibernation restore.\n");
     error = freeze_processes();
-    if (error)
-        goto Close_Finish;
+    if (error) {
+        swsusp_close(FMODE_READ);
+        goto Finish;
+    }
 
     error = freeze_kernel_threads();
     if (error) {
         thaw_processes();
-        goto Close_Finish;
+        swsusp_close(FMODE_READ);
+        goto Finish;
     }
 
     error = load_image_and_restore();
     thaw_processes();
- Finish:
+Finish:
     pm_notifier_call_chain(PM_POST_RESTORE);
- Restore:
+Restore:
     pm_restore_console();
     pr_info("resume failed (%d)\n", error);
     hibernate_release();
     /* For success case, the suspend path will release the lock */
- Unlock:
+Unlock:
     mutex_unlock(&system_transition_mutex);
     pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
     return error;
- Close_Finish:
-    swsusp_close(FMODE_READ);
-    goto Finish;
 }
 
 late_initcall_sync(software_resume);
 
-
-static const char * const hibernation_modes[] = {
-    [HIBERNATION_PLATFORM]    = "platform",
-    [HIBERNATION_SHUTDOWN]    = "shutdown",
-    [HIBERNATION_REBOOT]    = "reboot",
+static const char *const hibernation_modes[] = {
+    [HIBERNATION_PLATFORM] = "platform",       [HIBERNATION_SHUTDOWN] = "shutdown", [HIBERNATION_REBOOT] = "reboot",
 #ifdef CONFIG_SUSPEND
-    [HIBERNATION_SUSPEND]    = "suspend",
+    [HIBERNATION_SUSPEND] = "suspend",
 #endif
-    [HIBERNATION_TEST_RESUME]    = "test_resume",
+    [HIBERNATION_TEST_RESUME] = "test_resume",
 };
 
 /*
@@ -1066,43 +1112,47 @@ static const char * const hibernation_modes[] = {
  * into /sys/power/disk.
  */
 
-static ssize_t disk_show(struct kobject *kobj, struct kobj_attribute *attr,
-             char *buf)
+static ssize_t disk_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     int i;
     char *start = buf;
 
-    if (!hibernation_available())
+    if (!hibernation_available()) {
         return sprintf(buf, "[disabled]\n");
+    }
 
     for (i = HIBERNATION_FIRST; i <= HIBERNATION_MAX; i++) {
-        if (!hibernation_modes[i])
-            continue;
-        switch (i) {
-        case HIBERNATION_SHUTDOWN:
-        case HIBERNATION_REBOOT:
-#ifdef CONFIG_SUSPEND
-        case HIBERNATION_SUSPEND:
-#endif
-        case HIBERNATION_TEST_RESUME:
-            break;
-        case HIBERNATION_PLATFORM:
-            if (hibernation_ops)
-                break;
-            /* not a valid mode, continue with loop */
+        if (!hibernation_modes[i]) {
             continue;
         }
-        if (i == hibernation_mode)
+        switch (i) {
+            case HIBERNATION_SHUTDOWN:
+            case HIBERNATION_REBOOT:
+#ifdef CONFIG_SUSPEND
+            case HIBERNATION_SUSPEND:
+#endif
+            case HIBERNATION_TEST_RESUME:
+                break;
+            case HIBERNATION_PLATFORM:
+                if (hibernation_ops) {
+                    break;
+                }
+                /* not a valid mode, continue with loop */
+                continue;
+            default:
+                break;
+        }
+        if (i == hibernation_mode) {
             buf += sprintf(buf, "[%s] ", hibernation_modes[i]);
-        else
+        } else {
             buf += sprintf(buf, "%s ", hibernation_modes[i]);
+        }
     }
     buf += sprintf(buf, "\n");
-    return buf-start;
+    return buf - start;
 }
 
-static ssize_t disk_store(struct kobject *kobj, struct kobj_attribute *attr,
-              const char *buf, size_t n)
+static ssize_t disk_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
     int error = 0;
     int i;
@@ -1110,78 +1160,81 @@ static ssize_t disk_store(struct kobject *kobj, struct kobj_attribute *attr,
     char *p;
     int mode = HIBERNATION_INVALID;
 
-    if (!hibernation_available())
+    if (!hibernation_available()) {
         return -EPERM;
+    }
 
     p = memchr(buf, '\n', n);
     len = p ? p - buf : n;
 
     lock_system_sleep();
     for (i = HIBERNATION_FIRST; i <= HIBERNATION_MAX; i++) {
-        if (len == strlen(hibernation_modes[i])
-            && !strncmp(buf, hibernation_modes[i], len)) {
+        if (len == strlen(hibernation_modes[i]) && !strncmp(buf, hibernation_modes[i], len)) {
             mode = i;
             break;
         }
     }
     if (mode != HIBERNATION_INVALID) {
         switch (mode) {
-        case HIBERNATION_SHUTDOWN:
-        case HIBERNATION_REBOOT:
+            case HIBERNATION_SHUTDOWN:
+            case HIBERNATION_REBOOT:
 #ifdef CONFIG_SUSPEND
-        case HIBERNATION_SUSPEND:
+            case HIBERNATION_SUSPEND:
 #endif
-        case HIBERNATION_TEST_RESUME:
-            hibernation_mode = mode;
-            break;
-        case HIBERNATION_PLATFORM:
-            if (hibernation_ops)
+            case HIBERNATION_TEST_RESUME:
                 hibernation_mode = mode;
-            else
-                error = -EINVAL;
+                break;
+            case HIBERNATION_PLATFORM:
+                if (hibernation_ops) {
+                    hibernation_mode = mode;
+                } else {
+                    error = -EINVAL;
+                }
+            default:
+                break;
         }
-    } else
+    } else {
         error = -EINVAL;
+    }
 
-    if (!error)
-        pm_pr_dbg("Hibernation mode set to '%s'\n",
-                   hibernation_modes[mode]);
+    if (!error) {
+        pm_pr_dbg("Hibernation mode set to '%s'\n", hibernation_modes[mode]);
+    }
     unlock_system_sleep();
     return error ? error : n;
 }
 
 power_attr(disk);
 
-static ssize_t resume_show(struct kobject *kobj, struct kobj_attribute *attr,
-               char *buf)
+static ssize_t resume_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
-    return sprintf(buf, "%d:%d\n", MAJOR(swsusp_resume_device),
-               MINOR(swsusp_resume_device));
+    return sprintf(buf, "%d:%d\n", MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
 }
 
-static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
-                const char *buf, size_t n)
+static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
     dev_t res;
     int len = n;
     char *name;
 
-    if (len && buf[len-1] == '\n')
+    if (len && buf[len - 1] == '\n') {
         len--;
+    }
     name = kstrndup(buf, len, GFP_KERNEL);
-    if (!name)
+    if (!name) {
         return -ENOMEM;
+    }
 
     res = name_to_dev_t(name);
     kfree(name);
-    if (!res)
+    if (!res) {
         return -EINVAL;
+    }
 
     lock_system_sleep();
     swsusp_resume_device = res;
     unlock_system_sleep();
-    pm_pr_dbg("Configured hibernation resume from disk to %u\n",
-          swsusp_resume_device);
+    pm_pr_dbg("Configured hibernation resume from disk to %u\n", swsusp_resume_device);
     noresume = 0;
     software_resume();
     return n;
@@ -1189,22 +1242,20 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
 
 power_attr(resume);
 
-static ssize_t resume_offset_show(struct kobject *kobj,
-                  struct kobj_attribute *attr, char *buf)
+static ssize_t resume_offset_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     return sprintf(buf, "%llu\n", (unsigned long long)swsusp_resume_block);
 }
 
-static ssize_t resume_offset_store(struct kobject *kobj,
-                   struct kobj_attribute *attr, const char *buf,
-                   size_t n)
+static ssize_t resume_offset_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
     unsigned long long offset;
     int rc;
 
     rc = kstrtoull(buf, 0, &offset);
-    if (rc)
+    if (rc) {
         return rc;
+    }
     swsusp_resume_block = offset;
 
     return n;
@@ -1212,14 +1263,12 @@ static ssize_t resume_offset_store(struct kobject *kobj,
 
 power_attr(resume_offset);
 
-static ssize_t image_size_show(struct kobject *kobj, struct kobj_attribute *attr,
-                   char *buf)
+static ssize_t image_size_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     return sprintf(buf, "%lu\n", image_size);
 }
 
-static ssize_t image_size_store(struct kobject *kobj, struct kobj_attribute *attr,
-                const char *buf, size_t n)
+static ssize_t image_size_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
     unsigned long size;
 
@@ -1233,15 +1282,12 @@ static ssize_t image_size_store(struct kobject *kobj, struct kobj_attribute *att
 
 power_attr(image_size);
 
-static ssize_t reserved_size_show(struct kobject *kobj,
-                  struct kobj_attribute *attr, char *buf)
+static ssize_t reserved_size_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     return sprintf(buf, "%lu\n", reserved_size);
 }
 
-static ssize_t reserved_size_store(struct kobject *kobj,
-                   struct kobj_attribute *attr,
-                   const char *buf, size_t n)
+static ssize_t reserved_size_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
     unsigned long size;
 
@@ -1256,19 +1302,12 @@ static ssize_t reserved_size_store(struct kobject *kobj,
 power_attr(reserved_size);
 
 static struct attribute *g[] = {
-    &disk_attr.attr,
-    &resume_offset_attr.attr,
-    &resume_attr.attr,
-    &image_size_attr.attr,
-    &reserved_size_attr.attr,
-    NULL,
+    &disk_attr.attr, &resume_offset_attr.attr, &resume_attr.attr, &image_size_attr.attr, &reserved_size_attr.attr, NULL,
 };
-
 
 static const struct attribute_group attr_group = {
     .attrs = g,
 };
-
 
 static int __init pm_disk_init(void)
 {
@@ -1277,11 +1316,11 @@ static int __init pm_disk_init(void)
 
 core_initcall(pm_disk_init);
 
-
 static int __init resume_setup(char *str)
 {
-    if (noresume)
+    if (noresume) {
         return 1;
+    }
 
     strncpy(resume_file, str, HIBERNATE_TWOHUNDREDFIFTYFIVE);
     return 1;
@@ -1291,11 +1330,13 @@ static int __init resume_offset_setup(char *str)
 {
     unsigned long long offset;
 
-    if (noresume)
+    if (noresume) {
         return 1;
+    }
 
-    if (sscanf(str, "%llu", &offset) == 1)
+    if (sscanf(str, "%llu", &offset) == 1) {
         swsusp_resume_block = offset;
+    }
 
     return 1;
 }
@@ -1309,8 +1350,7 @@ static int __init hibernate_setup(char *str)
     } else if (!strncmp(str, "no", HIBERNATE_TWO)) {
         noresume = 1;
         nohibernate = 1;
-    } else if (IS_ENABLED(CONFIG_STRICT_KERNEL_RWX)
-           && !strncmp(str, "protect_image", HIBERNATE_THIRTEEN)) {
+    } else if (IS_ENABLED(CONFIG_STRICT_KERNEL_RWX) && !strncmp(str, "protect_image", HIBERNATE_THIRTEEN)) {
         enable_restore_image_protection();
     }
     return 1;
@@ -1332,8 +1372,9 @@ static int __init resumedelay_setup(char *str)
 {
     int rc = kstrtouint(str, 0, &resume_delay);
 
-    if (rc)
+    if (rc) {
         return rc;
+    }
     return 1;
 }
 

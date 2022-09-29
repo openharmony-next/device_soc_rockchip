@@ -27,17 +27,15 @@
 #include <soc/rockchip/rockchip_sip.h>
 
 #ifdef CONFIG_64BIT
-#define PSCI_FN_NATIVE(version, name)    PSCI_##version##_FN64_##name
+#define PSCI_FN_NATIVE(version, name) PSCI_##version##_FN64_##name
 #else
-#define PSCI_FN_NATIVE(version, name)    PSCI_##version##_FN_##name
+#define PSCI_FN_NATIVE(version, name) PSCI_##version##_FN_##name
 #endif
 
-#define SIZE_PAGE(n)    ((n) << 12)
+#define SIZE_PAGE(n) ((n) << 12)
 
-static struct arm_smccc_res __invoke_sip_fn_smc(unsigned long function_id,
-                        unsigned long arg0,
-                        unsigned long arg1,
-                        unsigned long arg2)
+static struct arm_smccc_res __invoke_sip_fn_smc(unsigned long function_id, unsigned long arg0, unsigned long arg1,
+                                                unsigned long arg2)
 {
     struct arm_smccc_res res;
 
@@ -105,9 +103,9 @@ u32 sip_smc_secure_reg_read(u32 addr_phy)
     struct arm_smccc_res res;
 
     res = __invoke_sip_fn_smc(SIP_ACCESS_REG, 0, addr_phy, SECURE_REG_RD);
-    if (res.a0)
-        pr_err("%s error: %d, addr phy: 0x%x\n",
-               __func__, (int)res.a0, addr_phy);
+    if (res.a0) {
+        pr_err("%s error: %d, addr phy: 0x%x\n", __func__, (int)res.a0, addr_phy);
+    }
 
     return res.a1;
 }
@@ -118,9 +116,9 @@ int sip_smc_secure_reg_write(u32 addr_phy, u32 val)
     struct arm_smccc_res res;
 
     res = __invoke_sip_fn_smc(SIP_ACCESS_REG, val, addr_phy, SECURE_REG_WR);
-    if (res.a0)
-        pr_err("%s error: %d, addr phy: 0x%x\n",
-               __func__, (int)res.a0, addr_phy);
+    if (res.a0) {
+        pr_err("%s error: %d, addr phy: 0x%x\n", __func__, (int)res.a0, addr_phy);
+    }
 
     return res.a0;
 }
@@ -135,8 +133,9 @@ static void *sip_map(phys_addr_t start, size_t size)
     unsigned int i;
     void *vaddr;
 
-    if (!pfn_valid(__phys_to_pfn(start)))
+    if (!pfn_valid(__phys_to_pfn(start))) {
         return ioremap(start, size);
+    }
 
     page_start = start - offset_in_page(start);
     page_count = DIV_ROUND_UP(size + offset_in_page(start), PAGE_SIZE);
@@ -145,13 +144,13 @@ static void *sip_map(phys_addr_t start, size_t size)
 
     pages = kmalloc_array(page_count, sizeof(struct page *), GFP_KERNEL);
     if (!pages) {
-        pr_err("%s: Failed to allocate array for %u pages\n",
-               __func__, page_count);
+        pr_err("%s: Failed to allocate array for %u pages\n", __func__, page_count);
         return NULL;
     }
 
-    for (i = 0; i < page_count; i++)
+    for (i = 0; i < page_count; i++) {
         pages[i] = phys_to_page(page_start + i * PAGE_SIZE);
+    }
 
     vaddr = vmap(pages, page_count, VM_MAP, prot);
     kfree(pages);
@@ -164,15 +163,15 @@ static void *sip_map(phys_addr_t start, size_t size)
     return vaddr + offset_in_page(start);
 }
 
-struct arm_smccc_res sip_smc_request_share_mem(u32 page_num,
-                           share_page_type_t page_type)
+struct arm_smccc_res sip_smc_request_share_mem(u32 page_num, share_page_type_t page_type)
 {
     struct arm_smccc_res res;
     unsigned long share_mem_phy;
 
     res = __invoke_sip_fn_smc(SIP_SHARE_MEM, page_num, page_type, 0);
-    if (IS_SIP_ERROR(res.a0))
+    if (IS_SIP_ERROR(res.a0)) {
         goto error;
+    }
 
     share_mem_phy = res.a1;
     res.a1 = (unsigned long)sip_map(share_mem_phy, SIZE_PAGE(page_num));
@@ -211,8 +210,9 @@ struct dram_addrmap_info *sip_smc_get_dram_map(void)
     struct arm_smccc_res res;
     static struct dram_addrmap_info *map;
 
-    if (map)
+    if (map) {
         return map;
+    }
 
     /* Request share memory size 4KB */
     res = sip_smc_request_share_mem(1, SHARE_PAGE_TYPE_DDR_ADDRMAP);
@@ -223,8 +223,7 @@ struct dram_addrmap_info *sip_smc_get_dram_map(void)
 
     map = (struct dram_addrmap_info *)res.a1;
 
-    res = sip_smc_dram(SHARE_PAGE_TYPE_DDR_ADDRMAP, 0,
-               ROCKCHIP_SIP_CONFIG_DRAM_ADDRMAP_GET);
+    res = sip_smc_dram(SHARE_PAGE_TYPE_DDR_ADDRMAP, 0, ROCKCHIP_SIP_CONFIG_DRAM_ADDRMAP_GET);
     if (res.a0) {
         pr_err("rockchip_sip_config_dram_init error:%lx\n", res.a0);
         map = NULL;
@@ -241,8 +240,9 @@ struct arm_smccc_res sip_smc_lastlog_request(void)
     void __iomem *addr1, *addr2;
 
     res = __invoke_sip_fn_smc(SIP_LAST_LOG, local_clock(), 0, 0);
-    if (IS_SIP_ERROR(res.a0))
+    if (IS_SIP_ERROR(res.a0)) {
         return res;
+    }
 
     addr1 = sip_map(res.a1, res.a3);
     if (!addr1) {
@@ -272,9 +272,9 @@ EXPORT_SYMBOL_GPL(sip_smc_lastlog_request);
  * depends on compile option(CONFIG_ARM or CONFIG_ARM64).
  */
 #ifdef CONFIG_ARM64
-#define SIP_UARTDBG_FN        SIP_UARTDBG_CFG64
+#define SIP_UARTDBG_FN SIP_UARTDBG_CFG64
 #else
-#define SIP_UARTDBG_FN        SIP_UARTDBG_CFG
+#define SIP_UARTDBG_FN SIP_UARTDBG_CFG
 static int firmware_64_32bit;
 #endif
 
@@ -282,16 +282,14 @@ static int fiq_sip_enabled;
 static int fiq_target_cpu;
 static phys_addr_t ft_fiq_mem_phy;
 static void __iomem *ft_fiq_mem_base;
-static void (*sip_fiq_debugger_uart_irq_tf)(struct pt_regs _pt_regs,
-                        unsigned long cpu);
+static void (*sip_fiq_debugger_uart_irq_tf)(struct pt_regs _pt_regs, unsigned long cpu);
 int sip_fiq_debugger_is_enabled(void)
 {
     return fiq_sip_enabled;
 }
 EXPORT_SYMBOL_GPL(sip_fiq_debugger_is_enabled);
 
-static struct pt_regs sip_fiq_debugger_get_pt_regs(void *reg_base,
-                           unsigned long sp_el1)
+static struct pt_regs sip_fiq_debugger_get_pt_regs(void *reg_base, unsigned long sp_el1)
 {
     struct pt_regs fiq_pt_regs;
     __maybe_unused struct sm_nsec_ctx *nsec_ctx = reg_base;
@@ -302,14 +300,14 @@ static struct pt_regs sip_fiq_debugger_get_pt_regs(void *reg_base,
      * 64-bit ATF + 64-bit kernel
      */
     /* copy cpu context: x0 ~ spsr_el3 */
-    memcpy(&fiq_pt_regs, reg_base, 8 * 31);
+    memcpy(&fiq_pt_regs, reg_base, 0xf8);
 
     /* copy pstate: spsr_el3 */
-    memcpy(&fiq_pt_regs.pstate, reg_base + 0x110, 8);
+    memcpy(&fiq_pt_regs.pstate, reg_base + 0x110, 0x8);
     fiq_pt_regs.sp = sp_el1;
 
     /* copy pc: elr_el3 */
-    memcpy(&fiq_pt_regs.pc, reg_base + 0x118, 8);
+    memcpy(&fiq_pt_regs.pc, reg_base + 0x118, 0x8);
 #else
     if (firmware_64_32bit == FIRMWARE_ATF_64BIT) {
         /*
@@ -328,8 +326,8 @@ static struct pt_regs sip_fiq_debugger_get_pt_regs(void *reg_base,
         fiq_pt_regs.ARM_r10 = gp_regs->x10;
         fiq_pt_regs.ARM_fp = gp_regs->x11;
         fiq_pt_regs.ARM_ip = gp_regs->x12;
-        fiq_pt_regs.ARM_sp = gp_regs->x19;    /* aarch32 svc_r13 */
-        fiq_pt_regs.ARM_lr = gp_regs->x18;    /* aarch32 svc_r14 */
+        fiq_pt_regs.ARM_sp = gp_regs->x19; /* aarch32 svc_r13 */
+        fiq_pt_regs.ARM_lr = gp_regs->x18; /* aarch32 svc_r14 */
         fiq_pt_regs.ARM_cpsr = gp_regs->spsr_el3;
         fiq_pt_regs.ARM_pc = gp_regs->elr_el3;
     } else {
@@ -369,9 +367,7 @@ static struct pt_regs sip_fiq_debugger_get_pt_regs(void *reg_base,
     return fiq_pt_regs;
 }
 
-static void sip_fiq_debugger_uart_irq_tf_cb(unsigned long sp_el1,
-                        unsigned long offset,
-                        unsigned long cpu)
+static void sip_fiq_debugger_uart_irq_tf_cb(unsigned long sp_el1, unsigned long offset, unsigned long cpu)
 {
     struct pt_regs fiq_pt_regs;
     char *cpu_context;
@@ -395,9 +391,7 @@ int sip_fiq_debugger_uart_irq_tf_init(u32 irq_id, void *callback_fn)
 
     /* init fiq debugger callback */
     sip_fiq_debugger_uart_irq_tf = callback_fn;
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, irq_id,
-                  (unsigned long)sip_fiq_debugger_uart_irq_tf_cb,
-                  UARTDBG_CFG_INIT);
+    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, irq_id, (unsigned long)sip_fiq_debugger_uart_irq_tf_cb, UARTDBG_CFG_INIT);
     if (IS_SIP_ERROR(res.a0)) {
         pr_err("%s error: %d\n", __func__, (int)res.a0);
         return res.a0;
@@ -406,8 +400,7 @@ int sip_fiq_debugger_uart_irq_tf_init(u32 irq_id, void *callback_fn)
     /* share memory ioremap */
     if (!ft_fiq_mem_base) {
         ft_fiq_mem_phy = res.a1;
-        ft_fiq_mem_base = sip_map(ft_fiq_mem_phy,
-                      FIQ_UARTDBG_SHARE_MEM_SIZE);
+        ft_fiq_mem_base = sip_map(ft_fiq_mem_phy, FIQ_UARTDBG_SHARE_MEM_SIZE);
         if (!ft_fiq_mem_base) {
             pr_err("%s: share memory ioremap failed\n", __func__);
             return -ENOMEM;
@@ -426,14 +419,15 @@ static ulong cpu_logical_map_mpidr(u32 cpu)
     /* Empirically, local "cpu_logical_map()" for rockchip platforms */
     ulong mpidr = 0x00;
 
-    if (cpu < 4)
+    if (cpu < 0x4) {
         /* 0x00, 0x01, 0x02, 0x03 */
         mpidr = cpu;
-    else if (cpu < 8)
+    } else if (cpu < 0x8) {
         /* 0x100, 0x101, 0x102, 0x103 */
-        mpidr = 0x100 | (cpu - 4);
-    else
+        mpidr = 0x100 | (cpu - 0x4);
+    } else {
         pr_err("Unsupported map cpu: %d\n", cpu);
+    }
 
     return mpidr;
 #else
@@ -446,8 +440,7 @@ int sip_fiq_debugger_switch_cpu(u32 cpu)
     struct arm_smccc_res res;
 
     fiq_target_cpu = cpu;
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, cpu_logical_map_mpidr(cpu),
-                  0, UARTDBG_CFG_OSHDL_CPUSW);
+    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, cpu_logical_map_mpidr(cpu), 0, UARTDBG_CFG_OSHDL_CPUSW);
     return res.a0;
 }
 
@@ -455,8 +448,7 @@ int sip_fiq_debugger_sdei_switch_cpu(u32 cur_cpu, u32 target_cpu, u32 flag)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_SWITCH_CPU,
-                  cur_cpu, target_cpu, flag);
+    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_SWITCH_CPU, cur_cpu, target_cpu, flag);
     return res.a0;
 }
 
@@ -464,12 +456,12 @@ int sip_fiq_debugger_sdei_get_event_id(u32 *fiq, u32 *sw_cpu, u32 *flag)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_GET_EVENT_ID,
-                  0, 0, 0);
+    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_GET_EVENT_ID, 0, 0, 0);
     *fiq = res.a1;
     *sw_cpu = res.a2;
-    if (flag)
+    if (flag) {
         *flag = res.a3;
+    }
 
     return res.a0;
 }
@@ -480,8 +472,7 @@ void sip_fiq_debugger_enable_debug(bool enable)
 {
     unsigned long val;
 
-    val = enable ? UARTDBG_CFG_OSHDL_DEBUG_ENABLE :
-               UARTDBG_CFG_OSHDL_DEBUG_DISABLE;
+    val = enable ? UARTDBG_CFG_OSHDL_DEBUG_ENABLE : UARTDBG_CFG_OSHDL_DEBUG_DISABLE;
 
     __invoke_sip_fn_smc(SIP_UARTDBG_FN, 0, 0, val);
 }
@@ -491,8 +482,7 @@ int sip_fiq_debugger_set_print_port(u32 port_phyaddr, u32 baudrate)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, port_phyaddr, baudrate,
-                  UARTDBG_CFG_PRINT_PORT);
+    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, port_phyaddr, baudrate, UARTDBG_CFG_PRINT_PORT);
     return res.a0;
 }
 EXPORT_SYMBOL_GPL(sip_fiq_debugger_set_print_port);
@@ -502,10 +492,10 @@ int sip_fiq_debugger_request_share_memory(void)
     struct arm_smccc_res res;
 
     /* request page share memory */
-    res = sip_smc_request_share_mem(FIQ_UARTDBG_PAGE_NUMS,
-                    SHARE_PAGE_TYPE_UARTDBG);
-    if (IS_SIP_ERROR(res.a0))
+    res = sip_smc_request_share_mem(FIQ_UARTDBG_PAGE_NUMS, SHARE_PAGE_TYPE_UARTDBG);
+    if (IS_SIP_ERROR(res.a0)) {
         return res.a0;
+    }
 
     return SIP_RET_SUCCESS;
 }
@@ -533,17 +523,18 @@ static __init int sip_firmware_init(void)
 {
     struct arm_smccc_res res;
 
-    if (!psci_smp_available())
+    if (!psci_smp_available()) {
         return 0;
+    }
 
     /*
      * OP-TEE works on kernel 3.10 and 4.4 and we have different sip
      * implement. We should tell OP-TEE the current rockchip sip version.
      */
-    res = __invoke_sip_fn_smc(SIP_SIP_VERSION, SIP_IMPLEMENT_V2,
-                  SECURE_REG_WR, 0);
-    if (IS_SIP_ERROR(res.a0))
+    res = __invoke_sip_fn_smc(SIP_SIP_VERSION, SIP_IMPLEMENT_V2, SECURE_REG_WR, 0);
+    if (IS_SIP_ERROR(res.a0)) {
         pr_err("%s: set rockchip sip version v2 failed\n", __func__);
+    }
 
     /*
      * Currently, we support:
@@ -556,17 +547,17 @@ static __init int sip_firmware_init(void)
      * We get info from cpuid and compare with all supported ARMv7 cpu.
      */
     switch (read_cpuid_part()) {
-    case ARM_CPU_PART_CORTEX_A7:
-    case ARM_CPU_PART_CORTEX_A8:
-    case ARM_CPU_PART_CORTEX_A9:
-    case ARM_CPU_PART_CORTEX_A12:
-    case ARM_CPU_PART_CORTEX_A15:
-    case ARM_CPU_PART_CORTEX_A17:
-        firmware_64_32bit = FIRMWARE_TEE_32BIT;
-        break;
-    default:
-        firmware_64_32bit = FIRMWARE_ATF_64BIT;
-        break;
+        case ARM_CPU_PART_CORTEX_A7:
+        case ARM_CPU_PART_CORTEX_A8:
+        case ARM_CPU_PART_CORTEX_A9:
+        case ARM_CPU_PART_CORTEX_A12:
+        case ARM_CPU_PART_CORTEX_A15:
+        case ARM_CPU_PART_CORTEX_A17:
+            firmware_64_32bit = FIRMWARE_TEE_32BIT;
+            break;
+        default:
+            firmware_64_32bit = FIRMWARE_ATF_64BIT;
+            break;
     }
 
     return 0;

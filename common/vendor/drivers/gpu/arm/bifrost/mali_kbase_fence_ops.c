@@ -70,15 +70,11 @@ kbase_fence_fence_value_str(struct dma_fence *fence, char *str, int size)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
-const struct fence_ops kbase_fence_ops = {
-    .wait = fence_default_wait,
+const struct fence_ops kbase_fence_ops = {.wait = fence_default_wait,
 #else
-const struct dma_fence_ops kbase_fence_ops = {
-    .wait = dma_fence_default_wait,
+const struct dma_fence_ops kbase_fence_ops = {.wait = dma_fence_default_wait,
 #endif
-    .get_driver_name = kbase_fence_get_driver_name,
-    .get_timeline_name = kbase_fence_get_timeline_name,
-    .enable_signaling = kbase_fence_enable_signaling,
-    .fence_value_str = kbase_fence_fence_value_str
-};
-
+                                          .get_driver_name = kbase_fence_get_driver_name,
+                                          .get_timeline_name = kbase_fence_get_timeline_name,
+                                          .enable_signaling = kbase_fence_enable_signaling,
+                                          .fence_value_str = kbase_fence_fence_value_str};

@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2010-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -68,7 +69,6 @@ mali_osk_errcode_t mali_osk_resource_initialize(void);
  * @return MALI_OSK_ERR_OK on success, MALI_OSK_ERR_ITEM_NOT_FOUND if resource is not found
  */
 mali_osk_errcode_t mali_osk_resource_find(u32 addr, _mali_osk_resource_t *res);
-
 
 /** @brief Find Mali GPU HW base address
  *
@@ -141,7 +141,6 @@ mali_bool mali_osk_gpu_secure_mode_is_enabled(void);
  * @return MALI_TRUE if supported, otherwise MALI_FALSE.
  */
 mali_bool mali_osk_gpu_secure_mode_is_supported(void);
-
 
 /** @} */ /* end group _mali_osk_miscellaneous */
 

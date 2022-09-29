@@ -1,11 +1,15 @@
 /*
  * Copyright (C) 2010, 2013-2017 ARM Limited. All rights reserved.
  * 
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
+ * This program is free software and is provided
+ * to you under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation,
+ * and any use by you of this program is subject to the terms of such GNU licence.
  * 
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is
+ * included with the program, and can also be obtained from Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA  02110-1301, USA.
  */
 
 /**
@@ -38,8 +42,9 @@ u32 _mali_osk_bitmap_alloc(struct _mali_osk_bitmap *bitmap)
         obj = -1;
     }
 
-    if (obj != -1)
+    if (obj != -1) {
         --bitmap->avail;
+    }
     _mali_osk_spinlock_unlock(bitmap->lock);
 
     return obj;
@@ -67,12 +72,10 @@ u32 _mali_osk_bitmap_alloc_range(struct _mali_osk_bitmap *bitmap, int cnt)
     }
 
     _mali_osk_spinlock_lock(bitmap->lock);
-    obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max,
-                     bitmap->last, cnt, 0);
+    obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max, bitmap->last, cnt, 0);
 
     if (obj >= bitmap->max) {
-        obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max,
-                         bitmap->reserve, cnt, 0);
+        obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max, bitmap->reserve, cnt, 0);
     }
 
     if (obj < bitmap->max) {
@@ -121,14 +124,13 @@ int _mali_osk_bitmap_init(struct _mali_osk_bitmap *bitmap, u32 num, u32 reserve)
 
     bitmap->reserve = reserve;
     bitmap->last = reserve;
-    bitmap->max  = num;
+    bitmap->max = num;
     bitmap->avail = num - reserve;
     bitmap->lock = _mali_osk_spinlock_init(_MALI_OSK_LOCKFLAG_UNORDERED, _MALI_OSK_LOCK_ORDER_FIRST);
     if (!bitmap->lock) {
         return MALI_OSK_ERR_NOMEM;
     }
-    bitmap->table = kzalloc(BITS_TO_LONGS(bitmap->max) *
-                sizeof(long), GFP_KERNEL);
+    bitmap->table = kzalloc(BITS_TO_LONGS(bitmap->max) * sizeof(long), GFP_KERNEL);
     if (!bitmap->table) {
         _mali_osk_spinlock_term(bitmap->lock);
         return MALI_OSK_ERR_NOMEM;
@@ -149,4 +151,3 @@ void _mali_osk_bitmap_term(struct _mali_osk_bitmap *bitmap)
         kfree(bitmap->table);
     }
 }
-

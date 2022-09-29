@@ -27,19 +27,17 @@
 #include "mpp_common.h"
 #include "mpp_iommu.h"
 
-#define IEP2_DRIVER_NAME        "mpp-iep2"
+#define IEP2_DRIVER_NAME "mpp-iep2"
 
-#define    IEP2_SESSION_MAX_BUFFERS        20
+#define IEP2_SESSION_MAX_BUFFERS 20
+#define IEP2_SESSION_MAX_BUFFERS 20
+#define IEP2_SESSION_PROCF 0644
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 4
+#define MVL 28
+#define MVR 27
 
-#define TILE_WIDTH        16
-#define TILE_HEIGHT        4
-#define MVL            28
-#define MVR            27
-
-enum rockchip_iep2_fmt {
-    ROCKCHIP_IEP2_FMT_YUV422 = 2,
-    ROCKCHIP_IEP2_FMT_YUV420
-};
+enum rockchip_iep2_fmt { ROCKCHIP_IEP2_FMT_YUV422 = 2, ROCKCHIP_IEP2_FMT_YUV420 };
 
 enum rockchip_iep2_yuv_swap {
     ROCKCHIP_IEP2_YUV_SWAP_SP_UV,
@@ -48,10 +46,7 @@ enum rockchip_iep2_yuv_swap {
     ROCKCHIP_IEP2_YUV_SWAP_P
 };
 
-enum rockchip_iep2_dil_ff_order {
-    ROCKCHIP_IEP2_DIL_FF_ORDER_TB,
-    ROCKCHIP_IEP2_DIL_FF_ORDER_BT
-};
+enum rockchip_iep2_dil_ff_order { ROCKCHIP_IEP2_DIL_FF_ORDER_TB, ROCKCHIP_IEP2_DIL_FF_ORDER_BT };
 
 enum rockchip_iep2_dil_mode {
     ROCKCHIP_IEP2_DIL_MODE_DISABLE,
@@ -74,17 +69,12 @@ enum ROCKCHIP_IEP2_PD_COMP_FLAG {
 };
 
 /* default iep2 mtn table */
-static u32 iep2_mtn_tab[] = {
-    0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x01010000, 0x06050302, 0x0f0d0a08, 0x1c191512,
-    0x2b282420, 0x3634312e, 0x3d3c3a38, 0x40403f3e,
-    0x40404040, 0x40404040, 0x40404040, 0x40404040
-};
+static u32 iep2_mtn_tab[] = {0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x01010000, 0x06050302,
+                             0x0f0d0a08, 0x1c191512, 0x2b282420, 0x3634312e, 0x3d3c3a38, 0x40403f3e,
+                             0x40404040, 0x40404040, 0x40404040, 0x40404040};
 
-#define to_iep_task(task)        \
-        container_of(task, struct iep_task, mpp_task)
-#define to_iep2_dev(dev)        \
-        container_of(dev, struct iep2_dev, mpp)
+#define to_iep_task(task) container_of(task, struct iep_task, mpp_task)
+#define to_iep2_dev(dev) container_of(dev, struct iep2_dev, mpp)
 
 struct iep2_addr {
     u32 y;
@@ -232,19 +222,15 @@ static int iep2_addr_rnum[] = {
     26, 31, 32, /* src prv */
     44, 46, -1, /* dst top */
     45, 47, -1, /* dst bot */
-    34, /* mv */
-    33, /* md */
+    34,         /* mv */
+    33,         /* md */
 };
 
-static int iep2_process_reg_fd(struct mpp_session *session,
-                   struct iep_task *task,
-                   struct mpp_task_msgs *msgs)
+static int iep2_process_reg_fd(struct mpp_session *session, struct iep_task *task, struct mpp_task_msgs *msgs)
 {
     int i;
     /* see the detail at above table iep2_addr_rnum */
-    int addr_num =
-        ARRAY_SIZE(task->params.src) * 3 +
-        ARRAY_SIZE(task->params.dst) * 3 + 2;
+    int addr_num = ARRAY_SIZE(task->params.src) * 0x3 + ARRAY_SIZE(task->params.dst) * 0x3 + 0x2;
 
     u32 *paddr = &task->params.src[0].y;
 
@@ -258,66 +244,62 @@ static int iep2_process_reg_fd(struct mpp_session *session,
             offset = 0;
         } else {
             usr_fd = paddr[i] & 0x3ff;
-            offset = paddr[i] >> 10;
+            offset = paddr[i] >> 0xa;
         }
 
-        if (usr_fd == 0 || iep2_addr_rnum[i] == -1)
+        if (usr_fd == 0 || iep2_addr_rnum[i] == -1) {
             continue;
+        }
 
         mem_region = mpp_task_attach_fd(&task->mpp_task, usr_fd);
         if (IS_ERR(mem_region)) {
-            mpp_debug(DEBUG_IOMMU, "reg[%3d]: %08x failed\n",
-                  iep2_addr_rnum[i], paddr[i]);
+            mpp_debug(DEBUG_IOMMU, "reg[%3d]: %08x failed\n", iep2_addr_rnum[i], paddr[i]);
             return PTR_ERR(mem_region);
         }
 
         mem_region->reg_idx = iep2_addr_rnum[i];
-        mpp_debug(DEBUG_IOMMU, "reg[%3d]: %3d => %pad + offset %10d\n",
-              iep2_addr_rnum[i], usr_fd, &mem_region->iova, offset);
+        mpp_debug(DEBUG_IOMMU, "reg[%3d]: %3d => %pad + offset %10d\n", iep2_addr_rnum[i], usr_fd, &mem_region->iova,
+                  offset);
         paddr[i] = mem_region->iova + offset;
     }
 
     return 0;
 }
 
-static int iep2_extract_task_msg(struct iep_task *task,
-                 struct mpp_task_msgs *msgs)
+static int iep2_extract_task_msg(struct iep_task *task, struct mpp_task_msgs *msgs)
 {
     u32 i;
     struct mpp_request *req;
 
     for (i = 0; i < msgs->req_cnt; i++) {
         req = &msgs->reqs[i];
-        if (!req->size)
+        if (!req->size) {
             continue;
+        }
 
         switch (req->cmd) {
-        case MPP_CMD_SET_REG_WRITE: {
-            if (copy_from_user(&task->params,
-                       req->data, req->size)) {
-                mpp_err("copy_from_user params failed\n");
-                return -EIO;
-            }
-        } break;
-        case MPP_CMD_SET_REG_READ: {
-            memcpy(&task->r_reqs[task->r_req_cnt++],
-                   req, sizeof(*req));
-        } break;
-        case MPP_CMD_SET_REG_ADDR_OFFSET: {
-            mpp_extract_reg_offset_info(&task->off_inf, req);
-        } break;
-        default:
-            break;
+            case MPP_CMD_SET_REG_WRITE: {
+                if (copy_from_user(&task->params, req->data, req->size)) {
+                    mpp_err("copy_from_user params failed\n");
+                    return -EIO;
+                }
+            } break;
+            case MPP_CMD_SET_REG_READ: {
+                memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
+            } break;
+            case MPP_CMD_SET_REG_ADDR_OFFSET: {
+                mpp_extract_reg_offset_info(&task->off_inf, req);
+            } break;
+            default:
+                break;
         }
     }
-    mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n",
-          task->w_req_cnt, task->r_req_cnt);
+    mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n", task->w_req_cnt, task->r_req_cnt);
 
     return 0;
 }
 
-static void *iep2_alloc_task(struct mpp_session *session,
-                 struct mpp_task_msgs *msgs)
+static void *iep2_alloc_task(struct mpp_session *session, struct mpp_task_msgs *msgs)
 {
     int ret;
     struct iep_task *task = NULL;
@@ -325,19 +307,22 @@ static void *iep2_alloc_task(struct mpp_session *session,
     mpp_debug_enter();
 
     task = kzalloc(sizeof(*task), GFP_KERNEL);
-    if (!task)
+    if (!task) {
         return NULL;
+    }
 
     mpp_task_init(session, &task->mpp_task);
     /* extract reqs for current task */
     ret = iep2_extract_task_msg(task, msgs);
-    if (ret)
+    if (ret) {
         goto fail;
+    }
     /* process fd in register */
     if (!(msgs->flags & MPP_FLAGS_REG_FD_NO_TRANS)) {
         ret = iep2_process_reg_fd(session, task, msgs);
-        if (ret)
+        if (ret) {
             goto fail;
+        }
     }
     task->clk_mode = CLK_MODE_NORMAL;
 
@@ -361,71 +346,53 @@ static void iep2_config(struct mpp_dev *mpp, struct iep_task *task)
     width = cfg->tile_cols * TILE_WIDTH;
     height = cfg->tile_rows * TILE_HEIGHT;
 
-    reg = IEP2_REG_SRC_FMT(cfg->src_fmt)
-        | IEP2_REG_SRC_YUV_SWAP(cfg->src_yuv_swap)
-        | IEP2_REG_DST_FMT(cfg->dst_fmt)
-        | IEP2_REG_DST_YUV_SWAP(cfg->dst_yuv_swap)
-        | IEP2_REG_DEBUG_DATA_EN;
+    reg = IEP2_REG_SRC_FMT(cfg->src_fmt) | IEP2_REG_SRC_YUV_SWAP(cfg->src_yuv_swap) | IEP2_REG_DST_FMT(cfg->dst_fmt) |
+          IEP2_REG_DST_YUV_SWAP(cfg->dst_yuv_swap) | IEP2_REG_DEBUG_DATA_EN;
     mpp_write_relaxed(mpp, IEP2_REG_IEP_CONFIG0, reg);
 
-    reg = IEP2_REG_SRC_PIC_WIDTH(width - 1)
-        | IEP2_REG_SRC_PIC_HEIGHT(height - 1);
+    reg = IEP2_REG_SRC_PIC_WIDTH(width - 1) | IEP2_REG_SRC_PIC_HEIGHT(height - 1);
     mpp_write_relaxed(mpp, IEP2_REG_SRC_IMG_SIZE, reg);
 
-    reg = IEP2_REG_SRC_VIR_Y_STRIDE(cfg->src_y_stride)
-        | IEP2_REG_SRC_VIR_UV_STRIDE(cfg->src_uv_stride);
+    reg = IEP2_REG_SRC_VIR_Y_STRIDE(cfg->src_y_stride) | IEP2_REG_SRC_VIR_UV_STRIDE(cfg->src_uv_stride);
     mpp_write_relaxed(mpp, IEP2_REG_VIR_SRC_IMG_WIDTH, reg);
 
     reg = IEP2_REG_DST_VIR_STRIDE(cfg->dst_y_stride);
     mpp_write_relaxed(mpp, IEP2_REG_VIR_DST_IMG_WIDTH, reg);
 
-    reg = IEP2_REG_DIL_MV_HIST_EN
-        | IEP2_REG_DIL_COMB_EN
-        | IEP2_REG_DIL_BLE_EN
-        | IEP2_REG_DIL_EEDI_EN
-        | IEP2_REG_DIL_MEMC_EN
-        | IEP2_REG_DIL_OSD_EN
-        | IEP2_REG_DIL_PD_EN
-        | IEP2_REG_DIL_FF_EN
-        | IEP2_REG_DIL_MD_PRE_EN
-        | IEP2_REG_DIL_FIELD_ORDER(cfg->dil_field_order)
-        | IEP2_REG_DIL_OUT_MODE(cfg->dil_out_mode)
-        | IEP2_REG_DIL_MODE(cfg->dil_mode);
-    if (cfg->roi_en)
+    reg = IEP2_REG_DIL_MV_HIST_EN | IEP2_REG_DIL_COMB_EN | IEP2_REG_DIL_BLE_EN | IEP2_REG_DIL_EEDI_EN |
+          IEP2_REG_DIL_MEMC_EN | IEP2_REG_DIL_OSD_EN | IEP2_REG_DIL_PD_EN | IEP2_REG_DIL_FF_EN |
+          IEP2_REG_DIL_MD_PRE_EN | IEP2_REG_DIL_FIELD_ORDER(cfg->dil_field_order) |
+          IEP2_REG_DIL_OUT_MODE(cfg->dil_out_mode) | IEP2_REG_DIL_MODE(cfg->dil_mode);
+    if (cfg->roi_en) {
         reg |= IEP2_REG_DIL_ROI_EN;
+    }
     mpp_write_relaxed(mpp, IEP2_REG_DIL_CONFIG0, reg);
 
     if (cfg->dil_mode != ROCKCHIP_IEP2_DIL_MODE_PD) {
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURY,
-                  cfg->src[0].y);
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURUV,
-                  cfg->src[0].cbcr);
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURV,
-                  cfg->src[0].cr);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURY, cfg->src[0].y);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURUV, cfg->src[0].cbcr);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURV, cfg->src[0].cr);
 
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTY,
-                  cfg->src[1].y);
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTUV,
-                  cfg->src[1].cbcr);
-        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTV,
-                  cfg->src[1].cr);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTY, cfg->src[1].y);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTUV, cfg->src[1].cbcr);
+        mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTV, cfg->src[1].cr);
     } else {
         struct iep2_addr *top, *bot;
 
         switch (cfg->pd_mode) {
-        default:
-        case ROCKCHIP_IEP2_PD_COMP_FLAG_CC:
-            top = &cfg->src[0];
-            bot = &cfg->src[0];
-            break;
-        case ROCKCHIP_IEP2_PD_COMP_FLAG_CN:
-            top = &cfg->src[0];
-            bot = &cfg->src[1];
-            break;
-        case ROCKCHIP_IEP2_PD_COMP_FLAG_NC:
-            top = &cfg->src[1];
-            bot = &cfg->src[0];
-            break;
+            default:
+            case ROCKCHIP_IEP2_PD_COMP_FLAG_CC:
+                top = &cfg->src[0];
+                bot = &cfg->src[0];
+                break;
+            case ROCKCHIP_IEP2_PD_COMP_FLAG_CN:
+                top = &cfg->src[0];
+                bot = &cfg->src[1];
+                break;
+            case ROCKCHIP_IEP2_PD_COMP_FLAG_NC:
+                top = &cfg->src[1];
+                bot = &cfg->src[0];
+                break;
         }
 
         mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_CURY, top->y);
@@ -436,9 +403,9 @@ static void iep2_config(struct mpp_dev *mpp, struct iep_task *task)
         mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_NXTV, bot->cr);
     }
 
-    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREY, cfg->src[2].y);
-    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREUV, cfg->src[2].cbcr);
-    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREV, cfg->src[2].cr);
+    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREY, cfg->src[0x2].y);
+    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREUV, cfg->src[0x2].cbcr);
+    mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_PREV, cfg->src[0x2].cr);
 
     mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_MD, cfg->md_addr);
     mpp_write_relaxed(mpp, IEP2_REG_SRC_ADDR_MV, cfg->mv_addr);
@@ -451,46 +418,35 @@ static void iep2_config(struct mpp_dev *mpp, struct iep_task *task)
     mpp_write_relaxed(mpp, IEP2_REG_DST_ADDR_BOTY, cfg->dst[1].y);
     mpp_write_relaxed(mpp, IEP2_REG_DST_ADDR_BOTC, cfg->dst[1].cbcr);
 
-    reg = IEP2_REG_MD_THETA(cfg->md_theta)
-        | IEP2_REG_MD_R(cfg->md_r)
-        | IEP2_REG_MD_LAMBDA(cfg->md_lambda);
+    reg = IEP2_REG_MD_THETA(cfg->md_theta) | IEP2_REG_MD_R(cfg->md_r) | IEP2_REG_MD_LAMBDA(cfg->md_lambda);
     mpp_write_relaxed(mpp, IEP2_REG_MD_CONFIG0, reg);
 
-    reg = IEP2_REG_DECT_RESI_THR(cfg->dect_resi_thr)
-        | IEP2_REG_OSD_AREA_NUM(cfg->osd_area_num)
-        | IEP2_REG_OSD_GRADH_THR(cfg->osd_gradh_thr)
-        | IEP2_REG_OSD_GRADV_THR(cfg->osd_gradv_thr);
+    reg = IEP2_REG_DECT_RESI_THR(cfg->dect_resi_thr) | IEP2_REG_OSD_AREA_NUM(cfg->osd_area_num) |
+          IEP2_REG_OSD_GRADH_THR(cfg->osd_gradh_thr) | IEP2_REG_OSD_GRADV_THR(cfg->osd_gradv_thr);
     mpp_write_relaxed(mpp, IEP2_REG_DECT_CONFIG0, reg);
 
     reg = IEP2_REG_OSD_POS_LIMIT_NUM(cfg->osd_pos_limit_num);
-    if (cfg->osd_pos_limit_en)
+    if (cfg->osd_pos_limit_en) {
         reg |= IEP2_REG_OSD_POS_LIMIT_EN;
+    }
     mpp_write_relaxed(mpp, IEP2_REG_OSD_LIMIT_CONFIG, reg);
 
-    mpp_write_relaxed(mpp, IEP2_REG_OSD_LIMIT_AREA(0),
-              cfg->osd_limit_area[0]);
-    mpp_write_relaxed(mpp, IEP2_REG_OSD_LIMIT_AREA(1),
-              cfg->osd_limit_area[1]);
+    mpp_write_relaxed(mpp, IEP2_REG_OSD_LIMIT_AREA(0), cfg->osd_limit_area[0]);
+    mpp_write_relaxed(mpp, IEP2_REG_OSD_LIMIT_AREA(1), cfg->osd_limit_area[1]);
 
-    reg = IEP2_REG_OSD_PEC_THR(cfg->osd_pec_thr)
-        | IEP2_REG_OSD_LINE_NUM(cfg->osd_line_num);
+    reg = IEP2_REG_OSD_PEC_THR(cfg->osd_pec_thr) | IEP2_REG_OSD_LINE_NUM(cfg->osd_line_num);
     mpp_write_relaxed(mpp, IEP2_REG_OSD_CONFIG0, reg);
 
-    reg = IEP2_REG_ME_PENA(cfg->me_pena)
-        | IEP2_REG_MV_BONUS(cfg->mv_bonus)
-        | IEP2_REG_MV_SIMILAR_THR(cfg->mv_similar_thr)
-        | IEP2_REG_MV_SIMILAR_NUM_THR0(cfg->mv_similar_num_thr0)
-        | IEP2_REG_ME_THR_OFFSET(cfg->me_thr_offset);
+    reg = IEP2_REG_ME_PENA(cfg->me_pena) | IEP2_REG_MV_BONUS(cfg->mv_bonus) |
+          IEP2_REG_MV_SIMILAR_THR(cfg->mv_similar_thr) | IEP2_REG_MV_SIMILAR_NUM_THR0(cfg->mv_similar_num_thr0) |
+          IEP2_REG_ME_THR_OFFSET(cfg->me_thr_offset);
     mpp_write_relaxed(mpp, IEP2_REG_ME_CONFIG0, reg);
 
-    reg = IEP2_REG_MV_LEFT_LIMIT((~cfg->mv_left_limit) + 1)
-        | IEP2_REG_MV_RIGHT_LIMIT(cfg->mv_right_limit);
+    reg = IEP2_REG_MV_LEFT_LIMIT((~cfg->mv_left_limit) + 1) | IEP2_REG_MV_RIGHT_LIMIT(cfg->mv_right_limit);
     mpp_write_relaxed(mpp, IEP2_REG_ME_LIMIT_CONFIG, reg);
 
-    mpp_write_relaxed(mpp, IEP2_REG_EEDI_CONFIG0,
-              IEP2_REG_EEDI_THR0(cfg->eedi_thr0));
-    mpp_write_relaxed(mpp, IEP2_REG_BLE_CONFIG0,
-              IEP2_REG_BLE_BACKTOMA_NUM(cfg->ble_backtoma_num));
+    mpp_write_relaxed(mpp, IEP2_REG_EEDI_CONFIG0, IEP2_REG_EEDI_THR0(cfg->eedi_thr0));
+    mpp_write_relaxed(mpp, IEP2_REG_BLE_CONFIG0, IEP2_REG_BLE_BACKTOMA_NUM(cfg->ble_backtoma_num));
 }
 
 static void iep2_osd_cfg(struct mpp_dev *mpp, struct iep_task *task)
@@ -500,15 +456,14 @@ static void iep2_osd_cfg(struct mpp_dev *mpp, struct iep_task *task)
     u32 reg;
 
     for (i = 0; i < hw_cfg->osd_area_num; ++i) {
-        reg = IEP2_REG_OSD_X_STA(hw_cfg->osd_x_sta[i])
-            | IEP2_REG_OSD_X_END(hw_cfg->osd_x_end[i])
-            | IEP2_REG_OSD_Y_STA(hw_cfg->osd_y_sta[i])
-            | IEP2_REG_OSD_Y_END(hw_cfg->osd_y_end[i]);
+        reg = IEP2_REG_OSD_X_STA(hw_cfg->osd_x_sta[i]) | IEP2_REG_OSD_X_END(hw_cfg->osd_x_end[i]) |
+              IEP2_REG_OSD_Y_STA(hw_cfg->osd_y_sta[i]) | IEP2_REG_OSD_Y_END(hw_cfg->osd_y_end[i]);
         mpp_write_relaxed(mpp, IEP2_REG_OSD_AREA_CONF(i), reg);
     }
 
-    for (; i < ARRAY_SIZE(hw_cfg->osd_x_sta); ++i)
+    for (; i < ARRAY_SIZE(hw_cfg->osd_x_sta); ++i) {
         mpp_write_relaxed(mpp, IEP2_REG_OSD_AREA_CONF(i), 0);
+    }
 }
 
 static void iep2_mtn_tab_cfg(struct mpp_dev *mpp, struct iep_task *task)
@@ -517,16 +472,14 @@ static void iep2_mtn_tab_cfg(struct mpp_dev *mpp, struct iep_task *task)
     int i;
     u32 *mtn_tab = hw_cfg->mtn_en ? hw_cfg->mtn_tab : iep2_mtn_tab;
 
-    for (i = 0; i < ARRAY_SIZE(hw_cfg->mtn_tab); ++i)
+    for (i = 0; i < ARRAY_SIZE(hw_cfg->mtn_tab); ++i) {
         mpp_write_relaxed(mpp, IEP2_REG_DIL_MTN_TAB(i), mtn_tab[i]);
+    }
 }
 
 static u32 iep2_tru_list_vld_tab[] = {
-    IEP2_REG_MV_TRU_LIST0_4_VLD, IEP2_REG_MV_TRU_LIST1_5_VLD,
-    IEP2_REG_MV_TRU_LIST2_6_VLD, IEP2_REG_MV_TRU_LIST3_7_VLD,
-    IEP2_REG_MV_TRU_LIST0_4_VLD, IEP2_REG_MV_TRU_LIST1_5_VLD,
-    IEP2_REG_MV_TRU_LIST2_6_VLD, IEP2_REG_MV_TRU_LIST3_7_VLD
-};
+    IEP2_REG_MV_TRU_LIST0_4_VLD, IEP2_REG_MV_TRU_LIST1_5_VLD, IEP2_REG_MV_TRU_LIST2_6_VLD, IEP2_REG_MV_TRU_LIST3_7_VLD,
+    IEP2_REG_MV_TRU_LIST0_4_VLD, IEP2_REG_MV_TRU_LIST1_5_VLD, IEP2_REG_MV_TRU_LIST2_6_VLD, IEP2_REG_MV_TRU_LIST3_7_VLD};
 
 static void iep2_tru_list_cfg(struct mpp_dev *mpp, struct iep_task *task)
 {
@@ -534,26 +487,26 @@ static void iep2_tru_list_cfg(struct mpp_dev *mpp, struct iep_task *task)
     int i;
     u32 reg;
 
-    for (i = 0; i < ARRAY_SIZE(cfg->mv_tru_list); i += 4) {
+    for (i = 0; i < ARRAY_SIZE(cfg->mv_tru_list); i += 0x4) {
         reg = 0;
 
-        if (cfg->mv_tru_vld[i])
-            reg |= IEP2_REG_MV_TRU_LIST0_4(cfg->mv_tru_list[i])
-                | iep2_tru_list_vld_tab[i];
+        if (cfg->mv_tru_vld[i]) {
+            reg |= IEP2_REG_MV_TRU_LIST0_4(cfg->mv_tru_list[i]) | iep2_tru_list_vld_tab[i];
+        }
 
-        if (cfg->mv_tru_vld[i + 1])
-            reg |= IEP2_REG_MV_TRU_LIST1_5(cfg->mv_tru_list[i + 1])
-                | iep2_tru_list_vld_tab[i + 1];
+        if (cfg->mv_tru_vld[i + 1]) {
+            reg |= IEP2_REG_MV_TRU_LIST1_5(cfg->mv_tru_list[i + 1]) | iep2_tru_list_vld_tab[i + 1];
+        }
 
-        if (cfg->mv_tru_vld[i + 2])
-            reg |= IEP2_REG_MV_TRU_LIST2_6(cfg->mv_tru_list[i + 2])
-                | iep2_tru_list_vld_tab[i + 2];
+        if (cfg->mv_tru_vld[i + 0x2]) {
+            reg |= IEP2_REG_MV_TRU_LIST2_6(cfg->mv_tru_list[i + 0x2]) | iep2_tru_list_vld_tab[i + 0x2];
+        }
 
-        if (cfg->mv_tru_vld[i + 3])
-            reg |= IEP2_REG_MV_TRU_LIST3_7(cfg->mv_tru_list[i + 3])
-                | iep2_tru_list_vld_tab[i + 3];
+        if (cfg->mv_tru_vld[i + 0x3]) {
+            reg |= IEP2_REG_MV_TRU_LIST3_7(cfg->mv_tru_list[i + 0x3]) | iep2_tru_list_vld_tab[i + 0x3];
+        }
 
-        mpp_write_relaxed(mpp, IEP2_REG_MV_TRU_LIST(i / 4), reg);
+        mpp_write_relaxed(mpp, IEP2_REG_MV_TRU_LIST(i / 0x4), reg);
     }
 }
 
@@ -564,18 +517,17 @@ static void iep2_comb_cfg(struct mpp_dev *mpp, struct iep_task *task)
     u32 reg = 0;
 
     for (i = 0; i < ARRAY_SIZE(hw_cfg->comb_osd_vld); ++i) {
-        if (hw_cfg->comb_osd_vld[i])
+        if (hw_cfg->comb_osd_vld[i]) {
             reg |= IEP2_REG_COMB_OSD_VLD(i);
+        }
     }
 
-    reg |= IEP2_REG_COMB_T_THR(hw_cfg->comb_t_thr)
-        | IEP2_REG_COMB_FEATRUE_THR(hw_cfg->comb_feature_thr)
-        | IEP2_REG_COMB_CNT_THR(hw_cfg->comb_cnt_thr);
+    reg |= IEP2_REG_COMB_T_THR(hw_cfg->comb_t_thr) | IEP2_REG_COMB_FEATRUE_THR(hw_cfg->comb_feature_thr) |
+           IEP2_REG_COMB_CNT_THR(hw_cfg->comb_cnt_thr);
     mpp_write_relaxed(mpp, IEP2_REG_COMB_CONFIG0, reg);
 }
 
-static int iep2_run(struct mpp_dev *mpp,
-            struct mpp_task *mpp_task)
+static int iep2_run(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     struct iep_task *task = NULL;
 
@@ -593,10 +545,7 @@ static int iep2_run(struct mpp_dev *mpp,
     iep2_comb_cfg(mpp, task);
 
     /* set interrupt enable bits */
-    mpp_write_relaxed(mpp, IEP2_REG_INT_EN,
-              IEP2_REG_FRM_DONE_EN
-              | IEP2_REG_OSD_MAX_EN
-              | IEP2_REG_BUS_ERROR_EN);
+    mpp_write_relaxed(mpp, IEP2_REG_INT_EN, IEP2_REG_FRM_DONE_EN | IEP2_REG_OSD_MAX_EN | IEP2_REG_BUS_ERROR_EN);
 
     /* Last, flush the registers */
     wmb();
@@ -613,8 +562,9 @@ static int iep2_irq(struct mpp_dev *mpp)
     mpp->irq_status = mpp_read(mpp, IEP2_REG_INT_STS);
     mpp_write(mpp, IEP2_REG_INT_CLR, 0xffffffff);
 
-    if (!IEP2_REG_RO_VALID_INT_STS(mpp->irq_status))
+    if (!IEP2_REG_RO_VALID_INT_STS(mpp->irq_status)) {
         return IRQ_NONE;
+    }
 
     return IRQ_WAKE_THREAD;
 }
@@ -635,11 +585,11 @@ static int iep2_isr(struct mpp_dev *mpp)
     mpp_time_diff(mpp_task);
     mpp->cur_task = NULL;
     task->irq_status = mpp->irq_status;
-    mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n",
-          task->irq_status);
+    mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n", task->irq_status);
 
-    if (IEP2_REG_RO_BUS_ERROR_STS(task->irq_status))
+    if (IEP2_REG_RO_BUS_ERROR_STS(task->irq_status)) {
         atomic_inc(&mpp->reset_request);
+    }
 
     mpp_task_finish(mpp_task->session, mpp_task);
 
@@ -655,12 +605,12 @@ static void iep2_osd_done(struct mpp_dev *mpp, struct iep_task *task)
 
     for (i = 0; i < task->output.dect_osd_cnt; ++i) {
         reg = mpp_read(mpp, IEP2_REG_RO_OSD_AREA_X(i));
-        task->output.x_sta[i] = IEP2_REG_RO_X_STA(reg) / 16;
-        task->output.x_end[i] = IEP2_REG_RO_X_END(reg) / 16;
+        task->output.x_sta[i] = IEP2_REG_RO_X_STA(reg) / 0x10;
+        task->output.x_end[i] = IEP2_REG_RO_X_END(reg) / 0x10;
 
         reg = mpp_read(mpp, IEP2_REG_RO_OSD_AREA_Y(i));
-        task->output.y_sta[i] = IEP2_REG_RO_Y_STA(reg) / 4;
-        task->output.y_end[i] = IEP2_REG_RO_Y_END(reg) / 4;
+        task->output.y_sta[i] = IEP2_REG_RO_Y_STA(reg) / 0x4;
+        task->output.y_end[i] = IEP2_REG_RO_Y_END(reg) / 0x4;
     }
 
     for (; i < ARRAY_SIZE(task->output.x_sta); ++i) {
@@ -671,8 +621,7 @@ static void iep2_osd_done(struct mpp_dev *mpp, struct iep_task *task)
     }
 }
 
-static int iep2_finish(struct mpp_dev *mpp,
-               struct mpp_task *mpp_task)
+static int iep2_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     struct iep_task *task = to_iep_task(mpp_task);
     struct iep2_output *output = &task->output;
@@ -701,8 +650,8 @@ static int iep2_finish(struct mpp_dev *mpp,
 
     iep2_osd_done(mpp, task);
 
-    for (i = 0; i < ARRAY_SIZE(output->mv_hist); i += 2) {
-        reg = mpp_read(mpp, IEP2_REG_RO_MV_HIST_BIN(i / 2));
+    for (i = 0; i < ARRAY_SIZE(output->mv_hist); i += 0x2) {
+        reg = mpp_read(mpp, IEP2_REG_RO_MV_HIST_BIN(i / 0x2));
         output->mv_hist[i] = IEP2_REG_RO_MV_HIST_EVEN(reg);
         output->mv_hist[i + 1] = IEP2_REG_RO_MV_HIST_ODD(reg);
     }
@@ -712,9 +661,7 @@ static int iep2_finish(struct mpp_dev *mpp,
     return 0;
 }
 
-static int iep2_result(struct mpp_dev *mpp,
-               struct mpp_task *mpp_task,
-               struct mpp_task_msgs *msgs)
+static int iep2_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct mpp_task_msgs *msgs)
 {
     u32 i;
     struct mpp_request *req;
@@ -733,8 +680,7 @@ static int iep2_result(struct mpp_dev *mpp,
     return 0;
 }
 
-static int iep2_free_task(struct mpp_session *session,
-              struct mpp_task *mpp_task)
+static int iep2_free_task(struct mpp_session *session, struct mpp_task *mpp_task)
 {
     struct iep_task *task = to_iep_task(mpp_task);
 
@@ -767,10 +713,8 @@ static int iep2_procfs_init(struct mpp_dev *mpp)
         iep->procfs = NULL;
         return -EIO;
     }
-    mpp_procfs_create_u32("aclk", 0644,
-                  iep->procfs, &iep->aclk_info.debug_rate_hz);
-    mpp_procfs_create_u32("session_buffers", 0644,
-                  iep->procfs, &mpp->session_max_buffers);
+    mpp_procfs_create_u32("aclk", IEP2_SESSION_PROCF, iep->procfs, &iep->aclk_info.debug_rate_hz);
+    mpp_procfs_create_u32("session_buffers", IEP2_SESSION_PROCF, iep->procfs, &mpp->session_max_buffers);
 
     return 0;
 }
@@ -786,8 +730,8 @@ static inline int iep2_procfs_init(struct mpp_dev *mpp)
 }
 #endif
 
-#define IEP2_TILE_W_MAX        120
-#define IEP2_TILE_H_MAX        272
+#define IEP2_TILE_W_MAX 120
+#define IEP2_TILE_H_MAX 272
 
 static int iep2_init(struct mpp_dev *mpp)
 {
@@ -798,34 +742,37 @@ static int iep2_init(struct mpp_dev *mpp)
 
     /* Get clock info from dtsi */
     ret = mpp_get_clk_info(mpp, &iep->aclk_info, "aclk");
-    if (ret)
+    if (ret) {
         mpp_err("failed on clk_get aclk\n");
+    }
     ret = mpp_get_clk_info(mpp, &iep->hclk_info, "hclk");
-    if (ret)
+    if (ret) {
         mpp_err("failed on clk_get hclk\n");
+    }
     ret = mpp_get_clk_info(mpp, &iep->sclk_info, "sclk");
-    if (ret)
+    if (ret) {
         mpp_err("failed on clk_get sclk\n");
+    }
     /* Set default rates */
-    mpp_set_clk_info_rate_hz(&iep->aclk_info, CLK_MODE_DEFAULT, 300 * MHZ);
+    mpp_set_clk_info_rate_hz(&iep->aclk_info, CLK_MODE_DEFAULT, 0x12c * MHZ);
 
     iep->rst_a = mpp_reset_control_get(mpp, RST_TYPE_A, "rst_a");
-    if (!iep->rst_a)
+    if (!iep->rst_a) {
         mpp_err("No aclk reset resource define\n");
+    }
     iep->rst_h = mpp_reset_control_get(mpp, RST_TYPE_H, "rst_h");
-    if (!iep->rst_h)
+    if (!iep->rst_h) {
         mpp_err("No hclk reset resource define\n");
+    }
     iep->rst_s = mpp_reset_control_get(mpp, RST_TYPE_CORE, "rst_s");
-    if (!iep->rst_s)
+    if (!iep->rst_s) {
         mpp_err("No sclk reset resource define\n");
+    }
 
     iep->roi.size = IEP2_TILE_W_MAX * IEP2_TILE_H_MAX;
-    iep->roi.vaddr = dma_alloc_coherent(mpp->dev, iep->roi.size,
-                        &iep->roi.iova,
-                        GFP_KERNEL);
+    iep->roi.vaddr = dma_alloc_coherent(mpp->dev, iep->roi.size, &iep->roi.iova, GFP_KERNEL);
     if (iep->roi.vaddr) {
         dev_err(mpp->dev, "allocate roi buffer failed\n");
-        //return -ENOMEM;
     }
 
     return 0;
@@ -853,8 +800,7 @@ static int iep2_clk_off(struct mpp_dev *mpp)
     return 0;
 }
 
-static int iep2_set_freq(struct mpp_dev *mpp,
-             struct mpp_task *mpp_task)
+static int iep2_set_freq(struct mpp_dev *mpp, struct mpp_task *mpp_task)
 {
     struct iep2_dev *iep = to_iep2_dev(mpp);
     struct iep_task *task = to_iep_task(mpp_task);
@@ -874,7 +820,7 @@ static int iep2_reset(struct mpp_dev *mpp)
         mpp_safe_reset(iep->rst_a);
         mpp_safe_reset(iep->rst_h);
         mpp_safe_reset(iep->rst_s);
-        udelay(5);
+        udelay(0x5);
         mpp_safe_unreset(iep->rst_a);
         mpp_safe_unreset(iep->rst_h);
         mpp_safe_unreset(iep->rst_s);
@@ -937,16 +883,18 @@ static int iep2_probe(struct platform_device *pdev)
 
     dev_info(dev, "probe device\n");
     iep = devm_kzalloc(dev, sizeof(struct iep2_dev), GFP_KERNEL);
-    if (!iep)
+    if (!iep) {
         return -ENOMEM;
+    }
 
     mpp = &iep->mpp;
     platform_set_drvdata(pdev, iep);
 
     if (pdev->dev.of_node) {
         match = of_match_node(mpp_iep2_match, pdev->dev.of_node);
-        if (match)
+        if (match) {
             mpp->var = (struct mpp_dev_var *)match->data;
+        }
     }
 
     ret = mpp_dev_probe(mpp, pdev);
@@ -955,11 +903,7 @@ static int iep2_probe(struct platform_device *pdev)
         return -EINVAL;
     }
 
-    ret = devm_request_threaded_irq(dev, mpp->irq,
-                    mpp_dev_irq,
-                    mpp_dev_isr_sched,
-                    IRQF_SHARED,
-                    dev_name(dev), mpp);
+    ret = devm_request_threaded_irq(dev, mpp->irq, mpp_dev_irq, mpp_dev_isr_sched, IRQF_SHARED, dev_name(dev), mpp);
     if (ret) {
         dev_err(dev, "register interrupter runtime failed\n");
         return -EINVAL;
@@ -999,21 +943,20 @@ static void iep2_shutdown(struct platform_device *pdev)
     dev_info(dev, "shutdown device\n");
 
     atomic_inc(&mpp->srv->shutdown_request);
-    ret = readx_poll_timeout(atomic_read,
-                 &mpp->task_count,
-                 val, val == 0, 20000, 200000);
-    if (ret == -ETIMEDOUT)
+    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 0x4e20, 0x30d40);
+    if (ret == -ETIMEDOUT) {
         dev_err(dev, "wait total running time out\n");
+    }
 }
 
 struct platform_driver rockchip_iep2_driver = {
     .probe = iep2_probe,
     .remove = iep2_remove,
     .shutdown = iep2_shutdown,
-    .driver = {
-        .name = IEP2_DRIVER_NAME,
-        .of_match_table = of_match_ptr(mpp_iep2_match),
-    },
+    .driver =
+        {
+            .name = IEP2_DRIVER_NAME,
+            .of_match_table = of_match_ptr(mpp_iep2_match),
+        },
 };
 EXPORT_SYMBOL(rockchip_iep2_driver);
-

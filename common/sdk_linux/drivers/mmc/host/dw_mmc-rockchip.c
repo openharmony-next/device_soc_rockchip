@@ -15,27 +15,27 @@
 #include "dw_mmc.h"
 #include "dw_mmc-pltfm.h"
 
-#define RK3288_CLKGEN_DIV       2
-#define RK3288_CLKGEN_MUL      2
+#define RK3288_CLKGEN_DIV 2
+#define RK3288_CLKGEN_MUL 2
 #define RK_NINTY_DEGREE_PHASE 90
 #define RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE 180
 #define RK_TWO_HUNDRED_SEVENTY_DEGREE_PHASE 270
 #define RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE 360
 #define RK3288_PHASE_DIV 2
-#define RK3288_PHASE_MUL      20
+#define RK3288_PHASE_MUL 20
 #define RK3288_CLK_MIN_ONE 375000
 #define RK3288_CLK_MIN_TWO 100000
 #define RK_SDIO_ID0_SLOT_NUM 8
 #define PM_AUTOSUSPEND_DELAY_COUNT 50
 
 struct dw_mci_rockchip_priv_data {
-    struct clk        *drv_clk;
-    struct clk        *sample_clk;
-    int            default_sample_phase;
-    int            num_phases;
-    bool            use_v2_tuning;
-    int            last_degree;
-    u32            f_min;
+    struct clk *drv_clk;
+    struct clk *sample_clk;
+    int default_sample_phase;
+    int num_phases;
+    bool use_v2_tuning;
+    int last_degree;
+    u32 f_min;
 };
 
 static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
@@ -45,8 +45,9 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
     unsigned int cclkin;
     u32 bus_hz;
 
-    if (ios->clock == 0)
+    if (ios->clock == 0) {
         return;
+    }
 
     /*
      * cclkin: source clock of mmc controller
@@ -57,18 +58,20 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
      * Note: div can only be 0 or 1, but div must be set to 1 for eMMC
      * DDR52 8-bit mode.
      */
-    if (ios->clock < priv->f_min)
+    if (ios->clock < priv->f_min) {
         ios->clock = priv->f_min;
+    }
 
-    if (ios->bus_width == MMC_BUS_WIDTH_8 &&
-        ios->timing == MMC_TIMING_MMC_DDR52)
+    if (ios->bus_width == MMC_BUS_WIDTH_8 && ios->timing == MMC_TIMING_MMC_DDR52) {
         cclkin = RK3288_CLKGEN_MUL * ios->clock * RK3288_CLKGEN_DIV;
-    else
+    } else {
         cclkin = ios->clock * RK3288_CLKGEN_DIV;
+    }
 
     ret = clk_set_rate(host->ciu_clk, cclkin);
-    if (ret)
+    if (ret) {
         dev_warn(host->dev, "failed to set rate %uHz\n", ios->clock);
+    }
 
     bus_hz = clk_get_rate(host->ciu_clk) / RK3288_CLKGEN_DIV;
     if (bus_hz != host->bus_hz) {
@@ -78,8 +81,9 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
     }
 
     /* Make sure we use phases which we can enumerate with */
-    if (!IS_ERR(priv->sample_clk) && ios->timing <= MMC_TIMING_SD_HS)
+    if (!IS_ERR(priv->sample_clk) && ios->timing <= MMC_TIMING_SD_HS) {
         clk_set_phase(priv->sample_clk, priv->default_sample_phase);
+    }
 
     /*
      * Set the drive phase offset based on speed mode to achieve hold times.
@@ -119,42 +123,43 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
         phase = RK_NINTY_DEGREE_PHASE;
 
         switch (ios->timing) {
-        case MMC_TIMING_MMC_DDR52:
-            /*
-             * Since clock in rate with MMC_DDR52 is doubled when
-             * bus width is 8 we need to double the phase offset
-             * to get the same timings.
-             */
-            if (ios->bus_width == MMC_BUS_WIDTH_8)
+            case MMC_TIMING_MMC_DDR52:
+                /*
+                 * Since clock in rate with MMC_DDR52 is doubled when
+                 * bus width is 8 we need to double the phase offset
+                 * to get the same timings.
+                 */
+                if (ios->bus_width == MMC_BUS_WIDTH_8) {
+                    phase = RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE;
+                }
+                break;
+            case MMC_TIMING_UHS_SDR104:
+            case MMC_TIMING_MMC_HS200:
+                /*
+                 * In the case of 150 MHz clock (typical max for
+                 * Rockchip SoCs), 90 degree offset will add a delay
+                 * of 1.67 ns.  That will meet min hold time of .8 ns
+                 * as long as clock output delay is < .87 ns.  On
+                 * SoCs measured this seems to be OK, but it doesn't
+                 * hurt to give margin here, so we use 180.
+                 */
                 phase = RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE;
-            break;
-        case MMC_TIMING_UHS_SDR104:
-        case MMC_TIMING_MMC_HS200:
-            /*
-             * In the case of 150 MHz clock (typical max for
-             * Rockchip SoCs), 90 degree offset will add a delay
-             * of 1.67 ns.  That will meet min hold time of .8 ns
-             * as long as clock output delay is < .87 ns.  On
-             * SoCs measured this seems to be OK, but it doesn't
-             * hurt to give margin here, so we use 180.
-             */
-            phase = RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE;
-            break;
+                break;
         }
 
         clk_set_phase(priv->drv_clk, phase);
     }
 }
 
-#define TUNING_ITERATION_TO_PHASE(i, num_phases) \
-        (DIV_ROUND_UP((i) * RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE, num_phases))
+#define TUNING_ITERATION_TO_PHASE(i, num_phases) (DIV_ROUND_UP((i)*RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE, num_phases))
 
 static int dw_mci_v2_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 {
     struct dw_mci *host = slot->host;
     struct dw_mci_rockchip_priv_data *priv = host->priv;
     struct mmc_host *mmc = slot->mmc;
-    u32 degrees[4] = {RK_NINTY_DEGREE_PHASE, RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE, RK_TWO_HUNDRED_SEVENTY_DEGREE_PHASE, RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE};
+    u32 degrees[4] = {RK_NINTY_DEGREE_PHASE, RK_ONE_HUNDRED_EIGHTY_DEGREE_PHASE, RK_TWO_HUNDRED_SEVENTY_DEGREE_PHASE,
+                      RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE};
     int i;
     static bool inherit = true;
 
@@ -166,12 +171,14 @@ static int dw_mci_v2_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 
     /* v2 only support 4 degrees in theory */
     for (i = 0; i < ARRAY_SIZE(degrees); i++) {
-        if (degrees[i] == priv->last_degree)
+        if (degrees[i] == priv->last_degree) {
             continue;
+        }
 
         clk_set_phase(priv->sample_clk, degrees[i]);
-        if (!mmc_send_tuning(mmc, opcode, NULL))
+        if (!mmc_send_tuning(mmc, opcode, NULL)) {
             break;
+        }
     }
 
     if (i == ARRAY_SIZE(degrees)) {
@@ -210,32 +217,33 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 
     if (priv->use_v2_tuning) {
         ret = dw_mci_v2_execute_tuning(slot, opcode);
-        if (!ret)
+        if (!ret) {
             return 0;
+        }
         /* Otherwise we continue using fine tuning */
     }
 
-    ranges = kmalloc_array(priv->num_phases / RK3288_PHASE_DIV + 1,
-                   sizeof(*ranges), GFP_KERNEL);
-    if (!ranges)
+    ranges = kmalloc_array(priv->num_phases / RK3288_PHASE_DIV + 1, sizeof(*ranges), GFP_KERNEL);
+    if (!ranges) {
         return -ENOMEM;
+    }
 
     /* Try each phase and extract good ranges */
-    for (i = 0; i < priv->num_phases; ) {
-        clk_set_phase(priv->sample_clk,
-                  TUNING_ITERATION_TO_PHASE(i, priv->num_phases));
+    for (i = 0; i < priv->num_phases;) {
+        clk_set_phase(priv->sample_clk, TUNING_ITERATION_TO_PHASE(i, priv->num_phases));
 
         v = !mmc_send_tuning(mmc, opcode, NULL);
 
-        if (i == 0)
+        if (i == 0) {
             first_v = v;
+        }
 
         if ((!prev_v) && v) {
             range_count++;
-            ranges[range_count-1].start = i;
+            ranges[range_count - 1].start = i;
         }
         if (v) {
-            ranges[range_count-1].end = i;
+            ranges[range_count - 1].end = i;
             i++;
         } else if (i == priv->num_phases - 1) {
             /* No extra skipping rules if we're at the end */
@@ -249,8 +257,9 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
             i += DIV_ROUND_UP(RK3288_PHASE_MUL * priv->num_phases, RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE);
 
             /* Always test the last one */
-            if (i >= priv->num_phases)
+            if (i >= priv->num_phases) {
                 i = priv->num_phases - 1;
+            }
         }
 
         prev_v = v;
@@ -264,14 +273,13 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 
     /* wrap around case, merge the end points */
     if ((range_count > 1) && first_v && v) {
-        ranges[0].start = ranges[range_count-1].start;
+        ranges[0].start = ranges[range_count - 1].start;
         range_count--;
     }
 
     if (ranges[0].start == 0 && ranges[0].end == priv->num_phases - 1) {
         clk_set_phase(priv->sample_clk, priv->default_sample_phase);
-        dev_info(host->dev, "All phases work, using default phase %d.",
-             priv->default_sample_phase);
+        dev_info(host->dev, "All phases work, using default phase %d.", priv->default_sample_phase);
         goto free;
     }
 
@@ -279,8 +287,9 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
     for (i = 0; i < range_count; i++) {
         int len = (ranges[i].end - ranges[i].start + 1);
 
-        if (len < 0)
+        if (len < 0) {
             len += priv->num_phases;
+        }
 
         if (longest_range_len < len) {
             longest_range_len = len;
@@ -288,30 +297,19 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
         }
 
         dev_dbg(host->dev, "Good phase range %d-%d (%d len)\n",
-            TUNING_ITERATION_TO_PHASE(ranges[i].start,
-                          priv->num_phases),
-            TUNING_ITERATION_TO_PHASE(ranges[i].end,
-                          priv->num_phases),
-            len
-        );
+                TUNING_ITERATION_TO_PHASE(ranges[i].start, priv->num_phases),
+                TUNING_ITERATION_TO_PHASE(ranges[i].end, priv->num_phases), len);
     }
 
     dev_dbg(host->dev, "Best phase range %d-%d (%d len)\n",
-        TUNING_ITERATION_TO_PHASE(ranges[longest_range].start,
-                      priv->num_phases),
-        TUNING_ITERATION_TO_PHASE(ranges[longest_range].end,
-                      priv->num_phases),
-        longest_range_len
-    );
+            TUNING_ITERATION_TO_PHASE(ranges[longest_range].start, priv->num_phases),
+            TUNING_ITERATION_TO_PHASE(ranges[longest_range].end, priv->num_phases), longest_range_len);
 
     middle_phase = ranges[longest_range].start + longest_range_len / RK3288_PHASE_DIV;
     middle_phase %= priv->num_phases;
-    dev_info(host->dev, "Successfully tuned phase to %d\n",
-         TUNING_ITERATION_TO_PHASE(middle_phase, priv->num_phases));
+    dev_info(host->dev, "Successfully tuned phase to %d\n", TUNING_ITERATION_TO_PHASE(middle_phase, priv->num_phases));
 
-    clk_set_phase(priv->sample_clk,
-              TUNING_ITERATION_TO_PHASE(middle_phase,
-                        priv->num_phases));
+    clk_set_phase(priv->sample_clk, TUNING_ITERATION_TO_PHASE(middle_phase, priv->num_phases));
 
 free:
     kfree(ranges);
@@ -324,38 +322,42 @@ static int dw_mci_rk3288_parse_dt(struct dw_mci *host)
     struct dw_mci_rockchip_priv_data *priv;
 
     priv = devm_kzalloc(host->dev, sizeof(*priv), GFP_KERNEL);
-    if (!priv)
+    if (!priv) {
         return -ENOMEM;
+    }
 
     /*
      * RK356X SoCs only support 375KHz for ID mode, so any clk request
      * that less than 1.6MHz(2 * 400KHz * RK3288_CLKGEN_DIV) should be
      * wrapped  into 375KHz
      */
-    if (of_device_is_compatible(host->dev->of_node,
-                    "rockchip,rk3568-dw-mshc"))
+    if (of_device_is_compatible(host->dev->of_node, "rockchip,rk3568-dw-mshc")) {
         priv->f_min = RK3288_CLK_MIN_ONE;
-    else
+    } else {
         priv->f_min = RK3288_CLK_MIN_TWO;
+    }
 
-    if (of_property_read_u32(np, "rockchip,desired-num-phases",
-                    &priv->num_phases))
+    if (of_property_read_u32(np, "rockchip,desired-num-phases", &priv->num_phases)) {
         priv->num_phases = RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE;
+    }
 
-    if (of_property_read_u32(np, "rockchip,default-sample-phase",
-                    &priv->default_sample_phase))
+    if (of_property_read_u32(np, "rockchip,default-sample-phase", &priv->default_sample_phase)) {
         priv->default_sample_phase = 0;
+    }
 
-    if (of_property_read_bool(np, "rockchip,use-v2-tuning"))
+    if (of_property_read_bool(np, "rockchip,use-v2-tuning")) {
         priv->use_v2_tuning = true;
+    }
 
     priv->drv_clk = devm_clk_get(host->dev, "ciu-drive");
-    if (IS_ERR(priv->drv_clk))
+    if (IS_ERR(priv->drv_clk)) {
         dev_dbg(host->dev, "ciu-drive not available\n");
+    }
 
     priv->sample_clk = devm_clk_get(host->dev, "ciu-sample");
-    if (IS_ERR(priv->sample_clk))
+    if (IS_ERR(priv->sample_clk)) {
         dev_dbg(host->dev, "ciu-sample not available\n");
+    }
 
     host->priv = priv;
 
@@ -367,9 +369,9 @@ static int dw_mci_rockchip_init(struct dw_mci *host)
     /* It is slot 8 on Rockchip SoCs */
     host->sdio_id0 = RK_SDIO_ID0_SLOT_NUM;
 
-    if (of_device_is_compatible(host->dev->of_node,
-                    "rockchip,rk3288-dw-mshc"))
+    if (of_device_is_compatible(host->dev->of_node, "rockchip,rk3288-dw-mshc")) {
         host->bus_hz /= RK3288_CLKGEN_DIV;
+    }
 
     host->need_xfer_timer = true;
     return 0;
@@ -384,23 +386,21 @@ static unsigned long dw_mci_rk3288_dwmmc_caps[4] = {
 };
 
 static const struct dw_mci_drv_data rk2928_drv_data = {
-    .init            = dw_mci_rockchip_init,
+    .init = dw_mci_rockchip_init,
 };
 
 static const struct dw_mci_drv_data rk3288_drv_data = {
-    .caps            = dw_mci_rk3288_dwmmc_caps,
-    .num_caps        = ARRAY_SIZE(dw_mci_rk3288_dwmmc_caps),
-    .set_ios        = dw_mci_rk3288_set_ios,
-    .execute_tuning        = dw_mci_rk3288_execute_tuning,
-    .parse_dt        = dw_mci_rk3288_parse_dt,
-    .init            = dw_mci_rockchip_init,
+    .caps = dw_mci_rk3288_dwmmc_caps,
+    .num_caps = ARRAY_SIZE(dw_mci_rk3288_dwmmc_caps),
+    .set_ios = dw_mci_rk3288_set_ios,
+    .execute_tuning = dw_mci_rk3288_execute_tuning,
+    .parse_dt = dw_mci_rk3288_parse_dt,
+    .init = dw_mci_rockchip_init,
 };
 
 static const struct of_device_id dw_mci_rockchip_match[] = {
-    { .compatible = "rockchip,rk2928-dw-mshc",
-        .data = &rk2928_drv_data },
-    { .compatible = "rockchip,rk3288-dw-mshc",
-        .data = &rk3288_drv_data },
+    {.compatible = "rockchip,rk2928-dw-mshc", .data = &rk2928_drv_data},
+    {.compatible = "rockchip,rk3288-dw-mshc", .data = &rk3288_drv_data},
     {},
 };
 MODULE_DEVICE_TABLE(of, dw_mci_rockchip_match);
@@ -412,12 +412,13 @@ static int dw_mci_rockchip_probe(struct platform_device *pdev)
     int ret;
     bool use_rpm = true;
 
-    if (!pdev->dev.of_node)
+    if (!pdev->dev.of_node) {
         return -ENODEV;
+    }
 
-    if (!device_property_read_bool(&pdev->dev, "non-removable") &&
-        !device_property_read_bool(&pdev->dev, "cd-gpios"))
+    if (!device_property_read_bool(&pdev->dev, "non-removable") && !device_property_read_bool(&pdev->dev, "cd-gpios")) {
         use_rpm = false;
+    }
 
     match = of_match_node(dw_mci_rockchip_match, pdev->dev.of_node);
     drv_data = match->data;
@@ -445,8 +446,9 @@ static int dw_mci_rockchip_probe(struct platform_device *pdev)
         return ret;
     }
 
-    if (use_rpm)
+    if (use_rpm) {
         pm_runtime_put_autosuspend(&pdev->dev);
+    }
 
     return 0;
 }
@@ -461,22 +463,19 @@ static int dw_mci_rockchip_remove(struct platform_device *pdev)
 }
 
 static const struct dev_pm_ops dw_mci_rockchip_dev_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-                pm_runtime_force_resume)
-    SET_RUNTIME_PM_OPS(dw_mci_runtime_suspend,
-               dw_mci_runtime_resume,
-               NULL)
-};
+    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
+        SET_RUNTIME_PM_OPS(dw_mci_runtime_suspend, dw_mci_runtime_resume, NULL)};
 
 static struct platform_driver dw_mci_rockchip_pltfm_driver = {
-    .probe        = dw_mci_rockchip_probe,
-    .remove        = dw_mci_rockchip_remove,
-    .driver        = {
-        .name        = "dwmmc_rockchip",
-        .probe_type    = PROBE_PREFER_ASYNCHRONOUS,
-        .of_match_table    = dw_mci_rockchip_match,
-        .pm        = &dw_mci_rockchip_dev_pm_ops,
-    },
+    .probe = dw_mci_rockchip_probe,
+    .remove = dw_mci_rockchip_remove,
+    .driver =
+        {
+            .name = "dwmmc_rockchip",
+            .probe_type = PROBE_PREFER_ASYNCHRONOUS,
+            .of_match_table = dw_mci_rockchip_match,
+            .pm = &dw_mci_rockchip_dev_pm_ops,
+        },
 };
 
 module_platform_driver(dw_mci_rockchip_pltfm_driver);

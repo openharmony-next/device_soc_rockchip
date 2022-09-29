@@ -1,9 +1,10 @@
 /**
  * Copyright (C) 2012-2014, 2016-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU licence.
- * 
+ * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
+ * licence.
+ *
  * A copy of the licence is included with the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
@@ -34,7 +35,8 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
         u32 used_notification_objects = 0;
         _mali_osk_notification_t **notobjs;
 
-        /* Pre allocate the number of notifications objects we need right now (might change after lock has been taken) */
+        /* Pre allocate the number of notifications objects we need right now (might change after lock has been taken)
+         */
         num_sessions_alloc = mali_session_get_count();
         if (0 == num_sessions_alloc) {
             /* No sessions to report to */
@@ -48,8 +50,8 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
         }
 
         for (i = 0; i < num_sessions_alloc; i++) {
-            notobjs[i] = _mali_osk_notification_create(MALI_NOTIFICATION_SETTINGS_CHANGED,
-                    sizeof(mali_uk_settings_changed_s));
+            notobjs[i] =
+                _mali_osk_notification_create(MALI_NOTIFICATION_SETTINGS_CHANGED, sizeof(mali_uk_settings_changed_s));
             if (NULL != notobjs[i]) {
                 mali_uk_settings_changed_s *data;
                 data = notobjs[i]->result_buffer;
@@ -69,7 +71,8 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
         if (num_sessions_alloc >= num_sessions_with_lock) {
             /* We have allocated enough notification objects for all the sessions atm */
             struct mali_session_data *session, *tmp;
-            MALI_SESSION_FOREACH(session, tmp, link) {
+            MALI_SESSION_FOREACH(session, tmp, link)
+            {
                 MALI_DEBUG_ASSERT(used_notification_objects < num_sessions_alloc);
                 if (NULL != notobjs[used_notification_objects]) {
                     mali_session_send_notification(session, notobjs[used_notification_objects]);

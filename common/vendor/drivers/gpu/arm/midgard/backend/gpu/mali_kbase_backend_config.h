@@ -13,17 +13,14 @@
  *
  */
 
-
-
 /*
  * Backend specific configuration
  */
 
-#ifndef _KBASE_BACKEND_CONFIG_H_
-#define _KBASE_BACKEND_CONFIG_H_
+#ifndef KBASE_BACKEND_CONFIG_H
+#define KBASE_BACKEND_CONFIG_H
 
 /* Enable GPU reset API */
 #define KBASE_GPU_RESET_EN 1
 
 #endif /* _KBASE_BACKEND_CONFIG_H_ */
-

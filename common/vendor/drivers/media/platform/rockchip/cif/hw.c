@@ -59,14 +59,14 @@ static const struct cif_reg px30_cif_regs[] = {
     [CIF_REG_DVP_LAST_PIX] = CIF_REG(CIF_LAST_PIX),
 };
 
-static const char * const px30_cif_clks[] = {
+static const char *const px30_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
     "pclk_cif",
     "cif_out",
 };
 
-static const char * const px30_cif_rsts[] = {
+static const char *const px30_cif_rsts[] = {
     "rst_cif_a",
     "rst_cif_h",
     "rst_cif_pclkin",
@@ -156,20 +156,13 @@ static const struct cif_reg rk1808_cif_regs[] = {
     [CIF_REG_MMU_AUTO_GATING] = CIF_REG(CIF_MMU_AUTO_GATING),
 };
 
-static const char * const rk1808_cif_clks[] = {
-    "aclk_cif",
-    "dclk_cif",
-    "hclk_cif",
-    "sclk_cif_out",
+static const char *const rk1808_cif_clks[] = {
+    "aclk_cif", "dclk_cif", "hclk_cif", "sclk_cif_out",
     /* "pclk_csi2host" */
 };
 
-static const char * const rk1808_cif_rsts[] = {
-    "rst_cif_a",
-    "rst_cif_h",
-    "rst_cif_i",
-    "rst_cif_d",
-    "rst_cif_pclkin",
+static const char *const rk1808_cif_rsts[] = {
+    "rst_cif_a", "rst_cif_h", "rst_cif_i", "rst_cif_d", "rst_cif_pclkin",
 };
 
 static const struct cif_reg rk3128_cif_regs[] = {
@@ -192,13 +185,13 @@ static const struct cif_reg rk3128_cif_regs[] = {
     [CIF_REG_DVP_LAST_PIX] = CIF_REG(CIF_LAST_PIX),
 };
 
-static const char * const rk3128_cif_clks[] = {
+static const char *const rk3128_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
     "sclk_cif_out",
 };
 
-static const char * const rk3128_cif_rsts[] = {
+static const char *const rk3128_cif_rsts[] = {
     "rst_cif",
 };
 
@@ -222,13 +215,13 @@ static const struct cif_reg rk3288_cif_regs[] = {
     [CIF_REG_DVP_LAST_PIX] = CIF_REG(CIF_LAST_PIX),
 };
 
-static const char * const rk3288_cif_clks[] = {
+static const char *const rk3288_cif_clks[] = {
     "aclk_cif0",
     "hclk_cif0",
     "cif0_in",
 };
 
-static const char * const rk3288_cif_rsts[] = {
+static const char *const rk3288_cif_rsts[] = {
     "rst_cif",
 };
 
@@ -252,25 +245,25 @@ static const struct cif_reg rk3328_cif_regs[] = {
     [CIF_REG_DVP_LAST_PIX] = CIF_REG(CIF_LAST_PIX),
 };
 
-static const char * const rk3328_cif_clks[] = {
+static const char *const rk3328_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
 };
 
-static const char * const rk3328_cif_rsts[] = {
+static const char *const rk3328_cif_rsts[] = {
     "rst_cif_a",
     "rst_cif_p",
     "rst_cif_h",
 };
 
-static const char * const rk3368_cif_clks[] = {
+static const char *const rk3368_cif_clks[] = {
     "pclk_cif",
     "aclk_cif0",
     "hclk_cif0",
     "cif0_in",
 };
 
-static const char * const rk3368_cif_rsts[] = {
+static const char *const rk3368_cif_rsts[] = {
     "rst_cif",
 };
 
@@ -295,19 +288,14 @@ static const struct cif_reg rk3368_cif_regs[] = {
     [CIF_REG_DVP_LAST_PIX] = CIF_REG(CIF_LAST_PIX),
 };
 
-static const char * const rv1126_cif_clks[] = {
+static const char *const rv1126_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
     "dclk_cif",
 };
 
-static const char * const rv1126_cif_rsts[] = {
-    "rst_cif_a",
-    "rst_cif_h",
-    "rst_cif_d",
-    "rst_cif_p",
-    "rst_cif_i",
-    "rst_cif_rx_p",
+static const char *const rv1126_cif_rsts[] = {
+    "rst_cif_a", "rst_cif_h", "rst_cif_d", "rst_cif_p", "rst_cif_i", "rst_cif_rx_p",
 };
 
 static const struct cif_reg rv1126_cif_regs[] = {
@@ -413,13 +401,13 @@ static const struct cif_reg rv1126_cif_regs[] = {
     [CIF_REG_GRF_CIFIO_CON] = CIF_REG(CIF_GRF_CIFIO_CON),
 };
 
-static const char * const rv1126_cif_lite_clks[] = {
+static const char *const rv1126_cif_lite_clks[] = {
     "aclk_cif_lite",
     "hclk_cif_lite",
     "dclk_cif_lite",
 };
 
-static const char * const rv1126_cif_lite_rsts[] = {
+static const char *const rv1126_cif_lite_rsts[] = {
     "rst_cif_lite_a",
     "rst_cif_lite_h",
     "rst_cif_lite_d",
@@ -482,19 +470,15 @@ static const struct cif_reg rv1126_cif_lite_regs[] = {
     [CIF_REG_Y_STAT_VALUE] = CIF_REG(CIF_Y_STAT_VALUE),
 };
 
-static const char * const rk3568_cif_clks[] = {
+static const char *const rk3568_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
     "dclk_cif",
     "iclk_cif_g",
 };
 
-static const char * const rk3568_cif_rsts[] = {
-    "rst_cif_a",
-    "rst_cif_h",
-    "rst_cif_d",
-    "rst_cif_p",
-    "rst_cif_i",
+static const char *const rk3568_cif_rsts[] = {
+    "rst_cif_a", "rst_cif_h", "rst_cif_d", "rst_cif_p", "rst_cif_i",
 };
 
 static const struct cif_reg rk3568_cif_regs[] = {
@@ -600,13 +584,13 @@ static const struct cif_reg rk3568_cif_regs[] = {
     [CIF_REG_GRF_CIFIO_CON1] = CIF_REG(CIF_GRF_VI_CON1),
 };
 
-static const char * const rk3588_cif_clks[] = {
+static const char *const rk3588_cif_clks[] = {
     "aclk_cif",
     "hclk_cif",
     "dclk_cif",
 };
 
-static const char * const rk3588_cif_rsts[] = {
+static const char *const rk3588_cif_rsts[] = {
     "rst_cif_a",
     "rst_cif_h",
     "rst_cif_d",
@@ -864,13 +848,15 @@ static irqreturn_t rkcif_irq_handler(int irq, void *ctx)
     unsigned int intstat_glb = 0;
     int i;
 
-    if (cif_hw->chip_id == CHIP_RK3588_CIF)
+    if (cif_hw->chip_id == CHIP_RK3588_CIF) {
         intstat_glb = rkcif_irq_global(cif_hw->cif_dev[0]);
+    }
     for (i = 0; i < cif_hw->dev_num; i++) {
         if (cif_hw->cif_dev[i]->isr_hdl) {
             cif_hw->cif_dev[i]->isr_hdl(irq, cif_hw->cif_dev[i]);
-            if (cif_hw->chip_id == CHIP_RK3588_CIF && intstat_glb)
+            if (cif_hw->chip_id == CHIP_RK3588_CIF && intstat_glb) {
                 rkcif_irq_handle_toisp(cif_hw->cif_dev[i], intstat_glb);
+            }
         }
     }
 
@@ -881,8 +867,9 @@ void rkcif_disable_sys_clk(struct rkcif_hw *cif_hw)
 {
     int i;
 
-    for (i = cif_hw->clk_size - 1; i >= 0; i--)
+    for (i = cif_hw->clk_size - 1; i >= 0; i--) {
         clk_disable_unprepare(cif_hw->clks[i]);
+    }
 }
 
 int rkcif_enable_sys_clk(struct rkcif_hw *cif_hw)
@@ -892,30 +879,34 @@ int rkcif_enable_sys_clk(struct rkcif_hw *cif_hw)
     for (i = 0; i < cif_hw->clk_size; i++) {
         ret = clk_prepare_enable(cif_hw->clks[i]);
 
-        if (ret < 0)
+        if (ret < 0) {
             goto err;
+        }
     }
 
     write_cif_reg_and(cif_hw->base_addr, CIF_CSI_INTEN, 0x0);
     return 0;
 
 err:
-    for (--i; i >= 0; --i)
+    for (--i; i >= 0; --i) {
         clk_disable_unprepare(cif_hw->clks[i]);
+    }
 
     return ret;
 }
 
 static void rkcif_iommu_cleanup(struct rkcif_hw *cif_hw)
 {
-    if (cif_hw->iommu_en)
+    if (cif_hw->iommu_en) {
         rockchip_iommu_disable(cif_hw->dev);
+    }
 }
 
 static void rkcif_iommu_enable(struct rkcif_hw *cif_hw)
 {
-    if (cif_hw->iommu_en)
+    if (cif_hw->iommu_en) {
         rockchip_iommu_enable(cif_hw->dev);
+    }
 }
 
 static inline bool is_iommu_enable(struct device *dev)
@@ -940,19 +931,25 @@ void rkcif_hw_soft_reset(struct rkcif_hw *cif_hw, bool is_rst_iommu)
 {
     unsigned int i;
 
-    if (cif_hw->iommu_en && is_rst_iommu)
+    if (cif_hw->iommu_en && is_rst_iommu) {
         rkcif_iommu_cleanup(cif_hw);
+    }
 
-    for (i = 0; i < ARRAY_SIZE(cif_hw->cif_rst); i++)
-        if (cif_hw->cif_rst[i])
+    for (i = 0; i < ARRAY_SIZE(cif_hw->cif_rst); i++) {
+        if (cif_hw->cif_rst[i]) {
             reset_control_assert(cif_hw->cif_rst[i]);
-    udelay(5);
-    for (i = 0; i < ARRAY_SIZE(cif_hw->cif_rst); i++)
-        if (cif_hw->cif_rst[i])
+        }
+    }
+    udelay(0x5);
+    for (i = 0; i < ARRAY_SIZE(cif_hw->cif_rst); i++) {
+        if (cif_hw->cif_rst[i]) {
             reset_control_deassert(cif_hw->cif_rst[i]);
+        }
+    }
 
-    if (cif_hw->iommu_en && is_rst_iommu)
+    if (cif_hw->iommu_en && is_rst_iommu) {
         rkcif_iommu_enable(cif_hw);
+    }
 }
 
 static int rkcif_plat_hw_probe(struct platform_device *pdev)
@@ -969,24 +966,25 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
     bool is_mem_reserved = false;
 
     match = of_match_node(rkcif_plat_of_match, node);
-    if (IS_ERR(match))
+    if (IS_ERR(match)) {
         return PTR_ERR(match);
+    }
     data = match->data;
 
     cif_hw = devm_kzalloc(dev, sizeof(*cif_hw), GFP_KERNEL);
-    if (!cif_hw)
+    if (!cif_hw) {
         return -ENOMEM;
+    }
 
     dev_set_drvdata(dev, cif_hw);
     cif_hw->dev = dev;
 
     irq = platform_get_irq(pdev, 0);
-    if (irq < 0)
+    if (irq < 0) {
         return irq;
+    }
 
-    ret = devm_request_irq(dev, irq, rkcif_irq_handler,
-                   IRQF_SHARED,
-                   dev_driver_string(dev), dev);
+    ret = devm_request_irq(dev, irq, rkcif_irq_handler, IRQF_SHARED, dev_driver_string(dev), dev);
     if (ret < 0) {
         dev_err(dev, "request irq failed: %d\n", ret);
         return ret;
@@ -998,9 +996,7 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
     cif_hw->sync_config.is_attach = false;
     cif_hw->sync_config.mode = RKCIF_NOSYNC_MODE;
     if (data->chip_id >= CHIP_RK1808_CIF) {
-        res = platform_get_resource_byname(pdev,
-                           IORESOURCE_MEM,
-                           "cif_regs");
+        res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cif_regs");
         cif_hw->base_addr = devm_ioremap_resource(dev, res);
         if (PTR_ERR(cif_hw->base_addr) == -EBUSY) {
             resource_size_t offset = res->start;
@@ -1015,19 +1011,19 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
     } else {
         res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
         cif_hw->base_addr = devm_ioremap_resource(dev, res);
-        if (IS_ERR(cif_hw->base_addr))
+        if (IS_ERR(cif_hw->base_addr)) {
             return PTR_ERR(cif_hw->base_addr);
+        }
     }
 
     cif_hw->grf = syscon_regmap_lookup_by_phandle(np, "rockchip,grf");
-    if (IS_ERR(cif_hw->grf))
+    if (IS_ERR(cif_hw->grf)) {
         dev_warn(dev, "unable to get rockchip,grf\n");
+    }
 
-    if (data->clks_num > RKCIF_MAX_BUS_CLK ||
-        data->rsts_num > RKCIF_MAX_RESET) {
-        dev_err(dev, "out of range: clks(%d %d) rsts(%d %d)\n",
-            data->clks_num, RKCIF_MAX_BUS_CLK,
-            data->rsts_num, RKCIF_MAX_RESET);
+    if (data->clks_num > RKCIF_MAX_BUS_CLK || data->rsts_num > RKCIF_MAX_RESET) {
+        dev_err(dev, "out of range: clks(%d %d) rsts(%d %d)\n", data->clks_num, RKCIF_MAX_BUS_CLK, data->rsts_num,
+                RKCIF_MAX_RESET);
         return -EINVAL;
     }
 
@@ -1045,8 +1041,9 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
     for (i = 0; i < data->rsts_num; i++) {
         struct reset_control *rst = NULL;
 
-        if (data->rsts[i])
+        if (data->rsts[i]) {
             rst = devm_reset_control_get(dev, data->rsts[i]);
+        }
         if (IS_ERR(rst)) {
             dev_err(dev, "failed to get %s\n", data->rsts[i]);
             return PTR_ERR(rst);
@@ -1064,10 +1061,11 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
     ret = of_reserved_mem_device_init(dev);
     if (ret) {
         is_mem_reserved = false;
-        if (!cif_hw->iommu_en)
+        if (!cif_hw->iommu_en) {
             dev_info(dev, "No reserved memory region assign to CIF\n");
-        else
+        } else {
             cif_hw->is_dma_contig = false;
+        }
     }
     if (is_mem_reserved) {
         cif_hw->mem_ops = &vb2_rdma_sg_memops;
@@ -1081,8 +1079,9 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
 
     if (data->chip_id < CHIP_RK1808_CIF) {
         cif_dev = devm_kzalloc(dev, sizeof(*cif_dev), GFP_KERNEL);
-        if (!cif_dev)
+        if (!cif_dev) {
             return -ENOMEM;
+        }
 
         cif_dev->dev = dev;
         cif_dev->hw_dev = cif_hw;
@@ -1090,8 +1089,9 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
         cif_hw->cif_dev[0] = cif_dev;
         cif_hw->dev_num = 1;
         ret = rkcif_plat_init(cif_dev, node, RKCIF_DVP);
-        if (ret)
+        if (ret) {
             return ret;
+        }
     }
 
     rkcif_hw_soft_reset(cif_hw, true);
@@ -1100,8 +1100,7 @@ static int rkcif_plat_hw_probe(struct platform_device *pdev)
 
     pm_runtime_enable(&pdev->dev);
 
-    if (data->chip_id >= CHIP_RK1808_CIF &&
-        data->chip_id != CHIP_RV1126_CIF_LITE) {
+    if (data->chip_id >= CHIP_RK1808_CIF && data->chip_id != CHIP_RV1126_CIF_LITE) {
         platform_driver_register(&rkcif_plat_drv);
         platform_driver_register(&rkcif_subdev_driver);
     }
@@ -1114,12 +1113,14 @@ static int rkcif_plat_remove(struct platform_device *pdev)
     struct rkcif_hw *cif_hw = platform_get_drvdata(pdev);
 
     pm_runtime_disable(&pdev->dev);
-    if (cif_hw->iommu_en)
+    if (cif_hw->iommu_en) {
         rkcif_iommu_cleanup(cif_hw);
+    }
 
     mutex_destroy(&cif_hw->dev_lock);
-    if (cif_hw->chip_id < CHIP_RK1808_CIF)
+    if (cif_hw->chip_id < CHIP_RK1808_CIF) {
         rkcif_plat_uninit(cif_hw->cif_dev[0]);
+    }
 
     return 0;
 }
@@ -1139,25 +1140,25 @@ static int __maybe_unused rkcif_runtime_resume(struct device *dev)
     int ret;
 
     ret = pinctrl_pm_select_default_state(dev);
-    if (ret < 0)
+    if (ret < 0) {
         return ret;
+    }
     rkcif_enable_sys_clk(cif_hw);
 
     return 0;
 }
 
 static const struct dev_pm_ops rkcif_plat_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-                pm_runtime_force_resume)
-    SET_RUNTIME_PM_OPS(rkcif_runtime_suspend, rkcif_runtime_resume, NULL)
-};
+    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
+        SET_RUNTIME_PM_OPS(rkcif_runtime_suspend, rkcif_runtime_resume, NULL)};
 
 static struct platform_driver rkcif_hw_plat_drv = {
-    .driver = {
-        .name = RKCIF_HW_DRIVER_NAME,
-        .of_match_table = of_match_ptr(rkcif_plat_of_match),
-        .pm = &rkcif_plat_pm_ops,
-    },
+    .driver =
+        {
+            .name = RKCIF_HW_DRIVER_NAME,
+            .of_match_table = of_match_ptr(rkcif_plat_of_match),
+            .pm = &rkcif_plat_pm_ops,
+        },
     .probe = rkcif_plat_hw_probe,
     .remove = rkcif_plat_remove,
 };
@@ -1167,8 +1168,9 @@ static int __init rk_cif_plat_drv_init(void)
     int ret;
 
     ret = platform_driver_register(&rkcif_hw_plat_drv);
-    if (ret)
+    if (ret) {
         return ret;
+    }
     return rkcif_csi2_plat_drv_init();
 }
 

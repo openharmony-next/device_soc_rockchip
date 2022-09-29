@@ -13,10 +13,6 @@
  *
  */
 
-
-
-
-
 /**
  * @file mali_kbase_defs.h
  *
@@ -24,8 +20,8 @@
  * allow the hierarchy of header files to work.
  */
 
-#ifndef _KBASE_DEFS_H_
-#define _KBASE_DEFS_H_
+#ifndef KBASE_DEFS_H_
+#define KBASE_DEFS_H_
 
 #include <mali_kbase_config.h>
 #include <mali_base_hwconfig_features.h>
@@ -46,10 +42,9 @@
 #include <linux/bus_logger.h>
 #endif
 
-
 #ifdef CONFIG_KDS
 #include <linux/kds.h>
-#endif                /* CONFIG_KDS */
+#endif /* CONFIG_KDS */
 
 #if defined(CONFIG_SYNC)
 #include <sync.h>
@@ -59,7 +54,7 @@
 
 #ifdef CONFIG_DEBUG_FS
 #include <linux/debugfs.h>
-#endif                /* CONFIG_DEBUG_FS */
+#endif /* CONFIG_DEBUG_FS */
 
 #ifdef CONFIG_MALI_DEVFREQ
 #include <linux/devfreq.h>
@@ -83,8 +78,8 @@
 #define KBASE_TRACE_ENABLE 1
 #else
 #define KBASE_TRACE_ENABLE 0
-#endif                /* CONFIG_MALI_DEBUG */
-#endif                /* KBASE_TRACE_ENABLE */
+#endif /* CONFIG_MALI_DEBUG */
+#endif /* KBASE_TRACE_ENABLE */
 
 /** Dump Job slot trace on error (only active if KBASE_TRACE_ENABLE != 0) */
 #define KBASE_TRACE_DUMP_ON_JOB_SLOT_ERROR 1
@@ -95,10 +90,10 @@
  * actually being reset to give other contexts time for their jobs to be soft-stopped and removed from the hardware
  * before resetting.
  */
-#define ZAP_TIMEOUT             1000
+#define ZAP_TIMEOUT 1000
 
 /** Number of milliseconds before we time out on a GPU soft/hard reset */
-#define RESET_TIMEOUT           500
+#define RESET_TIMEOUT 500
 
 /**
  * Prevent soft-stops from occuring in scheduling situations
@@ -130,7 +125,7 @@
  * You can optimize this down if your target devices will only ever support a
  * small number of job slots.
  */
-#define BASE_JM_MAX_NR_SLOTS        3
+#define BASE_JM_MAX_NR_SLOTS 3
 
 /**
  * The maximum number of Address Spaces to support in the Hardware.
@@ -138,15 +133,15 @@
  * You can optimize this down if your target devices will only ever support a
  * small number of Address Spaces
  */
-#define BASE_MAX_NR_AS              16
+#define BASE_MAX_NR_AS 16
 
 /* mmu */
 #define MIDGARD_MMU_VA_BITS 48
 
 #if MIDGARD_MMU_VA_BITS > 39
-#define MIDGARD_MMU_TOPLEVEL    0
+#define MIDGARD_MMU_TOPLEVEL 0
 #else
-#define MIDGARD_MMU_TOPLEVEL    1
+#define MIDGARD_MMU_TOPLEVEL 1
 #endif
 
 #define MIDGARD_MMU_BOTTOMLEVEL 3
@@ -154,14 +149,14 @@
 #define GROWABLE_FLAGS_REQUIRED (KBASE_REG_PF_GROW | KBASE_REG_GPU_WR)
 
 /** setting in kbase_context::as_nr that indicates it's invalid */
-#define KBASEP_AS_NR_INVALID     (-1)
+#define KBASEP_AS_NR_INVALID (-1)
 
 #define KBASE_LOCK_REGION_MAX_SIZE (63)
 #define KBASE_LOCK_REGION_MIN_SIZE (11)
 
-#define KBASE_TRACE_SIZE_LOG2 8    /* 256 entries */
+#define KBASE_TRACE_SIZE_LOG2 8 /* 256 entries */
 #define KBASE_TRACE_SIZE (1 << KBASE_TRACE_SIZE_LOG2)
-#define KBASE_TRACE_MASK ((1 << KBASE_TRACE_SIZE_LOG2)-1)
+#define KBASE_TRACE_MASK ((1 << KBASE_TRACE_SIZE_LOG2) - 1)
 
 #include "mali_kbase_js_defs.h"
 #include "mali_kbase_hwaccess_defs.h"
@@ -172,26 +167,26 @@
 #define KBASEP_FORCE_REPLAY_RANDOM_LIMIT 16
 
 /** Atom has been previously soft-stoppped */
-#define KBASE_KATOM_FLAG_BEEN_SOFT_STOPPPED (1<<1)
+#define KBASE_KATOM_FLAG_BEEN_SOFT_STOPPPED (1 << 1)
 /** Atom has been previously retried to execute */
-#define KBASE_KATOM_FLAGS_RERUN (1<<2)
-#define KBASE_KATOM_FLAGS_JOBCHAIN (1<<3)
+#define KBASE_KATOM_FLAGS_RERUN (1 << 2)
+#define KBASE_KATOM_FLAGS_JOBCHAIN (1 << 3)
 /** Atom has been previously hard-stopped. */
-#define KBASE_KATOM_FLAG_BEEN_HARD_STOPPED (1<<4)
+#define KBASE_KATOM_FLAG_BEEN_HARD_STOPPED (1 << 4)
 /** Atom has caused us to enter disjoint state */
-#define KBASE_KATOM_FLAG_IN_DISJOINT (1<<5)
+#define KBASE_KATOM_FLAG_IN_DISJOINT (1 << 5)
 /* Atom blocked on cross-slot dependency */
-#define KBASE_KATOM_FLAG_X_DEP_BLOCKED (1<<7)
+#define KBASE_KATOM_FLAG_X_DEP_BLOCKED (1 << 7)
 /* Atom has fail dependency on cross-slot dependency */
-#define KBASE_KATOM_FLAG_FAIL_BLOCKER (1<<8)
+#define KBASE_KATOM_FLAG_FAIL_BLOCKER (1 << 8)
 /* Atom is currently in the list of atoms blocked on cross-slot dependencies */
-#define KBASE_KATOM_FLAG_JSCTX_IN_X_DEP_LIST (1<<9)
+#define KBASE_KATOM_FLAG_JSCTX_IN_X_DEP_LIST (1 << 9)
 /* Atom is currently holding a context reference */
-#define KBASE_KATOM_FLAG_HOLDING_CTX_REF (1<<10)
+#define KBASE_KATOM_FLAG_HOLDING_CTX_REF (1 << 10)
 /* Atom requires GPU to be in protected mode */
-#define KBASE_KATOM_FLAG_PROTECTED (1<<11)
+#define KBASE_KATOM_FLAG_PROTECTED (1 << 11)
 /* Atom has been stored in runnable_tree */
-#define KBASE_KATOM_FLAG_JSCTX_IN_TREE (1<<12)
+#define KBASE_KATOM_FLAG_JSCTX_IN_TREE (1 << 12)
 
 /* SW related flags about types of JS_COMMAND action
  * NOTE: These must be masked off by JS_COMMAND_MASK */
@@ -200,7 +195,7 @@
 #define JS_COMMAND_SW_CAUSES_DISJOINT 0x100
 
 /** Bitmask of all SW related flags */
-#define JS_COMMAND_SW_BITS  (JS_COMMAND_SW_CAUSES_DISJOINT)
+#define JS_COMMAND_SW_BITS (JS_COMMAND_SW_CAUSES_DISJOINT)
 
 #if (JS_COMMAND_SW_BITS & JS_COMMAND_MASK)
 #error JS_COMMAND_SW_BITS not masked off by JS_COMMAND_MASK. Must update JS_COMMAND_SW_<..> bitmasks
@@ -208,8 +203,7 @@
 
 /** Soft-stop command that causes a Disjoint event. This of course isn't
  *  entirely masked off by JS_COMMAND_MASK */
-#define JS_COMMAND_SOFT_STOP_WITH_SW_DISJOINT \
-        (JS_COMMAND_SW_CAUSES_DISJOINT | JS_COMMAND_SOFT_STOP)
+#define JS_COMMAND_SOFT_STOP_WITH_SW_DISJOINT (JS_COMMAND_SW_CAUSES_DISJOINT | JS_COMMAND_SOFT_STOP)
 
 #define KBASEP_ATOM_ID_INVALID BASE_JD_ATOM_COUNT
 
@@ -278,7 +272,7 @@ struct kbase_io_history {
  *
  * @return readonly reference to dependent ATOM.
  */
-static inline const struct kbase_jd_atom * kbase_jd_katom_dep_atom(const struct kbase_jd_atom_dependency *dep)
+static inline const struct kbase_jd_atom *kbase_jd_katom_dep_atom(const struct kbase_jd_atom_dependency *dep)
 {
     LOCAL_ASSERT(dep != NULL);
 
@@ -308,8 +302,8 @@ static inline u8 kbase_jd_katom_dep_type(const struct kbase_jd_atom_dependency *
  * @param     type   The ATOM dependency type to be set.
  *
  */
-static inline void kbase_jd_katom_dep_set(const struct kbase_jd_atom_dependency *const_dep,
-        struct kbase_jd_atom *a, u8 type)
+static inline void kbase_jd_katom_dep_set(const struct kbase_jd_atom_dependency *const_dep, struct kbase_jd_atom *a,
+                                          u8 type)
 {
     struct kbase_jd_atom_dependency *dep;
 
@@ -436,12 +430,12 @@ struct kbase_jd_atom {
     struct list_head node;
     struct kds_resource_set *kds_rset;
     bool kds_dep_satisfied;
-#endif                /* CONFIG_KDS */
+#endif /* CONFIG_KDS */
 #if defined(CONFIG_SYNC)
     /* Stores either an input or output fence, depending on soft-job type */
     struct sync_fence *fence;
     struct sync_fence_waiter sync_waiter;
-#endif                /* CONFIG_SYNC */
+#endif /* CONFIG_SYNC */
 #if defined(CONFIG_MALI_DMA_FENCE) || defined(CONFIG_SYNC_FILE)
     struct {
         /* Use the functions/API defined in mali_kbase_fence.h to
@@ -512,7 +506,7 @@ struct kbase_jd_atom {
 
     /* Note: refer to kbasep_js_atom_retained_state, which will take a copy of some of the following members */
     enum base_jd_event_code event_code;
-    base_jd_core_req core_req;        /**< core requirements */
+    base_jd_core_req core_req; /**< core requirements */
     /** Job Slot to retry submitting to if submission from IRQ handler failed
      *
      * NOTE: see if this can be unified into the another member e.g. the event */
@@ -522,7 +516,7 @@ struct kbase_jd_atom {
     /* JS atom priority with respect to other atoms on its kctx. */
     int sched_priority;
 
-    int poking;        /* BASE_HW_ISSUE_8316 */
+    int poking; /* BASE_HW_ISSUE_8316 */
 
     wait_queue_head_t completed;
     enum kbase_jd_atom_state status;
@@ -649,7 +643,7 @@ struct kbase_jd_context {
 
 #ifdef CONFIG_KDS
     struct kds_callback kds_cb;
-#endif                /* CONFIG_KDS */
+#endif /* CONFIG_KDS */
 #ifdef CONFIG_GPU_TRACEPOINTS
     atomic_t work_id;
 #endif
@@ -660,18 +654,15 @@ struct kbase_device_info {
 };
 
 /** Poking state for BASE_HW_ISSUE_8316  */
-enum {
-    KBASE_AS_POKE_STATE_IN_FLIGHT     = 1<<0,
-    KBASE_AS_POKE_STATE_KILLING_POKE  = 1<<1
-};
+enum { KBASE_AS_POKE_STATE_IN_FLIGHT = 1 << 0, KBASE_AS_POKE_STATE_KILLING_POKE = 1 << 1 };
 
 /** Poking state for BASE_HW_ISSUE_8316  */
 typedef u32 kbase_as_poke_state;
 
 struct kbase_mmu_setup {
-    u64    transtab;
-    u64    memattr;
-    u64    transcfg;
+    u64 transtab;
+    u64 memattr;
+    u64 transcfg;
 };
 
 /**
@@ -716,19 +707,18 @@ static inline int kbase_as_has_page_fault(struct kbase_as *as)
 }
 
 struct kbasep_mem_device {
-    atomic_t used_pages;   /* Tracks usage of OS shared memory. Updated
-                   when OS memory is allocated/freed. */
-
+    atomic_t used_pages; /* Tracks usage of OS shared memory. Updated
+                 when OS memory is allocated/freed. */
 };
 
-#define KBASE_TRACE_CODE(X) KBASE_TRACE_CODE_ ## X
+#define KBASE_TRACE_CODE(X) KBASE_TRACE_CODE_##X
 
 enum kbase_trace_code {
-    /* IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
-     * THIS MUST BE USED AT THE START OF THE ENUM */
+/* IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
+ * THIS MUST BE USED AT THE START OF THE ENUM */
 #define KBASE_TRACE_CODE_MAKE_CODE(X) KBASE_TRACE_CODE(X)
 #include "mali_kbase_trace_defs.h"
-#undef  KBASE_TRACE_CODE_MAKE_CODE
+#undef KBASE_TRACE_CODE_MAKE_CODE
     /* Comma on its own, to extend the list */
     ,
     /* Must be the last in the enum */
@@ -736,7 +726,7 @@ enum kbase_trace_code {
 };
 
 #define KBASE_TRACE_FLAG_REFCOUNT (((u8)1) << 0)
-#define KBASE_TRACE_FLAG_JOBSLOT  (((u8)1) << 1)
+#define KBASE_TRACE_FLAG_JOBSLOT (((u8)1) << 1)
 
 struct kbase_trace {
     struct timespec64 timestamp;
@@ -825,7 +815,7 @@ struct kbase_trace_kbdev_timeline {
     u8 slot_atoms_submitted[BASE_JM_MAX_NR_SLOTS];
 
     /* Last UID for each PM event */
-    atomic_t pm_event_uid[KBASEP_TIMELINE_PM_EVENT_LAST+1];
+    atomic_t pm_event_uid[KBASEP_TIMELINE_PM_EVENT_LAST + 1];
     /* Counter for generating PM event UIDs */
     atomic_t pm_event_uid_counter;
     /*
@@ -834,7 +824,6 @@ struct kbase_trace_kbdev_timeline {
     bool l2_transitioning;
 };
 #endif /* CONFIG_MALI_TRACE_TIMELINE */
-
 
 struct kbasep_kctx_list_element {
     struct list_head link;
@@ -878,7 +867,7 @@ struct kbase_pm_device_data {
      *
      * @return 0 on success, else error code
      */
-     int (*callback_power_runtime_init)(struct kbase_device *kbdev);
+    int (*callback_power_runtime_init)(struct kbase_device *kbdev);
 
     /**
      * Callback for terminating the runtime power management.
@@ -918,11 +907,11 @@ struct kbase_pm_device_data {
  */
 struct kbase_mem_pool {
     struct kbase_device *kbdev;
-    size_t              cur_size;
-    size_t              max_size;
-    spinlock_t          pool_lock;
-    struct list_head    page_list;
-    struct shrinker     reclaim;
+    size_t cur_size;
+    size_t max_size;
+    spinlock_t pool_lock;
+    struct list_head page_list;
+    struct shrinker reclaim;
 
     struct kbase_mem_pool *next_pool;
 };
@@ -940,7 +929,7 @@ struct kbase_devfreq_opp {
     u64 core_mask;
 };
 
-#define DEVNAME_SIZE    16
+#define DEVNAME_SIZE 16
 
 struct kbase_device {
     s8 slot_submit_count_irq[BASE_JM_MAX_NR_SLOTS];
@@ -977,7 +966,7 @@ struct kbase_device {
     atomic_t serving_gpu_irq;
     atomic_t serving_mmu_irq;
     spinlock_t reg_op_lock;
-#endif    /* CONFIG_MALI_NO_MALI */
+#endif /* CONFIG_MALI_NO_MALI */
 
     struct kbase_pm_device_data pm;
     struct kbasep_js_device_data js_data;
@@ -993,7 +982,6 @@ struct kbase_device {
     u16 as_free; /* Bitpattern of free Address Spaces */
     /* Mapping from active Address Spaces to kbase_context */
     struct kbase_context *as_to_kctx[BASE_MAX_NR_AS];
-
 
     spinlock_t mmu_mask_change;
 
@@ -1054,8 +1042,8 @@ struct kbase_device {
     u64 shader_ready_bitmap;
     u64 shader_transitioning_bitmap;
 
-    s8 nr_hw_address_spaces;              /**< Number of address spaces in the GPU (constant after driver initialisation) */
-    s8 nr_user_address_spaces;              /**< Number of address spaces available to user contexts */
+    s8 nr_hw_address_spaces;   /**< Number of address spaces in the GPU (constant after driver initialisation) */
+    s8 nr_user_address_spaces; /**< Number of address spaces available to user contexts */
 
     /* Structure used for instrumentation and HW counters dumping */
     struct kbase_hwcnt {
@@ -1071,10 +1059,10 @@ struct kbase_device {
     struct kbase_vinstr_context *vinstr_ctx;
 
 #if KBASE_TRACE_ENABLE
-    spinlock_t              trace_lock;
-    u16                     trace_first_out;
-    u16                     trace_next_in;
-    struct kbase_trace            *trace_rbuf;
+    spinlock_t trace_lock;
+    u16 trace_first_out;
+    u16 trace_next_in;
+    struct kbase_trace *trace_rbuf;
 #endif
 
     u32 reset_timeout_ms;
@@ -1085,8 +1073,8 @@ struct kbase_device {
     void *platform_context;
 
     /* List of kbase_contexts created */
-    struct list_head        kctx_list;
-    struct mutex            kctx_list_lock;
+    struct list_head kctx_list;
+    struct mutex kctx_list_lock;
 
     struct rockchip_opp_info opp_info;
 #ifdef CONFIG_MALI_DEVFREQ
@@ -1115,7 +1103,6 @@ struct kbase_device {
     } ipa;
 #endif /* CONFIG_DEVFREQ_THERMAL */
 #endif /* CONFIG_MALI_DEVFREQ */
-
 
 #ifdef CONFIG_MALI_TRACE_TIMELINE
     struct kbase_trace_kbdev_timeline timeline;
@@ -1158,7 +1145,6 @@ struct kbase_device {
     /* fbdump profiling controls set by gator */
     u32 kbase_profiling_controls[FBDUMP_CONTROL_MAX];
 
-
 #if MALI_CUSTOMER_RELEASE == 0
     /* Number of jobs that are run before a job is forced to fail and
      * replay. May be KBASEP_FORCE_REPLAY_DISABLED, to disable forced
@@ -1191,7 +1177,6 @@ struct kbase_device {
 
     /* true if GPU is powered off or power off operation is in progress */
     bool poweroff_pending;
-
 
     /* defaults for new context created for this device */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
@@ -1235,7 +1220,6 @@ struct kbase_device {
      */
     bool protected_mode_support;
 
-
 #ifdef CONFIG_MALI_DEBUG
     wait_queue_head_t driver_inactive_wait;
     bool driver_inactive;
@@ -1277,10 +1261,7 @@ struct jsctx_queue {
     struct list_head x_dep_head;
 };
 
-
-#define KBASE_API_VERSION(major, minor) ((((major) & 0xFFF) << 20)  | \
-                     (((minor) & 0xFFF) << 8) | \
-                     ((0 & 0xFF) << 0))
+#define KBASE_API_VERSION(major, minor) ((((major)&0xFFF) << 20) | (((minor)&0xFFF) << 8) | ((0 & 0xFF) << 0))
 
 /**
  * enum kbase_context_flags - Flags for kbase contexts
@@ -1349,23 +1330,23 @@ struct kbase_context {
 
     atomic_t flags;
 
-    atomic_t                setup_complete;
-    atomic_t                setup_in_progress;
+    atomic_t setup_complete;
+    atomic_t setup_in_progress;
 
     u64 *mmu_teardown_pages;
 
     struct page *aliasing_sink_page;
 
-    struct mutex            mmu_lock;
-    struct mutex            reg_lock; /* To be converted to a rwlock? */
-    struct rb_root reg_rbtree_same; /* RB tree of GPU (live) regions,
-                     * SAME_VA zone */
-    struct rb_root reg_rbtree_exec; /* RB tree of GPU (live) regions,
-                     * EXEC zone */
+    struct mutex mmu_lock;
+    struct mutex reg_lock;            /* To be converted to a rwlock? */
+    struct rb_root reg_rbtree_same;   /* RB tree of GPU (live) regions,
+                                       * SAME_VA zone */
+    struct rb_root reg_rbtree_exec;   /* RB tree of GPU (live) regions,
+                                       * EXEC zone */
     struct rb_root reg_rbtree_custom; /* RB tree of GPU (live) regions,
-                     * CUSTOM_VA zone */
+                                       * CUSTOM_VA zone */
 
-    unsigned long    cookies;
+    unsigned long cookies;
     struct kbase_va_region *pending_regions[BITS_PER_LONG];
 
     wait_queue_head_t event_queue;
@@ -1374,12 +1355,12 @@ struct kbase_context {
 
     struct kbase_jd_context jctx;
     atomic_t used_pages;
-    atomic_t         nonmapped_pages;
+    atomic_t nonmapped_pages;
 
     struct kbase_mem_pool mem_pool;
 
-    struct shrinker         reclaim;
-    struct list_head        evict_list;
+    struct shrinker reclaim;
+    struct list_head evict_list;
 
     struct list_head waiting_soft_jobs;
     spinlock_t waiting_soft_jobs_lock;
@@ -1418,7 +1399,7 @@ struct kbase_context {
      * Mutable flags *must* be accessed under jctx.sched_info.ctx.jsctx_mutex
      *
      * All other flags must be added there */
-    spinlock_t         mm_update_lock;
+    spinlock_t mm_update_lock;
     struct mm_struct *process_mm;
     /* End of the SAME_VA zone */
     u64 same_va_end;
@@ -1446,8 +1427,7 @@ struct kbase_context {
 
 #endif /* CONFIG_DEBUG_FS */
 
-    struct jsctx_queue jsctx_queue
-        [KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
+    struct jsctx_queue jsctx_queue[KBASE_JS_ATOM_SCHED_PRIO_COUNT][BASE_JM_MAX_NR_SLOTS];
 
     /* Number of atoms currently pulled from this context */
     atomic_t atoms_pulled;
@@ -1455,8 +1435,7 @@ struct kbase_context {
     atomic_t atoms_pulled_slot[BASE_JM_MAX_NR_SLOTS];
     /* Number of atoms currently pulled from this context, per slot and
      * priority. Hold hwaccess_lock when accessing */
-    int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][
-            KBASE_JS_ATOM_SCHED_PRIO_COUNT];
+    int atoms_pulled_slot_pri[BASE_JM_MAX_NR_SLOTS][KBASE_JS_ATOM_SCHED_PRIO_COUNT];
 
     /* true if slot is blocked on the given priority. This will be set on a
      * soft-stop */
@@ -1536,15 +1515,12 @@ struct kbase_ctx_ext_res_meta {
     u64 gpu_addr;
 };
 
-enum kbase_reg_access_type {
-    REG_READ,
-    REG_WRITE
-};
+enum kbase_reg_access_type { REG_READ, REG_WRITE };
 
 enum kbase_share_attr_bits {
     /* (1ULL << 8) bit is reserved */
-    SHARE_BOTH_BITS = (2ULL << 8),    /* inner and outer shareable coherency */
-    SHARE_INNER_BITS = (3ULL << 8)    /* inner shareable coherency */
+    SHARE_BOTH_BITS = (2ULL << 8), /* inner and outer shareable coherency */
+    SHARE_INNER_BITS = (3ULL << 8) /* inner shareable coherency */
 };
 
 /**
@@ -1555,21 +1531,21 @@ enum kbase_share_attr_bits {
  */
 static inline bool kbase_device_is_cpu_coherent(struct kbase_device *kbdev)
 {
-    if ((kbdev->system_coherency == COHERENCY_ACE_LITE) ||
-            (kbdev->system_coherency == COHERENCY_ACE))
+    if ((kbdev->system_coherency == COHERENCY_ACE_LITE) || (kbdev->system_coherency == COHERENCY_ACE)) {
         return true;
+    }
 
     return false;
 }
 
 /* Conversion helpers for setting up high resolution timers */
-#define HR_TIMER_DELAY_MSEC(x) (ns_to_ktime(((u64)(x))*1000000U))
+#define HR_TIMER_DELAY_MSEC(x) (ns_to_ktime(((u64)(x)) * 1000000U))
 #define HR_TIMER_DELAY_NSEC(x) (ns_to_ktime(x))
 
 /* Maximum number of loops polling the GPU for a cache flush before we assume it must have completed */
-#define KBASE_CLEAN_CACHE_MAX_LOOPS     100000
+#define KBASE_CLEAN_CACHE_MAX_LOOPS 100000
 /* Maximum number of loops polling the GPU for an AS command to complete before we assume the GPU has hung */
-#define KBASE_AS_INACTIVE_MAX_LOOPS     100000
+#define KBASE_AS_INACTIVE_MAX_LOOPS 100000
 
 /* Maximum number of times a job can be replayed */
 #define BASEP_JD_REPLAY_LIMIT 15
@@ -1599,4 +1575,4 @@ struct job_descriptor_header {
     } next_job;
 };
 
-#endif                /* _KBASE_DEFS_H_ */
+#endif /* _KBASE_DEFS_H_ */

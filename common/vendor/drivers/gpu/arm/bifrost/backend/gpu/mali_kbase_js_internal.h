@@ -20,13 +20,12 @@
  *
  */
 
-
 /*
  * Register-based HW access backend specific job scheduler APIs
  */
 
-#ifndef _KBASE_JS_BACKEND_H_
-#define _KBASE_JS_BACKEND_H_
+#ifndef KBASE_JS_BACKEND_H_
+#define KBASE_JS_BACKEND_H_
 
 /**
  * kbase_backend_timer_init() - Initialise the JS scheduling timer

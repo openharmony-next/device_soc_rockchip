@@ -47,32 +47,32 @@
 #include "procfs.h"
 #include "isp_external.h"
 
-#define IO_MEM   __iomem
+#define IO_MEM __iomem
 #define MAYBE_UNUSED __maybe_unused
 #define DRIVER_NAME "rkisp"
-#define ISP_VDEV_NAME DRIVER_NAME  "_ispdev"
+#define ISP_VDEV_NAME DRIVER_NAME "_ispdev"
 
-#define GRP_ID_SENSOR            BIT(0)
-#define GRP_ID_MIPIPHY            BIT(1)
-#define GRP_ID_ISP            BIT(2)
-#define GRP_ID_ISP_MP            BIT(3)
-#define GRP_ID_ISP_SP            BIT(4)
-#define GRP_ID_ISP_DMARX        BIT(5)
-#define GRP_ID_ISP_BRIDGE        BIT(6)
-#define GRP_ID_CSI            BIT(7)
+#define GRP_ID_SENSOR BIT(0)
+#define GRP_ID_MIPIPHY BIT(1)
+#define GRP_ID_ISP BIT(2)
+#define GRP_ID_ISP_MP BIT(3)
+#define GRP_ID_ISP_SP BIT(4)
+#define GRP_ID_ISP_DMARX BIT(5)
+#define GRP_ID_ISP_BRIDGE BIT(6)
+#define GRP_ID_CSI BIT(7)
 
-#define RKISP_MAX_SENSOR        2
-#define RKISP_MAX_PIPELINE      4
-#define CAPTURE_VALUE_EI        8
-#define CAPTURE_VALUE_TH        16
-#define CAPTURE_VALUE_NIT       19
-#define BRIDGE_FI_HUN           500
-#define BRIDGE_V30_MSES            1000
+#define RKISP_MAX_SENSOR 2
+#define RKISP_MAX_PIPELINE 4
+#define CAPTURE_VALUE_EI 8
+#define CAPTURE_VALUE_TH 16
+#define CAPTURE_VALUE_NIT 19
+#define BRIDGE_FI_HUN 500
+#define BRIDGE_V30_MSES 1000
 
-#define RKISP_MEDIA_BUS_FMT_MASK    0xF000
-#define RKISP_MEDIA_BUS_FMT_BAYER    0x3000
+#define RKISP_MEDIA_BUS_FMT_MASK 0xF000
+#define RKISP_MEDIA_BUS_FMT_BAYER 0x3000
 
-#define RKISP_CONTI_ERR_MAX        50
+#define RKISP_CONTI_ERR_MAX 50
 
 enum rkisp_isp_state {
     ISP_FRAME_END = BIT(0),
@@ -101,13 +101,7 @@ enum rkisp_isp_inp {
     INP_CIF = BIT(8),
 };
 
-enum rkisp_rdbk_filt {
-    RDBK_F_VS,
-    RDBK_F_RD0,
-    RDBK_F_RD1,
-    RDBK_F_RD2,
-    RDBK_F_MAX
-};
+enum rkisp_rdbk_filt { RDBK_F_VS, RDBK_F_RD0, RDBK_F_RD1, RDBK_F_RD2, RDBK_F_MAX };
 
 /*
  * struct rkisp_pipeline - An ISP hardware pipeline
@@ -124,8 +118,7 @@ struct rkisp_pipeline {
     atomic_t power_cnt;
     atomic_t stream_cnt;
     struct v4l2_subdev *subdevs[RKISP_MAX_PIPELINE];
-    int (*open)(struct rkisp_pipeline *p,
-            struct media_entity *me, bool prepare);
+    int (*open)(struct rkisp_pipeline *p, struct media_entity *me, bool prepare);
     int (*close)(struct rkisp_pipeline *p);
     int (*set_stream)(struct rkisp_pipeline *p, bool on);
 };
@@ -214,7 +207,7 @@ struct rkisp_device {
     unsigned int isp_isr_cnt;
     unsigned int isp_inp;
     struct mutex apilock; /* mutex to serialize the calls of stream */
-    struct mutex iqlock; /* mutex to serialize the calls of iq */
+    struct mutex iqlock;  /* mutex to serialize the calls of iq */
     wait_queue_head_t sync_onoff;
     dma_addr_t resmem_addr;
     phys_addr_t resmem_pa;

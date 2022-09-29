@@ -20,7 +20,6 @@
 
 #include "common.h"
 #include "dev.h"
-#include "fec.h"
 #include "hw.h"
 #include "regs.h"
 
@@ -63,11 +62,10 @@ void rkispp_soft_reset(struct rkispp_hw_dev *hw)
         writel(OTHER_FORCE_UPD, hw->base_addr + RKISPP_CTRL_UPDATE);
         writel(GATE_DIS_ALL, hw->base_addr + RKISPP_CTRL_CLKGATE);
         writel(SW_FEC2DDR_DIS, hw->base_addr + RKISPP_FEC_CORE_CTRL);
-        writel(NR_LOST_ERR | TNR_LOST_ERR | FBCH_EMPTY_NR |
-        FBCH_EMPTY_TNR | FBCD_DEC_ERR_NR | FBCD_DEC_ERR_TNR |
-        BUS_ERR_NR | BUS_ERR_TNR | SCL2_INT | SCL1_INT |
-        SCL0_INT | FEC_INT | ORB_INT | SHP_INT | NR_INT | TNR_INT,
-        hw->base_addr + RKISPP_CTRL_INT_MSK);
+        writel(NR_LOST_ERR | TNR_LOST_ERR | FBCH_EMPTY_NR | FBCH_EMPTY_TNR | FBCD_DEC_ERR_NR | FBCD_DEC_ERR_TNR |
+                   BUS_ERR_NR | BUS_ERR_TNR | SCL2_INT | SCL1_INT | SCL0_INT | FEC_INT | ORB_INT | SHP_INT | NR_INT |
+                   TNR_INT,
+               hw->base_addr + RKISPP_CTRL_INT_MSK);
         writel(GATE_DIS_NR, hw->base_addr + RKISPP_CTRL_CLKGATE);
     } else if (hw->ispp_ver == ISPP_V20) {
         writel(GATE_DIS_ALL, hw->base_addr + RKISPP_CTRL_CLKGATE);
@@ -75,27 +73,15 @@ void rkispp_soft_reset(struct rkispp_hw_dev *hw)
         writel(FEC_INT, hw->base_addr + RKISPP_CTRL_INT_MSK);
         writel(GATE_DIS_FEC, hw->base_addr + RKISPP_CTRL_CLKGATE);
     }
-
 }
 
 /* using default value if reg no write for multi device */
 static void default_sw_reg_flag(struct rkispp_device *dev)
 {
     if (dev->hw_dev->ispp_ver == ISPP_V10) {
-        u32 reg[] = {
-            RKISPP_TNR_CTRL,
-            RKISPP_TNR_CORE_CTRL,
-            RKISPP_NR_CTRL,
-            RKISPP_NR_UVNR_CTRL_PARA,
-            RKISPP_SHARP_CTRL,
-            RKISPP_SHARP_CORE_CTRL,
-            RKISPP_SCL0_CTRL,
-            RKISPP_SCL1_CTRL,
-            RKISPP_SCL2_CTRL,
-            RKISPP_ORB_CORE_CTRL,
-            RKISPP_FEC_CTRL,
-            RKISPP_FEC_CORE_CTRL
-        };
+        u32 reg[] = {RKISPP_TNR_CTRL,   RKISPP_TNR_CORE_CTRL,   RKISPP_NR_CTRL,   RKISPP_NR_UVNR_CTRL_PARA,
+                     RKISPP_SHARP_CTRL, RKISPP_SHARP_CORE_CTRL, RKISPP_SCL0_CTRL, RKISPP_SCL1_CTRL,
+                     RKISPP_SCL2_CTRL,  RKISPP_ORB_CORE_CTRL,   RKISPP_FEC_CTRL,  RKISPP_FEC_CORE_CTRL};
         u32 i, *flag;
 
         for (i = 0; i < ARRAY_SIZE(reg); i++) {
@@ -103,10 +89,7 @@ static void default_sw_reg_flag(struct rkispp_device *dev)
             *flag = 0xffffffff;
         }
     } else if (dev->hw_dev->ispp_ver == ISPP_V20) {
-        u32 reg[] = {
-            RKISPP_FEC_CTRL,
-            RKISPP_FEC_CORE_CTRL
-        };
+        u32 reg[] = {RKISPP_FEC_CTRL, RKISPP_FEC_CORE_CTRL};
         u32 i, *flag;
 
         for (i = 0; i < ARRAY_SIZE(reg); i++) {
@@ -138,8 +121,9 @@ static void disable_sys_clk(struct rkispp_hw_dev *dev)
 {
     int i;
 
-    for (i = 0; i < dev->clks_num; i++)
+    for (i = 0; i < dev->clks_num; i++) {
         clk_disable_unprepare(dev->clks[i]);
+    }
 }
 
 static int enable_sys_clk(struct rkispp_hw_dev *dev)
@@ -150,25 +134,31 @@ static int enable_sys_clk(struct rkispp_hw_dev *dev)
 
     for (i = 0; i < dev->clks_num; i++) {
         ret = clk_prepare_enable(dev->clks[i]);
-        if (ret < 0)
+        if (ret < 0) {
             goto err;
+        }
     }
 
-    for (i = 0; i < dev->clk_rate_tbl_num; i++)
-        if (w <= dev->clk_rate_tbl[i].refer_data)
+    for (i = 0; i < dev->clk_rate_tbl_num; i++) {
+        if (w <= dev->clk_rate_tbl[i].refer_data) {
             break;
-    if (!dev->is_single)
+        }
+    }
+    if (!dev->is_single) {
         i++;
-    if (i > dev->clk_rate_tbl_num - 1)
+    }
+    if (i > dev->clk_rate_tbl_num - 1) {
         i = dev->clk_rate_tbl_num - 1;
+    }
     dev->core_clk_max = dev->clk_rate_tbl[i].clk_rate * 1000000;
     dev->core_clk_min = dev->clk_rate_tbl[0].clk_rate * 1000000;
     rkispp_set_clk_rate(dev->clks[0], dev->core_clk_min);
     dev_dbg(dev->dev, "set ispp clk:%luHz\n", clk_get_rate(dev->clks[0]));
     return 0;
 err:
-    for (--i; i >= 0; --i)
+    for (--i; i >= 0; --i) {
         clk_disable_unprepare(dev->clks[i]);
+    }
     return ret;
 }
 
@@ -190,61 +180,66 @@ static irqreturn_t irq_hdl(int irq, void *ctx)
         rkispp_fec_irq(hw_dev);
     }
 
-    if (mis_val)
+    if (mis_val) {
         ispp->irq_hdl(mis_val, ispp);
+    }
 
     return IRQ_HANDLED;
 }
 
-static const char * const rv1126_ispp_clks[] = {
+static const char *const rv1126_ispp_clks[] = {
     "clk_ispp",
     "aclk_ispp",
     "hclk_ispp",
 };
 
-static const char * const rk3588_ispp_clks[] = {
+static const char *const rk3588_ispp_clks[] = {
     "clk_ispp",
     "aclk_ispp",
     "hclk_ispp",
 };
 
-static const struct ispp_clk_info rv1126_ispp_clk_rate[] = {
-    {
-        .clk_rate = 150,
-        .refer_data = 0,
-    }, {
-        .clk_rate = 250,
-        .refer_data = 1920 //width
-    }, {
-        .clk_rate = 350,
-        .refer_data = 2688,
-    }, {
-        .clk_rate = 400,
-        .refer_data = 3072,
-    }, {
-        .clk_rate = 500,
-        .refer_data = 3840,
-    }
-};
+static const struct ispp_clk_info rv1126_ispp_clk_rate[] = {{
+                                                                .clk_rate = 150,
+                                                                .refer_data = 0,
+                                                            },
+                                                            {
+                                                                .clk_rate = 250,
+                                                                .refer_data = 1920 // width
+                                                            },
+                                                            {
+                                                                .clk_rate = 350,
+                                                                .refer_data = 2688,
+                                                            },
+                                                            {
+                                                                .clk_rate = 400,
+                                                                .refer_data = 3072,
+                                                            },
+                                                            {
+                                                                .clk_rate = 500,
+                                                                .refer_data = 3840,
+                                                            }};
 
-static const struct ispp_clk_info rk3588_ispp_clk_rate[] = {
-    {
-        .clk_rate = 300,
-        .refer_data = 1920, //width
-    }, {
-        .clk_rate = 400,
-        .refer_data = 2688,
-    }, {
-        .clk_rate = 500,
-        .refer_data = 3072,
-    }, {
-        .clk_rate = 600,
-        .refer_data = 3840,
-    }, {
-        .clk_rate = 702,
-        .refer_data = 4672,
-    }
-};
+static const struct ispp_clk_info rk3588_ispp_clk_rate[] = {{
+                                                                .clk_rate = 300,
+                                                                .refer_data = 1920, // width
+                                                            },
+                                                            {
+                                                                .clk_rate = 400,
+                                                                .refer_data = 2688,
+                                                            },
+                                                            {
+                                                                .clk_rate = 500,
+                                                                .refer_data = 3072,
+                                                            },
+                                                            {
+                                                                .clk_rate = 600,
+                                                                .refer_data = 3840,
+                                                            },
+                                                            {
+                                                                .clk_rate = 702,
+                                                                .refer_data = 4672,
+                                                            }};
 
 static struct irqs_data rv1126_ispp_irqs[] = {
     {"ispp_irq", irq_hdl},
@@ -279,7 +274,8 @@ static const struct of_device_id rkispp_hw_of_match[] = {
     {
         .compatible = "rockchip,rv1126-rkispp",
         .data = &rv1126_ispp_match_data,
-    }, {
+    },
+    {
         .compatible = "rockchip,rk3588-rkispp",
         .data = &rk3588_ispp_match_data,
     },
@@ -298,12 +294,14 @@ static int rkispp_hw_probe(struct platform_device *pdev)
     bool is_mem_reserved = true;
 
     match = of_match_node(rkispp_hw_of_match, node);
-    if (IS_ERR(match))
+    if (IS_ERR(match)) {
         return PTR_ERR(match);
+    }
 
     hw_dev = devm_kzalloc(dev, sizeof(*hw_dev), GFP_KERNEL);
-    if (!hw_dev)
+    if (!hw_dev) {
         return -ENOMEM;
+    }
 
     dev_set_drvdata(dev, hw_dev);
     hw_dev->dev = dev;
@@ -313,8 +311,7 @@ static int rkispp_hw_probe(struct platform_device *pdev)
     hw_dev->max_in.h = 0;
     hw_dev->max_in.fps = 0;
     of_property_read_u32_array(node, "max-input", &hw_dev->max_in.w, 3);
-    dev_info(dev, "max input:%dx%d@%dfps\n",
-         hw_dev->max_in.w, hw_dev->max_in.h, hw_dev->max_in.fps);
+    dev_info(dev, "max input:%dx%d@%dfps\n", hw_dev->max_in.w, hw_dev->max_in.h, hw_dev->max_in.fps);
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
     if (!res) {
         dev_err(dev, "get resource failed\n");
@@ -335,27 +332,19 @@ static int rkispp_hw_probe(struct platform_device *pdev)
     }
 
     rkispp_monitor = device_property_read_bool(dev, "rockchip,restart-monitor-en");
-    res = platform_get_resource_byname(pdev, IORESOURCE_IRQ,
-                       match_data->irqs[0].name);
+    res = platform_get_resource_byname(pdev, IORESOURCE_IRQ, match_data->irqs[0].name);
     if (res) {
         /* there are irq names in dts */
         for (i = 0; i < match_data->num_irqs; i++) {
-            irq = platform_get_irq_byname(pdev,
-                              match_data->irqs[i].name);
+            irq = platform_get_irq_byname(pdev, match_data->irqs[i].name);
             if (irq < 0) {
-                dev_err(dev, "no irq %s in dts\n",
-                    match_data->irqs[i].name);
+                dev_err(dev, "no irq %s in dts\n", match_data->irqs[i].name);
                 ret = irq;
                 goto err;
             }
-            ret = devm_request_irq(dev, irq,
-                           match_data->irqs[i].irq_hdl,
-                           IRQF_SHARED,
-                           dev_driver_string(dev),
-                           dev);
+            ret = devm_request_irq(dev, irq, match_data->irqs[i].irq_hdl, IRQF_SHARED, dev_driver_string(dev), dev);
             if (ret < 0) {
-                dev_err(dev, "request %s failed: %d\n",
-                    match_data->irqs[i].name, ret);
+                dev_err(dev, "request %s failed: %d\n", match_data->irqs[i].name, ret);
                 goto err;
             }
         }
@@ -365,8 +354,7 @@ static int rkispp_hw_probe(struct platform_device *pdev)
         struct clk *clk = devm_clk_get(dev, match_data->clks[i]);
 
         if (IS_ERR(clk)) {
-            dev_err(dev, "failed to get %s\n",
-                match_data->clks[i]);
+            dev_err(dev, "failed to get %s\n", match_data->clks[i]);
             ret = PTR_ERR(clk);
             goto err;
         }
@@ -401,10 +389,11 @@ static int rkispp_hw_probe(struct platform_device *pdev)
     ret = of_reserved_mem_device_init(dev);
     if (ret) {
         is_mem_reserved = false;
-        if (!hw_dev->is_mmu)
+        if (!hw_dev->is_mmu) {
             dev_info(dev, "No reserved memory region. default cma area!\n");
-        else
+        } else {
             hw_dev->is_dma_contig = false;
+        }
     }
     if (is_mem_reserved) {
         /* reserved memory using rdma_sg */
@@ -478,18 +467,16 @@ static int __maybe_unused rkispp_runtime_resume(struct device *dev)
 }
 
 static const struct dev_pm_ops rkispp_hw_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-                pm_runtime_force_resume)
-    SET_RUNTIME_PM_OPS(rkispp_runtime_suspend,
-               rkispp_runtime_resume, NULL)
-};
+    SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
+        SET_RUNTIME_PM_OPS(rkispp_runtime_suspend, rkispp_runtime_resume, NULL)};
 
 static struct platform_driver rkispp_hw_drv = {
-    .driver = {
-        .name = "rkispp_hw",
-        .of_match_table = of_match_ptr(rkispp_hw_of_match),
-        .pm = &rkispp_hw_pm_ops,
-    },
+    .driver =
+        {
+            .name = "rkispp_hw",
+            .of_match_table = of_match_ptr(rkispp_hw_of_match),
+            .pm = &rkispp_hw_pm_ops,
+        },
     .probe = rkispp_hw_probe,
     .remove = rkispp_hw_remove,
     .shutdown = rkispp_hw_shutdown,
@@ -500,8 +487,9 @@ int __init rkispp_hw_drv_init(void)
     int ret;
 
     ret = platform_driver_register(&rkispp_hw_drv);
-    if (!ret)
+    if (!ret) {
         ret = platform_driver_register(&rkispp_plat_drv);
+    }
     return ret;
 }
 

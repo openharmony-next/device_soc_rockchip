@@ -63,13 +63,15 @@ static void *debug_mem_start(struct seq_file *m, loff_t *_pos)
     struct debug_mem_mapping *map;
     loff_t pos = *_pos;
 
-    list_for_each_entry(map, &mem_data->mapping_list, node) {
+    list_for_each_entry(map, &mem_data->mapping_list, node)
+    {
         if (pos >= map->nr_pages) {
             pos -= map->nr_pages;
         } else {
             data = kmalloc(sizeof(*data), GFP_KERNEL);
-            if (!data)
+            if (!data) {
                 return NULL;
+            }
             data->lh = &map->node;
             data->offset = pos;
             return data;
@@ -126,25 +128,26 @@ static int debug_mem_show(struct seq_file *m, void *v)
     kbase_gpu_vm_lock(mem_data->kctx);
 
     if (data->offset >= map->alloc->nents) {
-        seq_printf(m, "%016llx: Unbacked page\n\n", (map->start_pfn +
-                data->offset) << PAGE_SHIFT);
+        seq_printf(m, "%016llx: Unbacked page\n\n", (map->start_pfn + data->offset) << PAGE_SHIFT);
         goto out;
     }
 
-    if (!(map->flags & KBASE_REG_CPU_CACHED))
+    if (!(map->flags & KBASE_REG_CPU_CACHED)) {
         prot = pgprot_writecombine(prot);
+    }
 
     page = as_page(map->alloc->pages[data->offset]);
     mapping = vmap(&page, 1, VM_MAP, prot);
-    if (!mapping)
+    if (!mapping) {
         goto out;
+    }
 
-    for (i = 0; i < PAGE_SIZE; i += 4*sizeof(*mapping)) {
-        seq_printf(m, "%016llx:", i + ((map->start_pfn +
-                data->offset) << PAGE_SHIFT));
+    for (i = 0; i < PAGE_SIZE; i += 0x4 * sizeof(*mapping)) {
+        seq_printf(m, "%016llx:", i + ((map->start_pfn + data->offset) << PAGE_SHIFT));
 
-        for (j = 0; j < 4*sizeof(*mapping); j += sizeof(*mapping))
-            seq_printf(m, " %08x", mapping[(i+j)/sizeof(*mapping)]);
+        for (j = 0; j < 0x4 * sizeof(*mapping); j += sizeof(*mapping)) {
+            seq_printf(m, " %08x", mapping[(i + j) / sizeof(*mapping)]);
+        }
         seq_putc(m, '\n');
     }
 
@@ -164,8 +167,7 @@ static const struct seq_operations ops = {
     .show = debug_mem_show,
 };
 
-static int debug_mem_zone_open(struct rb_root *rbtree,
-                        struct debug_mem_data *mem_data)
+static int debug_mem_zone_open(struct rb_root *rbtree, struct debug_mem_data *mem_data)
 {
     int ret = 0;
     struct rb_node *p;
@@ -175,9 +177,10 @@ static int debug_mem_zone_open(struct rb_root *rbtree,
     for (p = rb_first(rbtree); p; p = rb_next(p)) {
         reg = rb_entry(p, struct kbase_va_region, rblink);
 
-        if (reg->gpu_alloc == NULL)
+        if (reg->gpu_alloc == NULL) {
             /* Empty region - ignore */
             continue;
+        }
 
         mapping = kmalloc(sizeof(*mapping), GFP_KERNEL);
         if (!mapping) {
@@ -202,12 +205,14 @@ static int debug_mem_open(struct inode *i, struct file *file)
     struct debug_mem_data *mem_data;
     int ret;
 
-    if (get_file_rcu(kctx->filp) == 0)
+    if (get_file_rcu(kctx->filp) == 0) {
         return -ENOENT;
+    }
 
     ret = seq_open(file, &ops);
-    if (ret)
+    if (ret) {
         goto open_fail;
+    }
 
     mem_data = kmalloc(sizeof(*mem_data), GFP_KERNEL);
     if (!mem_data) {
@@ -250,8 +255,7 @@ out:
         while (!list_empty(&mem_data->mapping_list)) {
             struct debug_mem_mapping *mapping;
 
-            mapping = list_first_entry(&mem_data->mapping_list,
-                    struct debug_mem_mapping, node);
+            mapping = list_first_entry(&mem_data->mapping_list, struct debug_mem_mapping, node);
             kbase_mem_phy_alloc_put(mapping->alloc);
             list_del(&mapping->node);
             kfree(mapping);
@@ -275,8 +279,7 @@ static int debug_mem_release(struct inode *inode, struct file *file)
     seq_release(inode, file);
 
     while (!list_empty(&mem_data->mapping_list)) {
-        mapping = list_first_entry(&mem_data->mapping_list,
-                struct debug_mem_mapping, node);
+        mapping = list_first_entry(&mem_data->mapping_list, struct debug_mem_mapping, node);
         kbase_mem_phy_alloc_put(mapping->alloc);
         list_del(&mapping->node);
         kfree(mapping);
@@ -290,24 +293,18 @@ static int debug_mem_release(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations kbase_debug_mem_view_fops = {
-    .owner = THIS_MODULE,
-    .open = debug_mem_open,
-    .release = debug_mem_release,
-    .read = seq_read,
-    .llseek = seq_lseek
-};
+    .owner = THIS_MODULE, .open = debug_mem_open, .release = debug_mem_release, .read = seq_read, .llseek = seq_lseek};
 
 void kbase_debug_mem_view_init(struct kbase_context *const kctx)
 {
     /* Caller already ensures this, but we keep the pattern for
      * maintenance safety.
      */
-    if (WARN_ON(!kctx) ||
-        WARN_ON(IS_ERR_OR_NULL(kctx->kctx_dentry)))
+    if (WARN_ON(!kctx) || WARN_ON(IS_ERR_OR_NULL(kctx->kctx_dentry))) {
         return;
+    }
 
-    debugfs_create_file("mem_view", 0400, kctx->kctx_dentry, kctx,
-            &kbase_debug_mem_view_fops);
+    debugfs_create_file("mem_view", 0x100, kctx->kctx_dentry, kctx, &kbase_debug_mem_view_fops);
 }
 
 #endif

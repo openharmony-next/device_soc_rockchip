@@ -27,7 +27,7 @@
 #include <linux/workqueue.h>
 #include <linux/usb/ch9.h>
 
-#define UDC_TRACE_STR_MAX    512
+#define UDC_TRACE_STR_MAX 512
 
 struct usb_ep;
 
@@ -98,30 +98,29 @@ struct usb_ep;
  */
 
 struct usb_request {
-    void            *buf;
-    unsigned        length;
-    dma_addr_t        dma;
+    void *buf;
+    unsigned length;
+    dma_addr_t dma;
 
-    struct scatterlist    *sg;
-    unsigned        num_sgs;
-    unsigned        num_mapped_sgs;
+    struct scatterlist *sg;
+    unsigned num_sgs;
+    unsigned num_mapped_sgs;
 
-    unsigned        stream_id:16;
-    unsigned        is_last:1;
-    unsigned        no_interrupt:1;
-    unsigned        zero:1;
-    unsigned        short_not_ok:1;
-    unsigned        dma_mapped:1;
+    unsigned stream_id : 16;
+    unsigned is_last : 1;
+    unsigned no_interrupt : 1;
+    unsigned zero : 1;
+    unsigned short_not_ok : 1;
+    unsigned dma_mapped : 1;
 
-    void            (*complete)(struct usb_ep *ep,
-                    struct usb_request *req);
-    void            *context;
-    struct list_head    list;
+    void (*complete)(struct usb_ep *ep, struct usb_request *req);
+    void *context;
+    struct list_head list;
 
-    unsigned        frame_number;        /* ISO ONLY */
+    unsigned frame_number; /* ISO ONLY */
 
-    int            status;
-    unsigned        actual;
+    int status;
+    unsigned actual;
 };
 
 /*-------------------------------------------------------------------------*/
@@ -134,24 +133,21 @@ struct usb_request {
  * endpoints they support, as well as their capabilities.
  */
 struct usb_ep_ops {
-    int (*enable) (struct usb_ep *ep,
-        const struct usb_endpoint_descriptor *desc);
-    int (*disable) (struct usb_ep *ep);
-    void (*dispose) (struct usb_ep *ep);
+    int (*enable)(struct usb_ep *ep, const struct usb_endpoint_descriptor *desc);
+    int (*disable)(struct usb_ep *ep);
+    void (*dispose)(struct usb_ep *ep);
 
-    struct usb_request *(*alloc_request) (struct usb_ep *ep,
-        gfp_t gfp_flags);
-    void (*free_request) (struct usb_ep *ep, struct usb_request *req);
+    struct usb_request *(*alloc_request)(struct usb_ep *ep, gfp_t gfp_flags);
+    void (*free_request)(struct usb_ep *ep, struct usb_request *req);
 
-    int (*queue) (struct usb_ep *ep, struct usb_request *req,
-        gfp_t gfp_flags);
-    int (*dequeue) (struct usb_ep *ep, struct usb_request *req);
+    int (*queue)(struct usb_ep *ep, struct usb_request *req, gfp_t gfp_flags);
+    int (*dequeue)(struct usb_ep *ep, struct usb_request *req);
 
-    int (*set_halt) (struct usb_ep *ep, int value);
-    int (*set_wedge) (struct usb_ep *ep);
+    int (*set_halt)(struct usb_ep *ep, int value);
+    int (*set_wedge)(struct usb_ep *ep);
 
-    int (*fifo_status) (struct usb_ep *ep);
-    void (*fifo_flush) (struct usb_ep *ep);
+    int (*fifo_status)(struct usb_ep *ep);
+    void (*fifo_flush)(struct usb_ep *ep);
 };
 
 /**
@@ -164,32 +160,28 @@ struct usb_ep_ops {
  * @dir_out:Endpoint supports OUT direction.
  */
 struct usb_ep_caps {
-    unsigned type_control:1;
-    unsigned type_iso:1;
-    unsigned type_bulk:1;
-    unsigned type_int:1;
-    unsigned dir_in:1;
-    unsigned dir_out:1;
+    unsigned type_control : 1;
+    unsigned type_iso : 1;
+    unsigned type_bulk : 1;
+    unsigned type_int : 1;
+    unsigned dir_in : 1;
+    unsigned dir_out : 1;
 };
 
-#define USB_EP_CAPS_TYPE_CONTROL     0x01
-#define USB_EP_CAPS_TYPE_ISO         0x02
-#define USB_EP_CAPS_TYPE_BULK        0x04
-#define USB_EP_CAPS_TYPE_INT         0x08
-#define USB_EP_CAPS_TYPE_ALL \
-    (USB_EP_CAPS_TYPE_ISO | USB_EP_CAPS_TYPE_BULK | USB_EP_CAPS_TYPE_INT)
-#define USB_EP_CAPS_DIR_IN           0x01
-#define USB_EP_CAPS_DIR_OUT          0x02
-#define USB_EP_CAPS_DIR_ALL  (USB_EP_CAPS_DIR_IN | USB_EP_CAPS_DIR_OUT)
+#define USB_EP_CAPS_TYPE_CONTROL 0x01
+#define USB_EP_CAPS_TYPE_ISO 0x02
+#define USB_EP_CAPS_TYPE_BULK 0x04
+#define USB_EP_CAPS_TYPE_INT 0x08
+#define USB_EP_CAPS_TYPE_ALL (USB_EP_CAPS_TYPE_ISO | USB_EP_CAPS_TYPE_BULK | USB_EP_CAPS_TYPE_INT)
+#define USB_EP_CAPS_DIR_IN 0x01
+#define USB_EP_CAPS_DIR_OUT 0x02
+#define USB_EP_CAPS_DIR_ALL (USB_EP_CAPS_DIR_IN | USB_EP_CAPS_DIR_OUT)
 
-#define USB_EP_CAPS(_type, _dir) \
-    { \
-        .type_control = !!(_type & USB_EP_CAPS_TYPE_CONTROL), \
-        .type_iso = !!(_type & USB_EP_CAPS_TYPE_ISO), \
-        .type_bulk = !!(_type & USB_EP_CAPS_TYPE_BULK), \
-        .type_int = !!(_type & USB_EP_CAPS_TYPE_INT), \
-        .dir_in = !!(_dir & USB_EP_CAPS_DIR_IN), \
-        .dir_out = !!(_dir & USB_EP_CAPS_DIR_OUT), \
+#define USB_EP_CAPS(_type, _dir)                                                                                       \
+    {                                                                                                                  \
+        .type_control = !!((_type)&USB_EP_CAPS_TYPE_CONTROL), .type_iso = !!((_type)&USB_EP_CAPS_TYPE_ISO),            \
+        .type_bulk = !!((_type)&USB_EP_CAPS_TYPE_BULK), .type_int = !!((_type)&USB_EP_CAPS_TYPE_INT),                  \
+        .dir_in = !!((_dir)&USB_EP_CAPS_DIR_IN), .dir_out = !!((_dir)&USB_EP_CAPS_DIR_OUT),                            \
     }
 
 /**
@@ -225,24 +217,24 @@ struct usb_ep_caps {
  */
 
 struct usb_ep {
-    void            *driver_data;
+    void *driver_data;
 
-    const char        *name;
-    const struct usb_ep_ops    *ops;
-    struct list_head    ep_list;
-    struct usb_ep_caps    caps;
-    bool            claimed;
-    bool            enabled;
-    unsigned        maxpacket:16;
-    unsigned        maxpacket_limit:16;
-    unsigned        max_streams:16;
-    unsigned        mult:2;
-    unsigned        maxburst:5;
-    u8            address;
-    const struct usb_endpoint_descriptor    *desc;
-    const struct usb_ss_ep_comp_descriptor    *comp_desc;
+    const char *name;
+    const struct usb_ep_ops *ops;
+    struct list_head ep_list;
+    struct usb_ep_caps caps;
+    bool claimed;
+    bool enabled;
+    unsigned maxpacket : 16;
+    unsigned maxpacket_limit : 16;
+    unsigned max_streams : 16;
+    unsigned mult : 2;
+    unsigned maxburst : 5;
+    u8 address;
+    const struct usb_endpoint_descriptor *desc;
+    const struct usb_ss_ep_comp_descriptor *comp_desc;
 #if defined(CONFIG_ARCH_ROCKCHIP) && defined(CONFIG_NO_GKI)
-    u8            transfer_type;
+    u8 transfer_type;
 #endif
 };
 
@@ -262,48 +254,64 @@ int usb_ep_set_wedge(struct usb_ep *ep);
 int usb_ep_fifo_status(struct usb_ep *ep);
 void usb_ep_fifo_flush(struct usb_ep *ep);
 #else
-static inline void usb_ep_set_maxpacket_limit(struct usb_ep *ep,
-        unsigned maxpacket_limit)
-{ }
+static inline void usb_ep_set_maxpacket_limit(struct usb_ep *ep, unsigned maxpacket_limit)
+{
+}
 static inline int usb_ep_enable(struct usb_ep *ep)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_ep_disable(struct usb_ep *ep)
-{ return 0; }
-static inline struct usb_request *usb_ep_alloc_request(struct usb_ep *ep,
-        gfp_t gfp_flags)
-{ return NULL; }
-static inline void usb_ep_free_request(struct usb_ep *ep,
-        struct usb_request *req)
-{ }
-static inline int usb_ep_queue(struct usb_ep *ep, struct usb_request *req,
-        gfp_t gfp_flags)
-{ return 0; }
+{
+    return 0;
+}
+static inline struct usb_request *usb_ep_alloc_request(struct usb_ep *ep, gfp_t gfp_flags)
+{
+    return NULL;
+}
+static inline void usb_ep_free_request(struct usb_ep *ep, struct usb_request *req)
+{
+}
+static inline int usb_ep_queue(struct usb_ep *ep, struct usb_request *req, gfp_t gfp_flags)
+{
+    return 0;
+}
 static inline int usb_ep_dequeue(struct usb_ep *ep, struct usb_request *req)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_ep_set_halt(struct usb_ep *ep)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_ep_clear_halt(struct usb_ep *ep)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_ep_set_wedge(struct usb_ep *ep)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_ep_fifo_status(struct usb_ep *ep)
-{ return 0; }
+{
+    return 0;
+}
 static inline void usb_ep_fifo_flush(struct usb_ep *ep)
-{ }
+{
+}
 #endif /* USB_GADGET */
 
 /*-------------------------------------------------------------------------*/
 
 struct usb_dcd_config_params {
-    __u8  bU1devExitLat;    /* U1 Device exit Latency */
-#define USB_DEFAULT_U1_DEV_EXIT_LAT    0x01    /* Less then 1 microsec */
-    __le16 bU2DevExitLat;    /* U2 Device exit Latency */
-#define USB_DEFAULT_U2_DEV_EXIT_LAT    0x1F4    /* Less then 500 microsec */
-    __u8 besl_baseline;    /* Recommended baseline BESL (0-15) */
-    __u8 besl_deep;        /* Recommended deep BESL (0-15) */
-#define USB_DEFAULT_BESL_UNSPECIFIED    0xFF    /* No recommended value */
+    __u8 bU1devExitLat;                   /* U1 Device exit Latency */
+#define USB_DEFAULT_U1_DEV_EXIT_LAT 0x01  /* Less then 1 microsec */
+    __le16 bU2DevExitLat;                 /* U2 Device exit Latency */
+#define USB_DEFAULT_U2_DEV_EXIT_LAT 0x1F4 /* Less then 500 microsec */
+    __u8 besl_baseline;                   /* Recommended baseline BESL (0-15) */
+    __u8 besl_deep;                       /* Recommended deep BESL (0-15) */
+#define USB_DEFAULT_BESL_UNSPECIFIED 0xFF /* No recommended value */
 };
-
 
 struct usb_gadget;
 struct usb_gadget_driver;
@@ -313,27 +321,22 @@ struct usb_udc;
  * which don't involve endpoints (or i/o).
  */
 struct usb_gadget_ops {
-    int    (*get_frame)(struct usb_gadget *);
-    int    (*wakeup)(struct usb_gadget *);
-    int    (*set_selfpowered) (struct usb_gadget *, int is_selfpowered);
-    int    (*vbus_session) (struct usb_gadget *, int is_active);
-    int    (*vbus_draw) (struct usb_gadget *, unsigned mA);
-    int    (*pullup) (struct usb_gadget *, int is_on);
-    int    (*ioctl)(struct usb_gadget *,
-                unsigned code, unsigned long param);
-    void    (*get_config_params)(struct usb_gadget *,
-                     struct usb_dcd_config_params *);
-    int    (*udc_start)(struct usb_gadget *,
-            struct usb_gadget_driver *);
-    int    (*udc_stop)(struct usb_gadget *);
-    void    (*udc_set_speed)(struct usb_gadget *, enum usb_device_speed);
-    void    (*udc_set_ssp_rate)(struct usb_gadget *gadget,
-            enum usb_ssp_rate rate);
-    void    (*udc_async_callbacks)(struct usb_gadget *gadget, bool enable);
-    struct usb_ep *(*match_ep)(struct usb_gadget *,
-            struct usb_endpoint_descriptor *,
-            struct usb_ss_ep_comp_descriptor *);
-    int    (*check_config)(struct usb_gadget *gadget);
+    int (*get_frame)(struct usb_gadget *);
+    int (*wakeup)(struct usb_gadget *);
+    int (*set_selfpowered)(struct usb_gadget *, int is_selfpowered);
+    int (*vbus_session)(struct usb_gadget *, int is_active);
+    int (*vbus_draw)(struct usb_gadget *, unsigned mA);
+    int (*pullup)(struct usb_gadget *, int is_on);
+    int (*ioctl)(struct usb_gadget *, unsigned code, unsigned long param);
+    void (*get_config_params)(struct usb_gadget *, struct usb_dcd_config_params *);
+    int (*udc_start)(struct usb_gadget *, struct usb_gadget_driver *);
+    int (*udc_stop)(struct usb_gadget *);
+    void (*udc_set_speed)(struct usb_gadget *, enum usb_device_speed);
+    void (*udc_set_ssp_rate)(struct usb_gadget *gadget, enum usb_ssp_rate rate);
+    void (*udc_async_callbacks)(struct usb_gadget *gadget, bool enable);
+    struct usb_ep *(*match_ep)(struct usb_gadget *, struct usb_endpoint_descriptor *,
+                               struct usb_ss_ep_comp_descriptor *);
+    int (*check_config)(struct usb_gadget *gadget);
 };
 
 /**
@@ -410,54 +413,58 @@ struct usb_gadget_ops {
  * device is acting as a B-Peripheral (so is_a_peripheral is false).
  */
 struct usb_gadget {
-    struct work_struct        work;
-    struct usb_udc            *udc;
+    struct work_struct work;
+    struct usb_udc *udc;
     /* readonly to gadget driver */
-    const struct usb_gadget_ops    *ops;
-    struct usb_ep            *ep0;
-    struct list_head        ep_list;    /* of usb_ep */
-    enum usb_device_speed        speed;
-    enum usb_device_speed        max_speed;
+    const struct usb_gadget_ops *ops;
+    struct usb_ep *ep0;
+    struct list_head ep_list; /* of usb_ep */
+    enum usb_device_speed speed;
+    enum usb_device_speed max_speed;
 
     /* USB SuperSpeed Plus only */
-    enum usb_ssp_rate        ssp_rate;
-    enum usb_ssp_rate        max_ssp_rate;
+    enum usb_ssp_rate ssp_rate;
+    enum usb_ssp_rate max_ssp_rate;
 
-    enum usb_device_state        state;
-    const char            *name;
-    struct device            dev;
-    unsigned            isoch_delay;
-    unsigned            out_epnum;
-    unsigned            in_epnum;
-    unsigned            mA;
-    struct usb_otg_caps        *otg_caps;
+    enum usb_device_state state;
+    const char *name;
+    struct device dev;
+    unsigned isoch_delay;
+    unsigned out_epnum;
+    unsigned in_epnum;
+    unsigned mA;
+    struct usb_otg_caps *otg_caps;
 
-    unsigned            sg_supported:1;
-    unsigned            is_otg:1;
-    unsigned            is_a_peripheral:1;
-    unsigned            b_hnp_enable:1;
-    unsigned            a_hnp_support:1;
-    unsigned            a_alt_hnp_support:1;
-    unsigned            hnp_polling_support:1;
-    unsigned            host_request_flag:1;
-    unsigned            quirk_ep_out_aligned_size:1;
-    unsigned            quirk_altset_not_supp:1;
-    unsigned            quirk_stall_not_supp:1;
-    unsigned            quirk_zlp_not_supp:1;
-    unsigned            quirk_avoids_skb_reserve:1;
-    unsigned            is_selfpowered:1;
-    unsigned            deactivated:1;
-    unsigned            connected:1;
-    unsigned            lpm_capable:1;
-    int                irq;
+    unsigned sg_supported : 1;
+    unsigned is_otg : 1;
+    unsigned is_a_peripheral : 1;
+    unsigned b_hnp_enable : 1;
+    unsigned a_hnp_support : 1;
+    unsigned a_alt_hnp_support : 1;
+    unsigned hnp_polling_support : 1;
+    unsigned host_request_flag : 1;
+    unsigned quirk_ep_out_aligned_size : 1;
+    unsigned quirk_altset_not_supp : 1;
+    unsigned quirk_stall_not_supp : 1;
+    unsigned quirk_zlp_not_supp : 1;
+    unsigned quirk_avoids_skb_reserve : 1;
+    unsigned is_selfpowered : 1;
+    unsigned deactivated : 1;
+    unsigned connected : 1;
+    unsigned lpm_capable : 1;
+    int irq;
 };
-#define work_to_gadget(w)    (container_of((w), struct usb_gadget, work))
+#define work_to_gadget(w) (container_of((w), struct usb_gadget, work))
 
 /* Interface to the device model */
 static inline void set_gadget_data(struct usb_gadget *gadget, void *data)
-    { dev_set_drvdata(&gadget->dev, data); }
+{
+    dev_set_drvdata(&gadget->dev, data);
+}
 static inline void *get_gadget_data(struct usb_gadget *gadget)
-    { return dev_get_drvdata(&gadget->dev); }
+{
+    return dev_get_drvdata(&gadget->dev);
+}
 static inline struct usb_gadget *dev_to_usb_gadget(struct device *dev)
 {
     return container_of(dev, struct usb_gadget, dev);
@@ -471,21 +478,20 @@ static inline void usb_put_gadget(struct usb_gadget *gadget)
 {
     put_device(&gadget->dev);
 }
-extern void usb_initialize_gadget(struct device *parent,
-        struct usb_gadget *gadget, void (*release)(struct device *dev));
+extern void usb_initialize_gadget(struct device *parent, struct usb_gadget *gadget,
+                                  void (*release)(struct device *dev));
 extern int usb_add_gadget(struct usb_gadget *gadget);
 extern void usb_del_gadget(struct usb_gadget *gadget);
 
 /* Legacy device-model interface */
-extern int usb_add_gadget_udc_release(struct device *parent,
-        struct usb_gadget *gadget, void (*release)(struct device *dev));
+extern int usb_add_gadget_udc_release(struct device *parent, struct usb_gadget *gadget,
+                                      void (*release)(struct device *dev));
 extern int usb_add_gadget_udc(struct device *parent, struct usb_gadget *gadget);
 extern void usb_del_gadget_udc(struct usb_gadget *gadget);
 extern char *usb_get_gadget_udc_name(void);
 
 /* iterates the non-control endpoints; 'tmp' is a struct usb_ep pointer */
-#define gadget_for_each_ep(tmp, gadget) \
-    list_for_each_entry(tmp, &(gadget)->ep_list, ep_list)
+#define gadget_for_each_ep(tmp, gadget) list_for_each_entry(tmp, &(gadget)->ep_list, ep_list)
 
 /**
  * usb_ep_align - returns @len aligned to ep's maxpacketsize.
@@ -511,8 +517,7 @@ static inline size_t usb_ep_align(struct usb_ep *ep, size_t len)
  * This helper is used in case it's required for any reason to check and maybe
  * align buffer's size to an ep's maxpacketsize.
  */
-static inline size_t
-usb_ep_align_maybe(struct usb_gadget *g, struct usb_ep *ep, size_t len)
+static inline size_t usb_ep_align_maybe(struct usb_gadget *g, struct usb_ep *ep, size_t len)
 {
     return g->quirk_ep_out_aligned_size ? usb_ep_align(ep, len) : len;
 }
@@ -616,29 +621,53 @@ int usb_gadget_activate(struct usb_gadget *gadget);
 int usb_gadget_check_config(struct usb_gadget *gadget);
 #else
 static inline int usb_gadget_frame_number(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_wakeup(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_set_selfpowered(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_clear_selfpowered(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_vbus_connect(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_vbus_draw(struct usb_gadget *gadget, unsigned mA)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_vbus_disconnect(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_connect(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_disconnect(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_deactivate(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_activate(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 static inline int usb_gadget_check_config(struct usb_gadget *gadget)
-{ return 0; }
+{
+    return 0;
+}
 #endif /* CONFIG_USB_GADGET */
 
 /*-------------------------------------------------------------------------*/
@@ -717,27 +746,23 @@ static inline int usb_gadget_check_config(struct usb_gadget *gadget)
  * power is maintained.
  */
 struct usb_gadget_driver {
-    char            *function;
-    enum usb_device_speed    max_speed;
-    int            (*bind)(struct usb_gadget *gadget,
-                    struct usb_gadget_driver *driver);
-    void            (*unbind)(struct usb_gadget *);
-    int            (*setup)(struct usb_gadget *,
-                    const struct usb_ctrlrequest *);
-    void            (*disconnect)(struct usb_gadget *);
-    void            (*suspend)(struct usb_gadget *);
-    void            (*resume)(struct usb_gadget *);
-    void            (*reset)(struct usb_gadget *);
+    char *function;
+    enum usb_device_speed max_speed;
+    int (*bind)(struct usb_gadget *gadget, struct usb_gadget_driver *driver);
+    void (*unbind)(struct usb_gadget *);
+    int (*setup)(struct usb_gadget *, const struct usb_ctrlrequest *);
+    void (*disconnect)(struct usb_gadget *);
+    void (*suspend)(struct usb_gadget *);
+    void (*resume)(struct usb_gadget *);
+    void (*reset)(struct usb_gadget *);
 
     /* FIXME support safe rmmod */
-    struct device_driver    driver;
+    struct device_driver driver;
 
-    char            *udc_name;
-    struct list_head    pending;
-    unsigned                match_existing_only:1;
+    char *udc_name;
+    struct list_head pending;
+    unsigned match_existing_only : 1;
 };
-
-
 
 /*-------------------------------------------------------------------------*/
 
@@ -789,8 +814,8 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *driver);
  * together with its ID.
  */
 struct usb_string {
-    u8            id;
-    const char        *s;
+    u8 id;
+    const char *s;
 };
 
 /**
@@ -802,13 +827,13 @@ struct usb_string {
  * strings for a given language.
  */
 struct usb_gadget_strings {
-    u16            language;    /* 0x0409 for en-us */
-    struct usb_string    *strings;
+    u16 language; /* 0x0409 for en-us */
+    struct usb_string *strings;
 };
 
 struct usb_gadget_string_container {
-    struct list_head        list;
-    u8                      *stash[];
+    struct list_head list;
+    u8 *stash[];
 };
 
 /* put descriptor for string with that id into buf (buflen >= 256) */
@@ -822,16 +847,14 @@ bool usb_validate_langid(u16 langid);
 /* utility to simplify managing config descriptors */
 
 /* write vector of descriptors into buffer */
-int usb_descriptor_fillbuf(void *, unsigned,
-        const struct usb_descriptor_header **);
+int usb_descriptor_fillbuf(void *, unsigned, const struct usb_descriptor_header **);
 
 /* build config descriptor from single descriptor vector */
-int usb_gadget_config_buf(const struct usb_config_descriptor *config,
-    void *buf, unsigned buflen, const struct usb_descriptor_header **desc);
+int usb_gadget_config_buf(const struct usb_config_descriptor *config, void *buf, unsigned buflen,
+                          const struct usb_descriptor_header **desc);
 
 /* copy a NULL-terminated vector of descriptors */
-struct usb_descriptor_header **usb_copy_descriptors(
-        struct usb_descriptor_header **);
+struct usb_descriptor_header **usb_copy_descriptors(struct usb_descriptor_header **);
 
 /**
  * usb_free_descriptors - free descriptors returned by usb_copy_descriptors()
@@ -843,77 +866,69 @@ static inline void usb_free_descriptors(struct usb_descriptor_header **v)
 }
 
 struct usb_function;
-int usb_assign_descriptors(struct usb_function *f,
-        struct usb_descriptor_header **fs,
-        struct usb_descriptor_header **hs,
-        struct usb_descriptor_header **ss,
-        struct usb_descriptor_header **ssp);
+int usb_assign_descriptors(struct usb_function *f, struct usb_descriptor_header **fs, struct usb_descriptor_header **hs,
+                           struct usb_descriptor_header **ss, struct usb_descriptor_header **ssp);
 void usb_free_all_descriptors(struct usb_function *f);
 
-struct usb_descriptor_header *usb_otg_descriptor_alloc(
-                struct usb_gadget *gadget);
-int usb_otg_descriptor_init(struct usb_gadget *gadget,
-        struct usb_descriptor_header *otg_desc);
+struct usb_descriptor_header *usb_otg_descriptor_alloc(struct usb_gadget *gadget);
+int usb_otg_descriptor_init(struct usb_gadget *gadget, struct usb_descriptor_header *otg_desc);
 /*-------------------------------------------------------------------------*/
 
 /* utility to simplify map/unmap of usb_requests to/from DMA */
 
-#ifdef    CONFIG_HAS_DMA
-extern int usb_gadget_map_request_by_dev(struct device *dev,
-        struct usb_request *req, int is_in);
-extern int usb_gadget_map_request(struct usb_gadget *gadget,
-        struct usb_request *req, int is_in);
+#ifdef CONFIG_HAS_DMA
+extern int usb_gadget_map_request_by_dev(struct device *dev, struct usb_request *req, int is_in);
+extern int usb_gadget_map_request(struct usb_gadget *gadget, struct usb_request *req, int is_in);
 
-extern void usb_gadget_unmap_request_by_dev(struct device *dev,
-        struct usb_request *req, int is_in);
-extern void usb_gadget_unmap_request(struct usb_gadget *gadget,
-        struct usb_request *req, int is_in);
-#else /* !CONFIG_HAS_DMA */
-static inline int usb_gadget_map_request_by_dev(struct device *dev,
-        struct usb_request *req, int is_in) { return -ENOSYS; }
-static inline int usb_gadget_map_request(struct usb_gadget *gadget,
-        struct usb_request *req, int is_in) { return -ENOSYS; }
+extern void usb_gadget_unmap_request_by_dev(struct device *dev, struct usb_request *req, int is_in);
+extern void usb_gadget_unmap_request(struct usb_gadget *gadget, struct usb_request *req, int is_in);
+#else  /* !CONFIG_HAS_DMA */
+static inline int usb_gadget_map_request_by_dev(struct device *dev, struct usb_request *req, int is_in)
+{
+    return -ENOSYS;
+}
+static inline int usb_gadget_map_request(struct usb_gadget *gadget, struct usb_request *req, int is_in)
+{
+    return -ENOSYS;
+}
 
-static inline void usb_gadget_unmap_request_by_dev(struct device *dev,
-        struct usb_request *req, int is_in) { }
-static inline void usb_gadget_unmap_request(struct usb_gadget *gadget,
-        struct usb_request *req, int is_in) { }
+static inline void usb_gadget_unmap_request_by_dev(struct device *dev, struct usb_request *req, int is_in)
+{
+}
+static inline void usb_gadget_unmap_request(struct usb_gadget *gadget, struct usb_request *req, int is_in)
+{
+}
 #endif /* !CONFIG_HAS_DMA */
 
 /*-------------------------------------------------------------------------*/
 
 /* utility to set gadget state properly */
 
-extern void usb_gadget_set_state(struct usb_gadget *gadget,
-        enum usb_device_state state);
+extern void usb_gadget_set_state(struct usb_gadget *gadget, enum usb_device_state state);
 
 /*-------------------------------------------------------------------------*/
 
 /* utility to tell udc core that the bus reset occurs */
-extern void usb_gadget_udc_reset(struct usb_gadget *gadget,
-        struct usb_gadget_driver *driver);
+extern void usb_gadget_udc_reset(struct usb_gadget *gadget, struct usb_gadget_driver *driver);
 
 /*-------------------------------------------------------------------------*/
 
 /* utility to give requests back to the gadget layer */
 
-extern void usb_gadget_giveback_request(struct usb_ep *ep,
-        struct usb_request *req);
+extern void usb_gadget_giveback_request(struct usb_ep *ep, struct usb_request *req);
 
 /*-------------------------------------------------------------------------*/
 
 /* utility to find endpoint by name */
 
-extern struct usb_ep *gadget_find_ep_by_name(struct usb_gadget *g,
-        const char *name);
+extern struct usb_ep *gadget_find_ep_by_name(struct usb_gadget *g, const char *name);
 
 /*-------------------------------------------------------------------------*/
 
 /* utility to check if endpoint caps match descriptor needs */
 
-extern int usb_gadget_ep_match_desc(struct usb_gadget *gadget,
-        struct usb_ep *ep, struct usb_endpoint_descriptor *desc,
-        struct usb_ss_ep_comp_descriptor *ep_comp);
+extern int usb_gadget_ep_match_desc(struct usb_gadget *gadget, struct usb_ep *ep, struct usb_endpoint_descriptor *desc,
+                                    struct usb_ss_ep_comp_descriptor *ep_comp);
 
 /*-------------------------------------------------------------------------*/
 
@@ -924,13 +939,10 @@ extern void usb_udc_vbus_handler(struct usb_gadget *gadget, bool status);
 
 /* utility wrapping a simple endpoint selection policy */
 
-extern struct usb_ep *usb_ep_autoconfig(struct usb_gadget *,
-            struct usb_endpoint_descriptor *);
+extern struct usb_ep *usb_ep_autoconfig(struct usb_gadget *, struct usb_endpoint_descriptor *);
 
-
-extern struct usb_ep *usb_ep_autoconfig_ss(struct usb_gadget *,
-            struct usb_endpoint_descriptor *,
-            struct usb_ss_ep_comp_descriptor *);
+extern struct usb_ep *usb_ep_autoconfig_ss(struct usb_gadget *, struct usb_endpoint_descriptor *,
+                                           struct usb_ss_ep_comp_descriptor *);
 
 extern void usb_ep_autoconfig_release(struct usb_ep *);
 

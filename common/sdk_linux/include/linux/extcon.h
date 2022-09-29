@@ -23,21 +23,21 @@
 /*
  * Define the type of supported external connectors
  */
-#define EXTCON_TYPE_USB        BIT(0)    /* USB connector */
-#define EXTCON_TYPE_CHG        BIT(1)    /* Charger connector */
-#define EXTCON_TYPE_JACK    BIT(2)    /* Jack connector */
-#define EXTCON_TYPE_DISP    BIT(3)    /* Display connector */
-#define EXTCON_TYPE_MISC    BIT(4)    /* Miscellaneous connector */
+#define EXTCON_TYPE_USB BIT(0)  /* USB connector */
+#define EXTCON_TYPE_CHG BIT(1)  /* Charger connector */
+#define EXTCON_TYPE_JACK BIT(2) /* Jack connector */
+#define EXTCON_TYPE_DISP BIT(3) /* Display connector */
+#define EXTCON_TYPE_MISC BIT(4) /* Miscellaneous connector */
 
 /*
  * Define the unique id of supported external connectors
  */
-#define EXTCON_NONE        0
+#define EXTCON_NONE 0
 
 /* USB external connector */
-#define EXTCON_USB        1
-#define EXTCON_USB_HOST        2
-#define EXTCON_USB_VBUS_EN    3
+#define EXTCON_USB 1
+#define EXTCON_USB_HOST 2
+#define EXTCON_USB_VBUS_EN 3
 
 /*
  * Charging external connector
@@ -51,39 +51,39 @@
  * current at 5V. The EXTCON_CHG_USB_FAST connector can provide at
  * least 1A of current at 5V.
  */
-#define EXTCON_CHG_USB_SDP    5    /* Standard Downstream Port */
-#define EXTCON_CHG_USB_DCP    6    /* Dedicated Charging Port */
-#define EXTCON_CHG_USB_CDP    7    /* Charging Downstream Port */
-#define EXTCON_CHG_USB_ACA    8    /* Accessory Charger Adapter */
-#define EXTCON_CHG_USB_FAST    9
-#define EXTCON_CHG_USB_SLOW    10
-#define EXTCON_CHG_WPT        11    /* Wireless Power Transfer */
-#define EXTCON_CHG_USB_PD    12    /* USB Power Delivery */
+#define EXTCON_CHG_USB_SDP 5 /* Standard Downstream Port */
+#define EXTCON_CHG_USB_DCP 6 /* Dedicated Charging Port */
+#define EXTCON_CHG_USB_CDP 7 /* Charging Downstream Port */
+#define EXTCON_CHG_USB_ACA 8 /* Accessory Charger Adapter */
+#define EXTCON_CHG_USB_FAST 9
+#define EXTCON_CHG_USB_SLOW 10
+#define EXTCON_CHG_WPT 11    /* Wireless Power Transfer */
+#define EXTCON_CHG_USB_PD 12 /* USB Power Delivery */
 
 /* Jack external connector */
-#define EXTCON_JACK_MICROPHONE    20
-#define EXTCON_JACK_HEADPHONE    21
-#define EXTCON_JACK_LINE_IN    22
-#define EXTCON_JACK_LINE_OUT    23
-#define EXTCON_JACK_VIDEO_IN    24
-#define EXTCON_JACK_VIDEO_OUT    25
-#define EXTCON_JACK_SPDIF_IN    26    /* Sony Philips Digital InterFace */
-#define EXTCON_JACK_SPDIF_OUT    27
+#define EXTCON_JACK_MICROPHONE 20
+#define EXTCON_JACK_HEADPHONE 21
+#define EXTCON_JACK_LINE_IN 22
+#define EXTCON_JACK_LINE_OUT 23
+#define EXTCON_JACK_VIDEO_IN 24
+#define EXTCON_JACK_VIDEO_OUT 25
+#define EXTCON_JACK_SPDIF_IN 26 /* Sony Philips Digital InterFace */
+#define EXTCON_JACK_SPDIF_OUT 27
 
 /* Display external connector */
-#define EXTCON_DISP_HDMI    40    /* High-Definition Multimedia Interface */
-#define EXTCON_DISP_MHL        41    /* Mobile High-Definition Link */
-#define EXTCON_DISP_DVI        42    /* Digital Visual Interface */
-#define EXTCON_DISP_VGA        43    /* Video Graphics Array */
-#define EXTCON_DISP_DP        44    /* Display Port */
-#define EXTCON_DISP_HMD        45    /* Head-Mounted Display */
+#define EXTCON_DISP_HDMI 40 /* High-Definition Multimedia Interface */
+#define EXTCON_DISP_MHL 41  /* Mobile High-Definition Link */
+#define EXTCON_DISP_DVI 42  /* Digital Visual Interface */
+#define EXTCON_DISP_VGA 43  /* Video Graphics Array */
+#define EXTCON_DISP_DP 44   /* Display Port */
+#define EXTCON_DISP_HMD 45  /* Head-Mounted Display */
 
 /* Miscellaneous external connector */
-#define EXTCON_DOCK        60
-#define EXTCON_JIG        61
-#define EXTCON_MECHANICAL    62
+#define EXTCON_DOCK 60
+#define EXTCON_JIG 61
+#define EXTCON_MECHANICAL 62
 
-#define EXTCON_NUM        63
+#define EXTCON_NUM 63
 
 /*
  * Define the properties of supported external connectors.
@@ -120,22 +120,22 @@
  * @default:    0 (USB/USB2)
  *
  */
-#define EXTCON_PROP_USB_VBUS        0
-#define EXTCON_PROP_USB_TYPEC_POLARITY    1
-#define EXTCON_PROP_USB_SS        2
+#define EXTCON_PROP_USB_VBUS 0
+#define EXTCON_PROP_USB_TYPEC_POLARITY 1
+#define EXTCON_PROP_USB_SS 2
 
-#define EXTCON_PROP_USB_MIN        0
-#define EXTCON_PROP_USB_MAX        2
-#define EXTCON_PROP_USB_CNT    (EXTCON_PROP_USB_MAX - EXTCON_PROP_USB_MIN + 1)
+#define EXTCON_PROP_USB_MIN 0
+#define EXTCON_PROP_USB_MAX 2
+#define EXTCON_PROP_USB_CNT (EXTCON_PROP_USB_MAX - EXTCON_PROP_USB_MIN + 1)
 
 /* Properties of EXTCON_TYPE_CHG. */
-#define EXTCON_PROP_CHG_MIN        50
-#define EXTCON_PROP_CHG_MAX        50
-#define EXTCON_PROP_CHG_CNT    (EXTCON_PROP_CHG_MAX - EXTCON_PROP_CHG_MIN + 1)
+#define EXTCON_PROP_CHG_MIN 50
+#define EXTCON_PROP_CHG_MAX 50
+#define EXTCON_PROP_CHG_CNT (EXTCON_PROP_CHG_MAX - EXTCON_PROP_CHG_MIN + 1)
 
 /* Properties of EXTCON_TYPE_JACK. */
-#define EXTCON_PROP_JACK_MIN        100
-#define EXTCON_PROP_JACK_MAX        100
+#define EXTCON_PROP_JACK_MIN 100
+#define EXTCON_PROP_JACK_MAX 100
 #define EXTCON_PROP_JACK_CNT (EXTCON_PROP_JACK_MAX - EXTCON_PROP_JACK_MIN + 1)
 
 /*
@@ -147,11 +147,11 @@
  * @default:    0 (no hpd)
  *
  */
-#define EXTCON_PROP_DISP_HPD        150
+#define EXTCON_PROP_DISP_HPD 150
 
 /* Properties of EXTCON_TYPE_DISP. */
-#define EXTCON_PROP_DISP_MIN        150
-#define EXTCON_PROP_DISP_MAX        151
+#define EXTCON_PROP_DISP_MIN 150
+#define EXTCON_PROP_DISP_MAX 151
 #define EXTCON_PROP_DISP_CNT (EXTCON_PROP_DISP_MAX - EXTCON_PROP_DISP_MIN + 1)
 
 /*
@@ -161,7 +161,7 @@
  * would need the different data type to store it.
  */
 union extcon_property_value {
-    int intval;    /* type : integer (intval) */
+    int intval; /* type : integer (intval) */
 };
 
 struct extcon_dev;
@@ -182,11 +182,9 @@ int extcon_get_state(struct extcon_dev *edev, unsigned int id);
  * for each external connector. They are used to get the capability of the
  * property of each external connector based on the id and property.
  */
-int extcon_get_property(struct extcon_dev *edev, unsigned int id,
-                unsigned int prop,
-                union extcon_property_value *prop_val);
-int extcon_get_property_capability(struct extcon_dev *edev,
-                unsigned int id, unsigned int prop);
+int extcon_get_property(struct extcon_dev *edev, unsigned int id, unsigned int prop,
+                        union extcon_property_value *prop_val);
+int extcon_get_property_capability(struct extcon_dev *edev, unsigned int id, unsigned int prop);
 
 /*
  * Following APIs register the notifier block in order to detect
@@ -197,103 +195,86 @@ int extcon_get_property_capability(struct extcon_dev *edev,
  * extcon_register_notifier_all(*edev, *nb) : Register a notifier block
  *            for all supported external connectors of the extcon.
  */
-int extcon_register_notifier(struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb);
-int extcon_unregister_notifier(struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb);
-int devm_extcon_register_notifier(struct device *dev,
-                struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb);
-void devm_extcon_unregister_notifier(struct device *dev,
-                struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb);
+int extcon_register_notifier(struct extcon_dev *edev, unsigned int id, struct notifier_block *nb);
+int extcon_unregister_notifier(struct extcon_dev *edev, unsigned int id, struct notifier_block *nb);
+int devm_extcon_register_notifier(struct device *dev, struct extcon_dev *edev, unsigned int id,
+                                  struct notifier_block *nb);
+void devm_extcon_unregister_notifier(struct device *dev, struct extcon_dev *edev, unsigned int id,
+                                     struct notifier_block *nb);
 
-int extcon_register_notifier_all(struct extcon_dev *edev,
-                struct notifier_block *nb);
-int extcon_unregister_notifier_all(struct extcon_dev *edev,
-                struct notifier_block *nb);
-int devm_extcon_register_notifier_all(struct device *dev,
-                struct extcon_dev *edev,
-                struct notifier_block *nb);
-void devm_extcon_unregister_notifier_all(struct device *dev,
-                struct extcon_dev *edev,
-                struct notifier_block *nb);
+int extcon_register_notifier_all(struct extcon_dev *edev, struct notifier_block *nb);
+int extcon_unregister_notifier_all(struct extcon_dev *edev, struct notifier_block *nb);
+int devm_extcon_register_notifier_all(struct device *dev, struct extcon_dev *edev, struct notifier_block *nb);
+void devm_extcon_unregister_notifier_all(struct device *dev, struct extcon_dev *edev, struct notifier_block *nb);
 
 /*
  * Following APIs get the extcon_dev from devicetree or by through extcon name.
  */
 struct extcon_dev *extcon_get_extcon_dev(const char *extcon_name);
 struct extcon_dev *extcon_find_edev_by_node(struct device_node *node);
-struct extcon_dev *extcon_get_edev_by_phandle(struct device *dev,
-                             int index);
+struct extcon_dev *extcon_get_edev_by_phandle(struct device *dev, int index);
 
 /* Following API get the name of extcon device. */
 const char *extcon_get_edev_name(struct extcon_dev *edev);
 
-#else /* CONFIG_EXTCON */
+#else  /* CONFIG_EXTCON */
 static inline int extcon_get_state(struct extcon_dev *edev, unsigned int id)
 {
     return 0;
 }
 
-static inline int extcon_get_property(struct extcon_dev *edev, unsigned int id,
-                unsigned int prop,
-                union extcon_property_value *prop_val)
+static inline int extcon_get_property(struct extcon_dev *edev, unsigned int id, unsigned int prop,
+                                      union extcon_property_value *prop_val)
 {
     return 0;
 }
 
-static inline int extcon_get_property_capability(struct extcon_dev *edev,
-                unsigned int id, unsigned int prop)
+static inline int extcon_get_property_capability(struct extcon_dev *edev, unsigned int id, unsigned int prop)
 {
     return 0;
 }
 
-static inline int extcon_register_notifier(struct extcon_dev *edev,
-                unsigned int id, struct notifier_block *nb)
+static inline int extcon_register_notifier(struct extcon_dev *edev, unsigned int id, struct notifier_block *nb)
 {
     return 0;
 }
 
-static inline int extcon_unregister_notifier(struct extcon_dev *edev,
-                unsigned int id, struct notifier_block *nb)
+static inline int extcon_unregister_notifier(struct extcon_dev *edev, unsigned int id, struct notifier_block *nb)
 {
     return 0;
 }
 
-static inline int devm_extcon_register_notifier(struct device *dev,
-                struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb)
+static inline int devm_extcon_register_notifier(struct device *dev, struct extcon_dev *edev, unsigned int id,
+                                                struct notifier_block *nb)
 {
     return -ENOSYS;
 }
 
-static inline  void devm_extcon_unregister_notifier(struct device *dev,
-                struct extcon_dev *edev, unsigned int id,
-                struct notifier_block *nb) { }
+static inline void devm_extcon_unregister_notifier(struct device *dev, struct extcon_dev *edev, unsigned int id,
+                                                   struct notifier_block *nb)
+{
+}
 
-static inline int extcon_register_notifier_all(struct extcon_dev *edev,
-                           struct notifier_block *nb)
+static inline int extcon_register_notifier_all(struct extcon_dev *edev, struct notifier_block *nb)
 {
     return 0;
 }
 
-static inline int extcon_unregister_notifier_all(struct extcon_dev *edev,
-                         struct notifier_block *nb)
+static inline int extcon_unregister_notifier_all(struct extcon_dev *edev, struct notifier_block *nb)
 {
     return 0;
 }
 
-static inline int devm_extcon_register_notifier_all(struct device *dev,
-                            struct extcon_dev *edev,
-                            struct notifier_block *nb)
+static inline int devm_extcon_register_notifier_all(struct device *dev, struct extcon_dev *edev,
+                                                    struct notifier_block *nb)
 {
     return 0;
 }
 
-static inline void devm_extcon_unregister_notifier_all(struct device *dev,
-                               struct extcon_dev *edev,
-                               struct notifier_block *nb) { }
+static inline void devm_extcon_unregister_notifier_all(struct device *dev, struct extcon_dev *edev,
+                                                       struct notifier_block *nb)
+{
+}
 
 static inline struct extcon_dev *extcon_get_extcon_dev(const char *extcon_name)
 {
@@ -305,8 +286,7 @@ static inline struct extcon_dev *extcon_find_edev_by_node(struct device_node *no
     return ERR_PTR(-ENODEV);
 }
 
-static inline struct extcon_dev *extcon_get_edev_by_phandle(struct device *dev,
-                int index)
+static inline struct extcon_dev *extcon_get_edev_by_phandle(struct device *dev, int index)
 {
     return ERR_PTR(-ENODEV);
 }
@@ -322,15 +302,14 @@ static inline const char *extcon_get_edev_name(struct extcon_dev *edev)
  * definition to prevent the build break.
  */
 struct extcon_specific_cable_nb {
-       struct notifier_block *user_nb;
-       int cable_index;
-       struct extcon_dev *edev;
-       unsigned long previous_value;
+    struct notifier_block *user_nb;
+    int cable_index;
+    struct extcon_dev *edev;
+    unsigned long previous_value;
 };
 
-static inline int extcon_register_interest(struct extcon_specific_cable_nb *obj,
-                const char *extcon_name, const char *cable_name,
-                struct notifier_block *nb)
+static inline int extcon_register_interest(struct extcon_specific_cable_nb *obj, const char *extcon_name,
+                                           const char *cable_name, struct notifier_block *nb)
 {
     return -EINVAL;
 }

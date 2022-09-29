@@ -13,10 +13,8 @@
  *
  */
 
-
-
-#ifndef _PROTECTED_MODE_SWITCH_H_
-#define _PROTECTED_MODE_SWITCH_H_
+#ifndef PROTECTED_MODE_SWITCH_H_
+#define PROTECTED_MODE_SWITCH_H_
 
 struct protected_mode_device;
 
@@ -33,8 +31,7 @@ struct protected_mode_ops {
      *
      * Return: 0 on success, non-zero on error
      */
-    int (*protected_mode_enable)(
-            struct protected_mode_device *protected_dev);
+    int (*protected_mode_enable)(struct protected_mode_device *protected_dev);
 
     /**
      * protected_mode_disable() - Disable protected mode on device, and
@@ -43,8 +40,7 @@ struct protected_mode_ops {
      *
      * Return: 0 on success, non-zero on error
      */
-    int (*protected_mode_disable)(
-            struct protected_mode_device *protected_dev);
+    int (*protected_mode_disable)(struct protected_mode_device *protected_dev);
 };
 
 /**

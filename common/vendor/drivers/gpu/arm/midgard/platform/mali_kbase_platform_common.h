@@ -16,7 +16,6 @@
 #define MALI_KBASE_PLATFORM_COMMON_H
 #include <mali_kbase.h>
 
-
 /**
  * @brief Entry point to transfer control to a platform for early initialization
  *

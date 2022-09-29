@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISPP_PARAMS_H
-#define _RKISPP_PARAMS_H
+#ifndef H_RKISPP_PARAMS_H
+#define H_RKISPP_PARAMS_H
 
 #include <linux/fec-config.h>
 #include <linux/rkispp-config.h>
@@ -15,24 +15,17 @@
  * cur_params: current buf of parameters
  * first_params: the first params should take effect immediately
  */
-#define ISPP_PACK_4BYTE(a, b, c, d) \
-    (((a) & 0xFF) << 0 | ((b) & 0xFF) << 8 | \
-     ((c) & 0xFF) << 16 | ((d) & 0xFF) << 24)
+#define ISPP_PACK_4BYTE(a, b, c, d) (((a)&0xFF) << 0 | ((b)&0xFF) << 8 | ((c)&0xFF) << 16 | ((d)&0xFF) << 24)
 
-#define ISPP_PACK_4BIT(a, b, c, d, e, f, g, h) \
-    (((a) & 0xf) << 0 | ((b) & 0xf) << 4 | \
-     ((c) & 0xf) << 8 | ((d) & 0xf) << 12 | \
-     ((e) & 0xf) << 16 | ((f) & 0xf) << 20 | \
-     ((g) & 0xf) << 24 | ((h) & 0xf) << 28)
+#define ISPP_PACK_4BIT(a, b, c, d, e, f, g, h)                                                                         \
+    (((a)&0xf) << 0 | ((b)&0xf) << 4 | ((c)&0xf) << 8 | ((d)&0xf) << 12 | ((e)&0xf) << 16 | ((f)&0xf) << 20 |          \
+     ((g)&0xf) << 24 | ((h)&0xf) << 28)
 
-#define ISPP_PACK_4BYTE(a, b, c, d) \
-    (((a) & 0xFF) << 0 | ((b) & 0xFF) << 8 | \
-     ((c) & 0xFF) << 16 | ((d) & 0xFF) << 24)
+#define ISPP_PACK_4BYTE(a, b, c, d) (((a)&0xFF) << 0 | ((b)&0xFF) << 8 | ((c)&0xFF) << 16 | ((d)&0xFF) << 24)
 
-#define ISPP_PACK_2SHORT(a, b) \
-    (((a) & 0xFFFF) << 0 | ((b) & 0xFFFF) << 16)
+#define ISPP_PACK_2SHORT(a, b) (((a)&0xFFFF) << 0 | ((b)&0xFFFF) << 16)
 
-#define ISPP_NOBIG_OVERFLOW_SIZE    (2560 * 1440)
+#define ISPP_NOBIG_OVERFLOW_SIZE (2560 * 1440)
 
 struct rkispp_params_vdev {
     struct rkispp_vdev_node vnode;
@@ -61,9 +54,7 @@ struct rkispp_params_ops {
 
 int rkispp_register_params_vdev(struct rkispp_device *dev);
 void rkispp_unregister_params_vdev(struct rkispp_device *dev);
-void rkispp_params_get_fecbuf_inf(struct rkispp_params_vdev *params_vdev,
-                  struct rkispp_fecbuf_info *fecbuf);
-void rkispp_params_set_fecbuf_size(struct rkispp_params_vdev *params_vdev,
-                   struct rkispp_fecbuf_size *fecsize);
+void rkispp_params_get_fecbuf_inf(struct rkispp_params_vdev *params_vdev, struct rkispp_fecbuf_info *fecbuf);
+void rkispp_params_set_fecbuf_size(struct rkispp_params_vdev *params_vdev, struct rkispp_fecbuf_size *fecsize);
 
 #endif

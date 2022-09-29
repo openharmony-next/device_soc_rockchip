@@ -18,13 +18,13 @@
 
 #include "mpp_device.h"
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 extern const MppDevApi vcodec_service_api;
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

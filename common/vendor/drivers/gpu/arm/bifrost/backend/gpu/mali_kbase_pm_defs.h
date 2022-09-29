@@ -24,8 +24,8 @@
  * Backend-specific Power Manager definitions
  */
 
-#ifndef _KBASE_PM_HWACCESS_DEFS_H_
-#define _KBASE_PM_HWACCESS_DEFS_H_
+#ifndef KBASE_PM_HWACCESS_DEFS_H_
+#define KBASE_PM_HWACCESS_DEFS_H_
 
 #include "mali_kbase_pm_always_on.h"
 #include "mali_kbase_pm_coarse_demand.h"
@@ -82,7 +82,7 @@ enum kbase_pm_core_type {
  *                       are unknown
  */
 enum kbase_l2_core_state {
-#define KBASEP_L2_STATE(n) KBASE_L2_ ## n,
+#define KBASEP_L2_STATE(n) KBASE_L2_##n,
 #include "mali_kbase_pm_l2_states.h"
 #undef KBASEP_L2_STATE
 };
@@ -108,7 +108,7 @@ enum kbase_l2_core_state {
  * @KBASE_MCU_RESET_WAIT:     The GPU is resetting, MCU state is unknown.
  */
 enum kbase_mcu_state {
-#define KBASEP_MCU_STATE(n) KBASE_MCU_ ## n,
+#define KBASEP_MCU_STATE(n) KBASE_MCU_##n,
 #include "mali_kbase_pm_mcu_states.h"
 #undef KBASEP_MCU_STATE
 };
@@ -155,7 +155,7 @@ enum kbase_mcu_state {
  *                            states are unknown
  */
 enum kbase_shader_core_state {
-#define KBASEP_SHADER_STATE(n) KBASE_SHADERS_ ## n,
+#define KBASEP_SHADER_STATE(n) KBASE_SHADERS_##n,
 #include "mali_kbase_pm_shader_states.h"
 #undef KBASEP_SHADER_STATE
 };
@@ -475,7 +475,6 @@ struct kbase_pm_backend_data {
     bool gpu_clock_slowed_down;
     struct work_struct gpu_clock_control_work;
 };
-
 
 /* List of policy IDs */
 enum kbase_pm_policy_id {

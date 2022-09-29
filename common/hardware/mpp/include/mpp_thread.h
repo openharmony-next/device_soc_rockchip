@@ -65,31 +65,35 @@ class Condition;
 /*
  * for shorter type name and function name
  */
-class Mutex {
+class Mutex
+{
 public:
     Mutex();
     ~Mutex();
 
     void lock();
     void unlock();
-    int  trylock();
+    int trylock();
 
-    class Autolock {
+    class Autolock
+    {
     public:
-        inline Autolock(Mutex* mutex, RK_U32 enable = 1)
-            : mEnabled(enable), mLock(*mutex)
+        inline Autolock(Mutex *mutex, unsigned int enable = 1) : mEnabled(enable), mLock(*mutex)
         {
-            if (mEnabled)
-                    mLock.lock();
+            if (mEnabled) {
+                mLock.lock();
+            }
         }
         inline ~Autolock()
         {
-            if (mEnabled)
+            if (mEnabled) {
                 mLock.unlock();
+            }
         }
+
     private:
-        RK_S32 mEnabled;
-        Mutex& mLock;
+        signed int mEnabled;
+        Mutex &mLock;
     };
 
 private:
@@ -98,7 +102,7 @@ private:
     pthread_mutex_t mMutex;
 
     Mutex(const Mutex &);
-    Mutex &operator = (const Mutex&);
+    Mutex &operator=(const Mutex &);
 };
 
 inline Mutex::Mutex()
@@ -128,21 +132,21 @@ inline int Mutex::trylock()
 
 typedef Mutex::Autolock AutoMutex;
 
-
 /*
  * for shorter type name and function name
  */
-class Condition {
+class Condition
+{
 public:
     Condition();
     Condition(int type);
     ~Condition();
-    RK_S32 wait(Mutex& mutex);
-    RK_S32 wait(Mutex* mutex);
-    RK_S32 timedwait(Mutex& mutex, RK_S64 timeout);
-    RK_S32 timedwait(Mutex* mutex, RK_S64 timeout);
-    RK_S32 signal();
-    RK_S32 broadcast();
+    signed int wait(Mutex &mutex);
+    signed int wait(Mutex *mutex);
+    signed int timedwait(Mutex &mutex, RK_S64 timeout);
+    signed int timedwait(Mutex *mutex, RK_S64 timeout);
+    signed int signal();
+    signed int broadcast();
 
 private:
     pthread_cond_t mCond;
@@ -156,45 +160,46 @@ inline Condition::~Condition()
 {
     pthread_cond_destroy(&mCond);
 }
-inline RK_S32 Condition::wait(Mutex& mutex)
+inline signed int Condition::wait(Mutex &mutex)
 {
     return pthread_cond_wait(&mCond, &mutex.mMutex);
 }
-inline RK_S32 Condition::wait(Mutex* mutex)
+inline signed int Condition::wait(Mutex *mutex)
 {
     return pthread_cond_wait(&mCond, &mutex->mMutex);
 }
-inline RK_S32 Condition::timedwait(Mutex& mutex, RK_S64 timeout)
+inline signed int Condition::timedwait(Mutex &mutex, RK_S64 timeout)
 {
     return timedwait(&mutex, timeout);
 }
-inline RK_S32 Condition::timedwait(Mutex* mutex, RK_S64 timeout)
+inline signed int Condition::timedwait(Mutex *mutex, RK_S64 timeout)
 {
     struct timespec ts;
 
     clock_gettime(CLOCK_REALTIME_COARSE, &ts);
 
-    ts.tv_sec += timeout / 1000; // 1000:Get milliseconds
+    ts.tv_sec += timeout / 1000;              // 1000:Get milliseconds
     ts.tv_nsec += (timeout % 1000) * 1000000; // 1000:Get milliseconds // 1000000:Get seconds
     /* Prevent the out of range at nanoseconds field */
     ts.tv_sec += ts.tv_nsec / 1000000000; // 1000000000:Get seconds
-    ts.tv_nsec %= 1000000000; // 1000000000:Get Get nanoseconds
+    ts.tv_nsec %= 1000000000;             // 1000000000:Get Get nanoseconds
 
     return pthread_cond_timedwait(&mCond, &mutex->mMutex, &ts);
 }
-inline RK_S32 Condition::signal()
+inline signed int Condition::signal()
 {
     return pthread_cond_signal(&mCond);
 }
-inline RK_S32 Condition::broadcast()
+inline signed int Condition::broadcast()
 {
     return pthread_cond_broadcast(&mCond);
 }
 
-class MppMutexCond {
+class MppMutexCond
+{
 public:
-    MppMutexCond() {};
-    ~MppMutexCond() {};
+    MppMutexCond(){};
+    ~MppMutexCond(){};
 
     void lock()
     {
@@ -212,7 +217,7 @@ public:
     {
         mCondition.wait(mLock);
     }
-    RK_S32 wait(RK_S64 timeout)
+    signed int wait(RK_S64 timeout)
     {
         return mCondition.timedwait(mLock, timeout);
     }
@@ -236,9 +241,9 @@ private:
 
 // Thread lock / signal is distinguished by its source
 typedef enum MppThreadSignal_e {
-    THREAD_WORK, // for working loop
-    THREAD_INPUT, // for thread input
-    THREAD_OUTPUT, // for thread output
+    THREAD_WORK,    // for working loop
+    THREAD_INPUT,   // for thread input
+    THREAD_OUTPUT,  // for thread output
     THREAD_CONTROL, // for thread async control (reset)
     THREAD_SIGNAL_BUTT,
 } MppThreadSignal;
@@ -246,10 +251,11 @@ typedef enum MppThreadSignal_e {
 #define THREAD_NORMAL 0
 #define THRE 0
 
-class MppThread {
+class MppThread
+{
 public:
     MppThread(MppThreadFunc func, void *ctx, const char *name = NULL);
-    ~MppThread() {};
+    ~MppThread(){};
 
     MppThreadStatus get_status(MppThreadSignal id = THREAD_WORK);
     void set_status(MppThreadStatus status, MppThreadSignal id = THREAD_WORK);
@@ -279,8 +285,9 @@ public:
         mMutexCond[id].wait();
 
         // check the status is not changed then restore status
-        if (mStatus[id] == MPP_THREAD_WAITING)
+        if (mStatus[id] == MPP_THREAD_WAITING) {
             mStatus[id] = status;
+        }
     }
 
     void signal(MppThreadSignal id = THREAD_WORK)

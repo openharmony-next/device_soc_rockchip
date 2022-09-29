@@ -71,8 +71,7 @@ u64 kbase_pm_ca_get_core_mask(struct kbase_device *kbdev);
  *
  * Calls into the core availability policy
  */
-void kbase_pm_ca_update_core_status(struct kbase_device *kbdev, u64 cores_ready,
-                        u64 cores_transitioning);
+void kbase_pm_ca_update_core_status(struct kbase_device *kbdev, u64 cores_ready, u64 cores_transitioning);
 
 /**
  * kbase_pm_ca_get_instr_core_mask - Get the PM state sync-ed shaders core mask

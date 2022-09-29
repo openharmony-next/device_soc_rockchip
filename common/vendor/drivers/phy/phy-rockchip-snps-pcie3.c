@@ -24,23 +24,23 @@
 #define GRF_PCIE30PHY_CON6 0x18
 #define GRF_PCIE30PHY_CON9 0x24
 #define GRF_PCIE30PHY_STATUS0 0x80
-#define SRAM_INIT_DONE(reg) (reg & BIT(14))
+#define SRAM_INIT_DONE(reg) ((reg)&BIT(14))
 
 /* Register for RK3588 */
 #define PHP_GRF_PCIESEL_CON 0x100
 #define RK3588_PCIE3PHY_GRF_CMN_CON0 0x0
 #define RK3588_PCIE3PHY_GRF_PHY0_STATUS1 0x904
 #define RK3588_PCIE3PHY_GRF_PHY1_STATUS1 0xa04
-#define RK3588_SRAM_INIT_DONE(reg) (reg & BIT(0))
+#define RK3588_SRAM_INIT_DONE(reg) ((reg)&BIT(0))
 
-#define DEBUGER_INDEX_TH      3
-#define DEBUGER_INDEX_FO      4
-#define DEBUGER_INDEX_EI      8
-#define DEBUGER_INDEX_FIF     15
-#define DEBUGER_INDEX_SIX     16
-#define DEBUGER_INDEX_TWEF    24
-#define DEBUGER_INDEX_THIO    31
-#define SRAM_NODE_VALUE       500
+#define DEBUGER_INDEX_TH 3
+#define DEBUGER_INDEX_FO 4
+#define DEBUGER_INDEX_EI 8
+#define DEBUGER_INDEX_FIF 15
+#define DEBUGER_INDEX_SIX 16
+#define DEBUGER_INDEX_TWEF 24
+#define DEBUGER_INDEX_THIO 31
+#define SRAM_NODE_VALUE 500
 
 struct rockchip_p3phy_ops;
 
@@ -70,18 +70,18 @@ static int rockchip_p3phy_set_mode(struct phy *phy, enum phy_mode mode, int subm
 
     /* Acutally We don't care EP/RC mode, but just record it */
     switch (submode) {
-    case PHY_MODE_PCIE_RC:
-        priv->mode = PHY_MODE_PCIE_RC;
-        break;
-    case PHY_MODE_PCIE_EP:
-        priv->mode = PHY_MODE_PCIE_EP;
-        break;
-    case PHY_MODE_PCIE_BIFURCATION:
-        priv->is_bifurcation = true;
-        break;
-    default:
-        pr_info("%s, invalid mode\n", __func__);
-        return -EINVAL;
+        case PHY_MODE_PCIE_RC:
+            priv->mode = PHY_MODE_PCIE_RC;
+            break;
+        case PHY_MODE_PCIE_EP:
+            priv->mode = PHY_MODE_PCIE_EP;
+            break;
+        case PHY_MODE_PCIE_BIFURCATION:
+            priv->is_bifurcation = true;
+            break;
+        default:
+            pr_info("%s, invalid mode\n", __func__);
+            return -EINVAL;
     }
 
     return 0;
@@ -93,25 +93,19 @@ static int rockchip_p3phy_rk3568_init(struct rockchip_p3phy_priv *priv)
     u32 reg;
 
     /* Deassert PCIe PMA output clamp mode */
-    regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON9,
-             (0x1 << DEBUGER_INDEX_FIF) | (0x1 << DEBUGER_INDEX_THIO));
+    regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON9, (0x1 << DEBUGER_INDEX_FIF) | (0x1 << DEBUGER_INDEX_THIO));
     /* Set bifurcation if needed, and it doesn't care RC/EP */
     if (priv->is_bifurcation) {
-        regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON6,
-                 0x1 | (0xf << DEBUGER_INDEX_SIX));
-        regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON1,
-                 (0x1 << DEBUGER_INDEX_FIF) | (0x1 << DEBUGER_INDEX_THIO));
+        regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON6, 0x1 | (0xf << DEBUGER_INDEX_SIX));
+        regmap_write(priv->phy_grf, GRF_PCIE30PHY_CON1, (0x1 << DEBUGER_INDEX_FIF) | (0x1 << DEBUGER_INDEX_THIO));
     }
 
     reset_control_deassert(priv->p30phy);
 
-    ret = regmap_read_poll_timeout(priv->phy_grf,
-                       GRF_PCIE30PHY_STATUS0,
-                       reg, SRAM_INIT_DONE(reg),
-                       0, SRAM_NODE_VALUE);
-    if (ret)
-        pr_err("%s: lock failed 0x%x, check input refclk and power supply\n",
-               __func__, reg);
+    ret = regmap_read_poll_timeout(priv->phy_grf, GRF_PCIE30PHY_STATUS0, reg, SRAM_INIT_DONE(reg), 0, SRAM_NODE_VALUE);
+    if (ret) {
+        pr_err("%s: lock failed 0x%x, check input refclk and power supply\n", __func__, reg);
+    }
     return ret;
 }
 
@@ -125,22 +119,17 @@ static int rockchip_p3phy_rk3588_init(struct rockchip_p3phy_priv *priv)
     u32 reg;
 
     /* Deassert PCIe PMA output clamp mode */
-    regmap_write(priv->phy_grf, RK3588_PCIE3PHY_GRF_CMN_CON0,
-             (0x1 << DEBUGER_INDEX_EI) | (0x1 << DEBUGER_INDEX_TWEF));
+    regmap_write(priv->phy_grf, RK3588_PCIE3PHY_GRF_CMN_CON0, (0x1 << DEBUGER_INDEX_EI) | (0x1 << DEBUGER_INDEX_TWEF));
 
     reset_control_deassert(priv->p30phy);
 
-    ret = regmap_read_poll_timeout(priv->phy_grf,
-                       RK3588_PCIE3PHY_GRF_PHY0_STATUS1,
-                       reg, RK3588_SRAM_INIT_DONE(reg),
-                       0, SRAM_NODE_VALUE);
-    ret |= regmap_read_poll_timeout(priv->phy_grf,
-                    RK3588_PCIE3PHY_GRF_PHY1_STATUS1,
-                    reg, RK3588_SRAM_INIT_DONE(reg),
-                    0, SRAM_NODE_VALUE);
-    if (ret)
-        pr_err("%s: lock failed 0x%x, check input refclk and power supply\n",
-               __func__, reg);
+    ret = regmap_read_poll_timeout(priv->phy_grf, RK3588_PCIE3PHY_GRF_PHY0_STATUS1, reg, RK3588_SRAM_INIT_DONE(reg), 0,
+                                   SRAM_NODE_VALUE);
+    ret |= regmap_read_poll_timeout(priv->phy_grf, RK3588_PCIE3PHY_GRF_PHY1_STATUS1, reg, RK3588_SRAM_INIT_DONE(reg), 0,
+                                    SRAM_NODE_VALUE);
+    if (ret) {
+        pr_err("%s: lock failed 0x%x, check input refclk and power supply\n", __func__, reg);
+    }
     return ret;
 }
 
@@ -164,8 +153,9 @@ static int rochchip_p3phy_init(struct phy *phy)
 
     if (priv->ops->phy_init) {
         ret = priv->ops->phy_init(priv);
-        if (ret)
+        if (ret) {
             clk_bulk_disable_unprepare(priv->num_clks, priv->clks);
+        }
     };
 
     return ret;
@@ -197,8 +187,9 @@ static int rockchip_p3phy_probe(struct platform_device *pdev)
     u32 val, reg;
 
     priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-    if (!priv)
+    if (!priv) {
         return -ENOMEM;
+    }
 
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
     priv->mmio = devm_ioremap_resource(dev, res);
@@ -219,30 +210,31 @@ static int rockchip_p3phy_probe(struct platform_device *pdev)
         return PTR_ERR(priv->phy_grf);
     }
 
-    priv->pipe_grf = syscon_regmap_lookup_by_phandle(dev->of_node,
-                             "rockchip,pipe-grf");
-    if (IS_ERR(priv->pipe_grf))
+    priv->pipe_grf = syscon_regmap_lookup_by_phandle(dev->of_node, "rockchip,pipe-grf");
+    if (IS_ERR(priv->pipe_grf)) {
         dev_info(dev, "failed to find rockchip,pipe_grf regmap\n");
+    }
 
     ret = device_property_read_u32(dev, "rockchip,pcie30-phymode", &val);
-    if (!ret)
+    if (!ret) {
         priv->pcie30_phymode = val;
-    else
+    } else {
         priv->pcie30_phymode = PHY_MODE_PCIE_AGGREGATION;
+    }
 
     /* Select correct pcie30_phymode */
-    if (priv->pcie30_phymode > DEBUGER_INDEX_FO)
+    if (priv->pcie30_phymode > DEBUGER_INDEX_FO) {
         priv->pcie30_phymode = PHY_MODE_PCIE_AGGREGATION;
+    }
 
-    regmap_write(priv->phy_grf, RK3588_PCIE3PHY_GRF_CMN_CON0,
-             (0x7<<DEBUGER_INDEX_SIX) | priv->pcie30_phymode);
+    regmap_write(priv->phy_grf, RK3588_PCIE3PHY_GRF_CMN_CON0, (0x7 << DEBUGER_INDEX_SIX) | priv->pcie30_phymode);
 
     /* Set pcie1ln_sel in PHP_GRF_PCIESEL_CON */
     if (!IS_ERR(priv->pipe_grf)) {
         reg = priv->pcie30_phymode & DEBUGER_INDEX_TH;
-        if (reg)
-            regmap_write(priv->pipe_grf, PHP_GRF_PCIESEL_CON,
-                     (reg << DEBUGER_INDEX_SIX) | reg);
+        if (reg) {
+            regmap_write(priv->pipe_grf, PHP_GRF_PCIESEL_CON, (reg << DEBUGER_INDEX_SIX) | reg);
+        }
     };
 
     priv->phy = devm_phy_create(dev, NULL, &rochchip_p3phy_ops);
@@ -258,8 +250,9 @@ static int rockchip_p3phy_probe(struct platform_device *pdev)
     }
 
     priv->num_clks = devm_clk_bulk_get_all(dev, &priv->clks);
-    if (priv->num_clks < 1)
+    if (priv->num_clks < 1) {
         return -ENODEV;
+    }
 
     dev_set_drvdata(dev, priv);
     phy_set_drvdata(priv->phy, priv);
@@ -268,18 +261,19 @@ static int rockchip_p3phy_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id rockchip_p3phy_of_match[] = {
-    { .compatible = "rockchip,rk3568-pcie3-phy", .data = &rk3568_ops },
-    { .compatible = "rockchip,rk3588-pcie3-phy", .data = &rk3588_ops },
-    { },
+    {.compatible = "rockchip,rk3568-pcie3-phy", .data = &rk3568_ops},
+    {.compatible = "rockchip,rk3588-pcie3-phy", .data = &rk3588_ops},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_p3phy_of_match);
 
 static struct platform_driver rockchip_p3phy_driver = {
-    .probe    = rockchip_p3phy_probe,
-    .driver = {
-        .name = "rockchip-snps-pcie3-phy",
-        .of_match_table = rockchip_p3phy_of_match,
-    },
+    .probe = rockchip_p3phy_probe,
+    .driver =
+        {
+            .name = "rockchip-snps-pcie3-phy",
+            .of_match_table = rockchip_p3phy_of_match,
+        },
 };
 module_platform_driver(rockchip_p3phy_driver);
 MODULE_DESCRIPTION("Rockchip Synopsys PCIe 3.0 PHY driver");

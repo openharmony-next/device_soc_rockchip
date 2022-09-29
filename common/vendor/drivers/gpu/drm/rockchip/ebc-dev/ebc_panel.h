@@ -10,7 +10,7 @@
 
 #include <linux/dma-mapping.h>
 
-#define DIRECT_FB_NUM    2
+#define DIRECT_FB_NUM 2
 
 struct panel_buffer {
     void *virt_addr;
@@ -22,7 +22,7 @@ struct ebc_panel {
     struct device *dev;
     struct ebc_tcon *tcon;
     struct ebc_pmic *pmic;
-    struct panel_buffer fb[DIRECT_FB_NUM]; //for direct mode, one pixel 2bit
+    struct panel_buffer fb[DIRECT_FB_NUM]; // for direct mode, one pixel 2bit
     int current_buffer;
 
     u32 width;

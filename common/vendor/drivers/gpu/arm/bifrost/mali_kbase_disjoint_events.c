@@ -68,8 +68,9 @@ void kbase_disjoint_event_potential(struct kbase_device *kbdev)
 {
     KBASE_DEBUG_ASSERT(kbdev != NULL);
 
-    if (atomic_read(&kbdev->disjoint_event.state))
+    if (atomic_read(&kbdev->disjoint_event.state)) {
         kbase_disjoint_event(kbdev);
+    }
 }
 
 u32 kbase_disjoint_event_get(struct kbase_device *kbdev)
