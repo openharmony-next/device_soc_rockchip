@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#define PORT_FILE_PATH "/data/usb/mode"
+#define PORT_FILE_PATH "/data/service/el1/public/usb/mode"
 #define UDC_NAME "fcc00000.dwc3"
 
 #ifdef __cplusplus
