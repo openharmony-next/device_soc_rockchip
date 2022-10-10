@@ -1585,7 +1585,7 @@ static const struct of_device_id rockchip_pm_domain_dt_match[] = {
         .compatible = "rockchip,rk3588-power-controller",
         .data = (void *)&rk3588_pmu,
     },
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_pm_domain_dt_match);
 

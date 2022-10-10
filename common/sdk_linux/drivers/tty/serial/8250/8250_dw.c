@@ -103,7 +103,6 @@ static void dw8250_check_lcr(struct uart_port *p, int value)
     /* Make sure LCR write wasn't ignored */
     while (tries--) {
         unsigned int lcr = p->serial_in(p, UART_LCR);
-
         if ((value & ~UART_LCR_SPAR) == (lcr & ~UART_LCR_SPAR)) {
             return;
         }
@@ -124,7 +123,7 @@ static void dw8250_check_lcr(struct uart_port *p, int value)
         }
     }
     /*
-     * FIXME: this deadlocks if port->lock is already held
+     * this deadlocks if port->lock is already held
      * dev_err(p->dev, "Couldn't set LCR to %d\n", value);
      */
 }
@@ -359,7 +358,7 @@ static void dw8250_set_termios(struct uart_port *p, struct ktermios *termios, st
         rate = 0x16e3600;
     } else if (baud == 0x38400) {
         rate = baud * 0x20;
-    } else if (baud == 1152000) {
+    } else if (baud == 0x119400) {
         rate = baud * 0x20;
     } else {
         rate = baud * 0x10;
@@ -475,7 +474,6 @@ static void dw8250_quirks(struct uart_port *p, struct dw8250_data *data)
         if (of_device_is_compatible(np, "marvell,armada-38x-uart")) {
             p->serial_out = dw8250_serial_out38x;
         }
-
     } else if (acpi_dev_present("APMC0D08", NULL, -1)) {
         p->iotype = UPIO_MEM32;
         p->regshift = 0x2;
@@ -800,7 +798,7 @@ static const struct of_device_id dw8250_of_match[] = {{.compatible = "snps,dw-ap
                                                       {.compatible = "cavium,octeon-3860-uart"},
                                                       {.compatible = "marvell,armada-38x-uart"},
                                                       {.compatible = "renesas,rzn1-uart"},
-                                                      {/* Sentinel */}};
+                                                      {}};
 MODULE_DEVICE_TABLE(of, dw8250_of_match);
 
 static const struct acpi_device_id dw8250_acpi_match[] = {

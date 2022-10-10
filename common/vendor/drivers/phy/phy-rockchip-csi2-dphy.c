@@ -92,8 +92,8 @@ static int csi2_dphy_get_sensor_data_rate(struct v4l2_subdev *sd)
         v4l2_err(sd, "Invalid link_freq\n");
         return -EINVAL;
     }
-    dphy->data_rate_mbps = qm.value * 2;
-    do_div(dphy->data_rate_mbps, 1000 * 1000);
+    dphy->data_rate_mbps = qm.value * 0x02;
+    do_div(dphy->data_rate_mbps, 0x3E8 * 0x3E8);
     v4l2_info(sd, "dphy%d, data_rate_mbps %lld\n", dphy->phy_index, dphy->data_rate_mbps);
     return 0;
 }
@@ -117,13 +117,13 @@ static int csi2_dphy_update_sensor_mbus(struct v4l2_subdev *sd)
             sensor->lanes = 1;
             break;
         case V4L2_MBUS_CSI2_2_LANE:
-            sensor->lanes = 2;
+            sensor->lanes = 0x02;
             break;
         case V4L2_MBUS_CSI2_3_LANE:
-            sensor->lanes = 3;
+            sensor->lanes = 0x03;
             break;
         case V4L2_MBUS_CSI2_4_LANE:
-            sensor->lanes = 4;
+            sensor->lanes = 0x04;
             break;
         default:
             return -EINVAL;
@@ -400,13 +400,13 @@ static int rockchip_csi2_dphy_fwnode_parse(struct device *dev, struct v4l2_fwnod
         case 1:
             config->flags |= V4L2_MBUS_CSI2_1_LANE;
             break;
-        case 2:
+        case 0x02:
             config->flags |= V4L2_MBUS_CSI2_2_LANE;
             break;
-        case 3:
+        case 0x03:
             config->flags |= V4L2_MBUS_CSI2_3_LANE;
             break;
-        case 4:
+        case 0x04:
             config->flags |= V4L2_MBUS_CSI2_4_LANE;
             break;
         default:

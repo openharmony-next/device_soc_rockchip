@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd. */
 
-#ifndef _RKISP_ISP_PARAM_H
-#define _RKISP_ISP_PARAM_H
+#ifndef RKISP_ISP_PARAM_H
+#define RKISP_ISP_PARAM_H
 
 #include <linux/rkisp1-config.h>
 #include <linux/rkisp2-config.h>

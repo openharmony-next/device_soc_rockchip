@@ -40,12 +40,7 @@
 #include <linux/of_gpio.h>
 #endif
 
-#if 0
 #define DBG(x...) pr_info("[BT_RFKILL]: " x)
-#else
-#define DBG(x...)
-#endif
-
 #define LOG(x...) pr_info("[BT_RFKILL]: " x)
 
 #define BT_WAKEUP_TIMEOUT 10000
@@ -203,7 +198,7 @@ static inline void rfkill_rk_sleep_bt_internal(struct rfkill_rk_data *rfkill, bo
         }
 
         gpio_direction_output(wake->io, wake->enable);
-        usleep_range(10, 20);
+        usleep_range(0x0A, 0x14);
         gpio_direction_output(wake->io, !wake->enable);
 
         gpio_free(wake->io);
@@ -298,7 +293,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
     if (!blocked) {
         if (toggle) {
             rfkill_set_wifi_bt_power(1);
-            msleep(100);
+            msleep(0x64);
         }
 
         rfkill_rk_sleep_bt(BT_WAKEUP); // ensure bt is wakeup
@@ -306,15 +301,15 @@ static int rfkill_rk_set_power(void *data, bool blocked)
         if (gpio_is_valid(wake_host->io)) {
             LOG("%s: set bt wake_host high!\n", __func__);
             gpio_direction_output(wake_host->io, 1);
-            msleep(20);
+            msleep(0x14);
         }
 
         if (gpio_is_valid(poweron->io)) {
             if (gpio_get_value(poweron->io) == !poweron->enable) {
                 gpio_direction_output(poweron->io, !poweron->enable);
-                msleep(20);
+                msleep(0x14);
                 gpio_direction_output(poweron->io, poweron->enable);
-                msleep(20);
+                msleep(0x14);
                 if (gpio_is_valid(wake_host->io)) {
                     gpio_direction_input(wake_host->io);
                 }
@@ -324,7 +319,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
         if (gpio_is_valid(reset->io)) {
             if (gpio_get_value(reset->io) == !reset->enable) {
                 gpio_direction_output(reset->io, !reset->enable);
-                msleep(20);
+                msleep(0x14);
                 gpio_direction_output(reset->io, reset->enable);
             }
         }
@@ -333,7 +328,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
             pinctrl_select_state(pinctrl, rts->gpio_state);
             LOG("ENABLE UART_RTS\n");
             gpio_direction_output(rts->io, rts->enable);
-            msleep(100);
+            msleep(0x64);
             LOG("DISABLE UART_RTS\n");
             gpio_direction_output(rts->io, !rts->enable);
             pinctrl_select_state(pinctrl, rts->default_state);
@@ -346,7 +341,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
         if (gpio_is_valid(poweron->io)) {
             if (gpio_get_value(poweron->io) == poweron->enable) {
                 gpio_direction_output(poweron->io, !poweron->enable);
-                msleep(20);
+                msleep(0x14);
             }
         }
 
@@ -355,7 +350,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
         if (gpio_is_valid(reset->io)) {
             if (gpio_get_value(reset->io) == reset->enable) {
                 gpio_direction_output(reset->io, !reset->enable);
-                msleep(20);
+                msleep(0x14);
             }
         }
         if (toggle) {
@@ -690,7 +685,7 @@ static int rfkill_rk_probe(struct platform_device *pdev)
 
     INIT_DELAYED_WORK(&rfkill->bt_sleep_delay_work, rfkill_rk_delay_sleep_bt);
 
-    // rfkill_rk_set_power(rfkill, BT_BLOCKED);
+    
     //  bt turn off power
     if (gpio_is_valid(pdata->poweron_gpio.io)) {
         gpio_direction_output(pdata->poweron_gpio.io, !pdata->poweron_gpio.enable);

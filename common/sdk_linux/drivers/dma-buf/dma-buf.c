@@ -1198,7 +1198,7 @@ EXPORT_SYMBOL_GPL(dma_buf_move_notify);
  *   equally achieve that for a dma-buf object.
  */
 
-static int __dma_buf_begin_cpu_access(struct dma_buf *dmabuf, enum dma_data_direction direction)
+static int _dma_buf_begin_cpu_access(struct dma_buf *dmabuf, enum dma_data_direction direction)
 {
     bool write = (direction == DMA_BIDIRECTIONAL || direction == DMA_TO_DEVICE);
     struct dma_resv *resv = dmabuf->resv;
@@ -1244,7 +1244,7 @@ int dma_buf_begin_cpu_access(struct dma_buf *dmabuf, enum dma_data_direction dir
      * chooses. A double invocation here will be reasonably cheap no-op.
      */
     if (ret == 0) {
-        ret = __dma_buf_begin_cpu_access(dmabuf, direction);
+        ret = _dma_buf_begin_cpu_access(dmabuf, direction);
     }
 
     return ret;
@@ -1269,7 +1269,7 @@ int dma_buf_begin_cpu_access_partial(struct dma_buf *dmabuf, enum dma_data_direc
      * chooses. A double invocation here will be reasonably cheap no-op.
      */
     if (ret == 0) {
-        ret = __dma_buf_begin_cpu_access(dmabuf, direction);
+        ret = _dma_buf_begin_cpu_access(dmabuf, direction);
     }
 
     return ret;

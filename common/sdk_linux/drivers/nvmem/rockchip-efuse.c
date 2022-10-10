@@ -498,7 +498,7 @@ static const struct of_device_id rockchip_efuse_match[] = {
         .compatible = "rockchip,rk3399-efuse",
         .data = (void *)&rockchip_rk3399_efuse_read,
     },
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_efuse_match);
 

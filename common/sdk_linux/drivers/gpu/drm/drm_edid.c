@@ -2117,7 +2117,7 @@ static bool edid_vendor(const struct edid *edid, const char *vendor)
 
     edid_vendor[0] = ((edid->mfg_id[0] & 0x7c) >> 0x2) + '@';
     edid_vendor[1] = (((edid->mfg_id[0] & 0x3) << 0x3) | ((edid->mfg_id[1] & 0xe0) >> 0x5)) + '@';
-    edid_vendor[2] = (edid->mfg_id[1] & 0x1f) + '@';
+    edid_vendor[0x2] = (edid->mfg_id[1] & 0x1f) + '@';
 
     return !strncmp(edid_vendor, vendor, 0x3);
 }
@@ -2643,7 +2643,7 @@ static struct drm_display_mode *drm_mode_detailed(struct drm_device *dev, struct
         timing->pixel_clock = cpu_to_le16(0x440);
     }
 
-    mode->clock = le16_to_cpu(timing->pixel_clock) * 10;
+    mode->clock = le16_to_cpu(timing->pixel_clock) * 0xa;
 
     mode->hdisplay = hactive;
     mode->hsync_start = mode->hdisplay + hsync_offset;
@@ -2673,8 +2673,8 @@ static struct drm_display_mode *drm_mode_detailed(struct drm_device *dev, struct
     mode->flags |= (pt->misc & DRM_EDID_PT_VSYNC_POSITIVE) ? DRM_MODE_FLAG_PVSYNC : DRM_MODE_FLAG_NVSYNC;
 
 set_size:
-    mode->width_mm = pt->width_mm_lo | (pt->width_height_mm_hi & 0xf0) << 4;
-    mode->height_mm = pt->height_mm_lo | (pt->width_height_mm_hi & 0xf) << 8;
+    mode->width_mm = pt->width_mm_lo | (pt->width_height_mm_hi & 0xf0) << 0x4;
+    mode->height_mm = pt->height_mm_lo | (pt->width_height_mm_hi & 0xf) << 0x8;
 
     if (quirks & EDID_QUIRK_DETAILED_IN_CM) {
         mode->width_mm *= 0xa;
@@ -2701,7 +2701,7 @@ static bool mode_in_hsync_range(const struct drm_display_mode *mode, struct edid
         hmin += ((t[0x4] & 0x04) ? 0xff : 0);
     }
     hmax = t[0x8];
-    if (edid->revision >= 4) {
+    if (edid->revision >= 0x4) {
         hmax += ((t[0x4] & 0x08) ? 0xff : 0);
     }
     hsync = drm_mode_hsync(mode);
@@ -3076,7 +3076,7 @@ static int drm_cvt_modes(struct drm_connector *connector, struct detailed_timing
 
         cvt = &(timing->data.other_data.data.cvt[i]);
 
-        if (!memcmp(cvt->code, empty, 3)) {
+        if (!memcmp(cvt->code, empty, 0x3)) {
             continue;
         }
 
@@ -3948,7 +3948,7 @@ static int do_hdmi_vsdb_modes(struct drm_connector *connector, const u8 *db, u8 
 
     /* the declared length is not long enough for the 2 first bytes
      * of additional video format capabilities */
-    if (len < (8 + offset + 2)) {
+    if (len < (0x8 + offset + 0x2)) {
         goto out;
     }
 
@@ -4679,7 +4679,7 @@ int drm_edid_to_speaker_allocation(struct edid *edid, u8 **sadb)
         return 0;
     }
 
-    if (cea_revision(cea) < 3) {
+    if (cea_revision(cea) < 0x3) {
         DRM_DEBUG_KMS("SAD: wrong CEA revision\n");
         return 0;
     }
@@ -4697,7 +4697,7 @@ int drm_edid_to_speaker_allocation(struct edid *edid, u8 **sadb)
             dbl = cea_db_payload_len(db);
 
             /* Speaker Allocation Data Block */
-            if (dbl == 3) {
+            if (dbl == 0x3) {
                 *sadb = kmemdup(&db[1], dbl, GFP_KERNEL);
                 if (!*sadb) {
                     return -ENOMEM;
@@ -5427,6 +5427,8 @@ static int add_displayid_detailed_modes(struct drm_connector *connector, struct 
             switch (block->tag) {
                 case DATA_BLOCK_TYPE_1_DETAILED_TIMING:
                     num_modes += add_displayid_detailed_1_modes(connector, block);
+                    break;
+                default:
                     break;
             }
         }

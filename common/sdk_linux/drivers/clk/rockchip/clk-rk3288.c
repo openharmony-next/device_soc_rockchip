@@ -681,7 +681,7 @@ static int rk3288_clk_suspend(void)
      * RK3288_PMU_PWRMODE_CON1) appears to fail unless
      * "aclk_dmac1" is on.
      */
-    writel_relaxed(1 << 0x1c, rk3288_cru_base + RK3288_CLKGATE_CON(10));
+    writel_relaxed(1 << 0x1c, rk3288_cru_base + RK3288_CLKGATE_CON(0xa));
 
     /*
      * Switch PLLs other than DPLL (for SDRAM) to slow mode to

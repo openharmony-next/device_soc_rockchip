@@ -333,9 +333,9 @@ static const struct rk808_reg_data rk808_pre_init_reg[] = {
 };
 
 static const struct rk808_reg_data rk816_pre_init_reg[] = {
-    /* buck4 Max ILMIT*/
+    /* buck4 Max ILMIT */
     {RK816_BUCK4_CONFIG_REG, REG_WRITE_MSK, BUCK4_MAX_ILIMIT},
-    /* hotdie temperature: 105c*/
+    /* hotdie temperature: 105c */
     {RK816_THERMAL_REG, REG_WRITE_MSK, TEMP105C},
     /* set buck 12.5mv/us */
     {RK816_BUCK1_CONFIG_REG, BUCK_RATE_MSK, BUCK_RATE_12_5MV_US},
@@ -964,9 +964,7 @@ static int rk817_pinctrl_init(struct device *dev, struct rk808 *rk808)
     }
 
     pinctrl_dev->dev.parent = dev;
-
     ret = platform_device_add(pinctrl_dev);
-
     if (ret) {
         platform_device_put(pinctrl_dev);
         dev_err(dev, "Add rk805-pinctrl dev failed!\n");
@@ -988,9 +986,7 @@ static int rk817_pinctrl_init(struct device *dev, struct rk808 *rk808)
         dev_err(dev, "no pinctrl handle\n");
         return 0;
     }
-
     default_st = pinctrl_lookup_state(rk808->pins->p, PINCTRL_STATE_DEFAULT);
-
     if (IS_ERR(default_st)) {
         dev_dbg(dev, "no default pinctrl state\n");
         return -EINVAL;
@@ -1020,9 +1016,7 @@ static int rk817_pinctrl_init(struct device *dev, struct rk808 *rk808)
         dev_dbg(dev, "no reset-setting pinctrl state\n");
         return 0;
     }
-
     ret = pinctrl_select_state(rk808->pins->p, rk808->pins->reset);
-
     if (ret) {
         dev_dbg(dev, "failed to activate reset-setting pinctrl state\n");
     }

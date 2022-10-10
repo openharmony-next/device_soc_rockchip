@@ -196,7 +196,7 @@ static u32 drm_vblank_no_hw_counter(struct drm_device *dev, unsigned int pipe)
     return 0;
 }
 
-static u32 __get_vblank_counter(struct drm_device *dev, unsigned int pipe)
+static u32 _get_vblank_counter(struct drm_device *dev, unsigned int pipe)
 {
     if (drm_core_check_feature(dev, DRIVER_MODESET)) {
         struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
@@ -238,9 +238,9 @@ static void drm_reset_vblank_timestamp(struct drm_device *dev, unsigned int pipe
      * when drm_vblank_enable() applies the diff
      */
     do {
-        cur_vblank = __get_vblank_counter(dev, pipe);
+        cur_vblank = _get_vblank_counter(dev, pipe);
         rc = drm_get_last_vbltimestamp(dev, pipe, &t_vblank, false);
-    } while (cur_vblank != __get_vblank_counter(dev, pipe) && --count > 0);
+    } while (cur_vblank != _get_vblank_counter(dev, pipe) && --count > 0);
 
     /*
      * Only reinitialize corresponding vblank timestamp if high-precision query
@@ -295,9 +295,9 @@ static void drm_update_vblank_count(struct drm_device *dev, unsigned int pipe, b
      * corresponding vblank timestamp.
      */
     do {
-        cur_vblank = __get_vblank_counter(dev, pipe);
+        cur_vblank = _get_vblank_counter(dev, pipe);
         rc = drm_get_last_vbltimestamp(dev, pipe, &t_vblank, in_vblank_irq);
-    } while (cur_vblank != __get_vblank_counter(dev, pipe) && --count > 0);
+    } while (cur_vblank != _get_vblank_counter(dev, pipe) && --count > 0);
 
     if (max_vblank_count) {
         /* trust the hw counter when it's around */
@@ -421,7 +421,7 @@ u64 drm_crtc_accurate_vblank_count(struct drm_crtc *crtc)
 }
 EXPORT_SYMBOL(drm_crtc_accurate_vblank_count);
 
-static void __disable_vblank(struct drm_device *dev, unsigned int pipe)
+static void _disable_vblank(struct drm_device *dev, unsigned int pipe)
 {
     if (drm_core_check_feature(dev, DRIVER_MODESET)) {
         struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
@@ -474,7 +474,7 @@ void drm_vblank_disable_and_save(struct drm_device *dev, unsigned int pipe)
      * between drm_crtc_vblank_on() and drm_crtc_vblank_off().
      */
     drm_update_vblank_count(dev, pipe, false);
-    __disable_vblank(dev, pipe);
+    _disable_vblank(dev, pipe);
     vblank->enabled = false;
 
 out:
@@ -1076,7 +1076,7 @@ void drm_crtc_send_vblank_event(struct drm_crtc *crtc, struct drm_pending_vblank
 }
 EXPORT_SYMBOL(drm_crtc_send_vblank_event);
 
-static int __enable_vblank(struct drm_device *dev, unsigned int pipe)
+static int _enable_vblank(struct drm_device *dev, unsigned int pipe)
 {
     if (drm_core_check_feature(dev, DRIVER_MODESET)) {
         struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
@@ -1112,7 +1112,7 @@ static int drm_vblank_enable(struct drm_device *dev, unsigned int pipe)
          * timestamps. Filtercode in drm_handle_vblank() will
          * prevent double-accounting of same vblank interval.
          */
-        ret = __enable_vblank(dev, pipe);
+        ret = _enable_vblank(dev, pipe);
         drm_dbg_core(dev, "enabling vblank on crtc %u, ret: %d\n", pipe, ret);
         if (ret) {
             atomic_dec(&vblank->refcount);
@@ -1487,9 +1487,9 @@ void drm_vblank_restore(struct drm_device *dev, unsigned int pipe)
     framedur_ns = vblank->framedur_ns;
 
     do {
-        cur_vblank = __get_vblank_counter(dev, pipe);
+        cur_vblank = _get_vblank_counter(dev, pipe);
         drm_get_last_vbltimestamp(dev, pipe, &t_vblank, false);
-    } while (cur_vblank != __get_vblank_counter(dev, pipe) && --count > 0);
+    } while (cur_vblank != _get_vblank_counter(dev, pipe) && --count > 0);
 
     diff_ns = ktime_to_ns(ktime_sub(t_vblank, vblank->time));
     if (framedur_ns) {

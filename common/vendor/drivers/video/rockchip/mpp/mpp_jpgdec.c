@@ -164,7 +164,8 @@ static int jpgdec_extract_task_msg(struct jpgdec_task *task, struct mpp_task_msg
                     return -EIO;
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_READ: {
                 off_s = hw_info->reg_start * sizeof(u32);
                 off_e = hw_info->reg_end * sizeof(u32);
@@ -173,10 +174,12 @@ static int jpgdec_extract_task_msg(struct jpgdec_task *task, struct mpp_task_msg
                     continue;
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            } 
             default:
                 break;
         }
@@ -290,7 +293,7 @@ static int jpgdec_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     /* revert hack for decoded length */
     dec_get = mpp_read_relaxed(mpp, JPGDEC_REG_STREAM_RLC_BASE);
     dec_length = dec_get - task->strm_addr;
-    task->reg[JPGDEC_REG_STREAM_RLC_BASE_INDEX] = dec_length << 10;
+    task->reg[JPGDEC_REG_STREAM_RLC_BASE_INDEX] = dec_length << 0xA;
     /*
      * If the softrest_rdy bit is low,
      * it means that the soft-reset of the previous frame
@@ -313,7 +316,7 @@ static int jpgdec_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct 
     struct mpp_request *req;
     struct jpgdec_task *task = to_jpgdec_task(mpp_task);
 
-    /* FIXME may overflow the kernel */
+    /* may overflow the kernel */
     for (i = 0; i < task->r_req_cnt; i++) {
         req = &task->r_reqs[i];
 
@@ -393,7 +396,7 @@ static int jpgdec_init(struct mpp_dev *mpp)
         mpp_err("failed on clk_get hclk_vcodec\n");
     }
     /* Set default rates */
-    mpp_set_clk_info_rate_hz(&dec->aclk_info, CLK_MODE_DEFAULT, 300 * MHZ);
+    mpp_set_clk_info_rate_hz(&dec->aclk_info, CLK_MODE_DEFAULT, 0x12C * MHZ);
 
     /* Get reset control from dtsi */
     dec->rst_a = mpp_reset_control_get(mpp, RST_TYPE_A, "video_a");
@@ -463,8 +466,7 @@ static int jpgdec_isr(struct mpp_dev *mpp)
     int error_mask;
     struct jpgdec_task *task = NULL;
     struct mpp_task *mpp_task = mpp->cur_task;
-
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp_task) {
         dev_err(mpp->dev, "no current task\n");
         return IRQ_HANDLED;
@@ -474,40 +476,31 @@ static int jpgdec_isr(struct mpp_dev *mpp)
     task = to_jpgdec_task(mpp_task);
     task->irq_status = mpp->irq_status;
     mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n", task->irq_status);
-
     error_mask = JPGDEC_BUS_STA | JPGDEC_ERROR_STA | JPGDEC_TIMEOUT_STA | JPGDEC_BUF_EMPTY_STA;
-
     if (error_mask & task->irq_status) {
         atomic_inc(&mpp->reset_request);
     }
-
     mpp_task_finish(mpp_task->session, mpp_task);
-
     mpp_debug_leave();
-
     return IRQ_HANDLED;
 }
 
 static int jpgdec_reset(struct mpp_dev *mpp)
 {
     struct jpgdec_dev *dec = to_jpgdec_dev(mpp);
-
     if (dec->rst_a && dec->rst_h) {
         mpp_debug(DEBUG_RESET, "reset in\n");
-
         /* Don't skip this or iommu won't work after reset */
         rockchip_pmu_idle_request(mpp->dev, true);
         mpp_safe_reset(dec->rst_a);
         mpp_safe_reset(dec->rst_h);
-        udelay(5);
+        udelay(0x5);
         mpp_safe_unreset(dec->rst_a);
         mpp_safe_unreset(dec->rst_h);
         rockchip_pmu_idle_request(mpp->dev, false);
-
         mpp_debug(DEBUG_RESET, "reset out\n");
     }
     mpp_write(mpp, JPGDEC_REG_INT_EN_BASE, 0);
-
     return 0;
 }
 
@@ -613,7 +606,7 @@ static void jpgdec_shutdown(struct platform_device *pdev)
     dev_info(dev, "shutdown device\n");
 
     atomic_inc(&mpp->srv->shutdown_request);
-    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 20000, 200000);
+    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 0x4E20, 0X30D40);
     if (ret == -ETIMEDOUT) {
         dev_err(dev, "wait total running time out\n");
     }

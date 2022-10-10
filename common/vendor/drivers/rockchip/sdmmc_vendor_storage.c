@@ -54,8 +54,8 @@ struct vendor_info {
     u16 item_num;
     u16 free_offset;
     u16 free_size;
-    struct vendor_item item[126]; /* 126 * 8*/
-    u8 data[EMMC_VENDOR_PART_SIZE * 512 - 1024 - 8];
+    struct vendor_item item[126];
+    u8 data[EMMC_VENDOR_PART_SIZE * 0x200 - 0x400 - 0x8];
     u32 hash;
     u32 version2;
 };
@@ -82,7 +82,7 @@ static int emmc_vendor_ops(u8 *buffer, u32 addr, u32 n_sec, int write)
     u32 i, ret = 0;
 
     for (i = 0; i < n_sec; i++) {
-        ret = rk_emmc_transfer(buffer + i * 512, addr + i, 512, write);
+        ret = rk_emmc_transfer(buffer + i * 0x200, addr + i, 0x200, write);
     }
 
     return ret;
@@ -98,12 +98,12 @@ static int emmc_vendor_storage_init(void)
     for (i = 0; i < EMMC_VENDOR_PART_NUM; i++) {
         /* read first 512 bytes */
         p_buf = (u8 *)g_vendor;
-        if (rk_emmc_transfer(p_buf, EMMC_VENDOR_PART_START + EMMC_VENDOR_PART_SIZE * i, 512, 0)) {
+        if (rk_emmc_transfer(p_buf, EMMC_VENDOR_PART_START + EMMC_VENDOR_PART_SIZE * i, 0x200, 0)) {
             goto error_exit;
         }
         /* read last 512 bytes */
-        p_buf += (EMMC_VENDOR_PART_SIZE - 1) * 512;
-        if (rk_emmc_transfer(p_buf, EMMC_VENDOR_PART_START + EMMC_VENDOR_PART_SIZE * (i + 1) - 1, 512, 0)) {
+        p_buf += (EMMC_VENDOR_PART_SIZE - 1) * 0x200;
+        if (rk_emmc_transfer(p_buf, EMMC_VENDOR_PART_START + EMMC_VENDOR_PART_SIZE * (i + 1) - 1, 0x200, 0)) {
             goto error_exit;
         }
 
@@ -166,7 +166,7 @@ static int emmc_vendor_write(u32 id, void *pbuf, u32 size)
 
     p_data = g_vendor->data;
     item_num = g_vendor->item_num;
-    align_size = ALIGN(size, 0x40); /* align to 64 bytes*/
+    align_size = ALIGN(size, 0x40); /* align to 64 bytes */
     next_index = g_vendor->next_index;
     for (i = 0; i < item_num; i++) {
         item = &g_vendor->item[i];
@@ -238,12 +238,12 @@ static int id_blk_read_data(u32 index, u32 n_sec, u8 *buf)
     u32 i;
     u32 ret = 0;
 
-    if (index + n_sec >= 1024 * 5) {
+    if (index + n_sec >= 1024 * 0x5) {
         return 0;
     }
     index = index + EMMC_IDB_PART_OFFSET;
     for (i = 0; i < n_sec; i++) {
-        ret = rk_emmc_transfer(buf + i * 512, index + i, 512, 0);
+        ret = rk_emmc_transfer(buf + i * 0x200, index + i, 0x200, 0);
         if (ret) {
             return ret;
         }
@@ -256,12 +256,12 @@ static int id_blk_write_data(u32 index, u32 n_sec, u8 *buf)
     u32 i;
     u32 ret = 0;
 
-    if (index + n_sec >= 1024 * 5) {
+    if (index + n_sec >= 0x400 * 0x5) {
         return 0;
     }
     index = index + EMMC_IDB_PART_OFFSET;
     for (i = 0; i < n_sec; i++) {
-        ret = rk_emmc_transfer(buf + i * 512, index + i, 512, 1);
+        ret = rk_emmc_transfer(buf + i * 0x200, index + i, 0x200, 1);
         if (ret) {
             return ret;
         }
@@ -274,31 +274,31 @@ static int emmc_write_idblock(u32 size, u8 *buf, u32 *id_blk_tbl)
     u32 i, totle_sec, j;
     u32 totle_write_count = 0;
     u32 *p_raw_data = (u32 *)buf;
-    u32 *p_check_buf = kmalloc(EMMC_BOOT_PART_SIZE * 512, GFP_KERNEL);
+    u32 *p_check_buf = kmalloc(EMMC_BOOT_PART_SIZE * 0x200, GFP_KERNEL);
 
     if (!p_check_buf) {
         return -ENOMEM;
     }
 
-    totle_sec = (size + 511) >> 9;
-    if (totle_sec <= 8) {
-        totle_sec = 8;
+    totle_sec = (size + 0x1FF) >> 0x9;
+    if (totle_sec <= 0x8) {
+        totle_sec = 0x8;
     }
 
-    for (i = 0; i < 5; i++) {
-        memset(p_check_buf, 0, 512);
+    for (i = 0; i < 0x5; i++) {
+        memset(p_check_buf, 0, 0x200);
         id_blk_write_data(EMMC_BOOT_PART_SIZE * i, 1, (u8 *)p_check_buf);
-        id_blk_write_data(EMMC_BOOT_PART_SIZE * i + 1, totle_sec - 1, buf + 512);
+        id_blk_write_data(EMMC_BOOT_PART_SIZE * i + 1, totle_sec - 1, buf + 0x200);
         id_blk_write_data(EMMC_BOOT_PART_SIZE * i, 1, buf);
         id_blk_read_data(EMMC_BOOT_PART_SIZE * i, totle_sec, (u8 *)p_check_buf);
-        for (j = 0; j < totle_sec * 128; j++) {
+        for (j = 0; j < totle_sec * 0x80; j++) {
             if (p_check_buf[j] != p_raw_data[j]) {
-                memset(p_check_buf, 0, 512);
+                memset(p_check_buf, 0, 0x200);
                 id_blk_write_data(EMMC_BOOT_PART_SIZE * i, 1, (u8 *)p_check_buf);
                 break;
             }
         }
-        if (j >= totle_sec * 128) {
+        if (j >= totle_sec * 0x80) {
             totle_write_count++;
         }
     }
@@ -359,7 +359,7 @@ static u32 rk_crc_32(unsigned char *buf, u32 len)
     u32 crc = 0;
 
     for (i = 0; i < len; i++) {
-        crc = (crc << 8) ^ g_crc32_tbl[(crc >> 24) ^ *buf++];
+        crc = (crc << 0x8) ^ g_crc32_tbl[(crc >> 0x18) ^ *buf++];
     }
     return crc;
 }
@@ -372,7 +372,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
     struct rk_vendor_req *v_req;
     u32 *page_buf;
 
-    page_buf = kmalloc(4096, GFP_KERNEL);
+    page_buf = kmalloc(0x1000, GFP_KERNEL);
     if (!page_buf) {
         return -ENOMEM;
     }
@@ -383,7 +383,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
 
     switch (cmd) {
         case VENDOR_READ_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 8)) {
+            if (copy_from_user(page_buf, (void __user *)arg, 0x8)) {
                 ret = -EFAULT;
                 break;
             }
@@ -392,37 +392,41 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
                 if (size != -1) {
                     v_req->len = size;
                     ret = 0;
-                    if (copy_to_user((void __user *)arg, page_buf, v_req->len + 8)) {
+                    if (copy_to_user((void __user *)arg, page_buf, v_req->len + 0x8)) {
                         ret = -EFAULT;
                     }
                 }
             }
-        } break;
+            break;
+        } 
         case VENDOR_WRITE_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 8)) {
+            if (copy_from_user(page_buf, (void __user *)arg, 0x8)) {
                 ret = -EFAULT;
                 break;
             }
-            if (v_req->tag == VENDOR_REQ_TAG && (v_req->len < 4096 - 8)) {
-                if (copy_from_user(page_buf, (void __user *)arg, v_req->len + 8)) {
+            if (v_req->tag == VENDOR_REQ_TAG && (v_req->len < 0x1000 - 0x8)) {
+                if (copy_from_user(page_buf, (void __user *)arg, v_req->len + 0x8)) {
                     ret = -EFAULT;
                     break;
                 }
                 ret = emmc_vendor_write(v_req->id, v_req->data, v_req->len);
             }
-        } break;
+            break;
+        }
+        default:
+            break;
 
 #ifdef CONFIG_ROCKCHIP_VENDOR_STORAGE_UPDATE_LOADER
         case READ_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 512)) {
+            if (copy_from_user(page_buf, (void __user *)arg, 0x200)) {
                 ret = -EFAULT;
                 goto exit;
             }
 
             size = page_buf[1];
-            if (size <= 8) {
+            if (size <= 0x8) {
                 id_blk_read_data(page_buf[0], size, (u8 *)page_buf);
-                if (copy_to_user((void __user *)arg, page_buf, size * 512)) {
+                if (copy_to_user((void __user *)arg, page_buf, size * 0x200)) {
                     ret = -EFAULT;
                     goto exit;
                 }
@@ -434,19 +438,19 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
         } break;
 
         case WRITE_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 4096)) {
+            if (copy_from_user(page_buf, (void __user *)arg, 0x1000)) {
                 ret = -EFAULT;
                 goto exit;
             }
             if (!g_idb_buffer) {
-                g_idb_buffer = kmalloc(4096 + EMMC_BOOT_PART_SIZE * 512, GFP_KERNEL);
+                g_idb_buffer = kmalloc(0x1000 + EMMC_BOOT_PART_SIZE * 0x200, GFP_KERNEL);
                 if (!g_idb_buffer) {
                     ret = -EFAULT;
                     goto exit;
                 }
             }
-            if (page_buf[1] <= 4088 && page_buf[0] <= (EMMC_BOOT_PART_SIZE * 512 - 4096)) {
-                memcpy(g_idb_buffer + page_buf[0], page_buf + 2, page_buf[1]);
+            if (page_buf[1] <= 0xFF8 && page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200 - 0x1000)) {
+                memcpy(g_idb_buffer + page_buf[0], page_buf + 0x2, page_buf[1]);
             } else {
                 ret = -EFAULT;
                 goto exit;
@@ -455,11 +459,11 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
         } break;
 
         case END_WRITE_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 28)) {
+            if (copy_from_user(page_buf, (void __user *)arg, 0x1C)) {
                 ret = -EFAULT;
                 goto exit;
             }
-            if (page_buf[0] <= (EMMC_BOOT_PART_SIZE * 512)) {
+            if (page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200)) {
                 if (!g_idb_buffer) {
                     ret = -EFAULT;
                     goto exit;
@@ -479,8 +483,8 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
         } break;
 
         case GET_BAD_BLOCK_IO: {
-            memset(page_buf, 0, 64);
-            if (copy_to_user((void __user *)arg, page_buf, 64)) {
+            memset(page_buf, 0, 0x40);
+            if (copy_to_user((void __user *)arg, page_buf, 0x40)) {
                 ret = -EFAULT;
                 goto exit;
             }
@@ -489,7 +493,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
 
         case GET_LOCK_FLAG_IO: {
             page_buf[0] = 0;
-            if (copy_to_user((void __user *)arg, page_buf, 4)) {
+            if (copy_to_user((void __user *)arg, page_buf, 0x4)) {
                 ret = -EFAULT;
                 goto exit;
             }
@@ -500,7 +504,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
             page_buf[0] = 0x00800000;
             page_buf[1] = 0x00040400;
             page_buf[2] = 0x00010028;
-            if (copy_to_user((void __user *)arg, page_buf, 11)) {
+            if (copy_to_user((void __user *)arg, page_buf, 0xB)) {
                 ret = -EFAULT;
                 goto exit;
             }
@@ -534,7 +538,7 @@ static struct miscdevice vender_storage_dev = {
 static int vendor_init_thread(void *arg)
 {
     int ret;
-    unsigned long timeout = jiffies + 3 * HZ;
+    unsigned long timeout = jiffies + 0x3 * HZ;
 
     g_vendor = kmalloc(sizeof(*g_vendor), GFP_KERNEL | GFP_DMA);
     if (!g_vendor) {
@@ -547,7 +551,7 @@ static int vendor_init_thread(void *arg)
             break;
         }
         /* sleep wait emmc initialize completed */
-        msleep(100);
+        msleep(0x64);
     } while (1);
 
     if (!ret) {

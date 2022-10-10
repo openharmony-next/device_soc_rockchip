@@ -13,8 +13,8 @@
  * (at your option) any later version.
  */
 
-#ifndef _DW_MMC_H_
-#define _DW_MMC_H_
+#ifndef DW_MMC_H_
+#define DW_MMC_H_
 #include "rk_sdmmc_dbg.h"
 
 #define DW_MMC_240A 0x240a
@@ -211,7 +211,7 @@ static const struct sdmmc_reg dw_mci_regs[] = {{0x0000, "CTRL"},
 #define SDMMC_STAUTS_FIFO_FULL BIT(3)
 #define SDMMC_STAUTS_FIFO_EMPTY BIT(2)
 
-/* Control SDMMC_UHS_REG defines (base+ 0x74)*/
+/* Control SDMMC_UHS_REG defines (base+ 0x74) */
 #define SDMMC_UHS_DDR_MODE BIT(16)
 #define SDMMC_UHS_VOLT_REG_18 BIT(0)
 

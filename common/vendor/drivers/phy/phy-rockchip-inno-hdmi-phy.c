@@ -439,21 +439,21 @@ static inline struct inno_hdmi_phy *to_inno_hdmi_phy(struct clk_hw *hw)
 
 static inline void inno_write(struct inno_hdmi_phy *inno, u32 reg, u8 val)
 {
-    regmap_write(inno->regmap, reg * 4, val);
+    regmap_write(inno->regmap, reg * 0x04, val);
 }
 
 static inline u8 inno_read(struct inno_hdmi_phy *inno, u32 reg)
 {
     u32 val;
 
-    regmap_read(inno->regmap, reg * 4, &val);
+    regmap_read(inno->regmap, reg * 0x04, &val);
 
     return val;
 }
 
 static inline void inno_update_bits(struct inno_hdmi_phy *inno, u8 reg, u8 mask, u8 val)
 {
-    regmap_update_bits(inno->regmap, reg * 4, mask, val);
+    regmap_update_bits(inno->regmap, reg * 0x04, mask, val);
 }
 
 static u32 inno_hdmi_phy_get_tmdsclk(struct inno_hdmi_phy *inno, int rate)
@@ -462,23 +462,23 @@ static u32 inno_hdmi_phy_get_tmdsclk(struct inno_hdmi_phy *inno, int rate)
     u32 tmdsclk;
 
     switch (bus_width) {
-        case 4:
-            tmdsclk = (u32)rate / 2;
+        case 0x04:
+            tmdsclk = (u32)rate / 0x02;
             break;
-        case 5:
-            tmdsclk = (u32)rate * 5 / 8;
+        case 0x05:
+            tmdsclk = (u32)rate * 0x05 / 0x08;
             break;
-        case 6:
-            tmdsclk = (u32)rate * 3 / 4;
+        case 0x06:
+            tmdsclk = (u32)rate * 0x03 / 0x04;
             break;
-        case 10:
-            tmdsclk = (u32)rate * 5 / 4;
+        case 0x0A:
+            tmdsclk = (u32)rate * 0x05 / 0x04;
             break;
-        case 12:
-            tmdsclk = (u32)rate * 3 / 2;
+        case 0x0C:
+            tmdsclk = (u32)rate * 0x03 / 0x02;
             break;
-        case 16:
-            tmdsclk = (u32)rate * 2;
+        case 0x10:
+            tmdsclk = (u32)rate * 0x02;
             break;
         default:
             tmdsclk = rate;
@@ -527,7 +527,7 @@ static irqreturn_t inno_hdmi_phy_irq(int irq, void *dev_id)
     /* set pdata_en to 0 */
     inno_update_bits(inno, 0x02, 1, 0);
 
-    udelay(10);
+    udelay(0x0A);
 
     /* set pdata_en to 1 */
     inno_update_bits(inno, 0x02, 1, 1);
@@ -555,9 +555,9 @@ static int inno_hdmi_phy_power_on(struct phy *phy)
     }
 
     if (inno->plat_data->dev_type == INNO_HDMI_PHY_RK3328 && rockchip_get_cpu_version()) {
-        chipversion = 2;
-    } else if (inno->plat_data->dev_type == INNO_HDMI_PHY_RK3228 && tmdsclock <= 33750000 && inno->efuse_flag) {
-        chipversion = 4;
+        chipversion = 0x02;
+    } else if (inno->plat_data->dev_type == INNO_HDMI_PHY_RK3228 && tmdsclock <= 0x202FBF0 && inno->efuse_flag) {
+        chipversion = 0x04;
     }
 
     for (; cfg->tmdsclock != ~0UL; cfg++) {
@@ -669,7 +669,7 @@ static long inno_hdmi_phy_clk_round_rate(struct clk_hw *hw, unsigned long rate, 
     }
 
     /* XXX: Limit pixel clock under 600MHz */
-    if (cfg->pixclock > 600000000) {
+    if (cfg->pixclock > 0x23C34600) {
         return -EINVAL;
     }
 
@@ -821,7 +821,7 @@ static int inno_hdmi_phy_rk3228_power_on(struct inno_hdmi_phy *inno, const struc
         inno_update_bits(inno, 0xeb, m, v);
     }
 
-    for (v = 0; v < 4; v++) {
+    for (v = 0; v < 0x04; v++) {
         inno_write(inno, 0xef + v, phy_cfg->regs[v]);
     }
 
@@ -844,11 +844,11 @@ static int inno_hdmi_phy_rk3228_power_on(struct inno_hdmi_phy *inno, const struc
         }
 
         pll_tries++;
-        usleep_range(100, 110);
+        usleep_range(0x64, 0x6E);
     }
 
-    if (cfg->tmdsclock > 340000000) {
-        msleep(100);
+    if (cfg->tmdsclock > 0x1443FD00) {
+        msleep(0x64);
     }
 
     /* pdata_en enable */
@@ -949,7 +949,7 @@ static int inno_hdmi_phy_rk3228_pre_pll_update(struct inno_hdmi_phy *inno, const
         }
 
         pll_tries++;
-        usleep_range(100, 110);
+        usleep_range(0x64, 0x6E);
     }
 
     return 0;
@@ -969,18 +969,18 @@ static int inno_hdmi_phy_rk3328_power_on(struct inno_hdmi_phy *inno, const struc
     val = cfg->fbdiv & 0xff;
     inno_write(inno, 0xac, val);
     if (cfg->postdiv == 1) {
-        inno_write(inno, 0xaa, 2);
-        val = (cfg->fbdiv >> 8) | cfg->prediv;
+        inno_write(inno, 0xaa, 0x02);
+        val = (cfg->fbdiv >> 0x08) | cfg->prediv;
         inno_write(inno, 0xab, val);
     } else {
-        val = (cfg->postdiv / 2) - 1;
+        val = (cfg->postdiv / 0x02) - 1;
         inno_write(inno, 0xad, val);
-        val = (cfg->fbdiv >> 8) | cfg->prediv;
+        val = (cfg->fbdiv >> 0x08) | cfg->prediv;
         inno_write(inno, 0xab, val);
         inno_write(inno, 0xaa, 0x0e);
     }
 
-    for (val = 0; val < 14; val++) {
+    for (val = 0; val < 0x0E; val++) {
         inno_write(inno, 0xb5 + val, phy_cfg->regs[val]);
     }
 
@@ -996,17 +996,17 @@ static int inno_hdmi_phy_rk3328_power_on(struct inno_hdmi_phy *inno, const struc
     inno_write(inno, 0xca, 0);
     inno_write(inno, 0xcb, 0);
 
-    if (phy_cfg->tmdsclock > 340000000) {
+    if (phy_cfg->tmdsclock > 0x1443FD00) {
         /* Set termination resistor to 100ohm */
-        val = clk_get_rate(inno->sysclk) / 100000;
-        inno_write(inno, 0xc5, ((val >> 8) & 0xff) | 0x80);
+        val = clk_get_rate(inno->sysclk) / 0x186A0;
+        inno_write(inno, 0xc5, ((val >> 0x08) & 0xff) | 0x80);
         inno_write(inno, 0xc6, val & 0xff);
-        inno_write(inno, 0xc7, 3 << 1);
-        inno_write(inno, 0xc5, ((val >> 8) & 0xff));
+        inno_write(inno, 0xc7, 0x03 << 1);
+        inno_write(inno, 0xc5, ((val >> 0x08) & 0xff));
     } else {
         inno_write(inno, 0xc5, 0x81);
         /* clk termination resistor is 50ohm */
-        if (phy_cfg->tmdsclock > 165000000) {
+        if (phy_cfg->tmdsclock > 0x9D5B340) {
             inno_write(inno, 0xc8, 0x30);
         }
         /* data termination resistor is 150ohm */
@@ -1016,30 +1016,30 @@ static int inno_hdmi_phy_rk3328_power_on(struct inno_hdmi_phy *inno, const struc
     }
 
     /* set TMDS sync detection counter length */
-    temp = 47520000000;
+    temp = 0xB1069A800;
     do_div(temp, inno->tmdsclock);
-    inno_write(inno, 0xd8, (temp >> 8) & 0xff);
+    inno_write(inno, 0xd8, (temp >> 0x08) & 0xff);
     inno_write(inno, 0xd9, temp & 0xff);
 
     /* Power up post PLL */
     inno_update_bits(inno, 0xaa, 1, 0);
     /* Power up tmds driver */
-    inno_update_bits(inno, 0xb0, 4, 4);
+    inno_update_bits(inno, 0xb0, 0x04, 0x04);
     inno_write(inno, 0xb2, 0x0f);
 
     /* Wait for post PLL lock */
-    for (val = 0; val < 5; val++) {
+    for (val = 0; val < 0x05; val++) {
         if (inno_read(inno, 0xaf) & 1) {
             break;
         }
-        usleep_range(1000, 2000);
+        usleep_range(0x3E8, 0x7D0);
     }
     if (!(inno_read(inno, 0xaf) & 1)) {
         dev_err(inno->dev, "HDMI PHY Post PLL unlock\n");
         return -ETIMEDOUT;
     }
-    if (phy_cfg->tmdsclock > 340000000) {
-        msleep(100);
+    if (phy_cfg->tmdsclock > 0x1443FD00) {
+        msleep(0x64);
     }
     /* set pdata_en to 1 */
     inno_update_bits(inno, 0x02, 1, 1);
@@ -1055,7 +1055,7 @@ static void inno_hdmi_phy_rk3328_power_off(struct inno_hdmi_phy *inno)
     /* Power off driver */
     inno_write(inno, 0xb2, 0);
     /* Power off band gap */
-    inno_update_bits(inno, 0xb0, 4, 0);
+    inno_update_bits(inno, 0xb0, 0x04, 0);
     /* Power off post pll */
     inno_update_bits(inno, 0xaa, 1, 1);
 
@@ -1093,28 +1093,28 @@ static int inno_hdmi_phy_rk3328_pre_pll_update(struct inno_hdmi_phy *inno, const
     /* Power off PLL */
     inno_update_bits(inno, 0xa0, 1, 1);
     /* Configure pre-pll */
-    inno_update_bits(inno, 0xa0, 2, (cfg->vco_div_5_en & 1) << 1);
+    inno_update_bits(inno, 0xa0, 0x02, (cfg->vco_div_5_en & 1) << 1);
     inno_write(inno, 0xa1, cfg->prediv);
     if (cfg->fracdiv) {
-        val = ((cfg->fbdiv >> 8) & 0x0f) | 0xc0;
+        val = ((cfg->fbdiv >> 0x08) & 0x0f) | 0xc0;
     } else {
-        val = ((cfg->fbdiv >> 8) & 0x0f) | 0xf0;
+        val = ((cfg->fbdiv >> 0x08) & 0x0f) | 0xf0;
     }
     inno_write(inno, 0xa2, val);
     inno_write(inno, 0xa3, cfg->fbdiv & 0xff);
-    val = (cfg->pclk_div_a & 0x1f) | ((cfg->pclk_div_b & 3) << 5);
+    val = (cfg->pclk_div_a & 0x1f) | ((cfg->pclk_div_b & 0x03) << 0x05);
     inno_write(inno, 0xa5, val);
-    val = (cfg->pclk_div_d & 0x1f) | ((cfg->pclk_div_c & 3) << 5);
+    val = (cfg->pclk_div_d & 0x1f) | ((cfg->pclk_div_c & 0x03) << 0x05);
     inno_write(inno, 0xa6, val);
-    val = ((cfg->tmds_div_a & 3) << 4) | ((cfg->tmds_div_b & 3) << 2) | (cfg->tmds_div_c & 3);
+    val = ((cfg->tmds_div_a & 0x03) << 0x04) | ((cfg->tmds_div_b & 0x03) << 0x02) | (cfg->tmds_div_c & 0x03);
     inno_write(inno, 0xa4, val);
 
     if (cfg->fracdiv) {
         val = cfg->fracdiv & 0xff;
         inno_write(inno, 0xd3, val);
-        val = (cfg->fracdiv >> 8) & 0xff;
+        val = (cfg->fracdiv >> 0x08) & 0xff;
         inno_write(inno, 0xd2, val);
-        val = (cfg->fracdiv >> 16) & 0xff;
+        val = (cfg->fracdiv >> 0x10) & 0xff;
         inno_write(inno, 0xd1, val);
     } else {
         inno_write(inno, 0xd3, 0);
@@ -1126,13 +1126,13 @@ static int inno_hdmi_phy_rk3328_pre_pll_update(struct inno_hdmi_phy *inno, const
     inno_update_bits(inno, 0xa0, 1, 0);
 
     /* Wait for PLL lock */
-    for (val = 0; val < 5; val++) {
+    for (val = 0; val < 0x05; val++) {
         if (inno_read(inno, 0xa9) & 1) {
             break;
         }
-        usleep_range(1000, 2000);
+        usleep_range(0x3E8, 0x7D0);
     }
-    if (val == 5) {
+    if (val == 0x05) {
         dev_err(inno->dev, "Pre-PLL unlock\n");
         return -ETIMEDOUT;
     }
@@ -1148,27 +1148,27 @@ static unsigned long inno_hdmi_rk3328_phy_pll_recalc_rate(struct inno_hdmi_phy *
     u64 vco = parent_rate;
 
     nd = inno_read(inno, 0xa1) & 0x3f;
-    nf = ((inno_read(inno, 0xa2) & 0x0f) << 8) | inno_read(inno, 0xa3);
+    nf = ((inno_read(inno, 0xa2) & 0x0f) << 0x08) | inno_read(inno, 0xa3);
     vco *= nf;
     if ((inno_read(inno, 0xa2) & 0x30) == 0) {
-        frac = inno_read(inno, 0xd3) | (inno_read(inno, 0xd2) << 8) | (inno_read(inno, 0xd1) << 16);
-        vco += DIV_ROUND_CLOSEST(parent_rate * frac, (1 << 24));
+        frac = inno_read(inno, 0xd3) | (inno_read(inno, 0xd2) << 0x08) | (inno_read(inno, 0xd1) << 0x10);
+        vco += DIV_ROUND_CLOSEST(parent_rate * frac, (1 << 0x18));
     }
-    if (inno_read(inno, 0xa0) & 2) {
-        do_div(vco, nd * 5);
+    if (inno_read(inno, 0xa0) & 0x02) {
+        do_div(vco, nd * 0x05);
     } else {
         no_a = inno_read(inno, 0xa5) & 0x1f;
-        no_b = ((inno_read(inno, 0xa5) >> 5) & 7) + 2;
+        no_b = ((inno_read(inno, 0xa5) >> 0x05) & 0x07) + 0x02;
         no_d = inno_read(inno, 0xa6) & 0x1f;
         if (no_a == 1) {
-            do_div(vco, nd * no_b * no_d * 2);
+            do_div(vco, nd * no_b * no_d * 0x02);
         } else {
-            do_div(vco, nd * no_a * no_d * 2);
+            do_div(vco, nd * no_a * no_d * 0x02);
         }
     }
 
     frac = vco;
-    inno->pixclock = DIV_ROUND_CLOSEST(frac, 1000) * 1000;
+    inno->pixclock = DIV_ROUND_CLOSEST(frac, 0x3E8) * 0x3E8;
 
     dev_dbg(inno->dev, "%s rate %lu\n", __func__, inno->pixclock);
 
@@ -1185,20 +1185,20 @@ static unsigned long inno_hdmi_rk3228_phy_pll_recalc_rate(struct inno_hdmi_phy *
     nf = ((inno_read(inno, 0xe2) & 0x80) << 1) | inno_read(inno, 0xe3);
     vco *= nf;
 
-    if ((inno_read(inno, 0xe2) >> 5) & 0x1) {
-        do_div(vco, nd * 5);
+    if ((inno_read(inno, 0xe2) >> 0x05) & 0x1) {
+        do_div(vco, nd * 0x05);
     } else {
         no_a = inno_read(inno, 0xe4) & 0x1f;
         if (!no_a) {
             no_a = 1;
         }
-        no_b = ((inno_read(inno, 0xe4) >> 5) & 0x3) + 2;
+        no_b = ((inno_read(inno, 0xe4) >> 0x05) & 0x3) + 0x02;
         no_d = inno_read(inno, 0xe5) & 0x1f;
 
         if (no_a == 1) {
-            do_div(vco, nd * no_b * no_d * 2);
+            do_div(vco, nd * no_b * no_d * 0x02);
         } else {
-            do_div(vco, nd * no_a * no_d * 2);
+            do_div(vco, nd * no_a * no_d * 0x02);
         }
     }
 
@@ -1256,10 +1256,10 @@ static int inno_hdmi_update_phy_table(struct inno_hdmi_phy *inno, u32 *config, s
     int i, j;
 
     for (i = 0; i < phy_table_size; i++) {
-        phy_cfg[i].tmdsclock = (unsigned long)config[i * 15];
+        phy_cfg[i].tmdsclock = (unsigned long)config[i * 0x0F];
 
-        for (j = 0; j < 14; j++) {
-            phy_cfg[i].regs[j] = (u8)config[i * 15 + 1 + j];
+        for (j = 0; j < 0x0E; j++) {
+            phy_cfg[i].regs[j] = (u8)config[i * 0x0F + 1 + j];
         }
     }
 
@@ -1268,7 +1268,7 @@ static int inno_hdmi_update_phy_table(struct inno_hdmi_phy *inno, u32 *config, s
      * there is no more phy cfg data.
      */
     phy_cfg[i].tmdsclock = ~0UL;
-    for (j = 0; j < 14; j++) {
+    for (j = 0; j < 0x0E; j++) {
         phy_cfg[i].regs[j] = 0;
     }
 
@@ -1365,7 +1365,7 @@ static int inno_hdmi_phy_probe(struct platform_device *pdev)
     }
 
     phy_set_drvdata(inno->phy, inno);
-    phy_set_bus_width(inno->phy, 8);
+    phy_set_bus_width(inno->phy, 0x08);
 
     phy_provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);
     if (IS_ERR(phy_provider)) {

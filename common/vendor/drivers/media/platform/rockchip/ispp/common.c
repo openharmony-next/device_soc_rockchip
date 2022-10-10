@@ -51,11 +51,11 @@ void rkispp_update_regs(struct rkispp_device *dev, u32 start, u32 end)
     void __iomem *base = dev->hw_dev->base_addr;
     u32 i;
 
-    if (end > RKISP_ISPP_SW_REG_SIZE - 4) {
+    if (end > RKISP_ISPP_SW_REG_SIZE - 0x04) {
         dev_err(dev->dev, "%s out of range\n", __func__);
         return;
     }
-    for (i = start; i <= end; i += 4) {
+    for (i = start; i <= end; i += 0x04) {
         u32 *val = dev->sw_base_addr + i;
         u32 *flag = dev->sw_base_addr + i + RKISP_ISPP_SW_REG_SIZE;
 

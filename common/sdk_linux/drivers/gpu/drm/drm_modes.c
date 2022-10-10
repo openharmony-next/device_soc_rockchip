@@ -244,7 +244,7 @@ struct drm_display_mode *drm_cvt_mode(struct drm_device *dev, int hdisplay, int 
         int vsyncandback_porch, __maybe_unused vback_porch, hblank;
 
         /* estimated the horizontal period */
-        tmp1 = HV_FACTOR * 1000000 - CVT_MIN_VSYNC_BP * HV_FACTOR * vfieldrate;
+        tmp1 = HV_FACTOR * 0xf4240 - CVT_MIN_VSYNC_BP * HV_FACTOR * vfieldrate;
         tmp2 = (vdisplay_rnd + 0x2 * vmargin + CVT_MIN_V_PORCH) * 0x2 + interlace;
         hperiod = tmp1 * 0x2 / (tmp2 * vfieldrate);
 
@@ -521,7 +521,7 @@ struct drm_display_mode *drm_gtf_mode_complex(struct drm_device *dev, int hdispl
     drm_mode->clock = pixel_freq;
 
     if (interlaced) {
-        drm_mode->vtotal *= 2;
+        drm_mode->vtotal *= 0x2;
         drm_mode->flags |= DRM_MODE_FLAG_INTERLACE;
     }
 
@@ -1393,7 +1393,7 @@ static int drm_mode_parse_cmdline_bpp(const char *str, char **end_ptr, struct dr
     }
 
     str++;
-    bpp = simple_strtol(str, end_ptr, 10);
+    bpp = simple_strtol(str, end_ptr, 0xa);
     if (*end_ptr == str) {
         return -EINVAL;
     }

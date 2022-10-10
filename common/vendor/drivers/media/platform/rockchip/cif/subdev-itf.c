@@ -121,7 +121,7 @@ static int sditf_get_set_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_pad_conf
         pixm.pixelformat = rkcif_mbus_pixelcode_to_v4l2(fmt->format.code);
         pixm.width = priv->cap_info.width;
         pixm.height = priv->cap_info.height;
-        v4l2_dbg(3, rkcif_debug, &cif_dev->v4l2_dev, "%s, width %d, height %d, hdr mode %d\n", __func__,
+        v4l2_dbg(0x03, rkcif_debug, &cif_dev->v4l2_dev, "%s, width %d, height %d, hdr mode %d\n", __func__,
                  fmt->format.width, fmt->format.width, priv->hdr_cfg.hdr_mode);
         if (priv->hdr_cfg.hdr_mode == NO_HDR) {
             rkcif_set_fmt(&cif_dev->stream[0], &pixm, false);
@@ -131,7 +131,7 @@ static int sditf_get_set_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_pad_conf
         } else if (priv->hdr_cfg.hdr_mode == HDR_X3) {
             rkcif_set_fmt(&cif_dev->stream[0], &pixm, false);
             rkcif_set_fmt(&cif_dev->stream[1], &pixm, false);
-            rkcif_set_fmt(&cif_dev->stream[2], &pixm, false);
+            rkcif_set_fmt(&cif_dev->stream[0x02], &pixm, false);
         }
     }
 
@@ -187,7 +187,7 @@ static void sditf_reinit_mode(struct sditf_priv *priv, struct rkisp_vicap_mode *
             v4l2_err(&priv->cif_dev->v4l2_dev, "%s, mode name err, mode name: %s\n", __func__, mode->name);
         }
     }
-    v4l2_dbg(3, rkcif_debug, &priv->cif_dev->v4l2_dev, "%s, mode->is_rdbk %d, mode->name %s, link_mode %d\n", __func__,
+    v4l2_dbg(0x03, rkcif_debug, &priv->cif_dev->v4l2_dev, "%s, mode->is_rdbk %d, mode->name %s, link_mode %d\n", __func__,
              mode->is_rdbk, mode->name, priv->toisp_inf.link_mode);
 }
 
@@ -333,8 +333,8 @@ static int sditf_channel_enable(struct sditf_priv *priv, int user)
         priv->toisp_inf.ch_info[0].id = ch0;
         priv->toisp_inf.ch_info[1].is_valid = true;
         priv->toisp_inf.ch_info[1].id = ch1;
-        priv->toisp_inf.ch_info[2].is_valid = true;
-        priv->toisp_inf.ch_info[2].id = ch2;
+        priv->toisp_inf.ch_info[0x02].is_valid = true;
+        priv->toisp_inf.ch_info[0x02].id = ch2;
     }
     if (user == 0) {
         if (priv->toisp_inf.link_mode == TOISP_UNITE) {
@@ -410,7 +410,7 @@ static int sditf_start_stream(struct sditf_priv *priv)
     } else if (priv->hdr_cfg.hdr_mode == HDR_X3) {
         rkcif_do_start_stream(&cif_dev->stream[0], RKCIF_STREAM_MODE_TOISP);
         rkcif_do_start_stream(&cif_dev->stream[1], RKCIF_STREAM_MODE_TOISP);
-        rkcif_do_start_stream(&cif_dev->stream[2], RKCIF_STREAM_MODE_TOISP);
+        rkcif_do_start_stream(&cif_dev->stream[0x02], RKCIF_STREAM_MODE_TOISP);
     }
     return 0;
 }
@@ -427,7 +427,7 @@ static int sditf_stop_stream(struct sditf_priv *priv)
     } else if (priv->hdr_cfg.hdr_mode == HDR_X3) {
         rkcif_do_stop_stream(&cif_dev->stream[0], RKCIF_STREAM_MODE_TOISP);
         rkcif_do_stop_stream(&cif_dev->stream[1], RKCIF_STREAM_MODE_TOISP);
-        rkcif_do_stop_stream(&cif_dev->stream[2], RKCIF_STREAM_MODE_TOISP);
+        rkcif_do_stop_stream(&cif_dev->stream[0x02], RKCIF_STREAM_MODE_TOISP);
     }
     return 0;
 }
@@ -548,7 +548,7 @@ static int rkcif_subdev_media_init(struct sditf_priv *priv)
     priv->toisp_inf.link_mode = TOISP_NONE;
     priv->toisp_inf.ch_info[0].is_valid = false;
     priv->toisp_inf.ch_info[1].is_valid = false;
-    priv->toisp_inf.ch_info[2].is_valid = false;
+    priv->toisp_inf.ch_info[0x02].is_valid = false;
     return 0;
 }
 

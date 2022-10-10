@@ -266,8 +266,8 @@ static int rkispp_plat_probe(struct platform_device *pdev)
     struct rkispp_device *ispp_dev;
     int ret;
 
-    sprintf(rkispp_version, "v%02x.%02x.%02x", RKISPP_DRIVER_VERSION >> RKISPP_NODE_OFFSET_THI,
-            (RKISPP_DRIVER_VERSION & 0xff00) >> RKISPP_NODE_OFFSET_EI, RKISPP_DRIVER_VERSION & 0x00ff);
+    ret = sprintf(rkispp_version, "v%02x.%02x.%02x", RKISPP_DRIVER_VERSION >> RKISPP_NODE_OFFSET_THI,
+                  (RKISPP_DRIVER_VERSION & 0xff00) >> RKISPP_NODE_OFFSET_EI, RKISPP_DRIVER_VERSION & 0x00ff);
 
     dev_info(dev, "rkispp driver version: %s\n", rkispp_version);
 
@@ -288,7 +288,7 @@ static int rkispp_plat_probe(struct platform_device *pdev)
         return ret;
     }
 
-    sprintf(ispp_dev->media_dev.model, "%s%d", DRIVER_NAME, ispp_dev->dev_id);
+    ret = sprintf(ispp_dev->media_dev.model, "%s%d", DRIVER_NAME, ispp_dev->dev_id);
     ispp_dev->irq_hdl = rkispp_isr;
     mutex_init(&ispp_dev->apilock);
     mutex_init(&ispp_dev->iqlock);

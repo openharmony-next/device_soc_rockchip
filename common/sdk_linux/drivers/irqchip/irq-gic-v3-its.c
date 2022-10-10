@@ -793,7 +793,7 @@ static struct its_vpe *its_build_vmapti_cmd(struct its_node *its, struct its_cmd
     if (!is_v4_1(its) && desc->its_vmapti_cmd.db_enabled) {
         db = desc->its_vmapti_cmd.vpe->vpe_db_lpi;
     } else {
-        db = 1023;
+        db = 0x3FF;
     }
 
     its_encode_cmd(cmd, GITS_CMD_VMAPTI);
@@ -941,7 +941,6 @@ static int its_queue_full(struct its_node *its)
 
     widx = its->cmd_write - its->cmd_base;
     ridx = readl_relaxed(its->base + GITS_CREADR) / sizeof(struct its_cmd_block);
-
     /* This is incredibly unlikely to happen, unless the ITS locks up. */
     if (((widx + 1) % ITS_CMD_QUEUE_NR_ENTRIES) == ridx) {
         return 1;
@@ -1434,7 +1433,6 @@ static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
     struct its_device *its_dev = irq_data_get_irq_chip_data(d);
     u32 event = its_get_event_id(d);
     struct its_vlpi_map *map;
-
     /*
      * GICv4.1 does away with the per-LPI nonsense, nothing to do
      * here.
@@ -1442,15 +1440,11 @@ static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
     if (is_v4_1(its_dev->its)) {
         return;
     }
-
     map = dev_event_to_vlpi_map(its_dev, event);
-
     if (map->db_enabled == enable) {
         return;
     }
-
     map->db_enabled = enable;
-
     /*
      * More fun with the architecture:
      *
@@ -1843,16 +1837,12 @@ static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
     struct its_device *its_dev = irq_data_get_irq_chip_data(d);
     struct its_vlpi_map *map;
     int ret = 0;
-
     raw_spin_lock(&its_dev->event_map.vlpi_lock);
-
     map = get_vlpi_map(d);
-
     if (!its_dev->event_map.vm || !map) {
         ret = -EINVAL;
         goto out;
     }
-
     /* Copy our mapping information to the incoming request */
     *info->map = *map;
 
@@ -2294,13 +2284,10 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser, u64 ca
     if (!page) {
         return -ENOMEM;
     }
-
     base = (void *)page_address(page);
     baser_phys = virt_to_phys(base);
-
     /* Check if the physical address of the memory is above 48bits */
     if (IS_ENABLED(CONFIG_ARM64_64K_PAGES) && (baser_phys >> 0x30)) {
-
         /* 52bit PA is supported only when PageSize=64K */
         if (psz != SZ_64K) {
             pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
@@ -2765,9 +2752,7 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
     if (idx >= (npg * psz / GITS_LVL1_ENTRY_SIZE)) {
         return false;
     }
-
     table = gic_data_rdist_cpu(cpu)->vpe_l1_base;
-
     /* Allocate memory for 2nd level table */
     if (!table[idx]) {
         page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
@@ -2970,7 +2955,7 @@ static bool enabled_lpis_allowed(void)
 
     /* Check whether the property table is in a reserved region */
     val = gicr_read_propbaser(gic_data_rdist_rd_base() + GICR_PROPBASER);
-    addr = val & GENMASK_ULL(51, 12);
+    addr = val & GENMASK_ULL(0x33, 0xC);
 
     return gic_check_reserved_range(addr, LPI_PROPBASE_SZ);
 }
@@ -3064,13 +3049,13 @@ static void its_cpu_init_lpis(void)
          * RDs. If we don't, this is hopeless.
          */
         paddr = gicr_read_propbaser(rbase + GICR_PROPBASER);
-        paddr &= GENMASK_ULL(51, 12);
+        paddr &= GENMASK_ULL(0x33, 0xC);
         if (WARN_ON(gic_rdists->prop_table_pa != paddr)) {
             add_taint(TAINT_CRAP, LOCKDEP_STILL_OK);
         }
 
         paddr = gicr_read_pendbaser(rbase + GICR_PENDBASER);
-        paddr &= GENMASK_ULL(51, 16);
+        paddr &= GENMASK_ULL(0x33, 0x10);
 
         WARN_ON(!gic_check_reserved_range(paddr, LPI_PENDBASE_SZ));
         its_free_pending_table(gic_data_rdist()->pend_page);
@@ -3311,14 +3296,11 @@ static bool its_alloc_table_entry(struct its_node *its, struct its_baser *baser,
 static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
 {
     struct its_baser *baser;
-
     baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
-
     /* Don't allow device id that exceeds ITS hardware limit */
     if (!baser) {
         return (ilog2(dev_id) < device_ids(its));
     }
-
     return its_alloc_table_entry(its, baser, dev_id);
 }
 
@@ -3397,7 +3379,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id, in
      * Even if the device wants a single LPI, the ITT must be
      * sized as a power of two (and you need at least one bit...).
      */
-    nr_ites = max(2, nvecs);
+    nr_ites = max(0x2, nvecs);
     sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
     sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
     gfp_flags = GFP_KERNEL;
@@ -3536,13 +3518,13 @@ static int its_irq_gic_domain_alloc(struct irq_domain *domain, unsigned int virq
 
     if (irq_domain_get_of_node(domain->parent)) {
         fwspec.fwnode = domain->parent->fwnode;
-        fwspec.param_count = 3;
+        fwspec.param_count = 0x3;
         fwspec.param[0] = GIC_IRQ_TYPE_LPI;
         fwspec.param[1] = hwirq;
-        fwspec.param[2] = IRQ_TYPE_EDGE_RISING;
+        fwspec.param[0x2] = IRQ_TYPE_EDGE_RISING;
     } else if (is_fwnode_irqchip(domain->parent->fwnode)) {
         fwspec.fwnode = domain->parent->fwnode;
-        fwspec.param_count = 2;
+        fwspec.param_count = 0x2;
         fwspec.param[0] = hwirq;
         fwspec.param[1] = IRQ_TYPE_EDGE_RISING;
     } else {
@@ -3850,7 +3832,7 @@ static void its_vpe_schedule(struct its_vpe *vpe)
     val |= GICR_VPROPBASER_InnerShareable;
     gicr_write_vpropbaser(val, vlpi_base + GICR_VPROPBASER);
 
-    val = virt_to_phys(page_address(vpe->vpt_page)) & GENMASK_ULL(51, 16);
+    val = virt_to_phys(page_address(vpe->vpt_page)) & GENMASK_ULL(0x33, 0x10);
     val |= GICR_VPENDBASER_RaWaWb;
     val |= GICR_VPENDBASER_InnerShareable;
     /*
@@ -4329,9 +4311,9 @@ static int its_sgi_irq_domain_alloc(struct irq_domain *domain, unsigned int virq
     int i;
 
     /* Yes, we do want 16 SGIs */
-    WARN_ON(nr_irqs != 16);
+    WARN_ON(nr_irqs != 0x10);
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < 0x10; i++) {
         vpe->sgi_config[i].priority = 0;
         vpe->sgi_config[i].enabled = false;
         vpe->sgi_config[i].group = false;

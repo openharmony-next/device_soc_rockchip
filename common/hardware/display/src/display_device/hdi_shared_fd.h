@@ -19,14 +19,10 @@
 #include <memory>
 #include "display_common.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class HdiFd
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class HdiFd {
             public:
                 HdiFd()
                 {

@@ -25,113 +25,119 @@
 /* memory align for mpp */
 #define RK_MPP_ALIGN 4096
 
-static const struct capture_fmt input_fmts[] = {{
-                                                    .fourcc = V4L2_PIX_FMT_YUYV,
-                                                    .bpp = {16},
-                                                    .cplanes = 1,
-                                                    .mplanes = 1,
-                                                    .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_UYVY,
-                                                    .bpp = {16},
-                                                    .cplanes = 1,
-                                                    .mplanes = 1,
-                                                    .wr_fmt = FMT_YUYV | FMT_YUV422,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_NV16,
-                                                    .bpp = {8, 16},
-                                                    .cplanes = 2,
-                                                    .mplanes = 1,
-                                                    .wr_fmt = FMT_YUV422,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_NV12,
-                                                    .bpp = {8, 16},
-                                                    .cplanes = 2,
-                                                    .mplanes = 1,
-                                                    .wr_fmt = FMT_YUV420,
-                                                }};
+static const struct capture_fmt input_fmts[] = {
+    {
+        .fourcc = V4L2_PIX_FMT_YUYV,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_UYVY,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUYV | FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_NV16,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_NV12,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV420,
+    }
+};
 
-static const struct capture_fmt mb_fmts[] = {{
-                                                 .fourcc = V4L2_PIX_FMT_YUYV,
-                                                 .bpp = {16},
-                                                 .cplanes = 1,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_UYVY,
-                                                 .bpp = {16},
-                                                 .cplanes = 1,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YUYV | FMT_YUV422,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_NV16,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YUV422,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_NV12,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YUV420,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_FBC2,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YUV422 | FMT_FBC,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_FBC0,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .wr_fmt = FMT_YUV420 | FMT_FBC,
-                                             }};
+static const struct capture_fmt mb_fmts[] = {
+    {
+        .fourcc = V4L2_PIX_FMT_YUYV,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_UYVY,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUYV | FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_NV16,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_NV12,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV420,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_FBC2,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV422 | FMT_FBC,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_FBC0,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV420 | FMT_FBC,
+    }
+};
 
-static const struct capture_fmt scl_fmts[] = {{
-                                                  .fourcc = V4L2_PIX_FMT_NV16,
-                                                  .bpp = {8, 16},
-                                                  .cplanes = 2,
-                                                  .mplanes = 1,
-                                                  .wr_fmt = FMT_YUV422,
-                                              },
-                                              {
-                                                  .fourcc = V4L2_PIX_FMT_NV12,
-                                                  .bpp = {8, 16},
-                                                  .cplanes = 2,
-                                                  .mplanes = 1,
-                                                  .wr_fmt = FMT_YUV420,
-                                              },
-                                              {
-                                                  .fourcc = V4L2_PIX_FMT_GREY,
-                                                  .bpp = {8},
-                                                  .cplanes = 1,
-                                                  .mplanes = 1,
-                                                  .wr_fmt = FMT_YUV422,
-                                              },
-                                              {
-                                                  .fourcc = V4L2_PIX_FMT_YUYV,
-                                                  .bpp = {16},
-                                                  .cplanes = 1,
-                                                  .mplanes = 1,
-                                                  .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
-                                              },
-                                              {
-                                                  .fourcc = V4L2_PIX_FMT_UYVY,
-                                                  .bpp = {16},
-                                                  .cplanes = 1,
-                                                  .mplanes = 1,
-                                                  .wr_fmt = FMT_YUYV | FMT_YUV422,
-                                              }};
+static const struct capture_fmt scl_fmts[] = {
+    {
+        .fourcc = V4L2_PIX_FMT_NV16,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_NV12,
+        .bpp = {8, 16},
+        .cplanes = 2,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV420,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_GREY,
+        .bpp = {8},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_YUYV,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YC_SWAP | FMT_YUYV | FMT_YUV422,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_UYVY,
+        .bpp = {16},
+        .cplanes = 1,
+        .mplanes = 1,
+        .wr_fmt = FMT_YUYV | FMT_YUV422,
+    }
+};
 
 static struct stream_config input_config = {
     .fmts = input_fmts,
@@ -211,14 +217,14 @@ static int fcc_xysubs(u32 fcc, u32 *xsubs, u32 *ysubs)
         case V4L2_PIX_FMT_NV16:
         case V4L2_PIX_FMT_NV61:
         case V4L2_PIX_FMT_FBC2:
-            *xsubs = 2;
+            *xsubs = 0x02;
             *ysubs = 1;
             break;
         case V4L2_PIX_FMT_NV12:
         case V4L2_PIX_FMT_NV21:
         case V4L2_PIX_FMT_FBC0:
-            *xsubs = 2;
-            *ysubs = 2;
+            *xsubs = 0x02;
+            *ysubs = 0x02;
             break;
         default:
             return -EINVAL;
@@ -368,7 +374,7 @@ int rkispp_frame_end(struct rkispp_stream *stream, u32 state)
         stream->curr_buf->vb.sequence = dev->ispp_sdev.frm_sync_seq;
         stream->curr_buf->vb.vb2_buf.timestamp = ns;
 
-        if (stream->is_reg_withstream && (fmt->wr_fmt & FMT_FBC || fmt->wr_fmt == FMT_YUV420)) {
+        if (stream->is_reg_withstream && ((fmt->wr_fmt & FMT_FBC) || (fmt->wr_fmt == FMT_YUV420))) {
             void *addr = vb2_plane_vaddr(&stream->curr_buf->vb.vb2_buf, i);
 
             rkispp_find_regbuf_by_id(dev, &reg_buf, dev->dev_id, stream->curr_buf->vb.sequence);
@@ -380,7 +386,7 @@ int rkispp_frame_end(struct rkispp_stream *stream, u32 state)
 
                 rkispp_release_regbuf(dev, reg_buf);
                 vb2_set_plane_payload(&stream->curr_buf->vb.vb2_buf, 1, cpy_size);
-                v4l2_dbg(3, rkispp_debug, &dev->v4l2_dev, "stream(0x%x) write reg buf to last plane\n", stream->id);
+                v4l2_dbg(0x03, rkispp_debug, &dev->v4l2_dev, "stream(0x%x) write reg buf to last plane\n", stream->id);
             } else {
                 v4l2_err(&dev->v4l2_dev, "%s can not find reg buf: dev_id %d, sequence %d\n", __func__, dev->dev_id,
                          stream->curr_buf->vb.sequence);
@@ -417,7 +423,7 @@ int rkispp_frame_end(struct rkispp_stream *stream, u32 state)
             v4l2_dbg(0, rkispp_debug, &dev->v4l2_dev, "stream:%d no buf, lost frame:%d\n", stream->id, frame_id);
         }
 
-        if (stream->is_reg_withstream && (fmt->wr_fmt & FMT_FBC || fmt->wr_fmt == FMT_YUV420)) {
+        if (stream->is_reg_withstream && ((fmt->wr_fmt & FMT_FBC) || (fmt->wr_fmt == FMT_YUV420))) {
             rkispp_find_regbuf_by_id(dev, &reg_buf, dev->dev_id, frame_id);
             if (reg_buf) {
                 rkispp_release_regbuf(dev, reg_buf);
@@ -490,11 +496,11 @@ void rkispp_start_3a_run(struct rkispp_device *dev)
 
     v4l2_event_queue(vdev, &ev);
     ret = wait_event_timeout(dev->sync_onoff, params_vdev->streamon && !params_vdev->first_params,
-                             msecs_to_jiffies(1000));
+                             msecs_to_jiffies(0x3E8));
     if (!ret) {
         v4l2_warn(&dev->v4l2_dev, "waiting on params stream on event timeout\n");
     } else {
-        v4l2_dbg(1, rkispp_debug, &dev->v4l2_dev, "Waiting for 3A on use %d ms\n", 1000 - ret);
+        v4l2_dbg(1, rkispp_debug, &dev->v4l2_dev, "Waiting for 3A on use %d ms\n", 0x3E8 - ret);
     }
 }
 
@@ -512,11 +518,11 @@ static void rkispp_stop_3a_run(struct rkispp_device *dev)
     }
 
     v4l2_event_queue(vdev, &ev);
-    ret = wait_event_timeout(dev->sync_onoff, !params_vdev->streamon, msecs_to_jiffies(1000));
+    ret = wait_event_timeout(dev->sync_onoff, !params_vdev->streamon, msecs_to_jiffies(0x3E8));
     if (!ret) {
         v4l2_warn(&dev->v4l2_dev, "waiting on params stream off event timeout\n");
     } else {
-        v4l2_dbg(1, rkispp_debug, &dev->v4l2_dev, "Waiting for 3A off use %d ms\n", 1000 - ret);
+        v4l2_dbg(1, rkispp_debug, &dev->v4l2_dev, "Waiting for 3A off use %d ms\n", 0x3E8 - ret);
     }
 }
 
@@ -568,7 +574,7 @@ void secure_config_mb(struct rkispp_stream *stream)
     /* enable dma immediately, config in idle state */
     switch (stream->last_module) {
         case ISPP_MODULE_TNR:
-            rkispp_set_bits(dev, RKISPP_TNR_CTRL, FMT_WR_MASK, SW_TNR_1ST_FRM | stream->out_cap_fmt.wr_fmt << 4);
+            rkispp_set_bits(dev, RKISPP_TNR_CTRL, FMT_WR_MASK, SW_TNR_1ST_FRM | stream->out_cap_fmt.wr_fmt << 0x04);
             break;
         case ISPP_MODULE_NR:
         case ISPP_MODULE_SHP:
@@ -580,8 +586,8 @@ void secure_config_mb(struct rkispp_stream *stream)
         case ISPP_MODULE_FEC:
             limit_range = (stream->out_fmt.quantization != V4L2_QUANTIZATION_LIM_RANGE) ? 0 : SW_FEC_WR_YUV_LIMIT;
             rkispp_set_bits(dev, RKISPP_FEC_CTRL, SW_FEC_WR_YUV_LIMIT | FMT_WR_MASK,
-                            limit_range | stream->out_cap_fmt.wr_fmt << 4);
-            rkispp_write(dev, RKISPP_FEC_DST_SIZE, stream->out_fmt.height << 16 | stream->out_fmt.width);
+                            limit_range | stream->out_cap_fmt.wr_fmt << 0x04);
+            rkispp_write(dev, RKISPP_FEC_DST_SIZE, stream->out_fmt.height << 0x10 | stream->out_fmt.width);
             rkispp_clear_bits(dev, RKISPP_FEC_CORE_CTRL, SW_FEC2DDR_DIS);
             break;
         default:
@@ -589,11 +595,11 @@ void secure_config_mb(struct rkispp_stream *stream)
     }
 
     if (stream->out_cap_fmt.wr_fmt & FMT_YUYV) {
-        mult = 2;
+        mult = 0x02;
     } else if (stream->out_cap_fmt.wr_fmt & FMT_FBC) {
         mult = 0;
     }
-    set_vir_stride(stream, ALIGN(stream->out_fmt.width * mult, 16) >> 2);
+    set_vir_stride(stream, ALIGN(stream->out_fmt.width * mult, 0x10) >> 0x02);
 
     /* config first buf */
     rkispp_frame_end(stream, FRAME_INIT);
@@ -659,7 +665,7 @@ static int is_stopped_mb(struct rkispp_stream *stream)
 
     if (vdev->module_ens & ISPP_MODULE_FEC) {
         /* close dma write immediately */
-        rkispp_clear_bits(dev, RKISPP_FEC_CTRL, FMT_FBC << 4);
+        rkispp_clear_bits(dev, RKISPP_FEC_CTRL, FMT_FBC << 0x04);
         rkispp_set_bits(dev, RKISPP_FEC_CORE_CTRL, 0, SW_FEC2DDR_DIS);
     } else if (vdev->module_ens & (ISPP_MODULE_NR | ISPP_MODULE_SHP)) {
         val = dev->hw_dev->dummy_buf.dma_addr;
@@ -713,15 +719,15 @@ static int config_scl(struct rkispp_stream *stream)
 
     /* config first buf */
     rkispp_frame_end(stream, FRAME_INIT);
-    if (hy_fac == 8193 && vy_fac == 8193) {
+    if (hy_fac == 0x2001 && vy_fac == 0x2001) {
         val |= SW_SCL_BYPASS;
     }
     if (fmt->wr_fmt & FMT_YUYV) {
-        mult = 2;
+        mult = 0x02;
     }
-    set_vir_stride(stream, ALIGN(stream->out_fmt.width * mult, 16) >> 2);
-    set_scl_factor(stream, vy_fac << 16 | hy_fac);
-    val |= fmt->wr_fmt << 3 | ((fmt->fourcc != V4L2_PIX_FMT_GREY) ? 0 : SW_SCL_WR_UV_DIS) |
+    set_vir_stride(stream, ALIGN(stream->out_fmt.width * mult, 0x10) >> 0x02);
+    set_scl_factor(stream, (vy_fac << 0x10) | hy_fac);
+    val |= fmt->wr_fmt << 0x03 | ((fmt->fourcc != V4L2_PIX_FMT_GREY) ? 0 : SW_SCL_WR_UV_DIS) |
            ((stream->out_fmt.quantization != V4L2_QUANTIZATION_LIM_RANGE) ? 0 : SW_SCL_WR_YUV_LIMIT);
     rkispp_set_bits(dev, stream->config->reg.ctrl, mask, val);
     stream->is_cfg = true;
@@ -774,9 +780,9 @@ static int limit_check_scl(struct rkispp_stream *stream, struct v4l2_pix_format_
 
     if (stream->id == STREAM_S0) {
         if (*h == sdev->out_fmt.height || (forcc != V4L2_PIX_FMT_NV12)) {
-            max_width = 3264;
+            max_width = 0XCC0;
         } else {
-            max_width = 2080;
+            max_width = 0x820;
         }
         min_ratio = 1;
     }
@@ -842,11 +848,11 @@ static int rkispp_queue_setup(struct vb2_queue *queue, unsigned int *num_buffers
          * so that Rockchip encoder can use DMA buffer directly
          */
         sizes[i] = (stream->type == STREAM_OUTPUT && cap_fmt->wr_fmt != FMT_FBC)
-                       ? plane_fmt->sizeimage / pixm->height * ALIGN(pixm->height, 16)
+                       ? plane_fmt->sizeimage / pixm->height * ALIGN(pixm->height, 0x10)
                        : plane_fmt->sizeimage;
     }
 
-    if (stream->is_reg_withstream && (cap_fmt->wr_fmt & FMT_FBC || cap_fmt->wr_fmt == FMT_YUV420)) {
+    if (stream->is_reg_withstream && ((cap_fmt->wr_fmt & FMT_FBC) || (cap_fmt->wr_fmt == FMT_YUV420))) {
         (*num_planes)++;
         sizes[1] = sizeof(struct rkisp_ispp_reg);
     }
@@ -889,10 +895,10 @@ static void rkispp_buf_queue(struct vb2_buffer *vb)
     if (cap_fmt->mplanes == 1) {
         for (i = 0; i < cap_fmt->cplanes - 1; i++) {
             /* FBC mode calculate payload offset */
-            height = (cap_fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->height, 16) >> 4 : pixm->height;
+            height = (cap_fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->height, 0x10) >> 0x04 : pixm->height;
             size = (i == 0) ? pixm->plane_fmt[i].bytesperline * height : pixm->plane_fmt[i].sizeimage;
             offset = (cap_fmt->wr_fmt & FMT_FBC) ? ALIGN(size, RK_MPP_ALIGN) : size;
-            if (cap_fmt->wr_fmt & FMT_FBC && dev->ispp_ver == ISPP_V20) {
+            if ((cap_fmt->wr_fmt & FMT_FBC) && dev->ispp_ver == ISPP_V20) {
                 rkispp_write(dev, RKISPP_FEC_FBCE_HEAD_OFFSET, offset | SW_OFFSET_ENABLE);
             }
 
@@ -900,7 +906,7 @@ static void rkispp_buf_queue(struct vb2_buffer *vb)
         }
     }
 
-    v4l2_dbg(2, rkispp_debug, &stream->isppdev->v4l2_dev, "%s stream:%d buf:0x%x\n", __func__, stream->id,
+    v4l2_dbg(0x02, rkispp_debug, &stream->isppdev->v4l2_dev, "%s stream:%d buf:0x%x\n", __func__, stream->id,
              isppbuf->buff_addr[0]);
 
     spin_lock_irqsave(&stream->vbq_lock, lock_flags);
@@ -932,7 +938,7 @@ static void rkispp_stream_stop(struct rkispp_stream *stream)
         }
     }
     if (is_wait) {
-        ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(500));
+        ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(0x1F4));
         if (!ret) {
             v4l2_warn(&dev->v4l2_dev, "stream:%d stop timeout\n", stream->id);
         }
@@ -992,7 +998,7 @@ static void rkispp_stop_streaming(struct vb2_queue *queue)
 
     if (stream->id == STREAM_VIR) {
         stream->stopping = true;
-        wait_event_timeout(stream->done, stream->is_end, msecs_to_jiffies(500));
+        wait_event_timeout(stream->done, stream->is_end, msecs_to_jiffies(0x1F4));
         stream->streaming = false;
         stream->stopping = false;
         destroy_buf_queue(stream, VB2_BUF_STATE_ERROR);
@@ -1161,7 +1167,7 @@ static int rkispp_set_fmt(struct rkispp_stream *stream, struct v4l2_pix_format_m
         for (i = STREAM_MB; i <= STREAM_S2; i++) {
             struct rkispp_stream *t = &dev->stream_vdev.stream[i];
 
-            if (t->out_cap_fmt.wr_fmt & FMT_FBC || !t->streaming) {
+            if ((t->out_cap_fmt.wr_fmt & FMT_FBC) || !t->streaming) {
                 continue;
             }
             if (t->out_fmt.plane_fmt[0].sizeimage > imagsize) {
@@ -1179,8 +1185,8 @@ static int rkispp_set_fmt(struct rkispp_stream *stream, struct v4l2_pix_format_m
 
     fmt = find_fmt(stream, pixm->pixelformat);
     if (!fmt) {
-        v4l2_err(&dev->v4l2_dev, "nonsupport pixelformat:%c%c%c%c\n", pixm->pixelformat, pixm->pixelformat >> 8,
-                 pixm->pixelformat >> 16, pixm->pixelformat >> 24);
+        v4l2_err(&dev->v4l2_dev, "nonsupport pixelformat:%c%c%c%c\n", pixm->pixelformat, pixm->pixelformat >> 0x08,
+                 pixm->pixelformat >> 0x10, pixm->pixelformat >> 0x18);
         return -EINVAL;
     }
 
@@ -1200,18 +1206,17 @@ static int rkispp_set_fmt(struct rkispp_stream *stream, struct v4l2_pix_format_m
         plane_fmt = pixm->plane_fmt + i;
 
         if (pixm->width == RKISPP_MAX_WIDTH_V20) {
-            w = ALIGN(pixm->width, 16);
-            h = ALIGN(pixm->height, 16);
+            w = ALIGN(pixm->width, 0x10);
+            h = ALIGN(pixm->height, 0x10);
         } else {
-            w = (fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->width, 16) : pixm->width;
-            h = (fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->height, 16) : pixm->height;
+            w = (fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->width, 0x10) : pixm->width;
+            h = (fmt->wr_fmt & FMT_FBC) ? ALIGN(pixm->height, 0x10) : pixm->height;
         }
 
         width = i ? w / xsubs : w;
         height = i ? h / ysubs : h;
 
-        bytesperline = width * DIV_ROUND_UP(fmt->bpp[i], 8);
-
+        bytesperline = width * DIV_ROUND_UP(fmt->bpp[i], 0x08);
         if (i != 0 || plane_fmt->bytesperline < bytesperline) {
             plane_fmt->bytesperline = bytesperline;
         }
@@ -1221,8 +1226,8 @@ static int rkispp_set_fmt(struct rkispp_stream *stream, struct v4l2_pix_format_m
          * FBC payload: yuv420 or yuv422 size
          * FBC width and height need 16 align
          */
-        if (fmt->wr_fmt & FMT_FBC && i == 0) {
-            plane_fmt->sizeimage = ALIGN(plane_fmt->sizeimage >> 4, RK_MPP_ALIGN);
+        if ((fmt->wr_fmt & FMT_FBC) && i == 0) {
+            plane_fmt->sizeimage = ALIGN(plane_fmt->sizeimage >> 0x04, RK_MPP_ALIGN);
         } else if (fmt->wr_fmt & FMT_FBC) {
             plane_fmt->sizeimage += w * h;
         }
@@ -1234,7 +1239,7 @@ static int rkispp_set_fmt(struct rkispp_stream *stream, struct v4l2_pix_format_m
     }
 
     stream->is_reg_withstream = rkispp_is_reg_withstream_local(&stream->vnode.vdev.dev);
-    if (stream->is_reg_withstream && (fmt->wr_fmt & FMT_FBC || fmt->wr_fmt == FMT_YUV420)) {
+    if (stream->is_reg_withstream && ((fmt->wr_fmt & FMT_FBC) || (fmt->wr_fmt == FMT_YUV420))) {
         pixm->num_planes++;
     }
 
@@ -1379,13 +1384,14 @@ static int rkispp_g_fmt_vid_mplane(struct file *file, void *fh, struct v4l2_form
 
 static int rkispp_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct rkispp_stream *stream = video_drvdata(file);
     struct device *dev = stream->isppdev->dev;
     struct video_device *vdev = video_devdata(file);
 
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->isppdev->ispp_ver >> 4);
-    snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
+    ret = snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->isppdev->ispp_ver >> 0x04);
+    ret = snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
 
     return 0;
 }
@@ -1474,16 +1480,16 @@ static void dump_file(struct rkispp_device *dev, u32 restart_module)
     struct rkispp_dummy_buffer *dummy;
     struct file *fp = NULL;
     char file[160], reg[48];
-    int i;
+    int i, ret;
 
-    snprintf(file, sizeof(file), "%s/%s%d.reg", rkispp_dump_path, DRIVER_NAME, dev->dev_id);
+    ret = snprintf(file, sizeof(file), "%s/%s%d.reg", rkispp_dump_path, DRIVER_NAME, dev->dev_id);
     fp = filp_open(file, O_RDWR | O_CREAT, 0644);
     if (IS_ERR(fp)) {
         v4l2_err(&dev->v4l2_dev, "%s open %s fail\n", __func__, file);
         return;
     }
     for (i = 0; i < 0x1000; i += 16) {
-        snprintf(reg, sizeof(reg), "ffb6%04x:  %08x %08x %08x %08x\n", i, readl(base + i), readl(base + i + 4),
+        ret = snprintf(reg, sizeof(reg), "ffb6%04x:  %08x %08x %08x %08x\n", i, readl(base + i), readl(base + i + 4),
                  readl(base + i + 8), readl(base + i + 12));
         kernel_write(fp, reg, strlen(reg), &fp->f_pos);
     }
@@ -1565,7 +1571,7 @@ static void restart_module(struct rkispp_device *dev)
         dump_file(dev, monitor->restart_module);
     }
 
-    if (monitor->restart_module & MONITOR_TNR && monitor->tnr.is_err) {
+    if ((monitor->restart_module & MONITOR_TNR) && monitor->tnr.is_err) {
         rkispp_set_bits(dev, RKISPP_TNR_CTRL, 0, SW_TNR_1ST_FRM);
         monitor->tnr.is_err = false;
     }
@@ -1783,7 +1789,7 @@ void rkispp_isr(u32 mis_val, struct rkispp_device *dev)
         vdev->fec.dbg.interval = ns - vdev->fec.dbg.timestamp;
     }
 
-    if (mis_val & (CMD_TNR_ST_DONE | CMD_NR_SHP_ST_DONE) && (dev->isp_mode & ISP_ISPP_QUICK)) {
+    if ((mis_val & (CMD_TNR_ST_DONE | CMD_NR_SHP_ST_DONE)) && (dev->isp_mode & ISP_ISPP_QUICK)) {
         ++dev->ispp_sdev.frm_sync_seq;
     }
 
@@ -1812,7 +1818,7 @@ void rkispp_isr(u32 mis_val, struct rkispp_device *dev)
         }
     }
 
-    if ((mis_val & NR_INT || mis_val & FEC_INT) && dev->hw_dev->is_first) {
+    if (((mis_val & NR_INT) || (mis_val & FEC_INT)) && dev->hw_dev->is_first) {
         dev->mis_val = mis_val;
         INIT_WORK(&dev->irq_work, irq_work);
         schedule_work(&dev->irq_work);

@@ -53,7 +53,7 @@ static int rkisp_stats_get_rawawb_meas_reg(struct rkisp_isp_stats_vdev *stats_vd
     for (i = 0; i < ISP21_RAWAWB_HSTBIN_NUM / CIF_IMG_EFF_CTRL_MODE_SEPIA_SHIFT; i++) {
         value = rkisp_read(stats_vdev->dev, ISP21_RAWAWB_Y_HIST01 + CIF_IMG_EFF_CTRL_MODE_EMBOSS_SHIFT * i, true);
         pbuf->params.rawawb.ro_yhist_bin[CIF_IMG_EFF_CTRL_MODE_SEPIA_SHIFT * i] = value & 0xFFFF;
-        pbuf->params.rawawb.ro_yhist_bin[CIF_IMG_EFF_CTRL_MODE_SEPIA_SHIFT * i + 1] = (value & 0xFFFF0000) >> 16;
+        pbuf->params.rawawb.ro_yhist_bin[CIF_IMG_EFF_CTRL_MODE_SEPIA_SHIFT * i + 1] = (value & 0xFFFF0000) >> 0x10;
     }
 
     for (i = 0; i < ISP2X_RAWAWB_SUM_NUM; i++) {
@@ -287,7 +287,7 @@ static int rkisp_stats_get_rawhst2_meas_reg(struct rkisp_isp_stats_vdev *stats_v
     if (!pbuf) {
         rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, NULL, CIF_IMG_EFF_CTRL_MODE_SEPIA_SHIFT);
     } else {
-        ret = rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, &pbuf->params.rawhist2, 2);
+        ret = rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, &pbuf->params.rawhist2, 0x02);
         if (!ret) {
             pbuf->meas_type |= ISP2X_STAT_RAWHST2;
         }

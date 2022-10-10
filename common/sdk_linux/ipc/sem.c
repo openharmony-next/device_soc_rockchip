@@ -106,7 +106,7 @@ struct sem {
     struct list_head pending_alter; /* pending single-sop operations */
                                     /* that alter the semaphore */
     struct list_head pending_const; /* pending single-sop operations */
-                                    /* that do not alter the semaphore*/
+                                    /* that do not alter the semaphore */
     time64_t sem_otime;             /* candidate for sem_otime */
 } ____cacheline_aligned_in_smp;
 
@@ -368,7 +368,6 @@ static void complexmode_tryleave(struct sem_array *sma)
         return;
     }
     if (sma->use_global_lock == 1) {
-
         /* See SEM_BARRIER_1 for purpose/pairing */
         smp_store_release(&sma->use_global_lock, 0);
     } else {
@@ -884,7 +883,6 @@ static int wake_const_ops(struct sem_array *sma, int semnum, struct wake_q_head 
     list_for_each_entry_safe(q, tmp, pending_list, list)
     {
         int error = perform_atomic_semop(sma, q);
-
         if (error > 0) {
             continue;
         }
@@ -993,9 +991,7 @@ again:
         if (semnum != -1 && sma->sems[semnum].semval == 0) {
             break;
         }
-
         error = perform_atomic_semop(sma, q);
-
         /* Does q->sleeper still need to sleep? */
         if (error > 0) {
             continue;

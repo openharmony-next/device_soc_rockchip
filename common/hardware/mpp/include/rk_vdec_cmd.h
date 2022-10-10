@@ -16,8 +16,6 @@
 #ifndef __RK_VDEC_CMD_H__
 #define __RK_VDEC_CMD_H__
 
-#include "rk_type.h"
-
 /*
  * decoder query interface is only for debug usage
  */

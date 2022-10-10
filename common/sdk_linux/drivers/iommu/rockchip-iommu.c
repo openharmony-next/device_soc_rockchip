@@ -317,7 +317,7 @@ static inline bool rk_pte_is_page_valid(u32 pte)
     return pte & RK_PTE_PAGE_VALID;
 }
 
-/* TODO: set cache flags per prot IOMMU_CACHE */
+/* set cache flags per prot IOMMU_CACHE */
 static u32 rk_mk_pte(phys_addr_t page, int prot)
 {
     u32 flags = 0;
@@ -405,7 +405,7 @@ static void rk_iommu_zap_lines(struct rk_iommu *iommu, dma_addr_t iova_start, si
     int i;
     dma_addr_t iova_end = iova_start + size;
     /*
-     * TODO(djkurtz): Figure out when it is more efficient to shootdown the
+     * (djkurtz): Figure out when it is more efficient to shootdown the
      * entire iotlb rather than iterate over individual iovas.
      */
     for (i = 0; i < iommu->num_mmu; i++) {
@@ -1720,14 +1720,14 @@ static const struct rockchip_iommu_data iommu_data_v2 = {
 };
 
 static const struct of_device_id rk_iommu_dt_ids[] = {{
-                                                          .compatible = "rockchip,iommu",
-                                                          .data = &iommu_data_v1,
-                                                      },
-                                                      {
-                                                          .compatible = "rockchip,iommu-v2",
-                                                          .data = &iommu_data_v2,
-                                                      },
-                                                      {/* sentinel */}};
+    .compatible = "rockchip,iommu",
+    .data = &iommu_data_v1,
+},
+{
+    .compatible = "rockchip,iommu-v2",
+    .data = &iommu_data_v2,
+},
+{}};
 
 static int rk_iommu_probe(struct platform_device *pdev)
 {
@@ -1856,7 +1856,6 @@ static int rk_iommu_probe(struct platform_device *pdev)
 
     for (i = 0; i < iommu->num_irq; i++) {
         int irq = platform_get_irq(pdev, i);
-
         if (irq < 0) {
             return irq;
         }

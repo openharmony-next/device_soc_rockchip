@@ -395,10 +395,10 @@ static int rk817_charge_ac_get_property(struct power_supply *psy, enum power_sup
             DBG("report prop: %d\n", val->intval);
             break;
         case POWER_SUPPLY_PROP_VOLTAGE_MAX:
-            val->intval = charge->max_chrg_voltage * 1000; /* uV */
+            val->intval = charge->max_chrg_voltage * 0x3E8; /* uV */
             break;
         case POWER_SUPPLY_PROP_CURRENT_MAX:
-            val->intval = charge->max_chrg_current * 1000; /* uA */
+            val->intval = charge->max_chrg_current * 0x3E8; /* uA */
             break;
         default:
             ret = -EINVAL;
@@ -639,31 +639,31 @@ static void rk817_charge_set_chrg_voltage(struct rk817_charger *charge, int chrg
 {
     int voltage;
 
-    if (chrg_vol < 4100 || chrg_vol > 4500) {
+    if (chrg_vol < 0x1004 || chrg_vol > 0x1194) {
         dev_err(charge->dev, "the charge voltage is error!\n");
     } else {
-        voltage = (chrg_vol - 4100) / 50;
+        voltage = (chrg_vol - 0x1004) / 0x32;
         rk817_charge_field_write(charge, CHRG_VOL_SEL, CHRG_VOL_4100MV + voltage);
     }
 }
 
 static void rk817_charge_set_chrg_current(struct rk817_charger *charge, int chrg_current)
 {
-    if (chrg_current < 500 || chrg_current > 3500) {
+    if (chrg_current < 0x1F4 || chrg_current > 0xDAC) {
         dev_err(charge->dev, "the charge current is error!\n");
     }
 
-    if (chrg_current < 1000) {
+    if (chrg_current < 0x3E8) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_500MA);
-    } else if (chrg_current < 1500) {
+    } else if (chrg_current < 0x5DC) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_1000MA);
-    } else if (chrg_current < 2000) {
+    } else if (chrg_current < 0x7D0) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_1500MA);
-    } else if (chrg_current < 2500) {
+    } else if (chrg_current < 0x9C4) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_2000MA);
-    } else if (chrg_current < 3000) {
+    } else if (chrg_current < 0xBB8) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_2500MA);
-    } else if (chrg_current < 3500) {
+    } else if (chrg_current < 0xDAC) {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_3000MA);
     } else {
         rk817_charge_field_write(charge, CHRG_CUR_SEL, CHRG_CUR_3500MA);
@@ -679,11 +679,11 @@ static void rk817_charge_set_input_voltage(struct rk817_charger *charge, int inp
 {
     int voltage;
 
-    if (input_voltage < 4000) {
+    if (input_voltage < 0xFA0) {
         dev_err(charge->dev, "the input voltage is error.\n");
     }
 
-    voltage = INPUT_VOL_4000MV + (input_voltage - 4000) / 100;
+    voltage = INPUT_VOL_4000MV + (input_voltage - 0xFA0) / 0x64;
 
     rk817_charge_field_write(charge, USB_VLIM_SEL, voltage);
     rk817_charge_vlimit_enable(charge);
@@ -696,23 +696,23 @@ static void rk817_charge_ilimit_enable(struct rk817_charger *charge)
 
 static void rk817_charge_set_input_current(struct rk817_charger *charge, int input_current)
 {
-    if (input_current < 80 || input_current > 3000) {
+    if (input_current < 0x50 || input_current > 0xBB8) {
         dev_err(charge->dev, "the input current is error.\n");
     }
 
-    if (input_current < 450) {
+    if (input_current < 0x1C2) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_80MA);
-    } else if (input_current < 850) {
+    } else if (input_current < 0x352) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_450MA);
-    } else if (input_current < 1500) {
+    } else if (input_current < 0x5DC) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_850MA);
-    } else if (input_current < 1750) {
+    } else if (input_current < 0x6D6) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_1500MA);
-    } else if (input_current < 2000) {
+    } else if (input_current < 0x7D0) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_1750MA);
-    } else if (input_current < 2500) {
+    } else if (input_current < 0x9C4) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_2000MA);
-    } else if (input_current < 3000) {
+    } else if (input_current < 0xBB8) {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_2500MA);
     } else {
         rk817_charge_field_write(charge, USB_ILIM_SEL, INPUT_CUR_3000MA);
@@ -730,11 +730,11 @@ static void rk817_charge_set_term_current_analog(struct rk817_charger *charge, i
 {
     int value;
 
-    if (chrg_current < 200) {
+    if (chrg_current < 0xC8) {
         value = CHRG_TERM_150MA;
-    } else if (chrg_current < 300) {
+    } else if (chrg_current < 0x12C) {
         value = CHRG_TERM_200MA;
-    } else if (chrg_current < 400) {
+    } else if (chrg_current < 0x190) {
         value = CHRG_TERM_300MA;
     } else {
         value = CHRG_TERM_400MA;
@@ -750,8 +750,8 @@ static void rk817_charge_set_term_current_digital(struct rk817_charger *charge, 
 
     value = CURRENT_TO_ADC(chrg_current, charge->res_div);
 
-    value &= (0xff << 5);
-    current_adc = value >> 5;
+    value &= (0xff << 0x05);
+    current_adc = value >> 0x05;
     rk817_charge_field_write(charge, CHRG_TERM_DIG, current_adc);
 }
 
@@ -776,10 +776,10 @@ static int rk817_charge_get_dsoc(struct rk817_charger *charge)
     int soc_save;
 
     soc_save = rk817_charge_field_read(charge, SOC_REG0);
-    soc_save |= (rk817_charge_field_read(charge, SOC_REG1) << 8);
-    soc_save |= (rk817_charge_field_read(charge, SOC_REG2) << 16);
+    soc_save |= (rk817_charge_field_read(charge, SOC_REG1) << 0x08);
+    soc_save |= (rk817_charge_field_read(charge, SOC_REG2) << 0x10);
 
-    return soc_save / 1000;
+    return soc_save / 0x3E8;
 }
 
 static void rk817_charge_set_otg_in(struct rk817_charger *charge, int online)
@@ -850,7 +850,7 @@ static void rk817_charge_set_chrg_param(struct rk817_charger *charge, enum charg
             break;
     }
 
-    if (rk817_charge_online(charge) && rk817_charge_get_dsoc(charge) == 100) {
+    if (rk817_charge_online(charge) && rk817_charge_get_dsoc(charge) == 0x64) {
         charge->prop_status = POWER_SUPPLY_STATUS_FULL;
     }
 }
@@ -909,7 +909,7 @@ static irqreturn_t rk817_charge_dc_det_isr(int irq, void *charger)
         irq_set_irq_type(irq, IRQF_TRIGGER_HIGH);
     }
 
-    queue_delayed_work(charge->dc_charger_wq, &charge->dc_work, msecs_to_jiffies(10));
+    queue_delayed_work(charge->dc_charger_wq, &charge->dc_work, msecs_to_jiffies(0x0A));
 
     return IRQ_HANDLED;
 }

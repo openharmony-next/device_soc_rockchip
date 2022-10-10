@@ -122,7 +122,7 @@ TRACE_EVENT(sched_switch,
 
             TP_STRUCT__entry(__array(char, prev_comm, TASK_COMM_LEN) __field(pid_t, prev_pid) __field(int, prev_prio)
                                  __field(long, prev_state) __array(char, next_comm, TASK_COMM_LEN)
-                                     __field(pid_t, next_pid) __field(int, next_prio)),
+                                    __field(pid_t, next_pid) __field(int, next_prio)),
 
             TP_fast_assign(memcpy(__entry->next_comm, next->comm, TASK_COMM_LEN); __entry->prev_pid = prev->pid;
                            __entry->prev_prio = prev->prio;
@@ -379,7 +379,7 @@ DECLARE_EVENT_CLASS(
 
     TP_STRUCT__entry(__field(pid_t, src_pid) __field(pid_t, src_tgid) __field(pid_t, src_ngid) __field(int, src_cpu)
                          __field(int, src_nid) __field(pid_t, dst_pid) __field(pid_t, dst_tgid) __field(pid_t, dst_ngid)
-                             __field(int, dst_cpu) __field(int, dst_nid)),
+                            __field(int, dst_cpu) __field(int, dst_nid)),
 
     TP_fast_assign(__entry->src_pid = task_pid_nr(src_tsk); __entry->src_tgid = task_tgid_nr(src_tsk);
                    __entry->src_ngid = task_numa_group_id(src_tsk); __entry->src_cpu = src_cpu;

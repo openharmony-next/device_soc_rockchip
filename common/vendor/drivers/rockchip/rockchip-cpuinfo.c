@@ -40,8 +40,8 @@ static int rockchip_cpuinfo_probe(struct platform_device *pdev)
             return PTR_ERR(efuse_buf);
         }
 
-        if (len == 2) {
-            rockchip_set_cpu((efuse_buf[0] << 8 | efuse_buf[1]));
+        if (len == 0x2) {
+            rockchip_set_cpu(((efuse_buf[0] << 0x8) | efuse_buf[1]));
         }
         kfree(efuse_buf);
     }
@@ -74,15 +74,15 @@ static int rockchip_cpuinfo_probe(struct platform_device *pdev)
         return PTR_ERR(efuse_buf);
     }
 
-    if (len != 16) {
+    if (len != 0x10) {
         kfree(efuse_buf);
         dev_err(dev, "invalid id len: %zu\n", len);
         return -EINVAL;
     }
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 0x8; i++) {
         buf[i] = efuse_buf[1 + (i << 1)];
-        buf[i + 8] = efuse_buf[i << 1];
+        buf[i + 0x8] = efuse_buf[i << 1];
     }
 
     kfree(efuse_buf);
@@ -90,8 +90,8 @@ static int rockchip_cpuinfo_probe(struct platform_device *pdev)
     dev_info(dev, "SoC\t\t: %lx\n", rockchip_soc_id);
 
 #ifdef CONFIG_NO_GKI
-    system_serial_low = crc32(0, buf, 8);
-    system_serial_high = crc32(system_serial_low, buf + 8, 8);
+    system_serial_low = crc32(0, buf, 0x8);
+    system_serial_high = crc32(system_serial_low, buf + 0x8, 0x8);
 
     dev_info(dev, "Serial\t\t: %08x%08x\n", system_serial_high, system_serial_low);
 #endif
@@ -135,7 +135,7 @@ static void rk3288_init(void)
     base = ioremap(RK3288_HDMI_PHYS, SZ_4K);
     if (base) {
         /* RK3288W HDMI Revision ID is 0x1A */
-        if (readl_relaxed(base + 4) == 0x1A) {
+        if (readl_relaxed(base + 0x4) == 0x1A) {
             rockchip_soc_id = ROCKCHIP_SOC_RK3288W;
         }
         iounmap(base);

@@ -21,7 +21,6 @@
 
 int rkwifi_set_firmware(char *fw, char *nvram)
 {
-
     sprintf(fw, "%s%s", VENDOR_ETC_FIRMWARE, "fw_bcmdhd.bin");
     sprintf(nvram, "%s%s", VENDOR_ETC_FIRMWARE, "nvram.txt");
     return 0;

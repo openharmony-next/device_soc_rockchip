@@ -22,71 +22,71 @@
 #include "hdi_netlink_monitor.h"
 
 namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-HdiSession &HdiSession::GetInstance()
-{
-    static HdiSession instance;
-    static std::once_flag once;
-    std::call_once(once, [&]() { instance.Init(); });
-    return instance;
-}
-
-void HdiSession::Init()
-{
-    DISPLAY_DEBUGLOG();
-    mHdiDevices = HdiDeviceInterface::DiscoveryDevice();
-    DISPLAY_DEBUGLOG("devices size %{public}zd", mHdiDevices.size());
-    mHdiDisplays.clear();
-    for (auto device : mHdiDevices) {
-        auto displays = device->DiscoveryDisplay();
-        /* Register the connectors instead of display device.
-         * There are several connectors in one display device
-         * in rockchip platform.
-         */
-        for (auto display : displays) {
-            mHdiDisplays[display.first] = display.second;
-        }
-    }
-    mNetLinkMonitor = std::make_shared<HdiNetLinkMonitor>();
-    mNetLinkMonitor->Init();
-}
-
-void HdiSession::HandleHotplug(bool plugIn)
-{
-    for (auto device : mHdiDevices) {
-        for (auto displayMap : mHdiDisplays) {
-            auto display = displayMap.second;
-            auto isSuccess = device->HandleHotplug(display->GetId(), plugIn);
-            if (isSuccess == true) {
-                DoHotPlugCallback(display->GetId(), plugIn);
+    namespace HDI {
+        namespace DISPLAY {
+            HdiSession &HdiSession::GetInstance()
+            {
+                static HdiSession instance;
+                static std::once_flag once;
+                std::call_once(once, [&]() { instance.Init(); });
+                return instance;
             }
-        }
-    }
-}
 
-int32_t HdiSession::RegHotPlugCallback(HotPlugCallback callback, void *data)
-{
-    DISPLAY_CHK_RETURN((callback == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the callback is nullptr"));
-    mHotPlugCallBacks.emplace(callback, data);
-    for (auto displayMap : mHdiDisplays) {
-        auto display = displayMap.second;
-        if (display->IsConnected()) {
-            DoHotPlugCallback(display->GetId(), true);
-        }
-    }
-    return DISPLAY_SUCCESS;
-}
+            void HdiSession::Init()
+            {
+                DISPLAY_DEBUGLOG();
+                mHdiDevices = HdiDeviceInterface::DiscoveryDevice();
+                DISPLAY_DEBUGLOG("devices size %{public}zd", mHdiDevices.size());
+                mHdiDisplays.clear();
+                for (auto device : mHdiDevices) {
+                    auto displays = device->DiscoveryDisplay();
+                    /* Register the connectors instead of display device.
+                     * There are several connectors in one display device
+                     * in rockchip platform.
+                     */
+                    for (auto display : displays) {
+                        mHdiDisplays[display.first] = display.second;
+                    }
+                }
+                mNetLinkMonitor = std::make_shared<HdiNetLinkMonitor>();
+                mNetLinkMonitor->Init();
+            }
 
-void HdiSession::DoHotPlugCallback(uint32_t devId, bool connect)
-{
-    DISPLAY_DEBUGLOG();
-    for (const auto &callback : mHotPlugCallBacks) {
-        callback.first(devId, connect, callback.second);
-    }
-}
-} // OHOS
-} // HDI
+            void HdiSession::HandleHotplug(bool plugIn)
+            {
+                for (auto device : mHdiDevices) {
+                    for (auto displayMap : mHdiDisplays) {
+                        auto display = displayMap.second;
+                        auto isSuccess = device->HandleHotplug(display->GetId(), plugIn);
+                        if (isSuccess == true) {
+                            DoHotPlugCallback(display->GetId(), plugIn);
+                        }
+                    }
+                }
+            }
+
+            int32_t HdiSession::RegHotPlugCallback(HotPlugCallback callback, void *data)
+            {
+                DISPLAY_CHK_RETURN((callback == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the callback is nullptr"));
+                mHotPlugCallBacks.emplace(callback, data);
+                for (auto displayMap : mHdiDisplays) {
+                    auto display = displayMap.second;
+                    if (display->IsConnected()) {
+                        DoHotPlugCallback(display->GetId(), true);
+                    }
+                }
+                return DISPLAY_SUCCESS;
+            }
+
+            void HdiSession::DoHotPlugCallback(uint32_t devId, bool connect)
+            {
+                DISPLAY_DEBUGLOG();
+                for (const auto &callback : mHotPlugCallBacks) {
+                    callback.first(devId, connect, callback.second);
+                }
+            }
+        } // OHOS
+    }     // HDI
 } // DISPLAY
 
 using namespace OHOS::HDI::DISPLAY;
@@ -223,7 +223,7 @@ static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *l
 {
     DISPLAY_DEBUGLOG();
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayReleaseFence, num, layers,
-        fences);
+                                                         fences);
 }
 
 static int32_t Commit(uint32_t devId, int32_t *fence)
@@ -248,7 +248,6 @@ static int32_t SetVirtualDisplayBuffer(uint32_t devId, BufferHandle *buffer, int
     DISPLAY_DEBUGLOG();
     return DISPLAY_NOT_SUPPORT;
 }
-
 
 // Layer function
 static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId)
@@ -335,7 +334,6 @@ static int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType typ
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerBlendType, type);
 }
 
-
 extern "C" {
 int32_t DeviceInitialize(DeviceFuncs **funcs)
 {
@@ -379,7 +377,6 @@ int32_t DeviceUninitialize(DeviceFuncs *funcs)
     free(funcs);
     return DISPLAY_SUCCESS;
 }
-
 
 int32_t LayerInitialize(LayerFuncs **funcs)
 {

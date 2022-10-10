@@ -16,8 +16,6 @@
 #ifndef __MPP_ENV_H__
 #define __MPP_ENV_H__
 
-#include "rk_type.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

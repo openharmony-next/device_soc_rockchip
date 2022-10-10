@@ -19,14 +19,10 @@
 #include <memory>
 #include "hdi_layer.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class HdiComposition
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class HdiComposition {
             public:
                 HdiComposition()
                 {
@@ -51,8 +47,7 @@ namespace OHOS
                 std::vector<HdiLayer *> mCompLayers;
             };
 
-            class HdiComposer
-            {
+            class HdiComposer {
             public:
                 HdiComposer(std::unique_ptr<HdiComposition> pre, std::unique_ptr<HdiComposition> post);
                 virtual ~HdiComposer(){};

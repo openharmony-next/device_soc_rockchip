@@ -253,7 +253,7 @@ static int vdpu_process_reg_fd(struct mpp_session *session, struct vdpu_task *ta
             offset = 0;
         } else {
             fd = task->reg[idx] & 0x3ff;
-            offset = task->reg[idx] >> 10 << 4;
+            offset = task->reg[idx] >> 0xA << 0x4;
         }
         mem_region = mpp_task_attach_fd(&task->mpp_task, fd);
         if (IS_ERR(mem_region)) {
@@ -299,7 +299,8 @@ static int vdpu_extract_task_msg(struct vdpu_task *task, struct mpp_task_msgs *m
                     return -EIO;
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_READ: {
                 off_s = hw_info->reg_start * sizeof(u32);
                 off_e = hw_info->reg_end * sizeof(u32);
@@ -308,16 +309,17 @@ static int vdpu_extract_task_msg(struct vdpu_task *task, struct mpp_task_msgs *m
                     continue;
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            } 
             default:
                 break;
         }
     }
     mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n", task->w_req_cnt, task->r_req_cnt);
-
     return 0;
 }
 
@@ -424,7 +426,7 @@ static int vdpu_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     /* revert hack for decoded length */
     dec_get = mpp_read_relaxed(mpp, VDPU1_REG_STREAM_RLC_BASE);
     dec_length = dec_get - task->strm_addr;
-    task->reg[VDPU1_REG_STREAM_RLC_BASE_INDEX] = dec_length << 10;
+    task->reg[VDPU1_REG_STREAM_RLC_BASE_INDEX] = dec_length << 0xA;
     mpp_debug(DEBUG_REGISTER, "dec_get %08x dec_length %d\n", dec_get, dec_length);
 
     mpp_debug_leave();
@@ -438,7 +440,7 @@ static int vdpu_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct mp
     struct mpp_request *req;
     struct vdpu_task *task = to_vdpu_task(mpp_task);
 
-    /* FIXME may overflow the kernel */
+    /* may overflow the kernel */
     for (i = 0; i < task->r_req_cnt; i++) {
         req = &task->r_reqs[i];
 
@@ -518,7 +520,7 @@ static int vdpu_init(struct mpp_dev *mpp)
         mpp_err("failed on clk_get hclk_vcodec\n");
     }
     /* Set default rates */
-    mpp_set_clk_info_rate_hz(&dec->aclk_info, CLK_MODE_DEFAULT, 300 * MHZ);
+    mpp_set_clk_info_rate_hz(&dec->aclk_info, CLK_MODE_DEFAULT, 0x12C * MHZ);
 
     /* Get reset control from dtsi */
     dec->rst_a = mpp_reset_control_get(mpp, RST_TYPE_A, "video_a");
@@ -559,7 +561,7 @@ static int vdpu_3288_get_freq(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     struct vdpu_task *task = to_vdpu_task(mpp_task);
 
     width = VDPU1_GET_WIDTH(task->reg[VDPU1_RGE_WIDTH_INDEX]);
-    if (width > 2560) {
+    if (width > 0xA00) {
         task->clk_mode = CLK_MODE_ADVANCED;
     }
 
@@ -572,7 +574,7 @@ static int vdpu_3368_get_freq(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     struct vdpu_task *task = to_vdpu_task(mpp_task);
 
     width = VDPU1_GET_WIDTH(task->reg[VDPU1_RGE_WIDTH_INDEX]);
-    if (width > 2560) {
+    if (width > 0xA00) {
         task->clk_mode = CLK_MODE_ADVANCED;
     }
 
@@ -617,8 +619,7 @@ static int vdpu_isr(struct mpp_dev *mpp)
     u32 err_mask;
     struct vdpu_task *task = NULL;
     struct mpp_task *mpp_task = mpp->cur_task;
-
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp_task) {
         dev_err(mpp->dev, "no current task\n");
         return IRQ_HANDLED;
@@ -628,18 +629,13 @@ static int vdpu_isr(struct mpp_dev *mpp)
     task = to_vdpu_task(mpp_task);
     task->irq_status = mpp->irq_status;
     mpp_debug(DEBUG_IRQ_STATUS, "irq_status: %08x\n", task->irq_status);
-
     err_mask =
         VDPU1_INT_TIMEOUT | VDPU1_INT_STRM_ERROR | VDPU1_INT_ASO_ERROR | VDPU1_INT_BUF_EMPTY | VDPU1_INT_BUS_ERROR;
-
     if (err_mask & task->irq_status) {
         atomic_inc(&mpp->reset_request);
     }
-
     mpp_task_finish(mpp_task->session, mpp_task);
-
     mpp_debug_leave();
-
     return IRQ_HANDLED;
 }
 
@@ -654,7 +650,7 @@ static int vdpu_reset(struct mpp_dev *mpp)
         rockchip_pmu_idle_request(mpp->dev, true);
         mpp_safe_reset(dec->rst_a);
         mpp_safe_reset(dec->rst_h);
-        udelay(5);
+        udelay(0x5);
         mpp_safe_unreset(dec->rst_a);
         mpp_safe_unreset(dec->rst_h);
         rockchip_pmu_idle_request(mpp->dev, false);
@@ -835,7 +831,7 @@ static void vdpu_shutdown(struct platform_device *pdev)
     dev_info(dev, "shutdown device\n");
 
     atomic_inc(&mpp->srv->shutdown_request);
-    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 20000, 200000);
+    ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 0x4E20, 0x30D40);
     if (ret == -ETIMEDOUT) {
         dev_err(dev, "wait total running time out\n");
     }

@@ -905,7 +905,6 @@ struct power_supply_battery_ocv_table *power_supply_find_ocv2cap_table(struct po
 
     for (i = 0; i < POWER_SUPPLY_OCV_TEMP_MAX; i++) {
         temp_diff = abs(info->ocv_temp[i] - temp);
-
         if (temp_diff < best_temp_diff) {
             best_temp_diff = temp_diff;
             best_index = i;
@@ -1015,7 +1014,7 @@ static int power_supply_read_temp(struct thermal_zone_device *tzd, int *temp)
     }
 
     /* Convert tenths of degree Celsius to milli degree Celsius. */
-    *temp = val.intval * 100;
+    *temp = val.intval * 0x64;
 
     return ret;
 }

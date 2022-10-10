@@ -65,7 +65,7 @@ struct __guc_ads_blob {
     u8 reg_state_buffer[GUC_S3_SAVE_SPACE_PAGES * PAGE_SIZE];
 } __packed;
 
-static void __guc_ads_init(struct intel_guc *guc)
+static void _guc_ads_init(struct intel_guc *guc)
 {
     struct intel_gt *gt = guc_to_gt(guc);
     struct __guc_ads_blob *blob = guc->ads_blob;
@@ -144,7 +144,7 @@ int intel_guc_ads_create(struct intel_guc *guc)
         return ret;
     }
 
-    __guc_ads_init(guc);
+    _guc_ads_init(guc);
 
     return 0;
 }
@@ -167,5 +167,5 @@ void intel_guc_ads_reset(struct intel_guc *guc)
     if (!guc->ads_vma) {
         return;
     }
-    __guc_ads_init(guc);
+    _guc_ads_init(guc);
 }

@@ -39,14 +39,14 @@ static const uint32_t formats_for_cluster[] = {
 #endif
     DRM_FORMAT_YUV420_8BIT,  /* yuv420_8bit non-Linear mode only */
     DRM_FORMAT_YUV420_10BIT, /* yuv420_10bit non-Linear mode only */
-    DRM_FORMAT_YUYV,         /* yuv422_8bit non-Linear mode only*/
+    DRM_FORMAT_YUYV,         /* yuv422_8bit non-Linear mode only */
     DRM_FORMAT_Y210,         /* yuv422_10bit non-Linear mode only */
 };
 
 static const uint32_t formats_for_esmart[] = {
     DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB8888, DRM_FORMAT_XBGR8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_RGB888,
-    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane
-                                                                                     */
+    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   
+    DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV21, /* yvu420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV16, /* yuv422_8bit linear mode, 2 plane */
     DRM_FORMAT_NV61, /* yvu422_8bit linear mode, 2 plane */
@@ -66,8 +66,8 @@ static const uint32_t formats_for_esmart[] = {
 /* RK356x can't support uv swap for YUYV and UYVY */
 static const uint32_t formats_for_rk356x_esmart[] = {
     DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB8888, DRM_FORMAT_XBGR8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_RGB888,
-    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane
-                                                                                     */
+    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   
+    DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV16, /* yuv422_8bit linear mode, 2 plane */
     DRM_FORMAT_NV24, /* yuv444_8bit linear mode, 2 plane */
     DRM_FORMAT_NV15, /* yuv420_10bit linear mode, 2 plane, no padding */
@@ -1612,7 +1612,7 @@ static const struct vop2_win_regs rk3568_esmart_win_data = {
  *    * nearest-neighbor/bilinear/average for scale down
  *
  *
- * @TODO describe the wind like cpu-map dt nodes;
+ * describe the wind like cpu-map dt nodes;
  */
 static const struct vop2_win_data rk3568_vop_win_data[] = {
     {
@@ -2008,7 +2008,7 @@ static const struct vop2_power_domain_data rk3588_vop_mem_pg_data[] = {
  * AXI 1:
  * Cluster2/3, Esmart2/3
  *
- * @TODO describe the wind like cpu-map dt nodes;
+ * describe the wind like cpu-map dt nodes;
  */
 static const struct vop2_win_data rk3588_vop_win_data[] = {
     {

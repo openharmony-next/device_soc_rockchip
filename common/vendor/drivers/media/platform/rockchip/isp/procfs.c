@@ -155,8 +155,8 @@ static void isp21_show(struct rkisp_device *dev, struct seq_file *p)
     seq_printf(p,
                "%-10s %s(0x%x), y_offs:0x%x c_offs:0x%x\n"
                "\t   coeff Y:0x%x 0x%x 0x%x CB:0x%x 0x%x 0x%x CR:0x%x 0x%x 0x%x\n",
-               "CSM", (val & full_range_flg) ? "FULL" : "LIMIT", val, (tmp >> 24) & 0x3f,
-               (tmp >> 16) & 0xff ? (tmp >> 16) & 0xff : 128, tmp & 0x1ff, rkisp_read(dev, ISP_CC_COEFF_1, false),
+               "CSM", (val & full_range_flg) ? "FULL" : "LIMIT", val, (tmp >> 0x18) & 0x3f,
+               (tmp >> 0x10) & 0xff ? (tmp >> 0x10) & 0xff : 0x80, tmp & 0x1ff, rkisp_read(dev, ISP_CC_COEFF_1, false),
                rkisp_read(dev, ISP_CC_COEFF_2, false), rkisp_read(dev, ISP_CC_COEFF_3, false),
                rkisp_read(dev, ISP_CC_COEFF_4, false), rkisp_read(dev, ISP_CC_COEFF_5, false),
                rkisp_read(dev, ISP_CC_COEFF_6, false), rkisp_read(dev, ISP_CC_COEFF_7, false),
@@ -209,11 +209,11 @@ static void isp30_show(struct rkisp_device *dev, struct seq_file *p)
     val = rkisp_read(dev, ISP3X_BLS_CTRL, false);
     seq_printf(p, "%-10s %s(0x%x)\n", "BLS", (val & 1) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_ISP_CTRL0, false);
-    seq_printf(p, "%-10s %s(0x%x)\n", "SDG", (val & BIT(6)) ? "ON" : "OFF", val);
+    seq_printf(p, "%-10s %s(0x%x)\n", "SDG", (val & BIT(0x06)) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_LSC_CTRL, false);
     seq_printf(p, "%-10s %s(0x%x)\n", "LSC", (val & 1) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_ISP_CTRL0, false);
-    seq_printf(p, "%-10s %s(0x%x) (gain: 0x%08x, 0x%08x)\n", "AWBGAIN", (val & BIT(7)) ? "ON" : "OFF", val,
+    seq_printf(p, "%-10s %s(0x%x) (gain: 0x%08x, 0x%08x)\n", "AWBGAIN", (val & BIT(0x07)) ? "ON" : "OFF", val,
                rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_G, false), rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_RB, false));
     val = rkisp_read(dev, ISP3X_DEBAYER_CONTROL, false);
     seq_printf(p, "%-10s %s(0x%x)\n", "DEBAYER", (val & 1) ? "ON" : "OFF", val);
@@ -253,12 +253,12 @@ static void isp30_show(struct rkisp_device *dev, struct seq_file *p)
     seq_printf(p,
                "%-10s %s(0x%x), y_offs:0x%x c_offs:0x%x\n"
                "\t   coeff Y:0x%x 0x%x 0x%x CB:0x%x 0x%x 0x%x CR:0x%x 0x%x 0x%x\n",
-               "CSM", (val & full_range_flg) ? "FULL" : "LIMIT", val, (tmp >> 24) & 0x3f,
-               (tmp >> 16) & 0xff ? (tmp >> 16) & 0xff : 128, tmp & 0x1ff, rkisp_read(dev, ISP3X_ISP_CC_COEFF_1, false),
-               rkisp_read(dev, ISP3X_ISP_CC_COEFF_2, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_3, false),
-               rkisp_read(dev, ISP3X_ISP_CC_COEFF_4, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_5, false),
-               rkisp_read(dev, ISP3X_ISP_CC_COEFF_6, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_7, false),
-               rkisp_read(dev, ISP3X_ISP_CC_COEFF_8, false));
+               "CSM", (val & full_range_flg) ? "FULL" : "LIMIT", val, (tmp >> 0x18) & 0x3f,
+               (tmp >> 0x10) & 0xff ? (tmp >> 0x10) & 0xff : 0x80, tmp & 0x1ff, \
+               rkisp_read(dev, ISP3X_ISP_CC_COEFF_1, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_2, false),
+               rkisp_read(dev, ISP3X_ISP_CC_COEFF_3, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_4, false),
+               rkisp_read(dev, ISP3X_ISP_CC_COEFF_5, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_6, false),
+               rkisp_read(dev, ISP3X_ISP_CC_COEFF_7, false), rkisp_read(dev, ISP3X_ISP_CC_COEFF_8, false));
     val = rkisp_read(dev, ISP3X_CAC_CTRL, false);
     seq_printf(p, "%-10s %s(0x%x)\n", "CAC", (val & 1) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_GAIN_CTRL, false);
@@ -284,21 +284,21 @@ static void isp30_show(struct rkisp_device *dev, struct seq_file *p)
     val = rkisp_read(dev, ISP3X_RAWHIST_BIG1_BASE, false);
     seq_printf(p, "%-10s %s(0x%x)\n", "RAWHIST3", (val & 1) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_ISP_CTRL1, true);
-    seq_printf(p, "%-10s %s(0x%x)\n", "BigMode", val & BIT(28) ? "ON" : "OFF", val);
+    seq_printf(p, "%-10s %s(0x%x)\n", "BigMode", val & BIT(0x1C) ? "ON" : "OFF", val);
     val = rkisp_read(dev, ISP3X_ISP_DEBUG1, true);
     seq_printf(p,
                "%-10s space full status group (0x%x)\n"
                "\t   ibuf2:0x%x ibuf1:0x%x ibuf0:0x%x mpfbc_infifo:0x%x\n"
                "\t   r1fifo:0x%x r0fifo:0x%x outfifo:0x%x lafifo:0x%x\n",
-               "DEBUG1", val, val >> 28, (val >> 24) & 0xf, (val >> 20) & 0xf, (val >> 16) & 0xf, (val >> 12) & 0xf,
-               (val >> 8) & 0xf, (val >> 4) & 0xf, val & 0xf);
+               "DEBUG1", val, val >> 0x1C, (val >> 0x18) & 0xf, (val >> 0x14) & 0xf, (val >> 0x10) & 0xf,
+               (val >> 0x0C) & 0xf, (val >> 0x08) & 0xf, (val >> 0x04) & 0xf, val & 0xf);
     val = rkisp_read(dev, ISP3X_ISP_DEBUG2, true);
     seq_printf(p,
                "%-10s 0x%x\n"
                "\t   bay3d_fifo_full iir:%d cur:%d\n"
                "\t   module outform vertical counter:%d, out frame counter:%d\n"
                "\t   isp output line counter:%d\n",
-               "DEBUG2", val, !!(val & BIT(31)), !!(val & BIT(30)), (val >> 16) & 0x3fff, (val >> 14) & 0x3,
+               "DEBUG2", val, !!(val & BIT(0x1F)), !!(val & BIT(0x1E)), (val >> 0x10) & 0x3fff, (val >> 0x0E) & 0x3,
                val & 0x3fff);
     val = rkisp_read(dev, ISP3X_ISP_DEBUG3, true);
     seq_printf(p,
@@ -307,13 +307,13 @@ static void isp30_show(struct rkisp_device *dev, struct seq_file *p)
                "\t   gic(%d %d) dbr(%d %d) debayer(%d %d) dhaz(%d %d)\n"
                "\t   lut3d(%d %d) ldch(%d %d) ynr(%d %d) shp(%d %d)\n"
                "\t   cgc(%d %d) cac(%d %d) isp_out(%d %d) isp_in(%d %d)\n",
-               "DEBUG3", val, !!(val & BIT(31)), !!(val & BIT(30)), !!(val & BIT(29)), !!(val & BIT(28)),
-               !!(val & BIT(27)), !!(val & BIT(26)), !!(val & BIT(25)), !!(val & BIT(24)), !!(val & BIT(23)),
-               !!(val & BIT(22)), !!(val & BIT(21)), !!(val & BIT(20)), !!(val & BIT(19)), !!(val & BIT(18)),
-               !!(val & BIT(17)), !!(val & BIT(16)), !!(val & BIT(15)), !!(val & BIT(14)), !!(val & BIT(13)),
-               !!(val & BIT(12)), !!(val & BIT(11)), !!(val & BIT(10)), !!(val & BIT(9)), !!(val & BIT(8)),
-               !!(val & BIT(7)), !!(val & BIT(6)), !!(val & BIT(5)), !!(val & BIT(4)), !!(val & BIT(3)),
-               !!(val & BIT(2)), !!(val & BIT(1)), !!(val & BIT(0)));
+               "DEBUG3", val, !!(val & BIT(0x1F)), !!(val & BIT(0x1E)), !!(val & BIT(0x1D)), !!(val & BIT(0x1C)),
+               !!(val & BIT(0x1B)), !!(val & BIT(0x1A)), !!(val & BIT(0x19)), !!(val & BIT(0x18)), !!(val & BIT(0x17)),
+               !!(val & BIT(0x16)), !!(val & BIT(0x15)), !!(val & BIT(0x4)), !!(val & BIT(0x13)), !!(val & BIT(0x12)),
+               !!(val & BIT(0x11)), !!(val & BIT(0x10)), !!(val & BIT(0x0F)), !!(val & BIT(0x0E)), !!(val & BIT(0x0D)),
+               !!(val & BIT(0x0C)), !!(val & BIT(0x0B)), !!(val & BIT(0x0A)), !!(val & BIT(0x09)), !!(val & BIT(0x08)),
+               !!(val & BIT(0x07)), !!(val & BIT(0x06)), !!(val & BIT(0x05)), !!(val & BIT(0x04)), !!(val & BIT(0x03)),
+               !!(val & BIT(0x02)), !!(val & BIT(1)), !!(val & BIT(0)));
 }
 
 static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
@@ -345,8 +345,8 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
                v1);
     v0 = rkisp_read(dev, ISP3X_ISP_CTRL0, false);
     v1 = rkisp_next_read(dev, ISP3X_ISP_CTRL0, false);
-    seq_printf(p, "%-10s Left %s(0x%x), Right %s(0x%x)\n", "SDG", (v0 & BIT(6)) ? "ON" : "OFF", v0,
-               (v1 & BIT(6)) ? "ON" : "OFF", v1);
+    seq_printf(p, "%-10s Left %s(0x%x), Right %s(0x%x)\n", "SDG", (v0 & BIT(0x06)) ? "ON" : "OFF", v0,
+               (v1 & BIT(0x06)) ? "ON" : "OFF", v1);
     v0 = rkisp_read(dev, ISP3X_LSC_CTRL, false);
     v1 = rkisp_next_read(dev, ISP3X_LSC_CTRL, false);
     seq_printf(p, "%-10s Left %s(0x%x), Right %s(0x%x)\n", "LSC", (v0 & 1) ? "ON" : "OFF", v0, (v1 & 1) ? "ON" : "OFF",
@@ -354,8 +354,8 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
     v0 = rkisp_read(dev, ISP3X_ISP_CTRL0, false);
     v1 = rkisp_next_read(dev, ISP3X_ISP_CTRL0, false);
     seq_printf(p, "%-10s Left %s(0x%x) gain:0x%08x 0x%08x, Right %s(0x%x) gain:0x%08x 0x%08x\n", "AWBGAIN",
-               (v0 & BIT(7)) ? "ON" : "OFF", v0, rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_G, false),
-               rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_RB, false), (v1 & BIT(7)) ? "ON" : "OFF", v1,
+               (v0 & BIT(0x07)) ? "ON" : "OFF", v0, rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_G, false),
+               rkisp_read(dev, ISP3X_ISP_AWB_GAIN0_RB, false), (v1 & BIT(0x07)) ? "ON" : "OFF", v1,
                rkisp_next_read(dev, ISP3X_ISP_AWB_GAIN0_G, false), rkisp_next_read(dev, ISP3X_ISP_AWB_GAIN0_RB, false));
     v0 = rkisp_read(dev, ISP3X_DEBAYER_CONTROL, false);
     v1 = rkisp_next_read(dev, ISP3X_DEBAYER_CONTROL, false);
@@ -476,8 +476,8 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
                (v1 & 1) ? "ON" : "OFF", v1);
     v0 = rkisp_read(dev, ISP3X_ISP_CTRL1, true);
     v1 = rkisp_next_read(dev, ISP3X_ISP_CTRL1, true);
-    seq_printf(p, "%-10s Left %s(0x%x), Right %s(0x%x)\n", "BigMode", v0 & BIT(28) ? "ON" : "OFF", v0,
-               v1 & BIT(28) ? "ON" : "OFF", v1);
+    seq_printf(p, "%-10s Left %s(0x%x), Right %s(0x%x)\n", "BigMode", v0 & BIT(0x1C) ? "ON" : "OFF", v0,
+               v1 & BIT(0x1C) ? "ON" : "OFF", v1);
     v0 = rkisp_read(dev, ISP3X_ISP_DEBUG1, true);
     v1 = rkisp_next_read(dev, ISP3X_ISP_DEBUG1, true);
     seq_printf(p,
@@ -486,9 +486,9 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
                "\t   ibuf0(L:0x%x R:0x%x) mpfbc_infifo(L:0x%x R:0x%x)\n"
                "\t   r1fifo(L:0x%x R:0x%x) r0fifo(L:0x%x R:0x%x)\n"
                "\t   outfifo(L:0x%x R:0x%x) lafifo(L:0x%x R:0x%x)\n",
-               "DEBUG1", v0, v1, v0 >> 28, v1 >> 28, (v0 >> 24) & 0xf, (v1 >> 24) & 0xf, (v0 >> 20) & 0xf,
-               (v1 >> 20) & 0xf, (v0 >> 16) & 0xf, (v1 >> 16) & 0xf, (v0 >> 12) & 0xf, (v1 >> 12) & 0xf,
-               (v0 >> 8) & 0xf, (v1 >> 8) & 0xf, (v0 >> 4) & 0xf, (v1 >> 4) & 0xf, v0 & 0xf, v1 & 0xf);
+               "DEBUG1", v0, v1, v0 >> 0x1C, v1 >> 0x1C, (v0 >> 0x18) & 0xf, (v1 >> 0x18) & 0xf, (v0 >> 0x14) & 0xf,
+               (v1 >> 0x14) & 0xf, (v0 >> 0x10) & 0xf, (v1 >> 0x10) & 0xf, (v0 >> 0x0C) & 0xf, (v1 >> 0x0C) & 0xf,
+               (v0 >> 0x08) & 0xf, (v1 >> 0x08) & 0xf, (v0 >> 0x04) & 0xf, (v1 >> 0x04) & 0xf, v0 & 0xf, v1 & 0xf);
     v0 = rkisp_read(dev, ISP3X_ISP_DEBUG2, true);
     v1 = rkisp_next_read(dev, ISP3X_ISP_DEBUG2, true);
     seq_printf(p,
@@ -496,8 +496,9 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
                "\t   bay3d_fifo_full iir(L:%d R:%d) cur(L:%d R:%d)\n"
                "\t   module outform vertical counter(L:%d R:%d), out frame counter:(L:%d R:%d)\n"
                "\t   isp output line counter(L:%d R:%d)\n",
-               "DEBUG2", v0, v1, !!(v0 & BIT(31)), !!(v1 & BIT(31)), !!(v0 & BIT(30)), !!(v1 & BIT(30)),
-               (v0 >> 16) & 0x3fff, (v1 >> 16) & 0x3fff, (v0 >> 14) & 0x3, (v1 >> 14) & 0x3, v0 & 0x3fff, v1 & 0x3fff);
+               "DEBUG2", v0, v1, !!(v0 & BIT(0x1F)), !!(v1 & BIT(0x1F)), !!(v0 & BIT(0x1E)), !!(v1 & BIT(0x1E)),
+               (v0 >> 0x10) & 0x3fff, (v1 >> 0x10) & 0x3fff, (v0 >> 0x0E) & 0x3, (v1 >> 0x0E) & 0x3, \
+                v0 & 0x3fff, v1 & 0x3fff);
     v0 = rkisp_read(dev, ISP3X_ISP_DEBUG3, true);
     v1 = rkisp_next_read(dev, ISP3X_ISP_DEBUG3, true);
     seq_printf(
@@ -511,17 +512,19 @@ static void isp30_unite_show(struct rkisp_device *dev, struct seq_file *p)
         "\t   ynr(L:%d %d R:%d %d) shp(L:%d %d R:%d %d)\n"
         "\t   cgc(L:%d %d R:%d %d) cac(L:%d %d R:%d %d)\n"
         "\t   isp_out(L:%d %d R:%d %d) isp_in(L:%d %d R:%d %d)\n",
-        "DEBUG3", v0, v1, !!(v0 & BIT(31)), !!(v0 & BIT(30)), !!(v1 & BIT(31)), !!(v1 & BIT(30)), !!(v0 & BIT(29)),
-        !!(v0 & BIT(28)), !!(v1 & BIT(29)), !!(v1 & BIT(28)), !!(v0 & BIT(27)), !!(v0 & BIT(26)), !!(v1 & BIT(27)),
-        !!(v1 & BIT(26)), !!(v0 & BIT(25)), !!(v0 & BIT(24)), !!(v1 & BIT(25)), !!(v1 & BIT(24)), !!(v0 & BIT(23)),
-        !!(v0 & BIT(22)), !!(v1 & BIT(23)), !!(v1 & BIT(22)), !!(v0 & BIT(21)), !!(v0 & BIT(20)), !!(v1 & BIT(21)),
-        !!(v1 & BIT(20)), !!(v0 & BIT(19)), !!(v0 & BIT(18)), !!(v1 & BIT(19)), !!(v1 & BIT(18)), !!(v0 & BIT(17)),
-        !!(v0 & BIT(16)), !!(v1 & BIT(17)), !!(v1 & BIT(16)), !!(v0 & BIT(15)), !!(v0 & BIT(14)), !!(v1 & BIT(15)),
-        !!(v1 & BIT(14)), !!(v0 & BIT(13)), !!(v0 & BIT(12)), !!(v1 & BIT(13)), !!(v1 & BIT(12)), !!(v0 & BIT(11)),
-        !!(v0 & BIT(10)), !!(v1 & BIT(11)), !!(v1 & BIT(10)), !!(v0 & BIT(9)), !!(v0 & BIT(8)), !!(v1 & BIT(9)),
-        !!(v1 & BIT(8)), !!(v0 & BIT(7)), !!(v0 & BIT(6)), !!(v1 & BIT(7)), !!(v1 & BIT(6)), !!(v0 & BIT(5)),
-        !!(v0 & BIT(4)), !!(v1 & BIT(5)), !!(v1 & BIT(4)), !!(v0 & BIT(3)), !!(v0 & BIT(2)), !!(v1 & BIT(3)),
-        !!(v1 & BIT(2)), !!(v0 & BIT(1)), !!(v0 & BIT(0)), !!(v1 & BIT(1)), !!(v1 & BIT(0)));
+        "DEBUG3", v0, v1, !!(v0 & BIT(0x1F)), !!(v0 & BIT(0x1E)), !!(v1 & BIT(0x1F)), !!(v1 & BIT(0x1E)),
+        !!(v0 & BIT(0x1D)), !!(v0 & BIT(0x1C)), !!(v1 & BIT(0x1D)), !!(v1 & BIT(0x1C)), !!(v0 & BIT(0x1B)),
+        !!(v0 & BIT(0x1A)), !!(v1 & BIT(0x1B)), !!(v1 & BIT(0x1A)), !!(v0 & BIT(0x19)), !!(v0 & BIT(0x18)),
+        !!(v1 & BIT(0x19)), !!(v1 & BIT(0x18)), !!(v0 & BIT(0x17)), !!(v0 & BIT(0x16)), !!(v1 & BIT(0x17)),
+        !!(v1 & BIT(0x16)), !!(v0 & BIT(0x15)), !!(v0 & BIT(0x14)), !!(v1 & BIT(0x15)), !!(v1 & BIT(0x14)),
+        !!(v0 & BIT(0x13)), !!(v0 & BIT(0x12)), !!(v1 & BIT(0x13)), !!(v1 & BIT(0x12)), !!(v0 & BIT(0x11)),
+        !!(v0 & BIT(0x10)), !!(v1 & BIT(0x11)), !!(v1 & BIT(0x10)), !!(v0 & BIT(0x0F)), !!(v0 & BIT(0x0E)),
+        !!(v1 & BIT(0x0F)), !!(v1 & BIT(0x0E)), !!(v0 & BIT(0x0D)), !!(v0 & BIT(0x0C)), !!(v1 & BIT(0x0D)),
+        !!(v1 & BIT(0x0C)), !!(v0 & BIT(0x0B)), !!(v0 & BIT(0x0A)), !!(v1 & BIT(0x0B)), !!(v1 & BIT(0x0A)),
+        !!(v0 & BIT(0x09)), !!(v0 & BIT(0x08)), !!(v1 & BIT(0x09)), !!(v1 & BIT(0x08)), !!(v0 & BIT(0x07)),
+        !!(v0 & BIT(0x06)), !!(v1 & BIT(0x07)), !!(v1 & BIT(0x06)), !!(v0 & BIT(0x05)), !!(v0 & BIT(0x04)),
+        !!(v1 & BIT(0x05)), !!(v1 & BIT(0x04)), !!(v0 & BIT(0x03)), !!(v0 & BIT(0x02)), !!(v1 & BIT(0x03)),
+        !!(v1 & BIT(0x02)), !!(v0 & BIT(1)), !!(v0 & BIT(0)), !!(v1 & BIT(1)), !!(v1 & BIT(0)));
 }
 
 static int isp_show(struct seq_file *p, void *v)
@@ -531,8 +534,8 @@ static int isp_show(struct seq_file *p, void *v)
     struct rkisp_sensor_info *sensor = dev->active_sensor;
     u32 val = 0;
 
-    seq_printf(p, "%-10s Version:v%02x.%02x.%02x\n", dev->name, RKISP_DRIVER_VERSION >> 16,
-               (RKISP_DRIVER_VERSION & 0xff00) >> 8, RKISP_DRIVER_VERSION & 0x00ff);
+    seq_printf(p, "%-10s Version:v%02x.%02x.%02x\n", dev->name, RKISP_DRIVER_VERSION >> 0x10,
+               (RKISP_DRIVER_VERSION & 0xff00) >> 0x08, RKISP_DRIVER_VERSION & 0x00ff);
     for (val = 0; val < dev->hw_dev->num_clks; val++) {
         seq_printf(p, "%-10s %ld\n", dev->hw_dev->match_data->clks[val], clk_get_rate(dev->hw_dev->clks[val]));
     }
@@ -551,21 +554,21 @@ static int isp_show(struct seq_file *p, void *v)
     if (IS_HDR_RDBK(dev->hdr.op_mode)) {
         seq_printf(
             p, "%-10s mode:frame%d (frame:%d rate:%dms %s time:%dms frameloss:%d) cnt(total:%d X1:%d X2:%d X3:%d)\n",
-            "Isp Read", dev->rd_mode - 3, dev->dmarx_dev.cur_frame.id,
-            (u32)(dev->dmarx_dev.cur_frame.timestamp - dev->dmarx_dev.pre_frame.timestamp) / 1000 / 1000,
-            (dev->isp_state & ISP_FRAME_END) ? "idle" : "working", sdev->dbg.interval / 1000 / 1000,
+            "Isp Read", dev->rd_mode - 0x03, dev->dmarx_dev.cur_frame.id,
+            (u32)(dev->dmarx_dev.cur_frame.timestamp - dev->dmarx_dev.pre_frame.timestamp) / 0x3E8 / 0x3E8,
+            (dev->isp_state & ISP_FRAME_END) ? "idle" : "working", sdev->dbg.interval / 0x3E8 / 0x3E8,
             sdev->dbg.frameloss, dev->rdbk_cnt, dev->rdbk_cnt_x1, dev->rdbk_cnt_x2, dev->rdbk_cnt_x3);
     } else {
         seq_printf(p, "%-10s frame:%d %s time:%dms v-blank:%dus\n", "Isp online", sdev->dbg.id,
-                   (dev->isp_state & ISP_FRAME_END) ? "idle" : "working", sdev->dbg.interval / 1000 / 1000,
-                   sdev->dbg.delay / 1000);
+                   (dev->isp_state & ISP_FRAME_END) ? "idle" : "working", sdev->dbg.interval / 0x3E8 / 0x3E8,
+                   sdev->dbg.delay / 0x3E8);
     }
 
     if (dev->br_dev.en) {
         seq_printf(p, "%-10s rkispp%d Format:%s%s Size:%dx%d (frame:%d rate:%dms frameloss:%d)\n", "Output",
                    dev->dev_id, (dev->br_dev.work_mode & ISP_ISPP_FBC) ? "FBC" : "YUV",
                    (dev->br_dev.work_mode & ISP_ISPP_422) ? "422" : "420", dev->br_dev.crop.width,
-                   dev->br_dev.crop.height, dev->br_dev.dbg.id, dev->br_dev.dbg.interval / 1000 / 1000,
+                   dev->br_dev.crop.height, dev->br_dev.dbg.id, dev->br_dev.dbg.interval / 0x3E8 / 0x3E8,
                    dev->br_dev.dbg.frameloss);
     }
     for (val = 0; val < RKISP_MAX_STREAM; val++) {
@@ -575,10 +578,10 @@ static int isp_show(struct seq_file *p, void *v)
             continue;
         }
         seq_printf(p, "%-10s %s Format:%c%c%c%c Size:%dx%d (frame:%d rate:%dms delay:%dms frameloss:%d)\n", "Output",
-                   stream->vnode.vdev.name, stream->out_fmt.pixelformat, stream->out_fmt.pixelformat >> 8,
-                   stream->out_fmt.pixelformat >> 16, stream->out_fmt.pixelformat >> 24, stream->out_fmt.width,
-                   stream->out_fmt.height, stream->dbg.id, stream->dbg.interval / 1000 / 1000,
-                   stream->dbg.delay / 1000 / 1000, stream->dbg.frameloss);
+                   stream->vnode.vdev.name, stream->out_fmt.pixelformat, stream->out_fmt.pixelformat >> 0x08,
+                   stream->out_fmt.pixelformat >> 0x10, stream->out_fmt.pixelformat >> 0x18, stream->out_fmt.width,
+                   stream->out_fmt.height, stream->dbg.id, stream->dbg.interval / 0x3E8 / 0x3E8,
+                   stream->dbg.delay / 0x3E8 / 0x3E8, stream->dbg.frameloss);
     }
 
     switch (dev->isp_ver) {

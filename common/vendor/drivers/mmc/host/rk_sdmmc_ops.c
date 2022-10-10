@@ -66,7 +66,7 @@ static void rk_emmc_prepare_mrq(struct mmc_request *mrq, struct scatterlist *sg,
 
     mrq->cmd->arg = dev_addr;
     if (!mmc_card_blockaddr(this_card)) {
-        mrq->cmd->arg <<= 9;
+        mrq->cmd->arg <<= 0x09;
     }
 
     mrq->cmd->flags = MMC_RSP_R1 | MMC_CMD_ADTC;
@@ -89,7 +89,7 @@ static void rk_emmc_prepare_mrq(struct mmc_request *mrq, struct scatterlist *sg,
 
 static int rk_emmc_busy(struct mmc_command *cmd)
 {
-    return !(cmd->resp[0] & R1_READY_FOR_DATA) || (R1_CURRENT_STATE(cmd->resp[0]) == 7);
+    return !(cmd->resp[0] & R1_READY_FOR_DATA) || (R1_CURRENT_STATE(cmd->resp[0]) == 0x07);
 }
 
 /*
@@ -105,7 +105,7 @@ static int rk_emmc_wait_busy(void)
         memset(&cmd, 0, sizeof(struct mmc_command));
 
         cmd.opcode = MMC_SEND_STATUS;
-        cmd.arg = this_card->rca << 16;
+        cmd.arg = this_card->rca << 0x10;
         cmd.flags = MMC_RSP_R1 | MMC_CMD_AC;
 
         ret = mmc_wait_for_cmd(this_card->host, &cmd, 0);

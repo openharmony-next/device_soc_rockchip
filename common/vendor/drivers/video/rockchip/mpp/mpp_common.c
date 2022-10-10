@@ -550,7 +550,7 @@ int mpp_dev_reset(struct mpp_dev *mpp)
     if (mpp->auto_freq_en && mpp->hw_ops->reduce_freq) {
         mpp->hw_ops->reduce_freq(mpp);
     }
-    /* FIXME lock resource lock of the other devices in combo */
+    /* lock resource lock of the other devices in combo */
     mpp_iommu_down_write(mpp->iommu_info);
     mpp_reset_down_write(mpp->reset_group);
     atomic_set(&mpp->reset_request, 0);
@@ -601,7 +601,7 @@ static int mpp_task_run(struct mpp_dev *mpp, struct mpp_task *task)
         mpp->hw_ops->set_freq(mpp, task);
     }
     /*
-     * TODO: Lock the reader locker of the device resource lock here,
+     * Lock the reader locker of the device resource lock here,
      * release at the finish operation
      */
     mpp_reset_down_read(mpp->reset_group);
@@ -654,7 +654,7 @@ static void mpp_task_worker_default(struct kthread_work *work_s)
     }
 
     /*
-     * FIXME if the hardware supports task query, but we still need to lock
+     * if the hardware supports task query, but we still need to lock
      * the running list and lock the mpp service in the current state.
      */
     /* Push a pending task to running queue */
@@ -980,25 +980,22 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
     switch (req->cmd) {
         case MPP_CMD_QUERY_HW_SUPPORT: {
             u32 hw_support = srv->hw_support;
-
             mpp_debug(DEBUG_IOCTL, "hw_support %08x\n", hw_support);
             if (put_user(hw_support, (u32 MPP_USER *)req->data)) {
                 return -EFAULT;
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_QUERY_HW_ID: {
             struct mpp_hw_info *hw_info;
-
             mpp = NULL;
             if (session && session->mpp) {
                 mpp = session->mpp;
             } else {
                 u32 client_type;
-
                 if (get_user(client_type, (u32 MPP_USER *)req->data)) {
                     return -EFAULT;
                 }
-
                 mpp_debug(DEBUG_IOCTL, "client %d\n", client_type);
                 client_type = array_index_nospec(client_type, MPP_DEVICE_BUTT);
                 if (test_bit(client_type, &srv->hw_support)) {
@@ -1013,7 +1010,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             if (put_user(hw_info->hw_id, (u32 MPP_USER *)req->data)) {
                 return -EFAULT;
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_QUERY_CMD_SUPPORT: {
             __u32 cmd = 0;
 
@@ -1024,7 +1022,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             if (put_user(mpp_get_cmd_butt(cmd), (u32 MPP_USER *)req->data)) {
                 return -EFAULT;
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_INIT_CLIENT_TYPE: {
             u32 client_type;
 
@@ -1066,7 +1065,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 }
             }
             mpp_session_attach_workqueue(session, mpp->queue);
-        } break;
+            break;
+        } 
         case MPP_CMD_INIT_DRIVER_DATA: {
             u32 val;
 
@@ -1080,7 +1080,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             if (mpp->grf_info->grf) {
                 regmap_write(mpp->grf_info->grf, 0x5d8, val);
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_INIT_TRANS_TABLE: {
             if (session && req->size) {
                 int trans_tbl_size = sizeof(session->trans_table);
@@ -1096,23 +1097,26 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 }
                 session->trans_count = req->size / sizeof(session->trans_table[0]);
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_SET_REG_WRITE:
         case MPP_CMD_SET_REG_READ:
         case MPP_CMD_SET_REG_ADDR_OFFSET:
         case MPP_CMD_SET_RCB_INFO: {
             msgs->flags |= req->flags;
             msgs->set_cnt++;
-        } break;
+            break;
+        } 
         case MPP_CMD_POLL_HW_FINISH: {
             msgs->flags |= req->flags;
             msgs->poll_cnt++;
-        } break;
+            break;
+        } 
         case MPP_CMD_RESET_SESSION: {
             int ret2;
             int val;
 
-            ret2 = readx_poll_timeout(atomic_read, &session->task_count, val, val == 0, 1000, 500000);
+            ret2 = readx_poll_timeout(atomic_read, &session->task_count, val, val == 0, 0x3E8, 0x7A120);
             if (ret2 == -ETIMEDOUT) {
                 mpp_err("wait task running time out\n");
             } else {
@@ -1127,7 +1131,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 mpp_iommu_up_write(mpp->iommu_info);
             }
             return ret2;
-        } break;
+            break;
+        } 
         case MPP_CMD_TRANS_FD_TO_IOVA: {
             u32 i;
             u32 count;
@@ -1166,7 +1171,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 mpp_err("copy_to_user failed.\n");
                 return -EINVAL;
             }
-        } break;
+            break;
+        } 
         case MPP_CMD_RELEASE_FD: {
             u32 i;
             int ret2;
@@ -1190,7 +1196,8 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                     return ret2;
                 }
             }
-        } break;
+            break;
+        } 
         default: {
             mpp = session->mpp;
             if (!mpp) {
@@ -1202,9 +1209,9 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             }
 
             mpp_debug(DEBUG_IOCTL, "unknown mpp ioctl cmd %x\n", req->cmd);
-        } break;
+            break;
+        } 
     }
-
     return 0;
 }
 
@@ -1241,7 +1248,6 @@ static long mpp_dev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg
         switch (cmd) {
             case MPP_IOC_CFG_V1: {
                 struct mpp_msg_v1 msg_v1;
-
                 memset(&msg_v1, 0, sizeof(msg_v1));
                 if (copy_from_user(&msg_v1, msg, sizeof(msg_v1))) {
                     return -EFAULT;
@@ -1250,9 +1256,9 @@ static long mpp_dev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg
                 if (ret) {
                     return -EFAULT;
                 }
-
                 msg += sizeof(msg_v1);
-            } break;
+                break;
+            } 
             default:
                 mpp_err("unknown ioctl cmd %x\n", cmd);
                 return -EINVAL;
@@ -1437,7 +1443,7 @@ int mpp_translate_reg_address(struct mpp_session *session, struct mpp_task *task
             offset = 0;
         } else {
             usr_fd = reg[tbl[i]] & 0x3ff;
-            offset = reg[tbl[i]] >> 10;
+            offset = reg[tbl[i]] >> 0xA;
         }
 
         if (usr_fd == 0) {
@@ -1721,7 +1727,7 @@ int mpp_dev_probe(struct mpp_dev *mpp, struct platform_device *pdev)
 
     if (mpp->task_capacity == 1) {
         /* power domain autosuspend delay 2s */
-        pm_runtime_set_autosuspend_delay(dev, 2000);
+        pm_runtime_set_autosuspend_delay(dev, 0x7D0);
         pm_runtime_use_autosuspend(dev);
     } else {
         dev_info(dev, "link mode task capacity %d\n", mpp->task_capacity);
@@ -1767,7 +1773,7 @@ int mpp_dev_probe(struct mpp_dev *mpp, struct platform_device *pdev)
 
     pm_runtime_get_sync(dev);
     /*
-     * TODO: here or at the device itself, some device does not
+     * here or at the device itself, some device does not
      * have the iommu, maybe in the device is better.
      */
     mpp->iommu_info = mpp_iommu_probe(dev);
@@ -1969,15 +1975,12 @@ int mpp_read_req(struct mpp_dev *mpp, u32 *regs, u32 start_idx, u32 end_idx)
 int mpp_get_clk_info(struct mpp_dev *mpp, struct mpp_clk_info *clk_info, const char *name)
 {
     int index = of_property_match_string(mpp->dev->of_node, "clock-names", name);
-
     if (index < 0) {
         return -EINVAL;
     }
-
     clk_info->clk = devm_clk_get(mpp->dev, name);
     of_property_read_u32_index(mpp->dev->of_node, "rockchip,normal-rates", index, &clk_info->normal_rate_hz);
     of_property_read_u32_index(mpp->dev->of_node, "rockchip,advanced-rates", index, &clk_info->advanced_rate_hz);
-
     return 0;
 }
 
@@ -2032,14 +2035,16 @@ unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_C
             } else {
                 clk_rate_hz = MPP_REDUCE_RATE_HZ;
             }
-        } break;
+            break;
+        } 
         case CLK_MODE_NORMAL: {
             if (clk_info->normal_rate_hz) {
                 clk_rate_hz = clk_info->normal_rate_hz;
             } else {
                 clk_rate_hz = clk_info->default_rate_hz;
             }
-        } break;
+            break;
+        } 
         case CLK_MODE_ADVANCED: {
             if (clk_info->advanced_rate_hz) {
                 clk_rate_hz = clk_info->advanced_rate_hz;
@@ -2048,13 +2053,14 @@ unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_C
             } else {
                 clk_rate_hz = clk_info->default_rate_hz;
             }
-        } break;
+            break;
+        } 
         case CLK_MODE_DEFAULT:
         default: {
             clk_rate_hz = clk_info->default_rate_hz;
-        } break;
+            break;
+        } 
     }
-
     return clk_rate_hz;
 }
 

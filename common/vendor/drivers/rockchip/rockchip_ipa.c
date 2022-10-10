@@ -29,7 +29,7 @@ static void calculate_static_coefficient(struct ipa_power_model_data *data)
         if (ref_lkg) {
             lkg = ref_lkg;
         } else {
-            lkg = (min + max) / 2;
+            lkg = (min + max) / 0x02;
         }
     }
     if (ref_lkg) {
@@ -43,8 +43,8 @@ static void calculate_static_coefficient(struct ipa_power_model_data *data)
         lkg = max;
     }
     /* As ts have beed multiplied by 1000 in devicetree */
-    lkg_scaling_factor = (ls[2] * lkg * lkg + ls[1] * lkg + ls[0]) / 1000;
-    data->static_coefficient = static_coeff * lkg_scaling_factor / 100;
+    lkg_scaling_factor = (ls[0x02] * lkg * lkg + ls[1] * lkg + ls[0]) / 1000;
+    data->static_coefficient = static_coeff * lkg_scaling_factor / 0x64;
 }
 
 /**
@@ -94,7 +94,7 @@ struct ipa_power_model_data *rockchip_ipa_power_model_init(struct device *dev, c
     }
     /* cpu power model node doesn't contain dynamic-coefficient */
     of_property_read_u32(model_node, "dynamic-coefficient", &model_data->dynamic_coefficient);
-    if (of_property_read_u32_array(model_node, "ts", (u32 *)model_data->ts, 4)) {
+    if (of_property_read_u32_array(model_node, "ts", (u32 *)model_data->ts, 0x04)) {
         dev_err(dev, "ts in power_model not available\n");
         ret = -EINVAL;
         goto err;
@@ -103,12 +103,12 @@ struct ipa_power_model_data *rockchip_ipa_power_model_init(struct device *dev, c
     if (!of_property_read_u32(model_node, "ref-leakage", &model_data->ref_leakage)) {
         goto cal_static_coeff;
     }
-    if (of_property_read_u32_array(model_node, "leakage-range", (u32 *)model_data->lkg_range, 2)) {
+    if (of_property_read_u32_array(model_node, "leakage-range", (u32 *)model_data->lkg_range, 0x02)) {
         dev_err(dev, "leakage-range isn't available\n");
         ret = -EINVAL;
         goto err;
     }
-    if (of_property_read_u32_array(model_node, "ls", (u32 *)model_data->ls, 3)) {
+    if (of_property_read_u32_array(model_node, "ls", (u32 *)model_data->ls, 0x03)) {
         dev_err(dev, "ls isn't available\n");
         ret = -EINVAL;
         goto err;

@@ -286,27 +286,25 @@ void rkvdec2_3568_hack_data_setup(struct mpp_dma_buffer *fix)
 {
     u32 iova = fix->iova;
     u32 i;
-
     memcpy(fix->vaddr, h264_fix_data, sizeof(h264_fix_data));
     memcpy(fix->vaddr + PAGE_SIZE, h264_cabac_tbl, sizeof(h264_cabac_tbl));
-
-    /* input stream 0x0200*/
-    rkvdec2_3568_hack[71].data = iova;
+    /* input stream 0x0200 */
+    rkvdec2_3568_hack[0x47].data = iova;
     /* rlc */
-    rkvdec2_3568_hack[72].data = iova + RKDEC_HACK_DATA_RLC_OFFSET;
-    /* output frame 0x0208*/
-    rkvdec2_3568_hack[73].data = iova + RKDEC_HACK_DATA_OUT_OFFSET;
-    /* colmv out 0x020c*/
-    rkvdec2_3568_hack[74].data = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
+    rkvdec2_3568_hack[0x48].data = iova + RKDEC_HACK_DATA_RLC_OFFSET;
+    /* output frame 0x0208 */
+    rkvdec2_3568_hack[0x49].data = iova + RKDEC_HACK_DATA_OUT_OFFSET;
+    /* colmv out 0x020c */
+    rkvdec2_3568_hack[0x4A].data = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
 
     /* pps in */
-    rkvdec2_3568_hack[87].data = iova + RKDEC_HACK_DATA_PPS_OFFSET;
+    rkvdec2_3568_hack[0x57].data = iova + RKDEC_HACK_DATA_PPS_OFFSET;
     /* rps in */
-    rkvdec2_3568_hack[89].data = iova + RKDEC_HACK_DATA_RPS_OFFSET;
-    for (i = 0; i < 33; i++) {
-        rkvdec2_3568_hack[90 + i].data = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
+    rkvdec2_3568_hack[0x59].data = iova + RKDEC_HACK_DATA_RPS_OFFSET;
+    for (i = 0; i < 0x21; i++) {
+        rkvdec2_3568_hack[0x5A + i].data = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
     }
-    rkvdec2_3568_hack[123].data = iova + PAGE_SIZE;
+    rkvdec2_3568_hack[0x7B].data = iova + PAGE_SIZE;
 }
 
 void rkvdec2_3568_hack_fix(struct mpp_dev *mpp)
@@ -326,14 +324,14 @@ void rkvdec2_3568_hack_fix(struct mpp_dev *mpp)
     wmb();
     writel(0x00000001, reg_base + 0x0028);
 
-    udelay(5);
+    udelay(0x5);
 
     reg = readl(mpp->reg_base + 0x0380);
     while ((reg & 0x106) != 0x106) {
-        udelay(2);
+        udelay(0x2);
         reg = readl(mpp->reg_base + 0x0380);
         cnt++;
-        if (cnt > 25) {
+        if (cnt > 0x19) {
             break;
         }
     }

@@ -1193,7 +1193,6 @@ static inline __must_check bool try_get_page(struct page *page)
 static inline void put_page(struct page *page)
 {
     page = compound_head(page);
-
     /*
      * For devmap managed pages we need to catch refcount transition from
      * 2 to 1, when refcount reach one it means the page is free and we
@@ -1801,7 +1800,6 @@ static inline struct page **frame_vector_pages(struct frame_vector *vec)
 {
     if (vec->is_pfns) {
         int err = frame_vector_to_pages(vec);
-
         if (err) {
             return ERR_PTR(err);
         }
@@ -1885,7 +1883,6 @@ static inline bool get_user_page_fast_only(unsigned long addr, unsigned int gup_
 static inline unsigned long get_mm_counter(struct mm_struct *mm, int member)
 {
     long val = atomic_long_read(&mm->rss_stat.count[member]);
-
 #ifdef SPLIT_RSS_COUNTING
     /*
      * counter is updated in asynchronous manner and may go to minus.
@@ -1968,7 +1965,6 @@ static inline unsigned long get_mm_hiwater_vm(struct mm_struct *mm)
 static inline void update_hiwater_rss(struct mm_struct *mm)
 {
     unsigned long _rss = get_mm_rss(mm);
-
     if ((mm)->hiwater_rss < _rss) {
         (mm)->hiwater_rss = _rss;
     }
@@ -1989,7 +1985,6 @@ static inline void reset_mm_hiwater_rss(struct mm_struct *mm)
 static inline void setmax_mm_hiwater_rss(unsigned long *maxrss, struct mm_struct *mm)
 {
     unsigned long hiwater_rss = get_mm_hiwater_rss(mm);
-
     if (*maxrss < hiwater_rss) {
         *maxrss = hiwater_rss;
     }
@@ -2758,14 +2753,12 @@ int vm_iomap_memory(struct vm_area_struct *vma, phys_addr_t start, unsigned long
 static inline vm_fault_t vmf_insert_page(struct vm_area_struct *vma, unsigned long addr, struct page *page)
 {
     int err = vm_insert_page(vma, addr, page);
-
     if (err == -ENOMEM) {
         return VM_FAULT_OOM;
     }
     if (err < 0 && err != -EBUSY) {
         return VM_FAULT_SIGBUS;
     }
-
     return VM_FAULT_NOPAGE;
 }
 
@@ -2818,7 +2811,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address, unsi
  * period _often_ under userspace control.  This is in contrast to
  * iov_iter_get_pages(), whose usages are transient.
  *
- * FIXME: For pages which are part of a filesystem, mappings are subject to the
+ * For pages which are part of a filesystem, mappings are subject to the
  * lifetime enforced by the filesystem and we need guarantees that longterm
  * users like RDMA and V4L2 only establish mappings which coordinate usage with
  * the filesystem.  Ideas for this coordination include revoking the longterm
@@ -2827,7 +2820,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address, unsi
  * specifically failed.  Filesystem pages are still subject to bugs and use of
  * FOLL_LONGTERM should be avoided on those pages.
  *
- * FIXME: Also NOTE that FOLL_LONGTERM is not supported in every GUP call.
+ * Also NOTE that FOLL_LONGTERM is not supported in every GUP call.
  * Currently only get_user_pages() and get_user_pages_fast() support this flag
  * and calls to get_user_pages_[un]locked are specifically not allowed.  This
  * is due to an incompatibility with the FS DAX check and

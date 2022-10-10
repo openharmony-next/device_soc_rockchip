@@ -248,8 +248,8 @@ int rkisp_align_sensor_resolution(struct rkisp_device *dev, struct v4l2_rect *cr
             /* only crop bounds, want to isp to do input crop */
             ret = v4l2_subdev_call(sensor, pad, get_selection, NULL, &sel);
             if (!ret) {
-                crop->left = ALIGN(sel.r.left, 2);
-                crop->width = ALIGN(sel.r.width, 2);
+                crop->left = ALIGN(sel.r.left, 0x02);
+                crop->width = ALIGN(sel.r.width, 0x02);
 
                 crop->left = clamp_t(u32, crop->left, 0, w);
                 crop->top = clamp_t(u32, sel.r.top, 0, h);
@@ -267,11 +267,12 @@ int rkisp_align_sensor_resolution(struct rkisp_device *dev, struct v4l2_rect *cr
         crop->width = clamp_t(u32, crop->width, CIF_ISP_INPUT_W_MIN, w - crop->left);
         crop->height = clamp_t(u32, crop->height, CIF_ISP_INPUT_H_MIN, h - crop->top);
         if ((code & RKISP_MEDIA_BUS_FMT_MASK) == RKISP_MEDIA_BUS_FMT_BAYER &&
-            (ALIGN_DOWN(crop->width, 16) != crop->width || ALIGN_DOWN(crop->height, 8) != crop->height)) {
+            (ALIGN_DOWN(crop->width, 0x10) != crop->width || ALIGN_DOWN(crop->height, 0x08) != crop->height)) {
             v4l2_warn(&dev->v4l2_dev,
                       "Note: bayer raw need width 16 align, height 8 align!\n"
                       "suggest (%d,%d)/%dx%d, specical requirements, Ignore!\n",
-                      ALIGN_DOWN(crop->left, 4), crop->top, ALIGN_DOWN(crop->width, 16), ALIGN_DOWN(crop->height, 8));
+                      ALIGN_DOWN(crop->left, 0x04), crop->top, ALIGN_DOWN(crop->width, 0x10),
+                      ALIGN_DOWN(crop->height, 0x08));
         }
         return 0;
     }
@@ -290,13 +291,13 @@ int rkisp_align_sensor_resolution(struct rkisp_device *dev, struct v4l2_rect *cr
      * height 8 align
      * width and height no exceeding the max limit
      */
-    dest_w = ALIGN_DOWN(w, 16);
-    dest_h = ALIGN_DOWN(h, 8);
+    dest_w = ALIGN_DOWN(w, 0x10);
+    dest_h = ALIGN_DOWN(h, 0x08);
 
     /* try to center of crop
-     *4 align to no change bayer raw format
+     * 4 align to no change bayer raw format
      */
-    crop->left = ALIGN_DOWN((src_w - dest_w) >> 1, 4);
+    crop->left = ALIGN_DOWN((src_w - dest_w) >> 1, 0x04);
     crop->top = (src_h - dest_h) >> 1;
     crop->width = dest_w;
     crop->height = dest_h;
@@ -378,10 +379,10 @@ int rkisp_update_sensor_info(struct rkisp_device *dev)
 
             switch (ch.vc) {
                 case V4L2_MBUS_CSI2_CHANNEL_3:
-                    vc = 3;
+                    vc = 0x03;
                     break;
                 case V4L2_MBUS_CSI2_CHANNEL_2:
-                    vc = 2;
+                    vc = 0x02;
                     break;
                 case V4L2_MBUS_CSI2_CHANNEL_1:
                     vc = 1;
@@ -504,7 +505,7 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
 
     if (rd_mode != dev->rd_mode) {
         rkisp_unite_set_bits(dev, ISP_HDRMGE_BASE, ISP_HDRMGE_MODE_MASK, val, false, hw->is_unite);
-        dev->skip_frame = 2;
+        dev->skip_frame = 0x02;
         is_upd = true;
     }
 
@@ -541,8 +542,8 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
         rkisp_update_regs(dev, MI_RD_CTRL2, ISP_LSC_CTRL);
         rkisp_update_regs(dev, MI_MP_WR_Y_BASE, MI_MP_WR_Y_LLENGTH);
         rkisp_update_regs(dev, ISP_LSC_XGRAD_01, ISP_RAWAWB_RAM_DATA);
-        if (dev->isp_ver == ISP_V20 && (rkisp_read(dev, ISP_DHAZ_CTRL, false) & ISP_DHAZ_ENMUX ||
-                                        rkisp_read(dev, ISP_HDRTMO_CTRL, false) & ISP_HDRTMO_EN)) {
+        if ((dev->isp_ver == ISP_V20) && ((rkisp_read(dev, ISP_DHAZ_CTRL, false) & ISP_DHAZ_ENMUX) ||
+                                        (rkisp_read(dev, ISP_HDRTMO_CTRL, false) & ISP_HDRTMO_EN))) {
             dma2frm += (dma2frm ? 0 : 1);
         } else if (dev->isp_ver == ISP_V21) {
             val = rkisp_read(dev, MI_WR_CTRL2, false);
@@ -550,7 +551,7 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
             rkisp_write(dev, MI_WR_INIT, ISP21_SP_FORCE_UPD | ISP21_MP_FORCE_UPD, true);
             /* sensor mode & index */
             val = rkisp_read_reg_cache(dev, ISP_ACQ_H_OFFS);
-            val |= ISP21_SENSOR_MODE(hw->dev_num >= 3 ? 2 : hw->dev_num - 1) | ISP21_SENSOR_INDEX(dev->dev_id);
+            val |= ISP21_SENSOR_MODE(hw->dev_num >= 0x03 ? 0x02 : hw->dev_num - 1) | ISP21_SENSOR_INDEX(dev->dev_id);
             writel(val, hw->base_addr + ISP_ACQ_H_OFFS);
         } else if (dev->isp_ver == ISP_V30) {
             val = rkisp_read(dev, MI_WR_CTRL2, false);
@@ -565,7 +566,7 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
 
             /* sensor mode & index */
             val = rkisp_read_reg_cache(dev, ISP_ACQ_H_OFFS);
-            val |= ISP21_SENSOR_MODE(hw->dev_num >= 3 ? 2 : hw->dev_num - 1) | ISP21_SENSOR_INDEX(dev->dev_id);
+            val |= ISP21_SENSOR_MODE(hw->dev_num >= 0x03 ? 0x02 : hw->dev_num - 1) | ISP21_SENSOR_INDEX(dev->dev_id);
             writel(val, hw->base_addr + ISP_ACQ_H_OFFS);
         }
         is_upd = true;
@@ -574,10 +575,10 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
     if (dev->isp_ver == ISP_V21 || dev->isp_ver == ISP_V30) {
         dma2frm = 0;
     }
-    if (dma2frm > 2) {
-        dma2frm = 2;
+    if (dma2frm > 0x02) {
+        dma2frm = 0x02;
     }
-    if (dma2frm == 2) {
+    if (dma2frm == 0x02) {
         dev->rdbk_cnt_x3++;
     } else if (dma2frm == 1) {
         dev->rdbk_cnt_x2++;
@@ -590,7 +591,7 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
     params_vdev->rdbk_times = dma2frm + 1;
 
     /* read 3d lut at frame end */
-    if (hw->is_single && is_upd && rkisp_read_reg_cache(dev, ISP_3DLUT_UPDATE) & 0x1) {
+    if (hw->is_single && is_upd && (rkisp_read_reg_cache(dev, ISP_3DLUT_UPDATE) & 0x1)) {
         rkisp_write(dev, ISP_3DLUT_UPDATE, 0, true);
         is_3dlut_upd = true;
     }
@@ -610,7 +611,7 @@ void rkisp_trigger_read_back(struct rkisp_device *dev, u8 dma2frm, u32 mode, boo
     val &= ~SW_IBUF_OP_MODE(0xf);
     tmp = SW_IBUF_OP_MODE(dev->rd_mode);
     val |= tmp | SW_CSI2RX_EN | SW_DMA_2FRM_MODE(dma2frm);
-    v4l2_dbg(2, rkisp_debug, &dev->v4l2_dev, "readback frame:%d time:%d 0x%x\n", cur_frame_id, dma2frm + 1, val);
+    v4l2_dbg(0x02, rkisp_debug, &dev->v4l2_dev, "readback frame:%d time:%d 0x%x\n", cur_frame_id, dma2frm + 1, val);
     if (!dma2frm) {
         rkisp_bridge_update_mi(dev, 0);
     }
@@ -639,7 +640,7 @@ static void rkisp_rdbk_trigger_handle(struct rkisp_device *dev, u32 cmd)
     if (!hw->is_idle) {
         goto end;
     }
-    if (hw->monitor.state & ISP_MIPI_ERROR && hw->monitor.is_en) {
+    if ((hw->monitor.state & ISP_MIPI_ERROR) && hw->monitor.is_en) {
         goto end;
     }
 
@@ -656,7 +657,7 @@ static void rkisp_rdbk_trigger_handle(struct rkisp_device *dev, u32 cmd)
     }
 
     if (max) {
-        v4l2_dbg(2, rkisp_debug, &dev->v4l2_dev, "trigger fifo len:%d\n", max);
+        v4l2_dbg(0x02, rkisp_debug, &dev->v4l2_dev, "trigger fifo len:%d\n", max);
         isp = hw->isp[id];
         rkisp_rdbk_trigger_event(isp, T_CMD_DEQUEUE, &t);
         isp->dmarx_dev.pre_frame = isp->dmarx_dev.cur_frame;
@@ -731,7 +732,7 @@ void rkisp_check_idle(struct rkisp_device *dev, u32 irq)
     u32 val = 0;
 
     dev->irq_ends |= (irq & dev->irq_ends_mask);
-    v4l2_dbg(3, rkisp_debug, &dev->v4l2_dev, "%s irq:0x%x ends:0x%x mask:0x%x\n", __func__, irq, dev->irq_ends,
+    v4l2_dbg(0x03, rkisp_debug, &dev->v4l2_dev, "%s irq:0x%x ends:0x%x mask:0x%x\n", __func__, irq, dev->irq_ends,
              dev->irq_ends_mask);
     if (dev->irq_ends == dev->irq_ends_mask && dev->hw_dev->monitor.is_en) {
         dev->hw_dev->monitor.retry = 0;
@@ -800,7 +801,7 @@ static void rkisp_config_ism(struct rkisp_device *dev)
     }
 
     if (is_unite) {
-        width = width / 2 + RKMOUDLE_UNITE_EXTEND_PIXEL;
+        width = width / 0x02 + RKMOUDLE_UNITE_EXTEND_PIXEL;
     }
     rkisp_unite_write(dev, CIF_ISP_IS_RECENTER, 0, false, is_unite);
     rkisp_unite_write(dev, CIF_ISP_IS_MAX_DX, 0, false, is_unite);
@@ -810,7 +811,7 @@ static void rkisp_config_ism(struct rkisp_device *dev)
     rkisp_unite_write(dev, CIF_ISP_IS_V_OFFS, out_crop->top, false, is_unite);
     rkisp_unite_write(dev, CIF_ISP_IS_H_SIZE, width, false, is_unite);
     if (dev->cap_dev.stream[RKISP_STREAM_SP].interlaced) {
-        mult = 2;
+        mult = 0x02;
     }
     rkisp_unite_write(dev, CIF_ISP_IS_V_SIZE, out_crop->height / mult, false, is_unite);
 
@@ -827,62 +828,64 @@ static int rkisp_reset_handle_v2x(struct rkisp_device *dev)
     void __iomem *base = dev->base_addr;
     void *reg_buf = NULL;
     u32 *reg, *reg1, i;
-    struct backup_reg backup[] = {{
-                                      .base = MI_MP_WR_Y_BASE,
-                                      .shd = MI_MP_WR_Y_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_MP_WR_CB_BASE,
-                                      .shd = MI_MP_WR_CB_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_MP_WR_CR_BASE,
-                                      .shd = MI_MP_WR_CR_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_SP_WR_Y_BASE,
-                                      .shd = MI_SP_WR_Y_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_SP_WR_CB_BASE,
-                                      .shd = MI_SP_WR_CB_BASE_AD_SHD,
-                                  },
-                                  {
-                                      .base = MI_SP_WR_CR_BASE,
-                                      .shd = MI_SP_WR_CR_BASE_AD_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW0_WR_BASE,
-                                      .shd = MI_RAW0_WR_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW1_WR_BASE,
-                                      .shd = MI_RAW1_WR_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW2_WR_BASE,
-                                      .shd = MI_RAW2_WR_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW3_WR_BASE,
-                                      .shd = MI_RAW3_WR_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW0_RD_BASE,
-                                      .shd = MI_RAW0_RD_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW1_RD_BASE,
-                                      .shd = MI_RAW1_RD_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_RAW2_RD_BASE,
-                                      .shd = MI_RAW2_RD_BASE_SHD,
-                                  },
-                                  {
-                                      .base = MI_GAIN_WR_BASE,
-                                      .shd = MI_GAIN_WR_BASE_SHD,
-                                  }};
+    struct backup_reg backup[] = {
+        {
+            .base = MI_MP_WR_Y_BASE,
+            .shd = MI_MP_WR_Y_BASE_SHD,
+        },
+        {
+            .base = MI_MP_WR_CB_BASE,
+            .shd = MI_MP_WR_CB_BASE_SHD,
+        },
+        {
+            .base = MI_MP_WR_CR_BASE,
+            .shd = MI_MP_WR_CR_BASE_SHD,
+        },
+        {
+            .base = MI_SP_WR_Y_BASE,
+            .shd = MI_SP_WR_Y_BASE_SHD,
+        },
+        {
+            .base = MI_SP_WR_CB_BASE,
+            .shd = MI_SP_WR_CB_BASE_AD_SHD,
+        },
+        {
+            .base = MI_SP_WR_CR_BASE,
+            .shd = MI_SP_WR_CR_BASE_AD_SHD,
+        },
+        {
+            .base = MI_RAW0_WR_BASE,
+            .shd = MI_RAW0_WR_BASE_SHD,
+        },
+        {
+            .base = MI_RAW1_WR_BASE,
+            .shd = MI_RAW1_WR_BASE_SHD,
+        },
+        {
+            .base = MI_RAW2_WR_BASE,
+            .shd = MI_RAW2_WR_BASE_SHD,
+        },
+        {
+            .base = MI_RAW3_WR_BASE,
+            .shd = MI_RAW3_WR_BASE_SHD,
+        },
+        {
+            .base = MI_RAW0_RD_BASE,
+            .shd = MI_RAW0_RD_BASE_SHD,
+        },
+        {
+            .base = MI_RAW1_RD_BASE,
+            .shd = MI_RAW1_RD_BASE_SHD,
+        },
+        {
+            .base = MI_RAW2_RD_BASE,
+            .shd = MI_RAW2_RD_BASE_SHD,
+        },
+        {
+            .base = MI_GAIN_WR_BASE,
+            .shd = MI_GAIN_WR_BASE_SHD,
+        }
+    };
 
     reg_buf = kzalloc(RKISP_ISP_SW_REG_SIZE, GFP_KERNEL);
     if (!reg_buf) {
@@ -937,7 +940,7 @@ static int rkisp_reset_handle_v2x(struct rkisp_device *dev)
     reg = reg_buf + ISP_CTRL;
     *reg |= CIF_ISP_CTRL_ISP_ENABLE | CIF_ISP_CTRL_ISP_INFORM_ENABLE | CIF_ISP_CTRL_ISP_CFG_UPD;
     writel(*reg, base + ISP_CTRL);
-    udelay(50);
+    udelay(0x32);
     /* config base_reg */
     for (i = 0; i < ARRAY_SIZE(backup); i++) {
         writel(backup[i].val, base + backup[i].base);
@@ -974,13 +977,13 @@ static void rkisp_restart_monitor(struct work_struct *work)
 
     dev_info(hw->dev, "%s enter\n", __func__);
     while (!(monitor->state & ISP_STOP) && monitor->is_en) {
-        ret = wait_for_completion_timeout(&monitor->cmpl, msecs_to_jiffies(100));
+        ret = wait_for_completion_timeout(&monitor->cmpl, msecs_to_jiffies(0x64));
         /* isp stop to exit
          * isp err to reset
          * mipi err wait isp idle, then reset
          */
-        if (monitor->state & ISP_STOP || (ret && !(monitor->state & ISP_ERROR)) ||
-            (!ret && monitor->state & ISP_FRAME_END && !(monitor->state & ISP_MIPI_ERROR))) {
+        if ((monitor->state & ISP_STOP) || (ret && !(monitor->state & ISP_ERROR)) ||
+            (!ret && (monitor->state & ISP_FRAME_END) && !(monitor->state & ISP_MIPI_ERROR))) {
             for (i = 0; i < hw->dev_num; i++) {
                 isp = hw->isp[i];
                 if (!(isp->isp_inp & INP_CSI)) {
@@ -991,7 +994,7 @@ static void rkisp_restart_monitor(struct work_struct *work)
                 }
                 if (isp->csi_dev.irq_cnt != mipi_irq_cnt) {
                     mipi_irq_cnt = isp->csi_dev.irq_cnt;
-                    timeout = 5;
+                    timeout = 0x05;
                 } else if (mipi_irq_cnt && timeout-- == 0) {
                     /* mipi no input */
                     monitor->state |= ISP_MIPI_ERROR;
@@ -1007,7 +1010,7 @@ static void rkisp_restart_monitor(struct work_struct *work)
         }
         for (i = 0; i < hw->dev_num; i++) {
             isp = hw->isp[i];
-            if (isp->isp_inp & INP_CSI || isp->isp_inp & INP_DVP || isp->isp_inp & INP_LVDS) {
+            if ((isp->isp_inp & INP_CSI) || (isp->isp_inp & INP_DVP) || (isp->isp_inp & INP_LVDS)) {
                 if (!(isp->isp_state & ISP_START)) {
                     break;
                 }
@@ -1033,7 +1036,7 @@ static void rkisp_restart_monitor(struct work_struct *work)
 
         for (i = 0; i < hw->dev_num; i++) {
             isp = hw->isp[i];
-            if (isp->isp_inp & INP_CSI || isp->isp_inp & INP_DVP || isp->isp_inp & INP_LVDS) {
+            if ((isp->isp_inp & INP_CSI) || (isp->isp_inp & INP_DVP) || (isp->isp_inp & INP_LVDS)) {
                 if (!(isp->isp_state & ISP_START)) {
                     break;
                 }
@@ -1105,8 +1108,8 @@ static void rkisp_config_color_space(struct rkisp_device *dev)
             break;
     }
 
-    for (i = 0; i < 9; i++) {
-        rkisp_unite_write(dev, CIF_ISP_CC_COEFF_0 + i * 4, *(coeff + i), false, dev->hw_dev->is_unite);
+    for (i = 0; i < 0x09; i++) {
+        rkisp_unite_write(dev, CIF_ISP_CC_COEFF_0 + i * 0x04, *(coeff + i), false, dev->hw_dev->is_unite);
     }
 
     if (dev->isp_sdev.quantization == V4L2_QUANTIZATION_FULL_RANGE) {
@@ -1142,7 +1145,7 @@ static void rkisp_config_cmsk_single(struct rkisp_device *dev, struct rkisp_cmsk
     if (bp_en) {
         ctrl |= ISP3X_SW_CMSK_EN_BP;
         rkisp_write(dev, ISP3X_CMSK_CTRL3, bp_en, false);
-        val = cfg->win[2].mode;
+        val = cfg->win[0x02].mode;
         rkisp_write(dev, ISP3X_CMSK_CTRL6, val, false);
     }
 
@@ -1152,13 +1155,13 @@ static void rkisp_config_cmsk_single(struct rkisp_device *dev, struct rkisp_cmsk
         }
 
         val = ISP3X_SW_CMSK_YUV(cfg->win[i].cover_color_y, cfg->win[i].cover_color_u, cfg->win[i].cover_color_v);
-        rkisp_write(dev, ISP3X_CMSK_YUV0 + i * 4, val, false);
+        rkisp_write(dev, ISP3X_CMSK_YUV0 + i * 0x04, val, false);
 
         val = ISP_PACK_2SHORT(cfg->win[i].h_offs, cfg->win[i].v_offs);
-        rkisp_write(dev, ISP3X_CMSK_OFFS0 + i * 8, val, false);
+        rkisp_write(dev, ISP3X_CMSK_OFFS0 + i * 0x08, val, false);
 
         val = ISP_PACK_2SHORT(cfg->win[i].h_size, cfg->win[i].v_size);
-        rkisp_write(dev, ISP3X_CMSK_SIZE0 + i * 8, val, false);
+        rkisp_write(dev, ISP3X_CMSK_SIZE0 + i * 0x08, val, false);
     }
 
     if (ctrl) {
@@ -1192,35 +1195,35 @@ static void rkisp_config_cmsk_dual(struct rkisp_device *dev, struct rkisp_cmsk_c
             /* cmsk window at left isp */
             right.win[0].win_en &= ~BIT(i);
             right.win[1].win_en &= ~BIT(i);
-            right.win[2].win_en &= ~BIT(i);
+            right.win[0x02].win_en &= ~BIT(i);
         } else if (h_offs >= w) {
             /* cmsk window at right isp */
             left.win[0].win_en &= ~BIT(i);
             left.win[1].win_en &= ~BIT(i);
-            left.win[2].win_en &= ~BIT(i);
+            left.win[0x02].win_en &= ~BIT(i);
         } else {
             /* cmsk window at dual isp */
-            left.win[i].h_size = ALIGN(w - h_offs, 8);
+            left.win[i].h_size = ALIGN(w - h_offs, 0x08);
 
             right.win[i].h_offs = RKMOUDLE_UNITE_EXTEND_PIXEL;
             val = h_offs + h_size - w;
-            right.win[i].h_size = ALIGN(val, 8);
+            right.win[i].h_size = ALIGN(val, 0x08);
             right.win[i].h_offs -= right.win[i].h_size - val;
         }
 
         val = ISP3X_SW_CMSK_YUV(left.win[i].cover_color_y, left.win[i].cover_color_u, left.win[i].cover_color_v);
-        rkisp_write(dev, ISP3X_CMSK_YUV0 + i * 4, val, false);
-        rkisp_next_write(dev, ISP3X_CMSK_YUV0 + i * 4, val, false);
+        rkisp_write(dev, ISP3X_CMSK_YUV0 + i * 0x04, val, false);
+        rkisp_next_write(dev, ISP3X_CMSK_YUV0 + i * 0x04, val, false);
 
         val = ISP_PACK_2SHORT(left.win[i].h_offs, left.win[i].v_offs);
-        rkisp_write(dev, ISP3X_CMSK_OFFS0 + i * 8, val, false);
+        rkisp_write(dev, ISP3X_CMSK_OFFS0 + i * 0x08, val, false);
         val = ISP_PACK_2SHORT(left.win[i].h_size, left.win[i].v_size);
-        rkisp_write(dev, ISP3X_CMSK_SIZE0 + i * 8, val, false);
+        rkisp_write(dev, ISP3X_CMSK_SIZE0 + i * 0x08, val, false);
 
         val = ISP_PACK_2SHORT(right.win[i].h_offs, right.win[i].v_offs);
-        rkisp_next_write(dev, ISP3X_CMSK_OFFS0 + i * 8, val, false);
+        rkisp_next_write(dev, ISP3X_CMSK_OFFS0 + i * 0x08, val, false);
         val = ISP_PACK_2SHORT(right.win[i].h_size, right.win[i].v_size);
-        rkisp_next_write(dev, ISP3X_CMSK_SIZE0 + i * 8, val, false);
+        rkisp_next_write(dev, ISP3X_CMSK_SIZE0 + i * 0x08, val, false);
     }
 
     w += RKMOUDLE_UNITE_EXTEND_PIXEL;
@@ -1237,10 +1240,10 @@ static void rkisp_config_cmsk_dual(struct rkisp_device *dev, struct rkisp_cmsk_c
         val = left.win[1].mode;
         rkisp_write(dev, ISP3X_CMSK_CTRL5, val, false);
     }
-    if (left.win[2].win_en) {
+    if (left.win[0x02].win_en) {
         ctrl |= ISP3X_SW_CMSK_EN_BP;
-        rkisp_write(dev, ISP3X_CMSK_CTRL3, left.win[2].win_en, false);
-        val = left.win[2].mode;
+        rkisp_write(dev, ISP3X_CMSK_CTRL3, left.win[0x02].win_en, false);
+        val = left.win[0x02].mode;
         rkisp_write(dev, ISP3X_CMSK_CTRL6, val, false);
     }
     if (ctrl) {
@@ -1263,10 +1266,10 @@ static void rkisp_config_cmsk_dual(struct rkisp_device *dev, struct rkisp_cmsk_c
         val = right.win[1].mode;
         rkisp_next_write(dev, ISP3X_CMSK_CTRL5, val, false);
     }
-    if (right.win[2].win_en) {
+    if (right.win[0x02].win_en) {
         ctrl |= ISP3X_SW_CMSK_EN_BP;
-        rkisp_next_write(dev, ISP3X_CMSK_CTRL3, right.win[2].win_en, false);
-        val = right.win[2].mode;
+        rkisp_next_write(dev, ISP3X_CMSK_CTRL3, right.win[0x02].win_en, false);
+        val = right.win[0x02].mode;
         rkisp_next_write(dev, ISP3X_CMSK_CTRL6, val, false);
     }
     if (ctrl) {
@@ -1367,7 +1370,7 @@ static int rkisp_config_isp(struct rkisp_device *dev)
             acq_prop = CIF_ISP_ACQ_PROP_DMA_RGB;
         }
     } else if (in_fmt->fmt_type == FMT_YUV) {
-        acq_mult = 2;
+        acq_mult = 0x02;
         if (sensor && (sensor->mbus.type == V4L2_MBUS_CSI2_DPHY || sensor->mbus.type == V4L2_MBUS_CCP2)) {
             isp_ctrl = CIF_ISP_CTRL_ISP_MODE_ITU601;
         } else {
@@ -1408,7 +1411,7 @@ static int rkisp_config_isp(struct rkisp_device *dev)
     rkisp_unite_write(dev, CIF_ISP_ACQ_NR_FRAMES, 0, true, is_unite);
 
     if (is_unite) {
-        width = width / 2 + RKMOUDLE_UNITE_EXTEND_PIXEL;
+        width = width / 0x02 + RKMOUDLE_UNITE_EXTEND_PIXEL;
     }
     /* Acquisition Size */
     rkisp_unite_write(dev, CIF_ISP_ACQ_H_OFFS, acq_mult * in_crop->left, false, is_unite);
@@ -1421,8 +1424,8 @@ static int rkisp_config_isp(struct rkisp_device *dev)
     rkisp_unite_write(dev, CIF_ISP_OUT_H_SIZE, width, false, is_unite);
 
     if (dev->cap_dev.stream[RKISP_STREAM_SP].interlaced) {
-        rkisp_unite_write(dev, CIF_ISP_ACQ_V_SIZE, in_crop->height / 2, false, is_unite);
-        rkisp_unite_write(dev, CIF_ISP_OUT_V_SIZE, in_crop->height / 2, false, is_unite);
+        rkisp_unite_write(dev, CIF_ISP_ACQ_V_SIZE, in_crop->height / 0x02, false, is_unite);
+        rkisp_unite_write(dev, CIF_ISP_OUT_V_SIZE, in_crop->height / 0x02, false, is_unite);
     } else {
         rkisp_unite_write(dev, CIF_ISP_ACQ_V_SIZE, in_crop->height + extend_line, false, is_unite);
         rkisp_unite_write(dev, CIF_ISP_OUT_V_SIZE, in_crop->height + extend_line, false, is_unite);
@@ -1466,15 +1469,15 @@ static int rkisp_config_dvp(struct rkisp_device *dev)
     u32 val, input_sel, data_width;
 
     switch (in_fmt->bus_width) {
-        case 8:
+        case 0x08:
             input_sel = CIF_ISP_ACQ_PROP_IN_SEL_8B_ZERO;
             data_width = ISP_CIF_DATA_WIDTH_8B;
             break;
-        case 10:
+        case 0x0A:
             input_sel = CIF_ISP_ACQ_PROP_IN_SEL_10B_ZERO;
             data_width = ISP_CIF_DATA_WIDTH_10B;
             break;
-        case 12:
+        case 0x0C:
             input_sel = CIF_ISP_ACQ_PROP_IN_SEL_12B;
             data_width = ISP_CIF_DATA_WIDTH_12B;
             break;
@@ -1511,26 +1514,26 @@ static int rkisp_config_lvds(struct rkisp_device *dev)
             lane = 1;
             break;
         case V4L2_MBUS_CSI2_2_LANE:
-            lane = 2;
+            lane = 0x02;
             break;
         case V4L2_MBUS_CSI2_3_LANE:
-            lane = 3;
+            lane = 0x03;
             break;
         case V4L2_MBUS_CSI2_4_LANE:
         default:
-            lane = 4;
+            lane = 0x04;
     }
     lane = BIT(lane) - 1;
 
     switch (in_fmt->bus_width) {
-        case 8:
+        case 0x08:
             data = 0;
             break;
-        case 10:
+        case 0x0A:
             data = 1;
             break;
-        case 12:
-            data = 2;
+        case 0x0C:
+            data = 0x02;
             break;
         default:
             ret = -EINVAL;
@@ -1562,7 +1565,7 @@ static int rkisp_config_path(struct rkisp_device *dev)
 
     /* isp input interface selects */
     if ((sensor && sensor->mbus.type == V4L2_MBUS_CSI2_DPHY) ||
-        dev->isp_inp & (INP_RAWRD0 | INP_RAWRD1 | INP_RAWRD2 | INP_CIF)) {
+        (dev->isp_inp & (INP_RAWRD0 | INP_RAWRD1 | INP_RAWRD2 | INP_CIF))) {
         /* mipi sensor->isp or isp read from ddr */
         dpcl |= CIF_VI_DPCL_IF_SEL_MIPI;
     } else if (sensor && (sensor->mbus.type == V4L2_MBUS_BT656 || sensor->mbus.type == V4L2_MBUS_PARALLEL)) {
@@ -1636,7 +1639,7 @@ static void rkisp_start_3a_run(struct rkisp_device *dev)
     if (!ret) {
         v4l2_warn(&dev->v4l2_dev, "waiting on params stream on event timeout\n");
     } else {
-        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "Waiting for 3A on use %d ms\n", 1000 - jiffies_to_msecs(ret));
+        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "Waiting for 3A on use %d ms\n", 0x3E8 - jiffies_to_msecs(ret));
     }
 }
 
@@ -1658,7 +1661,7 @@ static void rkisp_stop_3a_run(struct rkisp_device *dev)
     if (!ret) {
         v4l2_warn(&dev->v4l2_dev, "waiting on params stream off event timeout\n");
     } else {
-        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "Waiting for 3A off use %d ms\n", 1000 - jiffies_to_msecs(ret));
+        v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "Waiting for 3A off use %d ms\n", 0x3E8 - jiffies_to_msecs(ret));
     }
 }
 
@@ -1726,7 +1729,7 @@ static int rkisp_isp_stop(struct rkisp_device *dev)
         val = readl(base + CIF_MIPI_CTRL);
         val = val & (~CIF_MIPI_CTRL_SHUTDOWNLANES(0xf));
         writel(val & (~CIF_MIPI_CTRL_OUTPUT_ENA), base + CIF_MIPI_CTRL);
-        udelay(20);
+        udelay(0x14);
     }
     /* stop lsc to avoid lsclut error */
     if (dev->isp_ver == ISP_V20 || dev->isp_ver == ISP_V21 || dev->isp_ver == ISP_V30) {
@@ -1743,7 +1746,7 @@ static int rkisp_isp_stop(struct rkisp_device *dev)
         rkisp_next_write(dev, CIF_ISP_CTRL, val | CIF_ISP_CTRL_ISP_CFG_UPD, true);
     }
 
-    readx_poll_timeout_atomic(readl, base + CIF_ISP_RIS, val, val & CIF_ISP_OFF, 20, 100);
+    readx_poll_timeout_atomic(readl, base + CIF_ISP_RIS, val, val & CIF_ISP_OFF, 0x14, 0x64);
     v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "MI_CTRL:%x, ISP_CTRL:%x\n", readl(base + CIF_MI_CTRL),
              readl(base + CIF_ISP_CTRL));
 
@@ -1756,9 +1759,9 @@ static int rkisp_isp_stop(struct rkisp_device *dev)
         if (old_rate > safe_rate) {
             rkisp_set_clk_rate(hw->clks[0], safe_rate);
             if (hw->is_unite) {
-                rkisp_set_clk_rate(hw->clks[5], safe_rate);
+                rkisp_set_clk_rate(hw->clks[0x05], safe_rate);
             }
-            udelay(100);
+            udelay(0x64);
         }
         rkisp_soft_reset(dev->hw_dev, false);
     }
@@ -1833,7 +1836,7 @@ static int rkisp_isp_start(struct rkisp_device *dev)
     val |= CIF_ISP_CTRL_ISP_CFG_UPD | CIF_ISP_CTRL_ISP_ENABLE | CIF_ISP_CTRL_ISP_INFORM_ENABLE |
            CIF_ISP_CTRL_ISP_CFG_UPD_PERMANENT;
     if (dev->isp_ver == ISP_V20) {
-        val |= NOC_HURRY_PRIORITY(2) | NOC_HURRY_W_MODE(2) | NOC_HURRY_R_MODE(1);
+        val |= NOC_HURRY_PRIORITY(0x02) | NOC_HURRY_W_MODE(0x02) | NOC_HURRY_R_MODE(1);
     }
     if (atomic_read(&dev->hw_dev->refcnt) > 1) {
         is_direct = false;
@@ -1851,13 +1854,13 @@ static int rkisp_isp_start(struct rkisp_device *dev)
      * the MIPI interface and before starting the sensor output.
      */
     if (dev->hw_dev->is_single) {
-        usleep_range(1000, 1200);
+        usleep_range(0x3E8, 0x4B0);
     }
 
     v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s MI_CTRL 0x%08x ISP_CTRL 0x%08x\n", __func__, readl(base + CIF_MI_CTRL),
              readl(base + CIF_ISP_CTRL));
 
-    if (dev->hw_dev->monitor.is_en && atomic_read(&dev->hw_dev->refcnt) < 2) {
+    if (dev->hw_dev->monitor.is_en && atomic_read(&dev->hw_dev->refcnt) < 0x02) {
         dev->hw_dev->monitor.retry = 0;
         dev->hw_dev->monitor.state = ISP_FRAME_END;
         schedule_work(&dev->hw_dev->monitor.work);
@@ -1867,222 +1870,224 @@ static int rkisp_isp_start(struct rkisp_device *dev)
 
 /***************************** isp sub-devs *******************************/
 
-static const struct ispsd_in_fmt rkisp_isp_input_formats[] = {{
-                                                                  .name = "SBGGR10_1X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SBGGR10_1X10,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW10,
-                                                                  .bayer_pat = RAW_BGGR,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "SRGGB10_1X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SRGGB10_1X10,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW10,
-                                                                  .bayer_pat = RAW_RGGB,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "SGBRG10_1X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGBRG10_1X10,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW10,
-                                                                  .bayer_pat = RAW_GBRG,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "SGRBG10_1X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGRBG10_1X10,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW10,
-                                                                  .bayer_pat = RAW_GRBG,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "SRGGB12_1X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SRGGB12_1X12,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW12,
-                                                                  .bayer_pat = RAW_RGGB,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "SBGGR12_1X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SBGGR12_1X12,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW12,
-                                                                  .bayer_pat = RAW_BGGR,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "SGBRG12_1X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGBRG12_1X12,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW12,
-                                                                  .bayer_pat = RAW_GBRG,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "SGRBG12_1X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGRBG12_1X12,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW12,
-                                                                  .bayer_pat = RAW_GRBG,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "SRGGB8_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SRGGB8_1X8,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW8,
-                                                                  .bayer_pat = RAW_RGGB,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "SBGGR8_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SBGGR8_1X8,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW8,
-                                                                  .bayer_pat = RAW_BGGR,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "SGBRG8_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW8,
-                                                                  .bayer_pat = RAW_GBRG,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "SGRBG8_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_SGRBG8_1X8,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW8,
-                                                                  .bayer_pat = RAW_GRBG,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "YUYV8_2X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "YVYU8_2X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "UYVY8_2X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "VYUY8_2X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "YUYV10_2X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YUYV10_2X10,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "YVYU10_2X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YVYU10_2X10,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "UYVY10_2X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_UYVY10_2X10,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "VYUY10_2X10",
-                                                                  .mbus_code = MEDIA_BUS_FMT_VYUY10_2X10,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "YUYV12_2X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YUYV12_2X12,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "YVYU12_2X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_YVYU12_2X12,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "UYVY12_2X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_UYVY12_2X12,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "VYUY12_2X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_VYUY12_2X12,
-                                                                  .fmt_type = FMT_YUV,
-                                                                  .mipi_dt = CIF_CSI2_DT_YUV422_8b,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
-                                                                  .bus_width = 12,
-                                                              },
-                                                              {
-                                                                  .name = "Y8_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_Y8_1X8,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW8,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 8,
-                                                              },
-                                                              {
-                                                                  .name = "Y10_1X8",
-                                                                  .mbus_code = MEDIA_BUS_FMT_Y10_1X10,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW10,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 10,
-                                                              },
-                                                              {
-                                                                  .name = "Y12_1X12",
-                                                                  .mbus_code = MEDIA_BUS_FMT_Y12_1X12,
-                                                                  .fmt_type = FMT_BAYER,
-                                                                  .mipi_dt = CIF_CSI2_DT_RAW12,
-                                                                  .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
-                                                                  .bus_width = 12,
-                                                              }};
+static const struct ispsd_in_fmt rkisp_isp_input_formats[] = {
+    {
+        .name = "SBGGR10_1X10",
+        .mbus_code = MEDIA_BUS_FMT_SBGGR10_1X10,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW10,
+        .bayer_pat = RAW_BGGR,
+        .bus_width = 10,
+    },
+    {
+        .name = "SRGGB10_1X10",
+        .mbus_code = MEDIA_BUS_FMT_SRGGB10_1X10,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW10,
+        .bayer_pat = RAW_RGGB,
+        .bus_width = 10,
+    },
+    {
+        .name = "SGBRG10_1X10",
+        .mbus_code = MEDIA_BUS_FMT_SGBRG10_1X10,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW10,
+        .bayer_pat = RAW_GBRG,
+        .bus_width = 10,
+    },
+    {
+        .name = "SGRBG10_1X10",
+        .mbus_code = MEDIA_BUS_FMT_SGRBG10_1X10,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW10,
+        .bayer_pat = RAW_GRBG,
+        .bus_width = 10,
+    },
+    {
+        .name = "SRGGB12_1X12",
+        .mbus_code = MEDIA_BUS_FMT_SRGGB12_1X12,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW12,
+        .bayer_pat = RAW_RGGB,
+        .bus_width = 12,
+    },
+    {
+        .name = "SBGGR12_1X12",
+        .mbus_code = MEDIA_BUS_FMT_SBGGR12_1X12,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW12,
+        .bayer_pat = RAW_BGGR,
+        .bus_width = 12,
+    },
+    {
+        .name = "SGBRG12_1X12",
+        .mbus_code = MEDIA_BUS_FMT_SGBRG12_1X12,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW12,
+        .bayer_pat = RAW_GBRG,
+        .bus_width = 12,
+    },
+    {
+        .name = "SGRBG12_1X12",
+        .mbus_code = MEDIA_BUS_FMT_SGRBG12_1X12,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW12,
+        .bayer_pat = RAW_GRBG,
+        .bus_width = 12,
+    },
+    {
+        .name = "SRGGB8_1X8",
+        .mbus_code = MEDIA_BUS_FMT_SRGGB8_1X8,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW8,
+        .bayer_pat = RAW_RGGB,
+        .bus_width = 8,
+    },
+    {
+        .name = "SBGGR8_1X8",
+        .mbus_code = MEDIA_BUS_FMT_SBGGR8_1X8,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW8,
+        .bayer_pat = RAW_BGGR,
+        .bus_width = 8,
+    },
+    {
+        .name = "SGBRG8_1X8",
+        .mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW8,
+        .bayer_pat = RAW_GBRG,
+        .bus_width = 8,
+    },
+    {
+        .name = "SGRBG8_1X8",
+        .mbus_code = MEDIA_BUS_FMT_SGRBG8_1X8,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW8,
+        .bayer_pat = RAW_GRBG,
+        .bus_width = 8,
+    },
+    {
+        .name = "YUYV8_2X8",
+        .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 8,
+    },
+    {
+        .name = "YVYU8_2X8",
+        .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
+        .bus_width = 8,
+    },
+    {
+        .name = "UYVY8_2X8",
+        .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
+        .bus_width = 8,
+    },
+    {
+        .name = "VYUY8_2X8",
+        .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
+        .bus_width = 8,
+    },
+    {
+        .name = "YUYV10_2X10",
+        .mbus_code = MEDIA_BUS_FMT_YUYV10_2X10,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 10,
+    },
+    {
+        .name = "YVYU10_2X10",
+        .mbus_code = MEDIA_BUS_FMT_YVYU10_2X10,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
+        .bus_width = 10,
+    },
+    {
+        .name = "UYVY10_2X10",
+        .mbus_code = MEDIA_BUS_FMT_UYVY10_2X10,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
+        .bus_width = 10,
+    },
+    {
+        .name = "VYUY10_2X10",
+        .mbus_code = MEDIA_BUS_FMT_VYUY10_2X10,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
+        .bus_width = 10,
+    },
+    {
+        .name = "YUYV12_2X12",
+        .mbus_code = MEDIA_BUS_FMT_YUYV12_2X12,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 12,
+    },
+    {
+        .name = "YVYU12_2X12",
+        .mbus_code = MEDIA_BUS_FMT_YVYU12_2X12,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCRYCB,
+        .bus_width = 12,
+    },
+    {
+        .name = "UYVY12_2X12",
+        .mbus_code = MEDIA_BUS_FMT_UYVY12_2X12,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CBYCRY,
+        .bus_width = 12,
+    },
+    {
+        .name = "VYUY12_2X12",
+        .mbus_code = MEDIA_BUS_FMT_VYUY12_2X12,
+        .fmt_type = FMT_YUV,
+        .mipi_dt = CIF_CSI2_DT_YUV422_8b,
+        .yuv_seq = CIF_ISP_ACQ_PROP_CRYCBY,
+        .bus_width = 12,
+    },
+    {
+        .name = "Y8_1X8",
+        .mbus_code = MEDIA_BUS_FMT_Y8_1X8,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW8,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 8,
+    },
+    {
+        .name = "Y10_1X8",
+        .mbus_code = MEDIA_BUS_FMT_Y10_1X10,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW10,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 10,
+    },
+    {
+        .name = "Y12_1X12",
+        .mbus_code = MEDIA_BUS_FMT_Y12_1X12,
+        .fmt_type = FMT_BAYER,
+        .mipi_dt = CIF_CSI2_DT_RAW12,
+        .yuv_seq = CIF_ISP_ACQ_PROP_YCBYCR,
+        .bus_width = 12,
+    }
+};
 
 static const struct ispsd_out_fmt rkisp_isp_output_formats[] = {
     {
@@ -2299,8 +2304,8 @@ static void rkisp_isp_sd_try_crop(struct v4l2_subdev *sd, struct v4l2_rect *crop
     struct rkisp_device *dev = sd_to_isp_dev(sd);
     struct v4l2_rect in_crop = isp_sd->in_crop;
 
-    crop->left = ALIGN(crop->left, 2);
-    crop->width = ALIGN(crop->width, 2);
+    crop->left = ALIGN(crop->left, 0x02);
+    crop->width = ALIGN(crop->width, 0x02);
 
     if (pad == RKISP_ISP_PAD_SINK) {
         /* update sensor info if sensor link be changed */
@@ -2450,7 +2455,7 @@ static void rkisp_isp_read_add_fifo_data(struct rkisp_device *dev)
     idx = dev->emd_data_idx;
     dev->emd_data_fifo[idx].frame_id = 0;
     kfifo_reset_out(&dev->emd_data_fifo[idx].mipi_kfifo);
-    for (i = 0; i < CIFISP_ADD_DATA_FIFO_SIZE / 4; i++) {
+    for (i = 0; i < CIFISP_ADD_DATA_FIFO_SIZE / 0x04; i++) {
         mipi_status = readl(base + CIF_MIPI_STATUS);
         if (!(mipi_status & 0x01)) {
             break;
@@ -2458,7 +2463,7 @@ static void rkisp_isp_read_add_fifo_data(struct rkisp_device *dev)
 
         fifo_data = readl(base + CIF_MIPI_ADD_DATA_FIFO);
         kfifo_in(&dev->emd_data_fifo[idx].mipi_kfifo, &fifo_data, sizeof(fifo_data));
-        data_len += 4;
+        data_len += 0x04;
 
         if (kfifo_is_full(&dev->emd_data_fifo[idx].mipi_kfifo)) {
             v4l2_warn(v4l2_dev, "%s: mipi_kfifo is full!\n", __func__);
@@ -2512,8 +2517,8 @@ static int rkisp_isp_sd_s_stream(struct v4l2_subdev *sd, int on)
         rkisp_stop_3a_run(isp_dev);
         wait_event_timeout(isp_dev->sync_onoff,
                            isp_dev->irq_ends_mask == (ISP_FRAME_END | ISP_FRAME_IN) &&
-                               (!IS_HDR_RDBK(isp_dev->rd_mode) || isp_dev->isp_state & ISP_STOP),
-                           msecs_to_jiffies(5));
+                               (!IS_HDR_RDBK(isp_dev->rd_mode) || (isp_dev->isp_state & ISP_STOP)),
+                           msecs_to_jiffies(0x05));
         rkisp_isp_stop(isp_dev);
         atomic_dec(&isp_dev->hw_dev->refcnt);
         rkisp_params_stream_stop(&isp_dev->params_vdev);
@@ -2607,7 +2612,7 @@ static int rkisp_rx_buf_pool_init(struct rkisp_device *dev, struct rkisp_rx_buf 
     val = pool->dma;
     rkisp_write(dev, stream->config->mi.y_base_ad_init, val, false);
     if (dev->hw_dev->is_unite) {
-        val += (stream->out_fmt.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) * stream->out_isp_fmt.bpp[0] / 8;
+        val += (stream->out_fmt.width / 0x02 - RKMOUDLE_UNITE_EXTEND_PIXEL) * stream->out_isp_fmt.bpp[0] / 0x08;
         rkisp_next_write(dev, stream->config->mi.y_base_ad_init, val, false);
     }
     v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "%s dma:0x%x vaddr:%p", __func__, (u32)pool->dma, pool->vaddr);
@@ -2737,11 +2742,11 @@ static int rkisp_subdev_link_setup(struct media_entity *entity, const struct med
         stream = &dev->cap_dev.stream[RKISP_STREAM_SP];
     } else if (!strcmp(remote->entity->name, MP_VDEV_NAME)) {
         stream = &dev->cap_dev.stream[RKISP_STREAM_MP];
-        if (flags & MEDIA_LNK_FL_ENABLED && dev->br_dev.linked) {
+        if ((flags & MEDIA_LNK_FL_ENABLED) && dev->br_dev.linked) {
             goto err;
         }
     } else if (!strcmp(remote->entity->name, BRIDGE_DEV_NAME)) {
-        if (flags & MEDIA_LNK_FL_ENABLED && dev->cap_dev.stream[RKISP_STREAM_MP].linked) {
+        if ((flags & MEDIA_LNK_FL_ENABLED) && dev->cap_dev.stream[RKISP_STREAM_MP].linked) {
             goto err;
         }
         dev->br_dev.linked = flags & MEDIA_LNK_FL_ENABLED;
@@ -3120,7 +3125,7 @@ int rkisp_register_isp_subdev(struct rkisp_device *isp_dev, struct v4l2_device *
 
     spin_lock_init(&isp_dev->cmsk_lock);
     spin_lock_init(&isp_dev->rdbk_lock);
-    ret = kfifo_alloc(&isp_dev->rdbk_kfifo, 16 * sizeof(struct isp2x_csi_trigger), GFP_KERNEL);
+    ret = kfifo_alloc(&isp_dev->rdbk_kfifo, 0x10 * sizeof(struct isp2x_csi_trigger), GFP_KERNEL);
     if (ret < 0) {
         v4l2_err(v4l2_dev, "Failed to alloc csi kfifo %d", ret);
         return ret;
@@ -3349,13 +3354,12 @@ void rkisp_isp_isr(unsigned int isp_mis, unsigned int isp3a_mis, struct rkisp_de
      * The last time that rx perform 'back read' don't clear done flag
      * in advance, otherwise the statistics will be abnormal.
      */
-    if (isp3a_mis & ISP2X_3A_RAWAE_BIG && dev->params_vdev.rdbk_times > 0) {
+    if ((isp3a_mis & ISP2X_3A_RAWAE_BIG) && dev->params_vdev.rdbk_times > 0) {
         writel(BIT(31), base + RAWAE_BIG1_BASE + RAWAE_BIG_CTRL);
     }
 
     if (hw->is_unite) {
         u32 val = rkisp_read(dev, ISP3X_ISP_RIS, true);
-
         if (val) {
             rkisp_write(dev, ISP3X_ISP_ICR, val, true);
             v4l2_dbg(3, rkisp_debug, &dev->v4l2_dev, "left isp isr:0x%x\n", val);

@@ -64,7 +64,7 @@ enum {
     color_fill_mode = 0x2,
     update_palette_table_mode = 0x3,
     update_patten_buff_mode = 0x4,
-}; /*render mode*/
+}; /* render mode */
 
 enum {
     A_B_B = 0x0,
@@ -234,13 +234,13 @@ typedef struct FADING {
 typedef struct MMU {
     unsigned char mmu_en;
     unsigned long base_addr;
-    uint32_t mmu_flag; /* [0] mmu enable [1] src_flush [2] dst_flush [3] CMD_flush [4~5] page size*/
+    uint32_t mmu_flag; /* [0] mmu enable [1] src_flush [2] dst_flush [3] CMD_flush [4~5] page size */
 } MMU;
 
 typedef struct MMU_32 {
     unsigned char mmu_en;
     uint32_t base_addr;
-    uint32_t mmu_flag; /* [0] mmu enable [1] src_flush [2] dst_flush [3] CMD_flush [4~5] page size*/
+    uint32_t mmu_flag; /* [0] mmu enable [1] src_flush [2] dst_flush [3] CMD_flush [4~5] page size */
 } MMU_32;
 
 typedef struct RECT {
@@ -334,7 +334,7 @@ struct rga_req {
     unsigned long LUT_addr;      /* LUT addr */
 
     RECT clip; /* dst clip window default value is dst_vir */
-               /* value from [0, w-1] / [0, h-1]*/
+               /* value from [0, w-1] / [0, h-1] */
 
     int32_t sina; /* dst angle  default value 0  16.16 scan from table */
     int32_t cosa; /* dst angle  default value 0  16.16 scan from table */
@@ -367,15 +367,15 @@ struct rga_req {
 
     uint8_t alpha_global_value; /* global alpha value */
 
-    uint16_t rop_code; /* rop2/3/4 code  scan from rop code table*/
+    uint16_t rop_code; /* rop2/3/4 code  scan from rop code table */
 
-    uint8_t bsfilter_flag; /* [2] 0 blur 1 sharp / [1:0] filter_type*/
+    uint8_t bsfilter_flag; /* [2] 0 blur 1 sharp / [1:0] filter_type */
 
-    uint8_t palette_mode; /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp*/
+    uint8_t palette_mode; /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp */
 
     uint8_t yuv2rgb_mode; /* (enum) BT.601 MPEG / BT.601 JPEG / BT.709  */
 
-    uint8_t endian_mode; /* 0/big endian 1/little endian*/
+    uint8_t endian_mode; /* 0/big endian 1/little endian */
 
     uint8_t rotate_mode; /* (enum) rotate mode  */
                          /* 0x0,     no rotate  */
@@ -391,7 +391,7 @@ struct rga_req {
                             /* ([2~3] rop   mode)            */
                             /* ([4]   zero  mode en)         */
                             /* ([5]   dst   alpha mode)      */
-                            /* ([6]   alpha output mode sel) 0 src / 1 dst*/
+                            /* ([6]   alpha output mode sel) 0 src / 1 dst */
 
     uint8_t src_trans_mode;
 
@@ -407,7 +407,7 @@ struct rga_req_32 {
     uint32_t rop_mask_addr;  /* rop4 mask addr */
     uint32_t LUT_addr;       /* LUT addr */
     RECT clip;               /* dst clip window default value is dst_vir */
-                             /* value from [0, w-1] / [0, h-1]*/
+                             /* value from [0, w-1] / [0, h-1] */
     int32_t sina;            /* dst angle  default value 0  16.16 scan from table */
     int32_t cosa;            /* dst angle  default value 0  16.16 scan from table */
     uint16_t alpha_rop_flag; /* alpha rop process flag           */
@@ -429,9 +429,9 @@ struct rga_req_32 {
     FADING fading;
     uint8_t PD_mode;            /* porter duff alpha mode sel */
     uint8_t alpha_global_value; /* global alpha value */
-    uint16_t rop_code;          /* rop2/3/4 code  scan from rop code table*/
-    uint8_t bsfilter_flag;      /* [2] 0 blur 1 sharp / [1:0] filter_type*/
-    uint8_t palette_mode;       /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp*/
+    uint16_t rop_code;          /* rop2/3/4 code  scan from rop code table */
+    uint8_t bsfilter_flag;      /* [2] 0 blur 1 sharp / [1:0] filter_type */
+    uint8_t palette_mode;       /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp */
     uint8_t yuv2rgb_mode;       /* (enum) BT.601 MPEG / BT.601 JPEG / BT.709  */
     uint8_t endian_mode;        /* 0/big endian 1/little endian*/
     uint8_t rotate_mode;        /* (enum) rotate mode  */
@@ -445,7 +445,7 @@ struct rga_req_32 {
                                 /* ([2~3] rop   mode)            */
                                 /* ([4]   zero  mode en)         */
                                 /* ([5]   dst   alpha mode)      */
-                                /* ([6]   alpha output mode sel) 0 src / 1 dst*/
+                                /* ([6]   alpha output mode sel) 0 src / 1 dst */
     uint8_t src_trans_mode;
 
     uint8_t dither_mode;
@@ -534,7 +534,7 @@ struct rga2_req {
     u8 rop_mode;  /* rop mode select 0 : rop2 1 : rop3 2 : rop4 */
     u16 rop_code; /* rop2/3/4 code */
 
-    u8 palette_mode; /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp*/
+    u8 palette_mode; /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp */
 
     u8 yuv2rgb_mode;     /* (enum) BT.601 MPEG / BT.601 JPEG / BT.709  */
                          /* [1:0]   src0 csc mode        */
@@ -580,14 +580,14 @@ enum {
     BB_ROTATE_90 = 0x1,  /* rotate 90  */
     BB_ROTATE_180 = 0x2, /* rotate 180 */
     BB_ROTATE_270 = 0x3, /* rotate 270 */
-};                       /*rotate mode*/
+};                       /*rotate mode */
 
 enum {
     BB_MIRROR_OFF = (0x0 << 4), /* no mirror  */
     BB_MIRROR_X = (0x1 << 4),   /* x  mirror  */
     BB_MIRROR_Y = (0x2 << 4),   /* y  mirror  */
     BB_MIRROR_XY = (0x3 << 4),  /* xy mirror  */
-};                              /*mirror mode*/
+};                              /*mirror mode */
 
 enum {
     BB_COPY_USE_TILE = (0x1 << 6), /* bitblt mode copy but use Tile mode */
@@ -598,19 +598,19 @@ enum {
     BT_601_RANGE0 = 0x1,
     BT_601_RANGE1 = 0x2,
     BT_709_RANGE0 = 0x3,
-}; /*yuv2rgb_mode*/
+}; /* yuv2rgb_mode */
 
 enum {
     BPP1 = 0x0, /* BPP1 */
     BPP2 = 0x1, /* BPP2 */
     BPP4 = 0x2, /* BPP4 */
     BPP8 = 0x3  /* BPP8 */
-};              /*palette_mode*/
+};              /* palette_mode */
 
 enum {
     SOLID_COLOR = 0x0,  // color fill mode; ROP4: SOLID_rop4_mask_addr COLOR
     PATTERN_COLOR = 0x1 // pattern_fill_mode;ROP4:PATTERN_COLOR
-};                      /*color fill mode*/
+};                      /* color fill mode */
 
 enum { COLOR_FILL_CLIP = 0x0, COLOR_FILL_NOT_CLIP = 0x1 };
 
@@ -619,23 +619,23 @@ enum {
     MITCHELL = 0x1,
     HERMITE = 0x2,
     B_SPLINE = 0x3,
-}; /*bicubic coefficient*/
+}; /* bicubic coefficient */
 
-enum { ROP2 = 0x0, ROP3 = 0x1, ROP4 = 0x2 }; /*ROP mode*/
+enum { ROP2 = 0x0, ROP3 = 0x1, ROP4 = 0x2 }; /* ROP mode */
 
-enum { BIG_ENDIAN = 0x0, LITTLE_ENDIAN = 0x1 }; /*endian mode*/
+enum { BIG_ENDIAN = 0x0, LITTLE_ENDIAN = 0x1 }; /* endian mode */
 
 enum {
     MMU_TABLE_4KB = 0x0,
     MMU_TABLE_64KB = 0x1,
-}; /*MMU table size*/
+}; /* MMU table size */
 
 enum {
     RGB_2_666 = 0x0,
     RGB_2_565 = 0x1,
     RGB_2_555 = 0x2,
     RGB_2_444 = 0x3,
-}; /*dither down mode*/
+}; /* dither down mode */
 
 /**
  * struct for process session which connect to rga
@@ -725,4 +725,4 @@ struct rga2_service_info {
 #define RGA2_MODE_CTRL 0x100
 #define RGA_BLIT_COMPLETE_EVENT 1
 
-#endif /*_RK29_IPP_DRIVER_H_*/
+#endif /* _RK29_IPP_DRIVER_H_ */

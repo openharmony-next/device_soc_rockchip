@@ -120,34 +120,27 @@ static void rkvdec_link_status_update(struct rkvdec_link_dev *dev)
     u32 enable_ff0, enable_ff1;
     u32 loop_count = 10;
     u32 val;
-
     error_ff1 = (readl(reg_base + RKVDEC_LINK_DEC_NUM_BASE) & RKVDEC_LINK_BIT_DEC_ERROR) ? 1 : 0;
     enable_ff1 = readl(reg_base + RKVDEC_LINK_EN_BASE);
-
     dev->irq_status = readl(reg_base + RKVDEC_LINK_IRQ_BASE);
     dev->iova_curr = readl(reg_base + RKVDEC_LINK_CFG_ADDR_BASE);
     dev->link_mode = readl(reg_base + RKVDEC_LINK_MODE_BASE);
     dev->total = readl(reg_base + RKVDEC_LINK_TOTAL_NUM_BASE);
     dev->iova_next = readl(reg_base + RKVDEC_LINK_NEXT_ADDR_BASE);
-
     do {
         val = readl(reg_base + RKVDEC_LINK_DEC_NUM_BASE);
         error_ff0 = (val & RKVDEC_LINK_BIT_DEC_ERROR) ? 1 : 0;
         enable_ff0 = readl(reg_base + RKVDEC_LINK_EN_BASE);
-
         if (error_ff0 == error_ff1 && enable_ff0 == enable_ff1) {
             break;
         }
-
         error_ff1 = error_ff0;
         enable_ff1 = enable_ff0;
     } while (--loop_count);
-
     dev->error = error_ff0;
     dev->decoded_status = val;
     dev->decoded = RKVDEC_LINK_GET_DEC_NUM(val);
     dev->enabled = enable_ff0;
-
     if (!loop_count) {
         dev_info(dev->dev, "reach last 10 count\n");
     }
@@ -359,7 +352,7 @@ static int rkvdec_link_write_task_to_slot(struct rkvdec_link_dev *dev, int idx, 
     }
 
     /* setup error mode flag */
-    tb_reg[0x9] |= BIT(18) | BIT(0x9);
+    tb_reg[0x9] |= BIT(0x12) | BIT(0x9);
     tb_reg[info->tb_reg_second_en] |= RKVDEC_WAIT_RESET_EN;
 
     /* memset read registers */
@@ -643,7 +636,7 @@ static int rkvdec2_link_reset(struct mpp_dev *mpp)
 
     dev_info(mpp->dev, "resetting...\n");
 
-    /* FIXME lock resource lock of the other devices in combo */
+    /* lock resource lock of the other devices in combo */
     mpp_iommu_down_write(mpp->iommu_info);
     mpp_reset_down_write(mpp->reset_group);
     atomic_set(&mpp->reset_request, 0);
@@ -677,33 +670,24 @@ static int rkvdec2_link_irq(struct mpp_dev *mpp)
     struct rkvdec2_dev *dec = to_rkvdec2_dev(mpp);
     struct rkvdec_link_dev *link_dec = dec->link_dec;
     u32 irq_status = 0;
-
     if (!atomic_read(&link_dec->power_enabled)) {
         dev_info(link_dec->dev, "irq on power off\n");
         return -1;
     }
-
     irq_status = readl(link_dec->reg_base + RKVDEC_LINK_IRQ_BASE);
-
     if (irq_status & RKVDEC_LINK_BIT_IRQ_RAW) {
         u32 enabled = readl(link_dec->reg_base + RKVDEC_LINK_EN_BASE);
-
         if (!enabled) {
-            u32 bus = mpp_read_relaxed(mpp, 273 * 0x4);
-
+            u32 bus = mpp_read_relaxed(mpp, 0x111 * 0x4);
             if (bus & 0x7ffff) {
                 dev_info(link_dec->dev, "invalid bus status %08x\n", bus);
             }
         }
-
         link_dec->irq_status = irq_status;
         mpp->irq_status = mpp_read_relaxed(mpp, RKVDEC_REG_INT_EN);
-
         writel_relaxed(0, link_dec->reg_base + RKVDEC_LINK_IRQ_BASE);
     }
-
     mpp_debug(DEBUG_IRQ_STATUS | DEBUG_LINK_TABLE, "irq_status: %08x : %08x\n", irq_status, mpp->irq_status);
-
     return 0;
 }
 
@@ -1142,7 +1126,7 @@ done:
 
     mpp_taskqueue_scan_pending_abort_task(queue);
 
-    /* TODO: if reset is needed do reset here */
+    /* if reset is needed do reset here */
 }
 
 static int mpp_task_queue(struct mpp_dev *mpp, struct mpp_task *task)
@@ -1151,35 +1135,27 @@ static int mpp_task_queue(struct mpp_dev *mpp, struct mpp_task *task)
     struct rkvdec_link_dev *link_dec = dec->link_dec;
     u32 task_to_run = 0;
     int slot_idx = 0;
-
     mpp_debug_enter();
-
     rkvdec2_link_power_on(mpp);
     mpp_time_record(task);
     mpp_debug(DEBUG_TASK_INFO, "pid %d, start hw %s\n", task->session->pid, dev_name(mpp->dev));
-
     /* prepare the task for running */
     if (test_and_set_bit(TASK_STATE_PREPARE, &task->state)) {
         mpp_err("task %d has been prepare twice\n", task->task_index);
     }
-
     rkvdec2_link_prepare(mpp, task);
-
     task_to_run = link_dec->task_to_run;
     if (!task_to_run) {
         dev_err(link_dec->dev, "nothing to run\n");
         goto done;
     }
-
     mpp_reset_down_read(mpp->reset_group);
     link_dec->task_to_run = 0;
     slot_idx = rkvdec_link_get_task_send(link_dec);
     link_dec->task_running += task_to_run;
     rkvdec_link_send_task_to_hw(link_dec, task, slot_idx, task_to_run, 0);
-
 done:
     mpp_debug_leave();
-
     return 0;
 }
 
@@ -1187,11 +1163,9 @@ irqreturn_t rkvdec2_link_irq_proc(int irq, void *param)
 {
     struct mpp_dev *mpp = param;
     int ret = rkvdec2_link_irq(mpp);
-
     if (!ret) {
         rkvdec2_link_trigger_irq(mpp);
     }
-
     return IRQ_HANDLED;
 }
 
@@ -1637,19 +1611,15 @@ static int rkvdec2_ccu_power_off(struct mpp_taskqueue *queue, struct rkvdec2_ccu
 static int rkvdec2_soft_ccu_dequeue(struct mpp_taskqueue *queue)
 {
     struct mpp_task *mpp_task = NULL, *n;
-
     mpp_debug_enter();
-
     list_for_each_entry_safe(mpp_task, n, &queue->running_list, queue_link)
     {
         struct mpp_dev *mpp = mpp_task->mpp ? mpp_task->mpp : mpp_task->session->mpp;
         u32 irq_status = mpp->irq_status;
         u32 timeout_flag = test_bit(TASK_STATE_TIMEOUT, &mpp_task->state);
         u32 abort_flag = test_bit(TASK_STATE_ABORT, &mpp_task->state);
-
         if (irq_status || timeout_flag || abort_flag) {
             struct rkvdec2_task *task = to_rkvdec2_task(mpp_task);
-
             set_bit(TASK_STATE_HANDLE, &mpp_task->state);
             cancel_delayed_work(&mpp_task->timeout_work);
             mpp_time_diff(mpp_task);
@@ -1660,7 +1630,6 @@ static int rkvdec2_soft_ccu_dequeue(struct mpp_taskqueue *queue)
             }
             set_bit(TASK_STATE_FINISH, &mpp_task->state);
             set_bit(TASK_STATE_DONE, &mpp_task->state);
-
             set_bit(mpp->core_id, &queue->core_idle);
             mpp_dbg_core("set core %d idle %lx\n", mpp->core_id, queue->core_idle);
             /* Wake up the GET thread */
@@ -1673,7 +1642,6 @@ static int rkvdec2_soft_ccu_dequeue(struct mpp_taskqueue *queue)
             break;
         }
     }
-
     mpp_debug_leave();
     return 0;
 }
@@ -1718,18 +1686,15 @@ void *rkvdec2_ccu_alloc_task(struct mpp_session *session, struct mpp_task_msgs *
 {
     int ret;
     struct rkvdec2_task *task;
-
     task = kzalloc(sizeof(*task), GFP_KERNEL);
     if (!task) {
         return NULL;
     }
-
     ret = rkvdec2_task_init(session->mpp, session, task, msgs);
     if (ret) {
         kfree(task);
         return NULL;
     }
-
     return &task->mpp_task;
 }
 
@@ -1737,7 +1702,6 @@ irqreturn_t rkvdec2_soft_ccu_irq(int irq, void *param)
 {
     struct mpp_dev *mpp = param;
     u32 irq_status = mpp_read_relaxed(mpp, RKVDEC_REG_INT_EN);
-
     if (irq_status & RKVDEC_IRQ_RAW) {
         mpp_debug(DEBUG_IRQ_STATUS, "irq_status=%08x\n", irq_status);
         if (irq_status & RKVDEC_INT_ERROR_MASK) {

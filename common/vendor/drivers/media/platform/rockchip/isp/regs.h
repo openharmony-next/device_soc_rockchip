@@ -666,7 +666,7 @@
 #define CIF_ISP_GAMMA_OUT_MODE_EQU BIT(0)
 #define CIF_ISP_GOC_MODE_MAX 1
 #define CIF_ISP_GOC_RESERVED 0xFFFFF800
-/* ISP_CTRL BIT 11*/
+/* ISP_CTRL BIT 11 */
 #define CIF_ISP_CTRL_ISP_GAMMA_OUT_ENA_READ(x) (((x) >> 11) & 1)
 
 /* DPCC */
@@ -1612,7 +1612,7 @@ static inline void config_mi_ctrl(struct rkisp_stream *stream, u32 burst)
     void __iomem *addr = base + CIF_MI_CTRL;
     u32 reg;
 
-    reg = readl(addr) & ~GENMASK(19, 16);
+    reg = readl(addr) & ~GENMASK(0x13, 0x10);
     writel(reg | burst, addr);
     reg = readl(addr);
     writel(reg | CIF_MI_CTRL_INIT_BASE_EN, addr);

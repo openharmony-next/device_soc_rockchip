@@ -245,7 +245,7 @@ void fiq_debugger_dump_stacktrace(struct fiq_debugger_output *output, const stru
     }
 
     tail = ((struct frame_tail *)regs->ARM_fp) - 1;
-    while (depth-- && tail && !((unsigned long)tail & 3)) {
+    while (depth-- && tail && !((unsigned long)tail & 0x3)) {
         tail = user_backtrace(output, tail);
     }
 }

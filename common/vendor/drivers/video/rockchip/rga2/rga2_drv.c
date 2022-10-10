@@ -397,10 +397,10 @@ int rga2_scale_check(struct rga2_req *req)
             INFO("unsupported to scaling more than 16 times.\n");
         }
     } else {
-        if (((saw >> 3) >= daw) || ((sah >> 3) >= dah)) {
+        if (((saw >> 0x3) >= daw) || ((sah >> 0x3) >= dah)) {
             INFO("unsupported to scaling less than 1/8 tiems.\n");
         }
-        if (((daw >> 3) >= saw) || ((dah >> 3) >= sah)) {
+        if (((daw >> 0x3) >= saw) || ((dah >> 0x3) >= sah)) {
             INFO("unsupported to scaling more than 8 times.\n");
         }
     }
@@ -411,26 +411,26 @@ int rga2_scale_check(struct rga2_req *req)
 
 static void rga2_printf_cmd_buf(u32 *cmd_buf)
 {
-    u32 reg_p[32];
+    u32 reg_p[0x20];
     u32 i = 0;
     u32 src_stride, dst_stride, src_format, dst_format;
     u32 src_aw, src_ah, dst_aw, dst_ah;
 
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < 0x20; i++) {
         reg_p[i] = *(cmd_buf + i);
     }
 
-    src_stride = reg_p[6];
-    dst_stride = reg_p[18];
+    src_stride = reg_p[0x6];
+    dst_stride = reg_p[0x12];
 
     src_format = reg_p[1] & (~0xfffffff0);
-    dst_format = reg_p[14] & (~0xfffffff0);
+    dst_format = reg_p[0xE] & (~0xfffffff0);
 
     src_aw = (reg_p[0x7] & (~0xffff0000)) + 1;
     src_ah = ((reg_p[0x7] & (~0x0000ffff)) >> 0x10) + 1;
 
-    dst_aw = (reg_p[19] & (~0xffff0000)) + 1;
-    dst_ah = ((reg_p[19] & (~0x0000ffff)) >> 0x10) + 1;
+    dst_aw = (reg_p[0x13] & (~0xffff0000)) + 1;
+    dst_ah = ((reg_p[0x13] & (~0x0000ffff)) >> 0x10) + 1;
 
     DBG("src : aw = %d ah = %d stride = %d format is %x\n", src_aw, src_ah, src_stride, src_format);
     DBG("dst : aw = %d ah = %d stride = %d format is %x\n", dst_aw, dst_ah, dst_stride, dst_format);
@@ -473,8 +473,8 @@ static inline int rga2_init_version(void)
     pm_runtime_put(rga2_drvdata->dev);
 #endif
 
-    major_version = (reg_version & RGA2_MAJOR_VERSION_MASK) >> 24;
-    minor_version = (reg_version & RGA2_MINOR_VERSION_MASK) >> 20;
+    major_version = (reg_version & RGA2_MAJOR_VERSION_MASK) >> 0x18;
+    minor_version = (reg_version & RGA2_MINOR_VERSION_MASK) >> 0x14;
     svn_version = (reg_version & RGA2_SVN_VERSION_MASK);
 
     /*
@@ -483,7 +483,7 @@ static inline int rga2_init_version(void)
     if (!major_version && !minor_version) {
         major_version = 0x2;
     }
-    snprintf(rga->version, 10, "%x.%01x.%05x", major_version, minor_version, svn_version);
+    snprintf(rga->version, 0xA, "%x.%01x.%05x", major_version, minor_version, svn_version);
 
     return 0;
 }
@@ -492,19 +492,14 @@ static void rga2_soft_reset(void)
 {
     u32 i;
     u32 reg;
-
-    rga2_write((1 << 3) | (1 << 0x4) | (1 << 6), RGA2_SYS_CTRL);
-
+    rga2_write((1 << 0x3) | (1 << 0x4) | (1 << 0x6), RGA2_SYS_CTRL);
     for (i = 0; i < RGA2_RESET_TIMEOUT; i++) {
         reg = rga2_read(RGA2_SYS_CTRL) & 1; // RGA_SYS_CTRL
-
         if (reg == 0) {
             break;
         }
-
         udelay(1);
     }
-
     if (i == RGA2_RESET_TIMEOUT) {
         ERR("soft reset timeout.\n");
     }
@@ -548,13 +543,11 @@ static void rga2_power_on(void)
 {
     static ktime_t last;
     ktime_t now = ktime_get();
-
     if (ktime_to_ns(ktime_sub(now, last)) > NSEC_PER_SEC) {
         cancel_delayed_work_sync(&rga2_drvdata->power_off_work);
         rga2_queue_power_off_work();
         last = now;
     }
-
     if (rga2_service.enable) {
         return;
     }
@@ -583,7 +576,7 @@ static void rga2_power_off(void)
     total_running = atomic_read(&rga2_service.total_running);
     if (total_running) {
         pr_err("power off when %d task running!!\n", total_running);
-        mdelay(50);
+        mdelay(0x32);
         pr_err("delay 50 ms for running task\n");
         rga2_dump();
     }
@@ -618,7 +611,6 @@ static int rga2_flush(rga2_session *session, unsigned long arg)
 {
     int ret = 0;
     int ret_timeout;
-
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
     ktime_t start = ktime_set(0, 0);
     ktime_t end = ktime_set(0, 0);
@@ -628,18 +620,16 @@ static int rga2_flush(rga2_session *session, unsigned long arg)
     }
 #endif
     ret_timeout = wait_event_timeout(session->wait, atomic_read(&session->done), RGA2_TIMEOUT_DELAY);
-
     if (unlikely(ret_timeout < 0)) {
         u32 i;
         u32 *p;
-
         p = rga2_service.cmd_buff;
         pr_err("flush pid %d wait task ret %d\n", session->pid, ret);
         pr_err("interrupt = %x status = %x\n", rga2_read(RGA2_INT), rga2_read(RGA2_STATUS));
         rga2_printf_cmd_buf(p);
         DBG("rga2 CMD\n");
         for (i = 0; i < 0x7; i++) {
-            DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+            DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
         }
         mutex_lock(&rga2_service.lock);
         rga2_del_running_list();
@@ -648,14 +638,13 @@ static int rga2_flush(rga2_session *session, unsigned long arg)
     } else if (0 == ret_timeout) {
         u32 i;
         u32 *p;
-
         p = rga2_service.cmd_buff;
         pr_err("flush pid %d wait %d task done timeout\n", session->pid, atomic_read(&session->task_running));
         pr_err("interrupt = %x status = %x\n", rga2_read(RGA2_INT), rga2_read(RGA2_STATUS));
         rga2_printf_cmd_buf(p);
         DBG("rga2 CMD\n");
         for (i = 0; i < 0x7; i++) {
-            DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+            DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
         }
         mutex_lock(&rga2_service.lock);
         rga2_del_running_list_timeout();
@@ -690,30 +679,30 @@ static int rga2_get_result(rga2_session *session, unsigned long arg)
 static int rga2_check_param(const struct rga2_req *req)
 {
     if (!((req->render_mode == color_fill_mode))) {
-        if (unlikely((req->src.act_w <= 0) || (req->src.act_w > 8192) || (req->src.act_h <= 0) ||
-                     (req->src.act_h > 8192))) {
+        if (unlikely((req->src.act_w <= 0) || (req->src.act_w > 0x2000) || (req->src.act_h <= 0) ||
+                     (req->src.act_h > 0x2000))) {
             printk("invalid source resolution act_w = %d, act_h = %d\n", req->src.act_w, req->src.act_h);
             return -EINVAL;
         }
     }
 
     if (!((req->render_mode == color_fill_mode))) {
-        if (unlikely((req->src.vir_w <= 0) || (req->src.vir_w > 8192) || (req->src.vir_h <= 0) ||
-                     (req->src.vir_h > 8192))) {
+        if (unlikely((req->src.vir_w <= 0) || (req->src.vir_w > 0x2000) || (req->src.vir_h <= 0) ||
+                     (req->src.vir_h > 0x2000))) {
             printk("invalid source resolution vir_w = %d, vir_h = %d\n", req->src.vir_w, req->src.vir_h);
             return -EINVAL;
         }
     }
 
     // check dst width and height
-    if (unlikely((req->dst.act_w <= 0) || (req->dst.act_w > 4096) || (req->dst.act_h <= 0) ||
-                 (req->dst.act_h > 4096))) {
+    if (unlikely((req->dst.act_w <= 0) || (req->dst.act_w > 0x1000) || (req->dst.act_h <= 0) ||
+                 (req->dst.act_h > 0x1000))) {
         printk("invalid destination resolution act_w = %d, act_h = %d\n", req->dst.act_w, req->dst.act_h);
         return -EINVAL;
     }
 
-    if (unlikely((req->dst.vir_w <= 0) || (req->dst.vir_w > 4096) || (req->dst.vir_h <= 0) ||
-                 (req->dst.vir_h > 4096))) {
+    if (unlikely((req->dst.vir_w <= 0) || (req->dst.vir_w > 0x1000) || (req->dst.vir_h <= 0) ||
+                 (req->dst.vir_h > 0x1000))) {
         printk("invalid destination resolution vir_w = %d, vir_h = %d\n", req->dst.vir_w, req->dst.vir_h);
         return -EINVAL;
     }
@@ -748,10 +737,10 @@ static void rga2_copy_reg(struct rga2_reg *reg, uint32_t offset)
     atomic_add(1, &rga2_service.cmd_num);
     atomic_add(1, &reg->session->task_running);
 
-    cmd_buf = (uint32_t *)rga2_service.cmd_buff + offset * 32;
+    cmd_buf = (uint32_t *)rga2_service.cmd_buff + offset * 0x20;
     reg_p = (uint32_t *)reg->cmd_reg;
 
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < 0x20; i++) {
         cmd_buf[i] = reg_p[i];
     }
 }
@@ -763,7 +752,7 @@ static struct rga2_reg *rga2_reg_init(rga2_session *session, struct rga2_req *re
     /* Alloc 4k size for rga2_reg use. */
     struct rga2_reg *reg = (struct rga2_reg *)get_zeroed_page(GFP_KERNEL | GFP_DMA32);
 
-    if (NULL == reg) {
+    if (reg == NULL) {
         pr_err("get_zeroed_page fail in rga_reg_init\n");
         return NULL;
     }
@@ -857,7 +846,7 @@ static void rga2_try_set_reg(void)
             rga2_copy_reg(reg, 0);
             rga2_reg_from_wait_to_run(reg);
 
-            rga2_dma_flush_range(&reg->cmd_reg[0], &reg->cmd_reg[32]);
+            rga2_dma_flush_range(&reg->cmd_reg[0], &reg->cmd_reg[0x20]);
 
             rga2_write(0x0, RGA2_SYS_CTRL);
 
@@ -865,7 +854,7 @@ static void rga2_try_set_reg(void)
             rga2_write(virt_to_phys(reg->cmd_reg), RGA2_CMD_BASE);
 
             /* full csc reg */
-            for (i = 0; i < 12; i++) {
+            for (i = 0; i < 0xC; i++) {
                 rga2_write(reg->csc_reg[i], RGA2_CSC_COE_BASE + i * 0x4);
             }
 
@@ -876,24 +865,24 @@ static void rga2_try_set_reg(void)
 
                     p = rga2_service.cmd_buff;
                     INFO("CMD_REG\n");
-                    for (i = 0; i < 8; i++) {
-                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+                    for (i = 0; i < 0x8; i++) {
+                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
                     }
 
                     p = reg->csc_reg;
                     INFO("CSC_REG\n");
                     for (i = 0; i < 3; i++) {
-                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
                     }
                 }
             }
 #endif
 
             /* master mode */
-            rga2_write((0x1 << 1) | (0x1 << 0x2) | (0x1 << 0x5) | (0x1 << 6), RGA2_SYS_CTRL);
+            rga2_write((0x1 << 1) | (0x1 << 0x2) | (0x1 << 0x5) | (0x1 << 0x6), RGA2_SYS_CTRL);
 
             /* All CMD finish int */
-            rga2_write(rga2_read(RGA2_INT) | (0x1 << 10) | (0x1 << 9) | (0x1 << 8), RGA2_INT);
+            rga2_write(rga2_read(RGA2_INT) | (0x1 << 0xA) | (0x1 << 0x9) | (0x1 << 0x8), RGA2_INT);
 
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
             if (RGA2_TEST_TIME) {
@@ -908,14 +897,14 @@ static void rga2_try_set_reg(void)
             if (RGA2_TEST_REG) {
                 if (rga2_flag) {
                     INFO("CMD_READ_BACK_REG\n");
-                    for (i = 0; i < 8; i++) {
+                    for (i = 0; i < 0x8; i++) {
                         INFO("%.8x %.8x %.8x %.8x\n", rga2_read(0x100 + i * 0x10 + 0),
                              rga2_read(0x100 + i * 0x10 + 0x4), rga2_read(0x100 + i * 0x10 + 0x8),
                              rga2_read(0x100 + i * 0x10 + 0xc));
                     }
 
                     INFO("CSC_READ_BACK_REG\n");
-                    for (i = 0; i < 3; i++) {
+                    for (i = 0; i < 0x3; i++) {
                         INFO("%.8x %.8x %.8x %.8x\n", rga2_read(RGA2_CSC_COE_BASE + i * 0x10 + 0),
                              rga2_read(RGA2_CSC_COE_BASE + i * 0x10 + 0x4),
                              rga2_read(RGA2_CSC_COE_BASE + i * 0x10 + 0x8),
@@ -1095,7 +1084,6 @@ static int rga2_blit_sync(rga2_session *session, struct rga2_req *req)
         }
         if (RGA2_CHECK_MODE) {
             rga2_align_check(req);
-            /*rga2_scale_check(req);*/
         }
 #endif
 
@@ -1122,7 +1110,7 @@ static int rga2_blit_sync(rga2_session *session, struct rga2_req *req)
             rga2_printf_cmd_buf(p);
             DBG("rga2 CMD\n");
             for (i = 0; i < 0x7; i++) {
-                DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+                DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
             }
             mutex_lock(&rga2_service.lock);
             rga2_del_running_list();
@@ -1138,7 +1126,7 @@ static int rga2_blit_sync(rga2_session *session, struct rga2_req *req)
             rga2_printf_cmd_buf(p);
             DBG("rga2 CMD\n");
             for (i = 0; i < 0x7; i++) {
-                DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[3 + i * 0x4]);
+                DBG("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
             }
             mutex_lock(&rga2_service.lock);
             rga2_del_running_list_timeout();
@@ -1200,7 +1188,7 @@ static long rga_ioctl(struct file *file, uint32_t cmd, unsigned long arg)
 
     session = (rga2_session *)file->private_data;
 
-    if (NULL == session) {
+    if (session == NULL) {
         printk("%s [%d] rga thread session is null\n", __FUNCTION__, __LINE__);
         mutex_unlock(&rga2_service.mutex);
         return -EINVAL;
@@ -1387,7 +1375,7 @@ static long compat_rga_ioctl(struct file *file, uint32_t cmd, unsigned long arg)
     }
 #endif
 
-    if (NULL == session) {
+    if (session == NULL) {
         ERR("%s [%d] rga thread session is null\n", __func__, __LINE__);
         mutex_unlock(&rga2_service.mutex);
         return -EINVAL;
@@ -1505,7 +1493,7 @@ static long rga2_ioctl_kernel(struct rga_req *req_rga)
     memset(&req, 0x0, sizeof(req));
     mutex_lock(&rga2_service.mutex);
     session = &rga2_session_global;
-    if (NULL == session) {
+    if (session == NULL) {
         ERR("%s [%d] rga thread session is null\n", __func__, __LINE__);
         mutex_unlock(&rga2_service.mutex);
         return -EINVAL;
@@ -1522,7 +1510,7 @@ static int rga2_open(struct inode *inode, struct file *file)
 {
     rga2_session *session = kzalloc(sizeof(rga2_session), GFP_KERNEL);
 
-    if (NULL == session) {
+    if (session == NULL) {
         pr_err("unable to allocate memory for rga_session.");
         return -ENOMEM;
     }
@@ -1547,7 +1535,7 @@ static int rga2_release(struct inode *inode, struct file *file)
     int task_running;
     rga2_session *session = (rga2_session *)file->private_data;
 
-    if (NULL == session) {
+    if (session == NULL) {
         return -EINVAL;
     }
 
@@ -1622,12 +1610,12 @@ static irqreturn_t rga2_irq(int irq, void *dev_id)
         INFO("irq INT[%x], STATS[%x]\n", rga2_read(RGA2_INT), rga2_read(RGA2_STATUS));
     }
 #endif
-    /*if error interrupt then soft reset hardware*/
+    /* if error interrupt then soft reset hardware */
     if (rga2_read(RGA2_INT) & 0x01) {
         pr_err("Rga err irq! INT[%x],STATS[%x]\n", rga2_read(RGA2_INT), rga2_read(RGA2_STATUS));
         rga2_soft_reset();
     }
-    /*clear INT */
+    /* clear INT */
     rga2_write(rga2_read(RGA2_INT) | (0x1 << 0x4) | (0x1 << 0x5) | (0x1 << 0x6) | (0x1 << 0x7), RGA2_INT);
 
     return IRQ_WAKE_THREAD;
@@ -1708,7 +1696,7 @@ static int rga2_drv_probe(struct platform_device *pdev)
     mutex_init(&rga2_service.mutex);
     atomic_set(&rga2_service.total_running, 0);
     atomic_set(&rga2_service.src_format_swt, 0);
-    rga2_service.last_prc_src_format = 1; /* default is yuv first*/
+    rga2_service.last_prc_src_format = 1; /* default is yuv first */
     rga2_service.enable = false;
 
     rga2_ioctl_kernel_p = rga2_ioctl_kernel;
@@ -1936,14 +1924,14 @@ void rga2_slt(void)
             }
             err_count++;
         } else {
-            if (i % (640 * 1024) == 0) {
+            if (i % (0x280 * 0x400) == 0) {
                 INFO("[Y%.8d : 0x%.8x 0x%.8x]\n", i, *pstd, *pnow);
             }
             right_count++;
         }
         pstd++;
         pnow++;
-        if (err_count > 64) {
+        if (err_count > 0x40) {
             break;
         }
     }
@@ -2068,15 +2056,15 @@ void rga2_test_0(void)
     atomic_set(&session.num_done, 0);
 
     memset(&req, 0, sizeof(struct rga2_req));
-    src = kmalloc(800 * 480 * 0x4, GFP_KERNEL);
-    dst = kmalloc(800 * 480 * 0x4, GFP_KERNEL);
+    src = kmalloc(0x320 * 0x1E0 * 0x4, GFP_KERNEL);
+    dst = kmalloc(0x320 * 0x1E0 * 0x4, GFP_KERNEL);
 
     printk("\n********************************\n");
     printk("************ RGA2_TEST ************\n");
     printk("********************************\n\n");
 
-    memset(src, 0x80, 800 * 480 * 0x4);
-    memset(dst, 0xcc, 800 * 480 * 0x4);
+    memset(src, 0x80, 0x320 * 0x1E0 * 0x4);
+    memset(dst, 0xcc, 0x320 * 0x1E0 * 0x4);
 
     {
         uint32_t i, j;
@@ -2084,16 +2072,16 @@ void rga2_test_0(void)
 
         sp = (uint8_t *)src;
         for (j = 0; j < 0xf0; j++) {
-            sp = (uint8_t *)src + j * 0x140 * 10 / 8;
+            sp = (uint8_t *)src + j * 0x140 * 0xA / 0x8;
             for (i = 0; i < 0x140; i++) {
-                if ((i & 3) == 0) {
+                if ((i & 0x3) == 0) {
                     sp[i * 0x5 / 0x4] = 0;
                     sp[i * 0x5 / 0x4 + 1] = 0x1;
-                } else if ((i & 3) == 1) {
+                } else if ((i & 0x3) == 1) {
                     sp[i * 0x5 / 0x4 + 1] = 0x4;
-                } else if ((i & 3) == 0x2) {
+                } else if ((i & 0x3) == 0x2) {
                     sp[i * 0x5 / 0x4 + 1] = 0x10;
-                } else if ((i & 3) == 3) {
+                } else if ((i & 0x3) == 3) {
                     sp[i * 0x5 / 0x4 + 1] = 0x40;
                 }
             }

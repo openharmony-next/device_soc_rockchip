@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Rockchip Electronics Co., Ltd.
  */
 
-#ifndef _RKISP_REGS_V2X_H
-#define _RKISP_REGS_V2X_H
+#ifndef RKISP_REGS_V2X_H
+#define RKISP_REGS_V2X_H
 
 #define CTRL_BASE 0x00000000
 #define CTRL_VI_ISP_EN (CTRL_BASE + 0x00000)
@@ -2558,7 +2558,7 @@
 #define ISP21_SP_FORCE_UPD BIT(21)
 #define ISP21_MP_FORCE_UPD BIT(20)
 
-/* ISP21 MI_WR_CTRL2*/
+/* ISP21 MI_WR_CTRL2 */
 #define ISP21_BAY3D_FORCE_UPD BIT(22)
 #define ISP21_GAIN_FORCE_UPD BIT(21)
 #define ISP21_DBR_FORCE_UPD BIT(20)
@@ -2623,13 +2623,11 @@ static inline void raw_wr_set_pic_size(struct rkisp_stream *stream, u32 width, u
     void __iomem *base = stream->ispdev->base_addr;
 
     if (stream->out_isp_fmt.fmt_type == FMT_YUV) {
-        width *= 2;
+        width *= 0x02;
+    } else if (stream->out_isp_fmt.fmt_type == FMT_EBD) { /* hardware received 16bit embedded data */
+        width /= 0x02;
     }
-    /* hardware received 16bit embedded data */
-    else if (stream->out_isp_fmt.fmt_type == FMT_EBD) {
-        width /= 2;
-    }
-    writel(height << 16 | width, base + stream->config->dma.pic_size);
+    writel((height << 0x0A) | width, base + stream->config->dma.pic_size);
 }
 
 static inline void raw_wr_set_pic_offs(struct rkisp_stream *stream, u32 val)
@@ -2696,12 +2694,12 @@ static inline void mi_raw_length(struct rkisp_stream *stream)
     }
     rkisp_write(stream->ispdev, stream->config->mi.length, stream->out_fmt.plane_fmt[0].bytesperline, is_direct);
     if (stream->ispdev->isp_ver == ISP_V21 || stream->ispdev->isp_ver == ISP_V30) {
-        rkisp_set_bits(stream->ispdev, MI_RD_CTRL2, 0, BIT(30), false);
+        rkisp_set_bits(stream->ispdev, MI_RD_CTRL2, 0, BIT(0x1E), false);
     }
     if (stream->ispdev->hw_dev->is_unite) {
         rkisp_next_write(stream->ispdev, stream->config->mi.length, stream->out_fmt.plane_fmt[0].bytesperline,
                          is_direct);
-        rkisp_next_set_bits(stream->ispdev, MI_RD_CTRL2, 0, BIT(30), false);
+        rkisp_next_set_bits(stream->ispdev, MI_RD_CTRL2, 0, BIT(0x1E), false);
     }
 }
 

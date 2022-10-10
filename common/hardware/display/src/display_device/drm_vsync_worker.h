@@ -22,14 +22,10 @@
 #include "display_device.h"
 #include "hdi_device_common.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class DrmVsyncWorker
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class DrmVsyncWorker {
             public:
                 DrmVsyncWorker();
                 virtual ~DrmVsyncWorker();

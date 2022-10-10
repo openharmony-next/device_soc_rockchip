@@ -24,14 +24,10 @@
 #include "hdi_device_common.h"
 #include "hdi_drm_layer.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class AtomicReqPtr
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class AtomicReqPtr {
             public:
                 explicit AtomicReqPtr(drmModeAtomicReqPtr ptr) : mPtr(ptr)
                 {
@@ -51,8 +47,7 @@ namespace OHOS
                 drmModeAtomicReqPtr mPtr;
             };
 
-            class HdiDrmComposition : public HdiComposition
-            {
+            class HdiDrmComposition : public HdiComposition {
             public:
                 HdiDrmComposition(const std::shared_ptr<DrmConnector> &connector, const std::shared_ptr<DrmCrtc> &crtc,
                                   const std::shared_ptr<DrmDevice> &drmDevice);

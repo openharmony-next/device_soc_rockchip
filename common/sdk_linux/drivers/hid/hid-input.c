@@ -452,7 +452,7 @@ static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type, 
 
     if (quirks & HID_BATTERY_QUIRK_PERCENT) {
         min = 0;
-        max = 100;
+        max = 0x64;
     }
 
     if (quirks & HID_BATTERY_QUIRK_FEATURE) {
@@ -507,17 +507,13 @@ static void hidinput_cleanup_battery(struct hid_device *dev)
 static void hidinput_update_battery(struct hid_device *dev, int value)
 {
     int capacity;
-
     if (!dev->battery) {
         return;
     }
-
     if (value == 0 || value < dev->battery_min || value > dev->battery_max) {
         return;
     }
-
     capacity = hidinput_scale_battery_capacity(dev, value);
-
     if (dev->battery_status != HID_BATTERY_REPORTED || capacity != dev->battery_capacity) {
         dev->battery_capacity = capacity;
         dev->battery_status = HID_BATTERY_REPORTED;
@@ -579,7 +575,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
         case HID_UP_KEYBOARD:
             set_bit(EV_REP, input->evbit);
 
-            if ((usage->hid & HID_USAGE) < 256) {
+            if ((usage->hid & HID_USAGE) < 0x100) {
                 if (!hid_keyboard[usage->hid & HID_USAGE]) {
                     goto ignore;
                 }
@@ -735,13 +731,13 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
                         usage->hat_dir = 1;
                         break;
                     case HID_GD_DOWN:
-                        usage->hat_dir = 5;
+                        usage->hat_dir = 0x5;
                         break;
                     case HID_GD_RIGHT:
-                        usage->hat_dir = 3;
+                        usage->hat_dir = 0x3;
                         break;
                     case HID_GD_LEFT:
-                        usage->hat_dir = 7;
+                        usage->hat_dir = 0x7;
                         break;
                     default:
                         goto unknown;
@@ -1669,17 +1665,16 @@ mapped:
     }
 
     if (usage->type == EV_ABS) {
-
         int a = field->logical_minimum;
         int b = field->logical_maximum;
 
         if ((device->quirks & HID_QUIRK_BADPAD) && (usage->code == ABS_X || usage->code == ABS_Y)) {
             a = field->logical_minimum = 0;
-            b = field->logical_maximum = 255;
+            b = field->logical_maximum = 0xFF;
         }
 
         if (field->application == HID_GD_GAMEPAD || field->application == HID_GD_JOYSTICK) {
-            input_set_abs_params(input, usage->code, a, b, (b - a) >> 8, (b - a) >> 4);
+            input_set_abs_params(input, usage->code, a, b, (b - a) >> 0x8, (b - a) >> 0x4);
         } else {
             input_set_abs_params(input, usage->code, a, b, 0, 0);
         }
@@ -1688,13 +1683,13 @@ mapped:
 
         /* use a larger default input buffer for MT devices */
         if (usage->code == ABS_MT_POSITION_X && input->hint_events_per_packet == 0) {
-            input_set_events_per_packet(input, 60);
+            input_set_events_per_packet(input, 0x3C);
         }
     }
 
     if (usage->type == EV_ABS && (usage->hat_min < usage->hat_max || usage->hat_dir)) {
         int i;
-        for (i = usage->code; i < usage->code + 2 && i <= max; i++) {
+        for (i = usage->code; i < usage->code + 0x2 && i <= max; i++) {
             input_set_abs_params(input, i, -1, 1, 0, 0);
             set_bit(i, input->absbit);
         }
@@ -1745,12 +1740,12 @@ static void hidinput_handle_scroll(struct hid_usage *usage, struct input_dev *in
      * Our REL_WHEEL_HI_RES axis does the same because all HW must
      * adhere to the 120 expectation.
      */
-    hi_res = value * 120 / usage->resolution_multiplier;
+    hi_res = value * 0x78 / usage->resolution_multiplier;
 
     usage->wheel_accumulated += hi_res;
-    lo_res = usage->wheel_accumulated / 120;
+    lo_res = usage->wheel_accumulated / 0x78;
     if (lo_res) {
-        usage->wheel_accumulated -= lo_res * 120;
+        usage->wheel_accumulated -= lo_res * 0x78;
     }
 
     input_event(input, EV_REL, code, lo_res);
@@ -1780,9 +1775,9 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
     if (usage->hat_min < usage->hat_max || usage->hat_dir) {
         int hat_dir = usage->hat_dir;
         if (!hat_dir) {
-            hat_dir = (value - usage->hat_min) * 8 / (usage->hat_max - usage->hat_min + 1) + 1;
+            hat_dir = (value - usage->hat_min) * 0x8 / (usage->hat_max - usage->hat_min + 1) + 1;
         }
-        if (hat_dir < 0 || hat_dir > 8) {
+        if (hat_dir < 0 || hat_dir > 0x8) {
             hat_dir = 0;
         }
         input_event(input, usage->type, usage->code, hid_hat_to_axis[hat_dir].x);
@@ -1808,7 +1803,7 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
     if (usage->hid == (HID_UP_DIGITIZER | 0x0030) && (*quirks & HID_QUIRK_NOTOUCH)) { /* Pressure */
         int a = field->logical_minimum;
         int b = field->logical_maximum;
-        input_event(input, EV_KEY, BTN_TOUCH, value > a + ((b - a) >> 3));
+        input_event(input, EV_KEY, BTN_TOUCH, value > a + ((b - a) >> 0x3));
     }
 
     if (usage->hid == (HID_UP_PID | 0x83UL)) { /* Simultaneous Effects Max */
@@ -2125,7 +2120,6 @@ static void hidinput_change_resolution_multipliers(struct hid_device *hid)
     list_for_each_entry(rep, &rep_enum->report_list, list)
     {
         bool update_needed = __hidinput_change_resolution_multipliers(hid, rep, true);
-
         if (update_needed) {
             ret = __hid_request(hid, rep, HID_REQ_SET_REPORT);
             if (ret) {
@@ -2134,7 +2128,6 @@ static void hidinput_change_resolution_multipliers(struct hid_device *hid)
             }
         }
     }
-
     /* refresh our structs */
     hid_setup_resolution_multiplier(hid);
 }
@@ -2148,26 +2141,28 @@ static void report_features(struct hid_device *hid)
     int i, j;
 
     rep_enum = &hid->report_enum[HID_FEATURE_REPORT];
-    list_for_each_entry(rep, &rep_enum->report_list, list) for (i = 0; i < rep->maxfield; i++)
+    list_for_each_entry(rep, &rep_enum->report_list, list)
     {
-        /* Ignore if report count is out of bounds. */
-        if (rep->field[i]->report_count < 1) {
-            continue;
-        }
-
-        for (j = 0; j < rep->field[i]->maxusage; j++) {
-            usage = &rep->field[i]->usage[j];
-
-            /* Verify if Battery Strength feature is available */
-            if (usage->hid == HID_DC_BATTERYSTRENGTH) {
-                hidinput_setup_battery(hid, HID_FEATURE_REPORT, rep->field[i]);
+        for (i = 0; i < rep->maxfield; i++) {
+            /* Ignore if report count is out of bounds. */
+            if (rep->field[i]->report_count < 1) {
+                continue;
             }
 
-            if (drv->feature_mapping) {
-                drv->feature_mapping(hid, rep->field[i], usage);
+            for (j = 0; j < rep->field[i]->maxusage; j++) {
+                usage = &rep->field[i]->usage[j];
+
+                /* Verify if Battery Strength feature is available */
+                if (usage->hid == HID_DC_BATTERYSTRENGTH) {
+                    hidinput_setup_battery(hid, HID_FEATURE_REPORT, rep->field[i]);
+                }
+
+                if (drv->feature_mapping) {
+                    drv->feature_mapping(hid, rep->field[i], usage);
+                }
             }
-        }
-    }
+        }    
+    } 
 }
 
 static struct hid_input *hidinput_allocate(struct hid_device *hid, unsigned int application)
@@ -2320,7 +2315,6 @@ static void hidinput_cleanup_hidinput(struct hid_device *hid, struct hid_input *
 
         list_for_each_entry(report, &hid->report_enum[k].report_list, list)
         {
-
             for (i = 0; i < report->maxfield; i++) {
                 if (report->field[i]->hidinput == hidinput) {
                     report->field[i]->hidinput = NULL;
@@ -2416,7 +2410,6 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
 
         list_for_each_entry(report, &hid->report_enum[k].report_list, list)
         {
-
             if (!report->maxfield) {
                 continue;
             }

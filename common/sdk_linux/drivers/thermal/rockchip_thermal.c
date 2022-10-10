@@ -1172,7 +1172,7 @@ static const struct of_device_id of_rockchip_thermal_match[] = {
         .compatible = "rockchip,rk3568-tsadc",
         .data = (void *)&rk3568_tsadc_data,
     },
-    {/* end */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, of_rockchip_thermal_match);
 

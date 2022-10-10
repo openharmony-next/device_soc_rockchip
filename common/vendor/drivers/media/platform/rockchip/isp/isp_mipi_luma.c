@@ -45,11 +45,13 @@ static int rkisp_luma_g_fmt_meta_cap(struct file *file, void *priv, struct v4l2_
 
 static int rkisp_luma_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct video_device *vdev = video_devdata(file);
     struct rkisp_luma_vdev *luma_vdev = video_get_drvdata(vdev);
 
     strcpy(cap->driver, DRIVER_NAME);
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, luma_vdev->dev->isp_ver >> RKISP_MAX_PIPELINE);
+    ret = snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME,
+                   luma_vdev->dev->isp_ver >> RKISP_MAX_PIPELINE);
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
     strlcpy(cap->bus_info, "platform: " DRIVER_NAME, sizeof(cap->bus_info));
 

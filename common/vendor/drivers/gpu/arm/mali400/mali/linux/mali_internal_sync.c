@@ -1,12 +1,14 @@
 /*
  * Copyright (C) 2012-2018 ARM Limited. All rights reserved.
  *
- * This program is free software and is provided to you under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation, and any use by you of this program is subject to the terms of such GNU
- * licence.
+ * This program is free software and is provided to you under the terms of the
+ * GNU General Public License version 2 as published by the Free Software
+ * Foundation, and any use by you of this program is subject to the terms of
+ * such GNU licence.
  *
- * A copy of the licence is included with the program, and can also be obtained from Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * A copy of the licence is included with the program, and can also be obtained
+ * from Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 
 #include "mali_internal_sync.h"
@@ -37,9 +39,11 @@ static const struct fence_ops fence_ops;
 #endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-static struct mali_internal_sync_point *mali_internal_fence_to_sync_pt(struct dma_fence *fence)
+static struct mali_internal_sync_point *
+mali_internal_fence_to_sync_pt(struct dma_fence *fence)
 #else
-static struct mali_internal_sync_point *mali_internal_fence_to_sync_pt(struct fence *fence)
+static struct mali_internal_sync_point *
+mali_internal_fence_to_sync_pt(struct fence *fence)
 #endif
 {
     MALI_DEBUG_ASSERT_POINTER(fence);
@@ -50,7 +54,8 @@ static inline struct mali_internal_sync_timeline *
 mali_internal_sync_pt_to_sync_timeline(struct mali_internal_sync_point *sync_pt)
 {
     MALI_DEBUG_ASSERT_POINTER(sync_pt);
-    return container_of(sync_pt->base.lock, struct mali_internal_sync_timeline, sync_pt_list_lock);
+    return container_of(sync_pt->base.lock, struct mali_internal_sync_timeline,
+                        sync_pt_list_lock);
 }
 
 static void mali_internal_sync_timeline_free(struct kref *kref_count)
@@ -59,7 +64,8 @@ static void mali_internal_sync_timeline_free(struct kref *kref_count)
 
     MALI_DEBUG_ASSERT_POINTER(kref_count);
 
-    sync_timeline = container_of(kref_count, struct mali_internal_sync_timeline, kref_count);
+    sync_timeline = container_of(kref_count, struct mali_internal_sync_timeline,
+                                 kref_count);
 
     if (sync_timeline->ops->release_obj) {
         sync_timeline->ops->release_obj(sync_timeline);
@@ -69,9 +75,11 @@ static void mali_internal_sync_timeline_free(struct kref *kref_count)
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-static void mali_internal_fence_check_cb_func(struct fence *fence, struct fence_cb *cb)
+static void mali_internal_fence_check_cb_func(struct fence *fence,
+                                              struct fence_cb *cb)
 #else
-static void mali_internal_fence_check_cb_func(struct dma_fence *fence, struct dma_fence_cb *cb)
+static void mali_internal_fence_check_cb_func(struct dma_fence *fence,
+                                              struct dma_fence_cb *cb)
 #endif
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
@@ -99,7 +107,9 @@ static void mali_internal_fence_check_cb_func(struct dma_fence *fence, struct dm
     ret = sync_fence->fence->ops->signaled(sync_fence->fence);
 
     if (0 > ret) {
-        MALI_PRINT_ERROR(("Mali internal sync:Failed to wait fence  0x%x for sync_fence 0x%x.\n", fence, sync_fence));
+        MALI_PRINT_ERROR(("Mali internal sync:Failed to wait fence  0x%x for "
+                          "sync_fence 0x%x.\n",
+                          fence, sync_fence));
     }
     if (1 == ret) {
         wake_up_all(&sync_fence->wq);
@@ -108,7 +118,9 @@ static void mali_internal_fence_check_cb_func(struct dma_fence *fence, struct dm
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
-static void mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *sync_fence, struct fence *sync_pt)
+static void
+mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *sync_fence,
+                                   struct fence *sync_pt)
 {
     int fence_num = 0;
     MALI_DEBUG_ASSERT_POINTER(sync_fence);
@@ -119,7 +131,8 @@ static void mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *
     sync_fence->cbs[fence_num].fence = sync_pt;
     sync_fence->cbs[fence_num].sync_file = sync_fence;
 
-    if (!fence_add_callback(sync_pt, &sync_fence->cbs[fence_num].cb, mali_internal_fence_check_cb_func)) {
+    if (!fence_add_callback(sync_pt, &sync_fence->cbs[fence_num].cb,
+                            mali_internal_fence_check_cb_func)) {
         fence_get(sync_pt);
         sync_fence->num_fences++;
         atomic_inc(&sync_fence->status);
@@ -127,9 +140,13 @@ static void mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *
 }
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
-static int mali_internal_sync_fence_wake_up_wq(wait_queue_entry_t *curr, unsigned mode, int wake_flags, void *key)
+static int mali_internal_sync_fence_wake_up_wq(wait_queue_entry_t *curr,
+                                               unsigned mode, int wake_flags,
+                                               void *key)
 #else
-static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode, int wake_flags, void *key)
+static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr,
+                                               unsigned mode, int wake_flags,
+                                               void *key)
 #endif
 {
     struct mali_internal_sync_fence_waiter *wait;
@@ -147,21 +164,24 @@ static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode
     return 1;
 }
 
-struct mali_internal_sync_timeline *
-mali_internal_sync_timeline_create(const struct mali_internal_sync_timeline_ops *ops, int size, const char *name)
+struct mali_internal_sync_timeline *mali_internal_sync_timeline_create(
+    const struct mali_internal_sync_timeline_ops *ops, int size,
+    const char *name)
 {
     struct mali_internal_sync_timeline *sync_timeline = NULL;
 
     MALI_DEBUG_ASSERT_POINTER(ops);
 
     if (size < sizeof(struct mali_internal_sync_timeline)) {
-        MALI_PRINT_ERROR(("Mali internal sync:Invalid size to create the mali internal sync timeline.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Invalid size to create the mali "
+                          "internal sync timeline.\n"));
         goto err;
     }
 
     sync_timeline = kzalloc(size, GFP_KERNEL);
     if (NULL == sync_timeline) {
-        MALI_PRINT_ERROR(("Mali internal sync:Failed to  allocate buffer  for the mali internal sync timeline.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Failed to  allocate buffer  for "
+                          "the mali internal sync timeline.\n"));
         goto err;
     }
     kref_init(&sync_timeline->kref_count);
@@ -184,7 +204,8 @@ err:
     return NULL;
 }
 
-void mali_internal_sync_timeline_destroy(struct mali_internal_sync_timeline *sync_timeline)
+void mali_internal_sync_timeline_destroy(
+    struct mali_internal_sync_timeline *sync_timeline)
 {
     MALI_DEBUG_ASSERT_POINTER(sync_timeline);
 
@@ -196,7 +217,8 @@ void mali_internal_sync_timeline_destroy(struct mali_internal_sync_timeline *syn
     kref_put(&sync_timeline->kref_count, mali_internal_sync_timeline_free);
 }
 
-void mali_internal_sync_timeline_signal(struct mali_internal_sync_timeline *sync_timeline)
+void mali_internal_sync_timeline_signal(
+    struct mali_internal_sync_timeline *sync_timeline)
 {
     unsigned long flags;
     struct mali_internal_sync_point *sync_pt, *next;
@@ -205,7 +227,8 @@ void mali_internal_sync_timeline_signal(struct mali_internal_sync_timeline *sync
 
     spin_lock_irqsave(&sync_timeline->sync_pt_list_lock, flags);
 
-    list_for_each_entry_safe(sync_pt, next, &sync_timeline->sync_pt_list_head, sync_pt_list)
+    list_for_each_entry_safe(sync_pt, next, &sync_timeline->sync_pt_list_head,
+                             sync_pt_list)
     {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
         if (dma_fence_is_signaled_locked(&sync_pt->base))
@@ -218,8 +241,8 @@ void mali_internal_sync_timeline_signal(struct mali_internal_sync_timeline *sync
     spin_unlock_irqrestore(&sync_timeline->sync_pt_list_lock, flags);
 }
 
-struct mali_internal_sync_point *mali_internal_sync_point_create(struct mali_internal_sync_timeline *sync_timeline,
-                                                                 int size)
+struct mali_internal_sync_point *mali_internal_sync_point_create(
+    struct mali_internal_sync_timeline *sync_timeline, int size)
 {
     unsigned long flags;
     struct mali_internal_sync_point *sync_pt = NULL;
@@ -227,23 +250,26 @@ struct mali_internal_sync_point *mali_internal_sync_point_create(struct mali_int
     MALI_DEBUG_ASSERT_POINTER(sync_timeline);
 
     if (size < sizeof(struct mali_internal_sync_point)) {
-        MALI_PRINT_ERROR(("Mali internal sync:Invalid size to create the mali internal sync point.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Invalid size to create the mali "
+                          "internal sync point.\n"));
         goto err;
     }
 
     sync_pt = kzalloc(size, GFP_KERNEL);
     if (NULL == sync_pt) {
-        MALI_PRINT_ERROR(("Mali internal sync:Failed to  allocate buffer  for the mali internal sync point.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Failed to  allocate buffer  for "
+                          "the mali internal sync point.\n"));
         goto err;
     }
     spin_lock_irqsave(&sync_timeline->sync_pt_list_lock, flags);
     kref_get(&sync_timeline->kref_count);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-    dma_fence_init(&sync_pt->base, &fence_ops, &sync_timeline->sync_pt_list_lock, sync_timeline->fence_context,
-                   ++sync_timeline->value);
+    dma_fence_init(&sync_pt->base, &fence_ops,
+                   &sync_timeline->sync_pt_list_lock,
+                   sync_timeline->fence_context, ++sync_timeline->value);
 #else
-    fence_init(&sync_pt->base, &fence_ops, &sync_timeline->sync_pt_list_lock, sync_timeline->fence_context,
-               ++sync_timeline->value);
+    fence_init(&sync_pt->base, &fence_ops, &sync_timeline->sync_pt_list_lock,
+               sync_timeline->fence_context, ++sync_timeline->value);
 #endif
     INIT_LIST_HEAD(&sync_pt->sync_pt_list);
     spin_unlock_irqrestore(&sync_timeline->sync_pt_list_lock, flags);
@@ -268,8 +294,9 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_fdget(int fd)
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
-struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
-                                                                struct mali_internal_sync_fence *sync_fence2)
+struct mali_internal_sync_fence *
+mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
+                               struct mali_internal_sync_fence *sync_fence2)
 {
     struct mali_internal_sync_fence *new_sync_fence;
     int i, j, num_fence1, num_fence2, total_fences;
@@ -294,14 +321,16 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
         j = 1;
     }
 
-    new_sync_fence = (struct mali_internal_sync_fence *)sync_file_create(fence0);
+    new_sync_fence =
+        (struct mali_internal_sync_fence *)sync_file_create(fence0);
     if (NULL == new_sync_fence) {
-        MALI_PRINT_ERROR(
-            ("Mali internal sync:Failed to  create the mali internal sync fence when merging sync fence.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Failed to  create the mali "
+                          "internal sync fence when merging sync fence.\n"));
         return NULL;
     }
 
-    fence_remove_callback(new_sync_fence->cb[0].fence, &new_sync_fence->cb[0].cb);
+    fence_remove_callback(new_sync_fence->cb[0].fence,
+                          &new_sync_fence->cb[0].cb);
     new_sync_fence->num_fences = 0;
     atomic_dec(&new_sync_fence->status);
 
@@ -329,31 +358,39 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
     }
 
     for (; i < num_fence1; i++) {
-        mali_internal_sync_fence_add_fence(new_sync_fence, sync_fence1->cbs[i].fence);
+        mali_internal_sync_fence_add_fence(new_sync_fence,
+                                           sync_fence1->cbs[i].fence);
     }
 
     for (; j < num_fence2; j++) {
-        mali_internal_sync_fence_add_fence(new_sync_fence, sync_fence2->cbs[j].fence);
+        mali_internal_sync_fence_add_fence(new_sync_fence,
+                                           sync_fence2->cbs[j].fence);
     }
 
     return new_sync_fence;
 }
 #else
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-static struct fence **mali_internal_get_fences(struct mali_internal_sync_fence *sync_fence, int *num_fences)
+static struct fence **
+mali_internal_get_fences(struct mali_internal_sync_fence *sync_fence,
+                         int *num_fences)
 #else
-static struct dma_fence **mali_internal_get_fences(struct mali_internal_sync_fence *sync_fence, int *num_fences)
+static struct dma_fence **
+mali_internal_get_fences(struct mali_internal_sync_fence *sync_fence,
+                         int *num_fences)
 #endif
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
     if (sync_fence->fence->ops == &fence_array_ops) {
-        struct fence_array *fence_array = container_of(sync_fence->fence, struct fence_array, base);
+        struct fence_array *fence_array =
+            container_of(sync_fence->fence, struct fence_array, base);
         *num_fences = fence_array->num_fences;
         return fence_array->fences;
     }
 #else
     if (sync_fence->fence->ops == &dma_fence_array_ops) {
-        struct dma_fence_array *fence_array = container_of(sync_fence->fence, struct dma_fence_array, base);
+        struct dma_fence_array *fence_array =
+            container_of(sync_fence->fence, struct dma_fence_array, base);
         *num_fences = fence_array->num_fences;
         return fence_array->fences;
     }
@@ -363,9 +400,12 @@ static struct dma_fence **mali_internal_get_fences(struct mali_internal_sync_fen
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-static void mali_internal_add_fence_array(struct fence **fences, int *num_fences, struct fence *fence)
+static void mali_internal_add_fence_array(struct fence **fences,
+                                          int *num_fences, struct fence *fence)
 #else
-static void mali_internal_add_fence_array(struct dma_fence **fences, int *num_fences, struct dma_fence *fence)
+static void mali_internal_add_fence_array(struct dma_fence **fences,
+                                          int *num_fences,
+                                          struct dma_fence *fence)
 #endif
 {
     fences[*num_fences] = fence;
@@ -383,11 +423,13 @@ static void mali_internal_add_fence_array(struct dma_fence **fences, int *num_fe
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-static int mali_internal_sync_fence_set_fence_array(struct mali_internal_sync_fence *sync_fence, struct fence **fences,
-                                                    int num_fences)
+static int mali_internal_sync_fence_set_fence_array(
+    struct mali_internal_sync_fence *sync_fence, struct fence **fences,
+    int num_fences)
 #else
-static int mali_internal_sync_fence_set_fence_array(struct mali_internal_sync_fence *sync_fence,
-                                                    struct dma_fence **fences, int num_fences)
+static int mali_internal_sync_fence_set_fence_array(
+    struct mali_internal_sync_fence *sync_fence, struct dma_fence **fences,
+    int num_fences)
 #endif
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
@@ -400,9 +442,11 @@ static int mali_internal_sync_fence_set_fence_array(struct mali_internal_sync_fe
         kfree(fences);
     } else {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-        array = fence_array_create(num_fences, fences, fence_context_alloc(1), 1, false);
+        array = fence_array_create(num_fences, fences, fence_context_alloc(1),
+                                   1, false);
 #else
-        array = dma_fence_array_create(num_fences, fences, dma_fence_context_alloc(1), 1, false);
+        array = dma_fence_array_create(num_fences, fences,
+                                       dma_fence_context_alloc(1), 1, false);
 #endif
         if (!array) {
             return -ENOMEM;
@@ -412,8 +456,9 @@ static int mali_internal_sync_fence_set_fence_array(struct mali_internal_sync_fe
     return 0;
 }
 
-struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
-                                                                struct mali_internal_sync_fence *sync_fence2)
+struct mali_internal_sync_fence *
+mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
+                               struct mali_internal_sync_fence *sync_fence2)
 {
     struct mali_internal_sync_fence *sync_fence;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
@@ -430,7 +475,8 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
 
     fences = kcalloc(num_fences, sizeof(*fences), GFP_KERNEL);
     if (!fences) {
-        MALI_PRINT_ERROR(("Mali internal sync:Failed to  alloc buffer for fences.\n"));
+        MALI_PRINT_ERROR(
+            ("Mali internal sync:Failed to  alloc buffer for fences.\n"));
         goto fences_alloc_failed;
     }
 
@@ -478,7 +524,8 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
 #endif
 
     if (num_fences > real_num_fences) {
-        nfences = krealloc(fences, real_num_fences * sizeof(*fences), GFP_KERNEL);
+        nfences =
+            krealloc(fences, real_num_fences * sizeof(*fences), GFP_KERNEL);
         if (!nfences) {
             goto nfences_alloc_failed;
         }
@@ -488,8 +535,8 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
 
     sync_fence = (struct mali_internal_sync_fence *)sync_file_create(fences[0]);
     if (NULL == sync_fence) {
-        MALI_PRINT_ERROR(
-            ("Mali internal sync:Failed to  create the mali internal sync fence when merging sync fence.\n"));
+        MALI_PRINT_ERROR(("Mali internal sync:Failed to  create the mali "
+                          "internal sync fence when merging sync fence.\n"));
         goto sync_fence_alloc_failed;
     }
 
@@ -499,8 +546,10 @@ struct mali_internal_sync_fence *mali_internal_sync_fence_merge(struct mali_inte
     dma_fence_put(fences[0]);
 #endif
 
-    if (mali_internal_sync_fence_set_fence_array(sync_fence, fences, real_num_fences) < 0) {
-        MALI_PRINT_ERROR(("Mali internal sync:Failed to  set fence for sync fence.\n"));
+    if (mali_internal_sync_fence_set_fence_array(sync_fence, fences,
+                                                 real_num_fences) < 0) {
+        MALI_PRINT_ERROR(
+            ("Mali internal sync:Failed to  set fence for sync fence.\n"));
         goto sync_fence_set_failed;
     }
 
@@ -522,8 +571,9 @@ fences_alloc_failed:
 }
 #endif
 
-void mali_internal_sync_fence_waiter_init(struct mali_internal_sync_fence_waiter *waiter,
-                                          mali_internal_sync_callback_t callback)
+void mali_internal_sync_fence_waiter_init(
+    struct mali_internal_sync_fence_waiter *waiter,
+    mali_internal_sync_callback_t callback)
 {
     MALI_DEBUG_ASSERT_POINTER(waiter);
     MALI_DEBUG_ASSERT_POINTER(callback);
@@ -536,8 +586,9 @@ void mali_internal_sync_fence_waiter_init(struct mali_internal_sync_fence_waiter
     waiter->callback = callback;
 }
 
-int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fence,
-                                        struct mali_internal_sync_fence_waiter *waiter)
+int mali_internal_sync_fence_wait_async(
+    struct mali_internal_sync_fence *sync_fence,
+    struct mali_internal_sync_fence_waiter *waiter)
 {
     int err;
     unsigned long flags;
@@ -555,7 +606,8 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
         return 1;
     }
 
-    init_waitqueue_func_entry(&waiter->work, mali_internal_sync_fence_wake_up_wq);
+    init_waitqueue_func_entry(&waiter->work,
+                              mali_internal_sync_fence_wake_up_wq);
     waiter->work.private = sync_fence;
 
     spin_lock_irqsave(&sync_fence->wq.lock, flags);
@@ -572,7 +624,8 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
 
     return !err;
 #else
-    if ((sync_fence->fence) && (sync_fence->fence->ops) && (sync_fence->fence->ops->signaled)) {
+    if ((sync_fence->fence) && (sync_fence->fence->ops) &&
+        (sync_fence->fence->ops->signaled)) {
         err = sync_fence->fence->ops->signaled(sync_fence->fence);
     } else {
         err = -1;
@@ -587,9 +640,11 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
     }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-    err = dma_fence_add_callback(sync_fence->fence, &waiter->cb, mali_internal_fence_check_cb_func);
+    err = dma_fence_add_callback(sync_fence->fence, &waiter->cb,
+                                 mali_internal_fence_check_cb_func);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
-    err = fence_add_callback(sync_fence->fence, &waiter->cb, mali_internal_fence_check_cb_func);
+    err = fence_add_callback(sync_fence->fence, &waiter->cb,
+                             mali_internal_fence_check_cb_func);
 #endif
 
     if (0 != err) {
@@ -598,7 +653,8 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
         }
         return err;
     }
-    init_waitqueue_func_entry(&waiter->work, mali_internal_sync_fence_wake_up_wq);
+    init_waitqueue_func_entry(&waiter->work,
+                              mali_internal_sync_fence_wake_up_wq);
     waiter->work.private = sync_fence;
 
     spin_lock_irqsave(&sync_fence->wq.lock, flags);
@@ -617,8 +673,9 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
 #endif
 }
 
-int mali_internal_sync_fence_cancel_async(struct mali_internal_sync_fence *sync_fence,
-                                          struct mali_internal_sync_fence_waiter *waiter)
+int mali_internal_sync_fence_cancel_async(
+    struct mali_internal_sync_fence *sync_fence,
+    struct mali_internal_sync_fence_waiter *waiter)
 {
     unsigned long flags;
     int ret = 0;
@@ -670,7 +727,8 @@ static const char *mali_internal_fence_get_driver_name(struct fence *fence)
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-static const char *mali_internal_fence_get_timeline_name(struct dma_fence *fence)
+static const char *
+mali_internal_fence_get_timeline_name(struct dma_fence *fence)
 #else
 static const char *mali_internal_fence_get_timeline_name(struct fence *fence)
 #endif
@@ -736,8 +794,9 @@ static bool mali_internal_fence_signaled(struct fence *fence)
 
     ret = parent->ops->has_signaled(sync_pt);
     if (0 > ret)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0) ||                                                                 \
-     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 68)))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0) ||                         \
+     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0) &&                         \
+      LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 68)))
         fence->error = ret;
 #else
         fence->status = ret;
@@ -768,9 +827,11 @@ static bool mali_internal_fence_enable_signaling(struct fence *fence)
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-static void mali_internal_fence_value_str(struct dma_fence *fence, char *str, int size)
+static void mali_internal_fence_value_str(struct dma_fence *fence, char *str,
+                                          int size)
 #else
-static void mali_internal_fence_value_str(struct fence *fence, char *str, int size)
+static void mali_internal_fence_value_str(struct fence *fence, char *str,
+                                          int size)
 #endif
 {
     struct mali_internal_sync_point *sync_pt;

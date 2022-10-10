@@ -191,7 +191,7 @@ static unsigned long rockchip_get_video_param(char **str)
     strsep(str, "=");
     p = strsep(str, ",");
     if (p) {
-        if (kstrtoul(p, 10, &val)) {
+        if (kstrtoul(p, 0xA, &val)) {
             return 0;
         }
     }
@@ -214,7 +214,7 @@ static struct video_info *rockchip_parse_video_info(const char *buf)
     while ((cp = strpbrk(cp + 1, ","))) {
         ntokens++;
     }
-    if (ntokens != 5) {
+    if (ntokens != 0x5) {
         return NULL;
     }
 
@@ -243,13 +243,10 @@ static struct video_info *rockchip_parse_video_info(const char *buf)
 static struct video_info *rockchip_find_video_info(const char *buf)
 {
     struct video_info *info, *video_info;
-
     video_info = rockchip_parse_video_info(buf);
-
     if (!video_info) {
         return NULL;
     }
-
     mutex_lock(&video_info_mutex);
     list_for_each_entry(info, &video_info_list, node)
     {
@@ -261,10 +258,8 @@ static struct video_info *rockchip_find_video_info(const char *buf)
             return info;
         }
     }
-
     mutex_unlock(&video_info_mutex);
     kfree(video_info);
-
     return NULL;
 }
 
@@ -314,7 +309,7 @@ static void rockchip_update_video_info(void)
     if (max_res <= VIDEO_1080P_SIZE) {
         rockchip_set_system_status(SYS_STATUS_VIDEO_1080P);
     } else {
-        if (max_stream_bitrate == 10) {
+        if (max_stream_bitrate == 0xA) {
             rockchip_set_system_status(SYS_STATUS_VIDEO_4K_10B);
         } else {
             rockchip_set_system_status(SYS_STATUS_VIDEO_4K);
@@ -409,18 +404,18 @@ static int rockchip_get_temp_freq_table(struct device_node *np, char *porp_name,
         return -EINVAL;
     }
 
-    if (count % 2) {
+    if (count % 0x2) {
         return -EINVAL;
     }
 
-    table = kzalloc(sizeof(*table) * (count / 2 + 1), GFP_KERNEL);
+    table = kzalloc(sizeof(*table) * (count / 0x2 + 1), GFP_KERNEL);
     if (!table) {
         return -ENOMEM;
     }
 
-    for (i = 0; i < count / 2; i++) {
-        of_property_read_u32_index(np, porp_name, 2 * i, &table[i].temp);
-        of_property_read_u32_index(np, porp_name, 2 * i + 1, &table[i].freq);
+    for (i = 0; i < count / 0x2; i++) {
+        of_property_read_u32_index(np, porp_name, 0x2 * i, &table[i].temp);
+        of_property_read_u32_index(np, porp_name, 0x2 * i + 1, &table[i].freq);
     }
     table[i].freq = UINT_MAX;
     *freq_table = table;
@@ -448,19 +443,19 @@ static int rockchip_get_adjust_volt_table(struct device_node *np, char *porp_nam
         return -EINVAL;
     }
 
-    if (count % 3) {
+    if (count % 0x3) {
         return -EINVAL;
     }
 
-    volt_table = kzalloc(sizeof(*volt_table) * (count / 3 + 1), GFP_KERNEL);
+    volt_table = kzalloc(sizeof(*volt_table) * (count / 0x3 + 1), GFP_KERNEL);
     if (!volt_table) {
         return -ENOMEM;
     }
 
-    for (i = 0; i < count / 3; i++) {
-        of_property_read_u32_index(np, porp_name, 3 * i, &volt_table[i].min);
-        of_property_read_u32_index(np, porp_name, 3 * i + 1, &volt_table[i].max);
-        of_property_read_u32_index(np, porp_name, 3 * i + 2, &volt_table[i].volt);
+    for (i = 0; i < count / 0x3; i++) {
+        of_property_read_u32_index(np, porp_name, 0x3 * i, &volt_table[i].min);
+        of_property_read_u32_index(np, porp_name, 0x3 * i + 1, &volt_table[i].max);
+        of_property_read_u32_index(np, porp_name, 0x3 * i + 0x2, &volt_table[i].volt);
     }
     volt_table[i].min = 0;
     volt_table[i].max = 0;
@@ -474,7 +469,7 @@ static int rockchip_get_adjust_volt_table(struct device_node *np, char *porp_nam
 static int rockchip_get_low_temp_volt(struct monitor_dev_info *info, unsigned long rate, int *delta_volt)
 {
     int i, ret = -EINVAL;
-    unsigned int _rate = (unsigned int)(rate / 1000000);
+    unsigned int _rate = (unsigned int)(rate / 0xF4240);
 
     if (!info->low_temp_adjust_table) {
         return ret;
@@ -606,7 +601,7 @@ static int monitor_device_parse_wide_temp_config(struct device_node *np, struct 
     }
     if (!info->high_limit_table) {
         if (!of_property_read_u32(np, "rockchip,high-temp-max-freq", &value)) {
-            high_temp_max_freq = value * 1000;
+            high_temp_max_freq = value * 0x3E8;
             if (info->high_limit) {
                 info->high_limit = min(high_temp_max_freq, info->high_limit);
             } else {
@@ -711,7 +706,7 @@ int rockchip_monitor_cpu_low_temp_adjust(struct monitor_dev_info *info, bool is_
 {
     if (info->low_limit) {
         if (is_low) {
-            freq_qos_update_request(&info->max_temp_freq_req, info->low_limit / 1000);
+            freq_qos_update_request(&info->max_temp_freq_req, info->low_limit / 0x3E8);
         } else {
             freq_qos_update_request(&info->max_temp_freq_req, FREQ_QOS_MAX_DEFAULT_VALUE);
         }
@@ -728,12 +723,12 @@ int rockchip_monitor_cpu_high_temp_adjust(struct monitor_dev_info *info, bool is
     }
 
     if (info->high_limit_table) {
-        freq_qos_update_request(&info->max_temp_freq_req, info->high_limit / 1000);
+        freq_qos_update_request(&info->max_temp_freq_req, info->high_limit / 0x3E8);
         return 0;
     }
 
     if (is_high) {
-        freq_qos_update_request(&info->max_temp_freq_req, info->high_limit / 1000);
+        freq_qos_update_request(&info->max_temp_freq_req, info->high_limit / 0x3E8);
     } else {
         freq_qos_update_request(&info->max_temp_freq_req, FREQ_QOS_MAX_DEFAULT_VALUE);
     }
@@ -749,7 +744,7 @@ int rockchip_monitor_dev_low_temp_adjust(struct monitor_dev_info *info, bool is_
     }
 
     if (is_low) {
-        dev_pm_qos_update_request(&info->dev_max_freq_req, info->low_limit / 1000);
+        dev_pm_qos_update_request(&info->dev_max_freq_req, info->low_limit / 0x3E8);
     } else {
         dev_pm_qos_update_request(&info->dev_max_freq_req, PM_QOS_MAX_FREQUENCY_DEFAULT_VALUE);
     }
@@ -765,12 +760,12 @@ int rockchip_monitor_dev_high_temp_adjust(struct monitor_dev_info *info, bool is
     }
 
     if (info->high_limit_table) {
-        dev_pm_qos_update_request(&info->dev_max_freq_req, info->high_limit / 1000);
+        dev_pm_qos_update_request(&info->dev_max_freq_req, info->high_limit / 0x3E8);
         return 0;
     }
 
     if (is_high) {
-        dev_pm_qos_update_request(&info->dev_max_freq_req, info->high_limit / 1000);
+        dev_pm_qos_update_request(&info->dev_max_freq_req, info->high_limit / 0x3E8);
     } else {
         dev_pm_qos_update_request(&info->dev_max_freq_req, PM_QOS_MAX_FREQUENCY_DEFAULT_VALUE);
     }
@@ -908,7 +903,7 @@ static int rockchip_system_monitor_wide_temp_adjust(struct monitor_dev_info *inf
     if (info->high_limit_table) {
         for (i = 0; info->high_limit_table[i].freq != UINT_MAX; i++) {
             if (temp > info->high_limit_table[i].temp) {
-                target_freq = info->high_limit_table[i].freq * 1000;
+                target_freq = info->high_limit_table[i].freq * 0x3E8;
             }
         }
         if (target_freq != info->high_limit) {
@@ -1006,9 +1001,9 @@ static int rockchip_system_monitor_freq_qos_requset(struct monitor_dev_info *inf
     int ret;
 
     if (info->is_low_temp && info->low_limit) {
-        max_default_value = info->low_limit / 1000;
+        max_default_value = info->low_limit / 0x3E8;
     } else if (info->is_high_temp && info->high_limit) {
-        max_default_value = info->high_limit / 1000;
+        max_default_value = info->high_limit / 0x3E8;
     }
 
     if (info->devp->type == MONITOR_TPYE_CPU) {
@@ -1086,14 +1081,12 @@ EXPORT_SYMBOL(rockchip_monitor_volt_adjust_unlock);
 
 static int rockchip_monitor_set_read_margin(struct device *dev, struct rockchip_opp_info *opp_info, unsigned long volt)
 {
-
     if (opp_info && opp_info->data && opp_info->data->set_read_margin) {
         if (pm_runtime_active(dev)) {
             opp_info->data->set_read_margin(dev, opp_info, volt);
         }
         opp_info->volt_rm = volt;
     }
-
     return 0;
 }
 
@@ -1130,7 +1123,7 @@ int rockchip_monitor_check_rate_volt(struct monitor_dev_info *info, bool is_set_
     }
 
     if (info->init_freq) {
-        new_rate = info->init_freq * 1000;
+        new_rate = info->init_freq * 0x3E8;
         info->init_freq = 0;
     } else {
         new_rate = old_rate;
@@ -1417,7 +1410,7 @@ static void rockchip_system_monitor_thermal_update(void)
 
     dev_dbg(system_monitor->dev, "temperature=%d\n", temp);
 
-    if (temp < last_temp && last_temp - temp <= 2000) {
+    if (temp < last_temp && last_temp - temp <= 0x7D0) {
         goto out;
     }
     last_temp = temp;
@@ -1663,7 +1656,7 @@ static int rockchip_system_monitor_probe(struct platform_device *pdev)
 
     ebc_register_notifier(&rockchip_monitor_ebc_nb);
 
-    schedule_delayed_work(&system_monitor_early_min_volt_work, msecs_to_jiffies(30000));
+    schedule_delayed_work(&system_monitor_early_min_volt_work, msecs_to_jiffies(0x7530));
 
     dev_info(dev, "system monitor probe\n");
 
@@ -1674,7 +1667,7 @@ static const struct of_device_id rockchip_system_monitor_of_match[] = {
     {
         .compatible = "rockchip,system-monitor",
     },
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_system_monitor_of_match);
 

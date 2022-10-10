@@ -594,7 +594,7 @@ static void parse_edid_forum_vsdb(struct rockchip_drm_dsc_cap *dsc_cap, u8 *max_
     u8 dsc_max_frl_rate;
     u8 dsc_max_slices;
 
-    if (!hf_vsdb[7]) {
+    if (!hf_vsdb[0x7]) {
         return;
     }
 
@@ -612,15 +612,15 @@ static void parse_edid_forum_vsdb(struct rockchip_drm_dsc_cap *dsc_cap, u8 *max_
         return;
     }
 
-    dsc_cap->native_420 = hf_vsdb[11] & EDID_DSC_NATIVE_420;
-    dsc_cap->all_bpp = hf_vsdb[11] & EDID_DSC_ALL_BPP;
+    dsc_cap->native_420 = hf_vsdb[0xb] & EDID_DSC_NATIVE_420;
+    dsc_cap->all_bpp = hf_vsdb[0xb] & EDID_DSC_ALL_BPP;
 
     if (hf_vsdb[0xb] & EDID_DSC_16BPC) {
         dsc_cap->bpc_supported = 0x10;
     } else if (hf_vsdb[0xb] & EDID_DSC_12BPC) {
         dsc_cap->bpc_supported = 0xc;
     } else if (hf_vsdb[0xb] & EDID_DSC_10BPC) {
-        dsc_cap->bpc_supported = 10;
+        dsc_cap->bpc_supported = 0xa;
     } else {
         dsc_cap->bpc_supported = 0;
     }
@@ -677,7 +677,7 @@ static int check_next_hdr_version(const u8 *next_hdr_db)
 {
     u16 ver;
 
-    ver = (next_hdr_db[0x5] & 0xf0) << 8 | next_hdr_db[0];
+    ver = (next_hdr_db[0x5] & 0xf0) << 0x8 | next_hdr_db[0];
 
     switch (ver) {
         case 0x00f9:
@@ -702,8 +702,8 @@ static void parse_ver_26_v0_data(struct ver_26_v0 *hdr, const u8 *data)
     hdr->dm_major_ver = (data[0x15] & 0xf0) >> 0x4;
     hdr->dm_minor_ver = data[0x15] & 0xf;
 
-    hdr->t_min_pq = (data[0x13] << 0x4) | ((data[18] & 0xf0) >> 0x4);
-    hdr->t_max_pq = (data[0x14] << 0x4) | (data[18] & 0xf);
+    hdr->t_min_pq = (data[0x13] << 0x4) | ((data[0x12] & 0xf0) >> 0x4);
+    hdr->t_max_pq = (data[0x14] << 0x4) | (data[0x12] & 0xf);
 
     hdr->rx = (data[0x7] << 0x4) | ((data[0x6] & 0xf0) >> 0x4);
     hdr->ry = (data[0x8] << 0x4) | (data[0x6] & 0xf);
@@ -1823,7 +1823,7 @@ static int rockchip_drm_platform_probe(struct platform_device *pdev)
         return ret;
     }
 
-    ret = dma_coerce_mask_and_coherent(dev, DMA_BIT_MASK(64));
+    ret = dma_coerce_mask_and_coherent(dev, DMA_BIT_MASK(0x40));
     if (ret) {
         return ret;
     }

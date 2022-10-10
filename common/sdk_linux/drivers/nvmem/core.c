@@ -151,9 +151,7 @@ static ssize_t bin_attr_nvmem_read(struct file *filp, struct kobject *kobj, stru
     if (!nvmem->reg_read) {
         return -EPERM;
     }
-
     rc = nvmem_reg_read(nvmem, pos, buf, count);
-
     if (rc) {
         return rc;
     }
@@ -197,9 +195,7 @@ static ssize_t bin_attr_nvmem_write(struct file *filp, struct kobject *kobj, str
     if (!nvmem->reg_write) {
         return -EPERM;
     }
-
     rc = nvmem_reg_write(nvmem, pos, buf, count);
-
     if (rc) {
         return rc;
     }
@@ -576,7 +572,7 @@ static int nvmem_add_cells_from_of(struct nvmem_device *nvmem)
         cell->name = kasprintf(GFP_KERNEL, "%pOFn", child);
 
         addr = of_get_property(child, "bits", &len);
-        if (addr && len == (2 * sizeof(u32))) {
+        if (addr && len == (0x2 * sizeof(u32))) {
             cell->bit_offset = be32_to_cpup(addr++);
             cell->nbits = be32_to_cpup(addr);
         }
@@ -789,9 +785,7 @@ struct nvmem_device *devm_nvmem_register(struct device *dev, const struct nvmem_
     if (!ptr) {
         return ERR_PTR(-ENOMEM);
     }
-
     nvmem = nvmem_register(config);
-
     if (!IS_ERR(nvmem)) {
         *ptr = nvmem;
         devres_add(dev, ptr);
@@ -871,7 +865,6 @@ static void nvmem_device_put_ext(struct nvmem_device *nvmem)
  */
 struct nvmem_device *of_nvmem_device_get(struct device_node *np, const char *id)
 {
-
     struct device_node *nvmem_np;
     struct nvmem_device *nvmem;
     int index = 0;
@@ -905,14 +898,11 @@ struct nvmem_device *nvmem_device_get(struct device *dev, const char *dev_name)
 {
     if (dev->of_node) { /* try dt first */
         struct nvmem_device *nvmem;
-
         nvmem = of_nvmem_device_get(dev->of_node, dev_name);
-
         if (!IS_ERR(nvmem) || PTR_ERR(nvmem) == -EPROBE_DEFER) {
             return nvmem;
         }
     }
-
     return nvmem_device_get_ext((void *)dev_name, device_match_name);
 }
 EXPORT_SYMBOL_GPL(nvmem_device_get);
@@ -1262,22 +1252,17 @@ static void nvmem_shift_read_buffer_in_place(struct nvmem_cell *cell, void *buf)
 static int nvmem_cell_read_ext(struct nvmem_device *nvmem, struct nvmem_cell *cell, void *buf, size_t *len)
 {
     int rc;
-
     rc = nvmem_reg_read(nvmem, cell->offset, buf, cell->bytes);
-
     if (rc) {
         return rc;
     }
-
     /* shift bits in-place */
     if (cell->bit_offset || cell->nbits) {
         nvmem_shift_read_buffer_in_place(cell, buf);
     }
-
     if (len) {
         *len = cell->bytes;
     }
-
     return 0;
 }
 
@@ -1360,7 +1345,7 @@ static void *nvmem_cell_prepare_write_buffer(struct nvmem_cell *cell, u8 *_buf, 
         if (rc) {
             goto err;
         }
-        *p |= GENMASK(7, (nbits + bit_offset) % BITS_PER_BYTE) & v;
+        *p |= GENMASK(0x7, (nbits + bit_offset) % BITS_PER_BYTE) & v;
     }
 
     return buf;
@@ -1572,17 +1557,13 @@ EXPORT_SYMBOL_GPL(nvmem_device_cell_write);
 int nvmem_device_read(struct nvmem_device *nvmem, unsigned int offset, size_t bytes, void *buf)
 {
     int rc;
-
     if (!nvmem) {
         return -EINVAL;
     }
-
     rc = nvmem_reg_read(nvmem, offset, buf, bytes);
-
     if (rc) {
         return rc;
     }
-
     return bytes;
 }
 EXPORT_SYMBOL_GPL(nvmem_device_read);
@@ -1600,17 +1581,13 @@ EXPORT_SYMBOL_GPL(nvmem_device_read);
 int nvmem_device_write(struct nvmem_device *nvmem, unsigned int offset, size_t bytes, void *buf)
 {
     int rc;
-
     if (!nvmem) {
         return -EINVAL;
     }
-
     rc = nvmem_reg_write(nvmem, offset, buf, bytes);
-
     if (rc) {
         return rc;
     }
-
     return bytes;
 }
 EXPORT_SYMBOL_GPL(nvmem_device_write);

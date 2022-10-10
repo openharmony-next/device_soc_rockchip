@@ -12,7 +12,8 @@
 
 #define RKISP_BUF_MAX 2
 #define RKISPP_BUF_MAX 2
-#define RKISP_ISPP_BUF_MAX (RKISP_BUF_MAX + RKISPP_BUF_MAX + (2 * (DEV_MAX - 1)))
+#define RKISP_ISPP_BUF_MAX                                                     \
+    (RKISP_BUF_MAX + RKISPP_BUF_MAX + (2 * (DEV_MAX - 1)))
 
 #define RKISP_ISPP_REGBUF_NUM RKISPP_BUF_POOL_MAX
 #define RKISP_ISP_SW_REG_SIZE 0x6000
@@ -20,10 +21,14 @@
 #define RKISP_ISPP_SW_REG_SIZE 0x0d00
 #define RKISP_ISPP_SW_MAX_SIZE (RKISP_ISPP_SW_REG_SIZE * 2)
 
-#define RKISP_ISPP_CMD_SET_MODE _IOW('V', BASE_VIDIOC_PRIVATE + 0, struct rkisp_ispp_mode)
-#define RKISP_ISPP_CMD_SET_FMT _IOW('V', BASE_VIDIOC_PRIVATE + 1, struct max_input)
-#define RKISP_ISPP_CMD_REQUEST_REGBUF _IOW('V', BASE_VIDIOC_PRIVATE + 2, struct rkisp_ispp_reg *)
-#define RKISP_ISPP_CMD_GET_REG_WITHSTREAM _IOW('V', BASE_VIDIOC_PRIVATE + 3, bool)
+#define RKISP_ISPP_CMD_SET_MODE                                                \
+    _IOW('V', BASE_VIDIOC_PRIVATE + 0, struct rkisp_ispp_mode)
+#define RKISP_ISPP_CMD_SET_FMT                                                 \
+    _IOW('V', BASE_VIDIOC_PRIVATE + 1, struct max_input)
+#define RKISP_ISPP_CMD_REQUEST_REGBUF                                          \
+    _IOW('V', BASE_VIDIOC_PRIVATE + 2, struct rkisp_ispp_reg *)
+#define RKISP_ISPP_CMD_GET_REG_WITHSTREAM                                      \
+    _IOW('V', BASE_VIDIOC_PRIVATE + 3, bool)
 
 enum frame_end_state {
     FRAME_INIT,
@@ -118,10 +123,12 @@ struct rkisp_ispp_buf {
 
 int __init rkispp_hw_drv_init(void);
 
-#if IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISP_VERSION_V20) || IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISP_VERSION_V30)
+#if IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISP_VERSION_V20) ||                \
+    IS_ENABLED(CONFIG_VENDOR_VIDEO_ROCKCHIP_ISP_VERSION_V30)
 void rkisp_get_bridge_sd(struct platform_device *dev, struct v4l2_subdev **sd);
 #else
-static inline void rkisp_get_bridge_sd(struct platform_device *dev, struct v4l2_subdev **sd)
+static inline void rkisp_get_bridge_sd(struct platform_device *dev,
+                                       struct v4l2_subdev **sd)
 {
     *sd = NULL;
 }

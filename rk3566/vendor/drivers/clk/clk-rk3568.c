@@ -91,7 +91,7 @@ static struct rockchip_pll_rate_table rk3568_pll_rates[] = {
     RK3036_PLL_RATE(100000000, 1, 150, 6, 6, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 96, 6, 4, 1, 0),
     RK3036_PLL_RATE(74250000, 2, 99, 4, 4, 1, 0),
-    {/* sentinel */},
+    {},
 };
 
 #define RK3568_DIV_ATCLK_CORE_MASK 0x1f
@@ -1214,14 +1214,14 @@ static const struct clk_rk3568_inits clk_3568_cru_init = {
 };
 
 static const struct of_device_id clk_rk3568_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3568-cru",
-                                                                 .data = &clk_3568_cru_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3568-pmucru",
-                                                                 .data = &clk_rk3568_pmucru_init,
-                                                             },
-                                                             {}};
+    .compatible = "rockchip,rk3568-cru",
+    .data = &clk_3568_cru_init,
+},
+{
+    .compatible = "rockchip,rk3568-pmucru",
+    .data = &clk_rk3568_pmucru_init,
+},
+{}};
 MODULE_DEVICE_TABLE(of, clk_rk3568_match_table);
 
 static int __init clk_rk3568_probe(struct platform_device *pdev)

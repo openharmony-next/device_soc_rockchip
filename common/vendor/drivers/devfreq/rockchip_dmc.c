@@ -70,6 +70,8 @@
 #define ROCKCHIP_DE_SKEW_TWENTY 20
 #define ROCKCHIP_DE_SKEW_TWENTYONE 21
 
+#define DMCFREQ_WAIT_CTRL_T_DCF_EN_TWO 2
+
 struct dmc_freq_table {
     unsigned long freq;
     unsigned long volt;
@@ -1035,7 +1037,7 @@ int rockchip_dmcfreq_wait_complete(void)
     if (wait_ctrl.dcf_en == 1) {
         /* start dcf */
         regmap_update_bits(wait_ctrl.regmap_dcf, 0x0, 0x1, 0x1);
-    } else if (wait_ctrl.dcf_en == 2) {
+    } else if (wait_ctrl.dcf_en == DMCFREQ_WAIT_CTRL_T_DCF_EN_TWO) {
         res = sip_smc_dram(0, 0, ROCKCHIP_SIP_CONFIG_MCU_START);
         if (res.a0) {
             pr_err("rockchip_sip_config_mcu_start error:%lx\n", res.a0);
@@ -1909,7 +1911,7 @@ static int rockchip_get_rl_map_talbe(struct device_node *np, char *porp_name, st
         return -EINVAL;
     }
 
-    tbl = kzalloc(sizeof(*tbl) * (count / 2 + 1), GFP_KERNEL);
+    tbl = kzalloc(sizeof(*tbl) * (count / 0x2 + 1), GFP_KERNEL);
     if (!tbl) {
         return -ENOMEM;
     }

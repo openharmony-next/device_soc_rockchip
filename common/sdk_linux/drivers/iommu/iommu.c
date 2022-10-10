@@ -2397,34 +2397,27 @@ static size_t iommu_pgsize(struct iommu_domain *domain, unsigned long iova, phys
     unsigned long pgsizes;
     size_t offset, pgsize, pgsize_next;
     unsigned long addr_merge = paddr | iova;
-
     /* Page sizes supported by the hardware and small enough for @size */
     pgsizes = domain->pgsize_bitmap & GENMASK(__fls(size), 0);
-
     /* Constrain the page sizes further based on the maximum alignment */
     if (likely(addr_merge)) {
         pgsizes &= GENMASK(__ffs(addr_merge), 0);
     }
-
     /* Make sure we have at least one suitable page size */
     BUG_ON(!pgsizes);
-
     /* Pick the biggest page size remaining */
     pgsize_idx = __fls(pgsizes);
     pgsize = BIT(pgsize_idx);
     if (!count) {
         return pgsize;
     }
-
     /* Find the next biggest support page size, if it exists */
     pgsizes = domain->pgsize_bitmap & ~GENMASK(pgsize_idx, 0);
     if (!pgsizes) {
         goto out_set_count;
     }
-
     pgsize_idx_next = __ffs(pgsizes);
     pgsize_next = BIT(pgsize_idx_next);
-
     /*
      * There's no point trying a bigger page size unless the virtual
      * and physical addresses are similarly offset within the larger page.
@@ -2432,10 +2425,8 @@ static size_t iommu_pgsize(struct iommu_domain *domain, unsigned long iova, phys
     if ((iova ^ paddr) & (pgsize_next - 1)) {
         goto out_set_count;
     }
-
     /* Calculate the offset to the next page size alignment boundary */
     offset = pgsize_next - (addr_merge & (pgsize_next - 1));
-
     /*
      * If size is big enough to accommodate the larger page, reduce
      * the number of smaller pages.
@@ -2490,7 +2481,6 @@ static int iommu_map_ext(struct iommu_domain *domain, unsigned long iova, phys_a
 
     /* find out the minimum page size supported */
     min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
-
     /*
      * both the virtual address and the physical one, as well as
      * the size of the mapping, must be aligned (at least) to the
@@ -2584,10 +2574,8 @@ static size_t iommu_unmap_ext(struct iommu_domain *domain, unsigned long iova, s
     if (unlikely(!(domain->type & __IOMMU_DOMAIN_PAGING))) {
         return 0;
     }
-
     /* find out the minimum page size supported */
     min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
-
     /*
      * The virtual address, as well as the size of the mapping, must be
      * aligned (at least) to the size of the smallest page supported
@@ -2665,10 +2653,8 @@ static size_t iommu_map_sg_ext(struct iommu_domain *domain, unsigned long iova, 
 
     while (i <= nents) {
         phys_addr_t s_phys = sg_phys(sg);
-
         if (len && s_phys != start + len) {
             ret = iommu_map_ext(domain, iova + mapped, start, len, prot, gfp);
-
             if (ret) {
                 goto out_err;
             }
@@ -2920,10 +2906,12 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
     struct iommu_device *iommu;
 
     spin_lock(&iommu_device_lock);
-    list_for_each_entry(iommu, &iommu_device_list, list) if (iommu->fwnode == fwnode)
+    list_for_each_entry(iommu, &iommu_device_list, list)
     {
-        ops = iommu->ops;
-        break;
+        if (iommu->fwnode == fwnode) {
+            ops = iommu->ops;
+            break;
+        }
     }
     spin_unlock(&iommu_device_lock);
     return ops;

@@ -336,10 +336,10 @@ static int udphy_dplane_get(struct rockchip_udphy *udphy)
 
     switch (udphy->mode) {
         case UDPHY_MODE_DP:
-            dp_lanes = 4;
+            dp_lanes = 0x04;
             break;
         case UDPHY_MODE_DP_USB:
-            dp_lanes = 2;
+            dp_lanes = 0x02;
             break;
         case UDPHY_MODE_USB:
             fallthrough;
@@ -368,25 +368,25 @@ static int upphy_set_typec_default_mapping(struct rockchip_udphy *udphy)
     if (udphy->flip) {
         udphy->dp_lane_sel[0] = 0;
         udphy->dp_lane_sel[1] = 1;
-        udphy->dp_lane_sel[2] = 3;
-        udphy->dp_lane_sel[3] = 2;
+        udphy->dp_lane_sel[0x02] = 0x03;
+        udphy->dp_lane_sel[0x03] = 0x02;
         udphy->lane_mux_sel[0] = PHY_LANE_MUX_DP;
         udphy->lane_mux_sel[1] = PHY_LANE_MUX_DP;
-        udphy->lane_mux_sel[2] = PHY_LANE_MUX_USB;
-        udphy->lane_mux_sel[3] = PHY_LANE_MUX_USB;
+        udphy->lane_mux_sel[0x02] = PHY_LANE_MUX_USB;
+        udphy->lane_mux_sel[0x03] = PHY_LANE_MUX_USB;
         udphy->dp_aux_dout_sel = PHY_AUX_DP_DATA_POL_INVERT;
         udphy->dp_aux_din_sel = PHY_AUX_DP_DATA_POL_INVERT;
         gpiod_set_value_cansleep(udphy->sbu1_dc_gpio, 1);
         gpiod_set_value_cansleep(udphy->sbu2_dc_gpio, 0);
     } else {
-        udphy->dp_lane_sel[0] = 2;
-        udphy->dp_lane_sel[1] = 3;
-        udphy->dp_lane_sel[2] = 1;
-        udphy->dp_lane_sel[3] = 0;
+        udphy->dp_lane_sel[0] = 0x02;
+        udphy->dp_lane_sel[1] = 0x03;
+        udphy->dp_lane_sel[0x02] = 1;
+        udphy->dp_lane_sel[0x03] = 0;
         udphy->lane_mux_sel[0] = PHY_LANE_MUX_USB;
         udphy->lane_mux_sel[1] = PHY_LANE_MUX_USB;
-        udphy->lane_mux_sel[2] = PHY_LANE_MUX_DP;
-        udphy->lane_mux_sel[3] = PHY_LANE_MUX_DP;
+        udphy->lane_mux_sel[0x02] = PHY_LANE_MUX_DP;
+        udphy->lane_mux_sel[0x03] = PHY_LANE_MUX_DP;
         udphy->dp_aux_dout_sel = PHY_AUX_DP_DATA_POL_NORMAL;
         udphy->dp_aux_din_sel = PHY_AUX_DP_DATA_POL_NORMAL;
         gpiod_set_value_cansleep(udphy->sbu1_dc_gpio, 0);
@@ -507,7 +507,7 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, struct device
 
     num_lanes = len / sizeof(u32);
 
-    if (num_lanes != 2 && num_lanes != 4) {
+    if (num_lanes != 0x02 && num_lanes != 0x04) {
         dev_err(udphy->dev, "invalid number of lane mux\n");
         return -EINVAL;
     }
@@ -521,7 +521,7 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, struct device
     for (i = 0; i < num_lanes; i++) {
         int j;
 
-        if (udphy->dp_lane_sel[i] > 3) {
+        if (udphy->dp_lane_sel[i] > 0x03) {
             dev_err(udphy->dev, "lane mux between 0 and 3, exceeding the range\n");
             return -EINVAL;
         }
@@ -537,7 +537,7 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, struct device
     }
 
     udphy->mode = UDPHY_MODE_DP;
-    if (num_lanes == 2) {
+    if (num_lanes == 0x02) {
         udphy->mode |= UDPHY_MODE_USB;
     }
 
@@ -856,8 +856,8 @@ static int usbdp_typec_mux_set(struct typec_mux *mux, struct typec_mux_state *st
         case TYPEC_DP_STATE_E:
             udphy->lane_mux_sel[0] = PHY_LANE_MUX_DP;
             udphy->lane_mux_sel[1] = PHY_LANE_MUX_DP;
-            udphy->lane_mux_sel[2] = PHY_LANE_MUX_DP;
-            udphy->lane_mux_sel[3] = PHY_LANE_MUX_DP;
+            udphy->lane_mux_sel[0x02] = PHY_LANE_MUX_DP;
+            udphy->lane_mux_sel[0x03] = PHY_LANE_MUX_DP;
             mode = UDPHY_MODE_DP;
             break;
         case TYPEC_DP_STATE_D:
@@ -866,13 +866,13 @@ static int usbdp_typec_mux_set(struct typec_mux *mux, struct typec_mux_state *st
             if (udphy->flip) {
                 udphy->lane_mux_sel[0] = PHY_LANE_MUX_DP;
                 udphy->lane_mux_sel[1] = PHY_LANE_MUX_DP;
-                udphy->lane_mux_sel[2] = PHY_LANE_MUX_USB;
-                udphy->lane_mux_sel[3] = PHY_LANE_MUX_USB;
+                udphy->lane_mux_sel[0x02] = PHY_LANE_MUX_USB;
+                udphy->lane_mux_sel[0x03] = PHY_LANE_MUX_USB;
             } else {
                 udphy->lane_mux_sel[0] = PHY_LANE_MUX_USB;
                 udphy->lane_mux_sel[1] = PHY_LANE_MUX_USB;
-                udphy->lane_mux_sel[2] = PHY_LANE_MUX_DP;
-                udphy->lane_mux_sel[3] = PHY_LANE_MUX_DP;
+                udphy->lane_mux_sel[0x02] = PHY_LANE_MUX_DP;
+                udphy->lane_mux_sel[0x03] = PHY_LANE_MUX_DP;
             }
             mode = UDPHY_MODE_DP_USB;
             break;
@@ -1043,14 +1043,14 @@ static int rk3588_udphy_refclk_set(struct rockchip_udphy *udphy)
     dev_dbg(udphy->dev, "refclk freq %ld\n", rate);
 
     switch (rate) {
-        case 24000000:
+        case 0x16E3600:
             ret = regmap_multi_reg_write(udphy->pma_regmap, rk3588_udphy_24m_refclk_cfg,
                                          ARRAY_SIZE(rk3588_udphy_24m_refclk_cfg));
             if (ret) {
                 return ret;
             }
             break;
-        case 26000000:
+        case 0x18CBA80:
             /* register default is 26MHz */
             ret = regmap_multi_reg_write(udphy->pma_regmap, rk3588_udphy_26m_refclk_cfg,
                                          ARRAY_SIZE(rk3588_udphy_26m_refclk_cfg));
@@ -1131,8 +1131,8 @@ static int rk3588_udphy_init(struct rockchip_udphy *udphy)
 
     /* Step 3: configure lane mux */
     regmap_update_bits(udphy->pma_regmap, CMN_LANE_MUX_AND_EN_OFFSET, CMN_DP_LANE_MUX_ALL | CMN_DP_LANE_EN_ALL,
-                       FIELD_PREP(CMN_DP_LANE_MUX_N(3), udphy->lane_mux_sel[3]) |
-                           FIELD_PREP(CMN_DP_LANE_MUX_N(2), udphy->lane_mux_sel[2]) |
+                       FIELD_PREP(CMN_DP_LANE_MUX_N(0x03), udphy->lane_mux_sel[0x03]) |
+                           FIELD_PREP(CMN_DP_LANE_MUX_N(0x02), udphy->lane_mux_sel[0x02]) |
                            FIELD_PREP(CMN_DP_LANE_MUX_N(1), udphy->lane_mux_sel[1]) |
                            FIELD_PREP(CMN_DP_LANE_MUX_N(0), udphy->lane_mux_sel[0]) |
                            FIELD_PREP(CMN_DP_LANE_EN_ALL, 0));
@@ -1207,12 +1207,12 @@ static int rk3588_udphy_dplane_select(struct rockchip_udphy *udphy)
 
     switch (udphy->mode) {
         case UDPHY_MODE_DP:
-            value |= 2 << udphy->dp_lane_sel[2] * 2;
-            value |= 3 << udphy->dp_lane_sel[3] * 2;
+            value |= 0x02 << udphy->dp_lane_sel[0x02] * 0x02;
+            value |= 0x03 << udphy->dp_lane_sel[0x03] * 0x02;
             fallthrough;
         case UDPHY_MODE_DP_USB:
-            value |= 0 << udphy->dp_lane_sel[0] * 2;
-            value |= 1 << udphy->dp_lane_sel[1] * 2;
+            value |= 0 << udphy->dp_lane_sel[0] * 0x02;
+            value |= 1 << udphy->dp_lane_sel[1] * 0x02;
             break;
         case UDPHY_MODE_USB:
             break;
@@ -1221,7 +1221,7 @@ static int rk3588_udphy_dplane_select(struct rockchip_udphy *udphy)
     }
 
     regmap_write(udphy->vogrf, udphy->id ? RK3588_GRF_VO0_CON2 : RK3588_GRF_VO0_CON0,
-                 ((DP_AUX_DIN_SEL | DP_AUX_DOUT_SEL | DP_LANE_SEL_ALL) << 16) |
+                 ((DP_AUX_DIN_SEL | DP_AUX_DOUT_SEL | DP_LANE_SEL_ALL) << 0x10) |
                      FIELD_PREP(DP_AUX_DIN_SEL, udphy->dp_aux_din_sel) |
                      FIELD_PREP(DP_AUX_DOUT_SEL, udphy->dp_aux_dout_sel) | value);
 
@@ -1237,16 +1237,16 @@ static int rk3588_dp_phy_set_rate(struct rockchip_udphy *udphy, struct phy_confi
     regmap_update_bits(udphy->pma_regmap, CMN_DP_RSTN_OFFSET, CMN_DP_CMN_RSTN, FIELD_PREP(CMN_DP_CMN_RSTN, 0x0));
 
     switch (dp->link_rate) {
-        case 1620:
+        case 0x654:
             bw = DP_BW_RBR;
             break;
-        case 2700:
+        case 0xA8C:
             bw = DP_BW_HBR;
             break;
-        case 5400:
+        case 0x1518:
             bw = DP_BW_HBR2;
             break;
-        case 8100:
+        case 0x1FA4:
             bw = DP_BW_HBR3;
             break;
         default:
@@ -1314,13 +1314,13 @@ static int rk3588_dp_phy_set_voltages(struct rockchip_udphy *udphy, struct phy_c
     for (i = 0; i < dp->lanes; i++) {
         lane = udphy->dp_lane_sel[i];
         switch (dp->link_rate) {
-            case 1620:
-            case 2700:
+            case 0x654:
+            case 0xA8C:
                 regmap_update_bits(udphy->pma_regmap, TRSV_ANA_TX_CLK_OFFSET_N(lane), LN_ANA_TX_SER_TXCLK_INV,
                                    FIELD_PREP(LN_ANA_TX_SER_TXCLK_INV, udphy->lane_mux_sel[lane]));
                 break;
-            case 5400:
-            case 8100:
+            case 0x1518:
+            case 0x1FA4:
                 regmap_update_bits(udphy->pma_regmap, TRSV_ANA_TX_CLK_OFFSET_N(lane), LN_ANA_TX_SER_TXCLK_INV,
                                    FIELD_PREP(LN_ANA_TX_SER_TXCLK_INV, 0x0));
                 break;

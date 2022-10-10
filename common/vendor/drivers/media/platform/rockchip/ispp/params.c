@@ -48,10 +48,11 @@ static int rkispp_params_g_fmt_meta_out(struct file *file, void *fh, struct v4l2
 
 static int rkispp_params_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct video_device *vdev = video_devdata(file);
     struct rkispp_params_vdev *params_vdev = video_get_drvdata(vdev);
 
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, params_vdev->dev->ispp_ver >> 4);
+    ret = snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, params_vdev->dev->ispp_ver >> 0x04);
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
     strlcpy(cap->bus_info, "platform: " DRIVER_NAME, sizeof(cap->bus_info));
 
@@ -113,8 +114,8 @@ static int rkispp_param_init_fecbuf(struct rkispp_params_vdev *params, struct rk
     width = fecsize->meas_width;
     height = fecsize->meas_height;
     mesh_size = cal_fec_mesh(width, height, fecsize->meas_mode);
-    buf_size = ALIGN(sizeof(struct rkispp_fec_head), 16);
-    buf_size += 2 * (ALIGN(mesh_size * 2, 16) + ALIGN(mesh_size, 16));
+    buf_size = ALIGN(sizeof(struct rkispp_fec_head), 0x10);
+    buf_size += 0x02 * (ALIGN(mesh_size * 0x02, 0x10) + ALIGN(mesh_size, 0x10));
 
     params->buf_fec_idx = 0;
     for (i = 0; i < FEC_MESH_BUF_NUM; i++) {
@@ -130,10 +131,10 @@ static int rkispp_param_init_fecbuf(struct rkispp_params_vdev *params, struct rk
 
         fec_data = (struct rkispp_fec_head *)params->buf_fec[i].vaddr;
         fec_data->stat = FEC_BUF_INIT;
-        fec_data->meshxf_oft = ALIGN(sizeof(struct rkispp_fec_head), 16);
-        fec_data->meshyf_oft = fec_data->meshxf_oft + ALIGN(mesh_size, 16);
-        fec_data->meshxi_oft = fec_data->meshyf_oft + ALIGN(mesh_size, 16);
-        fec_data->meshyi_oft = fec_data->meshxi_oft + ALIGN(mesh_size * 2, 16);
+        fec_data->meshxf_oft = ALIGN(sizeof(struct rkispp_fec_head), 0x10);
+        fec_data->meshyf_oft = fec_data->meshxf_oft + ALIGN(mesh_size, 0x10);
+        fec_data->meshxi_oft = fec_data->meshyf_oft + ALIGN(mesh_size, 0x10);
+        fec_data->meshyi_oft = fec_data->meshxi_oft + ALIGN(mesh_size * 0x02, 0x10);
 
         if (!i) {
             u32 val, dma_addr = params->buf_fec[i].dma_addr;

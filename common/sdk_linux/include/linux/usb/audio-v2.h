@@ -55,7 +55,7 @@ struct uac2_ac_header_descriptor {
     __u8 bmControls;
 } __packed;
 
-/* 2.3.1.6 Type I Format Type Descriptor (Frmts20 final.pdf)*/
+/* 2.3.1.6 Type I Format Type Descriptor (Frmts20 final.pdf) */
 struct uac2_format_type_i_descriptor {
     __u8 bLength;            /* in bytes: 6 */
     __u8 bDescriptorType;    /* USB_DT_CS_INTERFACE */

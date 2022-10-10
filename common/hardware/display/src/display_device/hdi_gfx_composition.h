@@ -17,14 +17,10 @@
 #define HDI_GFX_COMPOSITION_H
 #include "display_gfx.h"
 #include "hdi_composer.h"
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class HdiGfxComposition : public HdiComposition
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class HdiGfxComposition : public HdiComposition {
             public:
                 int32_t Init(void) override;
                 int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer) override;

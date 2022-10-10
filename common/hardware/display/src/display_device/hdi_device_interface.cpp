@@ -19,26 +19,26 @@
 #include "drm_device.h"
 
 namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-std::vector<std::shared_ptr<HdiDeviceInterface>> HdiDeviceInterface::DiscoveryDevice()
-{
-    DISPLAY_DEBUGLOG();
-    int ret;
-    std::vector<std::shared_ptr<HdiDeviceInterface>> devices;
-    std::shared_ptr<HdiDeviceInterface> drmDevice = DrmDevice::Create();
-    if (!drmDevice) {
-        DISPLAY_LOGE("can not create drm device");
+    namespace HDI {
+        namespace DISPLAY {
+            std::vector<std::shared_ptr<HdiDeviceInterface>> HdiDeviceInterface::DiscoveryDevice()
+            {
+                DISPLAY_DEBUGLOG();
+                int ret;
+                std::vector<std::shared_ptr<HdiDeviceInterface>> devices;
+                std::shared_ptr<HdiDeviceInterface> drmDevice = DrmDevice::Create();
+                if (!drmDevice) {
+                    DISPLAY_LOGE("can not create drm device");
+                }
+                ret = drmDevice->Init();
+                if (ret == DISPLAY_SUCCESS) {
+                    DISPLAY_DEBUGLOG("drm device init success");
+                    devices.push_back(std::move(drmDevice));
+                } else {
+                    DISPLAY_LOGE("drm device init failed");
+                }
+                return devices;
+            }
+        }
     }
-    ret = drmDevice->Init();
-    if (ret == DISPLAY_SUCCESS) {
-        DISPLAY_DEBUGLOG("drm device init success");
-        devices.push_back(std::move(drmDevice));
-    } else {
-        DISPLAY_LOGE("drm device init failed");
-    }
-    return devices;
-}
-}
-}
 }

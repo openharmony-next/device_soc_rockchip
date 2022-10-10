@@ -1135,7 +1135,7 @@ ssize_t analogix_dp_transfer(struct analogix_dp_device *dp, struct drm_dp_aux_ms
     if (!(msg->request & DP_AUX_I2C_READ)) {
         for (i = 0; i < msg->size; i++) {
             reg = buffer[i];
-            analogix_dp_write(dp, ANALOGIX_DP_BUF_DATA_0 + 4 * i, reg);
+            analogix_dp_write(dp, ANALOGIX_DP_BUF_DATA_0 + 0x4 * i, reg);
             num_transferred++;
         }
     }

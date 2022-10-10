@@ -16,7 +16,6 @@
 #ifndef MPP_PLATFORM
 #define MPP_PLATFORM
 
-#include "rk_type.h"
 #include "mpp_soc.h"
 
 /*

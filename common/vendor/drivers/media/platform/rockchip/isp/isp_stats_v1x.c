@@ -49,7 +49,7 @@ static void rkisp1_stats_get_aec_meas_v10(struct rkisp_isp_stats_vdev *stats_vde
 
     pbuf->meas_type |= CIFISP_STAT_AUTOEXP;
     for (i = 0; i < config->ae_mean_max; i++) {
-        pbuf->params.ae.exp_mean[i] = (u8)readl(addr + i * 4);
+        pbuf->params.ae.exp_mean[i] = (u8)readl(addr + i * 0x04);
     }
 }
 
@@ -61,15 +61,15 @@ static void rkisp1_stats_get_aec_meas_v12(struct rkisp_isp_stats_vdev *stats_vde
     u32 value;
 
     pbuf->meas_type |= CIFISP_STAT_AUTOEXP;
-    for (i = 0; i < config->ae_mean_max / 4; i++) {
-        value = readl(addr + i * 4);
-        pbuf->params.ae.exp_mean[4 * i + 0] = CIF_ISP_EXP_GET_MEAN_xy0_V12(value);
-        pbuf->params.ae.exp_mean[4 * i + 1] = CIF_ISP_EXP_GET_MEAN_xy1_V12(value);
-        pbuf->params.ae.exp_mean[4 * i + 2] = CIF_ISP_EXP_GET_MEAN_xy2_V12(value);
-        pbuf->params.ae.exp_mean[4 * i + 3] = CIF_ISP_EXP_GET_MEAN_xy3_V12(value);
+    for (i = 0; i < config->ae_mean_max / 0x04; i++) {
+        value = readl(addr + i * 0x04);
+        pbuf->params.ae.exp_mean[0x04 * i + 0] = CIF_ISP_EXP_GET_MEAN_xy0_V12(value);
+        pbuf->params.ae.exp_mean[0x04 * i + 1] = CIF_ISP_EXP_GET_MEAN_xy1_V12(value);
+        pbuf->params.ae.exp_mean[0x04 * i + 0x02] = CIF_ISP_EXP_GET_MEAN_xy2_V12(value);
+        pbuf->params.ae.exp_mean[0x04 * i + 0x03] = CIF_ISP_EXP_GET_MEAN_xy3_V12(value);
     }
-    value = readl(addr + i * 4);
-    pbuf->params.ae.exp_mean[4 * i + 0] = CIF_ISP_EXP_GET_MEAN_xy0_V12(value);
+    value = readl(addr + i * 0x04);
+    pbuf->params.ae.exp_mean[0x04 * i + 0] = CIF_ISP_EXP_GET_MEAN_xy0_V12(value);
 }
 
 static void rkisp1_stats_get_afc_meas(struct rkisp_isp_stats_vdev *stats_vdev, struct rkisp1_stat_buffer *pbuf)
@@ -85,8 +85,8 @@ static void rkisp1_stats_get_afc_meas(struct rkisp_isp_stats_vdev *stats_vdev, s
     af->window[0].lum = readl(base_addr + CIF_ISP_AFM_LUM_A);
     af->window[1].sum = readl(base_addr + CIF_ISP_AFM_SUM_B);
     af->window[1].lum = readl(base_addr + CIF_ISP_AFM_LUM_B);
-    af->window[2].sum = readl(base_addr + CIF_ISP_AFM_SUM_C);
-    af->window[2].lum = readl(base_addr + CIF_ISP_AFM_LUM_C);
+    af->window[0x02].sum = readl(base_addr + CIF_ISP_AFM_SUM_C);
+    af->window[0x02].lum = readl(base_addr + CIF_ISP_AFM_LUM_C);
 }
 
 static void rkisp1_stats_get_hst_meas_v10(struct rkisp_isp_stats_vdev *stats_vdev, struct rkisp1_stat_buffer *pbuf)
@@ -97,7 +97,7 @@ static void rkisp1_stats_get_hst_meas_v10(struct rkisp_isp_stats_vdev *stats_vde
 
     pbuf->meas_type |= CIFISP_STAT_HIST;
     for (i = 0; i < config->hist_bin_n_max; i++) {
-        pbuf->params.hist.hist_bins[i] = readl(addr + (i * 4));
+        pbuf->params.hist.hist_bins[i] = readl(addr + (i * 0x04));
     }
 }
 
@@ -109,10 +109,10 @@ static void rkisp1_stats_get_hst_meas_v12(struct rkisp_isp_stats_vdev *stats_vde
     u32 value;
 
     pbuf->meas_type |= CIFISP_STAT_HIST;
-    for (i = 0; i < config->hist_bin_n_max / 2; i++) {
-        value = readl(addr + (i * 4));
-        pbuf->params.hist.hist_bins[2 * i] = CIF_ISP_HIST_GET_BIN0_V12(value);
-        pbuf->params.hist.hist_bins[2 * i + 1] = CIF_ISP_HIST_GET_BIN1_V12(value);
+    for (i = 0; i < config->hist_bin_n_max / 0x02; i++) {
+        value = readl(addr + (i * 0x04));
+        pbuf->params.hist.hist_bins[0x02 * i] = CIF_ISP_HIST_GET_BIN0_V12(value);
+        pbuf->params.hist.hist_bins[0x02 * i + 1] = CIF_ISP_HIST_GET_BIN1_V12(value);
     }
 }
 
@@ -180,7 +180,7 @@ static void rkisp1_stats_get_emb_data(struct rkisp_isp_stats_vdev *stats_vdev, s
         if (!out) {
             break;
         }
-        packet_len = (ph >> 8) & 0xfff;
+        packet_len = (ph >> 0x08) & 0xfff;
         i += sizeof(ph);
 
         /* handle the package data */
@@ -330,7 +330,6 @@ static void rkisp1_stats_isr_v1x(struct rkisp_isp_stats_vdev *stats_vdev, u32 is
 #ifdef LOG_ISR_EXE_TIME
     if (isp_ris & (CIF_ISP_EXP_END | CIF_ISP_AWB_DONE | CIF_ISP_FRAME | CIF_ISP_HIST_MEASURE_RDY)) {
         unsigned int diff_us = ktime_to_us(ktime_sub(ktime_get(), in_t));
-
         if (diff_us > g_longest_isr_time) {
             g_longest_isr_time = diff_us;
         }

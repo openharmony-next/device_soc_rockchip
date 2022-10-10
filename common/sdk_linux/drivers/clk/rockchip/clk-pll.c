@@ -283,7 +283,7 @@ static struct rockchip_pll_rate_table *rockchip_rk3066_pll_clk_set_by_auto(struc
         }
 
         for (no = 1; no <= PLL_NO_MAX; no++) {
-            if (!(no == 1 || !(no % 2))) {
+            if (!(no == 1 || !(no % 0x2))) {
                 continue;
             }
 
@@ -410,7 +410,7 @@ static int rockchip_rk3036_pll_wait_lock(struct rockchip_clk_pll *pll)
      * So define a very safe maximum of 1000us, meaning 24000 cycles.
      */
     ret = readl_relaxed_poll_timeout(pll->reg_base + RK3036_PLLCON(1), pllcon, pllcon & RK3036_PLLCON1_LOCK_STATUS, 0,
-                                     1000);
+                                     0x3e8);
     if (ret) {
         pr_err("%s: timeout waiting for pll to lock\n", __func__);
     }
@@ -1525,9 +1525,9 @@ static int boost_summary_show(struct seq_file *s, void *data)
 
     regmap_read(pll->boost, BOOST_HIGH_PERF_CNT0, &freq_cnt0);
     regmap_read(pll->boost, BOOST_HIGH_PERF_CNT1, &freq_cnt1);
-    freq_cnt = ((u64)freq_cnt1 << 32) + (u64)freq_cnt0;
+    freq_cnt = ((u64)freq_cnt1 << 0x20) + (u64)freq_cnt0;
     high_freq_time = freq_cnt;
-    do_div(high_freq_time, 24);
+    do_div(high_freq_time, 0x18);
 
     regmap_read(pll->boost, BOOST_SHORT_SWITCH_CNT, &short_count);
     regmap_read(pll->boost, BOOST_STATIS_THRESHOLD, &short_threshold);

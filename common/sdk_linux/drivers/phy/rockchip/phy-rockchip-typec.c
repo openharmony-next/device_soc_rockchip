@@ -501,26 +501,26 @@ static const struct phy_reg dp_pll_hbr2_ssc_cfg[] = {
 };
 
 static const struct rockchip_usb3phy_port_cfg rk3399_usb3phy_port_cfgs[] = {{
-                                                                                .reg = 0xff7c0000,
-                                                                                .typec_conn_dir = {0xe580, 0, 16},
-                                                                                .usb3tousb2_en = {0xe580, 3, 19},
-                                                                                .external_psm = {0xe588, 14, 30},
-                                                                                .pipe_status = {0xe5c0, 0, 0},
-                                                                                .usb3_host_disable = {0x2434, 0, 16},
-                                                                                .usb3_host_port = {0x2434, 12, 28},
-                                                                                .uphy_dp_sel = {0x6268, 19, 19},
-                                                                            },
-                                                                            {
-                                                                                .reg = 0xff800000,
-                                                                                .typec_conn_dir = {0xe58c, 0, 16},
-                                                                                .usb3tousb2_en = {0xe58c, 3, 19},
-                                                                                .external_psm = {0xe594, 14, 30},
-                                                                                .pipe_status = {0xe5c0, 16, 16},
-                                                                                .usb3_host_disable = {0x2444, 0, 16},
-                                                                                .usb3_host_port = {0x2444, 12, 28},
-                                                                                .uphy_dp_sel = {0x6268, 3, 19},
-                                                                            },
-                                                                            {/* sentinel */}};
+    .reg = 0xff7c0000,
+    .typec_conn_dir = {0xe580, 0, 16},
+    .usb3tousb2_en = {0xe580, 3, 19},
+    .external_psm = {0xe588, 14, 30},
+    .pipe_status = {0xe5c0, 0, 0},
+    .usb3_host_disable = {0x2434, 0, 16},
+    .usb3_host_port = {0x2434, 12, 28},
+    .uphy_dp_sel = {0x6268, 19, 19},
+},
+{
+    .reg = 0xff800000,
+    .typec_conn_dir = {0xe58c, 0, 16},
+    .usb3tousb2_en = {0xe58c, 3, 19},
+    .external_psm = {0xe594, 14, 30},
+    .pipe_status = {0xe5c0, 16, 16},
+    .usb3_host_disable = {0x2444, 0, 16},
+    .usb3_host_port = {0x2444, 12, 28},
+    .uphy_dp_sel = {0x6268, 3, 19},
+},
+{}};
 
 /* default phy config */
 static const struct phy_config tcphy_default_config[3][4] = {
@@ -862,7 +862,7 @@ int tcphy_dp_set_link_rate(struct phy *phy, int link_rate, bool ssc_on)
     reg |= DP_PLL_CLOCK_DISABLE;
     writel(reg, tcphy->base + PHY_DP_CLK_CTL);
 
-    ret = readl_poll_timeout(tcphy->base + PHY_DP_CLK_CTL, reg, !(reg & DP_PLL_CLOCK_ENABLE_ACK), 10,
+    ret = readl_poll_timeout(tcphy->base + PHY_DP_CLK_CTL, reg, !(reg & DP_PLL_CLOCK_ENABLE_ACK), 0xA,
                              PHY_MODE_SET_TIMEOUT);
     if (ret) {
         dev_err(tcphy->dev, "wait DP PLL clock disabled timeout\n");
@@ -875,7 +875,7 @@ int tcphy_dp_set_link_rate(struct phy *phy, int link_rate, bool ssc_on)
     reg |= DP_PLL_DISABLE;
     writel(reg, tcphy->base + PHY_DP_CLK_CTL);
 
-    ret = readl_poll_timeout(tcphy->base + PHY_DP_CLK_CTL, reg, !(reg & DP_PLL_READY), 0xa, PHY_MODE_SET_TIMEOUT);
+    ret = readl_poll_timeout(tcphy->base + PHY_DP_CLK_CTL, reg, !(reg & DP_PLL_READY), 0xA, PHY_MODE_SET_TIMEOUT);
     if (ret) {
         dev_err(tcphy->dev, "wait DP PLL not ready timeout\n");
         return ret;
@@ -1014,7 +1014,7 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
     pu_adj = CMN_CALIB_CODE(val);
     val = readl(tcphy->base + CMN_TXPD_ADJ_CTRL);
     pd_adj = CMN_CALIB_CODE(val);
-    calib = (pu_calib_code + pd_calib_code) / 2 + pu_adj + pd_adj;
+    calib = (pu_calib_code + pd_calib_code) / 0x2 + pu_adj + pd_adj;
 
     /* disable txda_cal_latch_en for rewrite the calibration values */
     tx_ana_ctrl_reg_1 = readl(tcphy->base + TX_ANA_CTRL_REG_1);
@@ -1026,7 +1026,7 @@ static void tcphy_dp_aux_calibration(struct rockchip_typec_phy *tcphy)
     val &= ~(TX_RESCAL_CODE_MASK << TX_RESCAL_CODE_OFFSET);
     val |= calib << TX_RESCAL_CODE_OFFSET;
     writel(val, tcphy->base + TX_DIG_CTRL_REG_2);
-    usleep_range(10000, 10050);
+    usleep_range(0x2710, 0x2742);
 
     /*
      * Enable signal for latch that sample and holds calibration values.
@@ -1193,7 +1193,7 @@ static int tcphy_phy_init(struct rockchip_typec_phy *tcphy, u8 mode)
 
     reset_control_deassert(tcphy->uphy_rst);
 
-    ret = readx_poll_timeout(readl, tcphy->base + PMA_CMN_CTRL1, val, val & CMN_READY, 10, PHY_MODE_SET_TIMEOUT);
+    ret = readx_poll_timeout(readl, tcphy->base + PMA_CMN_CTRL1, val, val & CMN_READY, 0xA, PHY_MODE_SET_TIMEOUT);
     if (ret < 0) {
         dev_err(tcphy->dev, "wait pma ready timeout\n");
         ret = -ETIMEDOUT;
@@ -1414,7 +1414,7 @@ static int rockchip_dp_phy_power_on(struct phy *phy)
     property_enable(tcphy, &cfg->uphy_dp_sel, 1);
 
     ret =
-        readx_poll_timeout(readl, tcphy->base + PHY_DP_MODE_CTL, val, val & DP_MODE_A2_ACK, 1000, PHY_MODE_SET_TIMEOUT);
+        readx_poll_timeout(readl, tcphy->base + PHY_DP_MODE_CTL, val, val & DP_MODE_A2_ACK, 0x3E8, PHY_MODE_SET_TIMEOUT);
     if (ret < 0) {
         dev_err(tcphy->dev, "failed to wait TCPHY enter A2\n");
         goto power_on_finish;
@@ -1652,7 +1652,7 @@ static int rockchip_typec_phy_remove(struct platform_device *pdev)
 }
 
 static const struct of_device_id rockchip_typec_phy_dt_ids[] = {
-    {.compatible = "rockchip,rk3399-typec-phy", .data = &rk3399_usb3phy_port_cfgs}, {/* sentinel */}};
+    {.compatible = "rockchip,rk3399-typec-phy", .data = &rk3399_usb3phy_port_cfgs}, {}};
 
 MODULE_DEVICE_TABLE(of, rockchip_typec_phy_dt_ids);
 

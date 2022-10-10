@@ -538,7 +538,7 @@ void dma_fence_free(struct dma_fence *fence)
 }
 EXPORT_SYMBOL(dma_fence_free);
 
-static bool __dma_fence_enable_signaling(struct dma_fence *fence)
+static bool _dma_fence_enable_signaling(struct dma_fence *fence)
 {
     bool was_set;
 
@@ -579,7 +579,7 @@ void dma_fence_enable_sw_signaling(struct dma_fence *fence)
     }
 
     spin_lock_irqsave(fence->lock, flags);
-    __dma_fence_enable_signaling(fence);
+    _dma_fence_enable_signaling(fence);
     spin_unlock_irqrestore(fence->lock, flags);
 }
 EXPORT_SYMBOL(dma_fence_enable_sw_signaling);
@@ -625,7 +625,7 @@ int dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *cb, dma
 
     spin_lock_irqsave(fence->lock, flags);
 
-    if (__dma_fence_enable_signaling(fence)) {
+    if (_dma_fence_enable_signaling(fence)) {
         cb->func = func;
         list_add_tail(&cb->node, &fence->cb_list);
     } else {
@@ -741,7 +741,7 @@ signed long dma_fence_default_wait(struct dma_fence *fence, bool intr, signed lo
         goto out;
     }
 
-    if (!__dma_fence_enable_signaling(fence)) {
+    if (!_dma_fence_enable_signaling(fence)) {
         goto out;
     }
 

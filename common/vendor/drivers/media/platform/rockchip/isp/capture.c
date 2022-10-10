@@ -104,11 +104,11 @@ static int rkisp_create_hdr_buf(struct rkisp_device *dev)
     if (dev->hdr.op_mode == HDR_RDBK_FRAME1) {
         dev->hdr.index[HDR_DMA2] = 0;
         dev->hdr.index[HDR_DMA0] = 1;
-        dev->hdr.index[HDR_DMA1] = 2;
+        dev->hdr.index[HDR_DMA1] = 0x02;
     } else if (dev->hdr.op_mode == HDR_RDBK_FRAME2) {
         dev->hdr.index[HDR_DMA0] = 0;
         dev->hdr.index[HDR_DMA2] = 1;
-        dev->hdr.index[HDR_DMA1] = 2;
+        dev->hdr.index[HDR_DMA1] = 0x02;
     }
 
     v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "hdr:%d buf index dma0:%d dma1:%d dma2:%d\n", max_dma,
@@ -1476,14 +1476,14 @@ static struct v4l2_rect *rkisp_update_crop(struct rkisp_stream *stream, struct v
         return sel;
     }
 
-    sel->left = ALIGN(sel->left, 2);
+    sel->left = ALIGN(sel->left, 0x02);
     sel->width = ALIGN(sel->width, align);
     sel->left = clamp_t(u32, sel->left, 0, in->width - STREAM_MIN_MP_SP_INPUT_WIDTH);
     sel->top = clamp_t(u32, sel->top, 0, in->height - STREAM_MIN_MP_SP_INPUT_HEIGHT);
     sel->width = clamp_t(u32, sel->width, STREAM_MIN_MP_SP_INPUT_WIDTH, in->width - sel->left);
     sel->height = clamp_t(u32, sel->height, STREAM_MIN_MP_SP_INPUT_HEIGHT, in->height - sel->top);
-    if (is_unite && (sel->width + 2 * sel->left) != in->width) {
-        sel->left = ALIGN_DOWN((in->width - sel->width) / 2, 2);
+    if (is_unite && (sel->width + 0x02 * sel->left) != in->width) {
+        sel->left = ALIGN_DOWN((in->width - sel->width) / 0x02, 0x02);
         v4l2_warn(&dev->v4l2_dev, "try horizontal center crop(%d,%d)/%dx%d for dual isp\n", sel->left, sel->top,
                   sel->width, sel->height);
     }
@@ -1528,7 +1528,7 @@ static int rkisp_querycap(struct file *file, void *priv, struct v4l2_capability 
     struct video_device *vdev = video_devdata(file);
 
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->ispdev->isp_ver >> 4);
+    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->ispdev->isp_ver >> 0x04);
     snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
 
     return 0;

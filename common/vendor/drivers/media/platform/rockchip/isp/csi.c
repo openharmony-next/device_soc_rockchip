@@ -198,13 +198,13 @@ static int csi_config(struct rkisp_csi_device *csi)
      */
     switch (sensor->mbus.flags & V4L2_MBUS_CSI2_LANES) {
         case V4L2_MBUS_CSI2_4_LANE:
-            lanes = 4;
+            lanes = 0x04;
             break;
         case V4L2_MBUS_CSI2_3_LANE:
-            lanes = 3;
+            lanes = 0x03;
             break;
         case V4L2_MBUS_CSI2_2_LANE:
-            lanes = 2;
+            lanes = 0x02;
             break;
         case V4L2_MBUS_CSI2_1_LANE:
             lanes = 1;
@@ -251,7 +251,7 @@ static int csi_config(struct rkisp_csi_device *csi)
         rkisp_write(dev, CIF_ISP_CSI0_CTRL2, 0x3FFF, true);
 
         /* Configure Data Type and Virtual Channel */
-        rkisp_write(dev, CIF_ISP_CSI0_DATA_IDS_1, csi->mipi_di[0] | csi->mipi_di[1] << 8, true);
+        rkisp_write(dev, CIF_ISP_CSI0_DATA_IDS_1, csi->mipi_di[0] | csi->mipi_di[1] << 0x08, true);
 
         /* clear interrupts state */
         rkisp_read(dev, CIF_ISP_CSI0_ERR1, true);
@@ -305,7 +305,7 @@ static int csi_config(struct rkisp_csi_device *csi)
         }
         rkisp_write(dev, CSI2RX_CTRL1, lanes - 1, true);
         rkisp_write(dev, CSI2RX_CTRL2, 0x3FFF, true);
-        val = SW_CSI_ID1(csi->mipi_di[1]) | SW_CSI_ID2(csi->mipi_di[2]) | SW_CSI_ID3(csi->mipi_di[3]);
+        val = SW_CSI_ID1(csi->mipi_di[1]) | SW_CSI_ID2(csi->mipi_di[0x02]) | SW_CSI_ID3(csi->mipi_di[0x03]);
         mask = SW_CSI_ID1(0xff) | SW_CSI_ID2(0xff) | SW_CSI_ID3(0xff);
         /* CSI_ID0 is for dmarx when read back mode */
         if (dev->hw_dev->is_single) {
@@ -317,7 +317,7 @@ static int csi_config(struct rkisp_csi_device *csi)
                 rkisp_set_bits(dev->hw_dev->isp[i], CSI2RX_DATA_IDS_1, mask, val, false);
             }
         }
-        val = SW_CSI_ID4(csi->mipi_di[4]);
+        val = SW_CSI_ID4(csi->mipi_di[0x04]);
         rkisp_write(dev, CSI2RX_DATA_IDS_2, val, true);
         /* clear interrupts state */
         rkisp_read(dev, CSI2RX_ERR_PHY, true);

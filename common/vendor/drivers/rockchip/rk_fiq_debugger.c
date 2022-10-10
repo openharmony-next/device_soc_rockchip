@@ -74,12 +74,12 @@ static bool tf_fiq_sup;
 
 static inline void rk_fiq_write(struct rk_fiq_debugger *t, unsigned int val, unsigned int off)
 {
-    __raw_writel(val, t->debug_port_base + off * 4);
+    __raw_writel(val, t->debug_port_base + off * 0x04);
 }
 
 static inline unsigned int rk_fiq_read(struct rk_fiq_debugger *t, unsigned int off)
 {
-    return __raw_readl(t->debug_port_base + off * 4);
+    return __raw_readl(t->debug_port_base + off * 0x04);
 }
 
 static inline unsigned int rk_fiq_read_lsr(struct rk_fiq_debugger *t)
@@ -108,17 +108,17 @@ static int debug_port_init(struct platform_device *pdev)
     }
 
     switch (t->baudrate) {
-        case 1500000:
+        case 0x16E360:
             dll = 0x1;
             break;
-        case 115200:
+        case 0x1C200:
         default:
             dll = 0xd;
             break;
     }
     /* reset uart */
     rk_fiq_write(t, 0x07, UART_SRR);
-    udelay(10);
+    udelay(0x0A);
     /* set uart to loop back mode */
     rk_fiq_write(t, 0x10, UART_MCR);
 
@@ -167,8 +167,8 @@ static int debug_getc(struct platform_device *pdev)
         temp = rk_fiq_read(t, UART_RX);
         buf[n & 0x1f] = temp;
         n++;
-        if (temp == 'q' && n > 2) {
-            if ((buf[(n - 2) & 0x1f] == 'i') && (buf[(n - 3) & 0x1f] == 'f')) {
+        if (temp == 'q' && n > 0x02) {
+            if ((buf[(n - 0x02) & 0x1f] == 'i') && (buf[(n - 0x03) & 0x1f] == 'f')) {
                 return FIQ_DEBUGGER_BREAK;
             } else {
                 return temp;
@@ -189,7 +189,7 @@ static void debug_putc(struct platform_device *pdev, unsigned int c)
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
     while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) && count--) {
-        udelay(10);
+        udelay(0x0A);
     }
 
     rk_fiq_write(t, c, UART_TX);
@@ -211,7 +211,7 @@ static void debug_flush(struct platform_device *pdev)
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
     while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--) {
-        udelay(10);
+        udelay(0x0A);
     }
 }
 
@@ -232,7 +232,7 @@ static void console_putc(struct platform_device *pdev, unsigned int c)
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
     while (!(rk_fiq_read(t, UART_USR) & UART_USR_TX_FIFO_NOT_FULL) && count--) {
-        usleep_range(200, 210);
+        usleep_range(0XC8, 0XD2);
     }
 
     rk_fiq_write(t, c, UART_TX);
@@ -246,7 +246,7 @@ static void console_flush(struct platform_device *pdev)
     t = container_of(dev_get_platdata(&pdev->dev), typeof(*t), pdata);
 
     while (!(rk_fiq_read_lsr(t) & UART_LSR_TEMT) && count--) {
-        usleep_range(200, 210);
+        usleep_range(0xC8, 0XD2);
     }
 }
 
@@ -424,7 +424,7 @@ void rk_fiq_sdei_event_sw_cpu(int wait_disable)
             break;
         }
         cnt--;
-        udelay(20);
+        udelay(0x14);
     } while (wait_disable && cnt);
 
     affinity = cpu_logical_map(rk_fiq_sdei.sw_cpu) & MPIDR_HWID_BITMASK;
@@ -450,7 +450,7 @@ int fiq_sdei_sw_cpu_event_callback(u32 event, struct pt_regs *regs, void *arg)
         }
     } else if (cpu_id == rk_fiq_sdei.cur_cpu && !rk_fiq_sdei.cpu_off_sw) {
         while (!rk_fiq_sdei.cpu_can_sw && cnt) {
-            udelay(10);
+            udelay(0x0A);
             cnt--;
         };
 
@@ -488,7 +488,7 @@ static int fiq_dbg_sdei_cpu_off_migrate_fiq(unsigned int cpu)
         _rk_fiq_dbg_sdei_switch_cpu(target_cpu, 1);
 
         while (rk_fiq_sdei.cur_cpu == cpu && cnt) {
-            udelay(10);
+            udelay(0x0A);
             cnt--;
         };
         if (!cnt) {

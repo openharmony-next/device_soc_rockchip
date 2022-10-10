@@ -25,9 +25,9 @@ u32 cal_fec_mesh(u32 width, u32 height, u32 mode)
     u32 mesh_height = mode ? 9 : 17;
 
     if (!left_height) {
-        left_height = 128;
+        left_height = 0x80;
     }
-    mesh_left_height = mode ? (left_height / 16 + 1) : (left_height / 8 + 1);
+    mesh_left_height = mode ? (left_height / 0x10 + 1) : (left_height / 0x08 + 1);
     mesh_size = (spb_num - 1) * mesh_width * mesh_height + mesh_width * mesh_left_height;
 
     return mesh_size;
@@ -546,7 +546,7 @@ int rkispp_register_subdev(struct rkispp_device *dev, struct v4l2_device *v4l2_d
     v4l2_subdev_init(sd, &rkispp_sd_ops);
     sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE | V4L2_SUBDEV_FL_HAS_EVENTS;
     sd->entity.ops = &rkispp_sd_media_ops;
-    snprintf(sd->name, sizeof(sd->name), "rkispp-subdev");
+    ret = snprintf(sd->name, sizeof(sd->name), "rkispp-subdev");
     sd->entity.function = MEDIA_ENT_F_PROC_VIDEO_COMPOSER;
     ispp_sdev->pads[RKISPP_PAD_SINK].flags = MEDIA_PAD_FL_SINK | MEDIA_PAD_FL_MUST_CONNECT;
     ispp_sdev->pads[RKISPP_PAD_SINK_PARAMS].flags = MEDIA_PAD_FL_SINK;

@@ -228,20 +228,20 @@ static const struct rk805_pin_function rk817_pin_functions[] = {
 
 /* for rk809 only a sleep pin */
 static const struct rk805_pin_group rk817_pin_groups[] = {{
-                                                              .name = "gpio_slp",
-                                                              .pins = {RK817_GPIO_SLP},
-                                                              .npins = 1,
-                                                          },
-                                                          {
-                                                              .name = "gpio_ts",
-                                                              .pins = {RK817_GPIO_TS},
-                                                              .npins = 1,
-                                                          },
-                                                          {
-                                                              .name = "gpio_gt",
-                                                              .pins = {RK817_GPIO_GT},
-                                                              .npins = 1,
-                                                          }};
+    .name = "gpio_slp",
+    .pins = {RK817_GPIO_SLP},
+    .npins = 1,
+},
+{
+    .name = "gpio_ts",
+    .pins = {RK817_GPIO_TS},
+    .npins = 1,
+},
+{
+    .name = "gpio_gt",
+    .pins = {RK817_GPIO_GT},
+    .npins = 1,
+}};
 
 #define RK817_GPIOTS_VAL_MSK BIT(3)
 #define RK817_GPIOGT_VAL_MSK BIT(6)
@@ -285,11 +285,9 @@ static void rk805_gpio_set(struct gpio_chip *chip, unsigned int offset, int valu
 {
     struct rk805_pctrl_info *pci = gpiochip_get_data(chip);
     int ret;
-
     if (!pci->pin_cfg[offset].val_msk) {
         return;
     }
-
     ret = regmap_update_bits(pci->rk808->regmap, pci->pin_cfg[offset].reg, pci->pin_cfg[offset].val_msk,
                              value ? pci->pin_cfg[offset].val_msk : 0);
     if (ret) {
@@ -314,7 +312,7 @@ static int rk805_gpio_get_direction(struct gpio_chip *chip, unsigned int offset)
     unsigned int val;
     int ret;
 
-    /* default output*/
+    /* default output */
     if (!pci->pin_cfg[offset].dir_msk) {
         return GPIO_LINE_DIRECTION_OUT;
     }
@@ -474,7 +472,6 @@ static int _rk817_pinctrl_set_mux(struct pinctrl_dev *pctldev, unsigned int offs
 
     mux <<= ffs(pci->pin_cfg[offset].fun_msk) - 1;
     ret = regmap_update_bits(pci->rk808->regmap, pci->pin_cfg[offset].reg, pci->pin_cfg[offset].fun_msk, mux);
-
     if (ret) {
         dev_err(pci->dev, "set gpio%d func%d failed\n", offset, mux);
     }

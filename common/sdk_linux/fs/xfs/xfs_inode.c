@@ -694,7 +694,6 @@ static void xfs_inode_inherit_flags(struct xfs_inode *ip, const struct xfs_inode
 {
     unsigned int di_flags = 0;
     umode_t mode = VFS_I(ip)->i_mode;
-
     if (S_ISDIR(mode)) {
         if (pip->i_d.di_flags & XFS_DIFLAG_RTINHERIT) {
             di_flags |= XFS_DIFLAG_RTINHERIT;
@@ -959,7 +958,6 @@ int xfs_dir_ialloc(xfs_trans_t **tpp,                                        /* 
      * the inode(s) that we've just allocated.
      */
     code = xfs_ialloc(tp, dp, mode, nlink, rdev, prid, &ialloc_context, &ip);
-
     /*
      * Return an error if we were unable to allocate a new inode.
      * This should only happen if we run out of space on disk or
@@ -1028,7 +1026,6 @@ int xfs_dir_ialloc(xfs_trans_t **tpp,                                        /* 
          * this call should always succeed.
          */
         code = xfs_ialloc(tp, dp, mode, nlink, rdev, prid, &ialloc_context, &ip);
-
         /*
          * If we get an error at this point, return to the caller
          * so that the current transaction can be aborted.
@@ -1579,7 +1576,6 @@ int xfs_release(xfs_inode_t *ip)
     }
 
     if (xfs_can_free_eofblocks(ip, false)) {
-
         /*
          * Check if the inode is being opened, written and closed
          * frequently and we have delayed allocation blocks outstanding
@@ -2413,7 +2409,6 @@ static void xfs_ifree_mark_inode_stale(struct xfs_buf *bp, struct xfs_inode *fre
 retry:
     rcu_read_lock();
     ip = radix_tree_lookup(&pag->pag_ici_root, XFS_INO_TO_AGINO(mp, inum));
-
     /* Inode not in memory, nothing to do */
     if (!ip) {
         rcu_read_unlock();
@@ -3280,7 +3275,6 @@ int xfs_rename(struct xfs_inode *src_dp, struct xfs_name *src_name, struct xfs_i
      * the target existed, or across two parent directories.
      */
     if (src_is_directory && (new_parent || target_ip != NULL)) {
-
         /*
          * Decrement link count on src_directory since the
          * entry that's moved no longer points to it.

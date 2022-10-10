@@ -244,11 +244,11 @@ static void rk_pcie_writel_atu(struct dw_pcie *pci, u32 reg, u32 val)
     int ret;
 
     if (pci->ops->write_dbi) {
-        pci->ops->write_dbi(pci, pci->atu_base, reg, 4, val);
+        pci->ops->write_dbi(pci, pci->atu_base, reg, 0x04, val);
         return;
     }
 
-    ret = dw_pcie_write(pci->atu_base + reg, 4, val);
+    ret = dw_pcie_write(pci->atu_base + reg, 0x04, val);
     if (ret) {
         dev_err(pci->dev, "Write ATU address failed\n");
     }
@@ -267,10 +267,10 @@ static u32 rk_pcie_readl_atu(struct dw_pcie *pci, u32 reg)
     u32 val;
 
     if (pci->ops->read_dbi) {
-        return pci->ops->read_dbi(pci, pci->atu_base, reg, 4);
+        return pci->ops->read_dbi(pci, pci->atu_base, reg, 0x04);
     }
 
-    ret = dw_pcie_read(pci->atu_base + reg, 4, &val);
+    ret = dw_pcie_read(pci->atu_base + reg, 0x04, &val);
     if (ret) {
         dev_err(pci->dev, "Read ATU address failed\n");
     }
@@ -1127,7 +1127,7 @@ static int rk_pcie_reset_grant_ctrl(struct rk_pcie *rk_pcie, bool enable)
     u32 val = (0x1 << 18); /* Write mask bit */
 
     if (enable) {
-        val |= (0x1 << 2);
+        val |= (0x1 << 0x02);
     }
 
     ret = regmap_write(rk_pcie->usb_pcie_grf, 0x0, val);
@@ -1159,9 +1159,9 @@ static void rk_pcie_config_dma_dwc(struct dma_table *table)
     table->ctx_reg.ctrlhi.asdword = 0x0;
     table->ctx_reg.xfersize = table->buf_size;
     table->ctx_reg.sarptrlo = (u32)(table->local & 0xffffffff);
-    table->ctx_reg.sarptrhi = (u32)(table->local >> 32);
+    table->ctx_reg.sarptrhi = (u32)(table->local >> 0x20);
     table->ctx_reg.darptrlo = (u32)(table->bus & 0xffffffff);
-    table->ctx_reg.darptrhi = (u32)(table->bus >> 32);
+    table->ctx_reg.darptrhi = (u32)(table->bus >> 0x20);
     table->wr_weilo.weight0 = 0x0;
     table->start.stop = 0x0;
     table->start.chnl = PCIE_DMA_CHN0;
@@ -1307,7 +1307,7 @@ static void rk_pcie_fast_link_setup(struct rk_pcie *rk_pcie)
 
     /* LTSSM EN ctrl mode */
     val = rk_pcie_readl_apb(rk_pcie, PCIE_CLIENT_HOT_RESET_CTRL);
-    val |= PCIE_LTSSM_ENABLE_ENHANCE | (PCIE_LTSSM_ENABLE_ENHANCE << 16);
+    val |= PCIE_LTSSM_ENABLE_ENHANCE | (PCIE_LTSSM_ENABLE_ENHANCE << 0x10);
     rk_pcie_writel_apb(rk_pcie, PCIE_CLIENT_HOT_RESET_CTRL, val);
 }
 

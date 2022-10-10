@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KBASE_CTX_SCHED_H_
-#define _KBASE_CTX_SCHED_H_
+#ifndef KBASE_CTX_SCHED_H_
+#define KBASE_CTX_SCHED_H_
 
 #include <mali_kbase.h>
 
@@ -204,4 +204,4 @@ bool kbase_ctx_sched_inc_refcount(struct kbase_context *kctx);
  */
 void kbase_ctx_sched_release_ctx_lock(struct kbase_context *kctx);
 
-#endif /* _KBASE_CTX_SCHED_H_ */
+#endif /* KBASE_CTX_SCHED_H_ */

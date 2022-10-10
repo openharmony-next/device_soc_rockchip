@@ -98,24 +98,19 @@ static int i2c_device_match(struct device *dev, struct device_driver *drv)
 {
     struct i2c_client *client = i2c_verify_client(dev);
     struct i2c_driver *driver;
-
     /* Attempt an OF style match */
     if (i2c_of_match_device(drv->of_match_table, client)) {
         return 1;
     }
-
     /* Then ACPI style match */
     if (acpi_driver_match_device(dev, drv)) {
         return 1;
     }
-
     driver = to_i2c_driver(drv);
-
     /* Finally an I2C match */
     if (i2c_match_id(driver->id_table, client)) {
         return 1;
     }
-
     return 0;
 }
 
@@ -424,7 +419,7 @@ static int i2c_init_recovery(struct i2c_adapter *adap)
         bri->set_scl = set_scl_gpio_value;
         if (bri->sda_gpiod) {
             bri->get_sda = get_sda_gpio_value;
-            /* FIXME: add proper flag instead of '0' once available */
+            /* add proper flag instead of '0' once available */
             if (gpiod_get_direction(bri->sda_gpiod) == 0) {
                 bri->set_sda = set_sda_gpio_value;
             }
@@ -472,16 +467,12 @@ static int i2c_device_probe(struct device *dev)
     struct i2c_client *client = i2c_verify_client(dev);
     struct i2c_driver *driver;
     int status;
-
     if (!client) {
         return 0;
     }
-
     client->irq = client->init_irq;
-
     if (!client->irq) {
         int irq = -ENOENT;
-
         if (client->flags & I2C_CLIENT_HOST_NOTIFY) {
             dev_dbg(dev, "Using Host Notify IRQ\n");
             /* Keep adapter active when Host Notify is required */
@@ -499,16 +490,12 @@ static int i2c_device_probe(struct device *dev)
             status = irq;
             goto put_sync_adapter;
         }
-
         if (irq < 0) {
             irq = 0;
         }
-
         client->irq = irq;
     }
-
     driver = to_i2c_driver(dev->driver);
-
     /*
      * An I2C ID table is not mandatory, if and only if, a suitable OF
      * or ACPI ID table is supplied for the probing device.
@@ -518,18 +505,14 @@ static int i2c_device_probe(struct device *dev)
         status = -ENODEV;
         goto put_sync_adapter;
     }
-
     if (client->flags & I2C_CLIENT_WAKE) {
         int wakeirq;
-
         wakeirq = of_irq_get_byname(dev->of_node, "wakeup");
         if (wakeirq == -EPROBE_DEFER) {
             status = wakeirq;
             goto put_sync_adapter;
         }
-
         device_init_wakeup(&client->dev, true);
-
         if (wakeirq > 0 && wakeirq != client->irq) {
             status = dev_pm_set_dedicated_wake_irq(dev, wakeirq);
         } else if (client->irq > 0) {
@@ -537,24 +520,19 @@ static int i2c_device_probe(struct device *dev)
         } else {
             status = 0;
         }
-
         if (status) {
             dev_warn(&client->dev, "failed to set up wakeup irq\n");
         }
     }
-
     dev_dbg(dev, "probe\n");
-
     status = of_clk_set_defaults(dev->of_node, false);
     if (status < 0) {
         goto err_clear_wakeup_irq;
     }
-
     status = dev_pm_domain_attach(&client->dev, true);
     if (status) {
         goto err_clear_wakeup_irq;
     }
-
     /*
      * When there are no more users of probe(),
      * rename probe_new to probe.
@@ -566,11 +544,9 @@ static int i2c_device_probe(struct device *dev)
     } else {
         status = -EINVAL;
     }
-
     if (status) {
         goto err_detach_pm_domain;
     }
-
     return 0;
 
 err_detach_pm_domain:
@@ -770,13 +746,10 @@ static int i2c_check_mux_parents(struct i2c_adapter *adapter, int addr)
 {
     struct i2c_adapter *parent = i2c_parent_is_i2c_adapter(adapter);
     int result;
-
     result = device_for_each_child(&adapter->dev, &addr, i2c_check_addr_busy_ext);
-
     if (!result && parent) {
         result = i2c_check_mux_parents(parent, addr);
     }
-
     return result;
 }
 
@@ -1710,7 +1683,7 @@ void i2c_del_adapter(struct i2c_adapter *adap)
 
     /* wait until all references to the device are gone
      *
-     * FIXME: This is old code and should ideally be replaced by an
+     * This is old code and should ideally be replaced by an
      * alternative which results in decoupling the lifetime of the struct
      * device from the i2c_adapter, like spi or netdev do. Any solution
      * should be thoroughly tested with DEBUG_KOBJECT_RELEASE enabled!
@@ -2315,8 +2288,9 @@ static int i2c_default_probe(struct i2c_adapter *adap, unsigned short addr)
 #endif
         if (!((addr & ~I2C_ADDR_LOW_THREE_BYTE_BIT_MASK) == I2C_ADDR_DEFAULT_VALUE_ONE ||
               (addr & ~I2C_ADDR_LOW_FOUR_BYTE_BIT_MASK) == I2C_ADDR_DEFAULT_VALUE_TWO) &&
-            i2c_check_functionality(adap, I2C_FUNC_SMBUS_QUICK))
-        err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_WRITE, 0, I2C_SMBUS_QUICK, NULL);
+            i2c_check_functionality(adap, I2C_FUNC_SMBUS_QUICK)){
+                err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_WRITE, 0, I2C_SMBUS_QUICK, NULL);
+            }
     else if (i2c_check_functionality(adap, I2C_FUNC_SMBUS_READ_BYTE)) {
         err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_READ, 0, I2C_SMBUS_BYTE, &dummy);
     } else {

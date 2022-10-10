@@ -11,7 +11,7 @@
 #include "intel_uc_fw_abi.h"
 #include "i915_drv.h"
 
-static inline struct intel_gt *____uc_fw_to_gt(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type type)
+static inline struct intel_gt *_uc_fw_to_gt(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type type)
 {
     if (type == INTEL_UC_FW_TYPE_GUC) {
         return container_of(uc_fw, struct intel_gt, uc.guc.fw);
@@ -21,17 +21,17 @@ static inline struct intel_gt *____uc_fw_to_gt(struct intel_uc_fw *uc_fw, enum i
     return container_of(uc_fw, struct intel_gt, uc.huc.fw);
 }
 
-static inline struct intel_gt *__uc_fw_to_gt(struct intel_uc_fw *uc_fw)
+static inline struct intel_gt *uc_fw_to_gt(struct intel_uc_fw *uc_fw)
 {
     GEM_BUG_ON(uc_fw->status == INTEL_UC_FIRMWARE_UNINITIALIZED);
-    return ____uc_fw_to_gt(uc_fw, uc_fw->type);
+    return _uc_fw_to_gt(uc_fw, uc_fw->type);
 }
 
 #ifdef CONFIG_DRM_I915_DEBUG_GUC
 void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_status status)
 {
     uc_fw->__status = status;
-    drm_dbg(&__uc_fw_to_gt(uc_fw)->i915->drm, "%s firmware -> %s\n", intel_uc_fw_type_repr(uc_fw->type),
+    drm_dbg(&uc_fw_to_gt(uc_fw)->i915->drm, "%s firmware -> %s\n", intel_uc_fw_type_repr(uc_fw->type),
             status == INTEL_UC_FIRMWARE_SELECTED ? uc_fw->path : intel_uc_fw_status_repr(status));
 }
 #endif
@@ -58,14 +58,14 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_statu
                                     fw_def(BROXTON, 0, guc_def(bxt, 33, 0, 0), huc_def(bxt, 2, 0, 0))                  \
                                         fw_def(SKYLAKE, 0, guc_def(skl, 33, 0, 0), huc_def(skl, 2, 0, 0))
 
-#define __MAKE_UC_FW_PATH(prefix_, name_, major_, minor_, patch_)                                                      \
+#define MAKE_UC_FW_PATH(prefix_, name_, major_, minor_, patch_)                                                      \
     "i915/" __stringify(prefix_) name_ __stringify(major_) "." __stringify(minor_) "." __stringify(patch_) ".bin"
 
 #define MAKE_GUC_FW_PATH(prefix_, major_, minor_, patch_)                                                              \
-    __MAKE_UC_FW_PATH(prefix_, "_guc_", (major_), (minor_), patch_)
+    MAKE_UC_FW_PATH(prefix_, "_guc_", (major_), (minor_), patch_)
 
 #define MAKE_HUC_FW_PATH(prefix_, major_, minor_, bld_num_)                                                            \
-    __MAKE_UC_FW_PATH(prefix_, "_huc_", (major_), (minor_), bld_num_)
+    MAKE_UC_FW_PATH(prefix_, "_huc_", (major_), (minor_), bld_num_)
 
 /* All blobs need to be declared via MODULE_FIRMWARE() */
 #define INTEL_UC_MODULE_FW(platform_, revid_, guc_, huc_)                                                              \
@@ -196,7 +196,7 @@ static void __uc_fw_user_override(struct drm_i915_private *i915, struct intel_uc
  */
 void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type type)
 {
-    struct drm_i915_private *i915 = ____uc_fw_to_gt(uc_fw, type)->i915;
+    struct drm_i915_private *i915 = _uc_fw_to_gt(uc_fw, type)->i915;
 
     /*
      * we use FIRMWARE_UNINITIALIZED to detect checks against uc_fw->status
@@ -220,7 +220,7 @@ void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type typ
 
 static void __force_fw_fetch_failures(struct intel_uc_fw *uc_fw, int e)
 {
-    struct drm_i915_private *i915 = __uc_fw_to_gt(uc_fw)->i915;
+    struct drm_i915_private *i915 = uc_fw_to_gt(uc_fw)->i915;
     bool user = e == -EINVAL;
 
     if (i915_inject_probe_error(i915, e)) {
@@ -263,7 +263,7 @@ static void __force_fw_fetch_failures(struct intel_uc_fw *uc_fw, int e)
  */
 int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 {
-    struct drm_i915_private *i915 = __uc_fw_to_gt(uc_fw)->i915;
+    struct drm_i915_private *i915 = uc_fw_to_gt(uc_fw)->i915;
     struct device *dev = i915->drm.dev;
     struct drm_i915_gem_object *obj;
     const struct firmware *fw = NULL;
@@ -328,7 +328,7 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
     }
 
     /* Sanity check whether this fw is not larger than whole WOPCM memory */
-    size = __intel_uc_fw_get_upload_size(uc_fw);
+    size = _intel_uc_fw_get_upload_size(uc_fw);
     if (unlikely(size >= i915->wopcm.size)) {
         drm_warn(&i915->drm, "%s firmware %s: invalid size: %zu > %zu\n", intel_uc_fw_type_repr(uc_fw->type),
                  uc_fw->path, size, (size_t)i915->wopcm.size);
@@ -377,7 +377,7 @@ fail:
 
 static u32 uc_fw_ggtt_offset(struct intel_uc_fw *uc_fw)
 {
-    struct i915_ggtt *ggtt = __uc_fw_to_gt(uc_fw)->ggtt;
+    struct i915_ggtt *ggtt = uc_fw_to_gt(uc_fw)->ggtt;
     struct drm_mm_node *node = &ggtt->uc_fw;
 
     GEM_BUG_ON(!drm_mm_node_allocated(node));
@@ -390,7 +390,7 @@ static u32 uc_fw_ggtt_offset(struct intel_uc_fw *uc_fw)
 static void uc_fw_bind_ggtt(struct intel_uc_fw *uc_fw)
 {
     struct drm_i915_gem_object *obj = uc_fw->obj;
-    struct i915_ggtt *ggtt = __uc_fw_to_gt(uc_fw)->ggtt;
+    struct i915_ggtt *ggtt = uc_fw_to_gt(uc_fw)->ggtt;
     struct i915_vma dummy = {
         .node.start = uc_fw_ggtt_offset(uc_fw),
         .node.size = obj->base.size,
@@ -410,7 +410,7 @@ static void uc_fw_bind_ggtt(struct intel_uc_fw *uc_fw)
 static void uc_fw_unbind_ggtt(struct intel_uc_fw *uc_fw)
 {
     struct drm_i915_gem_object *obj = uc_fw->obj;
-    struct i915_ggtt *ggtt = __uc_fw_to_gt(uc_fw)->ggtt;
+    struct i915_ggtt *ggtt = uc_fw_to_gt(uc_fw)->ggtt;
     u64 start = uc_fw_ggtt_offset(uc_fw);
 
     ggtt->vm.clear_range(&ggtt->vm, start, obj->base.size);
@@ -418,7 +418,7 @@ static void uc_fw_unbind_ggtt(struct intel_uc_fw *uc_fw)
 
 static int uc_fw_xfer(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
 {
-    struct intel_gt *gt = __uc_fw_to_gt(uc_fw);
+    struct intel_gt *gt = uc_fw_to_gt(uc_fw);
     struct intel_uncore *uncore = gt->uncore;
     u64 offset;
     int ret;
@@ -476,7 +476,7 @@ static int uc_fw_xfer(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
  */
 int intel_uc_fw_upload(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
 {
-    struct intel_gt *gt = __uc_fw_to_gt(uc_fw);
+    struct intel_gt *gt = uc_fw_to_gt(uc_fw);
     int err;
 
     /* make sure the status was cleared the last time we reset the uc */

@@ -16,8 +16,6 @@
 #ifndef __VPU_H__
 #define __VPU_H__
 
-#include "rk_type.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

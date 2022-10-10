@@ -464,7 +464,7 @@ static int drvodt_proc_show(struct seq_file *m, void *v)
             seq_printf(m, "[%2d]%s: NULL (unknown) %c\n", i, drv_odt_msg[i],
                        (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
         } else if (*(p_uint + (i * 0x3) + 0x1) == DRV_ODT_UNKNOWN) {
-            seq_printf(m, "[%2d]%s: %d (unknown) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 3)),
+            seq_printf(m, "[%2d]%s: %d (unknown) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 0x3)),
                        (*(p_uint + (i * 0x3) + 0x2) == DRV_ODT_SUSPEND_FIX) ? '\0' : '*');
         } else if (i < (ARRAY_SIZE(drv_odt_msg) - 0x2)) {
             seq_printf(m, "[%2d]%s: %d (%d ohm) %c\n", i, drv_odt_msg[i], *(p_uint + (i * 0x3)),

@@ -480,7 +480,7 @@ static void dw_mipi_dsi2_set_lane_rate(struct dw_mipi_dsi2 *dsi2)
     max_lane_rate =
         (dsi2->c_option) ? dsi2->pdata->cphy_max_symbol_rate_per_lane : dsi2->pdata->dphy_max_bit_rate_per_lane;
 
-    lanes = (dsi2->slave || dsi2->master) ? dsi2->lanes * 2 : dsi2->lanes;
+    lanes = (dsi2->slave || dsi2->master) ? dsi2->lanes * 0x2 : dsi2->lanes;
     bpp = mipi_dsi_pixel_format_to_bpp(dsi2->format);
     if (bpp < 0) {
         bpp = 0x18;
@@ -1311,7 +1311,7 @@ static int dw_mipi_dsi2_read_from_fifo(struct dw_mipi_dsi2 *dsi2, const struct m
     u32 val;
 
     ret = regmap_read_poll_timeout(dsi2->regmap, DSI2_CORE_STATUS, val, val & CRI_RD_DATA_AVAIL, 0,
-                                   DIV_ROUND_UP(1000000, vrefresh));
+                                   DIV_ROUND_UP(0xf4240, vrefresh));
     if (ret) {
         DRM_DEV_ERROR(dsi2->dev, "CRI has no available read data\n");
         return ret;
@@ -1321,8 +1321,8 @@ static int dw_mipi_dsi2_read_from_fifo(struct dw_mipi_dsi2 *dsi2, const struct m
     data_type = val & 0x3f;
 
     if (mipi_dsi_packet_format_is_short(data_type)) {
-        for (i = 0; i < len && i < 2; i++) {
-            payload[i] = (val >> (8 * (i + 1))) & 0xff;
+        for (i = 0; i < len && i < 0x2; i++) {
+            payload[i] = (val >> (0x8 * (i + 1))) & 0xff;
         }
 
         return 0;
@@ -1330,7 +1330,7 @@ static int dw_mipi_dsi2_read_from_fifo(struct dw_mipi_dsi2 *dsi2, const struct m
 
     wc = (val >> 0x8) & 0xffff;
     /* Receive payload */
-    for (i = 0; i < len && i < wc; i += 4) {
+    for (i = 0; i < len && i < wc; i += 0x4) {
         regmap_read(dsi2->regmap, DSI2_CRI_RX_PLD, &val);
         for (j = 0; j < 0x4 && j + i < len && j + i < wc; j++) {
             payload[i + j] = val >> (0x8 * j);

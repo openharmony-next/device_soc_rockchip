@@ -38,4 +38,4 @@ u32 mali_get_user_setting(mali_uk_user_setting_t setting);
 #ifdef __cplusplus
 }
 #endif
-#endif /* __MALI_KERNEL_USER_SETTING__ */
+#endif /* __MALI___user_SETTING__ */

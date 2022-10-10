@@ -700,7 +700,7 @@ static int rga2_buf_size_cal(unsigned long yrgb_addr, unsigned long uv_addr, uns
         case RGA2_FORMAT_ARGB_4444:
         case RGA2_FORMAT_ABGR_5551:
         case RGA2_FORMAT_ABGR_4444:
-            stride = (w * 2 + 0x3) & (~0x3);
+            stride = (w * 0x2 + 0x3) & (~0x3);
             size_yrgb = stride * h;
             start = yrgb_addr >> PAGE_SHIFT;
             end = yrgb_addr + size_yrgb;
@@ -860,7 +860,6 @@ static int rga2_MapUserMemory(struct page **pages, uint32_t *pageTable, unsigned
 #else
     result = get_user_pages_remote(current->mm, Memory << PAGE_SHIFT, pageCount, writeFlag, pages, NULL, NULL);
 #endif
-
     if (result > 0 && result >= pageCount) {
         /* Fill the page table. */
         for (i = 0; i < pageCount; i++) {
@@ -1031,7 +1030,7 @@ static int rga2_mmu_flush_cache(struct rga2_reg *reg, struct rga2_req *req)
             ret = rga2_MapUserMemory(&pages[0], MMU_Base, DstStart, DstPageCount, 1, MMU_MAP_CLEAN | MMU_MAP_INVALID);
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
             if (RGA2_CHECK_MODE) {
-                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 2);
+                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 0x2);
             }
 #endif
         }
@@ -1184,7 +1183,7 @@ static int rga2_mmu_info_BitBlt_mode(struct rga2_reg *reg, struct rga2_req *req)
                                      MMU_MAP_CLEAN | MMU_MAP_INVALID);
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
             if (RGA2_CHECK_MODE) {
-                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 2);
+                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 0x2);
             }
 #endif
 
@@ -1196,7 +1195,7 @@ static int rga2_mmu_info_BitBlt_mode(struct rga2_reg *reg, struct rga2_req *req)
                                      MMU_MAP_INVALID);
 #ifdef CONFIG_ROCKCHIP_RGA2_DEBUGGER
             if (RGA2_CHECK_MODE) {
-                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 2);
+                rga2_user_memory_check(&pages[0], req->dst.vir_w, req->dst.vir_h, req->dst.format, 0x2);
             }
 #endif
 
@@ -1329,8 +1328,8 @@ static int rga2_mmu_info_color_palette_mode(struct rga2_reg *reg, struct rga2_re
             /* change the buf address in req struct */
             req->mmu_info.els_base_addr = (((unsigned long)MMU_Base_phys));
             /*
-             *The color palette mode will not have YUV format as input,
-             *so UV component address is not needed
+             * The color palette mode will not have YUV format as input,
+             * so UV component address is not needed
              */
             req->src.yrgb_addr = (req->src.yrgb_addr & (~PAGE_MASK));
         }

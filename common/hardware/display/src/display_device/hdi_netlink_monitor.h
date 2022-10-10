@@ -18,14 +18,10 @@
 
 #include <thread>
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class HdiNetLinkMonitor
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class HdiNetLinkMonitor {
             public:
                 HdiNetLinkMonitor();
                 int Init();

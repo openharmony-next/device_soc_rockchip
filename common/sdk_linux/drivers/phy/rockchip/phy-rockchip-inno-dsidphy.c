@@ -404,7 +404,6 @@ static const struct inno_mipi_dphy_timing *inno_mipi_dphy_get_timing(struct inno
 
 static void inno_mipi_dphy_max_2_5GHz_pll_enable(struct inno_dsidphy *inno)
 {
-
     phy_update_bits(inno, REGISTER_PART_ANALOG, 0x03, REG_PREDIV_MASK, REG_PREDIV(inno->pll.prediv));
     phy_update_bits(inno, REGISTER_PART_ANALOG, 0x03, REG_FBDIV_HI_MASK, REG_FBDIV_HI(inno->pll.fbdiv));
     phy_update_bits(inno, REGISTER_PART_ANALOG, 0x04, REG_FBDIV_LO_MASK, REG_FBDIV_LO(inno->pll.fbdiv));
@@ -868,22 +867,22 @@ static int inno_dsidphy_remove(struct platform_device *pdev)
 }
 
 static const struct of_device_id inno_dsidphy_of_match[] = {{
-                                                                .compatible = "rockchip,px30-dsi-dphy",
-                                                                .data = &px30_plat_data,
-                                                            },
-                                                            {
-                                                                .compatible = "rockchip,rk3128-dsi-dphy",
-                                                                .data = &px30_plat_data,
-                                                            },
-                                                            {
-                                                                .compatible = "rockchip,rk3368-dsi-dphy",
-                                                                .data = &px30_plat_data,
-                                                            },
-                                                            {
-                                                                .compatible = "rockchip,rk3568-dsi-dphy",
-                                                                .data = &rk3568_plat_data,
-                                                            },
-                                                            {}};
+    .compatible = "rockchip,px30-dsi-dphy",
+    .data = &px30_plat_data,
+},
+{
+    .compatible = "rockchip,rk3128-dsi-dphy",
+    .data = &px30_plat_data,
+},
+{
+    .compatible = "rockchip,rk3368-dsi-dphy",
+    .data = &px30_plat_data,
+},
+{
+    .compatible = "rockchip,rk3568-dsi-dphy",
+    .data = &rk3568_plat_data,
+},
+{}};
 MODULE_DEVICE_TABLE(of, inno_dsidphy_of_match);
 
 static struct platform_driver inno_dsidphy_driver = {

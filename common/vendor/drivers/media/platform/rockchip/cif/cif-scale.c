@@ -26,6 +26,7 @@
 #define SCALE_MIN_HEIGHT 4
 #define SCALE_OUTPUT_STEP_WISE 1
 #define CIF_SCALE_REQ_BUFS_MIN 3
+#define DELAY_TIMEOUT 1000
 
 static const struct cif_output_fmt scale_out_fmts[] = {{
                                                            .fourcc = V4L2_PIX_FMT_SRGGB16,
@@ -92,7 +93,7 @@ static u32 rkcif_scale_align_bits_per_pixel(struct rkcif_device *cif_dev, const 
             case V4L2_PIX_FMT_SGRBG16:
             case V4L2_PIX_FMT_SRGGB16:
                 bpp = max(fmt->bpp[plane_index], (u8)CIF_RAW_STORED_BIT_WIDTH_RV1126);
-                for (i = 1; i < 5; i++) {
+                for (i = 1; i < 0x05; i++) {
                     if (i * CIF_RAW_STORED_BIT_WIDTH_RV1126 >= bpp) {
                         bpp = i * CIF_RAW_STORED_BIT_WIDTH_RV1126;
                         break;
@@ -172,19 +173,19 @@ static int rkcif_scale_set_fmt(struct rkcif_scale_vdev *scale_vdev, struct v4l2_
         height = scale_vdev->src_res.height;
     }
     scale_ratio = width / pixm->width;
-    if (scale_ratio <= 8) {
+    if (scale_ratio <= 0x08) {
         scale_vdev->scale_mode = SCALE_8TIMES;
-        scale_times = 8;
-    } else if (scale_ratio <= 16) {
+        scale_times = 0x08;
+    } else if (scale_ratio <= 0x10) {
         scale_vdev->scale_mode = SCALE_16TIMES;
-        scale_times = 16;
+        scale_times = 0x10;
     } else {
         scale_vdev->scale_mode = SCALE_32TIMES;
-        scale_times = 32;
+        scale_times = 0x32;
     }
     // source resolution align (scale_times * 2)
-    pixm->width = width / (scale_times * 2) * 2;
-    pixm->height = height / (scale_times * 2) * 2;
+    pixm->width = width / (scale_times * 0x02) * 0x02;
+    pixm->height = height / (scale_times * 0x02) * 0x02;
     pixm->num_planes = fmt->mplanes;
     pixm->field = V4L2_FIELD_NONE;
     pixm->quantization = V4L2_QUANTIZATION_DEFAULT;
@@ -194,7 +195,7 @@ static int rkcif_scale_set_fmt(struct rkcif_scale_vdev *scale_vdev, struct v4l2_
     size = bpl * pixm->height;
     imagesize += size;
 
-    v4l2_dbg(3, rkcif_debug, &stream->cifdev->v4l2_dev, "%s C-Plane %i size: %d, Total imagesize: %d\n", __func__, 0,
+    v4l2_dbg(0x03, rkcif_debug, &stream->cifdev->v4l2_dev, "%s C-Plane %i size: %d, Total imagesize: %d\n", __func__, 0,
              size, imagesize);
 
     if (fmt->mplanes == 1) {
@@ -206,7 +207,7 @@ static int rkcif_scale_set_fmt(struct rkcif_scale_vdev *scale_vdev, struct v4l2_
         scale_vdev->scale_out_fmt = fmt;
         scale_vdev->pixm = *pixm;
 
-        v4l2_dbg(3, rkcif_debug, &stream->cifdev->v4l2_dev, "%s: req(%d, %d) src out(%d, %d)\n", __func__, pixm->width,
+        v4l2_dbg(0x03, rkcif_debug, &stream->cifdev->v4l2_dev, "%s: req(%d, %d) src out(%d, %d)\n", __func__, pixm->width,
                  pixm->height, scale_vdev->src_res.width, scale_vdev->src_res.height);
     }
     return 0;
@@ -248,13 +249,13 @@ static long rkcif_scale_ioctl_default(struct file *file, void *fh, bool valid_pr
         case RKCIF_CMD_GET_SCALE_BLC:
             pblc = (struct bayer_blc *)arg;
             *pblc = scale_vdev->blc;
-            v4l2_dbg(3, rkcif_debug, &dev->v4l2_dev, "get scale blc %d %d %d %d\n", pblc->pattern00, pblc->pattern01,
+            v4l2_dbg(0x03, rkcif_debug, &dev->v4l2_dev, "get scale blc %d %d %d %d\n", pblc->pattern00, pblc->pattern01,
                      pblc->pattern02, pblc->pattern03);
             break;
         case RKCIF_CMD_SET_SCALE_BLC:
             pblc = (struct bayer_blc *)arg;
             scale_vdev->blc = *pblc;
-            v4l2_dbg(3, rkcif_debug, &dev->v4l2_dev, "set scale blc %d %d %d %d\n", pblc->pattern00, pblc->pattern01,
+            v4l2_dbg(0x03, rkcif_debug, &dev->v4l2_dev, "set scale blc %d %d %d %d\n", pblc->pattern00, pblc->pattern01,
                      pblc->pattern02, pblc->pattern03);
             break;
         default:
@@ -311,7 +312,7 @@ static int rkcif_scale_enum_frameintervals(struct file *file, void *fh, struct v
     } else if (ret == -ENOIOCTLCMD) {
         /* Set a default value for sensors not implements ioctl */
         fi.interval.numerator = 1;
-        fi.interval.denominator = 30;
+        fi.interval.denominator = 0x1E;
     }
 
     fival->type = V4L2_FRMIVAL_TYPE_CONTINUOUS;
@@ -352,21 +353,21 @@ static int rkcif_scale_enum_framesizes(struct file *file, void *prov, struct v4l
 
     switch (fsize->index) {
         case SCALE_8TIMES:
-            scale_times = 8;
+            scale_times = 0x08;
             break;
         case SCALE_16TIMES:
-            scale_times = 16;
+            scale_times = 0x10;
             break;
         case SCALE_32TIMES:
-            scale_times = 32;
+            scale_times = 0x20;
             break;
         default:
-            scale_times = 32;
+            scale_times = 0x20;
             break;
     }
     fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
-    s->width = input_rect.width / (scale_times * 2) * 2;
-    s->height = input_rect.height / (scale_times * 2) * 2;
+    s->width = input_rect.width / (scale_times * 0x02) * 0x02;
+    s->height = input_rect.height / (scale_times * 0x02) * 0x02;
 
     return 0;
 }
@@ -545,7 +546,7 @@ static void rkcif_scale_vb2_stop_streaming(struct vb2_queue *vq)
     /* Make sure no new work queued in isr before draining wq */
     scale_vdev->stopping = true;
     ret =
-        wait_event_timeout(scale_vdev->wq_stopped, scale_vdev->state != RKCIF_STATE_STREAMING, msecs_to_jiffies(1000));
+        wait_event_timeout(scale_vdev->wq_stopped, scale_vdev->state != RKCIF_STATE_STREAMING, msecs_to_jiffies(DELAY_TIMEOUT));
     if (!ret) {
         rkcif_scale_stop(scale_vdev);
         scale_vdev->stopping = false;
@@ -579,11 +580,11 @@ static int rkcif_scale_channel_init(struct rkcif_scale_vdev *scale_vdev)
     if (cif_dev->inf_id == RKCIF_DVP) {
         scale_vdev->ch_src = SCALE_DVP;
     } else {
-        scale_vdev->ch_src = 4 * cif_dev->csi_host_idx + scale_vdev->ch;
+        scale_vdev->ch_src = 0x04 * cif_dev->csi_host_idx + scale_vdev->ch;
     }
     ch_info->width = pixm.width;
     ch_info->height = pixm.height;
-    ch_info->vir_width = ALIGN(ch_info->width * fmt->bpp[0] / 8, 8);
+    ch_info->vir_width = ALIGN(ch_info->width * fmt->bpp[0] / 0x08, 0x08);
     return 0;
 }
 

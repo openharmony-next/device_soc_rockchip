@@ -23,15 +23,11 @@
 #include "hdi_layer.h"
 #include "hdi_device_common.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             const int INVALID_DRM_ID = 0;
-            class DrmGemBuffer
-            {
+            class DrmGemBuffer {
             public:
                 DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl);
                 virtual ~DrmGemBuffer();
@@ -49,8 +45,7 @@ namespace OHOS
                 uint32_t mDrmFormat = DRM_FORMAT_INVALID;
             };
 
-            class HdiDrmLayer : public HdiLayer
-            {
+            class HdiDrmLayer : public HdiLayer {
             public:
                 explicit HdiDrmLayer(LayerType type) : HdiLayer(type)
                 {

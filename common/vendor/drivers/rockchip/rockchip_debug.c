@@ -104,8 +104,8 @@ static int rockchip_debug_dump_edpcsr(struct fiq_debugger_output *output)
 
         /* Try to read a bunch of times if CPU is actually running */
         for (j = 0; j < NUM_CPU_SAMPLES && printed < NUM_SAMPLES_TO_PRINT; j++) {
-            if (sizeof(edpcsr) == 8) {
-                edpcsr = ((u64)readl(base + EDPCSR_LO)) | ((u64)readl(base + EDPCSR_HI) << 32);
+            if (sizeof(edpcsr) == 0x08) {
+                edpcsr = ((u64)readl(base + EDPCSR_LO)) | ((u64)readl(base + EDPCSR_HI) << 0x20);
             } else {
                 edpcsr = (u32)readl(base + EDPCSR_LO);
             }
@@ -145,16 +145,16 @@ static int rockchip_debug_dump_pmpcsr(struct fiq_debugger_output *output)
 
         /* Try to read a bunch of times if CPU is actually running */
         for (j = 0; j < NUM_CPU_SAMPLES && printed < NUM_SAMPLES_TO_PRINT; j++) {
-            pmpcsr = ((u64)readl(base + PMPCSR_LO)) | ((u64)readl(base + PMPCSR_HI) << 32);
+            pmpcsr = ((u64)readl(base + PMPCSR_LO)) | ((u64)readl(base + PMPCSR_HI) << 0x20);
 
-            el = (pmpcsr >> 61) & 0x3;
+            el = (pmpcsr >> 0x3D) & 0x3;
             if (pmpcsr & 0x8000000000000000) {
                 ns = 1;
             } else {
                 ns = 0;
             }
 
-            if (el == 2) {
+            if (el == 0x02) {
                 pmpcsr |= 0xff00000000000000;
             } else {
                 pmpcsr &= 0x0fffffffffffffff;
@@ -228,8 +228,8 @@ static int rockchip_panic_notify_edpcsr(struct notifier_block *nb, unsigned long
 
         /* Try to read a bunch of times if CPU is actually running */
         for (j = 0; j < NUM_CPU_SAMPLES && printed < NUM_SAMPLES_TO_PRINT; j++) {
-            if (sizeof(edpcsr) == 8) {
-                edpcsr = ((u64)readl(base + EDPCSR_LO)) | ((u64)readl(base + EDPCSR_HI) << 32);
+            if (sizeof(edpcsr) == 0x08) {
+                edpcsr = ((u64)readl(base + EDPCSR_LO)) | ((u64)readl(base + EDPCSR_HI) << 0x20);
             } else {
                 edpcsr = (u32)readl(base + EDPCSR_LO);
             }
@@ -276,16 +276,16 @@ static int rockchip_panic_notify_pmpcsr(struct notifier_block *nb, unsigned long
 
         /* Try to read a bunch of times if CPU is actually running */
         for (j = 0; j < NUM_CPU_SAMPLES && printed < NUM_SAMPLES_TO_PRINT; j++) {
-            pmpcsr = ((u64)readl(base + PMPCSR_LO)) | ((u64)readl(base + PMPCSR_HI) << 32);
+            pmpcsr = ((u64)readl(base + PMPCSR_LO)) | ((u64)readl(base + PMPCSR_HI) << 0x20);
 
-            el = (pmpcsr >> 61) & 0x3;
+            el = (pmpcsr >> 0x3D) & 0x3;
             if (pmpcsr & 0x8000000000000000) {
                 ns = 1;
             } else {
                 ns = 0;
             }
 
-            if (el == 2) {
+            if (el == 0x02) {
                 pmpcsr |= 0xff00000000000000;
             } else {
                 pmpcsr &= 0x0fffffffffffffff;

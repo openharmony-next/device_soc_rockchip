@@ -333,7 +333,6 @@ enum v4l2_ycbcr_encoding {
  * enum v4l2_ycbcr_encoding.
  */
 enum v4l2_hsv_encoding {
-
     /* Hue mapped to 0 - 179 */
     V4L2_HSV_ENC_180 = 128,
 
@@ -1126,7 +1125,7 @@ struct v4l2_exportbuffer {
 struct v4l2_framebuffer {
     __u32 capability;
     __u32 flags;
-    /* FIXME: in theory we should pass something like PCI device + memory
+    /* in theory we should pass something like PCI device + memory
      * region + offset instead of some physical address */
     void *base;
     struct {
@@ -1277,8 +1276,7 @@ typedef __u64 v4l2_std_id;
 #define V4L2_STD_ATSC_8_VSB ((v4l2_std_id)0x01000000)
 #define V4L2_STD_ATSC_16_VSB ((v4l2_std_id)0x02000000)
 
-/* FIXME:
-   Although std_id is 64 bits, there is an issue on PPC32 architecture that
+/* Although std_id is 64 bits, there is an issue on PPC32 architecture that
    makes switch(__u64) to break. So, there's a hack on v4l2-common.c rounding
    this value to 32 bits.
    As, currently, the max value is for V4L2_STD_ATSC_16_VSB (30 bits wide),
@@ -2063,7 +2061,7 @@ struct v4l2_sliced_vbi_format {
 /* Teletext World System Teletext
    (WST), defined on ITU-R BT.653-2 */
 #define V4L2_SLICED_TELETEXT_B (0x0001)
-/* Video Program System, defined on ETS 300 231*/
+/* Video Program System, defined on ETS 300 231 */
 #define V4L2_SLICED_VPS (0x0400)
 /* Closed Caption, defined on EIA-608 */
 #define V4L2_SLICED_CAPTION_525 (0x1000)

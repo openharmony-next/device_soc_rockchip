@@ -51,10 +51,11 @@ static int rkisp_params_g_fmt_meta_out(struct file *file, void *fh, struct v4l2_
 
 static int rkisp_params_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct video_device *vdev = video_devdata(file);
     struct rkisp_isp_params_vdev *params_vdev = video_get_drvdata(vdev);
 
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, params_vdev->dev->isp_ver >> 4);
+    ret = snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", DRIVER_NAME, params_vdev->dev->isp_ver >> 0x04);
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
     strlcpy(cap->bus_info, "platform: " DRIVER_NAME, sizeof(cap->bus_info));
 

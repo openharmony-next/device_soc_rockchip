@@ -16,7 +16,6 @@
 #ifndef __RK_VENC_CFG_H__
 #define __RK_VENC_CFG_H__
 
-#include <stddef.h>
 #include "rk_type.h"
 #include "mpp_err.h"
 

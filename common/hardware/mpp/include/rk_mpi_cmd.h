@@ -16,8 +16,11 @@
 #ifndef H__RK_MPI_CMD_H__
 #define H__RK_MPI_CMD_H__
 
+#include "rk_vdec_cmd.h"
+#include "rk_vdec_cfg.h"
 #include "rk_venc_cmd.h"
-
+#include "rk_venc_cfg.h"
+#include "rk_venc_ref.h"
 /*
  * Command id bit usage is defined as follows:
  * bit 20 - 23  - module id

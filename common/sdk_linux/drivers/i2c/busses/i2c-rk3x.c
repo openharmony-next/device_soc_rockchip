@@ -535,21 +535,16 @@ static irqreturn_t rk3x_i2c_irq(int irqno, void *dev_id)
 {
     struct rk3x_i2c *i2c = dev_id;
     unsigned int ipd;
-
     spin_lock(&i2c->lock);
-
     ipd = i2c_readl(i2c, REG_IPD);
     if (i2c->state == STATE_IDLE) {
         dev_warn_ratelimited(i2c->dev, "irq in STATE_IDLE, ipd = 0x%x\n", ipd);
         rk3x_i2c_clean_ipd(i2c);
         goto out;
     }
-
     dev_dbg(i2c->dev, "IRQ: state %d, ipd: %x\n", i2c->state, ipd);
-
     /* Clean interrupt bits we don't care about */
     ipd &= ~(REG_INT_BRF | REG_INT_BTF);
-
     if (ipd & REG_INT_NAKRCV) {
         /*
          * We got a NACK in the last operation. Depending on whether
@@ -565,12 +560,10 @@ static irqreturn_t rk3x_i2c_irq(int irqno, void *dev_id)
             goto out;
         }
     }
-
     /* is there anything left to handle? */
     if ((ipd & REG_INT_ALL) == 0) {
         goto out;
     }
-
     switch (i2c->state) {
         case STATE_WRITE:
             rk3x_i2c_handle_write(i2c, ipd);
@@ -719,19 +712,16 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate, struct i2c_timings *
          * so we don't run too fast.
          */
         extra_div = min_total_div - min_div_for_hold;
-
         /*
          * We'll try to split things up perfectly evenly,
          * biasing slightly towards having a higher div
          * for low (spend more time low).
          */
         ideal_low_div = DIV_ROUND_UP(clk_rate_khz * min_low_ns, scl_rate_khz * RK_I2C_SCL_RATE_HZ_MUL * min_total_ns);
-
         /* Don't allow it to go over the maximum */
         if (ideal_low_div > max_low_div) {
             ideal_low_div = max_low_div;
         }
-
         /*
          * Handle when the ideal low div is going to take up
          * more than we have.
@@ -739,7 +729,6 @@ static int rk3x_i2c_v0_calc_timings(unsigned long clk_rate, struct i2c_timings *
         if (ideal_low_div > min_low_div + extra_div) {
             ideal_low_div = min_low_div + extra_div;
         }
-
         /* Give low the "ideal" and give high whatever extra is left */
         extra_low_div = ideal_low_div - min_low_div;
         t_calc->div_low = ideal_low_div;
@@ -1111,61 +1100,45 @@ static int rk3x_i2c_xfer_common(struct i2c_adapter *adap, struct i2c_msg *msgs, 
     u32 val;
     int ret = 0;
     int i;
-
     if (i2c->suspended) {
         return -EACCES;
     }
-
     spin_lock_irqsave(&i2c->lock, flags);
-
     clk_enable(i2c->clk);
     clk_enable(i2c->pclk);
-
     i2c->is_last_msg = false;
-
     /*
      * Process msgs. We can handle more than one message at once (see
      * rk3x_i2c_setup()).
      */
     for (i = 0; i < num; i += ret) {
         ret = rk3x_i2c_setup(i2c, msgs + i, num - i);
-
         if (ret < 0) {
             dev_err(i2c->dev, "rk3x_i2c_setup() failed\n");
             break;
         }
-
         if (i + ret >= num) {
             i2c->is_last_msg = true;
         }
-
         rk3x_i2c_start(i2c);
-
         spin_unlock_irqrestore(&i2c->lock, flags);
-
         if (!polling) {
             timeout = wait_event_timeout(i2c->wait, !i2c->busy, msecs_to_jiffies(WAIT_TIMEOUT));
         } else {
             timeout = rk3x_i2c_wait_xfer_poll(i2c);
         }
-
         spin_lock_irqsave(&i2c->lock, flags);
-
         if (timeout == 0) {
             dev_err(i2c->dev, "timeout, ipd: 0x%02x, state: %d\n", i2c_readl(i2c, REG_IPD), i2c->state);
-
             /* Force a STOP condition without interrupt */
             rk3x_i2c_disable_irq(i2c);
             val = i2c_readl(i2c, REG_CON) & REG_CON_TUNING_MASK;
             val |= REG_CON_EN | REG_CON_STOP;
             i2c_writel(i2c, val, REG_CON);
-
             i2c->state = STATE_IDLE;
-
             ret = -ETIMEDOUT;
             break;
         }
-
         if (i2c->error) {
             ret = i2c->error;
             break;

@@ -28,16 +28,12 @@
 #include "hdi_display.h"
 #include "hdi_shared_fd.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-            class DrmPropertyEnum
-            {
+            class DrmPropertyEnum {
             public:
                 explicit DrmPropertyEnum(drm_mode_property_enum *e) : value(e->value), name(e->name)
                 {
@@ -59,8 +55,7 @@ namespace OHOS
                 std::vector<uint32_t> blob_ids;
             };
 
-            class DrmDevice : public HdiDeviceInterface, std::enable_shared_from_this<DrmDevice>
-            {
+            class DrmDevice : public HdiDeviceInterface, std::enable_shared_from_this<DrmDevice> {
             public:
                 static std::shared_ptr<HdiDeviceInterface> Create();
                 static uint32_t ConvertToDrmFormat(PixelFormat fmtIn);

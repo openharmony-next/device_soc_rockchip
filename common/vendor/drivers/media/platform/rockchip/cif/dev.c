@@ -28,6 +28,11 @@
 #include "procfs.h"
 
 #define RKCIF_VERNO_LEN 10
+#define NUMBER_2 2
+#define NUMBER_3 3
+#define NUMBER_4 4
+#define NUMBER_10 10
+#define NUMBER_255 255
 
 int rkcif_debug;
 module_param_named(debug, rkcif_debug, int, 0644);
@@ -49,8 +54,8 @@ static ssize_t rkcif_show_compact_mode(struct device *dev, struct device_attribu
     int ret;
 
     ret = snprintf(buf, PAGE_SIZE, "%d %d %d %d\n", cif_dev->stream[0].is_compact ? 1 : 0,
-                   cif_dev->stream[1].is_compact ? 1 : 0, cif_dev->stream[2].is_compact ? 1 : 0,
-                   cif_dev->stream[3].is_compact ? 1 : 0);
+                   cif_dev->stream[1].is_compact ? 1 : 0, cif_dev->stream[NUMBER_2].is_compact ? 1 : 0,
+                   cif_dev->stream[NUMBER_3].is_compact ? 1 : 0);
     return ret;
 }
 
@@ -70,7 +75,7 @@ static ssize_t rkcif_store_compact_mode(struct device *dev, struct device_attrib
             } else {
                 val[index] = buf[i];
                 index++;
-                if (index == 4) {
+                if (index == NUMBER_4) {
                     break;
                 }
             }
@@ -160,10 +165,10 @@ static ssize_t rkcif_show_memory_mode(struct device *dev, struct device_attribut
     int ret;
 
     ret = snprintf(buf, PAGE_SIZE, "stream[0~3] %d %d %d %d, 0(low align) 1(high align) 2(compact)\n",
-                   cif_dev->stream[0].is_compact ? 2 : (cif_dev->stream[0].is_high_align ? 1 : 0),
-                   cif_dev->stream[1].is_compact ? 2 : (cif_dev->stream[1].is_high_align ? 1 : 0),
-                   cif_dev->stream[2].is_compact ? 2 : (cif_dev->stream[2].is_high_align ? 1 : 0),
-                   cif_dev->stream[3].is_compact ? 2 : (cif_dev->stream[3].is_high_align ? 1 : 0));
+                   cif_dev->stream[0].is_compact ? NUMBER_2 : (cif_dev->stream[0].is_high_align ? 1 : 0),
+                   cif_dev->stream[1].is_compact ? NUMBER_2 : (cif_dev->stream[1].is_high_align ? 1 : 0),
+                   cif_dev->stream[NUMBER_2].is_compact ? NUMBER_2 : (cif_dev->stream[NUMBER_2].is_high_align ? 1 : 0),
+                   cif_dev->stream[NUMBER_3].is_compact ? NUMBER_2 : (cif_dev->stream[NUMBER_3].is_high_align ? 1 : 0));
     return ret;
 }
 
@@ -183,7 +188,7 @@ static ssize_t rkcif_store_memory_mode(struct device *dev, struct device_attribu
             } else {
                 val[index] = buf[i];
                 index++;
-                if (index == 4) {
+                if (index == NUMBER_4) {
                     break;
                 }
             }
@@ -234,7 +239,7 @@ static ssize_t rkcif_store_scale_ch0_blc(struct device *dev, struct device_attri
             if (((buf[i] == ' ') || (buf[i] == '\n')) && j) {
                 index++;
                 j = 0;
-                if (index == 4) {
+                if (index == NUMBER_4) {
                     break;
                 }
                 continue;
@@ -247,20 +252,20 @@ static ssize_t rkcif_store_scale_ch0_blc(struct device *dev, struct device_attri
                 ret = kstrtoint(cha, 0, &temp);
                 if (!ret) {
                     if (j) {
-                        val[index] *= 10;
+                        val[index] *= NUMBER_10;
                     }
                     val[index] += temp;
                     j++;
                 }
             }
         }
-        if (val[0] > 255 || val[1] > 255 || val[2] > 255 || val[3] > 255) {
+        if (val[0] > NUMBER_255 || val[1] > NUMBER_255 || val[NUMBER_2] > NUMBER_255 || val[NUMBER_3] > NUMBER_255) {
             return -EINVAL;
         }
         cif_dev->scale_vdev[0].blc.pattern00 = val[0];
         cif_dev->scale_vdev[0].blc.pattern01 = val[1];
-        cif_dev->scale_vdev[0].blc.pattern02 = val[2];
-        cif_dev->scale_vdev[0].blc.pattern03 = val[3];
+        cif_dev->scale_vdev[0].blc.pattern02 = val[NUMBER_2];
+        cif_dev->scale_vdev[0].blc.pattern03 = val[NUMBER_3];
         dev_info(cif_dev->dev, "set ch0 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
                  cif_dev->scale_vdev[0].blc.pattern00, cif_dev->scale_vdev[0].blc.pattern01,
                  cif_dev->scale_vdev[0].blc.pattern02, cif_dev->scale_vdev[0].blc.pattern03);
@@ -298,7 +303,7 @@ static ssize_t rkcif_store_scale_ch1_blc(struct device *dev, struct device_attri
             if (((buf[i] == ' ') || (buf[i] == '\n')) && j) {
                 index++;
                 j = 0;
-                if (index == 4) {
+                if (index == NUMBER_4) {
                     break;
                 }
                 continue;
@@ -311,21 +316,21 @@ static ssize_t rkcif_store_scale_ch1_blc(struct device *dev, struct device_attri
                 ret = kstrtoint(cha, 0, &temp);
                 if (!ret) {
                     if (j) {
-                        val[index] *= 10;
+                        val[index] *= NUMBER_10;
                     }
                     val[index] += temp;
                     j++;
                 }
             }
         }
-        if (val[0] > 255 || val[1] > 255 || val[2] > 255 || val[3] > 255) {
+        if (val[0] > NUMBER_255 || val[1] > NUMBER_255 || val[NUMBER_2] > NUMBER_255 || val[NUMBER_3] > NUMBER_255) {
             return -EINVAL;
         }
 
         cif_dev->scale_vdev[1].blc.pattern00 = val[0];
         cif_dev->scale_vdev[1].blc.pattern01 = val[1];
-        cif_dev->scale_vdev[1].blc.pattern02 = val[2];
-        cif_dev->scale_vdev[1].blc.pattern03 = val[3];
+        cif_dev->scale_vdev[1].blc.pattern02 = val[NUMBER_2];
+        cif_dev->scale_vdev[1].blc.pattern03 = val[NUMBER_3];
 
         dev_info(cif_dev->dev, "set ch1 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
                  cif_dev->scale_vdev[1].blc.pattern00, cif_dev->scale_vdev[1].blc.pattern01,
@@ -343,8 +348,8 @@ static ssize_t rkcif_show_scale_ch2_blc(struct device *dev, struct device_attrib
     int ret;
 
     ret = snprintf(buf, PAGE_SIZE, "ch2 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
-                   cif_dev->scale_vdev[2].blc.pattern00, cif_dev->scale_vdev[2].blc.pattern01,
-                   cif_dev->scale_vdev[2].blc.pattern02, cif_dev->scale_vdev[2].blc.pattern03);
+                   cif_dev->scale_vdev[NUMBER_2].blc.pattern00, cif_dev->scale_vdev[NUMBER_2].blc.pattern01,
+                   cif_dev->scale_vdev[NUMBER_2].blc.pattern02, cif_dev->scale_vdev[NUMBER_2].blc.pattern03);
     return ret;
 }
 
@@ -384,18 +389,18 @@ static ssize_t rkcif_store_scale_ch2_blc(struct device *dev, struct device_attri
                 }
             }
         }
-        if (val[0] > 0xFF || val[1] > 0xFF || val[2] > 0xFF || val[3] > 0xFF) {
+        if (val[0] > 0xFF || val[1] > 0xFF || val[NUMBER_2] > 0xFF || val[NUMBER_3] > 0xFF) {
             return -EINVAL;
         }
 
-        cif_dev->scale_vdev[2].blc.pattern00 = val[0];
-        cif_dev->scale_vdev[2].blc.pattern01 = val[1];
-        cif_dev->scale_vdev[2].blc.pattern02 = val[2];
-        cif_dev->scale_vdev[2].blc.pattern03 = val[3];
+        cif_dev->scale_vdev[NUMBER_2].blc.pattern00 = val[0];
+        cif_dev->scale_vdev[NUMBER_2].blc.pattern01 = val[1];
+        cif_dev->scale_vdev[NUMBER_2].blc.pattern02 = val[NUMBER_2];
+        cif_dev->scale_vdev[NUMBER_2].blc.pattern03 = val[NUMBER_3];
 
         dev_info(cif_dev->dev, "set ch2 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
-                 cif_dev->scale_vdev[2].blc.pattern00, cif_dev->scale_vdev[2].blc.pattern01,
-                 cif_dev->scale_vdev[2].blc.pattern02, cif_dev->scale_vdev[2].blc.pattern03);
+                 cif_dev->scale_vdev[NUMBER_2].blc.pattern00, cif_dev->scale_vdev[NUMBER_2].blc.pattern01,
+                 cif_dev->scale_vdev[NUMBER_2].blc.pattern02, cif_dev->scale_vdev[NUMBER_2].blc.pattern03);
     }
 
     return len;
@@ -408,8 +413,8 @@ static ssize_t rkcif_show_scale_ch3_blc(struct device *dev, struct device_attrib
     int ret;
 
     ret = snprintf(buf, PAGE_SIZE, "ch3 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
-                   cif_dev->scale_vdev[3].blc.pattern00, cif_dev->scale_vdev[3].blc.pattern01,
-                   cif_dev->scale_vdev[3].blc.pattern02, cif_dev->scale_vdev[3].blc.pattern03);
+                   cif_dev->scale_vdev[NUMBER_3].blc.pattern00, cif_dev->scale_vdev[NUMBER_3].blc.pattern01,
+                   cif_dev->scale_vdev[NUMBER_3].blc.pattern02, cif_dev->scale_vdev[NUMBER_3].blc.pattern03);
     return ret;
 }
 
@@ -449,18 +454,18 @@ static ssize_t rkcif_store_scale_ch3_blc(struct device *dev, struct device_attri
                 }
             }
         }
-        if (val[0] > 0xFF || val[1] > 0xFF || val[2] > 0xFF || val[3] > 0xFF) {
+        if (val[0] > 0xFF || val[1] > 0xFF || val[NUMBER_2] > 0xFF || val[NUMBER_3] > 0xFF) {
             return -EINVAL;
         }
 
-        cif_dev->scale_vdev[3].blc.pattern00 = val[0];
-        cif_dev->scale_vdev[3].blc.pattern01 = val[1];
-        cif_dev->scale_vdev[3].blc.pattern02 = val[2];
-        cif_dev->scale_vdev[3].blc.pattern03 = val[3];
+        cif_dev->scale_vdev[NUMBER_3].blc.pattern00 = val[0];
+        cif_dev->scale_vdev[NUMBER_3].blc.pattern01 = val[1];
+        cif_dev->scale_vdev[NUMBER_3].blc.pattern02 = val[NUMBER_2];
+        cif_dev->scale_vdev[NUMBER_3].blc.pattern03 = val[NUMBER_3];
 
         dev_info(cif_dev->dev, "set ch3 pattern00: %d, pattern01: %d, pattern02: %d, pattern03: %d\n",
-                 cif_dev->scale_vdev[3].blc.pattern00, cif_dev->scale_vdev[3].blc.pattern01,
-                 cif_dev->scale_vdev[3].blc.pattern02, cif_dev->scale_vdev[3].blc.pattern03);
+                 cif_dev->scale_vdev[NUMBER_3].blc.pattern00, cif_dev->scale_vdev[NUMBER_3].blc.pattern01,
+                 cif_dev->scale_vdev[NUMBER_3].blc.pattern02, cif_dev->scale_vdev[NUMBER_3].blc.pattern03);
     }
 
     return len;
@@ -675,15 +680,16 @@ void rkcif_config_dvp_clk_sampling_edge(struct rkcif_device *dev, enum rkcif_clk
 }
 
 /**************************** pipeline operations *****************************/
-static int __cif_pipeline_prepare(struct rkcif_pipeline *p, struct media_entity *me)
+static int cif_pipeline_prepare(struct rkcif_pipeline *p, struct media_entity *me)
 {
     struct v4l2_subdev *sd;
     int i;
 
     p->num_subdevs = 0;
     memset(p->subdevs, 0, sizeof(p->subdevs));
+    bool doRunWhile = true;
 
-    while (1) {
+    while (doRunWhile) {
         struct media_pad *pad = NULL;
 
         /* Find remote source pad */
@@ -700,6 +706,7 @@ static int __cif_pipeline_prepare(struct rkcif_pipeline *p, struct media_entity 
         }
 
         if (!pad) {
+            doRunWhile = false;
             break;
         }
 
@@ -707,6 +714,7 @@ static int __cif_pipeline_prepare(struct rkcif_pipeline *p, struct media_entity 
         p->subdevs[p->num_subdevs++] = sd;
         me = &sd->entity;
         if (me->num_pads == 1) {
+            doRunWhile = false;
             break;
         }
     }
@@ -714,7 +722,7 @@ static int __cif_pipeline_prepare(struct rkcif_pipeline *p, struct media_entity 
     return 0;
 }
 
-static int __cif_pipeline_s_cif_clk(struct rkcif_pipeline *p)
+static int cif_pipeline_s_cif_clk(struct rkcif_pipeline *p)
 {
     return 0;
 }
@@ -732,14 +740,14 @@ static int rkcif_pipeline_open(struct rkcif_pipeline *p, struct media_entity *me
 
     /* go through media graphic and get subdevs */
     if (prepare) {
-        __cif_pipeline_prepare(p, me);
+        cif_pipeline_prepare(p, me);
     }
 
     if (!p->num_subdevs) {
         return -EINVAL;
     }
 
-    ret = __cif_pipeline_s_cif_clk(p);
+    ret = cif_pipeline_s_cif_clk(p);
     if (ret < 0) {
         return ret;
     }
@@ -783,7 +791,7 @@ static void rkcif_set_sensor_streamon_in_sync_mode(struct rkcif_device *cif_dev)
                 }
                 hw->sync_config.slave.is_streaming[i] = true;
             }
-            v4l2_dbg(3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, slave_dev[%d]\n", i);
+            v4l2_dbg(NUMBER_3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, slave_dev[%d]\n", i);
         }
         for (i = 0; i < hw->sync_config.ext_master.count; i++) {
             dev = hw->sync_config.ext_master.cif_dev[i];
@@ -795,7 +803,7 @@ static void rkcif_set_sensor_streamon_in_sync_mode(struct rkcif_device *cif_dev)
                 }
                 hw->sync_config.ext_master.is_streaming[i] = true;
             }
-            v4l2_dbg(3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, ext_master_dev[%d]\n", i);
+            v4l2_dbg(NUMBER_3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, ext_master_dev[%d]\n", i);
         }
         for (i = 0; i < hw->sync_config.int_master.count; i++) {
             dev = hw->sync_config.int_master.cif_dev[i];
@@ -807,7 +815,7 @@ static void rkcif_set_sensor_streamon_in_sync_mode(struct rkcif_device *cif_dev)
                 }
                 hw->sync_config.int_master.is_streaming[i] = true;
             }
-            v4l2_dbg(3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, int_master_dev[%d]\n", i);
+            v4l2_dbg(NUMBER_3, rkcif_debug, &dev->v4l2_dev, "quick stream in sync mode, int_master_dev[%d]\n", i);
         }
     }
 }
@@ -868,14 +876,14 @@ static int rkcif_pipeline_set_stream(struct rkcif_pipeline *p, bool on)
                 if (atomic_read(&p->stream_cnt) == 1) {
                     rockchip_set_system_status(SYS_STATUS_CIF0);
                     can_be_set = false;
-                } else if (atomic_read(&p->stream_cnt) == 2) {
+                } else if (atomic_read(&p->stream_cnt) == NUMBER_2) {
                     can_be_set = true;
                 }
             } else if (cif_dev->hdr.hdr_mode == HDR_X3) {
                 if (atomic_read(&p->stream_cnt) == 1) {
                     rockchip_set_system_status(SYS_STATUS_CIF0);
                     can_be_set = false;
-                } else if (atomic_read(&p->stream_cnt) == 3) {
+                } else if (atomic_read(&p->stream_cnt) == NUMBER_3) {
                     can_be_set = true;
                 }
             }
@@ -1121,13 +1129,13 @@ static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
                     sensor->lanes = 1;
                     break;
                 case V4L2_MBUS_CSI2_2_LANE:
-                    sensor->lanes = 2;
+                    sensor->lanes = NUMBER_2;
                     break;
                 case V4L2_MBUS_CSI2_3_LANE:
-                    sensor->lanes = 3;
+                    sensor->lanes = NUMBER_3;
                     break;
                 case V4L2_MBUS_CSI2_4_LANE:
-                    sensor->lanes = 4;
+                    sensor->lanes = NUMBER_4;
                     break;
                 default:
                     sensor->lanes = 1;
@@ -1449,17 +1457,17 @@ static void rkcif_init_reset_monitor(struct rkcif_device *dev)
             }
 
             if (i == 0x2) {
-                timer->frm_num_of_monitor_cycle = para[2];
+                timer->frm_num_of_monitor_cycle = para[NUMBER_2];
                 v4l2_info(&dev->v4l2_dev, "timer frm num of monitor cycle:%d\n", timer->frm_num_of_monitor_cycle);
             }
 
             if (i == 0x3) {
-                timer->err_time_interval = para[3];
+                timer->err_time_interval = para[NUMBER_3];
                 v4l2_info(&dev->v4l2_dev, "timer err time for keeping:%d ms\n", timer->err_time_interval);
             }
 
             if (i == 0x4) {
-                timer->csi2_err_ref_cnt = para[4];
+                timer->csi2_err_ref_cnt = para[NUMBER_4];
                 v4l2_info(&dev->v4l2_dev, "timer csi2 err ref val for resetting:%d\n", timer->csi2_err_ref_cnt);
             }
         }

@@ -1216,7 +1216,7 @@ static void dw_hdmi_qp_dsc_configure(struct rockchip_hdmi *hdmi, struct rockchip
     dev_info(hdmi->dev, "dsc_enable\n");
     s->dsc_enable = 1;
     s->dsc_sink_cap.version_major = 1;
-    s->dsc_sink_cap.version_minor = 2;
+    s->dsc_sink_cap.version_minor = 0x2;
     s->dsc_sink_cap.slice_width = slice_width;
     s->dsc_sink_cap.slice_height = slice_height;
     s->dsc_sink_cap.target_bits_per_pixel_x16 = bits_per_pixel;

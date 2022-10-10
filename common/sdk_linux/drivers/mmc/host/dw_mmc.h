@@ -166,7 +166,7 @@ struct dw_mci {
     unsigned int prev_blksz;
     unsigned char timing;
 
-    /* DMA interface members*/
+    /* DMA interface members */
     int use_dma;
     int using_dma;
     int dma_64bit_address;

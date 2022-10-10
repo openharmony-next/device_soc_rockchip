@@ -144,19 +144,19 @@ static int rockchip_get_sel_table(struct device_node *np, char *porp_name, struc
         return -EINVAL;
     }
 
-    if (count % 3) {
+    if (count % 0x03) {
         return -EINVAL;
     }
 
-    sel_table = kzalloc(sizeof(*sel_table) * (count / 3 + 1), GFP_KERNEL);
+    sel_table = kzalloc(sizeof(*sel_table) * (count / 0x03 + 1), GFP_KERNEL);
     if (!sel_table) {
         return -ENOMEM;
     }
 
-    for (i = 0; i < count / 3; i++) {
-        of_property_read_u32_index(np, porp_name, 3 * i, &sel_table[i].min);
-        of_property_read_u32_index(np, porp_name, 3 * i + 1, &sel_table[i].max);
-        of_property_read_u32_index(np, porp_name, 3 * i + 2, &sel_table[i].sel);
+    for (i = 0; i < count / 0x03; i++) {
+        of_property_read_u32_index(np, porp_name, 0x03 * i, &sel_table[i].min);
+        of_property_read_u32_index(np, porp_name, 0x03 * i + 1, &sel_table[i].max);
+        of_property_read_u32_index(np, porp_name, 0x03 * i + 0x02, &sel_table[i].sel);
     }
     sel_table[i].min = 0;
     sel_table[i].max = 0;
@@ -187,18 +187,18 @@ static int rockchip_get_bin_sel_table(struct device_node *np, char *porp_name, s
         return -EINVAL;
     }
 
-    if (count % 2) {
+    if (count % 0x02) {
         return -EINVAL;
     }
 
-    sel_table = kzalloc(sizeof(*sel_table) * (count / 2 + 1), GFP_KERNEL);
+    sel_table = kzalloc(sizeof(*sel_table) * (count / 0x02 + 1), GFP_KERNEL);
     if (!sel_table) {
         return -ENOMEM;
     }
 
-    for (i = 0; i < count / 2; i++) {
-        of_property_read_u32_index(np, porp_name, 2 * i, &sel_table[i].bin);
-        of_property_read_u32_index(np, porp_name, 2 * i + 1, &sel_table[i].sel);
+    for (i = 0; i < count / 0x02; i++) {
+        of_property_read_u32_index(np, porp_name, 0x02 * i, &sel_table[i].bin);
+        of_property_read_u32_index(np, porp_name, 0x02 * i + 1, &sel_table[i].sel);
     }
 
     sel_table[i].bin = 0;
@@ -266,7 +266,7 @@ static int rockchip_parse_pvtm_config(struct device_node *np, struct pvtm_config
     if (of_property_read_u32(np, "rockchip,pvtm-volt", &pvtm->volt)) {
         return -EINVAL;
     }
-    if (of_property_read_u32_array(np, "rockchip,pvtm-ch", pvtm->ch, 2)) {
+    if (of_property_read_u32_array(np, "rockchip,pvtm-ch", pvtm->ch, 0x02)) {
         return -EINVAL;
     }
     if (pvtm->ch[0] >= PVTM_CH_MAX || pvtm->ch[1] >= PVTM_SUB_CH_MAX) {
@@ -284,7 +284,7 @@ static int rockchip_parse_pvtm_config(struct device_node *np, struct pvtm_config
     if (of_property_read_u32(np, "rockchip,pvtm-ref-temp", &pvtm->ref_temp)) {
         return -EINVAL;
     }
-    if (of_property_read_u32_array(np, "rockchip,pvtm-temp-prop", pvtm->temp_prop, 2)) {
+    if (of_property_read_u32_array(np, "rockchip,pvtm-temp-prop", pvtm->temp_prop, 0x02)) {
         return -EINVAL;
     }
     if (of_property_read_string(np, "rockchip,pvtm-thermal-zone", &pvtm->tz_name)) {
@@ -331,7 +331,7 @@ static int rockchip_get_pvtm_specific_value(struct device *dev, struct device_no
      * Set pvtm_freq to the lowest frequency in dts,
      * so change frequency first.
      */
-    ret = clk_set_rate(clk, pvtm->freq * 1000);
+    ret = clk_set_rate(clk, pvtm->freq * 0X3E8);
     if (ret) {
         dev_err(dev, "Failed to set pvtm freq\n");
         goto pvtm_value_out;
@@ -378,7 +378,7 @@ static int rockchip_get_pvtm_specific_value(struct device *dev, struct device_no
      * current temperature and reference temperature
      */
     pvtm->tz->ops->get_temp(pvtm->tz, &cur_temp);
-    diff_temp = (cur_temp / 1000 - pvtm->ref_temp);
+    diff_temp = (cur_temp / 0x3E8 - pvtm->ref_temp);
     diff_value = diff_temp * (diff_temp < 0 ? pvtm->temp_prop[0] : pvtm->temp_prop[1]);
     *target_value = avg_value + diff_value;
 
@@ -415,7 +415,7 @@ static int temp_to_conversion_rate(int temp)
 
     low = 0;
     high = ARRAY_SIZE(conv_table) - 1;
-    mid = (high + low) / 2;
+    mid = (high + low) / 0x02;
 
     /* No temp available, return max conversion_rate */
     if (temp <= conv_table[low].temp) {
@@ -435,10 +435,10 @@ static int temp_to_conversion_rate(int temp)
         } else {
             high = mid - 1;
         }
-        mid = (low + high) / 2;
+        mid = (low + high) / 0x02;
     }
 
-    return 100;
+    return 0x64;
 }
 
 static int rockchip_adjust_leakage(struct device *dev, struct device_node *np, int *leakage)
@@ -467,9 +467,9 @@ static int rockchip_adjust_leakage(struct device *dev, struct device_node *np, i
      * Reserves a decimal point : temp = temp * 10
      */
     temp = value;
-    temp = mul_frac((int_to_frac(temp) / 63 * 20 + int_to_frac(20)), int_to_frac(10));
+    temp = mul_frac((int_to_frac(temp) / 0x3F * 0x14 + int_to_frac(0x14)), int_to_frac(0x0A));
     conversion = temp_to_conversion_rate(frac_to_int(temp));
-    *leakage = *leakage * conversion / 100;
+    *leakage = *leakage * conversion / 0x64;
 
 next:
     cell = of_nvmem_cell_get(np, "leakage_volt");
@@ -487,7 +487,7 @@ next:
      * leakage(1v) = leakage(1.35v) / 4
      */
     if (value) {
-        *leakage = *leakage / 4;
+        *leakage = *leakage / 0x04;
     }
 
     return 0;
@@ -558,7 +558,7 @@ static int rockchip_get_leakage_v3(struct device *dev, struct device_node *np, c
         return -EINVAL;
     }
 
-    *leakage = (((lkg & 0xf8) >> 3) * 1000) + ((lkg & 0x7) * 125);
+    *leakage = (((lkg & 0xf8) >> 0x03) * 0x3E8) + ((lkg & 0x7) * 0x7D);
 
     return 0;
 }
@@ -590,10 +590,10 @@ int rockchip_of_get_leakage(struct device *dev, char *lkg_name, int *leakage)
                  * round up to the nearest whole number for calculating
                  * static power,  it does not need to be precise.
                  */
-                if (*leakage % 1000 > 500) {
-                    *leakage = *leakage / 1000 + 1;
+                if (*leakage % 0x3E8 > 0x1F4) {
+                    *leakage = *leakage / 0x3E8 + 1;
                 } else {
-                    *leakage = *leakage / 1000;
+                    *leakage = *leakage / 0x3E8;
                 }
             }
             break;
@@ -636,7 +636,7 @@ void rockchip_of_get_lkg_sel(struct device *dev, struct device_node *np, char *l
             if (ret) {
                 return;
             }
-            dev_info(dev, "leakage=%d.%d\n", leakage / 1000, leakage % 1000);
+            dev_info(dev, "leakage=%d.%d\n", leakage / 0x3E8, leakage % 0x3E8);
             break;
         default:
             return;
@@ -684,12 +684,12 @@ static int rockchip_get_pvtm(struct device *dev, struct device_node *np, char *r
     u16 tmp = 0;
 
     if (!rockchip_nvmem_cell_read_u16(np, "pvtm", &tmp) && tmp) {
-        pvtm = 10 * tmp;
+        pvtm = 0x0A * tmp;
         dev_info(dev, "pvtm = %d, from nvmem\n", pvtm);
         return pvtm;
     }
 
-    if (of_property_read_u32_array(np, "rockchip,pvtm-ch", ch, 2)) {
+    if (of_property_read_u32_array(np, "rockchip,pvtm-ch", ch, 0X02)) {
         return -EINVAL;
     }
 
@@ -833,18 +833,18 @@ int rockchip_get_volt_rm_table(struct device *dev, struct device_node *np, char 
         return -EINVAL;
     }
 
-    if (count % 2) {
+    if (count % 0x02) {
         return -EINVAL;
     }
 
-    rm_table = devm_kzalloc(dev, sizeof(*rm_table) * (count / 2 + 1), GFP_KERNEL);
+    rm_table = devm_kzalloc(dev, sizeof(*rm_table) * (count / 0x02 + 1), GFP_KERNEL);
     if (!rm_table) {
         return -ENOMEM;
     }
 
-    for (i = 0; i < count / 2; i++) {
-        of_property_read_u32_index(np, porp_name, 2 * i, &rm_table[i].volt);
-        of_property_read_u32_index(np, porp_name, 2 * i + 1, &rm_table[i].rm);
+    for (i = 0; i < count / 0x02; i++) {
+        of_property_read_u32_index(np, porp_name, 0x02 * i, &rm_table[i].volt);
+        of_property_read_u32_index(np, porp_name, 0x02 * i + 1, &rm_table[i].rm);
     }
 
     rm_table[i].volt = 0;
@@ -936,7 +936,7 @@ static int rockchip_adjust_opp_by_irdrop(struct device *dev, struct device_node 
         if (!irdrop_table) {
             delta_irdrop = 0;
         } else {
-            opp_rate = opp->rate / 1000000;
+            opp_rate = opp->rate / 0xF4240;
             board_irdrop = -EINVAL;
             for (i = 0; irdrop_table[i].sel != SEL_TABLE_END; i++) {
                 if (opp_rate >= irdrop_table[i].min) {

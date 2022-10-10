@@ -1193,7 +1193,7 @@ void dw_hdmi_set_channel_count(struct dw_hdmi *hdmi, unsigned int cnt)
      * For >2 channel PCM audio, we need to select layout 1
      * and set an appropriate channel map.
      */
-    if (cnt > 2) {
+    if (cnt > 0x2) {
         layout = HDMI_FC_AUDSCONF_AUD_PACKET_LAYOUT_LAYOUT1;
     } else {
         layout = HDMI_FC_AUDSCONF_AUD_PACKET_LAYOUT_LAYOUT0;
@@ -1337,24 +1337,24 @@ static int hdmi_bus_fmt_color_depth(unsigned int bus_format)
         case MEDIA_BUS_FMT_YUV8_1X24:
         case MEDIA_BUS_FMT_UYVY8_1X16:
         case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
-            return 8;
+            return 0x8;
 
         case MEDIA_BUS_FMT_RGB101010_1X30:
         case MEDIA_BUS_FMT_YUV10_1X30:
         case MEDIA_BUS_FMT_UYVY10_1X20:
         case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
-            return 10;
+            return 0xa;
 
         case MEDIA_BUS_FMT_RGB121212_1X36:
         case MEDIA_BUS_FMT_YUV12_1X36:
         case MEDIA_BUS_FMT_UYVY12_1X24:
         case MEDIA_BUS_FMT_UYYVYY12_0_5X36:
-            return 12;
+            return 0xc;
 
         case MEDIA_BUS_FMT_RGB161616_1X48:
         case MEDIA_BUS_FMT_YUV16_1X48:
         case MEDIA_BUS_FMT_UYYVYY16_0_5X48:
-            return 16;
+            return 0x10;
 
         default:
             return 0;
@@ -1947,7 +1947,7 @@ static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi, const struct 
     }
 
     if (!hdmi_bus_fmt_is_yuv422(hdmi->hdmi_data.enc_out_bus_format)) {
-        depth = fls(depth - 8);
+        depth = fls(depth - 0x8);
     } else {
         depth = 0;
     }
@@ -2005,7 +2005,7 @@ static int hdmi_phy_configure(struct dw_hdmi *hdmi, const struct drm_display_inf
 
     /* Wait for resuming transmission of TMDS clock and data */
     if (mtmdsclock > HDMI14_MAX_TMDSCLK) {
-        msleep(100);
+        msleep(0x64);
     }
 
     return dw_hdmi_phy_power_on(hdmi);
@@ -2351,7 +2351,7 @@ static void hdmi_config_drm_infoframe(struct dw_hdmi *hdmi, const struct drm_con
     hdmi_writeb(hdmi, frame.length, HDMI_FC_DRM_HB1);
 
     for (i = 0; i < frame.length; i++) {
-        hdmi_writeb(hdmi, buffer[4 + i], HDMI_FC_DRM_PB0 + i);
+        hdmi_writeb(hdmi, buffer[0x4 + i], HDMI_FC_DRM_PB0 + i);
     }
 
     hdmi_writeb(hdmi, 1, HDMI_FC_DRM_UP);
@@ -4457,9 +4457,9 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev, const struct dw_hdmi
 
         of_property_read_u32(np, "reg-io-width", &val);
         switch (val) {
-            case 4:
+            case 0x4:
                 reg_config = &hdmi_regmap_32bit_config;
-                hdmi->reg_shift = 2;
+                hdmi->reg_shift = 0x2;
                 break;
             case 1:
                 reg_config = &hdmi_regmap_8bit_config;

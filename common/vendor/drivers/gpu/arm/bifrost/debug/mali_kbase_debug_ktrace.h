@@ -34,8 +34,8 @@
  * - KBASE_KTRACE_TARGET_FTRACE: ftrace based tracepoints under 'mali' events
  */
 
-#ifndef _KBASE_DEBUG_KTRACE_H_
-#define _KBASE_DEBUG_KTRACE_H_
+#ifndef MALI_KBASE_DEBUG_KTRACE_H_
+#define MALI_KBASE_DEBUG_KTRACE_H_
 
 #if KBASE_KTRACE_TARGET_FTRACE
 #include "mali_linux_trace.h"
@@ -218,4 +218,4 @@ void kbasep_ktrace_dump(struct kbase_device *kbdev);
         KBASE_KTRACE_FTRACE_DUMP(kbdev);                                                                               \
     } while (0)
 
-#endif /* _KBASE_DEBUG_KTRACE_H_ */
+#endif /* MALI_KBASE_DEBUG_KTRACE_H_ */

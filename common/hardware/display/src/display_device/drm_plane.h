@@ -21,12 +21,9 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             enum class DrmPropertyType {
                 DRM_PROPERTY_TYPE_INT,
                 DRM_PROPERTY_TYPE_ENUM,
@@ -102,8 +99,7 @@ namespace OHOS
 
             class DrmDevice;
 
-            class DrmPlane
-            {
+            class DrmPlane {
             public:
                 explicit DrmPlane(drmModePlane &p);
                 virtual ~DrmPlane();

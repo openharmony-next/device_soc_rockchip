@@ -613,7 +613,6 @@ static int uvc_parse_format(struct uvc_device *dev, struct uvc_streaming *stream
 
             /* Find the format descriptor from its GUID. */
             fmtdesc = uvc_format_by_guid(&buffer[UVC_BUFER_INDEX_FIVE]);
-
             if (fmtdesc != NULL) {
                 strscpy(format->name, fmtdesc->name, sizeof(format->name));
                 format->fcc = fmtdesc->fcc;
@@ -1299,7 +1298,6 @@ static int uvc_parse_standard_control(struct uvc_device *dev, const unsigned cha
             if (type == UVC_ITT_CAMERA) {
                 n = buflen >= UVC_BUF_LEN_FIFTEEN ? buffer[UVC_BUFER_INDEX_FOURTEEN] : 0;
                 len = UVC_BUF_LEN_FIFTEEN;
-
             } else if (type == UVC_ITT_MEDIA_TRANSPORT_INPUT) {
                 n = buflen >= UVC_BUF_LEN_NINE ? buffer[UVC_BUFER_INDEX_EIGHT] : 0;
                 p = buflen >= UVC_BUF_LEN_TEN + n ? buffer[UVC_BUFER_INDEX_NINE + n] : 0;

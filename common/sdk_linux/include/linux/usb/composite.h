@@ -490,7 +490,7 @@ struct usb_composite_dev {
      */
     int delayed_status;
 
-    /* protects deactivations and delayed_status counts*/
+    /* protects deactivations and delayed_status counts */
     spinlock_t lock;
 
     /* public: */

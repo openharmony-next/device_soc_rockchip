@@ -198,10 +198,9 @@ void rkvdec2_link_hack_data_setup(struct mpp_dma_buffer *fix)
     /* output frame */
     rkvdec2_3568_hack_link[0x4a] = iova + RKDEC_HACK_DATA_OUT_OFFSET;
     /* colmv out */
-    rkvdec2_3568_hack_link[0x4b] = iova + 128 * 6;
+    rkvdec2_3568_hack_link[0x4b] = iova + 0x80 * 0x6;
     /* error ref */
-    rkvdec2_3568_hack_link[0x4c] = iova + 128 * 4;
-
+    rkvdec2_3568_hack_link[0x4c] = iova + 0x80 * 0x4;
     /* rps in */
     rkvdec2_3568_hack_link[0x59] = iova + RKDEC_HACK_DATA_PPS_OFFSET;
     /* pps in */
@@ -209,6 +208,5 @@ void rkvdec2_link_hack_data_setup(struct mpp_dma_buffer *fix)
     for (i = 0; i < 0x21; i++) {
         rkvdec2_3568_hack_link[0x5c + i] = iova + RKDEC_HACK_DATA_COLMV_OFFSET;
     }
-
     rkvdec2_3568_hack_link[0x7d] = iova + PAGE_SIZE;
 }

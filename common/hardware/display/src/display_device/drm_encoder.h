@@ -22,14 +22,10 @@
 #include <display_type.h>
 #include <drm_crtc.h>
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class DrmEncoder
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class DrmEncoder {
             public:
                 explicit DrmEncoder(drmModeEncoder e);
                 virtual ~DrmEncoder()

@@ -125,7 +125,7 @@ MODULE_PARM_DESC(clr_unready_dev, "clear unready devices");
 
 /**************************** pipeline operations *****************************/
 
-static int __isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity *me)
+static int isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity *me)
 {
     struct rkisp_device *dev = container_of(p, struct rkisp_device, pipe);
     struct v4l2_subdev *sd;
@@ -138,7 +138,9 @@ static int __isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity 
         return 0;
     }
 
-    while (1) {
+    bool doWhile = true;
+
+    while (doWhile) {
         struct media_pad *pad = NULL;
 
         /* Find remote source pad */
@@ -155,6 +157,7 @@ static int __isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity 
         }
 
         if (!pad) {
+            doWhile = false;
             break;
         }
 
@@ -165,6 +168,7 @@ static int __isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity 
 
         me = &sd->entity;
         if (me->num_pads == 1) {
+            doWhile = false;
             break;
         }
     }
@@ -175,7 +179,7 @@ static int __isp_pipeline_prepare(struct rkisp_pipeline *p, struct media_entity 
     return 0;
 }
 
-static int __isp_pipeline_s_isp_clk(struct rkisp_pipeline *p)
+static int isp_pipeline_s_isp_clk(struct rkisp_pipeline *p)
 {
     struct rkisp_device *dev = container_of(p, struct rkisp_device, pipe);
     struct rkisp_hw_dev *hw_dev = dev->hw_dev;
@@ -267,13 +271,13 @@ static int rkisp_pipeline_open(struct rkisp_pipeline *p, struct media_entity *me
 
     /* go through media graphic and get subdevs */
     if (prepare) {
-        ret = __isp_pipeline_prepare(p, me);
+        ret = isp_pipeline_prepare(p, me);
         if (ret < 0) {
             return ret;
         }
     }
 
-    ret = __isp_pipeline_s_isp_clk(p);
+    ret = isp_pipeline_s_isp_clk(p);
     if (ret < 0) {
         return ret;
     }

@@ -246,12 +246,10 @@ static ssize_t power_supply_show_property(struct device *dev, struct device_attr
     struct power_supply_attr *ps_attr = to_ps_attr(attr);
     enum power_supply_property psp = dev_attr_psp(attr);
     union power_supply_propval value;
-
     if (psp == POWER_SUPPLY_PROP_TYPE) {
         value.intval = psy->desc->type;
     } else {
         ret = power_supply_get_property(psy, psp, &value);
-
         if (ret < 0) {
             if (ret == -ENODATA) {
                 dev_dbg(dev, "driver has no data for `%s' property\n", attr->attr.name);
@@ -261,11 +259,9 @@ static ssize_t power_supply_show_property(struct device *dev, struct device_attr
             return ret;
         }
     }
-
     if (ps_attr->text_values_len > 0 && value.intval < ps_attr->text_values_len && value.intval >= 0) {
         return sprintf(buf, "%s\n", ps_attr->text_values[value.intval]);
     }
-
     switch (psp) {
         case POWER_SUPPLY_PROP_USB_TYPE:
             ret = power_supply_show_usb_type(dev, psy->desc, &value, buf);
@@ -276,7 +272,6 @@ static ssize_t power_supply_show_property(struct device *dev, struct device_attr
         default:
             ret = sprintf(buf, "%d\n", value.intval);
     }
-
     return ret;
 }
 

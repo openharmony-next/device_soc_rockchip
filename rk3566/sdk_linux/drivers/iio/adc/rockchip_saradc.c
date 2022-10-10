@@ -119,7 +119,7 @@ static int rockchip_saradc_read_raw(struct iio_dev *indio_dev, struct iio_chan_s
                 return info->uv_vref;
             }
 
-            *val = info->uv_vref / 1000;
+            *val = info->uv_vref / 0x3E8;
             *val2 = chan->scan_type.realbits;
             return IIO_VAL_FRACTIONAL_LOG2;
         default:
@@ -145,7 +145,7 @@ static irqreturn_t rockchip_saradc_isr(int irq, void *dev_id)
     spin_lock_irqsave(&info->lock, flags);
     if (info->test) {
         pr_info("chn[%d] val = %d\n", info->chn, info->last_val);
-        mod_timer(&info->timer, jiffies + HZ / 1000);
+        mod_timer(&info->timer, jiffies + HZ / 0x3E8);
     }
     spin_unlock_irqrestore(&info->lock, flags);
 #endif
@@ -345,7 +345,7 @@ static ssize_t saradc_test_chn_store(struct device *dev, struct device_attribute
     if (!info->test && val < SARADC_CTRL_CHN_MASK) {
         info->test = true;
         info->chn = val;
-        mod_timer(&info->timer, jiffies + HZ / 1000);
+        mod_timer(&info->timer, jiffies + HZ / 0x3E8);
     }
 
     spin_unlock_irqrestore(&info->lock, flags);

@@ -28,7 +28,7 @@ static unsigned long clk_half_divider_recalc_rate(struct clk_hw *hw, unsigned lo
     val &= div_mask(divider->width);
     val = val * 0x2 + 0x3;
 
-    return DIV_ROUND_UP_ULL(((u64)parent_rate * 2), val);
+    return DIV_ROUND_UP_ULL(((u64)parent_rate * 0x2), val);
 }
 
 static int clk_half_divider_bestdiv(struct clk_hw *hw, unsigned long rate, unsigned long *best_parent_rate, u8 width,

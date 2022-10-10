@@ -41,13 +41,13 @@ struct irqs_data {
 void rkispp_soft_reset(struct rkispp_hw_dev *hw)
 {
     writel(GLB_SOFT_RST_ALL, hw->base_addr + RKISPP_CTRL_RESET);
-    udelay(10);
+    udelay(0x0A);
     writel(~GLB_SOFT_RST_ALL, hw->base_addr + RKISPP_CTRL_RESET);
     if (hw->reset) {
         reset_control_assert(hw->reset);
-        udelay(20);
+        udelay(0x14);
         reset_control_deassert(hw->reset);
-        udelay(20);
+        udelay(0x14);
     }
 
     /* refresh iommu after reset */
@@ -150,8 +150,8 @@ static int enable_sys_clk(struct rkispp_hw_dev *dev)
     if (i > dev->clk_rate_tbl_num - 1) {
         i = dev->clk_rate_tbl_num - 1;
     }
-    dev->core_clk_max = dev->clk_rate_tbl[i].clk_rate * 1000000;
-    dev->core_clk_min = dev->clk_rate_tbl[0].clk_rate * 1000000;
+    dev->core_clk_max = dev->clk_rate_tbl[i].clk_rate * 0xF4240;
+    dev->core_clk_min = dev->clk_rate_tbl[0].clk_rate * 0xF4240;
     rkispp_set_clk_rate(dev->clks[0], dev->core_clk_min);
     dev_dbg(dev->dev, "set ispp clk:%luHz\n", clk_get_rate(dev->clks[0]));
     return 0;
@@ -175,7 +175,7 @@ static irqreturn_t irq_hdl(int irq, void *ctx)
     writel(mis_val, base + RKISPP_CTRL_INT_CLR);
     spin_unlock(&hw_dev->irq_lock);
 
-    if (IS_ENABLED(CONFIG_VIDEO_ROCKCHIP_ISPP_FEC) && mis_val & FEC_INT) {
+    if (IS_ENABLED(CONFIG_VIDEO_ROCKCHIP_ISPP_FEC) && (mis_val & FEC_INT)) {
         mis_val &= ~FEC_INT;
         rkispp_fec_irq(hw_dev);
     }
@@ -199,47 +199,51 @@ static const char *const rk3588_ispp_clks[] = {
     "hclk_ispp",
 };
 
-static const struct ispp_clk_info rv1126_ispp_clk_rate[] = {{
-                                                                .clk_rate = 150,
-                                                                .refer_data = 0,
-                                                            },
-                                                            {
-                                                                .clk_rate = 250,
-                                                                .refer_data = 1920 // width
-                                                            },
-                                                            {
-                                                                .clk_rate = 350,
-                                                                .refer_data = 2688,
-                                                            },
-                                                            {
-                                                                .clk_rate = 400,
-                                                                .refer_data = 3072,
-                                                            },
-                                                            {
-                                                                .clk_rate = 500,
-                                                                .refer_data = 3840,
-                                                            }};
+static const struct ispp_clk_info rv1126_ispp_clk_rate[] = {
+    {
+        .clk_rate = 150,
+        .refer_data = 0,
+    },
+    {
+        .clk_rate = 250,
+        .refer_data = 1920 // width
+    },
+    {
+        .clk_rate = 350,
+        .refer_data = 2688,
+    },
+    {
+        .clk_rate = 400,
+        .refer_data = 3072,
+    },
+    {
+        .clk_rate = 500,
+        .refer_data = 3840,
+    }
+};
 
-static const struct ispp_clk_info rk3588_ispp_clk_rate[] = {{
-                                                                .clk_rate = 300,
-                                                                .refer_data = 1920, // width
-                                                            },
-                                                            {
-                                                                .clk_rate = 400,
-                                                                .refer_data = 2688,
-                                                            },
-                                                            {
-                                                                .clk_rate = 500,
-                                                                .refer_data = 3072,
-                                                            },
-                                                            {
-                                                                .clk_rate = 600,
-                                                                .refer_data = 3840,
-                                                            },
-                                                            {
-                                                                .clk_rate = 702,
-                                                                .refer_data = 4672,
-                                                            }};
+static const struct ispp_clk_info rk3588_ispp_clk_rate[] = {
+    {
+        .clk_rate = 300,
+        .refer_data = 1920, // width
+    },
+    {
+        .clk_rate = 400,
+        .refer_data = 2688,
+    },
+    {
+        .clk_rate = 500,
+        .refer_data = 3072,
+    },
+    {
+        .clk_rate = 600,
+        .refer_data = 3840,
+    },
+    {
+        .clk_rate = 702,
+        .refer_data = 4672,
+    }
+};
 
 static struct irqs_data rv1126_ispp_irqs[] = {
     {"ispp_irq", irq_hdl},
@@ -310,7 +314,7 @@ static int rkispp_hw_probe(struct platform_device *pdev)
     hw_dev->max_in.w = 0;
     hw_dev->max_in.h = 0;
     hw_dev->max_in.fps = 0;
-    of_property_read_u32_array(node, "max-input", &hw_dev->max_in.w, 3);
+    of_property_read_u32_array(node, "max-input", &hw_dev->max_in.w, 0x03);
     dev_info(dev, "max input:%dx%d@%dfps\n", hw_dev->max_in.w, hw_dev->max_in.h, hw_dev->max_in.fps);
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
     if (!res) {

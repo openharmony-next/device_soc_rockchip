@@ -421,11 +421,9 @@ static int rockchip_usb_phy_extcon_register(struct rockchip_usb_phy_base *base)
     } else {
         /* Initialize extcon device */
         edev = devm_extcon_dev_allocate(base->dev, rockchip_usb_phy_extcon_cable);
-
         if (IS_ERR(edev)) {
             return -ENOMEM;
         }
-
         ret = devm_extcon_dev_register(base->dev, edev);
         if (ret) {
             dev_err(base->dev, "failed to register extcon device\n");
@@ -447,17 +445,12 @@ static void rk3288_usb_phy_otg_sm_work(struct work_struct *work)
     bool sch_work;
     bool vbus_attached;
     bool id;
-
     mutex_lock(&rk_phy->mutex);
-
     sch_work = false;
-
     regmap_read(rk_phy->base->reg_base, RK3288_SOC_STATUS2, &val);
     id = (val & RK3288_SOC_STATUS2_UTMIOTG_IDDIG) ? true : false;
-
     regmap_read(rk_phy->base->reg_base, RK3288_SOC_STATUS2, &val);
     vbus_attached = (val & RK3288_SOC_STATUS2_UTMISRP_BVALID) ? true : false;
-
     if (!vbus_attached || !id || rk_phy->mode == USB_DR_MODE_HOST) {
         dev_dbg(&rk_phy->phy->dev, "peripheral disconnected\n");
         wake_unlock(&rk_phy->wakelock);
@@ -466,7 +459,6 @@ static void rk3288_usb_phy_otg_sm_work(struct work_struct *work)
         chg_det_completed = false;
         goto out;
     }
-
     if (chg_det_completed) {
         sch_work = true;
         goto out;
@@ -870,9 +862,10 @@ err_clk:
 }
 
 static const struct rockchip_usb_phy_pdata rk3066a_pdata = {
-    .phys = (struct rockchip_usb_phys[]){{.reg = 0x17c, .pll_name = "sclk_otgphy0_480m"},
-                                         {.reg = 0x188, .pll_name = "sclk_otgphy1_480m"},
-                                         {/* sentinel */}},
+    .phys = (struct rockchip_usb_phys[]){
+        {.reg = 0x17c, .pll_name = "sclk_otgphy0_480m"},
+        {.reg = 0x188, .pll_name = "sclk_otgphy1_480m"},
+        {}},
 };
 
 static int __init rockchip_init_usb_uart_common(struct regmap *grf, const struct rockchip_usb_phy_pdata *pdata)
@@ -940,9 +933,10 @@ static int __init rk3188_init_usb_uart(struct regmap *grf, const struct rockchip
 }
 
 static const struct rockchip_usb_phy_pdata rk3188_pdata = {
-    .phys = (struct rockchip_usb_phys[]){{.reg = 0x10c, .pll_name = "sclk_otgphy0_480m"},
-                                         {.reg = 0x11c, .pll_name = "sclk_otgphy1_480m"},
-                                         {/* sentinel */}},
+    .phys = (struct rockchip_usb_phys[]){
+        {.reg = 0x10c, .pll_name = "sclk_otgphy0_480m"},
+        {.reg = 0x11c, .pll_name = "sclk_otgphy1_480m"},
+        {}},
     .init_usb_uart = rk3188_init_usb_uart,
     .usb_uart_phy = 0,
 };
@@ -983,10 +977,11 @@ static int __init rk3288_init_usb_uart(struct regmap *grf, const struct rockchip
 }
 
 static const struct rockchip_usb_phy_pdata rk3288_pdata = {
-    .phys = (struct rockchip_usb_phys[]){{.reg = 0x320, .pll_name = "sclk_otgphy0_480m"},
-                                         {.reg = 0x334, .pll_name = "sclk_otgphy1_480m"},
-                                         {.reg = 0x348, .pll_name = "sclk_otgphy2_480m"},
-                                         {/* sentinel */}},
+    .phys = (struct rockchip_usb_phys[]){
+        {.reg = 0x320, .pll_name = "sclk_otgphy0_480m"},
+        {.reg = 0x334, .pll_name = "sclk_otgphy1_480m"},
+        {.reg = 0x348, .pll_name = "sclk_otgphy2_480m"},
+        {}},
     .init_usb_uart = rk3288_init_usb_uart,
     .usb_uart_phy = 0,
 };

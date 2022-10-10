@@ -460,25 +460,20 @@ static int rkvenc_extract_task_msg(struct mpp_session *session, struct rkvenc_ta
     u32 i, j;
     struct mpp_request *req;
     struct rkvenc_hw_info *hw = task->hw_info;
-
     mpp_debug_enter();
-
     for (i = 0; i < msgs->req_cnt; i++) {
         req = &msgs->reqs[i];
         if (!req->size) {
             continue;
         }
-
         switch (req->cmd) {
             case MPP_CMD_SET_REG_WRITE: {
                 void *data;
                 struct mpp_request *wreq;
-
                 for (j = 0; j < hw->reg_class; j++) {
                     if (!req_over_class(req, task, j)) {
                         continue;
                     }
-
                     ret = rkvenc_alloc_class_msg(task, j);
                     if (ret) {
                         mpp_err("alloc class msg %d fail.\n", j);
@@ -498,15 +493,14 @@ static int rkvenc_extract_task_msg(struct mpp_session *session, struct rkvenc_ta
                     task->reg[j].valid = 1;
                     task->w_req_cnt++;
                 }
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_READ: {
                 struct mpp_request *rreq;
-
                 for (j = 0; j < hw->reg_class; j++) {
                     if (!req_over_class(req, task, j)) {
                         continue;
                     }
-
                     ret = rkvenc_alloc_class_msg(task, j);
                     if (ret) {
                         mpp_err("alloc class msg reg %d fail.\n", j);
@@ -517,17 +511,19 @@ static int rkvenc_extract_task_msg(struct mpp_session *session, struct rkvenc_ta
                     task->reg[j].valid = 1;
                     task->r_req_cnt++;
                 }
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            }
             case MPP_CMD_SET_RCB_INFO: {
                 struct rkvenc2_session_priv *priv = session->priv;
-
                 if (priv) {
                     rkvenc2_extract_rcb_info(&priv->rcb_inf, req);
                 }
-            } break;
+                break;
+            } 
             default:
                 break;
         }
@@ -728,13 +724,11 @@ free_task:
 static void *rkvenc_ccu_alloc_task(struct mpp_session *session, struct mpp_task_msgs *msgs)
 {
     struct rkvenc_dev *enc = to_rkvenc_dev(session->mpp);
-
     /* if multi-cores, choose one for current task */
     if (enc->ccu) {
         enc = rkvenc_core_balance(enc->ccu);
         session->mpp = &enc->mpp;
     }
-
     return rkvenc_alloc_task(session, msgs);
 }
 
@@ -743,11 +737,8 @@ static void *rkvenc2_prepare(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     struct mpp_taskqueue *queue = mpp->queue;
     unsigned long flags;
     s32 core_id;
-
     spin_lock_irqsave(&queue->running_lock, flags);
-
     core_id = find_first_bit(&queue->core_idle, queue->core_count);
-
     if (core_id >= queue->core_count) {
         mpp_task = NULL;
         mpp_dbg_core("core %d all busy %lx\n", core_id, queue->core_idle);
@@ -758,9 +749,7 @@ static void *rkvenc2_prepare(struct mpp_dev *mpp, struct mpp_task *mpp_task)
         mpp_task->mpp = queue->cores[core_id];
         mpp_task->core_id = core_id;
     }
-
     spin_unlock_irqrestore(&queue->running_lock, flags);
-
     return mpp_task;
 }
 
@@ -852,7 +841,7 @@ static int rkvenc_isr(struct mpp_dev *mpp)
 
     mpp_debug_enter();
 
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp->cur_task) {
         dev_err(mpp->dev, "no current task\n");
         return IRQ_HANDLED;
@@ -992,12 +981,13 @@ static int rkvenc_control(struct mpp_session *session, struct mpp_request *req)
                     mpp_err("codec info invalid, type %d, flag %d\n", elem.type, elem.flag);
                 }
             }
-        } break;
+            break;
+        }
         default: {
             mpp_err("unknown mpp ioctl cmd %x\n", req->cmd);
-        } break;
+            break;
+        }
     }
-
     return 0;
 }
 
@@ -1007,7 +997,6 @@ static int rkvenc_free_session(struct mpp_session *session)
         kfree(session->priv);
         session->priv = NULL;
     }
-
     return 0;
 }
 
@@ -1063,7 +1052,7 @@ static int rkvenc_dump_session(struct mpp_session *session, struct seq_file *seq
         }
     }
     seq_puts(seq, "\n");
-    /* item data*/
+    /* item data */
     seq_printf(seq, "|%8p|", session);
     seq_printf(seq, "%8s|", mpp_device_name[session->device_type]);
     for (i = ENC_INFO_BASE; i < ENC_INFO_BUTT; i++) {
@@ -1715,7 +1704,7 @@ static void rkvenc_shutdown(struct platform_device *pdev)
             atomic_inc(&mpp->srv->shutdown_request);
         }
 
-        ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 1000, 200000);
+        ret = readx_poll_timeout(atomic_read, &mpp->task_count, val, val == 0, 0x3E8, 0x30D40);
         if (ret == -ETIMEDOUT) {
             dev_err(dev, "wait total running time out\n");
         }

@@ -100,7 +100,7 @@ static void default_sw_reg_flag(struct rkisp_device *dev)
         flag = dev->sw_base_addr + reg[i] + RKISP_ISP_SW_REG_SIZE;
         *flag = SW_REG_CACHE;
         if (dev->hw_dev->is_unite) {
-            flag += RKISP_ISP_SW_MAX_SIZE / 4;
+            flag += RKISP_ISP_SW_MAX_SIZE / 0x04;
             *flag = SW_REG_CACHE;
         }
     }
@@ -123,7 +123,6 @@ static irqreturn_t mipi_irq_hdl(int irq, void *ctx)
         err1 = readl(base + CIF_ISP_CSI0_ERR1);
         err2 = readl(base + CIF_ISP_CSI0_ERR2);
         err3 = readl(base + CIF_ISP_CSI0_ERR3);
-
         if (err1 || err2 || err3) {
             rkisp_mipi_v13_isr(err1, err2, err3, isp);
         }
@@ -145,7 +144,6 @@ static irqreturn_t mipi_irq_hdl(int irq, void *ctx)
         }
     } else {
         u32 mis_val = readl(base + CIF_MIPI_MIS);
-
         if (mis_val) {
             rkisp_mipi_isr(mis_val, isp);
         }
@@ -330,130 +328,145 @@ static const char *const rv1126_isp_clks[] = {
 };
 
 /* isp clock adjustment table (MHz) */
-static const struct isp_clk_info rk1808_isp_clk_rate[] = {{
-                                                              300,
-                                                          },
-                                                          {
-                                                              400,
-                                                          },
-                                                          {
-                                                              500,
-                                                          },
-                                                          {
-                                                              600,
-                                                          }};
+static const struct isp_clk_info rk1808_isp_clk_rate[] = {
+    {
+        300,
+    },
+    {
+        400,
+    },
+    {
+        500,
+    },
+    {
+        600,
+    }
+};
 
 /* isp clock adjustment table (MHz) */
-static const struct isp_clk_info rk3288_isp_clk_rate[] = {{
-                                                              150,
-                                                          },
-                                                          {
-                                                              384,
-                                                          },
-                                                          {
-                                                              500,
-                                                          },
-                                                          {
-                                                              594,
-                                                          }};
+static const struct isp_clk_info rk3288_isp_clk_rate[] = {
+    {
+        150,
+    },
+    {
+        384,
+    },
+    {
+        500,
+    },
+    {
+        594,
+    }
+};
 
 /* isp clock adjustment table (MHz) */
-static const struct isp_clk_info rk3326_isp_clk_rate[] = {{
-                                                              300,
-                                                          },
-                                                          {
-                                                              347,
-                                                          },
-                                                          {
-                                                              400,
-                                                          },
-                                                          {
-                                                              520,
-                                                          },
-                                                          {
-                                                              600,
-                                                          }};
+static const struct isp_clk_info rk3326_isp_clk_rate[] = {
+    {
+        300,
+    },
+    {
+        347,
+    },
+    {
+        400,
+    },
+    {
+        520,
+    },
+    {
+        600,
+    }
+};
 
 /* isp clock adjustment table (MHz) */
-static const struct isp_clk_info rk3368_isp_clk_rate[] = {{
-                                                              300,
-                                                          },
-                                                          {
-                                                              400,
-                                                          },
-                                                          {
-                                                              600,
-                                                          }};
+static const struct isp_clk_info rk3368_isp_clk_rate[] = {
+    {
+        300,
+    },
+    {
+        400,
+    },
+    {
+        600,
+    }
+};
 
 /* isp clock adjustment table (MHz) */
-static const struct isp_clk_info rk3399_isp_clk_rate[] = {{
-                                                              300,
-                                                          },
-                                                          {
-                                                              400,
-                                                          },
-                                                          {
-                                                              600,
-                                                          }};
+static const struct isp_clk_info rk3399_isp_clk_rate[] = {
+    {
+        300,
+    },
+    {
+        400,
+    },
+    {
+        600,
+    }
+};
 
-static const struct isp_clk_info rk3568_isp_clk_rate[] = {{
-                                                              .clk_rate = 300,
-                                                              .refer_data = 1920, // width
-                                                          },
-                                                          {
-                                                              .clk_rate = 400,
-                                                              .refer_data = 2688,
-                                                          },
-                                                          {
-                                                              .clk_rate = 500,
-                                                              .refer_data = 3072,
-                                                          },
-                                                          {
-                                                              .clk_rate = 600,
-                                                              .refer_data = 3840,
-                                                          }};
+static const struct isp_clk_info rk3568_isp_clk_rate[] = {
+    {
+        .clk_rate = 300,
+        .refer_data = 1920, // width
+    },
+    {
+        .clk_rate = 400,
+        .refer_data = 2688,
+    },
+    {
+        .clk_rate = 500,
+        .refer_data = 3072,
+    },
+    {
+        .clk_rate = 600,
+        .refer_data = 3840,
+    }
+};
 
-static const struct isp_clk_info rk3588_isp_clk_rate[] = {{
-                                                              .clk_rate = 300,
-                                                              .refer_data = 1920, // width
-                                                          },
-                                                          {
-                                                              .clk_rate = 400,
-                                                              .refer_data = 2688,
-                                                          },
-                                                          {
-                                                              .clk_rate = 500,
-                                                              .refer_data = 3072,
-                                                          },
-                                                          {
-                                                              .clk_rate = 600,
-                                                              .refer_data = 3840,
-                                                          },
-                                                          {
-                                                              .clk_rate = 702,
-                                                              .refer_data = 4672,
-                                                          }};
+static const struct isp_clk_info rk3588_isp_clk_rate[] = {
+    {
+        .clk_rate = 300,
+        .refer_data = 1920, // width
+    },
+    {
+        .clk_rate = 400,
+        .refer_data = 2688,
+    },
+    {
+        .clk_rate = 500,
+        .refer_data = 3072,
+    },
+    {
+        .clk_rate = 600,
+        .refer_data = 3840,
+    },
+    {
+        .clk_rate = 702,
+        .refer_data = 4672,
+    }};
 
-static const struct isp_clk_info rv1126_isp_clk_rate[] = {{
-                                                              .clk_rate = 20,
-                                                              .refer_data = 0,
-                                                          },
-                                                          {
-                                                              .clk_rate = 300,
-                                                              .refer_data = 1920, // width
-                                                          },
-                                                          {
-                                                              .clk_rate = 400,
-                                                              .refer_data = 2688,
-                                                          },
-                                                          {
-                                                              .clk_rate = 500,
-                                                              .refer_data = 3072,
-                                                          },
-                                                          {
-                                                              .clk_rate = 600,
-                                                              .refer_data = 3840,
-                                                          }};
+static const struct isp_clk_info rv1126_isp_clk_rate[] = {
+    {
+        .clk_rate = 20,
+        .refer_data = 0,
+    },
+    {
+        .clk_rate = 300,
+        .refer_data = 1920, // width
+    },
+    {
+        .clk_rate = 400,
+        .refer_data = 2688,
+    },
+    {
+        .clk_rate = 500,
+        .refer_data = 3072,
+    },
+    {
+        .clk_rate = 600,
+        .refer_data = 3840,
+    }
+};
 
 static struct isp_irqs_data rk1808_isp_irqs[] = {
     {"isp_irq", isp_irq_hdl}, {"mi_irq", mi_irq_hdl}, {"mipi_irq", mipi_irq_hdl}};
@@ -645,14 +658,14 @@ void rkisp_soft_reset(struct rkisp_hw_dev *dev, bool is_secure)
         if (dev->is_unite) {
             writel(0xffff, dev->base_next_addr + CIF_IRCL);
         }
-        udelay(10);
+        udelay(0x0A);
     }
 
     if (dev->reset) {
         reset_control_assert(dev->reset);
-        udelay(10);
+        udelay(0x0A);
         reset_control_deassert(dev->reset);
-        udelay(10);
+        udelay(0x0A);
     }
 
     /* reset for Dehaze */
@@ -663,7 +676,7 @@ void rkisp_soft_reset(struct rkisp_hw_dev *dev, bool is_secure)
     if (dev->is_unite) {
         writel(0xffff, dev->base_next_addr + CIF_IRCL);
     }
-    udelay(10);
+    udelay(0x0A);
 
     /* refresh iommu after reset */
     if (dev->is_mmu) {
@@ -745,7 +758,7 @@ static int enable_sys_clk(struct rkisp_hw_dev *dev)
     rate = dev->clk_rate_tbl[0].clk_rate * 1000000UL;
     rkisp_set_clk_rate(dev->clks[0], rate);
     if (dev->is_unite) {
-        rkisp_set_clk_rate(dev->clks[5], rate);
+        rkisp_set_clk_rate(dev->clks[0X0A5], rate);
     }
     rkisp_soft_reset(dev, false);
     isp_config_clk(dev, true);
@@ -796,7 +809,7 @@ static int rkisp_hw_probe(struct platform_device *pdev)
     hw_dev->max_in.w = 0;
     hw_dev->max_in.h = 0;
     hw_dev->max_in.fps = 0;
-    of_property_read_u32_array(node, "max-input", &hw_dev->max_in.w, 3);
+    of_property_read_u32_array(node, "max-input", &hw_dev->max_in.w, 0x03);
     dev_info(dev, "max input:%dx%d@%dfps\n", hw_dev->max_in.w, hw_dev->max_in.h, hw_dev->max_in.fps);
     hw_dev->grf = syscon_regmap_lookup_by_phandle(node, "rockchip,grf");
     if (IS_ERR(hw_dev->grf)) {

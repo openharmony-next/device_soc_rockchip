@@ -45,12 +45,10 @@ static bool mpp_iommu_is_paged(struct mpp_rk_iommu *iommu)
     int i;
     u32 status;
     bool active = true;
-
     for (i = 0; i < iommu->mmu_num; i++) {
         status = readl(iommu->bases[i] + RK_MMU_STATUS);
         active &= !!(status & RK_MMU_STATUS_PAGING_ENABLED);
     }
-
     return active;
 }
 
@@ -62,7 +60,6 @@ static u32 mpp_iommu_get_dte_addr(struct mpp_rk_iommu *iommu)
 static int mpp_iommu_enable(struct mpp_rk_iommu *iommu)
 {
     int i;
-
     /* check iommu whether is paged */
     iommu->is_paged = mpp_iommu_is_paged(iommu);
     if (iommu->is_paged) {
@@ -73,12 +70,12 @@ static int mpp_iommu_enable(struct mpp_rk_iommu *iommu)
     for (i = 0; i < iommu->mmu_num; i++) {
         writel(RK_MMU_CMD_ENABLE_STALL, iommu->bases[i] + RK_MMU_COMMAND);
     }
-    udelay(2);
+    udelay(0x2);
     /* force reset */
     for (i = 0; i < iommu->mmu_num; i++) {
         writel(RK_MMU_CMD_FORCE_RESET, iommu->bases[i] + RK_MMU_COMMAND);
     }
-    udelay(2);
+    udelay(0x2);
 
     for (i = 0; i < iommu->mmu_num; i++) {
         /* restore dte and status */
@@ -106,7 +103,6 @@ static int mpp_iommu_enable(struct mpp_rk_iommu *iommu)
         mpp_err("iommu->base_addr=%08x enable failed\n", iommu->base_addr[0]);
         return -EINVAL;
     }
-
     return 0;
 }
 
@@ -114,30 +110,28 @@ static int mpp_iommu_disable(struct mpp_rk_iommu *iommu)
 {
     int i;
     u32 dte;
-
     if (iommu->is_paged) {
         dte = readl(iommu->bases[0] + RK_MMU_DTE_ADDR);
         if (!dte) {
             return -EINVAL;
         }
-        udelay(2);
+        udelay(0x2);
         /* enable stall */
         for (i = 0; i < iommu->mmu_num; i++) {
             writel(RK_MMU_CMD_ENABLE_STALL, iommu->bases[i] + RK_MMU_COMMAND);
         }
-        udelay(2);
+        udelay(0x2);
         /* disable paging */
         for (i = 0; i < iommu->mmu_num; i++) {
             writel(RK_MMU_CMD_DISABLE_PAGING, iommu->bases[i] + RK_MMU_COMMAND);
         }
-        udelay(2);
+        udelay(0x2);
         /* disable stall */
         for (i = 0; i < iommu->mmu_num; i++) {
             writel(RK_MMU_CMD_DISABLE_STALL, iommu->bases[i] + RK_MMU_COMMAND);
         }
-        udelay(2);
+        udelay(0x2);
     }
-
     return 0;
 }
 
@@ -145,7 +139,6 @@ int px30_workaround_combo_init(struct mpp_dev *mpp)
 {
     struct mpp_rk_iommu *iommu = NULL, *loop = NULL, *n;
     struct platform_device *pdev = mpp->iommu_info->pdev;
-
     /* find whether exist in iommu link */
     list_for_each_entry_safe(loop, n, &mpp->queue->mmu_list, link)
     {
@@ -159,7 +152,6 @@ int px30_workaround_combo_init(struct mpp_dev *mpp)
         int i;
         struct resource *res;
         void __iomem *base;
-
         iommu = devm_kzalloc(mpp->srv->dev, sizeof(*iommu), GFP_KERNEL);
         for (i = 0; i < pdev->num_resources; i++) {
             res = platform_get_resource(pdev, IORESOURCE_MEM, i);
@@ -188,7 +180,6 @@ int px30_workaround_combo_init(struct mpp_dev *mpp)
         mutex_unlock(&mpp->queue->mmu_lock);
     }
     mpp->iommu_info->iommu = iommu;
-
     return 0;
 }
 
@@ -199,23 +190,19 @@ int px30_workaround_combo_switch_grf(struct mpp_dev *mpp)
     u32 next_val;
     bool pd_is_on;
     struct mpp_rk_iommu *loop = NULL, *n;
-
     if (!mpp->grf_info->grf || !mpp->grf_info->val) {
         return 0;
     }
-
     curr_val = mpp_get_grf(mpp->grf_info);
     next_val = mpp->grf_info->val & MPP_GRF_VAL_MASK;
     if (curr_val == next_val) {
         return 0;
     }
-
     pd_is_on = rockchip_pmu_pd_is_on(mpp->dev);
     if (!pd_is_on) {
         rockchip_pmu_pd_on(mpp->dev);
     }
     mpp->hw_ops->clk_on(mpp);
-
     list_for_each_entry_safe(loop, n, &mpp->queue->mmu_list, link)
     {
         /* update iommu parameters */
@@ -228,11 +215,9 @@ int px30_workaround_combo_switch_grf(struct mpp_dev *mpp)
     mpp_set_grf(mpp->grf_info);
     /* enable current iommu */
     ret = mpp_iommu_enable(mpp->iommu_info->iommu);
-
     mpp->hw_ops->clk_off(mpp);
     if (!pd_is_on) {
         rockchip_pmu_pd_off(mpp->dev);
     }
-
     return ret;
 }

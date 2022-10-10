@@ -5,8 +5,8 @@
  * Copyright (C) 2020 Rockchip Electronics Co., Ltd.
  */
 
-#ifndef _RKCIF_SDITF_H
-#define _RKCIF_SDITF_H
+#ifndef RKCIF_SDITF_H
+#define RKCIF_SDITF_H
 
 #include <linux/mutex.h>
 #include <media/media-device.h>

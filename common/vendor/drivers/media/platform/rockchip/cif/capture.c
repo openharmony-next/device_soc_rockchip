@@ -25,6 +25,7 @@
 #include "mipi-csi2.h"
 #include "common.h"
 
+#define DIFF_TIME 1000000
 #define CIF_REQ_BUFS_MIN 3
 #define CIF_MIN_WIDTH 64
 #define CIF_MIN_HEIGHT 64
@@ -64,13 +65,13 @@ static int fcc_xysubs(u32 fcc, u32 *xsubs, u32 *ysubs)
         case V4L2_PIX_FMT_VYUY:
         case V4L2_PIX_FMT_YUYV:
         case V4L2_PIX_FMT_YVYU:
-            *xsubs = 2;
+            *xsubs = 0x02;
             *ysubs = 1;
             break;
         case V4L2_PIX_FMT_NV21:
         case V4L2_PIX_FMT_NV12:
-            *xsubs = 2;
-            *ysubs = 2;
+            *xsubs = 0x02;
+            *ysubs = 0x02;
             break;
         default:
             return -EINVAL;
@@ -372,194 +373,196 @@ static const struct cif_output_fmt out_fmts[] = {
     /* TODO: We can support NV12M/NV21M/NV16M/NV61M too */
 };
 
-static const struct cif_input_fmt in_fmts[] = {{
-                                                   .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YUYV,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_YUYV,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YUYV,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_YUYV,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_INTERLACED,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YVYU,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_YVYU,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YVYU,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_YVYU,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_INTERLACED,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_UYVY,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_UYVY,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_UYVY,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_UYVY,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_INTERLACED,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_VYUY,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_VYUY,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
-                                                   .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_VYUY,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
-                                                   .csi_yuv_order = CSI_YUV_INPUT_ORDER_VYUY,
-                                                   .fmt_type = CIF_FMT_TYPE_YUV,
-                                                   .field = V4L2_FIELD_INTERLACED,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SBGGR8_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGRBG8_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SRGGB8_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SBGGR10_1X10,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGBRG10_1X10,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGRBG10_1X10,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SRGGB10_1X10,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SBGGR12_1X12,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGBRG12_1X12,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SGRBG12_1X12,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SRGGB12_1X12,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_RGB888_1X24,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RGB888,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_Y8_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_Y10_1X10,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_Y12_1X12,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_EBD_1X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               },
-                                               {
-                                                   .mbus_code = MEDIA_BUS_FMT_SPD_2X8,
-                                                   .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
-                                                   .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
-                                                   .fmt_type = CIF_FMT_TYPE_RAW,
-                                                   .field = V4L2_FIELD_NONE,
-                                               }};
+static const struct cif_input_fmt in_fmts[] = {
+    {
+        .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YUYV,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_YUYV,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_YUYV8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YUYV,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_YUYV,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_INTERLACED,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YVYU,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_YVYU,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_YVYU8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_YVYU,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_YVYU,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_INTERLACED,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_UYVY,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_UYVY,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_UYVY8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_UYVY,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_UYVY,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_INTERLACED,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_VYUY,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_VYUY,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_VYUY8_2X8,
+        .dvp_fmt_val = YUV_INPUT_422 | YUV_INPUT_ORDER_VYUY,
+        .csi_fmt_val = CSI_WRDDR_TYPE_YUV422,
+        .csi_yuv_order = CSI_YUV_INPUT_ORDER_VYUY,
+        .fmt_type = CIF_FMT_TYPE_YUV,
+        .field = V4L2_FIELD_INTERLACED,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SBGGR8_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGRBG8_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SRGGB8_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SBGGR10_1X10,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGBRG10_1X10,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGRBG10_1X10,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SRGGB10_1X10,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SBGGR12_1X12,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGBRG12_1X12,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SGRBG12_1X12,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SRGGB12_1X12,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_RGB888_1X24,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RGB888,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_Y8_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_Y10_1X10,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_10,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW10,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_Y12_1X12,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_EBD_1X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_8,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW8,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    },
+    {
+        .mbus_code = MEDIA_BUS_FMT_SPD_2X8,
+        .dvp_fmt_val = INPUT_MODE_RAW | RAW_DATA_WIDTH_12,
+        .csi_fmt_val = CSI_WRDDR_TYPE_RAW12,
+        .fmt_type = CIF_FMT_TYPE_RAW,
+        .field = V4L2_FIELD_NONE,
+    }
+};
 
 static inline struct rkcif_rx_buffer *to_cif_rx_buf(struct rkisp_rx_buf *dbufs)
 {
@@ -676,7 +679,7 @@ static unsigned char get_data_type(u32 pixelformat, u8 cmd_mode_en)
         case MEDIA_BUS_FMT_YVYU8_2X8:
             return 0x1e;
         case MEDIA_BUS_FMT_RGB888_1X24: {
-            if (cmd_mode_en) { /* dsi command mode*/
+            if (cmd_mode_en) { /* dsi command mode */
                 return 0x39;
             } else { /* dsi video mode */
                 return 0x3e;
@@ -696,13 +699,13 @@ static int get_csi_crop_align(const struct cif_input_fmt *fmt_in)
 {
     switch (fmt_in->csi_fmt_val) {
         case CSI_WRDDR_TYPE_RGB888:
-            return 24;
+            return 0x18;
         case CSI_WRDDR_TYPE_RAW10:
         case CSI_WRDDR_TYPE_RAW12:
-            return 4;
+            return 0x04;
         case CSI_WRDDR_TYPE_RAW8:
         case CSI_WRDDR_TYPE_YUV422:
-            return 8;
+            return 0x08;
         default:
             return -1;
     }
@@ -733,10 +736,10 @@ const struct cif_input_fmt *get_input_fmt(struct v4l2_subdev *sd, struct v4l2_re
         fmt.format.code = ch_info.bus_fmt;
         switch (ch_info.vc) {
             case V4L2_MBUS_CSI2_CHANNEL_3:
-                csi_info->vc = 3;
+                csi_info->vc = 0x03;
                 break;
             case V4L2_MBUS_CSI2_CHANNEL_2:
-                csi_info->vc = 2;
+                csi_info->vc = 0x02;
                 break;
             case V4L2_MBUS_CSI2_CHANNEL_1:
                 csi_info->vc = 1;
@@ -1444,15 +1447,14 @@ static int rkcif_assign_new_buffer_update_toisp(struct rkcif_stream *stream, int
     if (mbus_cfg->type == V4L2_MBUS_CSI2_DPHY || mbus_cfg->type == V4L2_MBUS_CSI2_CPHY ||
         mbus_cfg->type == V4L2_MBUS_CCP2) {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_reg_index_of_frm1_y_addr(channel_id);
+                     : get_reg_index_of_frm1_y_addr(channel_id);
     } else {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_dvp_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_dvp_reg_index_of_frm1_y_addr(channel_id);
+                     : get_dvp_reg_index_of_frm1_y_addr(channel_id);
     }
     spin_lock_irqsave(&stream->vbq_lock, flags);
     if (!list_empty(&stream->rx_buf_head)) {
         if (stream->frame_phase == CIF_CSI_FRAME0_READY) {
-
             dbufs = list_first_entry(&stream->rx_buf_head, struct rkisp_rx_buf, list);
             if (dbufs) {
                 list_del(&dbufs->list);
@@ -1606,14 +1608,14 @@ static int rkcif_assign_new_buffer_update(struct rkcif_stream *stream, int chann
     if (mbus_cfg->type == V4L2_MBUS_CSI2_DPHY || mbus_cfg->type == V4L2_MBUS_CSI2_CPHY ||
         mbus_cfg->type == V4L2_MBUS_CCP2) {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_reg_index_of_frm1_y_addr(channel_id);
+                     : get_reg_index_of_frm1_y_addr(channel_id);
         frm_addr_uv = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_reg_index_of_frm0_uv_addr(channel_id)
-                                                                 : get_reg_index_of_frm1_uv_addr(channel_id);
+                      : get_reg_index_of_frm1_uv_addr(channel_id);
     } else {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_dvp_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_dvp_reg_index_of_frm1_y_addr(channel_id);
+                     : get_dvp_reg_index_of_frm1_y_addr(channel_id);
         frm_addr_uv = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_dvp_reg_index_of_frm0_uv_addr(channel_id)
-                                                                 : get_dvp_reg_index_of_frm1_uv_addr(channel_id);
+                      : get_dvp_reg_index_of_frm1_uv_addr(channel_id);
     }
 
     spin_lock_irqsave(&stream->vbq_lock, flags);
@@ -1636,7 +1638,6 @@ static int rkcif_assign_new_buffer_update(struct rkcif_stream *stream, int chann
                 } else {
                     buffer = NULL;
                 }
-
             } else {
                 stream->next_buf = list_first_entry(&stream->buf_head, struct rkcif_buffer, queue);
                 if (stream->next_buf) {
@@ -1767,14 +1768,14 @@ static int rkcif_update_new_buffer_wake_up_mode(struct rkcif_stream *stream)
     if (mbus_cfg->type == V4L2_MBUS_CSI2_DPHY || mbus_cfg->type == V4L2_MBUS_CSI2_CPHY ||
         mbus_cfg->type == V4L2_MBUS_CCP2) {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_reg_index_of_frm1_y_addr(channel_id);
+                     : get_reg_index_of_frm1_y_addr(channel_id);
         frm_addr_uv = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_reg_index_of_frm0_uv_addr(channel_id)
-                                                                 : get_reg_index_of_frm1_uv_addr(channel_id);
+                      : get_reg_index_of_frm1_uv_addr(channel_id);
     } else {
         frm_addr_y = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_dvp_reg_index_of_frm0_y_addr(channel_id)
-                                                                : get_dvp_reg_index_of_frm1_y_addr(channel_id);
+                     : get_dvp_reg_index_of_frm1_y_addr(channel_id);
         frm_addr_uv = stream->frame_phase & CIF_CSI_FRAME0_READY ? get_dvp_reg_index_of_frm0_uv_addr(channel_id)
-                                                                 : get_dvp_reg_index_of_frm1_uv_addr(channel_id);
+                      : get_dvp_reg_index_of_frm1_uv_addr(channel_id);
     }
     spin_lock_irqsave(&stream->vbq_lock, flags);
     if (stream->is_buf_active) {
@@ -2089,8 +2090,8 @@ static int rkcif_csi_channel_set(struct rkcif_stream *stream, struct csi_channel
         rkcif_write_register_or(dev, CIF_REG_MIPI_LVDS_INTEN, CSI_LINE_INTEN(channel->id));
         wait_line = dev->wait_line;
     }
-    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID0_1, wait_line << 16 | wait_line);
-    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID2_3, wait_line << 16 | wait_line);
+    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID0_1, (wait_line << 16) | wait_line);
+    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID2_3, (wait_line << 16) | wait_line);
 
     rkcif_write_register_or(dev, CIF_REG_MIPI_LVDS_INTEN, CSI_DMA_END_INTEN(channel->id));
     rkcif_write_register(dev, CIF_REG_MIPI_WATER_LINE,
@@ -2259,7 +2260,7 @@ static int rkcif_csi_get_output_type_mask(struct rkcif_stream *stream)
     return mask;
 }
 
-/*config reg for rk3588*/
+/* config reg for rk3588 */
 static int rkcif_csi_channel_set_v1(struct rkcif_stream *stream, struct csi_channel_info *channel,
                                     enum v4l2_mbus_type mbus_type, unsigned int mode)
 {
@@ -2292,8 +2293,8 @@ static int rkcif_csi_channel_set_v1(struct rkcif_stream *stream, struct csi_chan
         rkcif_write_register_or(dev, CIF_REG_MIPI_LVDS_INTEN, CSI_LINE_INTEN_RK3588(channel->id));
         wait_line = dev->wait_line;
     }
-    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID0_1, wait_line << 16 | wait_line);
-    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID2_3, wait_line << 16 | wait_line);
+    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID0_1, (wait_line << 16) | wait_line);
+    rkcif_write_register(dev, CIF_REG_MIPI_LVDS_LINE_INT_NUM_ID2_3, (wait_line << 16) | wait_line);
 
     rkcif_write_register_or(dev, CIF_REG_MIPI_LVDS_INTEN, CSI_DMA_END_INTEN(channel->id));
     if (stream->cifdev->id_use_cnt == 0) {
@@ -2478,7 +2479,6 @@ static void rkcif_stream_stop(struct rkcif_stream *stream)
                 rkcif_write_register_and(cif_dev, CIF_REG_MIPI_LVDS_CTRL, ~CSI_ENABLE_CAPTURE);
             }
         }
-
     } else {
         if (atomic_read(&cif_dev->pipe.stream_cnt) == 1) {
             val = rkcif_read_register(cif_dev, CIF_REG_DVP_CTRL);
@@ -2892,9 +2892,7 @@ static void rkcif_release_rdbk_buf(struct rkcif_stream *stream)
     rdbk_buf = dev->rdbk_buf[index];
     if (rdbk_buf) {
         if (rdbk_buf != stream->curr_buf && rdbk_buf != stream->next_buf) {
-
             has_added = false;
-
             list_for_each_entry(tmp_buf, &stream->buf_head, queue)
             {
                 if (tmp_buf == rdbk_buf) {
@@ -3381,7 +3379,6 @@ static int rkcif_sanity_check_fmt(struct rkcif_stream *stream, const struct v4l2
                                dev->active_sensor->mbus.type == V4L2_MBUS_CSI2_CPHY)) {
         if (crop->left > 0) {
             int align_x = get_csi_crop_align(stream->cif_fmt_in);
-
             if (align_x > 0 && crop->left % align_x != 0) {
                 v4l2_err(v4l2_dev, "ERROR: crop left must align %d\n", align_x);
                 return -EINVAL;
@@ -4159,10 +4156,10 @@ int rkcif_set_fmt(struct rkcif_stream *stream, struct v4l2_pix_format_mplane *pi
         if (fmt->fmt_type == CIF_FMT_TYPE_RAW && stream->is_compact &&
             (dev->active_sensor->mbus.type == V4L2_MBUS_CSI2_DPHY ||
              dev->active_sensor->mbus.type == V4L2_MBUS_CSI2_CPHY || dev->active_sensor->mbus.type == V4L2_MBUS_CCP2)) {
-            bpl = ALIGN(width * fmt->raw_bpp / 8, 256);
+            bpl = ALIGN(width * fmt->raw_bpp / 0x08, 0x100);
         } else {
             if (fmt->fmt_type == CIF_FMT_TYPE_RAW && stream->is_compact && dev->chip_id >= CHIP_RK3588_CIF) {
-                bpl = ALIGN(width * fmt->raw_bpp / 8, 256);
+                bpl = ALIGN(width * fmt->raw_bpp / 0x08, 0x100);
             } else {
                 bpp = rkcif_align_bits_per_pixel(stream, fmt, i);
                 bpl = width * bpp / CIF_YUV_STORED_BIT_WIDTH;
@@ -4450,7 +4447,7 @@ static int rkcif_enum_frameintervals(struct file *file, void *fh, struct v4l2_fr
     } else if (ret == -ENOIOCTLCMD) {
         /* Set a default value for sensors not implements ioctl */
         fi.interval.numerator = 1;
-        fi.interval.denominator = 30;
+        fi.interval.denominator = 0x1E;
     }
 
     fival->type = V4L2_FRMIVAL_TYPE_CONTINUOUS;
@@ -4515,12 +4512,13 @@ static int rkcif_g_fmt_vid_cap_mplane(struct file *file, void *fh, struct v4l2_f
 
 static int rkcif_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct rkcif_stream *stream = video_drvdata(file);
     struct device *dev = stream->cifdev->dev;
 
     strlcpy(cap->driver, dev->driver->name, sizeof(cap->driver));
     strlcpy(cap->card, dev->driver->name, sizeof(cap->card));
-    snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
+    ret = snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
 
     return 0;
 }
@@ -5275,7 +5273,7 @@ int rkcif_register_dvp_sof_subdev(struct rkcif_device *dev)
     v4l2_subdev_init(sd, &rkcif_dvp_sof_sd_ops);
     sd->owner = THIS_MODULE;
     sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE | V4L2_SUBDEV_FL_HAS_EVENTS;
-    snprintf(sd->name, sizeof(sd->name), "rkcif-dvp-sof");
+    ret = snprintf(sd->name, sizeof(sd->name), "rkcif-dvp-sof");
 
     v4l2_set_subdevdata(sd, subdev);
     ret = v4l2_device_register_subdev(v4l2_dev, sd);
@@ -5380,7 +5378,7 @@ void rkcif_irq_oneframe(struct rkcif_device *cif_dev)
             return;
         }
 
-        if (frmid % 2 != 0) {
+        if (frmid % 0x02 != 0) {
             stream->frame_phase = CIF_CSI_FRAME0_READY;
             if (stream->curr_buf) {
                 vb_done = &stream->curr_buf->vb;
@@ -5399,7 +5397,6 @@ void rkcif_irq_oneframe(struct rkcif_device *cif_dev)
          */
         rkcif_write_register(cif_dev, CIF_REG_DVP_FRAME_STATUS, cif_frmst & FRM0_STAT_CLS);
         ret = rkcif_assign_new_buffer_oneframe(stream, RKCIF_YUV_ADDR_STATE_UPDATE);
-
         if (vb_done && (!ret)) {
             vb_done->sequence = stream->frame_idx;
             rkcif_vb_done_oneframe(stream, vb_done);
@@ -5544,7 +5541,7 @@ static bool rkcif_is_csi2_err_trigger_reset(struct rkcif_timer *timer)
         if (timer->csi2_err_triggered_cnt >= 1) {
             cur_time = ktime_get_ns();
             diff_time = cur_time - timer->csi2_first_err_timestamp;
-            diff_time = div_u64(diff_time, 1000000);
+            diff_time = div_u64(diff_time, DIFF_TIME);
             if (diff_time >= timer->err_time_interval) {
                 is_triggered = true;
                 v4l2_info(&dev->v4l2_dev, "trigger reset for time out of csi err\n");
@@ -5639,17 +5636,17 @@ static void rkcif_cal_csi_crop_width_vwidth(struct rkcif_stream *stream, u32 raw
      * writing of ddr, aliged with 256
      */
     if (fmt->fmt_type == CIF_FMT_TYPE_RAW && stream->is_compact) {
-        *crop_vwidth = ALIGN(raw_width * fmt->raw_bpp / 8, 256);
+        *crop_vwidth = ALIGN(raw_width * fmt->raw_bpp / 0x08, 0x100);
     } else {
         if (fmt->fmt_type == CIF_FMT_TYPE_RAW) {
-            *crop_vwidth = ALIGN(raw_width * 2, 8);
+            *crop_vwidth = ALIGN(raw_width * 0x02, 0x08);
         } else {
-            *crop_vwidth = ALIGN(raw_width * fmt->bpp[0] / 8, 8);
+            *crop_vwidth = ALIGN(raw_width * fmt->bpp[0] / 0x08, 0x08);
         }
     }
 
     if (channel->fmt_val == CSI_WRDDR_TYPE_RGB888) {
-        *crop_width = raw_width * fmt->bpp[0] / 8;
+        *crop_width = raw_width * fmt->bpp[0] / 0x08;
     }
     /*
      * rk cif don't support output yuyv fmt data
@@ -5660,8 +5657,8 @@ static void rkcif_cal_csi_crop_width_vwidth(struct rkcif_stream *stream, u32 raw
     fourcc = stream->cif_fmt_out->fourcc;
     if (fourcc == V4L2_PIX_FMT_YUYV || fourcc == V4L2_PIX_FMT_YVYU || fourcc == V4L2_PIX_FMT_UYVY ||
         fourcc == V4L2_PIX_FMT_VYUY) {
-        *crop_width = 2 * raw_width;
-        *crop_vwidth *= 2;
+        *crop_width = 0x02 * raw_width;
+        *crop_vwidth *= 0x02;
     }
 }
 
@@ -5681,7 +5678,7 @@ static void rkcif_dynamic_crop(struct rkcif_stream *stream)
         struct csi_channel_info *channel = &cif_dev->channels[stream->id];
 
         if (channel->fmt_val == CSI_WRDDR_TYPE_RGB888) {
-            crop_x = 3 * stream->crop[CROP_SRC_ACT].left;
+            crop_x = 0x03 * stream->crop[CROP_SRC_ACT].left;
         } else {
             crop_x = stream->crop[CROP_SRC_ACT].left;
         }
@@ -5691,15 +5688,14 @@ static void rkcif_dynamic_crop(struct rkcif_stream *stream)
         crop_height = stream->crop[CROP_SRC_ACT].height;
 
         rkcif_cal_csi_crop_width_vwidth(stream, raw_width, &crop_width, &crop_vwidth);
-        rkcif_write_register(cif_dev, get_reg_index_of_id_crop_start(channel->id), crop_y << 16 | crop_x);
-        rkcif_write_register(cif_dev, get_reg_index_of_id_ctrl1(channel->id), crop_height << 16 | crop_width);
+        rkcif_write_register(cif_dev, get_reg_index_of_id_crop_start(channel->id), (crop_y << 0x10) | crop_x);
+        rkcif_write_register(cif_dev, get_reg_index_of_id_ctrl1(channel->id), (crop_height << 0x10) | crop_width);
 
         rkcif_write_register(cif_dev, get_reg_index_of_frm0_y_vlw(channel->id), crop_vwidth);
         rkcif_write_register(cif_dev, get_reg_index_of_frm1_y_vlw(channel->id), crop_vwidth);
         rkcif_write_register(cif_dev, get_reg_index_of_frm0_uv_vlw(channel->id), crop_vwidth);
         rkcif_write_register(cif_dev, get_reg_index_of_frm1_uv_vlw(channel->id), crop_vwidth);
     } else {
-
         raw_width = stream->crop[CROP_SRC_ACT].width;
         crop_width = raw_width;
         crop_vwidth = raw_width;
@@ -5707,7 +5703,7 @@ static void rkcif_dynamic_crop(struct rkcif_stream *stream)
         crop_x = stream->crop[CROP_SRC_ACT].left;
         crop_y = stream->crop[CROP_SRC_ACT].top;
 
-        rkcif_write_register(cif_dev, CIF_REG_DVP_CROP, crop_y << CIF_CROP_Y_SHIFT | crop_x);
+        rkcif_write_register(cif_dev, CIF_REG_DVP_CROP, (crop_y << CIF_CROP_Y_SHIFT) | crop_x);
 
         if (stream->cif_fmt_in->fmt_type == CIF_FMT_TYPE_RAW) {
             fmt = find_output_fmt(stream, stream->pixm.pixelformat);
@@ -5715,7 +5711,7 @@ static void rkcif_dynamic_crop(struct rkcif_stream *stream)
         }
         rkcif_write_register(cif_dev, CIF_REG_DVP_VIR_LINE_WIDTH, crop_vwidth);
 
-        rkcif_write_register(cif_dev, CIF_REG_DVP_SET_SIZE, crop_height << 16 | crop_width);
+        rkcif_write_register(cif_dev, CIF_REG_DVP_SET_SIZE, (crop_height << 0x10) | crop_width);
     }
 
     stream->crop_dyn_en = false;
@@ -5744,7 +5740,6 @@ static void rkcif_monitor_reset_event(struct rkcif_device *dev)
     timer->is_triggered = rkcif_is_triggered_monitoring(dev);
 
     if (timer->is_triggered) {
-
         struct v4l2_rect *raw_rect = &dev->terminal_sensor.raw_rect;
         enum rkcif_monitor_mode mode;
         s32 vblank = 0;
@@ -6074,7 +6069,6 @@ static void rkcif_deal_readout_time(struct rkcif_stream *stream)
 
     if ((cif_dev->hdr.hdr_mode == NO_HDR) && (stream->id == RKCIF_STREAM_MIPI_ID0)) {
         detect_stream->readout.early_time = stream->readout.fe_timestamp - stream->readout.wk_timestamp;
-
     } else if ((cif_dev->hdr.hdr_mode == HDR_X2) && (stream->id == RKCIF_STREAM_MIPI_ID1)) {
         detect_stream->readout.early_time = stream->readout.fe_timestamp - stream->readout.wk_timestamp;
         detect_stream->readout.total_time = stream->readout.fe_timestamp - detect_stream->readout.fe_timestamp;
@@ -6097,7 +6091,6 @@ static void rkcif_update_stream(struct rkcif_device *cif_dev, struct rkcif_strea
     int ret = 0;
 
     if (stream->frame_phase == (CIF_CSI_FRAME0_READY | CIF_CSI_FRAME1_READY)) {
-
         v4l2_err(&cif_dev->v4l2_dev, "stream[%d], frm0/frm1 end simultaneously,frm id:%d\n", stream->id,
                  stream->frame_idx);
 
@@ -6105,7 +6098,6 @@ static void rkcif_update_stream(struct rkcif_device *cif_dev, struct rkcif_strea
         return;
     }
     if (!stream->is_line_wake_up) {
-
         spin_lock_irqsave(&stream->fps_lock, flags);
         if (stream->frame_phase & CIF_CSI_FRAME0_READY) {
             if (stream->curr_buf) {
@@ -6157,7 +6149,6 @@ end:
 static void rkcif_update_stream_toisp(struct rkcif_device *cif_dev, struct rkcif_stream *stream, int mipi_id)
 {
     if (stream->frame_phase == (CIF_CSI_FRAME0_READY | CIF_CSI_FRAME1_READY)) {
-
         v4l2_err(&cif_dev->v4l2_dev, "stream[%d], frm0/frm1 end simultaneously,frm id:%d\n", stream->id,
                  stream->frame_idx);
 
@@ -6234,9 +6225,7 @@ static int rkcif_do_reset_work(struct rkcif_device *cif_dev, enum rkmodule_reset
         stream = &cif_dev->stream[i];
 
         if (stream->state == RKCIF_STATE_STREAMING) {
-
             v4l2_dbg(1, rkcif_debug, &cif_dev->v4l2_dev, "stream[%d] stopping\n", stream->id);
-
             stream->stopping = true;
 
             ret = wait_event_timeout(stream->wq_stopped, stream->state != RKCIF_STATE_STREAMING, msecs_to_jiffies(fps));
@@ -6269,12 +6258,9 @@ static int rkcif_do_reset_work(struct rkcif_device *cif_dev, enum rkmodule_reset
 
     on = 0;
     for (i = 0; i < p->num_subdevs; i++) {
-
         if (p->subdevs[i] == terminal_sensor->sd) {
-
             if (reset_src == RKCIF_RESET_SRC_ERR_CSI2 || reset_src == RKCIF_RESET_SRC_ERR_HOTPLUG ||
                 reset_src == RKICF_RESET_SRC_ERR_CUTOFF) {
-
                 ret = v4l2_subdev_call(p->subdevs[i], core, ioctl, RKMODULE_SET_QUICK_STREAM, &on);
                 if (ret) {
                     v4l2_err(&cif_dev->v4l2_dev, "quick stream off subdev:%s failed\n", p->subdevs[i]->name);
@@ -6337,11 +6323,8 @@ static int rkcif_do_reset_work(struct rkcif_device *cif_dev, enum rkmodule_reset
 
     on = 1;
     for (i = 0; i < p->num_subdevs; i++) {
-
         if (p->subdevs[i] == terminal_sensor->sd) {
-
             rkcif_set_sof(cif_dev, resume_info->frm_sync_seq);
-
             if (reset_src == RKCIF_RESET_SRC_ERR_CSI2 || reset_src == RKCIF_RESET_SRC_ERR_HOTPLUG ||
                 reset_src == RKICF_RESET_SRC_ERR_CUTOFF) {
                 ret = v4l2_subdev_call(p->subdevs[i], core, ioctl, RKMODULE_SET_QUICK_STREAM, &on);
@@ -6511,14 +6494,11 @@ void rkcif_reset_watchdog_timer_handler(struct timer_list *t)
     timer->run_cnt += 1;
 
     if (timer->last_buf_wakeup_cnt < dev->buf_wake_up_cnt) {
-
         v4l2_dbg(1, rkcif_debug, &dev->v4l2_dev, "info: frame end still update(%d, %d) in detecting cnt:%d, mode:%d\n",
                  timer->last_buf_wakeup_cnt, dev->buf_wake_up_cnt, timer->run_cnt, timer->monitor_mode);
 
         timer->last_buf_wakeup_cnt = dev->buf_wake_up_cnt;
-
         rkcif_is_reduced_frame_rate(dev);
-
         if (timer->monitor_mode == RKCIF_MONITOR_MODE_HOTPLUG) {
             ret = v4l2_subdev_call(terminal_sensor->sd, core, ioctl, RKMODULE_GET_VICAP_RST_INFO, &rst_info);
             if (ret) {
@@ -6564,16 +6544,12 @@ void rkcif_reset_watchdog_timer_handler(struct timer_list *t)
             }
         }
     } else if (timer->last_buf_wakeup_cnt == dev->buf_wake_up_cnt) {
-
         bool is_reduced = rkcif_is_reduced_frame_rate(dev);
-
         if (is_reduced) {
             mod_timer(&timer->timer, jiffies + timer->cycle);
             v4l2_info(&dev->v4l2_dev, "%s fps is reduced\n", __func__);
         } else {
-
             v4l2_info(&dev->v4l2_dev, "do reset work due to frame end is stopped, run_cnt:%d\n", timer->run_cnt);
-
             timer->reset_src = RKICF_RESET_SRC_ERR_CUTOFF;
             rkcif_init_reset_work(timer);
         }
@@ -6586,7 +6562,6 @@ end_detect:
     timer->is_triggered = false;
     timer->is_running = false;
     spin_unlock_irqrestore(&timer->timer_lock, flags);
-
     v4l2_info(&dev->v4l2_dev, "stream[%d] is stopped, stop reset detect!\n", dev->stream[i].id);
 }
 
@@ -7030,7 +7005,7 @@ void rkcif_irq_pingpong_v1(struct rkcif_device *cif_dev)
             return;
         }
 
-        if (intstat & CSI_FRAME0_START_ID0 || intstat & CSI_FRAME1_START_ID0) {
+        if ((intstat & CSI_FRAME0_START_ID0) || (intstat & CSI_FRAME1_START_ID0)) {
             rkcif_deal_sof(cif_dev);
         }
 
@@ -7137,7 +7112,7 @@ void rkcif_irq_pingpong_v1(struct rkcif_device *cif_dev)
 
         stream = &cif_dev->stream[RKCIF_STREAM_CIF];
 
-        if (intstat & DVP_FRAME0_START_ID0 || intstat & DVP_FRAME1_START_ID0) {
+        if ((intstat & DVP_FRAME0_START_ID0) || (intstat & DVP_FRAME1_START_ID0)) {
             rkcif_deal_sof(cif_dev);
         }
 
@@ -7163,7 +7138,6 @@ void rkcif_irq_pingpong_v1(struct rkcif_device *cif_dev)
 
         for (i = 0; i < RKCIF_MAX_STREAM_DVP; i++) {
             ch_id = rkcif_dvp_g_ch_id_by_fe(&cif_dev->v4l2_dev, intstat);
-
             if (ch_id < 0) {
                 continue;
             }
@@ -7269,7 +7243,7 @@ void rkcif_irq_pingpong(struct rkcif_device *cif_dev)
             v4l2_err(&cif_dev->v4l2_dev, "%s:ERR: double fs in one fs int\n", __func__);
         }
 
-        if (intstat & CSI_FRAME0_START_ID0 || intstat & CSI_FRAME1_START_ID0) {
+        if ((intstat & CSI_FRAME0_START_ID0) || (intstat & CSI_FRAME1_START_ID0)) {
             rkcif_deal_sof(cif_dev);
         }
 
@@ -7420,9 +7394,7 @@ void rkcif_irq_pingpong(struct rkcif_device *cif_dev)
         }
 
         if (cif_dev->chip_id <= CHIP_RK1808_CIF) {
-
             stream = &cif_dev->stream[RKCIF_STREAM_CIF];
-
             if ((intstat & FRAME_END)) {
                 struct vb2_v4l2_buffer *vb_done = NULL;
 
@@ -7446,7 +7418,6 @@ void rkcif_irq_pingpong(struct rkcif_device *cif_dev)
                 }
 
                 if (lastline != stream->pixm.height || (!(cif_frmst & CIF_F0_READY) && !(cif_frmst & CIF_F1_READY))) {
-
                     cif_dev->dvp_sof_in_oneframe = 1;
                     v4l2_err(&cif_dev->v4l2_dev, "Bad frame, pp irq:0x%x frmst:0x%x size:%dx%d\n", intstat, cif_frmst,
                              lastpix, lastline);
@@ -7474,7 +7445,6 @@ void rkcif_irq_pingpong(struct rkcif_device *cif_dev)
                 spin_unlock_irqrestore(&stream->fps_lock, flags);
 
                 ret = rkcif_assign_new_buffer_oneframe(stream, RKCIF_YUV_ADDR_STATE_UPDATE);
-
                 if (vb_done && (!ret)) {
                     vb_done->sequence = stream->frame_idx;
                     rkcif_vb_done_oneframe(stream, vb_done);
@@ -7485,7 +7455,6 @@ void rkcif_irq_pingpong(struct rkcif_device *cif_dev)
         } else {
             for (i = 0; i < RKCIF_MAX_STREAM_DVP; i++) {
                 ch_id = rkcif_dvp_g_ch_id(&cif_dev->v4l2_dev, &intstat, cif_frmst);
-
                 if (ch_id < 0) {
                     continue;
                 }

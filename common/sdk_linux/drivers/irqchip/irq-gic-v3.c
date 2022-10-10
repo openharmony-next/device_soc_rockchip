@@ -522,7 +522,6 @@ static int gic_irq_nmi_setup(struct irq_data *d)
     /* desc lock should already be held */
     if (gic_irq_in_rdist(d)) {
         u32 idx = gic_get_ppi_index(d);
-
         /* Setting up PPI as NMI, only switch handler for first NMI */
         if (!refcount_inc_not_zero(&ppi_nmi_refs[idx])) {
             refcount_set(&ppi_nmi_refs[idx], 1);
@@ -561,7 +560,6 @@ static void gic_irq_nmi_teardown(struct irq_data *d)
     /* desc lock should already be held */
     if (gic_irq_in_rdist(d)) {
         u32 idx = gic_get_ppi_index(d);
-
         /* Tearing down NMI, only switch handler for last NMI */
         if (refcount_dec_and_test(&ppi_nmi_refs[idx])) {
             desc->handle_irq = handle_percpu_devid_irq;
@@ -600,7 +598,6 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
     int ret;
 
     range = get_intid_range(d);
-
     /* Interrupt configuration for SGIs can't be changed */
     if (range == SGI_RANGE) {
         return type != IRQ_TYPE_EDGE_RISING ? -EINVAL : 0;
@@ -1653,36 +1650,36 @@ static bool gic_enable_quirk_hip06_07(void *data)
 }
 
 static const struct gic_quirk gic_quirks[] = {{
-                                                  .desc = "GICv3: Qualcomm MSM8996 broken firmware",
-                                                  .compatible = "qcom,msm8996-gic-v3",
-                                                  .init = gic_enable_quirk_msm8996,
-                                              },
-                                              {
-                                                  .desc = "GICv3: HIP06 erratum 161010803",
-                                                  .iidr = 0x0204043b,
-                                                  .mask = 0xffffffff,
-                                                  .init = gic_enable_quirk_hip06_07,
-                                              },
-                                              {
-                                                  .desc = "GICv3: HIP07 erratum 161010803",
-                                                  .iidr = 0x00000000,
-                                                  .mask = 0xffffffff,
-                                                  .init = gic_enable_quirk_hip06_07,
-                                              },
-                                              {
-                                                  /*
-                                                   * Reserved register accesses generate a Synchronous
-                                                   * External Abort. This erratum applies to:
-                                                   * - ThunderX: CN88xx
-                                                   * - OCTEON TX: CN83xx, CN81xx
-                                                   * - OCTEON TX2: CN93xx, CN96xx, CN98xx, CNF95xx*
-                                                   */
-                                                  .desc = "GICv3: Cavium erratum 38539",
-                                                  .iidr = 0xa000034c,
-                                                  .mask = 0xe8f00fff,
-                                                  .init = gic_enable_quirk_cavium_38539,
-                                              },
-                                              {}};
+    .desc = "GICv3: Qualcomm MSM8996 broken firmware",
+    .compatible = "qcom,msm8996-gic-v3",
+    .init = gic_enable_quirk_msm8996,
+},
+{
+    .desc = "GICv3: HIP06 erratum 161010803",
+    .iidr = 0x0204043b,
+    .mask = 0xffffffff,
+    .init = gic_enable_quirk_hip06_07,
+},
+{
+    .desc = "GICv3: HIP07 erratum 161010803",
+    .iidr = 0x00000000,
+    .mask = 0xffffffff,
+    .init = gic_enable_quirk_hip06_07,
+},
+{
+    /*
+    * Reserved register accesses generate a Synchronous
+    * External Abort. This erratum applies to:
+    * - ThunderX: CN88xx
+    * - OCTEON TX: CN83xx, CN81xx
+    * - OCTEON TX2: CN93xx, CN96xx, CN98xx, CNF95xx*
+    */
+    .desc = "GICv3: Cavium erratum 38539",
+    .iidr = 0xa000034c,
+    .mask = 0xe8f00fff,
+    .init = gic_enable_quirk_cavium_38539,
+},
+{}};
 
 static void gic_enable_nmi_support(void)
 {

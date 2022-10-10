@@ -506,7 +506,7 @@ static int cgroup_pidlist_show(struct seq_file *s, void *v)
     return 0;
 }
 
-static ssize_t __cgroup1_procs_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off,
+static ssize_t cgroup1_procs_write_func(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off,
                                      bool threadgroup)
 {
     struct cgroup *cgrp;
@@ -558,12 +558,12 @@ out_unlock:
 
 static ssize_t cgroup1_procs_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off)
 {
-    return __cgroup1_procs_write(of, buf, nbytes, off, true);
+    return cgroup1_procs_write_func(of, buf, nbytes, off, true);
 }
 
 static ssize_t cgroup1_tasks_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off)
 {
-    return __cgroup1_procs_write(of, buf, nbytes, off, false);
+    return cgroup1_procs_write_func(of, buf, nbytes, off, false);
 }
 
 static ssize_t cgroup_release_agent_write(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off)

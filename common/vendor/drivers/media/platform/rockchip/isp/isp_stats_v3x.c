@@ -67,10 +67,10 @@ static int rkisp_stats_get_rawawb_meas_reg(struct rkisp_isp_stats_vdev *stats_vd
     }
 
     pbuf->meas_type |= ISP3X_STAT_RAWAWB;
-    for (i = 0; i < ISP3X_RAWAWB_HSTBIN_NUM / 2; i++) {
-        value = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_Y_HIST01 + 4 * i, id);
-        pbuf->params.rawawb.ro_yhist_bin[2 * i] = value & 0xFFFF;
-        pbuf->params.rawawb.ro_yhist_bin[2 * i + 1] = (value & 0xFFFF0000) >> 16;
+    for (i = 0; i < ISP3X_RAWAWB_HSTBIN_NUM / 0x02; i++) {
+        value = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_Y_HIST01 + 0x04 * i, id);
+        pbuf->params.rawawb.ro_yhist_bin[0x02 * i] = value & 0xFFFF;
+        pbuf->params.rawawb.ro_yhist_bin[0x02 * i + 1] = (value & 0xFFFF0000) >> 0x10;
     }
 
     for (i = 0; i < ISP3X_RAWAWB_SUM_NUM; i++) {
@@ -87,7 +87,7 @@ static int rkisp_stats_get_rawawb_meas_reg(struct rkisp_isp_stats_vdev *stats_vd
         pbuf->params.rawawb.ro_rawawb_wp_num_big[i] =
             isp3_stats_read(stats_vdev, ISP3X_RAWAWB_WP_NUM_BIG_0 + 0x30 * i, id);
 
-        pbuf->params.rawawb.ro_wp_num2[i] = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_WPNUM2_0 + 4 * i, id);
+        pbuf->params.rawawb.ro_wp_num2[i] = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_WPNUM2_0 + 0x04 * i, id);
     }
 
     for (i = 0; i < ISP3X_RAWAWB_MULWD_NUM; i++) {
@@ -115,9 +115,9 @@ static int rkisp_stats_get_rawawb_meas_reg(struct rkisp_isp_stats_vdev *stats_vd
         lsb = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_RAM_DATA_BASE, id);
         msb = isp3_stats_read(stats_vdev, ISP3X_RAWAWB_RAM_DATA_BASE, id);
         pbuf->params.rawawb.ramdata[i].b = lsb & 0x3FFFF;
-        pbuf->params.rawawb.ramdata[i].g = ((lsb & 0xFFFC0000) >> 18) | (msb & 0xF) << 14;
-        pbuf->params.rawawb.ramdata[i].r = (msb & 0x3FFFF0) >> 4;
-        pbuf->params.rawawb.ramdata[i].wp = (msb & 0xFFC00000) >> 22;
+        pbuf->params.rawawb.ramdata[i].g = ((lsb & 0xFFFC0000) >> 0x12) | (msb & 0xF) << 0x0E;
+        pbuf->params.rawawb.ramdata[i].r = (msb & 0x3FFFF0) >> 0x04;
+        pbuf->params.rawawb.ramdata[i].wp = (msb & 0xFFC00000) >> 0x16;
     }
 
 out:
@@ -170,7 +170,7 @@ static int rkisp_stats_get_rawaebig_meas_reg(struct rkisp_isp_stats_vdev *stats_
         case 1:
             addr = ISP3X_RAWAE_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = ISP3X_RAWAE_BIG3_BASE;
             break;
         case 0:
@@ -191,15 +191,15 @@ static int rkisp_stats_get_rawaebig_meas_reg(struct rkisp_isp_stats_vdev *stats_
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumr[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMR + i * 4, id);
+        ae->sumr[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMR + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumg[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMG + i * 4, id);
+        ae->sumg[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMG + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumb[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMB + i * 4, id);
+        ae->sumb[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMB + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_MEAN_NUM; i++) {
@@ -224,7 +224,7 @@ static int rkisp_stats_get_rawhstbig_meas_reg(struct rkisp_isp_stats_vdev *stats
         case 1:
             addr = ISP3X_RAWHIST_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = ISP3X_RAWHIST_BIG3_BASE;
             break;
         case 0:
@@ -293,9 +293,9 @@ static int rkisp_stats_get_rawae2_meas_reg(struct rkisp_isp_stats_vdev *stats_vd
     int ret = 0;
 
     if (!pbuf) {
-        rkisp_stats_get_rawaebig_meas_reg(stats_vdev, NULL, 2, id);
+        rkisp_stats_get_rawaebig_meas_reg(stats_vdev, NULL, 0x02, id);
     } else {
-        ret = rkisp_stats_get_rawaebig_meas_reg(stats_vdev, &pbuf->params.rawae2, 2, id);
+        ret = rkisp_stats_get_rawaebig_meas_reg(stats_vdev, &pbuf->params.rawae2, 0x02, id);
         if (!ret) {
             pbuf->meas_type |= ISP3X_STAT_RAWAE2;
         }
@@ -310,9 +310,9 @@ static int rkisp_stats_get_rawhst2_meas_reg(struct rkisp_isp_stats_vdev *stats_v
     int ret = 0;
 
     if (!pbuf) {
-        rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, NULL, 2, id);
+        rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, NULL, 0x02, id);
     } else {
-        ret = rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, &pbuf->params.rawhist2, 2, id);
+        ret = rkisp_stats_get_rawhstbig_meas_reg(stats_vdev, &pbuf->params.rawhist2, 0x02, id);
         if (!ret) {
             pbuf->meas_type |= ISP3X_STAT_RAWHST2;
         }
@@ -375,7 +375,7 @@ static int rkisp_stats_get_rawaelite_meas_reg(struct rkisp_isp_stats_vdev *stats
     pbuf->meas_type |= ISP3X_STAT_RAWAE0;
     ae = &pbuf->params.rawae0;
     for (i = 0; i < ISP3X_RAWAELITE_MEAN_NUM; i++) {
-        value = isp3_stats_read(stats_vdev, ISP3X_RAWAE_LITE_RO_MEAN + 4 * i, id);
+        value = isp3_stats_read(stats_vdev, ISP3X_RAWAE_LITE_RO_MEAN + 0x04 * i, id);
         ae->data[i].channelg_xy = ISP3X_RAWAEBIG_GET_MEAN_G(value);
         ae->data[i].channelb_xy = ISP3X_RAWAEBIG_GET_MEAN_B(value);
         ae->data[i].channelr_xy = ISP3X_RAWAEBIG_GET_MEAN_R(value);
@@ -489,10 +489,10 @@ static int rkisp_stats_get_dhaz_stats(struct rkisp_isp_stats_vdev *stats_vdev, s
         dhaz->dhaz_adp_gratio = value >> 16;
         dhaz->dhaz_adp_tmax = value & 0xFFFF;
 
-        for (i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM / 2; i++) {
-            value = isp3_stats_read(stats_vdev, ISP3X_DHAZ_HIST_REG0 + 4 * i, id);
-            dhaz->h_rgb_iir[2 * i] = value & 0xFFFF;
-            dhaz->h_rgb_iir[2 * i + 1] = value >> 16;
+        for (i = 0; i < ISP3X_DHAZ_HIST_IIR_NUM / 0x02; i++) {
+            value = isp3_stats_read(stats_vdev, ISP3X_DHAZ_HIST_REG0 + 0x04 * i, id);
+            dhaz->h_rgb_iir[0x02 * i] = value & 0xFFFF;
+            dhaz->h_rgb_iir[0x02 * i + 1] = value >> 0x10;
         }
     }
     return 0;
@@ -539,43 +539,43 @@ static int rkisp_stats_get_rawawb_meas_ddr(struct rkisp_isp_stats_vdev *stats_vd
     raw_addr = stats_vdev->stats_buf[rd_buf_idx].vaddr + offs + 0x2b00;
     reg_addr = stats_vdev->stats_buf[rd_buf_idx].vaddr + offs + 0x2b00 + 0x710;
     for (i = 0; i < ISP3X_RAWAWB_SUM_NUM; i++) {
-        rawawb->ro_rawawb_sum_rgain_nor[i] = reg_addr[(0x20 * i + 0x0) / 4];
-        rawawb->ro_rawawb_sum_bgain_nor[i] = reg_addr[(0x20 * i + 0x4) / 4];
-        rawawb->ro_rawawb_wp_num_nor[i] = reg_addr[(0x20 * i + 0x8) / 4];
-        rawawb->ro_wp_num2[i] = reg_addr[(0x20 * i + 0xc) / 4];
-        rawawb->ro_rawawb_sum_rgain_big[i] = reg_addr[(0x20 * i + 0x10) / 4];
-        rawawb->ro_rawawb_sum_bgain_big[i] = reg_addr[(0x20 * i + 0x14) / 4];
-        rawawb->ro_rawawb_wp_num_big[i] = reg_addr[(0x20 * i + 0x18) / 4];
+        rawawb->ro_rawawb_sum_rgain_nor[i] = reg_addr[(0x20 * i + 0x0) / 0x04];
+        rawawb->ro_rawawb_sum_bgain_nor[i] = reg_addr[(0x20 * i + 0x4) / 0x04];
+        rawawb->ro_rawawb_wp_num_nor[i] = reg_addr[(0x20 * i + 0x8) / 0x04];
+        rawawb->ro_wp_num2[i] = reg_addr[(0x20 * i + 0xc) / 0x04];
+        rawawb->ro_rawawb_sum_rgain_big[i] = reg_addr[(0x20 * i + 0x10) / 0x04];
+        rawawb->ro_rawawb_sum_bgain_big[i] = reg_addr[(0x20 * i + 0x14) / 0x04];
+        rawawb->ro_rawawb_wp_num_big[i] = reg_addr[(0x20 * i + 0x18) / 0x04];
     }
 
-    for (i = 0; i < ISP3X_RAWAWB_HSTBIN_NUM / 2; i++) {
-        value = reg_addr[(0x04 * i + 0xE0) / 4];
-        rawawb->ro_yhist_bin[2 * i] = value & 0xFFFF;
-        rawawb->ro_yhist_bin[2 * i + 1] = (value & 0xFFFF0000) >> 16;
+    for (i = 0; i < ISP3X_RAWAWB_HSTBIN_NUM / 0x02; i++) {
+        value = reg_addr[(0x04 * i + 0xE0) / 0x04];
+        rawawb->ro_yhist_bin[0x02 * i] = value & 0xFFFF;
+        rawawb->ro_yhist_bin[0x02 * i + 1] = (value & 0xFFFF0000) >> 0x10;
     }
 
     for (i = 0; i < ISP3X_RAWAWB_MULWD_NUM; i++) {
-        rawawb->ro_sum_r_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF0) / 4];
-        rawawb->ro_sum_b_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF4) / 4];
-        rawawb->ro_wp_nm_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF8) / 4];
-        rawawb->ro_sum_r_big_multiwindow[i] = reg_addr[(0x20 * i + 0x100) / 4];
-        rawawb->ro_sum_b_big_multiwindow[i] = reg_addr[(0x20 * i + 0x104) / 4];
-        rawawb->ro_wp_nm_big_multiwindow[i] = reg_addr[(0x20 * i + 0x108) / 4];
+        rawawb->ro_sum_r_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF0) / 0x04];
+        rawawb->ro_sum_b_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF4) / 0x04];
+        rawawb->ro_wp_nm_nor_multiwindow[i] = reg_addr[(0x20 * i + 0xF8) / 0x04];
+        rawawb->ro_sum_r_big_multiwindow[i] = reg_addr[(0x20 * i + 0x100) / 0x04];
+        rawawb->ro_sum_b_big_multiwindow[i] = reg_addr[(0x20 * i + 0x104) / 0x04];
+        rawawb->ro_wp_nm_big_multiwindow[i] = reg_addr[(0x20 * i + 0x108) / 0x04];
     }
 
     for (i = 0; i < ISP3X_RAWAWB_EXCL_STAT_NUM; i++) {
-        rawawb->ro_sum_r_exc[i] = reg_addr[(0x10 * i + 0x170) / 4];
-        rawawb->ro_sum_b_exc[i] = reg_addr[(0x10 * i + 0x174) / 4];
-        rawawb->ro_wp_nm_exc[i] = reg_addr[(0x10 * i + 0x178) / 4];
+        rawawb->ro_sum_r_exc[i] = reg_addr[(0x10 * i + 0x170) / 0x04];
+        rawawb->ro_sum_b_exc[i] = reg_addr[(0x10 * i + 0x174) / 0x04];
+        rawawb->ro_wp_nm_exc[i] = reg_addr[(0x10 * i + 0x178) / 0x04];
     }
 
     for (i = 0; i < ISP3X_RAWAWB_RAMDATA_NUM; i++) {
-        lsb = raw_addr[2 * i];
-        msb = raw_addr[2 * i + 1];
+        lsb = raw_addr[0x02 * i];
+        msb = raw_addr[0x02 * i + 1];
         rawawb->ramdata[i].b = lsb & 0x3FFFF;
-        rawawb->ramdata[i].g = ((lsb & 0xFFFC0000) >> 18) | (msb & 0xF) << 14;
-        rawawb->ramdata[i].r = (msb & 0x3FFFF0) >> 4;
-        rawawb->ramdata[i].wp = (msb & 0xFFC00000) >> 22;
+        rawawb->ramdata[i].g = ((lsb & 0xFFFC0000) >> 0x12) | (msb & 0xF) << 0x0E;
+        rawawb->ramdata[i].r = (msb & 0x3FFFF0) >> 0x04;
+        rawawb->ramdata[i].wp = (msb & 0xFFC00000) >> 0x16;
     }
 
 out:
@@ -612,10 +612,10 @@ static int rkisp_stats_get_rawaf_meas_ddr(struct rkisp_isp_stats_vdev *stats_vde
     af->highlit_cnt_winb = isp3_stats_read(stats_vdev, ISP3X_RAWAF_HIGHLIT_CNT_WINB, id);
 
     for (i = 0; i < ISP3X_RAWAF_SUMDATA_NUM; i++) {
-        af->ramdata[i].v1 = ddr_addr[i * 4];
-        af->ramdata[i].v2 = ddr_addr[i * 4 + 1];
-        af->ramdata[i].h1 = ddr_addr[i * 4 + 2];
-        af->ramdata[i].h2 = ddr_addr[i * 4 + 3];
+        af->ramdata[i].v1 = ddr_addr[i * 0x04];
+        af->ramdata[i].v2 = ddr_addr[i * 0x04 + 1];
+        af->ramdata[i].h1 = ddr_addr[i * 0x04 + 0x02];
+        af->ramdata[i].h2 = ddr_addr[i * 0x04 + 0x03];
     }
 
 out:
@@ -636,11 +636,11 @@ static int rkisp_stats_get_rawaebig_meas_ddr(struct rkisp_isp_stats_vdev *stats_
     switch (blk_no) {
         case 1:
             addr = RAWAE_BIG2_BASE;
-            ddr_addr += 0x0390 >> 2;
+            ddr_addr += 0x0390 >> 0x02;
             break;
-        case 2:
+        case 0x02:
             addr = RAWAE_BIG3_BASE;
-            ddr_addr += 0x0720 >> 2;
+            ddr_addr += 0x0720 >> 0x02;
             break;
         default:
             addr = RAWAE_BIG1_BASE;
@@ -659,15 +659,15 @@ static int rkisp_stats_get_rawaebig_meas_ddr(struct rkisp_isp_stats_vdev *stats_
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumr[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMR + i * 4, id);
+        ae->sumr[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMR + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumg[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMG + i * 4, id);
+        ae->sumg[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMG + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_SUBWIN_NUM; i++) {
-        ae->sumb[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMB + i * 4, id);
+        ae->sumb[i] = isp3_stats_read(stats_vdev, addr + ISP3X_RAWAE_BIG_WND1_SUMB + i * 0x04, id);
     }
 
     for (i = 0; i < ISP3X_RAWAEBIG_MEAN_NUM; i++) {
@@ -693,11 +693,11 @@ static int rkisp_stats_get_rawhstbig_meas_ddr(struct rkisp_isp_stats_vdev *stats
 
     switch (blk_no) {
         case 1:
-            ddr_addr += 0x0800 >> 2;
+            ddr_addr += 0x0800 >> 0x02;
             addr = ISP3X_RAWHIST_BIG2_BASE;
             break;
-        case 2:
-            ddr_addr += 0x0C00 >> 2;
+        case 0x02:
+            ddr_addr += 0x0C00 >> 0x02;
             addr = ISP3X_RAWHIST_BIG3_BASE;
             break;
         case 0:
@@ -766,9 +766,9 @@ static int rkisp_stats_get_rawae2_meas_ddr(struct rkisp_isp_stats_vdev *stats_vd
     int ret = 0;
 
     if (!pbuf) {
-        rkisp_stats_get_rawaebig_meas_ddr(stats_vdev, NULL, 2, id);
+        rkisp_stats_get_rawaebig_meas_ddr(stats_vdev, NULL, 0x02, id);
     } else {
-        ret = rkisp_stats_get_rawaebig_meas_ddr(stats_vdev, &pbuf->params.rawae2, 2, id);
+        ret = rkisp_stats_get_rawaebig_meas_ddr(stats_vdev, &pbuf->params.rawae2, 0x02, id);
         if (!ret) {
             pbuf->meas_type |= ISP3X_STAT_RAWAE2;
         }
@@ -783,9 +783,9 @@ static int rkisp_stats_get_rawhst2_meas_ddr(struct rkisp_isp_stats_vdev *stats_v
     int ret = 0;
 
     if (!pbuf) {
-        rkisp_stats_get_rawhstbig_meas_ddr(stats_vdev, NULL, 2, id);
+        rkisp_stats_get_rawhstbig_meas_ddr(stats_vdev, NULL, 0x02, id);
     } else {
-        ret = rkisp_stats_get_rawhstbig_meas_ddr(stats_vdev, &pbuf->params.rawhist2, 2, id);
+        ret = rkisp_stats_get_rawhstbig_meas_ddr(stats_vdev, &pbuf->params.rawhist2, 0x02, id);
         if (!ret) {
             pbuf->meas_type |= ISP3X_STAT_RAWHST2;
         }
@@ -919,7 +919,7 @@ static void rkisp_merge_dual_dhaz_params(struct rkisp_isp_stats_vdev *stats_vdev
     u32 num = isp3_stats_read(stats_vdev, ISP3X_DHAZ_IIR0, 0) & 0x1f;
 
     if (!left_stat || !right_stat || !(left_stat->meas_type & ISP3X_STAT_DHAZ) ||
-        !(right_stat->meas_type & ISP3X_STAT_DHAZ) || !(isp3_stats_read(stats_vdev, ISP3X_DHAZ_CTRL, 0) & BIT(25))) {
+        !(right_stat->meas_type & ISP3X_STAT_DHAZ) || !(isp3_stats_read(stats_vdev, ISP3X_DHAZ_CTRL, 0) & BIT(0x19))) {
         return;
     }
 
@@ -933,47 +933,50 @@ static void rkisp_merge_dual_dhaz_params(struct rkisp_isp_stats_vdev *stats_vdev
         return;
     }
 
-    val = ISP_PACK_2SHORT((l_dhaz->dhaz_adp_wt + r_dhaz->dhaz_adp_wt) / 2,
-                          (l_dhaz->dhaz_adp_air_base + r_dhaz->dhaz_adp_air_base) / 2);
+    val = ISP_PACK_2SHORT((l_dhaz->dhaz_adp_wt + r_dhaz->dhaz_adp_wt) / 0x02,
+                          (l_dhaz->dhaz_adp_air_base + r_dhaz->dhaz_adp_air_base) / 0x02);
     isp3_stats_write(stats_vdev, ISP3X_DHAZ_ADT_WR0, val, 0);
     isp3_stats_write(stats_vdev, ISP3X_DHAZ_ADT_WR0, val, 1);
 
-    val = ISP_PACK_2SHORT((l_dhaz->dhaz_adp_tmax + r_dhaz->dhaz_adp_tmax) / 2,
-                          (l_dhaz->dhaz_adp_gratio + r_dhaz->dhaz_adp_gratio) / 2);
+    val = ISP_PACK_2SHORT((l_dhaz->dhaz_adp_tmax + r_dhaz->dhaz_adp_tmax) / 0x02,
+                          (l_dhaz->dhaz_adp_gratio + r_dhaz->dhaz_adp_gratio) / 0x02);
     isp3_stats_write(stats_vdev, ISP3X_DHAZ_ADT_WR1, val, 0);
     isp3_stats_write(stats_vdev, ISP3X_DHAZ_ADT_WR1, val, 1);
 
     num = min_t(u32, num, left_stat->frame_id + 1);
-    pic_sumh = l_dhaz->dhaz_pic_sumh + r_dhaz->dhaz_pic_sumh;
-    for (i = 0; i < ISP3X_DHAZ_HIST_WR_NUM / 3; i++) {
-        hist_out0 =
-            (l_dhaz->h_rgb_iir[i * 3] * l_dhaz->dhaz_pic_sumh + r_dhaz->h_rgb_iir[i * 3] * r_dhaz->dhaz_pic_sumh) /
-            pic_sumh;
-        hist_out0 = (dhaz_cfg->hist_wr[i * 3] * (num - 1) + hist_out0) / num;
-        dhaz_cfg->hist_wr[i * 3] = hist_out0;
-
-        hist_out1 = (l_dhaz->h_rgb_iir[i * 3 + 1] * l_dhaz->dhaz_pic_sumh +
-                     r_dhaz->h_rgb_iir[i * 3 + 1] * r_dhaz->dhaz_pic_sumh) /
-                    pic_sumh;
-        hist_out1 = (dhaz_cfg->hist_wr[i * 3 + 1] * (num - 1) + hist_out1) / num;
-        dhaz_cfg->hist_wr[i * 3 + 1] = hist_out1;
-
-        hist_out2 = (l_dhaz->h_rgb_iir[i * 3 + 2] * l_dhaz->dhaz_pic_sumh +
-                     r_dhaz->h_rgb_iir[i * 3 + 2] * r_dhaz->dhaz_pic_sumh) /
-                    pic_sumh;
-        hist_out2 = (dhaz_cfg->hist_wr[i * 3 + 2] * (num - 1) + hist_out2) / num;
-        dhaz_cfg->hist_wr[i * 3 + 2] = hist_out2;
-
-        val = hist_out0 | hist_out1 << 10 | hist_out2 << 20;
-        isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 4, val, 0);
-        isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 4, val, 1);
+    if (num == 0) {
+        return;
     }
-    val = (l_dhaz->h_rgb_iir[i * 3] * l_dhaz->dhaz_pic_sumh + r_dhaz->h_rgb_iir[i * 3] * r_dhaz->dhaz_pic_sumh) /
+    pic_sumh = l_dhaz->dhaz_pic_sumh + r_dhaz->dhaz_pic_sumh;
+    for (i = 0; i < ISP3X_DHAZ_HIST_WR_NUM / 0x03; i++) {
+        hist_out0 =
+            (l_dhaz->h_rgb_iir[i * 0x03] * l_dhaz->dhaz_pic_sumh + r_dhaz->h_rgb_iir[i * 0x03] * \
+             r_dhaz->dhaz_pic_sumh) / pic_sumh;
+        hist_out0 = (dhaz_cfg->hist_wr[i * 0x03] * (num - 1) + hist_out0) / num;
+        dhaz_cfg->hist_wr[i * 0x03] = hist_out0;
+
+        hist_out1 = (l_dhaz->h_rgb_iir[i * 0x03 + 1] * l_dhaz->dhaz_pic_sumh +
+                     r_dhaz->h_rgb_iir[i * 0x03 + 1] * r_dhaz->dhaz_pic_sumh) /
+                    pic_sumh;
+        hist_out1 = (dhaz_cfg->hist_wr[i * 0x03 + 1] * (num - 1) + hist_out1) / num;
+        dhaz_cfg->hist_wr[i * 0x03 + 1] = hist_out1;
+
+        hist_out2 = (l_dhaz->h_rgb_iir[i * 0x03 + 0x02] * l_dhaz->dhaz_pic_sumh +
+                     r_dhaz->h_rgb_iir[i * 0x03 + 0x02] * r_dhaz->dhaz_pic_sumh) /
+                    pic_sumh;
+        hist_out2 = (dhaz_cfg->hist_wr[i * 0x03 + 0x02] * (num - 1) + hist_out2) / num;
+        dhaz_cfg->hist_wr[i * 0x03 + 0x02] = hist_out2;
+
+        val = (hist_out0) | (hist_out1 << 0x0A) | (hist_out2 << 0x14);
+        isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 0x04, val, 0);
+        isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 0x04, val, 1);
+    }
+    val = (l_dhaz->h_rgb_iir[i * 0x03] * l_dhaz->dhaz_pic_sumh + r_dhaz->h_rgb_iir[i * 0x03] * r_dhaz->dhaz_pic_sumh) /
           pic_sumh;
-    val = (dhaz_cfg->hist_wr[i * 3] * (num - 1) + val) / num;
-    dhaz_cfg->hist_wr[i * 3] = val;
-    isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 4, val, 0);
-    isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 4, val, 1);
+    val = (dhaz_cfg->hist_wr[i * 0x03] * (num - 1) + val) / num;
+    dhaz_cfg->hist_wr[i * 0x03] = val;
+    isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 0x04, val, 0);
+    isp3_stats_write(stats_vdev, ISP3X_DHAZ_HIST_WR0 + i * 0x04, val, 1);
 }
 
 static void rkisp_stats_send_meas_v3x(struct rkisp_isp_stats_vdev *stats_vdev, struct rkisp_isp_readout_work *meas_work)
@@ -1061,7 +1064,7 @@ static void rkisp_stats_send_meas_v3x(struct rkisp_isp_stats_vdev *stats_vdev, s
     if (stats_vdev->dev->hw_dev->is_unite) {
         struct rkisp3x_isp_stat_buffer *left_stat = cur_stat_buf;
 
-        size *= 2;
+        size *= 0x02;
         if (cur_buf) {
             cur_stat_buf++;
             cur_stat_buf->frame_id = cur_frame_id;

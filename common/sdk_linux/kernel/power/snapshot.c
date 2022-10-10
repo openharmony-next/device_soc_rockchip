@@ -1908,7 +1908,6 @@ err_out:
 static unsigned int count_pages_for_highmem(unsigned int nr_highmem)
 {
     unsigned int free_highmem = count_free_highmem_pages() + alloc_highmem;
-
     if (free_highmem >= nr_highmem) {
         nr_highmem = 0;
     } else {
@@ -1962,7 +1961,6 @@ static inline int get_highmem_buffer(int safe_needed)
 static inline unsigned int alloc_highmem_pages(struct memory_bitmap *bm, unsigned int nr_highmem)
 {
     unsigned int to_alloc = count_free_highmem_pages();
-
     if (to_alloc > nr_highmem) {
         to_alloc = nr_highmem;
     }
@@ -2621,7 +2619,6 @@ static void *get_buffer(struct memory_bitmap *bm, struct chain_allocator *ca)
     struct pbe *pbe;
     struct page *page;
     unsigned long pfn = memory_bm_next_pfn(bm);
-
     if (pfn == BM_END_OF_MAP) {
         return ERR_PTR(-EFAULT);
     }

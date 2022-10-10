@@ -343,7 +343,7 @@ static void rockchip_u3phy_rest_deassert(struct rockchip_u3phy *u3phy, unsigned 
     }
 
     if (flag & U3PHY_POR_RST) {
-        usleep_range(12, 15);
+        usleep_range(0x0C, 0x0F);
         dev_dbg(u3phy->dev, "deassert u2 and u3 phy power on reset\n");
         for (rst = U3_POR_RSTN; rst <= U2_POR_RSTN; rst++) {
             if (u3phy->rsts[rst]) {
@@ -353,7 +353,7 @@ static void rockchip_u3phy_rest_deassert(struct rockchip_u3phy *u3phy, unsigned 
     }
 
     if (flag & U3PHY_MAC_RST) {
-        usleep_range(1200, 1500);
+        usleep_range(0x4B0, 0x5DC);
         dev_dbg(u3phy->dev, "deassert pipe and utmi MAC reset\n");
         for (rst = PIPE_MAC_RSTN; rst <= UTMI_MAC_RSTN; rst++) {
             if (u3phy->rsts[rst]) {
@@ -447,11 +447,11 @@ static int rockchip_u3phy_power_on(struct phy *phy)
 
         /* exit to p0 */
         param_write(u3phy->u3phy_grf, &u3phy->cfgs->grfcfg.pp_pwr_en[PIPE_PWR_P0], true);
-        usleep_range(90, 100);
+        usleep_range(0x5A, 0x64);
 
         /* enter to p2 from p0 */
         param_write(u3phy->u3phy_grf, &u3phy->cfgs->grfcfg.pp_pwr_en[PIPE_PWR_P2], false);
-        udelay(3);
+        udelay(0x03);
     }
 
 done:
@@ -481,11 +481,11 @@ static int rockchip_u3phy_power_off(struct phy *phy)
 
         /* exit to p0 */
         param_write(u3phy->u3phy_grf, &u3phy->cfgs->grfcfg.pp_pwr_en[PIPE_PWR_P0], true);
-        udelay(2);
+        udelay(0x02);
 
         /* enter to p3 from p0 */
         param_write(u3phy->u3phy_grf, &u3phy->cfgs->grfcfg.pp_pwr_en[PIPE_PWR_P3], true);
-        udelay(6);
+        udelay(0x06);
 
         if (u3phy->cfgs->phy_pipe_power) {
             dev_dbg(u3phy->dev, "do pipe power down\n");
@@ -844,7 +844,7 @@ static int rockchip_u3phy_probe(struct platform_device *pdev)
         return PTR_ERR(u3phy->grf);
     }
 
-    if (of_property_read_u32_array(np, "reg", reg, 2)) {
+    if (of_property_read_u32_array(np, "reg", reg, 0x02)) {
         dev_err(dev, "the reg property is not assigned in %s node\n", np->name);
         return -EINVAL;
     }
@@ -934,47 +934,47 @@ static int rk3328_u3phy_pipe_power(struct rockchip_u3phy *u3phy, struct rockchip
 
     if (on) {
         reg = readl(u3phy_port->base + 0x1a8);
-        reg &= ~BIT(4); /* ldo power up */
+        reg &= ~BIT(0x04); /* ldo power up */
         writel(reg, u3phy_port->base + 0x1a8);
 
         reg = readl(u3phy_port->base + 0x044);
-        reg &= ~BIT(4); /* bg power on */
+        reg &= ~BIT(0x04); /* bg power on */
         writel(reg, u3phy_port->base + 0x044);
 
         reg = readl(u3phy_port->base + 0x150);
-        reg |= BIT(6); /* tx bias enable */
+        reg |= BIT(0x06); /* tx bias enable */
         writel(reg, u3phy_port->base + 0x150);
 
         reg = readl(u3phy_port->base + 0x080);
-        reg &= ~BIT(2); /* tx cm power up */
+        reg &= ~BIT(0x02); /* tx cm power up */
         writel(reg, u3phy_port->base + 0x080);
 
         reg = readl(u3phy_port->base + 0x0c0);
         /* tx obs enable and rx cm enable */
-        reg |= (BIT(3) | BIT(4));
+        reg |= (BIT(0x03) | BIT(0x04));
         writel(reg, u3phy_port->base + 0x0c0);
 
         udelay(1);
     } else {
         reg = readl(u3phy_port->base + 0x1a8);
-        reg |= BIT(4); /* ldo power down */
+        reg |= BIT(0x04); /* ldo power down */
         writel(reg, u3phy_port->base + 0x1a8);
 
         reg = readl(u3phy_port->base + 0x044);
-        reg |= BIT(4); /* bg power down */
+        reg |= BIT(0x04); /* bg power down */
         writel(reg, u3phy_port->base + 0x044);
 
         reg = readl(u3phy_port->base + 0x150);
-        reg &= ~BIT(6); /* tx bias disable */
+        reg &= ~BIT(0x06); /* tx bias disable */
         writel(reg, u3phy_port->base + 0x150);
 
         reg = readl(u3phy_port->base + 0x080);
-        reg |= BIT(2); /* tx cm power down */
+        reg |= BIT(0x02); /* tx cm power down */
         writel(reg, u3phy_port->base + 0x080);
 
         reg = readl(u3phy_port->base + 0x0c0);
         /* tx obs disable and rx cm disable */
-        reg &= ~(BIT(3) | BIT(4));
+        reg &= ~(BIT(0x03) | BIT(0x04));
         writel(reg, u3phy_port->base + 0x0c0);
     }
 
@@ -1028,7 +1028,7 @@ static int rk3328_u3phy_tuning(struct rockchip_u3phy *u3phy, struct rockchip_u3p
         }
 
         /* Enable SSC */
-        udelay(3);
+        udelay(0x03);
         writel(0x08, u3phy_port->base + 0x000);
         writel(0x0c, u3phy_port->base + 0x120);
 

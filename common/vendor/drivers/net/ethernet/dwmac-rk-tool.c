@@ -46,7 +46,7 @@ struct dwmac_rk_hdr {
     u32 id;
     int tx;
     int rx;
-} __packed;
+} packed;
 
 struct dwmac_rk_lb_priv {
     /* desc && buffer */
@@ -293,7 +293,7 @@ static int dwmac_rk_set_loopback(struct stmmac_priv *priv, int type, int speed, 
             ret = -EOPNOTSUPP;
     }
 
-    usleep_range(100000, 200000);
+    usleep_range(0x186A0, 0x30D40);
     return ret;
 }
 
@@ -304,7 +304,7 @@ static inline void dwmac_rk_ether_addr_copy(u8 *dst, const u8 *src)
 
     a[0] = b[0];
     a[1] = b[1];
-    a[2] = b[2];
+    a[0x02] = b[0x02];
 }
 
 static void dwmac_rk_udp4_hwcsum(struct sk_buff *skb, __be32 src, __be32 dst)
@@ -385,7 +385,7 @@ static struct sk_buff *dwmac_rk_get_skb(struct stmmac_priv *priv, struct dwmac_r
 
         thdr->source = htons(attr->sport);
         thdr->dest = htons(attr->dport);
-        thdr->doff = sizeof(struct tcphdr) / 4;
+        thdr->doff = sizeof(struct tcphdr) / 0x04;
         thdr->check = 0;
     } else {
         if (!uhdr) {
@@ -399,9 +399,9 @@ static struct sk_buff *dwmac_rk_get_skb(struct stmmac_priv *priv, struct dwmac_r
         uhdr->check = 0;
     }
 
-    ihdr->ihl = 5;
-    ihdr->ttl = 32;
-    ihdr->version = 4;
+    ihdr->ihl = 0x05;
+    ihdr->ttl = 0x20;
+    ihdr->version = 0x04;
     if (attr->tcp) {
         ihdr->protocol = IPPROTO_TCP;
     } else {
@@ -489,7 +489,7 @@ static int dwmac_rk_loopback_validate(struct stmmac_priv *priv, struct dwmac_rk_
             goto out;
         }
 
-        thdr = (struct tcphdr *)((u8 *)ihdr + 4 * ihdr->ihl);
+        thdr = (struct tcphdr *)((u8 *)ihdr + 0x04 * ihdr->ihl);
         if (thdr->dest != htons(lb_priv->packet->dport)) {
             goto out;
         }
@@ -500,7 +500,7 @@ static int dwmac_rk_loopback_validate(struct stmmac_priv *priv, struct dwmac_rk_
             goto out;
         }
 
-        uhdr = (struct udphdr *)((u8 *)ihdr + 4 * ihdr->ihl);
+        uhdr = (struct udphdr *)((u8 *)ihdr + 0x04 * ihdr->ihl);
         if (uhdr->dest != htons(lb_priv->packet->dport)) {
             goto out;
         }
@@ -635,7 +635,7 @@ static int dwmac_rk_get_desc_status(struct stmmac_priv *priv, struct dwmac_rk_lb
         return -EBUSY;
     }
 
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     return 0;
 }
@@ -699,7 +699,7 @@ dma_map_err:
     return -EFAULT;
 }
 
-static int __dwmac_rk_loopback_run(struct stmmac_priv *priv, struct dwmac_rk_lb_priv *lb_priv)
+static int dwmac_rk_loopback_run_first(struct stmmac_priv *priv, struct dwmac_rk_lb_priv *lb_priv)
 {
     u32 rx_channels_count = min_t(u32, priv->plat->rx_queues_to_use, 1);
     u32 tx_channels_count = min_t(u32, priv->plat->tx_queues_to_use, 1);
@@ -710,11 +710,11 @@ static int __dwmac_rk_loopback_run(struct stmmac_priv *priv, struct dwmac_rk_lb_
     bool finish = false;
 
     if (lb_priv->speed == LOOPBACK_SPEED1000) {
-        delay = 10;
+        delay = 0x0A;
     } else if (lb_priv->speed == LOOPBACK_SPEED100) {
-        delay = 20;
+        delay = 0x14;
     } else if (lb_priv->speed == LOOPBACK_SPEED10) {
-        delay = 50;
+        delay = 0x32;
     } else {
         return -EPERM;
     }
@@ -745,7 +745,7 @@ static int __dwmac_rk_loopback_run(struct stmmac_priv *priv, struct dwmac_rk_lb_
     }
 
     do {
-        usleep_range(100, 150);
+        usleep_range(0x64, 0x96);
         delay--;
         if (priv->plat->has_gmac4) {
             status = readl(priv->ioaddr + DMA_CHAN_STATUS(0));
@@ -774,7 +774,7 @@ stop:
 
     stmmac_mac_set(priv, priv->ioaddr, false);
     /* wait for state machine is disabled */
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     dwmac_rk_tx_clean(priv, lb_priv);
     dwmac_rk_rx_clean(priv, lb_priv);
@@ -791,7 +791,7 @@ static int dwmac_rk_loopback_with_identify(struct stmmac_priv *priv, struct dwma
     lb_priv->packet = &dwmac_rk_tcp_attr;
     dwmac_rk_set_rgmii_delayline(priv, tx, rx);
 
-    return __dwmac_rk_loopback_run(priv, lb_priv);
+    return dwmac_rk_loopback_run_first(priv, lb_priv);
 }
 
 static inline bool dwmac_rk_delayline_is_txvalid(struct dwmac_rk_lb_priv *lb_priv, int tx)
@@ -840,7 +840,7 @@ static int dwmac_rk_delayline_scan_cross(struct stmmac_priv *priv, struct dwmac_
 
             /* look for tx_mid */
             if ((tx_right - tx_left) > SCAN_VALID_RANGE) {
-                tx_mid = (tx_right + tx_left) / 2;
+                tx_mid = (tx_right + tx_left) / 0x02;
                 break;
             }
         }
@@ -865,7 +865,7 @@ static int dwmac_rk_delayline_scan_cross(struct stmmac_priv *priv, struct dwmac_
 
         if ((rx_down - rx_up) > SCAN_VALID_RANGE) {
             /* Now get the rx_mid */
-            rx_mid = (rx_up + rx_down) / 2;
+            rx_mid = (rx_up + rx_down) / 0x02;
         } else {
             rx_index += SCAN_STEP;
             rx_mid = 0;
@@ -1094,6 +1094,9 @@ static void dwmac_rk_dma_operation_mode(struct stmmac_priv *priv, struct dwmac_r
     }
 
     /* Adjust for real per queue fifo size */
+    if (rx_channels_count == 0 || tx_channels_count == 0) {
+        return;
+    }
     rxfifosz /= rx_channels_count;
     txfifosz /= tx_channels_count;
 
@@ -1166,12 +1169,12 @@ static int dwmac_rk_init(struct net_device *dev, struct dwmac_rk_lb_priv *lb_pri
     int ret;
     u32 mode;
 
-    lb_priv->dma_buf_sz = 1536; /* mtu 1500 size */
+    lb_priv->dma_buf_sz = 0x600; /* mtu 1500 size */
 
     if (priv->plat->has_gmac4) {
         lb_priv->buf_sz = priv->dma_cap.rx_fifo_size; /* rx fifo size */
     } else {
-        lb_priv->buf_sz = 4096; /* rx fifo size */
+        lb_priv->buf_sz = 0x1000; /* rx fifo size */
     }
 
     ret = dwmac_rk_alloc_dma_desc_resources(priv, lb_priv);
@@ -1266,12 +1269,12 @@ static int dwmac_rk_phy_poll_reset(struct stmmac_priv *priv, int addr)
     mdiobus_write(priv->mii, addr, MII_BMCR, val | BMCR_RESET);
 
     do {
-        msleep(50);
+        msleep(0x32);
         ret = mdiobus_read(priv->mii, addr, MII_BMCR);
         if (ret < 0) {
             return ret;
         }
-    } while (ret & BMCR_RESET && --retries);
+    } while ((ret & BMCR_RESET) && --retries);
     if (ret & BMCR_RESET) {
         return -ETIMEDOUT;
     }
@@ -1322,7 +1325,7 @@ static int dwmac_rk_loopback_run(struct stmmac_priv *priv, struct dwmac_rk_lb_pr
         }
     }
     /* wait for phy and controller ready */
-    usleep_range(100000, 200000);
+    usleep_range(0x186A0, 0x30D40);
 
     dwmac_rk_set_loopback(priv, lb_priv->type, lb_priv->speed, true, phy_addr, true);
 
@@ -1347,7 +1350,7 @@ static int dwmac_rk_loopback_run(struct stmmac_priv *priv, struct dwmac_rk_lb_pr
         lb_priv->rx = 0;
 
         lb_priv->packet = &dwmac_rk_tcp_attr;
-        ret = __dwmac_rk_loopback_run(priv, lb_priv);
+        ret = dwmac_rk_loopback_run_first(priv, lb_priv);
     }
 
 out:

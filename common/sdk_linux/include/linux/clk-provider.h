@@ -1049,7 +1049,7 @@ static inline long divider_ro_round_rate(struct clk_hw *hw, unsigned long rate, 
 }
 
 /*
- * FIXME clock api without lock protection
+ * clock api without lock protection
  */
 unsigned long clk_hw_round_rate(struct clk_hw *hw, unsigned long rate);
 

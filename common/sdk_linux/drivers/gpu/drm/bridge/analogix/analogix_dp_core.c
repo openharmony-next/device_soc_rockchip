@@ -562,7 +562,7 @@ static int analogix_dp_process_equalizer_training(struct analogix_dp_device *dp)
 
     lane_count = dp->link_train.lane_count;
 
-    retval = drm_dp_dpcd_read(&dp->aux, DP_LANE0_1_STATUS, link_status, 2);
+    retval = drm_dp_dpcd_read(&dp->aux, DP_LANE0_1_STATUS, link_status, 0x2);
     if (retval < 0) {
         return retval;
     }
@@ -783,7 +783,7 @@ static int analogix_dp_fast_link_train(struct analogix_dp_device *dp)
             return ret;
         }
 
-        ret = drm_dp_dpcd_read(&dp->aux, DP_LANE0_1_STATUS, link_status, 2);
+        ret = drm_dp_dpcd_read(&dp->aux, DP_LANE0_1_STATUS, link_status, 0x2);
         if (ret < 0) {
             DRM_DEV_ERROR(dp->dev, "Read link status failed %d\n", ret);
             return ret;
@@ -1426,7 +1426,7 @@ static void analogix_dp_bridge_atomic_enable(struct drm_bridge *bridge, struct d
         }
         dev_err(dp->dev, "failed to set bridge, retry: %d\n", timeout_loop);
         timeout_loop++;
-        usleep_range(10, 11);
+        usleep_range(0xa, 0xb);
     }
     dev_err(dp->dev, "too many times retry set bridge, give it up\n");
 }
@@ -1539,8 +1539,8 @@ static void analogix_dp_bridge_mode_set(struct drm_bridge *bridge, const struct 
 
     /* Input video dynamic_range & colorimetry */
     vic = drm_match_cea_mode(mode);
-    if ((vic == 6) || (vic == 7) || (vic == 21) || (vic == 22) || (vic == 2) || (vic == 3) || (vic == 17) ||
-        (vic == 18)) {
+    if ((vic == 0x6) || (vic == 0x7) || (vic == 0x15) || (vic == 0x16) || (vic == 0x2) || (vic == 0x3) || (vic == 0x11) ||
+        (vic == 0x12)) {
         video->dynamic_range = CEA;
         video->ycbcr_coeff = COLOR_YCBCR601;
     } else if (vic) {
@@ -1553,16 +1553,16 @@ static void analogix_dp_bridge_mode_set(struct drm_bridge *bridge, const struct 
 
     /* Input vide bpc and color_formats */
     switch (display_info->bpc) {
-        case 12:
+        case 0xc:
             video->color_depth = COLOR_12;
             break;
-        case 10:
+        case 0xa:
             video->color_depth = COLOR_10;
             break;
-        case 8:
+        case 0x8:
             video->color_depth = COLOR_8;
             break;
-        case 6:
+        case 0x6:
             video->color_depth = COLOR_6;
             break;
         default:

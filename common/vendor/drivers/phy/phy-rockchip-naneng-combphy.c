@@ -141,9 +141,9 @@ static int rockchip_combphy_pcie_init(struct rockchip_combphy_priv *priv)
     }
 
     if (priv->cfg->force_det_out) {
-        val = readl(priv->mmio + (0x19 << 2));
-        val |= BIT(5);
-        writel(val, priv->mmio + (0x19 << 2));
+        val = readl(priv->mmio + (0x19 << 0x02));
+        val |= BIT(0x05);
+        writel(val, priv->mmio + (0x19 << 0x02));
     }
 
     return ret;
@@ -327,7 +327,7 @@ static int rockchip_combphy_parse_dt(struct device *dev, struct rockchip_combphy
     }
 
     if (!device_property_read_u32_array(dev, "rockchip,pcie1ln-sel-bits", vals, ARRAY_SIZE(vals))) {
-        regmap_write(priv->pipe_grf, vals[0], (GENMASK(vals[2], vals[1]) << 16) | (vals[3] << vals[1]));
+        regmap_write(priv->pipe_grf, vals[0], (GENMASK(vals[0x02], vals[1]) << 0x10) | (vals[0x03] << vals[1]));
     }
 
     priv->apb_rst = devm_reset_control_get_optional(dev, "combphy-apb");
@@ -437,9 +437,9 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
     switch (priv->mode) {
         case PHY_TYPE_PCIE:
             /* Set SSC downward spread spectrum */
-            val = readl(priv->mmio + (0x1f << 2));
-            val &= ~GENMASK(5, 4);
-            val |= 0x01 << 4;
+            val = readl(priv->mmio + (0x1f << 0x02));
+            val &= ~GENMASK(0x05, 0x04);
+            val |= 0x01 << 0x04;
             writel(val, priv->mmio + 0x7c);
 
             param_write(priv->phy_grf, &cfg->con0_for_pcie, true);
@@ -449,37 +449,37 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
             break;
         case PHY_TYPE_USB3:
             /* Set SSC downward spread spectrum */
-            val = readl(priv->mmio + (0x1f << 2));
-            val &= ~GENMASK(5, 4);
-            val |= 0x01 << 4;
+            val = readl(priv->mmio + (0x1f << 0x02));
+            val &= ~GENMASK(0x05, 0x04);
+            val |= 0x01 << 0x04;
             writel(val, priv->mmio + 0x7c);
 
             /* Enable adaptive CTLE for USB3.0 Rx */
-            val = readl(priv->mmio + (0x0e << 2));
+            val = readl(priv->mmio + (0x0e << 0x02));
             val &= ~GENMASK(0, 0);
             val |= 0x01;
-            writel(val, priv->mmio + (0x0e << 2));
+            writel(val, priv->mmio + (0x0e << 0x02));
 
             /* Set PLL KVCO fine tuning signals */
-            val = readl(priv->mmio + (0x20 << 2));
-            val &= ~(0x7 << 2);
-            val |= 0x2 << 2;
-            writel(val, priv->mmio + (0x20 << 2));
+            val = readl(priv->mmio + (0x20 << 0x02));
+            val &= ~(0x7 << 0x02);
+            val |= 0x2 << 0x02;
+            writel(val, priv->mmio + (0x20 << 0x02));
 
             /* Set PLL LPF R1 to su_trim[10:7]=1001 */
-            writel(0x4, priv->mmio + (0xb << 2));
+            writel(0x4, priv->mmio + (0xb << 0x02));
 
             /* Set PLL input clock divider 1/2 */
             val = readl(priv->mmio + (0x5 << 2));
-            val &= ~(0x3 << 6);
-            val |= 0x1 << 6;
-            writel(val, priv->mmio + (0x5 << 2));
+            val &= ~(0x3 << 0x06);
+            val |= 0x1 << 0x06;
+            writel(val, priv->mmio + (0x5 << 0x02));
 
             /* Set PLL loop divider */
-            writel(0x32, priv->mmio + (0x11 << 2));
+            writel(0x32, priv->mmio + (0x11 << 0x02));
 
             /* Set PLL KVCO to min and set PLL charge pump current to max */
-            writel(0xf0, priv->mmio + (0xa << 2));
+            writel(0xf0, priv->mmio + (0xa << 0x02));
 
             param_write(priv->phy_grf, &cfg->pipe_sel_usb, true);
             param_write(priv->phy_grf, &cfg->pipe_txcomp_sel, false);
@@ -516,48 +516,48 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
     rate = clk_get_rate(refclk);
 
     switch (rate) {
-        case 24000000:
+        case 0x16E3600:
             if (priv->mode == PHY_TYPE_USB3 || priv->mode == PHY_TYPE_SATA) {
                 /* Set ssc_cnt[9:0]=0101111101 & 31.5KHz */
-                val = readl(priv->mmio + (0x0e << 2));
-                val &= ~GENMASK(7, 6);
-                val |= 0x01 << 6;
-                writel(val, priv->mmio + (0x0e << 2));
+                val = readl(priv->mmio + (0x0e << 0x02));
+                val &= ~GENMASK(0x07, 0x06);
+                val |= 0x01 << 0x06;
+                writel(val, priv->mmio + (0x0e << 0x02));
 
-                val = readl(priv->mmio + (0x0f << 2));
-                val &= ~GENMASK(7, 0);
+                val = readl(priv->mmio + (0x0f << 0x02));
+                val &= ~GENMASK(0x07, 0);
                 val |= 0x5f;
-                writel(val, priv->mmio + (0x0f << 2));
+                writel(val, priv->mmio + (0x0f << 0x02));
             }
             break;
-        case 25000000:
+        case 0x17D7840:
             param_write(priv->phy_grf, &cfg->pipe_clk_25m, true);
             break;
-        case 100000000:
+        case 0x5F5E100:
             param_write(priv->phy_grf, &cfg->pipe_clk_100m, true);
             if (priv->mode == PHY_TYPE_PCIE) {
                 /* PLL KVCO tuning fine */
-                val = readl(priv->mmio + (0x20 << 2));
-                val &= ~(0x7 << 2);
-                val |= 0x2 << 2;
-                writel(val, priv->mmio + (0x20 << 2));
+                val = readl(priv->mmio + (0x20 << 0x02));
+                val &= ~(0x7 << 0x02);
+                val |= 0x2 << 0x02;
+                writel(val, priv->mmio + (0x20 << 0x02));
 
                 /* Enable controlling random jitter, aka RMJ */
-                writel(0x4, priv->mmio + (0xb << 2));
+                writel(0x4, priv->mmio + (0xb << 0x02));
 
-                val = readl(priv->mmio + (0x5 << 2));
-                val &= ~(0x3 << 6);
-                val |= 0x1 << 6;
-                writel(val, priv->mmio + (0x5 << 2));
+                val = readl(priv->mmio + (0x5 << 0x02));
+                val &= ~(0x3 << 0x06);
+                val |= 0x1 << 0x06;
+                writel(val, priv->mmio + (0x5 << 0x02));
 
-                writel(0x32, priv->mmio + (0x11 << 2));
-                writel(0xf0, priv->mmio + (0xa << 2));
+                writel(0x32, priv->mmio + (0x11 << 0x02));
+                writel(0xf0, priv->mmio + (0xa << 0x02));
             } else if (priv->mode == PHY_TYPE_SATA) {
                 /* downward spread spectrum +500ppm */
-                val = readl(priv->mmio + (0x1f << 2));
-                val &= ~GENMASK(7, 4);
+                val = readl(priv->mmio + (0x1f << 0x02));
+                val &= ~GENMASK(0x07, 0x04);
                 val |= 0x50;
-                writel(val, priv->mmio + (0x1f << 2));
+                writel(val, priv->mmio + (0x1f << 0x02));
             }
             break;
         default:
@@ -567,21 +567,21 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
 
     if (device_property_read_bool(priv->dev, "rockchip,ext-refclk")) {
         param_write(priv->phy_grf, &cfg->pipe_clk_ext, true);
-        if (priv->mode == PHY_TYPE_PCIE && rate == 100000000) {
-            val = readl(priv->mmio + (0xc << 2));
-            val |= 0x3 << 4 | 0x1 << 7;
-            writel(val, priv->mmio + (0xc << 2));
+        if (priv->mode == PHY_TYPE_PCIE && rate == 0x5F5E100) {
+            val = readl(priv->mmio + (0xc << 0x02));
+            val |= 0x3 << 0x04 | 0x1 << 0x07;
+            writel(val, priv->mmio + (0xc << 0x02));
 
-            val = readl(priv->mmio + (0xd << 2));
+            val = readl(priv->mmio + (0xd << 0x02));
             val |= 0x1;
-            writel(val, priv->mmio + (0xd << 2));
+            writel(val, priv->mmio + (0xd << 0x02));
         }
     }
 
     if (device_property_read_bool(priv->dev, "rockchip,enable-ssc")) {
-        val = readl(priv->mmio + (0x7 << 2));
-        val |= BIT(4);
-        writel(val, priv->mmio + (0x7 << 2));
+        val = readl(priv->mmio + (0x7 << 0x02));
+        val |= BIT(0x04);
+        writel(val, priv->mmio + (0x7 << 0x02));
     }
 
     return 0;
@@ -647,7 +647,7 @@ static int rk3588_combphy_cfg(struct rockchip_combphy_priv *priv)
 
     /* Configure PHY reference clock frequency */
     for (i = 0; i < priv->num_clks; i++) {
-        if (!strncmp(priv->clks[i].id, "refclk", 6)) {
+        if (!strncmp(priv->clks[i].id, "refclk", 0x06)) {
             refclk = priv->clks[i].clk;
             break;
         }
@@ -667,37 +667,37 @@ static int rk3588_combphy_cfg(struct rockchip_combphy_priv *priv)
             break;
         case PHY_TYPE_USB3:
             /* Set SSC downward spread spectrum */
-            val = readl(priv->mmio + (0x1f << 2));
-            val &= ~GENMASK(5, 4);
-            val |= 0x01 << 4;
+            val = readl(priv->mmio + (0x1f << 0x02));
+            val &= ~GENMASK(0x05, 0x04);
+            val |= 0x01 << 0x04;
             writel(val, priv->mmio + 0x7c);
 
             /* Enable adaptive CTLE for USB3.0 Rx */
-            val = readl(priv->mmio + (0x0e << 2));
+            val = readl(priv->mmio + (0x0e << 0x02));
             val &= ~GENMASK(0, 0);
             val |= 0x01;
-            writel(val, priv->mmio + (0x0e << 2));
+            writel(val, priv->mmio + (0x0e << 0x02));
 
             /* Set PLL KVCO fine tuning signals */
-            val = readl(priv->mmio + (0x20 << 2));
-            val &= ~(0x7 << 2);
-            val |= 0x2 << 2;
-            writel(val, priv->mmio + (0x20 << 2));
+            val = readl(priv->mmio + (0x20 << 0x02));
+            val &= ~(0x7 << 0x02);
+            val |= 0x2 << 0x02;
+            writel(val, priv->mmio + (0x20 << 0x02));
 
             /* Set PLL LPF R1 to su_trim[10:7]=1001 */
-            writel(0x4, priv->mmio + (0xb << 2));
+            writel(0x4, priv->mmio + (0xb << 0x02));
 
             /* Set PLL input clock divider 1/2 */
             val = readl(priv->mmio + (0x5 << 2));
-            val &= ~(0x3 << 6);
-            val |= 0x1 << 6;
-            writel(val, priv->mmio + (0x5 << 2));
+            val &= ~(0x3 << 0x06);
+            val |= 0x1 << 0x06;
+            writel(val, priv->mmio + (0x5 << 0x02));
 
             /* Set PLL loop divider */
-            writel(0x32, priv->mmio + (0x11 << 2));
+            writel(0x32, priv->mmio + (0x11 << 0x02));
 
             /* Set PLL KVCO to min and set PLL charge pump current to max */
-            writel(0xf0, priv->mmio + (0xa << 2));
+            writel(0xf0, priv->mmio + (0xa << 0x02));
 
             param_write(priv->phy_grf, &cfg->pipe_txcomp_sel, false);
             param_write(priv->phy_grf, &cfg->pipe_txelec_sel, false);
@@ -705,12 +705,12 @@ static int rk3588_combphy_cfg(struct rockchip_combphy_priv *priv)
             break;
         case PHY_TYPE_SATA:
             /* Enable adaptive CTLE for SATA Rx */
-            val = readl(priv->mmio + (0x0e << 2));
+            val = readl(priv->mmio + (0x0e << 0x02));
             val &= ~GENMASK(0, 0);
             val |= 0x01;
-            writel(val, priv->mmio + (0x0e << 2));
+            writel(val, priv->mmio + (0x0e << 0x02));
             /* Set tx_rterm = 50 ohm and rx_rterm = 43.5 ohm */
-            writel(0x8F, priv->mmio + (0x06 << 2));
+            writel(0x8F, priv->mmio + (0x06 << 0x02));
 
             param_write(priv->phy_grf, &cfg->con0_for_sata, true);
             param_write(priv->phy_grf, &cfg->con1_for_sata, true);
@@ -729,47 +729,47 @@ static int rk3588_combphy_cfg(struct rockchip_combphy_priv *priv)
     rate = clk_get_rate(refclk);
 
     switch (rate) {
-        case 24000000:
+        case 0x16E3600:
             if (priv->mode == PHY_TYPE_USB3 || priv->mode == PHY_TYPE_SATA) {
                 /* Set ssc_cnt[9:0]=0101111101 & 31.5KHz */
-                val = readl(priv->mmio + (0x0e << 2));
-                val &= ~GENMASK(7, 6);
-                val |= 0x01 << 6;
-                writel(val, priv->mmio + (0x0e << 2));
+                val = readl(priv->mmio + (0x0e << 0x02));
+                val &= ~GENMASK(0x07, 0x06);
+                val |= 0x01 << 0x06;
+                writel(val, priv->mmio + (0x0e << 0x02));
 
-                val = readl(priv->mmio + (0x0f << 2));
-                val &= ~GENMASK(7, 0);
+                val = readl(priv->mmio + (0x0f << 0x02));
+                val &= ~GENMASK(0x07, 0);
                 val |= 0x5f;
-                writel(val, priv->mmio + (0x0f << 2));
+                writel(val, priv->mmio + (0x0f << 0x02));
             }
             break;
-        case 25000000:
+        case 0x17D7840:
             param_write(priv->phy_grf, &cfg->pipe_clk_25m, true);
             break;
-        case 100000000:
+        case 0x5F5E100:
             param_write(priv->phy_grf, &cfg->pipe_clk_100m, true);
             if (priv->mode == PHY_TYPE_PCIE) {
                 /* PLL KVCO tuning fine */
-                val = readl(priv->mmio + (0x20 << 2));
-                val &= ~GENMASK(4, 2);
-                val |= 0x4 << 2;
-                writel(val, priv->mmio + (0x20 << 2));
+                val = readl(priv->mmio + (0x20 << 0x02));
+                val &= ~GENMASK(0x04, 0x02);
+                val |= 0x4 << 0x02;
+                writel(val, priv->mmio + (0x20 << 0x02));
 
                 /* Set up rx_trim: PLL LPF C1 85pf R1 1.25kohm */
                 val = 0x4c;
-                writel(val, priv->mmio + (0x1b << 2));
+                writel(val, priv->mmio + (0x1b << 0x02));
 
                 /* Set up su_trim:  */
                 val = 0xf0;
-                writel(val, priv->mmio + (0xa << 2));
+                writel(val, priv->mmio + (0xa << 0x02));
                 val = 0x4;
-                writel(val, priv->mmio + (0xb << 2));
+                writel(val, priv->mmio + (0xb << 0x02));
             } else if (priv->mode == PHY_TYPE_SATA) {
                 /* downward spread spectrum +500ppm */
-                val = readl(priv->mmio + (0x1f << 2));
-                val &= ~GENMASK(7, 4);
+                val = readl(priv->mmio + (0x1f << 0x02));
+                val &= ~GENMASK(0x07, 0x04);
                 val |= 0x50;
-                writel(val, priv->mmio + (0x1f << 2));
+                writel(val, priv->mmio + (0x1f << 0x02));
             }
             break;
         default:

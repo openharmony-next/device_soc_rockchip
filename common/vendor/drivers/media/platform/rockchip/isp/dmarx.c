@@ -108,122 +108,125 @@ static const struct capture_fmt dmarx_fmts[] = {
         .uv_swap = 0,
         .write_format = CIF_MI_DMA_CTRL_READ_FMT_PACKED,
         .output_format = CIF_MI_DMA_CTRL_FMT_YUV422,
-    }};
+    }
+};
 
-static const struct capture_fmt rawrd_fmts[] = {{
-                                                    .fourcc = V4L2_PIX_FMT_SRGGB8,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {8},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGRBG8,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {8},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGBRG8,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {8},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SBGGR8,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {8},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_GREY,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {8},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SRGGB10,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {10},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGRBG10,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {10},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGBRG10,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {10},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SBGGR10,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {10},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_Y10,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {10},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SRGGB12,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {12},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGRBG12,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {12},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SGBRG12,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {12},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_SBGGR12,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {12},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_Y12,
-                                                    .fmt_type = FMT_BAYER,
-                                                    .bpp = {12},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_YUYV,
-                                                    .fmt_type = FMT_YUV,
-                                                    .bpp = {16},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_YVYU,
-                                                    .fmt_type = FMT_YUV,
-                                                    .bpp = {16},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_UYVY,
-                                                    .fmt_type = FMT_YUV,
-                                                    .bpp = {16},
-                                                    .mplanes = 1,
-                                                },
-                                                {
-                                                    .fourcc = V4L2_PIX_FMT_VYUY,
-                                                    .fmt_type = FMT_YUV,
-                                                    .bpp = {16},
-                                                    .mplanes = 1,
-                                                }};
+static const struct capture_fmt rawrd_fmts[] = {
+    {
+        .fourcc = V4L2_PIX_FMT_SRGGB8,
+        .fmt_type = FMT_BAYER,
+        .bpp = {8},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGRBG8,
+        .fmt_type = FMT_BAYER,
+        .bpp = {8},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGBRG8,
+        .fmt_type = FMT_BAYER,
+        .bpp = {8},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SBGGR8,
+        .fmt_type = FMT_BAYER,
+        .bpp = {8},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_GREY,
+        .fmt_type = FMT_BAYER,
+        .bpp = {8},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SRGGB10,
+        .fmt_type = FMT_BAYER,
+        .bpp = {10},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGRBG10,
+        .fmt_type = FMT_BAYER,
+        .bpp = {10},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGBRG10,
+        .fmt_type = FMT_BAYER,
+        .bpp = {10},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SBGGR10,
+        .fmt_type = FMT_BAYER,
+        .bpp = {10},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_Y10,
+        .fmt_type = FMT_BAYER,
+        .bpp = {10},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SRGGB12,
+        .fmt_type = FMT_BAYER,
+        .bpp = {12},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGRBG12,
+        .fmt_type = FMT_BAYER,
+        .bpp = {12},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SGBRG12,
+        .fmt_type = FMT_BAYER,
+        .bpp = {12},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_SBGGR12,
+        .fmt_type = FMT_BAYER,
+        .bpp = {12},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_Y12,
+        .fmt_type = FMT_BAYER,
+        .bpp = {12},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_YUYV,
+        .fmt_type = FMT_YUV,
+        .bpp = {16},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_YVYU,
+        .fmt_type = FMT_YUV,
+        .bpp = {16},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_UYVY,
+        .fmt_type = FMT_YUV,
+        .bpp = {16},
+        .mplanes = 1,
+    },
+    {
+        .fourcc = V4L2_PIX_FMT_VYUY,
+        .fmt_type = FMT_YUV,
+        .bpp = {16},
+        .mplanes = 1,
+    }
+};
 
 static struct stream_config rkisp_dmarx_stream_config = {
     .fmts = dmarx_fmts,
@@ -366,7 +369,7 @@ static int rawrd_config_mi(struct rkisp_stream *stream)
         default:
             val |= CIF_CSI2_DT_RAW12;
     }
-    rkisp_unite_write(dev, CSI2RX_RAW_RD_CTRL, stream->memory << 2, false, is_unite);
+    rkisp_unite_write(dev, CSI2RX_RAW_RD_CTRL, stream->memory << 0x02, false, is_unite);
     rkisp_unite_write(dev, CSI2RX_DATA_IDS_1, val, false, is_unite);
     rkisp_rawrd_set_pic_size(dev, stream->out_fmt.width, stream->out_fmt.height);
     mi_raw_length(stream);
@@ -386,7 +389,7 @@ static void update_rawrd(struct rkisp_stream *stream)
         val = stream->curr_buf->buff_addr[RKISP_PLANE_Y];
         rkisp_write(dev, stream->config->mi.y_base_ad_init, val, false);
         if (dev->hw_dev->is_unite) {
-            val += (stream->out_fmt.width / 2 - RKMOUDLE_UNITE_EXTEND_PIXEL) * fmt->bpp[0] / 8;
+            val += (stream->out_fmt.width / 0x02 - RKMOUDLE_UNITE_EXTEND_PIXEL) * fmt->bpp[0] / 0x08;
             rkisp_next_write(dev, stream->config->mi.y_base_ad_init, val, false);
         }
         stream->frame_end = false;
@@ -476,7 +479,7 @@ static void dmarx_stop(struct rkisp_stream *stream)
 
     stream->stopping = true;
     if ((dev->isp_state & ISP_START) && !stream->frame_end) {
-        ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(100));
+        ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(0x64));
         if (!ret) {
             v4l2_warn(v4l2_dev, "dmarx:%d waiting on event return error %d\n", stream->id, ret);
         }
@@ -568,7 +571,7 @@ static void rkisp_buf_queue(struct vb2_buffer *vb)
         }
     }
 
-    v4l2_dbg(2, rkisp_debug, &stream->ispdev->v4l2_dev, "rx:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
+    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev, "rx:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
 
     spin_lock_irqsave(&stream->vbq_lock, lock_flags);
     if (stream->streaming && list_empty(&stream->buf_queue) && !stream->curr_buf) {
@@ -685,7 +688,7 @@ static int rkisp_set_fmt(struct rkisp_stream *stream, struct v4l2_pix_format_mpl
     fmt = find_fmt(stream, pixm->pixelformat);
     if (!fmt) {
         v4l2_err(&stream->ispdev->v4l2_dev, "nonsupport pixelformat:%c%c%c%c\n", pixm->pixelformat,
-                 pixm->pixelformat >> 8, pixm->pixelformat >> 16, pixm->pixelformat >> 24);
+                 pixm->pixelformat >> 0x08, pixm->pixelformat >> 0x10, pixm->pixelformat >> 0x18);
         return -EINVAL;
     }
 
@@ -719,9 +722,9 @@ static int rkisp_set_fmt(struct rkisp_stream *stream, struct v4l2_pix_format_mpl
         if ((stream->ispdev->isp_ver == ISP_V20 || stream->ispdev->isp_ver == ISP_V21 ||
              stream->ispdev->isp_ver == ISP_V30) &&
             fmt->fmt_type == FMT_BAYER && !stream->memory && stream->id != RKISP_STREAM_DMARX) {
-            bytesperline = ALIGN(width * fmt->bpp[i] / 8, 256);
+            bytesperline = ALIGN(width * fmt->bpp[i] / 0x08, 0x100);
         } else {
-            bytesperline = width * DIV_ROUND_UP(fmt->bpp[i], 8);
+            bytesperline = width * DIV_ROUND_UP(fmt->bpp[i], 0x08);
         }
         /* stride is only available for sp stream and y plane */
         if (i != 0 || plane_fmt->bytesperline < bytesperline) {
@@ -745,7 +748,7 @@ static int rkisp_set_fmt(struct rkisp_stream *stream, struct v4l2_pix_format_mpl
         stream->out_isp_fmt = *fmt;
         stream->out_fmt = *pixm;
 
-        stream->u.dmarx.y_stride = pixm->plane_fmt[0].bytesperline / DIV_ROUND_UP(fmt->bpp[0], 8);
+        stream->u.dmarx.y_stride = pixm->plane_fmt[0].bytesperline / DIV_ROUND_UP(fmt->bpp[0], 0x08);
 
         v4l2_dbg(1, rkisp_debug, &stream->ispdev->v4l2_dev, "%s: rx:%d req(%d, %d) out(%d, %d)\n", __func__, stream->id,
                  pixm->width, pixm->height, stream->out_fmt.width, stream->out_fmt.height);
@@ -812,13 +815,14 @@ static int rkisp_g_fmt_vid_out_mplane(struct file *file, void *fh, struct v4l2_f
 
 static int rkisp_querycap(struct file *file, void *priv, struct v4l2_capability *cap)
 {
+    int ret = 0;
     struct rkisp_stream *stream = video_drvdata(file);
     struct device *dev = stream->ispdev->dev;
     struct video_device *vdev = video_devdata(file);
 
     strlcpy(cap->card, vdev->name, sizeof(cap->card));
-    snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->ispdev->isp_ver >> 4);
-    snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
+    ret = snprintf(cap->driver, sizeof(cap->driver), "%s_v%d", dev->driver->name, stream->ispdev->isp_ver >> 0x04);
+    ret = snprintf(cap->bus_info, sizeof(cap->bus_info), "platform:%s", dev_name(dev));
 
     return 0;
 }
@@ -1045,7 +1049,7 @@ void rkisp_rawrd_set_pic_size(struct rkisp_device *dev, u32 width, u32 height)
     }
 
     w *= mult;
-    rkisp_unite_write(dev, CSI2RX_RAW_RD_PIC_SIZE, height << 16 | w, false, is_unite);
+    rkisp_unite_write(dev, CSI2RX_RAW_RD_PIC_SIZE, (height << 0x10) | w, false, is_unite);
 }
 
 void rkisp_dmarx_get_frame(struct rkisp_device *dev, u32 *id, u64 *sof_timestamp, u64 *timestamp, bool sync)

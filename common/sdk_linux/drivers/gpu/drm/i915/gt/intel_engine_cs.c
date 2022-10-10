@@ -212,7 +212,7 @@ u32 intel_engine_context_size(struct intel_gt *gt, u8 class)
     }
 }
 
-static u32 __engine_mmio_base(struct drm_i915_private *i915, const struct engine_mmio_base *bases)
+static u32 _engine_mmio_base(struct drm_i915_private *i915, const struct engine_mmio_base *bases)
 {
     int i;
 
@@ -228,7 +228,7 @@ static u32 __engine_mmio_base(struct drm_i915_private *i915, const struct engine
     return bases[i].base;
 }
 
-static void __sprint_engine_name(struct intel_engine_cs *engine)
+static void _sprint_engine_name(struct intel_engine_cs *engine)
 {
     /*
      * Before we know what the uABI name for this engine will be,
@@ -301,11 +301,11 @@ static int intel_engine_setup(struct intel_gt *gt, enum intel_engine_id id)
     engine->gt = gt;
     engine->uncore = gt->uncore;
     engine->hw_id = engine->guc_id = info->hw_id;
-    engine->mmio_base = __engine_mmio_base(i915, info->mmio_bases);
+    engine->mmio_base = _engine_mmio_base(i915, info->mmio_bases);
 
     engine->class = info->class;
     engine->instance = info->instance;
-    __sprint_engine_name(engine);
+    _sprint_engine_name(engine);
 
     engine->props.heartbeat_interval_ms = CONFIG_DRM_I915_HEARTBEAT_INTERVAL;
     engine->props.max_busywait_duration_ns = CONFIG_DRM_I915_MAX_REQUEST_BUSYWAIT;
@@ -345,7 +345,7 @@ static int intel_engine_setup(struct intel_gt *gt, enum intel_engine_id id)
     return 0;
 }
 
-static void __setup_engine_capabilities(struct intel_engine_cs *engine)
+static void _setup_engine_capabilities(struct intel_engine_cs *engine)
 {
     struct drm_i915_private *i915 = engine->i915;
 
@@ -378,7 +378,7 @@ static void intel_setup_engine_capabilities(struct intel_gt *gt)
     struct intel_engine_cs *engine;
     enum intel_engine_id id;
 
-    for_each_engine(engine, gt, id) __setup_engine_capabilities(engine);
+    for_each_engine(engine, gt, id) _setup_engine_capabilities(engine);
 }
 
 /**
@@ -1653,7 +1653,7 @@ void intel_engine_dump(struct intel_engine_cs *engine, struct drm_printer *m, co
     intel_engine_print_breadcrumbs(engine, m);
 }
 
-static ktime_t __intel_engine_get_busy_time(struct intel_engine_cs *engine, ktime_t *now)
+static ktime_t _intel_engine_get_busy_time(struct intel_engine_cs *engine, ktime_t *now)
 {
     ktime_t total = engine->stats.total;
 
@@ -1683,7 +1683,7 @@ ktime_t intel_engine_get_busy_time(struct intel_engine_cs *engine, ktime_t *now)
 
     do {
         seq = read_seqbegin(&engine->stats.lock);
-        total = __intel_engine_get_busy_time(engine, now);
+        total = _intel_engine_get_busy_time(engine, now);
     } while (read_seqretry(&engine->stats.lock, seq));
 
     return total;

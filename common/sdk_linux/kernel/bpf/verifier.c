@@ -1639,7 +1639,6 @@ static bool is_reg64(struct bpf_verifier_env *env, struct bpf_insn *insn, u32 re
 
     if (class == BPF_LD) {
         u8 mode = BPF_MODE(code);
-
         /* LD_IMM64 */
         if (mode == BPF_IMM) {
             return true;
@@ -1834,9 +1833,10 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, u32 *reg_mask, 
                  * before this insn
                  */
                 *reg_mask |= sreg;
-            } /* else dreg += K
-               * dreg still needs precision before this insn
-               */
+            }
+            /* else dreg += K
+             * dreg still needs precision before this insn
+             */
         }
     } else if (class == BPF_LDX) {
         if (!(*reg_mask & dreg)) {
@@ -2683,7 +2683,6 @@ static int check_stack_read(struct bpf_verifier_env *env, int ptr_regno, int off
     int err;
     /* Some accesses are only permitted with a static offset. */
     bool var_off = !tnum_is_const(reg->var_off);
-
     /* The offset is required to be static when reads don't go to a
      * register, in order to not leak pointers (see
      * check_stack_read_fixed_off).
@@ -2755,12 +2754,10 @@ static int check_map_access_type(struct bpf_verifier_env *env, u32 regno, int of
     struct bpf_reg_state *regs = cur_regs(env);
     struct bpf_map *map = regs[regno].map_ptr;
     u32 cap = bpf_map_flags_to_cap(map);
-
     if (type == BPF_WRITE && !(cap & BPF_MAP_CAN_WRITE)) {
         verbose(env, "write into map forbidden, value_size=%d off=%d size=%d\n", map->value_size, off, size);
         return -EACCES;
     }
-
     if (type == BPF_READ && !(cap & BPF_MAP_CAN_READ)) {
         verbose(env, "read from map forbidden, value_size=%d off=%d size=%d\n", map->value_size, off, size);
         return -EACCES;
@@ -3794,14 +3791,12 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
             }
             regs[value_regno].type = reg_type;
         }
-
     } else if (reg->type == PTR_TO_STACK) {
         /* Basic bounds checks. */
         err = check_stack_access_within_bounds(env, regno, off, size, ACCESS_DIRECT, t);
         if (err) {
             return err;
         }
-
         state = func(env, reg);
         err = update_stack_depth(env, state, off);
         if (err) {
@@ -5396,7 +5391,6 @@ static int check_helper_call(struct bpf_verifier_env *env, int func_id, int insn
     }
 
     regs = cur_regs(env);
-
     /* check that flags argument in get_local_storage(map, flags) is 0,
      * this is required because get_local_storage() can't return an error.
      */
@@ -5506,7 +5500,6 @@ static int check_helper_call(struct bpf_verifier_env *env, int func_id, int insn
         regs[BPF_REG_0].ref_obj_id = meta.ref_obj_id;
     } else if (is_acquire_function(func_id, meta.map_ptr)) {
         int id = acquire_reference_state(env, insn_idx);
-
         if (id < 0) {
             return id;
         }
@@ -6691,7 +6684,7 @@ static void scalar_min_max_arsh(struct bpf_reg_state *dst_reg, struct bpf_reg_st
     dst_reg->smin_value >>= umin_val;
     dst_reg->smax_value >>= umin_val;
 
-    dst_reg->var_off = tnum_arshift(dst_reg->var_off, umin_val, 64);
+    dst_reg->var_off = tnum_arshift(dst_reg->var_off, umin_val, 0x40);
 
     /* blow away the dst_reg umin_value/umax_value and rely on
      * dst_reg var_off to refine the result.
@@ -6992,15 +6985,12 @@ static int check_alu_op(struct bpf_verifier_env *env, struct bpf_insn *insn)
         if (err) {
             return err;
         }
-
     } else if (opcode == BPF_MOV) {
-
         if (BPF_SRC(insn->code) == BPF_X) {
             if (insn->imm != 0 || insn->off != 0) {
                 verbose(env, "BPF_MOV uses reserved fields\n");
                 return -EINVAL;
             }
-
             /* check src operand */
             err = check_reg_arg(env, insn->src_reg, SRC_OP);
             if (err) {
@@ -7073,13 +7063,10 @@ static int check_alu_op(struct bpf_verifier_env *env, struct bpf_insn *insn)
                 verifier_mark_reg_known(regs + insn->dst_reg, (u32)insn->imm);
             }
         }
-
     } else if (opcode > BPF_END) {
         verbose(env, "invalid BPF_ALU opcode %x\n", opcode);
         return -EINVAL;
-
     } else { /* all other ALU ops: and, sub, xor, add, ... */
-
         if (BPF_SRC(insn->code) == BPF_X) {
             if (insn->imm != 0 || insn->off != 0) {
                 verbose(env, "BPF_ALU uses reserved fields\n");
@@ -7110,19 +7097,16 @@ static int check_alu_op(struct bpf_verifier_env *env, struct bpf_insn *insn)
 
         if ((opcode == BPF_LSH || opcode == BPF_RSH || opcode == BPF_ARSH) && BPF_SRC(insn->code) == BPF_K) {
             int size = BPF_CLASS(insn->code) == BPF_ALU64 ? VERIFIER_SIXTYFOUR : 32;
-
             if (insn->imm < 0 || insn->imm >= size) {
                 verbose(env, "invalid shift %d\n", insn->imm);
                 return -EINVAL;
             }
         }
-
         /* check dest operand */
         err = check_reg_arg(env, insn->dst_reg, DST_OP_NO_MARK);
         if (err) {
             return err;
         }
-
         return adjust_reg_min_max_vals(env, insn);
     }
 
@@ -7585,19 +7569,19 @@ static void reg_set_min_max_inv(struct bpf_reg_state *true_reg, struct bpf_reg_s
                                 u8 opcode, bool is_jmp32)
 {
     /* How can we transform "a <op> b" into "b <op> a"? */
-    static const u8 opcode_flip[VERIFIER_SIXTEEN] = {/* these stay the same */
-                                                     [BPF_JEQ >> VERIFIER_FOUR] = BPF_JEQ,
-                                                     [BPF_JNE >> VERIFIER_FOUR] = BPF_JNE,
-                                                     [BPF_JSET >> VERIFIER_FOUR] = BPF_JSET,
-                                                     /* these swap "lesser" and "greater" (L and G in the opcodes) */
-                                                     [BPF_JGE >> VERIFIER_FOUR] = BPF_JLE,
-                                                     [BPF_JGT >> VERIFIER_FOUR] = BPF_JLT,
-                                                     [BPF_JLE >> VERIFIER_FOUR] = BPF_JGE,
-                                                     [BPF_JLT >> VERIFIER_FOUR] = BPF_JGT,
-                                                     [BPF_JSGE >> VERIFIER_FOUR] = BPF_JSLE,
-                                                     [BPF_JSGT >> VERIFIER_FOUR] = BPF_JSLT,
-                                                     [BPF_JSLE >> VERIFIER_FOUR] = BPF_JSGE,
-                                                     [BPF_JSLT >> VERIFIER_FOUR] = BPF_JSGT};
+    static const u8 opcode_flip[VERIFIER_SIXTEEN] = {
+        [BPF_JEQ >> VERIFIER_FOUR] = BPF_JEQ,
+        [BPF_JNE >> VERIFIER_FOUR] = BPF_JNE,
+        [BPF_JSET >> VERIFIER_FOUR] = BPF_JSET,
+        /* these swap "lesser" and "greater" (L and G in the opcodes) */
+        [BPF_JGE >> VERIFIER_FOUR] = BPF_JLE,
+        [BPF_JGT >> VERIFIER_FOUR] = BPF_JLT,
+        [BPF_JLE >> VERIFIER_FOUR] = BPF_JGE,
+        [BPF_JLT >> VERIFIER_FOUR] = BPF_JGT,
+        [BPF_JSGE >> VERIFIER_FOUR] = BPF_JSLE,
+        [BPF_JSGT >> VERIFIER_FOUR] = BPF_JSLT,
+        [BPF_JSLE >> VERIFIER_FOUR] = BPF_JSGE,
+        [BPF_JSLT >> VERIFIER_FOUR] = BPF_JSGT};
     opcode = opcode_flip[opcode >> VERIFIER_FOUR];
     /* This uses zero as "not present in table"; luckily the zero opcode,
      * BPF_JA, can't get here.
@@ -8445,7 +8429,6 @@ static int check_cfg(struct bpf_verifier_env *env)
 
         if (BPF_CLASS(insns[t].code) == BPF_JMP || BPF_CLASS(insns[t].code) == BPF_JMP32) {
             u8 opcode = BPF_OP(insns[t].code);
-
             if (opcode == BPF_EXIT) {
                 goto mark_explored;
             } else if (opcode == BPF_CALL) {
@@ -8948,7 +8931,6 @@ static void clean_verifier_state(struct bpf_verifier_env *env, struct bpf_verifi
  * stored in the state lists have their final liveness state already,
  * but a lot of states will get revised from liveness point of view when
  * the verifier explores other branches.
- * Example:
  * 1: r0 = 1
  * 2: if r1 == 100 goto pc+1
  * 3: r0 = 2
@@ -9760,7 +9742,6 @@ static int do_check(struct bpf_verifier_env *env)
             if (err) {
                 return err;
             }
-
         } else if (class == BPF_LDX) {
             enum bpf_reg_type *prev_src_type, src_reg_type;
 
@@ -9796,7 +9777,6 @@ static int do_check(struct bpf_verifier_env *env)
                  * save type to validate intersecting paths
                  */
                 *prev_src_type = src_reg_type;
-
             } else if (reg_type_mismatch(src_reg_type, *prev_src_type)) {
                 /* ABuser program is trying to use the same insn
                  * dst_reg = *(u32*) (src_reg + off)
@@ -9808,10 +9788,8 @@ static int do_check(struct bpf_verifier_env *env)
                 verbose(env, "same insn cannot be used with different pointers\n");
                 return -EINVAL;
             }
-
         } else if (class == BPF_STX) {
             enum bpf_reg_type *prev_dst_type, dst_reg_type;
-
             if (BPF_MODE(insn->code) == BPF_XADD) {
                 err = check_xadd(env, env->insn_idx, insn);
                 if (err) {
@@ -9849,7 +9827,6 @@ static int do_check(struct bpf_verifier_env *env)
                 verbose(env, "same insn cannot be used with different pointers\n");
                 return -EINVAL;
             }
-
         } else if (class == BPF_ST) {
             if (BPF_MODE(insn->code) != BPF_MEM || insn->src_reg != BPF_REG_0) {
                 verbose(env, "BPF_ST uses reserved fields\n");
@@ -9860,7 +9837,6 @@ static int do_check(struct bpf_verifier_env *env)
             if (err) {
                 return err;
             }
-
             if (is_ctx_reg(env, insn->dst_reg)) {
                 verbose(env, "BPF_ST stores into R%d %s is not allowed\n", insn->dst_reg,
                         reg_type_str(env, reg_state(env, insn->dst_reg)->type));
@@ -9873,10 +9849,8 @@ static int do_check(struct bpf_verifier_env *env)
             if (err) {
                 return err;
             }
-
         } else if (class == BPF_JMP || class == BPF_JMP32) {
             u8 opcode = BPF_OP(insn->code);
-
             env->jmps_processed++;
             if (opcode == BPF_CALL) {
                 if (BPF_SRC(insn->code) != BPF_K || insn->off != 0 ||
@@ -9899,29 +9873,24 @@ static int do_check(struct bpf_verifier_env *env)
                 if (err) {
                     return err;
                 }
-
             } else if (opcode == BPF_JA) {
                 if (BPF_SRC(insn->code) != BPF_K || insn->imm != 0 || insn->src_reg != BPF_REG_0 ||
                     insn->dst_reg != BPF_REG_0 || class == BPF_JMP32) {
                     verbose(env, "BPF_JA uses reserved fields\n");
                     return -EINVAL;
                 }
-
                 env->insn_idx += insn->off + 1;
                 continue;
-
             } else if (opcode == BPF_EXIT) {
                 if (BPF_SRC(insn->code) != BPF_K || insn->imm != 0 || insn->src_reg != BPF_REG_0 ||
                     insn->dst_reg != BPF_REG_0 || class == BPF_JMP32) {
                     verbose(env, "BPF_EXIT uses reserved fields\n");
                     return -EINVAL;
                 }
-
                 if (env->cur_state->active_spin_lock) {
                     verbose(env, "bpf_spin_unlock is missing\n");
                     return -EINVAL;
                 }
-
                 if (state->curframe) {
                     /* exit from nested function */
                     err = prepare_func_exit(env, &env->insn_idx);
@@ -9961,19 +9930,16 @@ static int do_check(struct bpf_verifier_env *env)
             }
         } else if (class == BPF_LD) {
             u8 mode = BPF_MODE(insn->code);
-
             if (mode == BPF_ABS || mode == BPF_IND) {
                 err = check_ld_abs(env, insn);
                 if (err) {
                     return err;
                 }
-
             } else if (mode == BPF_IMM) {
                 err = check_ld_imm(env, insn);
                 if (err) {
                     return err;
                 }
-
                 env->insn_idx++;
                 sanitize_mark_insn_seen(env);
             } else {
@@ -9984,7 +9950,6 @@ static int do_check(struct bpf_verifier_env *env)
             verbose(env, "unknown insn class %d\n", class);
             return -EINVAL;
         }
-
         env->insn_idx++;
     }
 
@@ -11811,7 +11776,6 @@ static int check_struct_ops_btf_id(struct bpf_verifier_env *env)
 
     if (st_ops->check_member) {
         int err = st_ops->check_member(t, member);
-
         if (err) {
             verbose(env, "attach to unsupported member %s of struct %s\n", mname, st_ops->name);
             return err;
@@ -11831,7 +11795,6 @@ static int check_attach_modify_return(unsigned long addr, const char *func_name)
     if (within_error_injection_list(addr) || !strncmp(SECURITY_PREFIX, func_name, sizeof(SECURITY_PREFIX) - 1)) {
         return 0;
     }
-
     return -EINVAL;
 }
 

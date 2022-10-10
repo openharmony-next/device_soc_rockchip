@@ -140,7 +140,7 @@ static const struct rockchip_grf_info rk3399_grf __initconst = {
 #define RV1126_GRF1_UART2RX_LOW_CON 0x10258
 #define RV1126_GRF1_IOFUNC_CON1 0x10264
 #define RV1126_GRF1_IOFUNC_CON3 0x1026C
-#define RV1126_JTAG_GROUP0 0x0 /* mux to sdmmc*/
+#define RV1126_JTAG_GROUP0 0x0 /* mux to sdmmc */
 #define RV1126_JTAG_GROUP1 0x1 /* mux to uart2 */
 #define FORCE_JTAG_ENABLE 0x1
 #define FORCE_JTAG_DISABLE 0x0
@@ -199,7 +199,7 @@ static const struct of_device_id rockchip_grf_dt_match[] __initconst = {
         .compatible = "rockchip,rv1126-grf",
         .data = (void *)&rv1126_grf,
     },
-    {/* sentinel */},
+    {},
 };
 
 static int __init rockchip_grf_init(void)

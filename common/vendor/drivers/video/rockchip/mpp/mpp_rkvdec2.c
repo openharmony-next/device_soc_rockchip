@@ -110,7 +110,8 @@ static int rkvdec2_extract_task_msg(struct mpp_session *session, struct rkvdec2_
                     return -EIO;
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_READ: {
                 int req_base;
                 int max_size;
@@ -129,23 +130,24 @@ static int rkvdec2_extract_task_msg(struct mpp_session *session, struct rkvdec2_
                 }
 
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            } 
             case MPP_CMD_SET_RCB_INFO: {
                 struct rkvdec2_session_priv *priv = session->priv;
-
                 if (priv) {
                     mpp_extract_rcb_info(&priv->rcb_inf, req);
                 }
-            } break;
+                break;
+            } 
             default:
                 break;
         }
     }
     mpp_debug(DEBUG_TASK_INFO, "w_req_cnt %d, r_req_cnt %d\n", task->w_req_cnt, task->r_req_cnt);
-
     return 0;
 }
 
@@ -224,7 +226,7 @@ int rkvdec2_task_init(struct mpp_dev *mpp, struct mpp_session *session, struct r
         u32 width = priv->codec_info[DEC_INFO_WIDTH].val;
         u32 bitdepth = priv->codec_info[DEC_INFO_BITDEPTH].val;
 
-        task->width = (bitdepth > 8) ? ((width * bitdepth + 7) >> 3) : width;
+        task->width = (bitdepth > 0x8) ? ((width * bitdepth + 0x7) >> 0x3) : width;
         task->height = priv->codec_info[DEC_INFO_HEIGHT].val;
         task->pixels = task->width * task->height;
         mpp_debug(DEBUG_TASK_INFO, "width=%d, bitdepth=%d, height=%d\n", width, bitdepth, task->height);
@@ -366,7 +368,7 @@ static int rkvdec2_isr(struct mpp_dev *mpp)
     struct rkvdec2_task *task = NULL;
     struct mpp_task *mpp_task = mpp->cur_task;
 
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp_task) {
         dev_err(mpp->dev, "no current task\n");
         return IRQ_HANDLED;
@@ -395,11 +397,11 @@ static int rkvdec2_read_perf_sel(struct mpp_dev *mpp, u32 *regs, u32 s, u32 e)
     u32 i;
     u32 sel0, sel1, sel2, val;
 
-    for (i = s; i < e; i += 3) {
+    for (i = s; i < e; i += 0x3) {
         /* set sel */
         sel0 = i;
         sel1 = ((i + 1) < e) ? (i + 1) : 0;
-        sel2 = ((i + 2) < e) ? (i + 2) : 0;
+        sel2 = ((i + 0x2) < e) ? (i + 0x2) : 0;
         val = RKVDEC_SET_PERF_SEL(sel0, sel1, sel2);
         writel_relaxed(val, mpp->reg_base + RKVDEC_PERF_SEL_BASE);
         /* read data */
@@ -450,7 +452,7 @@ static int rkvdec2_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
     /* revert hack for decoded length */
     dec_get = mpp_read_relaxed(mpp, RKVDEC_REG_RLC_BASE);
     dec_length = dec_get - task->strm_addr;
-    task->reg[RKVDEC_REG_RLC_BASE_INDEX] = dec_length << 10;
+    task->reg[RKVDEC_REG_RLC_BASE_INDEX] = dec_length << 0xA;
     mpp_debug(DEBUG_REGISTER, "dec_get %08x dec_length %d\n", dec_get, dec_length);
 
     mpp_debug_leave();
@@ -527,10 +529,12 @@ static int rkvdec2_control(struct mpp_session *session, struct mpp_request *req)
                     mpp_err("codec info invalid, type %d, flag %d\n", elem.type, elem.flag);
                 }
             }
-        } break;
+            break;
+        } 
         default: {
             mpp_err("unknown mpp ioctl cmd %x\n", req->cmd);
-        } break;
+            break;
+        } 
     }
 
     return 0;

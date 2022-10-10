@@ -62,7 +62,6 @@ void fiq_debugger_dump_regs_aarch32(struct fiq_debugger_output *output, const st
 
 void fiq_debugger_dump_regs_aarch64(struct fiq_debugger_output *output, const struct pt_regs *regs)
 {
-
     output->printf(output, "  x0 %016lx   x1 %016lx\n", regs->regs[0], regs->regs[1]);
     output->printf(output, "  x2 %016lx   x3 %016lx\n", regs->regs[DEBUGER_INDEX_TW], regs->regs[DEBUGER_INDEX_TH]);
     output->printf(output, "  x4 %016lx   x5 %016lx\n", regs->regs[DEBUGER_INDEX_FO], regs->regs[DEBUGER_INDEX_FI]);
@@ -166,7 +165,7 @@ void fiq_debugger_dump_stacktrace(struct fiq_debugger_output *output, const stru
 
     if (!user_mode(regs)) {
         struct stackframe frame;
-        frame.fp = regs->regs[29];
+        frame.fp = regs->regs[0x1D];
         frame.pc = regs->pc;
         output->printf(output, "\n");
         walk_stackframe(current, &frame, report_trace, &sts);

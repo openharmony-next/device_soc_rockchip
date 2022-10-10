@@ -255,7 +255,6 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
              * 20 degrees.
              */
             i += DIV_ROUND_UP(RK3288_PHASE_MUL * priv->num_phases, RK_THREE_HUNDRED_SIXTY_DEGREE_PHASE);
-
             /* Always test the last one */
             if (i >= priv->num_phases) {
                 i = priv->num_phases - 1;

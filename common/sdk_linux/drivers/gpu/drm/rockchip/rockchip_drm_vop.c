@@ -54,31 +54,31 @@
 
 #define VOP_REG_SUPPORT(vop, reg)                                                                                      \
     ((reg).mask &&                                                                                                     \
-     (!(reg).major || ((reg).major == VOP_MAJOR(vop->version) && (reg).begin_minor <= VOP_MINOR(vop->version) &&       \
-                       (reg).end_minor >= VOP_MINOR(vop->version))))
+     (!(reg).major || ((reg).major == VOP_MAJOR((vop)->version) && (reg).begin_minor <= VOP_MINOR((vop)->version) &&       \
+                       (reg).end_minor >= VOP_MINOR((vop)->version))))
 
-#define VOP_WIN_SUPPORT(vop, win, name) VOP_REG_SUPPORT(vop, win->phy->name)
+#define VOP_WIN_SUPPORT(vop, win, name) VOP_REG_SUPPORT(vop, (win)->phy->name)
 
-#define VOP_WIN_SCL_EXT_SUPPORT(vop, win, name) ((win)->phy->scl->ext && VOP_REG_SUPPORT(vop, win->phy->scl->ext->name))
+#define VOP_WIN_SCL_EXT_SUPPORT(vop, win, name) ((win)->phy->scl->ext && VOP_REG_SUPPORT(vop, (win)->phy->scl->ext->name))
 
-#define VOP_CTRL_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, vop->data->ctrl->name)
+#define VOP_CTRL_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, (vop)->data->ctrl->name)
 
-#define VOP_INTR_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, vop->data->intr->name)
+#define VOP_INTR_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, (vop)->data->intr->name)
 
-#define __REG_SET(x, off, mask, shift, v, write_mask, relaxed)                                                         \
+#define REG_SET_EX(x, off, mask, shift, v, write_mask, relaxed)                                                         \
     vop_mask_write((x), (off), (mask), (shift), (v), (write_mask), (relaxed))
 
-#define _REG_SET(vop, name, off, reg, mask, v, relaxed)                                                                \
+#define REG_SET_E(vop, name, off, reg, mask, v, relaxed)                                                                \
     do {                                                                                                               \
         if (VOP_REG_SUPPORT(vop, reg))                                                                                 \
-            __REG_SET(vop, off + reg.offset, mask, reg.shift, v, reg.write_mask, relaxed);                             \
+            REG_SET_EX(vop, (off) + (reg).offset, mask, (reg).shift, v, (reg).write_mask, relaxed);                    \
         else                                                                                                           \
             dev_dbg((vop)->dev, "Warning: not support " #name "\n");                                                   \
     } while (0)
 
-#define REG_SET(x, name, off, reg, v, relaxed) _REG_SET(x, name, off, reg, reg.mask, v, relaxed)
+#define REG_SET(x, name, off, reg, v, relaxed) REG_SET_E(x, name, off, reg, (reg).mask, v, relaxed)
 #define REG_SET_MASK(x, name, off, reg, mask, v, relaxed)                                                              \
-    _REG_SET((x), (name), (off), (reg), (reg).mask &(mask), (v), (relaxed))
+    REG_SET_E((x), (name), (off), (reg), (reg).mask &(mask), (v), (relaxed))
 
 #define VOP_WIN_SET(x, win, name, v) REG_SET((x), (name), (win)->offset, VOP_WIN_NAME(win, name), (v), true)
 #define VOP_WIN_SET_EXT(x, win, ext, name, v) REG_SET((x), (name), 0, (win)->ext->name, (v), true)
@@ -89,8 +89,8 @@
 
 #define VOP_INTR_GET(vop, name) vop_read_reg((vop), 0, &(vop)->data->ctrl->name)
 
-#define VOP_INTR_SET(vop, name, v) REG_SET(vop, name, 0, vop->data->intr->name, v, false)
-#define VOP_INTR_SET_MASK(vop, name, mask, v) REG_SET_MASK(vop, name, 0, vop->data->intr->name, mask, v, false)
+#define VOP_INTR_SET(vop, name, v) REG_SET((vop), name, 0, (vop)->data->intr->name, v, false)
+#define VOP_INTR_SET_MASK(vop, name, mask, v) REG_SET_MASK((vop), name, 0, (vop)->data->intr->name, mask, v, false)
 
 #define VOP_REG_SET(vop, group, name, v) vop_reg_set((vop), &(vop)->data->group->name, 0, ~0, (v), #name)
 
@@ -1904,7 +1904,7 @@ static void vop_plane_atomic_update(struct drm_plane *plane, struct drm_plane_st
      * VOP full need to do rb swap to show rgb888/bgr888 format color correctly
      */
     if ((fb->format->format == DRM_FORMAT_RGB888 || fb->format->format == DRM_FORMAT_BGR888) &&
-        VOP_MAJOR(vop->version) == 3) {
+        VOP_MAJOR(vop->version) == 0x3) {
         rb_swap = !rb_swap;
     }
     VOP_WIN_SET(vop, win, rb_swap, rb_swap);
@@ -2354,12 +2354,14 @@ static int vop_crtc_loader_protect(struct drm_crtc *crtc, bool on)
     return 0;
 }
 
-#define DEBUG_PRINT(args...)                                                                                           \
-    do {                                                                                                               \
-        if (s)                                                                                                         \
-            seq_printf(s, args);                                                                                       \
-        else                                                                                                           \
-            pr_err(args);                                                                                              \
+#define DEBUG_PRINT(args...)                                                                                       \
+    do {                                                                                                           \
+            pr_err(args);                                                                                          \
+    } while (0)
+
+#define DEBUG_PRINT_S(s, args...)                                                                                  \
+    do {                                                                                                           \
+            seq_printf(s, args);                                                                                   \
     } while (0)
 
 static int vop_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
@@ -2414,7 +2416,7 @@ static void vop_dump_connector_on_crtc(struct drm_crtc *crtc, struct seq_file *s
     drm_for_each_connector_iter(connector, &conn_iter)
     {
         if (crtc->state->connector_mask & drm_connector_mask(connector)) {
-            DEBUG_PRINT("    Connector: %s\n", connector->name);
+            DEBUG_PRINT_S(s, "    Connector: %s\n", connector->name);
         }
     }
     drm_connector_list_iter_end(&conn_iter);
@@ -2430,30 +2432,30 @@ static int vop_crtc_debugfs_dump(struct drm_crtc *crtc, struct seq_file *s)
     struct drm_plane *plane;
     int i;
 
-    DEBUG_PRINT("VOP [%s]: %s\n", dev_name(vop->dev), crtc_state->active ? "ACTIVE" : "DISABLED");
+    DEBUG_PRINT_S(s, "VOP [%s]: %s\n", dev_name(vop->dev), crtc_state->active ? "ACTIVE" : "DISABLED");
 
     if (!crtc_state->active) {
         return 0;
     }
 
     vop_dump_connector_on_crtc(crtc, s);
-    DEBUG_PRINT("\tbus_format[%x]: %s\n", state->bus_format, drm_get_bus_format_name(state->bus_format));
-    DEBUG_PRINT("\toverlay_mode[%d] output_mode[%x]", state->yuv_overlay, state->output_mode);
-    DEBUG_PRINT(" color_space[%d]\n", state->color_space);
-    DEBUG_PRINT("    Display mode: %dx%d%s%d\n", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "p",
+    DEBUG_PRINT_S(s, "\tbus_format[%x]: %s\n", state->bus_format, drm_get_bus_format_name(state->bus_format));
+    DEBUG_PRINT_S(s, "\toverlay_mode[%d] output_mode[%x]", state->yuv_overlay, state->output_mode);
+    DEBUG_PRINT_S(s, " color_space[%d]\n", state->color_space);
+    DEBUG_PRINT_S(s, "    Display mode: %dx%d%s%d\n", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "p",
                 drm_mode_vrefresh(mode));
-    DEBUG_PRINT("\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, mode->flags);
-    DEBUG_PRINT("\tH: %d %d %d %d\n", mode->hdisplay, mode->hsync_start, mode->hsync_end, mode->htotal);
-    DEBUG_PRINT("\tV: %d %d %d %d\n", mode->vdisplay, mode->vsync_start, mode->vsync_end, mode->vtotal);
+    DEBUG_PRINT_S(s, "\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, mode->flags);
+    DEBUG_PRINT_S(s, "\tH: %d %d %d %d\n", mode->hdisplay, mode->hsync_start, mode->hsync_end, mode->htotal);
+    DEBUG_PRINT_S(s, "\tV: %d %d %d %d\n", mode->vdisplay, mode->vsync_start, mode->vsync_end, mode->vtotal);
 
     for (i = 0; i < vop->num_wins; i++) {
         plane = &vop->win[i].base;
         vop_plane_info_dump(s, plane);
     }
-    DEBUG_PRINT("    post: sdr2hdr[%d] hdr2sdr[%d]\n", state->hdr.sdr2hdr_state.bt1886eotf_post_conv_en,
+    DEBUG_PRINT_S(s, "    post: sdr2hdr[%d] hdr2sdr[%d]\n", state->hdr.sdr2hdr_state.bt1886eotf_post_conv_en,
                 state->hdr.hdr2sdr_en);
-    DEBUG_PRINT("    pre : sdr2hdr[%d]\n", state->hdr.sdr2hdr_state.bt1886eotf_pre_conv_en);
-    DEBUG_PRINT("    post CSC: r2y[%d] y2r[%d] CSC mode[%d]\n", state->post_r2y_en, state->post_y2r_en,
+    DEBUG_PRINT_S(s, "    pre : sdr2hdr[%d]\n", state->hdr.sdr2hdr_state.bt1886eotf_pre_conv_en);
+    DEBUG_PRINT_S(s, "    post CSC: r2y[%d] y2r[%d] CSC mode[%d]\n", state->post_r2y_en, state->post_y2r_en,
                 state->post_csc_mode);
 
     return 0;
@@ -2471,7 +2473,7 @@ static void vop_crtc_regs_dump(struct drm_crtc *crtc, struct seq_file *s)
     }
 
     for (i = 0; i < dump_len; i += 0x10) {
-        DEBUG_PRINT("0x%08x: %08x %08x %08x %08x\n", i, vop_readl(vop, i), vop_readl(vop, i + 4),
+        DEBUG_PRINT_S(s, "0x%08x: %08x %08x %08x %08x\n", i, vop_readl(vop, i), vop_readl(vop, i + 4),
                     vop_readl(vop, i + 0x8), vop_readl(vop, i + 0xc));
     }
 }
@@ -2488,16 +2490,17 @@ static int vop_gamma_show(struct seq_file *s, void *data)
 
     for (i = 0; i < vop->lut_len; i++) {
         if (i % 0x8 == 0) {
-            DEBUG_PRINT("\n");
+            DEBUG_PRINT_S(s, "\n");
         }
-        DEBUG_PRINT("0x%08x ", vop->lut[i]);
+        DEBUG_PRINT_S(s, "0x%08x ", vop->lut[i]);
     }
-    DEBUG_PRINT("\n");
+    DEBUG_PRINT_S(s, "\n");
 
     return 0;
 }
 
 #undef DEBUG_PRINT
+#undef DEBUG_PRINT_S
 
 static struct drm_info_list vop_debugfs_files[] = {
     {"gamma_lut", vop_gamma_show, 0, NULL},
@@ -2552,7 +2555,7 @@ static enum drm_mode_status vop_crtc_mode_valid(struct drm_crtc *crtc, const str
     }
 
     if (mode->flags & DRM_MODE_FLAG_DBLCLK) {
-        request_clock *= 2;
+        request_clock *= 0x2;
     }
     clock = clk_round_rate(vop->dclk, request_clock * 0x3e8) / 0x3e8;
 
@@ -2704,7 +2707,7 @@ static size_t vop_crtc_bandwidth(struct drm_crtc *crtc, struct drm_crtc_state *c
         act_h = drm_rect_height(&pstate->src) >> 0x10;
         cpp = pstate->fb->format->cpp[0];
 
-        vop_bw_info->frame_bw_mbyte += act_w * act_h / 0x3e8 * cpp * drm_mode_vrefresh(adjusted_mode) / 1000;
+        vop_bw_info->frame_bw_mbyte += act_w * act_h / 0x3e8 * cpp * drm_mode_vrefresh(adjusted_mode) / 0x3e8;
     }
 
     sort(pbandwidth, cnt, sizeof(pbandwidth[0]), vop_bandwidth_cmp, NULL);
@@ -3656,7 +3659,7 @@ static void vop_cfg_update(struct drm_crtc *crtc, struct drm_crtc_state *old_crt
 
 static bool vop_fs_irq_is_pending(struct vop *vop)
 {
-    if (VOP_MAJOR(vop->version) == 3 && VOP_MINOR(vop->version) >= 0x7) {
+    if (VOP_MAJOR(vop->version) == 0x3 && VOP_MINOR(vop->version) >= 0x7) {
         return VOP_INTR_GET_TYPE(vop, status, FS_FIELD_INTR);
     } else {
         return VOP_INTR_GET_TYPE(vop, status, FS_INTR);
@@ -4104,7 +4107,7 @@ static irqreturn_t vop_isr(int irq, void *data)
 #define ERROR_HANDLER(x)                                                                                               \
     do {                                                                                                               \
         if (active_irqs & x##_INTR) {                                                                                  \
-            DRM_DEV_ERROR_RATELIMITED(vop->dev, #x " irq err\n");                                                      \
+            DRM_DEV_ERROR_RATELIMITED((vop)->dev, #x " irq err\n");                                                    \
             active_irqs &= ~x##_INTR;                                                                                  \
             ret = IRQ_HANDLED;                                                                                         \
         }                                                                                                              \
@@ -4220,7 +4223,7 @@ static int vop_plane_init(struct vop *vop, struct vop_win *win, unsigned long po
     win->output_height_prop = drm_property_create_range(vop->drm_dev, DRM_MODE_PROP_IMMUTABLE, "OUTPUT_HEIGHT", 0,
                                                         vop_data->max_input.height);
 
-    win->scale_prop = drm_property_create_range(vop->drm_dev, DRM_MODE_PROP_IMMUTABLE, "SCALE_RATE", 8, 8);
+    win->scale_prop = drm_property_create_range(vop->drm_dev, DRM_MODE_PROP_IMMUTABLE, "SCALE_RATE", 0x8, 0x8);
     /*
      * Support 24 bit(RGB888) or 16 bit(rgb565) color key.
      * Bit 31 is used as a flag to disable (0) or enable
@@ -4751,7 +4754,7 @@ static int vop_bind(struct device *dev, struct device *master, void *data)
     res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gamma_lut");
     if (res) {
         vop->lut_len = resource_size(res) / sizeof(*vop->lut);
-        if (vop->lut_len != 256 && vop->lut_len != 1024) {
+        if (vop->lut_len != 0x100 && vop->lut_len != 0x400) {
             dev_err(vop->dev, "unsupported lut sizes %d\n", vop->lut_len);
             return -EINVAL;
         }

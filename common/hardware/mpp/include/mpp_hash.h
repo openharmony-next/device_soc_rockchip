@@ -77,7 +77,7 @@ static inline int hlist_empty(const struct hlist_head *h)
     return !h->first;
 }
 
-static inline void __hlist_del(struct hlist_node *n)
+static inline void _hlist_del(struct hlist_node *n)
 {
     struct hlist_node *next = n->next;
     struct hlist_node **pprev = n->pprev;
@@ -90,7 +90,7 @@ static inline void __hlist_del(struct hlist_node *n)
 
 static inline void hlist_del(struct hlist_node *n)
 {
-    __hlist_del(n);
+    _hlist_del(n);
     n->next = (struct hlist_node *)LIST_POISON1;
     n->pprev = (struct hlist_node **)LIST_POISON2;
 }
@@ -98,7 +98,7 @@ static inline void hlist_del(struct hlist_node *n)
 static inline void hlist_del_init(struct hlist_node *n)
 {
     if (!hlist_unhashed(n)) {
-        __hlist_del(n);
+        _hlist_del(n);
         INIT_HLIST_NODE(n);
     }
 }
@@ -287,7 +287,7 @@ static inline void hlist_move_list(struct hlist_head *old, struct hlist_head *_n
  * This has to be a macro since HASH_BITS() will not work on pointers since
  * it calculates the size during preprocessing.
  */
-#define hash_empty(hashtable) __hash_empty(hashtable, HASH_SIZE(hashtable))
+#define hash_empty(hashtable) _hash_empty(hashtable, HASH_SIZE(hashtable))
 
 /**
  * hash_for_each - iterate over a hashtable
@@ -325,7 +325,7 @@ static inline unsigned int hash_32(unsigned int val, unsigned int bits)
     return hash >> (32 - bits); // (32 - bits)
 }
 
-static inline unsigned int __hash_32(unsigned int val)
+static inline unsigned int _hash_32(unsigned int val)
 {
     return val * GOLDEN_RATIO_32;
 }
@@ -366,7 +366,7 @@ static inline bool hash_hashed(struct hlist_node *node)
     return !hlist_unhashed(node);
 }
 
-static inline bool __hash_empty(struct hlist_head *ht, unsigned int sz)
+static inline bool _hash_empty(struct hlist_head *ht, unsigned int sz)
 {
     unsigned int i;
 

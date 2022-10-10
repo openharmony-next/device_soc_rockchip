@@ -264,7 +264,6 @@ static void px30_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
         if (ret) {
             dev_err(dev, "%s: set clk_mac_speed rate 25000000 failed: %d\n", __func__, ret);
         }
-
     } else {
         dev_err(dev, "unknown speed value for RMII! speed=%d", speed);
     }
@@ -375,7 +374,6 @@ static void rk1808_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
         if (ret) {
             dev_err(dev, "%s: set clk_mac_speed rate 25000000 failed: %d\n", __func__, ret);
         }
-
     } else {
         dev_err(dev, "unknown speed value for RMII! speed=%d", speed);
     }
@@ -600,7 +598,7 @@ static const struct rk_gmac_ops rk3228_ops = {
 #define RK3288_GRF_SOC_CON1 0x0248
 #define RK3288_GRF_SOC_CON3 0x0250
 
-/*RK3288_GRF_SOC_CON1*/
+/* RK3288_GRF_SOC_CON1 */
 #define RK3288_GMAC_PHY_INTF_SEL_RGMII (GRF_BIT(6) | GRF_CLR_BIT(7) | GRF_CLR_BIT(8))
 #define RK3288_GMAC_PHY_INTF_SEL_RMII (GRF_CLR_BIT(6) | GRF_CLR_BIT(7) | GRF_BIT(8))
 #define RK3288_GMAC_FLOW_CTRL GRF_BIT(9)
@@ -615,7 +613,7 @@ static const struct rk_gmac_ops rk3228_ops = {
 #define RK3288_GMAC_RMII_MODE GRF_BIT(14)
 #define RK3288_GMAC_RMII_MODE_CLR GRF_CLR_BIT(14)
 
-/*RK3288_GRF_SOC_CON3*/
+/* RK3288_GRF_SOC_CON3 */
 #define RK3288_GMAC_TXCLK_DLY_ENABLE GRF_BIT(14)
 #define RK3288_GMAC_TXCLK_DLY_DISABLE GRF_CLR_BIT(14)
 #define RK3288_GMAC_RXCLK_DLY_ENABLE GRF_BIT(15)
@@ -737,7 +735,6 @@ static void rk3308_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
         if (ret) {
             dev_err(dev, "%s: set clk_mac_speed rate 25000000 failed: %d\n", __func__, ret);
         }
-
     } else {
         dev_err(dev, "unknown speed value for RMII! speed=%d", speed);
     }
@@ -1912,7 +1909,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
         return ret;
     }
 
-    /*rmii or rgmii*/
+    /* rmii or rgmii */
     switch (bsp_priv->phy_iface) {
         case PHY_INTERFACE_MODE_RGMII:
             dev_info(dev, "init for RGMII\n");

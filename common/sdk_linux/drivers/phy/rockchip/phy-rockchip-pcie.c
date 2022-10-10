@@ -321,10 +321,10 @@ static const struct rockchip_pcie_data rk3399_pcie_data = {
 };
 
 static const struct of_device_id rockchip_pcie_phy_dt_ids[] = {{
-                                                                   .compatible = "rockchip,rk3399-pcie-phy",
-                                                                   .data = &rk3399_pcie_data,
-                                                               },
-                                                               {}};
+    .compatible = "rockchip,rk3399-pcie-phy",
+    .data = &rk3399_pcie_data,
+},
+{}};
 
 MODULE_DEVICE_TABLE(of, rockchip_pcie_phy_dt_ids);
 

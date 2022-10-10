@@ -464,7 +464,7 @@ static int dw_mipi_dsi_read(struct dw_mipi_dsi *dsi, const struct mipi_dsi_msg *
         return ret;
     }
 
-    for (i = 0; i < len; i += 4) {
+    for (i = 0; i < len; i += 0x4) {
         /* Read fifo must not be empty before all bytes are read */
         ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS, val, !(val & GEN_PLD_R_EMPTY), 0x3e8,
                                  CMD_PKT_STATUS_TIMEOUT_US);
@@ -1093,7 +1093,7 @@ static void dw_mipi_dsi_debugfs_remove(struct dw_mipi_dsi *dsi)
 
 #endif /* CONFIG_DEBUG_FS */
 
-static struct dw_mipi_dsi *__dw_mipi_dsi_probe(struct platform_device *pdev,
+static struct dw_mipi_dsi *_dw_mipi_dsi_probe(struct platform_device *pdev,
                                                const struct dw_mipi_dsi_plat_data *plat_data)
 {
     struct device *dev = &pdev->dev;
@@ -1186,7 +1186,7 @@ EXPORT_SYMBOL_GPL(dw_mipi_dsi_set_slave);
  */
 struct dw_mipi_dsi *dw_mipi_dsi_probe(struct platform_device *pdev, const struct dw_mipi_dsi_plat_data *plat_data)
 {
-    return __dw_mipi_dsi_probe(pdev, plat_data);
+    return _dw_mipi_dsi_probe(pdev, plat_data);
 }
 EXPORT_SYMBOL_GPL(dw_mipi_dsi_probe);
 

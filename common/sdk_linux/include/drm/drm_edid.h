@@ -322,7 +322,7 @@ struct edid {
     /* Vendor & product info */
     u8 mfg_id[2];
     u8 prod_code[2];
-    u32 serial; /* FIXME: byte order */
+    u32 serial; /* byte order */
     u8 mfg_week;
     u8 mfg_year;
     /* EDID version */
@@ -345,9 +345,9 @@ struct edid {
     u8 blue_y;
     u8 white_x;
     u8 white_y;
-    /* Est. timings and mfg rsvd timings*/
+    /* Est. timings and mfg rsvd timings */
     struct est_timings established_timings;
-    /* Standard timings 1-8*/
+    /* Standard timings 1-8 */
     struct std_timing standard_timings[8];
     /* Detailing timings 1-4 */
     struct detailed_timing detailed_timings[4];

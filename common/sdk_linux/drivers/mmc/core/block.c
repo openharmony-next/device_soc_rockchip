@@ -283,10 +283,11 @@ static ssize_t power_ro_lock_store(struct device *dev, struct device_attribute *
         pr_info("%s: Locking boot partition ro until next power on\n", md->disk->disk_name);
         set_disk_ro(md->disk, 1);
 
-        list_for_each_entry(part_md, &md->part, part) if (part_md->area_type == MMC_BLK_DATA_AREA_BOOT)
-        {
-            pr_info("%s: Locking boot partition ro until next power on\n", part_md->disk->disk_name);
-            set_disk_ro(part_md->disk, 1);
+        list_for_each_entry(part_md, &md->part, part){
+            if (part_md->area_type == MMC_BLK_DATA_AREA_BOOT) {
+                pr_info("%s: Locking boot partition ro until next power on\n", part_md->disk->disk_name);
+                set_disk_ro(part_md->disk, 1);
+            }
         }
     }
 out_put:
@@ -1077,7 +1078,6 @@ static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
 
     from = blk_rq_pos(req);
     nr = blk_rq_sectors(req);
-
     do {
         err = 0;
         if (card->quirks & MMC_QUIRK_INAND_CMD38) {
@@ -1113,7 +1113,6 @@ static void mmc_blk_issue_secdiscard_rq(struct mmc_queue *mq, struct request *re
 
     from = blk_rq_pos(req);
     nr = blk_rq_sectors(req);
-
     if (mmc_can_trim(card) && !mmc_erase_group_aligned(card, from, nr)) {
         arg = MMC_SECURE_TRIM1_ARG;
     } else {
@@ -1349,7 +1348,6 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq, 
      */
     do_data_tag = card->ext_csd.data_tag_unit_size && (req->cmd_flags & REQ_META) && (rq_data_dir(req) == WRITE) &&
                   ((brq->data.blocks * brq->data.blksz) >= card->ext_csd.data_tag_unit_size);
-
     if (do_data_tag) {
         brq->data.flags |= MMC_DATA_DAT_TAG;
     }
@@ -1689,9 +1687,7 @@ static void mmc_blk_read_single(struct mmc_queue *mq, struct request *req)
         } else {
             error = BLK_STS_OK;
         }
-
     } while (blk_update_request(req, error, MMC_SINGLE_SECTOR_SIZE));
-
     return;
 
 error_exit:
@@ -1841,7 +1837,7 @@ static void mmc_blk_mq_rw_recovery(struct mmc_queue *mq, struct request *req)
         return;
     }
 
-    /* FIXME: Missing single sector read for large sector size */
+    /* Missing single sector read for large sector size */
     if (!mmc_large_sector(card) && rq_data_dir(req) == READ && brq->data.blocks > 1) {
         /* Read one sector at a time */
         mmc_blk_read_single(mq, req);
@@ -2789,7 +2785,6 @@ static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
         n += sprintf(buf + n, "%02x", ext_csd[i]);
     }
     n += sprintf(buf + n, "\n");
-
     if (n != EXT_CSD_STR_LEN) {
         err = -EINVAL;
         kfree(ext_csd);

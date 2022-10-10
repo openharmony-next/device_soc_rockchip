@@ -70,7 +70,7 @@ int rockchip_drm_dump_plane_buffer(struct vop_dump_info *dump_info, int frame_co
     char format[8];
 
     drm_get_format_name(dump_info->format->format, &format_name);
-    strscpy(format, format_name.str, 5);
+    strscpy(format, format_name.str, 0x5);
     bpp = rockchip_drm_get_bpp(dump_info->format);
 
     if (dump_info->yuv_format) {

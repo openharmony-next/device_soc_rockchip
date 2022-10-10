@@ -186,7 +186,7 @@ static int rd_init(struct rd_device *rd, int major, int minor)
     }
 
     blk_queue_make_request(rd->rd_queue, rd_make_request);
-    blk_queue_max_hw_sectors(rd->rd_queue, 1024);
+    blk_queue_max_hw_sectors(rd->rd_queue, 0x400);
 
     /* This is so fdisk will align partitions on 4k, because of
      * direct_access API needing 4k alignment, returning a PFN

@@ -22,12 +22,9 @@
 #include "hdi_device_common.h"
 #include "hdi_shared_fd.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             const uint32_t INVALIDE_LAYER_ID = 0xffffffff;
             const uint32_t FENCE_TIMEOUT = 3000;
             struct HdiLayerBuffer {
@@ -70,8 +67,7 @@ namespace OHOS
                 int mFd = -1;
             };
 
-            class HdiLayer
-            {
+            class HdiLayer {
             public:
                 explicit HdiLayer(LayerType type) : mType(type)
                 {

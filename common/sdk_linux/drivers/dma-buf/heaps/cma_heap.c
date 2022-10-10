@@ -367,7 +367,7 @@ static const struct dma_heap_ops cma_heap_ops = {
     .allocate = cma_heap_allocate,
 };
 
-static int __add_cma_heap(struct cma *cma, void *data)
+static int _add_cma_heap(struct cma *cma, void *data)
 {
     struct cma_heap *cma_heap;
     struct dma_heap_export_info exp_info;
@@ -399,7 +399,7 @@ static int add_default_cma_heap(void)
     int ret = 0;
 
     if (default_cma) {
-        ret = __add_cma_heap(default_cma, NULL);
+        ret = _add_cma_heap(default_cma, NULL);
     }
 
     return ret;

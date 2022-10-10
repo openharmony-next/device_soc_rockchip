@@ -23,14 +23,10 @@
 #include "hdi_display.h"
 #include "hdi_netlink_monitor.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
-            class HdiSession
-            {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
+            class HdiSession {
             public:
                 void Init();
                 static HdiSession &GetInstance();

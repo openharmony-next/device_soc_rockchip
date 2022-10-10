@@ -191,7 +191,7 @@ struct rockchip_spi {
 
     atomic_t state;
 
-    /*depth of the FIFO buffer */
+    /* depth of the FIFO buffer */
     u32 fifo_len;
     /* frequency of spiclk */
     u32 freq;
@@ -334,7 +334,6 @@ static void rockchip_spi_pio_reader(struct rockchip_spi *rs)
      */
     if (rx_left) {
         u32 ftl = readl_relaxed(rs->regs + ROCKCHIP_SPI_RXFTLR) + 1;
-
         if (rx_left < ftl) {
             rx_left = ftl;
             words = rs->rx_left - rx_left;
@@ -414,15 +413,12 @@ static void rockchip_spi_dma_rxcb(void *data)
     struct spi_controller *ctlr = data;
     struct rockchip_spi *rs = spi_controller_get_devdata(ctlr);
     int state = atomic_fetch_andnot(RXDMA, &rs->state);
-
     if (state & TXDMA && !rs->slave_abort) {
         return;
     }
-
     if (rs->cs_inactive) {
         writel_relaxed(0, rs->regs + ROCKCHIP_SPI_IMR);
     }
-
     spi_enable_chip(rs, false);
     spi_finalize_current_transfer(ctlr);
 }
@@ -432,14 +428,11 @@ static void rockchip_spi_dma_txcb(void *data)
     struct spi_controller *ctlr = data;
     struct rockchip_spi *rs = spi_controller_get_devdata(ctlr);
     int state = atomic_fetch_andnot(TXDMA, &rs->state);
-
     if (state & RXDMA && !rs->slave_abort) {
         return;
     }
-
     /* Wait until the FIFO data completely. */
     wait_for_tx_idle(rs, ctlr->slave);
-
     spi_enable_chip(rs, false);
     spi_finalize_current_transfer(ctlr);
 }
@@ -747,15 +740,12 @@ static int rockchip_spi_probe(struct platform_device *pdev)
     u32 rsd_nsecs;
     bool slave_mode;
     struct pinctrl *pinctrl = NULL;
-
     slave_mode = of_property_read_bool(np, "spi-slave");
-
     if (slave_mode) {
         ctlr = spi_alloc_slave(&pdev->dev, sizeof(struct rockchip_spi));
     } else {
         ctlr = spi_alloc_master(&pdev->dev, sizeof(struct rockchip_spi));
     }
-
     if (!ctlr) {
         return -ENOMEM;
     }

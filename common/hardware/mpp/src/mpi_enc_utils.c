@@ -129,7 +129,7 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, signed int gop_mode)
             // P0/---------------------> P4
             lt_cnt = 0;
 
-            st_cnt = 5;
+            st_cnt = 0x5;
             /* set tsvc4 st-ref struct */
             /* st 0 layer 0 - ref */
             st_ref[0].is_non_ref = 0;
@@ -426,7 +426,7 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
         } break;
         default: {
             /* default use CBR mode */
-            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 17 / 0x10);
+            mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 0x11 / 0x10);
             mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 0xf / 0x10);
         } break;
     }
@@ -452,7 +452,7 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_min", 0xa);    // 10:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_max_i", 0x33); // 51:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_min_i", 0xa);  // 10:mpp cfg value
-                    mpp_enc_cfg_set_s32(cfg, "rc:qp_ip", 2);
+                    mpp_enc_cfg_set_s32(cfg, "rc:qp_ip", 0x2);
                 } break;
                 default: {
                     mpp_err_f("unsupport encoder rc mode %d\n", p->rc_mode);
@@ -697,7 +697,7 @@ int hal_mpp_encode(void *ctx, int dma_fd, unsigned char *buf, size_t *buf_size)
     info.type = MPP_BUFFER_TYPE_EXT_DMA;
     info.fd = dma_fd;
     info.size = p->frame_size & 0x07ffffff;
-    info.index = (p->frame_size & 0xf8000000) >> 27;
+    info.index = (p->frame_size & 0xf8000000) >> 0x1b;
 
     ret = mpp_buffer_import(&cam_buf, &info);
     if (ret != MPP_SUCCESS) {

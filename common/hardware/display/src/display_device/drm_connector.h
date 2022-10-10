@@ -25,20 +25,16 @@
 #include "hdi_device_common.h"
 #include "hdi_shared_fd.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             const std::string PROP_DPMS = "DPMS";
             const std::string PROP_CRTCID = "CRTC_ID";
             const std::string PROP_BRIGHTNESS = "brightness";
             class DrmDevice;
             class DrmModeBlock;
 
-            class DrmMode
-            {
+            class DrmMode {
             public:
                 DrmMode(){};
                 DrmMode(drmModeModeInfo &modeInfo, uint32_t id) : mModeInfo(modeInfo), mId(id)
@@ -56,8 +52,7 @@ namespace OHOS
                 int32_t mId = -1;
             };
 
-            class DrmModeBlock
-            {
+            class DrmModeBlock {
             public:
                 explicit DrmModeBlock(DrmMode &mode);
                 virtual ~DrmModeBlock();
@@ -71,8 +66,7 @@ namespace OHOS
                 uint32_t mBlockId = DRM_INVALID_ID;
             };
 
-            class DrmConnector
-            {
+            class DrmConnector {
             public:
                 DrmConnector(drmModeConnector c, FdPtr &fd);
                 virtual ~DrmConnector(){};

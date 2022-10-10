@@ -22,20 +22,16 @@
 #include "hdi_device_common.h"
 #include "hdi_display.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             const std::string PROP_ACTIVE = "ACTIVE";
             const std::string PROP_MODEID = "MODE_ID";
             const std::string PROP_OUTFENCE = "OUT_FENCE_PTR";
 
             class DrmDevice;
 
-            class DrmCrtc
-            {
+            class DrmCrtc {
             public:
                 DrmCrtc(drmModeCrtcPtr c, uint32_t pipe);
                 virtual ~DrmCrtc(){};

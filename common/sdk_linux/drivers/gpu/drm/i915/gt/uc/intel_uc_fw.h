@@ -66,7 +66,7 @@ struct intel_uc_fw {
     enum intel_uc_fw_type type;
     union {
         const enum intel_uc_fw_status status;
-        enum intel_uc_fw_status __status; /* no accidental overwrites */
+        enum intel_uc_fw_status _status; /* no accidental overwrites */
     };
     const char *path;
     bool user_overridden;
@@ -92,7 +92,7 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_statu
 #else
 static inline void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_status status)
 {
-    uc_fw->__status = status;
+    uc_fw->_status = status;
 }
 #endif
 
@@ -211,7 +211,7 @@ static inline void intel_uc_fw_sanitize(struct intel_uc_fw *uc_fw)
     }
 }
 
-static inline u32 __intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
+static inline u32 _intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
 {
     return sizeof(struct uc_css_header) + uc_fw->ucode_size;
 }
@@ -230,7 +230,7 @@ static inline u32 intel_uc_fw_get_upload_size(struct intel_uc_fw *uc_fw)
         return 0;
     }
 
-    return __intel_uc_fw_get_upload_size(uc_fw);
+    return _intel_uc_fw_get_upload_size(uc_fw);
 }
 
 void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw, enum intel_uc_fw_type type);

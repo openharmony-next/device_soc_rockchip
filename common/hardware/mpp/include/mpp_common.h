@@ -45,11 +45,11 @@
 #define MPP_ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 #define MPP_ALIGN(x, a) (((x) + (a)-1) & ~((a)-1))
 #define MPP_VSWAP(a, b)                                                                                                \
-    {                                                                                                                  \
+    do {                                                                                                               \
         (a) ^= (b);                                                                                                    \
         (b) ^= (a);                                                                                                    \
         (a) ^= (b);                                                                                                    \
-    }
+    } while (0)
 
 #define MPP_RB16(x) ((((const unsigned char *)(x))[0] << 8) | ((const unsigned char *)(x))[1])
 #define MPP_WB16(p, d)                                                                                                 \

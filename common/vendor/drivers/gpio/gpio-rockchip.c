@@ -101,11 +101,11 @@ static inline void rockchip_gpio_writel_bit(struct rockchip_pin_bank *bank, u32 
 
     if (bank->gpio_type == GPIO_TYPE_V2) {
         if (value) {
-            data = BIT(bit % 16) | BIT(bit % 16 + 16);
+            data = BIT(bit % 0x10) | BIT(bit % 0x10 + 0x10);
         } else {
-            data = BIT(bit % 16 + 16);
+            data = BIT(bit % 0x10 + 0x10);
         }
-        writel(data, bit >= 16 ? reg + 0x4 : reg);
+        writel(data, bit >= 0x10 ? reg + 0x4 : reg);
     } else {
         data = readl(reg);
         data &= ~BIT(bit);
@@ -122,8 +122,8 @@ static inline u32 rockchip_gpio_readl_bit(struct rockchip_pin_bank *bank, u32 bi
     u32 data;
 
     if (bank->gpio_type == GPIO_TYPE_V2) {
-        data = readl(bit >= 16 ? reg + 0x4 : reg);
-        data >>= bit % 16;
+        data = readl(bit >= 0x10 ? reg + 0x4 : reg);
+        data >>= bit % 0x10;
     } else {
         data = readl(reg);
         data >>= bit;
@@ -198,13 +198,13 @@ static int rockchip_gpio_set_debounce(struct gpio_chip *gc, unsigned int offset,
     if (!IS_ERR(bank->db_clk)) {
         div_debounce_support = true;
         freq = clk_get_rate(bank->db_clk);
-        max_debounce = (GENMASK(23, 0) + 1) * 2 * 1000000 / freq;
+        max_debounce = (GENMASK(0x17, 0) + 1) * 0x2 * 0xf4240 / freq;
         if (debounce > max_debounce) {
             return -EINVAL;
         }
 
         div = debounce * freq;
-        div_reg = DIV_ROUND_CLOSEST_ULL(div, 2 * USEC_PER_SEC) - 1;
+        div_reg = DIV_ROUND_CLOSEST_ULL(div, 0x2 * USEC_PER_SEC) - 1;
     } else {
         div_debounce_support = false;
     }
@@ -477,13 +477,13 @@ static int rockchip_interrupts_register(struct rockchip_pin_bank *bank)
     struct irq_chip_generic *gc;
     int ret;
 
-    bank->domain = irq_domain_add_linear(bank->of_node, 32, &irq_generic_chip_ops, NULL);
+    bank->domain = irq_domain_add_linear(bank->of_node, 0x20, &irq_generic_chip_ops, NULL);
     if (!bank->domain) {
         dev_warn(bank->dev, "could not initialize irq domain for bank %s\n", bank->name);
         return -EINVAL;
     }
 
-    ret = irq_alloc_domain_generic_chips(bank->domain, 32, 1, bank->name, handle_level_irq, clr, 0, 0);
+    ret = irq_alloc_domain_generic_chips(bank->domain, 0x20, 1, bank->name, handle_level_irq, clr, 0, 0);
     if (ret) {
         dev_err(bank->dev, "could not alloc generic chips for bank %s\n", bank->name);
         irq_domain_remove(bank->domain);

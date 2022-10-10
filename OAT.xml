@@ -32,14 +32,14 @@
                 <policyitem type="copyright" name="Institute of Software, CAS." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By ISCAS"/>           
                 <policyitem type="copyright" name="Shenzhen Kaihong DID Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>           
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
-		        <policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
+		<policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
                 <policyitem type="license" name="MIT" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="Intel Corporation" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="iSoftStone Information Technology (Group) Co.,Ltd. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/> 
-				<policyitem type="copyright" name="FuZhou Lockzhiner Electronic Co., Ltd. All rights reserved." path=".*" desc=""/>
+		<policyitem type="copyright" name="FuZhou Lockzhiner Electronic Co., Ltd. All rights reserved." path=".*" desc=""/>
                 <policyitem type="copyright" name="Lockzhiner Electronics Co., Ltd." path=".*" desc=""/>
-				<policyitem type="copyright" name="Shenzhen Kaihong Digital Industry Development Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Kaihong"/>
-				<policyitem type="license" name="EndUserLicenseAgreement" path=".*" desc="EULA file"/>
+		<policyitem type="copyright" name="Shenzhen Kaihong Digital Industry Development Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Kaihong"/>
+		<policyitem type="license" name="EndUserLicenseAgreement" path=".*" desc="EULA file"/>
 	        </policy>
         </policylist>
         <filefilterlist>
@@ -66,19 +66,19 @@
                 <filteritem type="filepath" name="rk3568/hardware/wifi/proc/sys/net/ipv4/ping_group_range/*" desc="project configuration file"/>
                 <filteritem type="filepath" name="rk2206/hardware/End User License Agreement.md" desc=""/>
                 <filteritem type="filepath" name="rk2206/sdk_liteos/loader/End User License Agreement.md" desc=""/>
-				<filteritem type="filepath" name="rk3566/sdk_linux/.*" desc="thirdparty file"/>
-				<filteritem type="filepath" name="rk3566/vendor/.*" desc="thirdparty file"/>
-				<filteritem type="filepath" name="common/sdk_linux/.*" desc="thirdparty file"/>
-				<filteritem type="filepath" name="common/vendor/.*" desc="thirdparty file"/>
+		<filteritem type="filepath" name="rk3566/sdk_linux/.*" desc="thirdparty file"/>
+		<filteritem type="filepath" name="rk3566/vendor/.*" desc="thirdparty file"/>
+		<filteritem type="filepath" name="common/sdk_linux/.*" desc="thirdparty file"/>
+		<filteritem type="filepath" name="common/vendor/.*" desc="thirdparty file"/>
                 <filteritem type="filepath" name="common/hardware/isp/bin64/*" desc="isp bin file"/>
-				<filteritem type="filepath" name="common/hardware/isp/lib64/*" desc="isp lib file"/>
-				<filteritem type="filepath" name="common/hardware/isp/bin/*" desc="isp bin file"/>
-				<filteritem type="filepath" name="common/hardware/isp/lib/*" desc="isp lib file"/>
-				<filteritem type="filepath" name="common/hardware/rga/lib64/*" desc="so file"/>
+		<filteritem type="filepath" name="common/hardware/isp/lib64/*" desc="isp lib file"/>
+		<filteritem type="filepath" name="common/hardware/isp/bin/*" desc="isp bin file"/>
+		<filteritem type="filepath" name="common/hardware/isp/lib/*" desc="isp lib file"/>
+		<filteritem type="filepath" name="common/hardware/rga/lib64/*" desc="so file"/>
                 <filteritem type="filepath" name="common/hardware/rga/lib/*" desc="so file"/>
-				<filteritem type="filepath" name="common/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
+		<filteritem type="filepath" name="common/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
                 <filteritem type="filepath" name="common/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
-				<filteritem type="filepath" name="common/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
+		<filteritem type="filepath" name="common/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
                 <filteritem type="filepath" name="common/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
 		<!--filteritem type="filename" name="*.uvwxyz" desc="Describe the reason for filtering scan results"/-->
                 <!--filteritem type="filepath" name="abcdefg/.*.uvwxyz" desc="Describe the reason for filtering scan results"/-->

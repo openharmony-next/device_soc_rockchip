@@ -32,8 +32,8 @@
  * SOFTWARE.
  */
 
-#ifndef _RKISP_PATH_VIDEO_H
-#define _RKISP_PATH_VIDEO_H
+#ifndef RKISP_PATH_VIDEO_H
+#define RKISP_PATH_VIDEO_H
 
 #include "common.h"
 #include "capture_v1x.h"

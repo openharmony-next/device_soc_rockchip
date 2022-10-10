@@ -23,17 +23,13 @@
 #include "hdi_composer.h"
 #include "hdi_layer.h"
 
-namespace OHOS
-{
-    namespace HDI
-    {
-        namespace DISPLAY
-        {
+namespace OHOS {
+    namespace HDI {
+        namespace DISPLAY {
             const uint32_t INVALIDE_DISPLAY_ID = 0xffffffff;
             const uint32_t DISPLAY_TYPE_DRM = (1 << 31);
 
-            class VsyncCallBack
-            {
+            class VsyncCallBack {
             public:
                 VsyncCallBack(VBlankCallback cb, void *data, uint32_t pipe);
                 virtual void Vsync(unsigned int sequence, uint64_t ns);
@@ -51,8 +47,7 @@ namespace OHOS
                 uint32_t mPipe;
             };
 
-            class HdiDisplay
-            {
+            class HdiDisplay {
             public:
                 uint32_t GetId() const
                 {

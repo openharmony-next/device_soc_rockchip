@@ -106,11 +106,11 @@ struct hw_cdc_tlp_tmp {
 #define NCM_TX_DEFAULT_TIMEOUT_MS 2
 
 static int ncm_prefer_32 = 1;
-// module_param(ncm_prefer_32, bool, S_IRUGO);
+
 module_param(ncm_prefer_32, int, S_IRUGO);
 
 static int ncm_prefer_crc = 0;
-// module_param(ncm_prefer_crc, bool, S_IRUGO);
+
 module_param(ncm_prefer_crc, int, S_IRUGO);
 
 static unsigned long ncm_tx_timeout = NCM_TX_DEFAULT_TIMEOUT_MS;
@@ -127,7 +127,7 @@ static int rt_debug = 0;
 module_param(rt_debug, int, S_IRUGO | S_IWUSR);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 26)
-// #include <linux/unaligned/access_ok.h>
+
 #else
 static inline u16 get_unaligned_le16(const void *p)
 {
@@ -386,7 +386,7 @@ static inline void put_ncm(__le16 **p, unsigned size, unsigned val)
         case 1:
             put_unaligned_le16((u16)val, *p);
             break;
-        case 2:
+        case 0x02:
             put_unaligned_le32((u32)val, *p);
 
             break;
@@ -405,7 +405,7 @@ static inline unsigned get_ncm(__le16 **p, unsigned size)
         case 1:
             tmp = get_unaligned_le16(*p);
             break;
-        case 2:
+        case 0x02:
             tmp = get_unaligned_le32(*p);
             break;
         default:
@@ -524,7 +524,7 @@ struct ntb {
 
 struct ncm_ctx {
     struct usb_cdc_ncm_desc_hw *ncm_desc;
-    // struct usbnet *unet;
+    
     struct hw_cdc_net *ndev;
     struct usb_interface *control;
     struct usb_interface *data;
@@ -686,7 +686,7 @@ int hw_get_endpoints(struct hw_cdc_net *dev, struct usb_interface *intf)
     for (tmp = 0; tmp < intf->num_altsetting; tmp++) {
         unsigned ep;
 
-        // in = out = status = NULL;
+        
         in = NULL;
         out = NULL;
         status = NULL;
@@ -795,7 +795,7 @@ void hw_skb_return(struct hw_cdc_net *dev, struct sk_buff *skb)
     int status;
     u32 sn;
 
-    if (skb->len > 128) {
+    if (skb->len > 0x80) {
         sn = be32_to_cpu(*(u32 *)(skb->data + 0x26));
         devdbg(dev, "hw_skb_return,len:%d receive sn:%x,  time:%ld-%ld", skb->len, sn, current_kernel_time().tv_sec,
                current_kernel_time().tv_nsec);
@@ -899,7 +899,7 @@ static int hw_change_mtu(struct net_device *net, int new_mtu)
 }
 
 /*-------------------------------------------------------------------------*/
-// #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 30)
+
 static struct net_device_stats *hw_get_stats(struct net_device *net)
 {
     struct hw_cdc_net *dev = netdev_priv(net);
@@ -1875,7 +1875,7 @@ static void hw_bh(unsigned long param)
             int i;
 
             // don't refill the queue all at once
-            for (i = 0; i < 10 && dev->rxq.qlen < qlen; i++) {
+            for (i = 0; i < 0x0A && dev->rxq.qlen < qlen; i++) {
                 urb = usb_alloc_urb(0, GFP_ATOMIC);
                 if (urb != NULL) {
                     rx_submit(dev, urb, GFP_ATOMIC);
@@ -1956,10 +1956,10 @@ static int hw_eth_mac_addr(struct net_device *dev, void *p)
 {
     dev->dev_addr[0] = 0x00;
     dev->dev_addr[1] = 0x1e;
-    dev->dev_addr[2] = 0x10;
-    dev->dev_addr[3] = 0x1f;
-    dev->dev_addr[4] = 0x00;
-    dev->dev_addr[5] = 0x01;
+    dev->dev_addr[0x02] = 0x10;
+    dev->dev_addr[0x03] = 0x1f;
+    dev->dev_addr[0x04] = 0x00;
+    dev->dev_addr[0x05] = 0x01;
 
     return 0;
 }
@@ -2087,7 +2087,7 @@ static int cdc_ncm_config(struct ncm_ctx *ctx)
         ctx->rx_max_ntb = NCM_NTB_HARD_MAX_IN_SIZE;
         put_unaligned_le32(ctx->rx_max_ntb, b);
         err = usb_control_msg(udev, tx_pipe, USB_CDC_SET_NTB_INPUT_SIZE,
-                              USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT, 0, control_if, b, 4,
+                              USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT, 0, control_if, b, 0x04,
                               NCM_CONTROL_TIMEOUT);
         if (err < 0) {
             deverr(ctx->ndev, "failed setting NTB input size\n");
@@ -2325,7 +2325,7 @@ static inline int ntb_init(struct ncm_ctx *ctx, struct ntb *n, unsigned size)
     dgrams_end = popts->nth_size;
 
     n->ndp_off = ALIGN(dgrams_end, ctx->tx_align);
-    n->ndp_len = popts->ndp_size + 2 * 2 * popts->dgram_item_len;
+    n->ndp_len = popts->ndp_size + 0x02 * 0x02 * popts->dgram_item_len;
     n->dgrams_end = dgrams_end;
 
     if (NTB_LEN(n) > n->max_len) {
@@ -2349,7 +2349,7 @@ static inline int ntb_add_dgram(struct ncm_ctx *ctx, struct ntb *n, unsigned dgr
     new_dgrams_end = dgram_off + dgram_len;
 
     new_ndp_off = ALIGN(new_dgrams_end, ctx->tx_align);
-    new_ndp_len = n->ndp_len + 2 * 2 * popts->dgram_item_len;
+    new_ndp_len = n->ndp_len + 0x02 * 0x02 * popts->dgram_item_len;
 
     if ((new_ndp_off + new_ndp_len) > n->max_len) {
         return -EINVAL;
@@ -2523,7 +2523,7 @@ static struct sk_buff *cdc_ncm_tx_fixup(struct hw_cdc_net *dev, struct sk_buff *
         is_curr_ntb_new = 1;
     }
 
-    if (skb->len < 128) {
+    if (skb->len < 0x80) {
         sn = be32_to_cpu(*(u32 *)(skb->data + 0x2a));
         devdbg(dev, "get pc ACK SN:%x  time:%ld-%ld", sn, current_kernel_time().tv_sec, current_kernel_time().tv_nsec);
     } else {
@@ -2652,7 +2652,7 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     }
 #endif
     printk("Meig NCM driver version:%s\n", DRIVER_VERSION);
-    //    DECLARE_MAC_BUF(mac);
+    
     deviceisBalong = false;
 
     name = udev->dev.driver->name;
@@ -2666,7 +2666,7 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     // set up our own records
     net = alloc_etherdev(sizeof(*dev));
     if (!net) {
-        // dbg ("can't kmalloc dev");
+        
         goto out;
     }
 
@@ -2700,7 +2700,7 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     mutex_init(&dev->phy_mutex);
 
     dev->net = net;
-    // strcpy (net->name, "eth%d");
+    
     memcpy(net->dev_addr, node_id, sizeof node_id);
 
     /* rx and tx sides can use different message sizes;
@@ -2772,7 +2772,7 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
 
     netif_device_attach(net);
 
-    // kernel_thread(hw_check_conn_status, (void *)net, 0);
+    
 
     /*set the carrier off as default*/
     netif_carrier_off(net);
@@ -2780,9 +2780,9 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     if (!deviceisBalong) {
         dev->qmi_sync = 0;
         INIT_DELAYED_WORK(&dev->status_work, hw_cdc_check_status_work);
-        schedule_delayed_work(&dev->status_work, 10 * HZ);
+        schedule_delayed_work(&dev->status_work, 0x0A * HZ);
     }
-    // hw_check_conn_status(udev);
+    
     //
 
     return 0;
@@ -2855,8 +2855,8 @@ int hw_send_tlp_download_request(struct usb_interface *intf)
     req.wIndex = interface->desc.bInterfaceNumber;
     req.wValue = 1;
     req.wLength = 1;
-    // req.data = buf;
-    req.timeout = 1000;
+    
+    req.timeout = 0x3E8;
     retval = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), req.bRequest, req.bRequestType, req.wValue, req.wIndex,
                              buf, req.wLength, req.timeout);
     /*check the TLP feature is activated or not, response value 0x01 indicates success*/
@@ -2924,12 +2924,12 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
 
     memset(info, 0, sizeof *info);
     info->control = intf;
-    while (len > 3) {
+    while (len > 0x03) {
         if (buf[1] != USB_DT_CS_INTERFACE) {
             goto next_desc;
         }
 
-        switch (buf[2]) {
+        switch (buf[0x02]) {
             case USB_CDC_HEADER_TYPE:
                 if (info->header) {
                     dev_dbg(&intf->dev, "extra CDC header\n");
@@ -3204,10 +3204,10 @@ static inline int hw_get_ethernet_addr(struct hw_cdc_net *dev)
     dev->net->dev_addr[0] = 0x00;
     dev->net->dev_addr[1] = 0x1e;
 
-    dev->net->dev_addr[2] = 0x10;
-    dev->net->dev_addr[3] = 0x1f;
-    dev->net->dev_addr[4] = 0x00;
-    dev->net->dev_addr[5] = 0x01; /*change 0x04 into 0x01 20100129*/
+    dev->net->dev_addr[0x02] = 0x10;
+    dev->net->dev_addr[0x03] = 0x1f;
+    dev->net->dev_addr[0x04] = 0x00;
+    dev->net->dev_addr[0x05] = 0x01; /*change 0x04 into 0x01 20100129*/
 
     return 0;
 }
@@ -3605,7 +3605,7 @@ static void hw_cdc_status(struct hw_cdc_net *dev, struct urb *urb)
             if (netif_msg_timer(dev)) {
                 devdbg(dev, "CDC: speed change (len %d)", urb->actual_length);
             }
-            if (urb->actual_length != (sizeof *event + 8)) {
+            if (urb->actual_length != (sizeof *event + 0x08)) {
                 set_bit(EVENT_STS_SPLIT, &dev->flags);
             } else {
                 dumpspeed(dev, (__le32 *)&event[1]);
@@ -3639,8 +3639,8 @@ static int hw_send_qmi_request_no_resp(struct usb_interface *intf, unsigned char
 static void hw_cdc_check_status_work(struct work_struct *work)
 
 {
-    // struct hw_cdc_net *net = usb_get_intfdata(intf);
-    // usb_device *udev = interface_to_usbdev(intf);
+    
+    
     struct hw_cdc_net *dev = container_of(work, struct hw_cdc_net, status_work.work);
 
     int ret;
@@ -3655,44 +3655,44 @@ static void hw_cdc_check_status_work(struct work_struct *work)
                                             0x20, 0x00, 0x04, 0x00, 0x01, 0x01, 0x00, 0x00};
     dev->qmi_sync = 1;
 
-    hw_send_qmi_request_no_resp(dev->intf, set_instance_req, 0x10, resp_buf, 56);
+    hw_send_qmi_request_no_resp(dev->intf, set_instance_req, 0x10, resp_buf, 0x38);
 
-    ret = hw_send_qmi_request(dev->intf, client_id_req, 0x10, resp_buf, 56);
+    ret = hw_send_qmi_request(dev->intf, client_id_req, 0x10, resp_buf, 0x38);
     if (0 == ret) {
         printk(KERN_ERR "%s: Get client ID failed\n", __FUNCTION__);
         goto failed;
     }
-    status_req[5] = resp_buf[23];
-    memset(resp_buf, 0, 56 * sizeof(unsigned char));
+    status_req[0x05] = resp_buf[0x17];
+    memset(resp_buf, 0, 0x38 * sizeof(unsigned char));
 
-    // for (repeat = 0; repeat < 3; repeat ++)
+    
     for (repeat = 0; repeat < 3; repeat++) {
-        ret = hw_send_qmi_request(dev->intf, status_req, 13, resp_buf, 56);
+        ret = hw_send_qmi_request(dev->intf, status_req, 0x0D, resp_buf, 0x38);
         if (0 == ret) {
             printk(KERN_ERR "%s: Get connection status failed\n", __FUNCTION__);
             continue;
         }
 
-        if (0x02 == resp_buf[23]) {
+        if (0x02 == resp_buf[0x17]) {
             printk(KERN_ERR "%s: carrier on\n", __FUNCTION__);
             netif_carrier_on(dev->net);
             break;
         } else {
 
             printk(KERN_ERR "%s: carrier off\n", __FUNCTION__);
-            // netif_carrier_off(dev->net);
+            
         }
     }
 failed:
     rel_client_id_req[0x0f] = 0x02;
-    rel_client_id_req[0x10] = status_req[5];
-    memset(resp_buf, 0, 56 * sizeof(unsigned char));
+    rel_client_id_req[0x10] = status_req[0x05];
+    memset(resp_buf, 0, 0x38 * sizeof(unsigned char));
 
-    ret = hw_send_qmi_request_no_resp(dev->intf, rel_client_id_req, 0x11, resp_buf, 56);
+    ret = hw_send_qmi_request_no_resp(dev->intf, rel_client_id_req, 0x11, resp_buf, 0x38);
 
     dev->qmi_sync = 0;
     cancel_delayed_work(&dev->status_work);
-    // memset(resp_buf, 0, 56 * sizeof (unsigned char));
+    
     return;
 }
 static int hw_send_qmi_request_no_resp(struct usb_interface *intf, unsigned char *snd_req, int snd_len,
@@ -3701,9 +3701,9 @@ static int hw_send_qmi_request_no_resp(struct usb_interface *intf, unsigned char
     int ret;
     int index = 0;
     struct usb_device *udev = interface_to_usbdev(intf);
-    for (index = 0; index < 3; index++) {
+    for (index = 0; index < 0x03; index++) {
         ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0x00, 0x21, 0x00,
-                              intf->cur_altsetting->desc.bInterfaceNumber, snd_req, snd_len, 5000);
+                              intf->cur_altsetting->desc.bInterfaceNumber, snd_req, snd_len, 0x1388);
         if (ret < 0) {
             printk(KERN_ERR "%s: send the qmi request failed\n", __FUNCTION__);
             continue;
@@ -3723,46 +3723,46 @@ static int hw_send_qmi_request(struct usb_interface *intf, unsigned char *snd_re
     struct hw_cdc_net *net = usb_get_intfdata(intf);
 
     ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0x00, 0x21, 0x00, intf->cur_altsetting->desc.bInterfaceNumber,
-                          snd_req, snd_len, 5000);
+                          snd_req, snd_len, 0x1388);
 
     if (ret < 0) {
         printk(KERN_ERR "%s: send the qmi request failed\n", __FUNCTION__);
         return ret;
     }
 
-    while (index < 10) {
+    while (index < 0x0A) {
         ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), 0x01, 0xA1, 0x00,
-                              intf->cur_altsetting->desc.bInterfaceNumber, read_resp, resp_len, 1000);
+                              intf->cur_altsetting->desc.bInterfaceNumber, read_resp, resp_len, 0x3E8);
         if (ret <= 0) {
             printk(KERN_ERR "%s: %d Get response failed\n", __FUNCTION__, index);
-            msleep(10);
+            msleep(0x0A);
         } else {
-            if (0x00 == read_resp[4]) {
-                if (0x01 == read_resp[6] && snd_req[5] == read_resp[5] && snd_req[8] == read_resp[8] &&
-                    snd_req[9] == read_resp[9]) {
+            if (0x00 == read_resp[0x04]) {
+                if (0x01 == read_resp[0x06] && snd_req[0x05] == read_resp[0x05] && snd_req[0x08] == read_resp[0x08] &&
+                    snd_req[0x09] == read_resp[0x09]) {
                     ret = 1;
                     break;
                 }
-            } else if (0x01 == read_resp[4]) {
-                if (0x02 == read_resp[6] && snd_req[5] == read_resp[5] && snd_req[9] == read_resp[9] &&
-                    snd_req[10] == read_resp[10]) {
+            } else if (0x01 == read_resp[0x04]) {
+                if (0x02 == read_resp[0x06] && snd_req[0x05] == read_resp[0x05] && snd_req[0x09] == read_resp[0x09] &&
+                    snd_req[0x0A] == read_resp[0x0A]) {
                     printk(KERN_ERR "%s: get the conn status req=%02x resp\n", __FUNCTION__, snd_req[9]);
                     ret = 1;
                     break;
                 }
-            } else if (0x04 == read_resp[4]) {
-                if (snd_req[9] == read_resp[9] && snd_req[10] == read_resp[10] && 0x02 == read_resp[16]) {
+            } else if (0x04 == read_resp[0x04]) {
+                if (snd_req[0x09] == read_resp[0x09] && snd_req[0x0A] == read_resp[0x0A] && 0x02 == read_resp[0x10]) {
                     printk(KERN_ERR "%s: get the conn status ind= carrier on\n", __FUNCTION__);
                     netif_carrier_on(net->net);
                 }
             }
         }
-        // index ++;
+        
         index++;
         continue;
     }
 
-    if (index >= 10) {
+    if (index >= 0x0A) {
         ret = 0;
     }
     return ret;

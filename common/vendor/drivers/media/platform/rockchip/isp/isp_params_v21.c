@@ -12,9 +12,9 @@
 #include "regs_v2x.h"
 #include "isp_params_v21.h"
 
-#define ISP2X_PACK_4BYTE(a, b, c, d) (((a)&0xFF) << 0 | ((b)&0xFF) << 8 | ((c)&0xFF) << 16 | ((d)&0xFF) << 24)
+#define ISP2X_PACK_4BYTE(a, b, c, d) ((((a)&0xFF) << 0) | (((b)&0xFF) << 8) | (((c)&0xFF) << 16) | (((d)&0xFF) << 24))
 
-#define ISP2X_PACK_2SHORT(a, b) (((a)&0xFFFF) << 0 | ((b)&0xFFFF) << 16)
+#define ISP2X_PACK_2SHORT(a, b) ((((a)&0xFFFF) << 0) | (((b)&0xFFFF) << 16))
 
 #define ISP2X_REG_WR_MASK BIT(31) // disable write protect
 #define ISP2X_NOBIG_OVERFLOW_SIZE (2688 * 1536)
@@ -36,44 +36,44 @@ static void isp_dpcc_config(struct rkisp_isp_params_vdev *params_vdev, const str
     value = rkisp_ioread32(params_vdev, ISP_DPCC0_MODE);
     value &= ISP_DPCC_EN;
 
-    value |= (arg->stage1_enable & 0x01) << 2 | (arg->grayscale_mode & 0x01) << 1;
+    value |= (arg->stage1_enable & 0x01) << 0x02 | (arg->grayscale_mode & 0x01) << 1;
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_MODE);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_MODE);
 
-    value = (arg->sw_rk_out_sel & 0x03) << 5 | (arg->sw_dpcc_output_sel & 0x01) << 4 |
-            (arg->stage1_rb_3x3 & 0x01) << 3 | (arg->stage1_g_3x3 & 0x01) << 2 |
+    value = (arg->sw_rk_out_sel & 0x03) << 0x05 | (arg->sw_dpcc_output_sel & 0x01) << 0x04 |
+            (arg->stage1_rb_3x3 & 0x01) << 0x03 | (arg->stage1_g_3x3 & 0x01) << 0x02 |
             (arg->stage1_incl_rb_center & 0x01) << 1 | (arg->stage1_incl_green_center & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_OUTPUT_MODE);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_OUTPUT_MODE);
 
-    value = (arg->stage1_use_fix_set & 0x01) << 3 | (arg->stage1_use_set_3 & 0x01) << 2 |
+    value = (arg->stage1_use_fix_set & 0x01) << 0x03 | (arg->stage1_use_set_3 & 0x01) << 0x02 |
             (arg->stage1_use_set_2 & 0x01) << 1 | (arg->stage1_use_set_1 & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_SET_USE);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_SET_USE);
 
-    value = (arg->sw_rk_red_blue1_en & 0x01) << 13 | (arg->rg_red_blue1_enable & 0x01) << 12 |
-            (arg->rnd_red_blue1_enable & 0x01) << 11 | (arg->ro_red_blue1_enable & 0x01) << 10 |
-            (arg->lc_red_blue1_enable & 0x01) << 9 | (arg->pg_red_blue1_enable & 0x01) << 8 |
-            (arg->sw_rk_green1_en & 0x01) << 5 | (arg->rg_green1_enable & 0x01) << 4 |
-            (arg->rnd_green1_enable & 0x01) << 3 | (arg->ro_green1_enable & 0x01) << 2 |
+    value = (arg->sw_rk_red_blue1_en & 0x01) << 0x0D | (arg->rg_red_blue1_enable & 0x01) << 0x0C |
+            (arg->rnd_red_blue1_enable & 0x01) << 0x0B | (arg->ro_red_blue1_enable & 0x01) << 0x0A |
+            (arg->lc_red_blue1_enable & 0x01) << 0x09 | (arg->pg_red_blue1_enable & 0x01) << 0x08 |
+            (arg->sw_rk_green1_en & 0x01) << 0x05 | (arg->rg_green1_enable & 0x01) << 0x04 |
+            (arg->rnd_green1_enable & 0x01) << 0x03 | (arg->ro_green1_enable & 0x01) << 0x02 |
             (arg->lc_green1_enable & 0x01) << 1 | (arg->pg_green1_enable & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_METHODS_SET_1);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_METHODS_SET_1);
 
-    value = (arg->sw_rk_red_blue2_en & 0x01) << 13 | (arg->rg_red_blue2_enable & 0x01) << 12 |
-            (arg->rnd_red_blue2_enable & 0x01) << 11 | (arg->ro_red_blue2_enable & 0x01) << 10 |
-            (arg->lc_red_blue2_enable & 0x01) << 9 | (arg->pg_red_blue2_enable & 0x01) << 8 |
-            (arg->sw_rk_green2_en & 0x01) << 5 | (arg->rg_green2_enable & 0x01) << 4 |
-            (arg->rnd_green2_enable & 0x01) << 3 | (arg->ro_green2_enable & 0x01) << 2 |
+    value = (arg->sw_rk_red_blue2_en & 0x01) << 0x0D | (arg->rg_red_blue2_enable & 0x01) << 0x0C |
+            (arg->rnd_red_blue2_enable & 0x01) << 0x0B | (arg->ro_red_blue2_enable & 0x01) << 0x0A |
+            (arg->lc_red_blue2_enable & 0x01) << 0x09 | (arg->pg_red_blue2_enable & 0x01) << 0x08 |
+            (arg->sw_rk_green2_en & 0x01) << 0x05 | (arg->rg_green2_enable & 0x01) << 0x04 |
+            (arg->rnd_green2_enable & 0x01) << 0x03 | (arg->ro_green2_enable & 0x01) << 0x02 |
             (arg->lc_green2_enable & 0x01) << 1 | (arg->pg_green2_enable & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_METHODS_SET_2);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_METHODS_SET_2);
 
-    value = (arg->sw_rk_red_blue3_en & 0x01) << 13 | (arg->rg_red_blue3_enable & 0x01) << 12 |
-            (arg->rnd_red_blue3_enable & 0x01) << 11 | (arg->ro_red_blue3_enable & 0x01) << 10 |
-            (arg->lc_red_blue3_enable & 0x01) << 9 | (arg->pg_red_blue3_enable & 0x01) << 8 |
-            (arg->sw_rk_green3_en & 0x01) << 5 | (arg->rg_green3_enable & 0x01) << 4 |
-            (arg->rnd_green3_enable & 0x01) << 3 | (arg->ro_green3_enable & 0x01) << 2 |
+    value = (arg->sw_rk_red_blue3_en & 0x01) << 0x0D | (arg->rg_red_blue3_enable & 0x01) << 0x0C |
+            (arg->rnd_red_blue3_enable & 0x01) << 0x0B | (arg->ro_red_blue3_enable & 0x01) << 0x0A |
+            (arg->lc_red_blue3_enable & 0x01) << 0x09 | (arg->pg_red_blue3_enable & 0x01) << 0x08 |
+            (arg->sw_rk_green3_en & 0x01) << 0x05 | (arg->rg_green3_enable & 0x01) << 0x04 |
+            (arg->rnd_green3_enable & 0x01) << 0x03 | (arg->ro_green3_enable & 0x01) << 0x02 |
             (arg->lc_green3_enable & 0x01) << 1 | (arg->pg_green3_enable & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_METHODS_SET_3);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_METHODS_SET_3);
@@ -141,19 +141,22 @@ static void isp_dpcc_config(struct rkisp_isp_params_vdev *params_vdev, const str
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_RG_FAC_3);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_RG_FAC_3);
 
-    value = (arg->ro_lim_3_rb & 0x03) << 10 | (arg->ro_lim_3_g & 0x03) << 8 | (arg->ro_lim_2_rb & 0x03) << 6 |
-            (arg->ro_lim_2_g & 0x03) << 4 | (arg->ro_lim_1_rb & 0x03) << 2 | (arg->ro_lim_1_g & 0x03);
+    value = (arg->ro_lim_3_rb & 0x03) << 0x0A | (arg->ro_lim_3_g & 0x03) << 0x08 | \
+            (arg->ro_lim_2_rb & 0x03) << 0x06 | (arg->ro_lim_2_g & 0x03) << 0x04 | \
+            (arg->ro_lim_1_rb & 0x03) << 0x02 | (arg->ro_lim_1_g & 0x03);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_RO_LIMITS);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_RO_LIMITS);
 
-    value = (arg->rnd_offs_3_rb & 0x03) << 10 | (arg->rnd_offs_3_g & 0x03) << 8 | (arg->rnd_offs_2_rb & 0x03) << 6 |
-            (arg->rnd_offs_2_g & 0x03) << 4 | (arg->rnd_offs_1_rb & 0x03) << 2 | (arg->rnd_offs_1_g & 0x03);
+    value = (arg->rnd_offs_3_rb & 0x03) << 0x0A | (arg->rnd_offs_3_g & 0x03) << 0x08 | \
+            (arg->rnd_offs_2_rb & 0x03) << 0x06 | (arg->rnd_offs_2_g & 0x03) << 0x04 | \
+            (arg->rnd_offs_1_rb & 0x03) << 0x02 | (arg->rnd_offs_1_g & 0x03);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_RND_OFFS);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_RND_OFFS);
 
-    value = (arg->bpt_rb_3x3 & 0x01) << 11 | (arg->bpt_g_3x3 & 0x01) << 10 | (arg->bpt_incl_rb_center & 0x01) << 9 |
-            (arg->bpt_incl_green_center & 0x01) << 8 | (arg->bpt_use_fix_set & 0x01) << 7 |
-            (arg->bpt_use_set_3 & 0x01) << 6 | (arg->bpt_use_set_2 & 0x01) << 5 | (arg->bpt_use_set_1 & 0x01) << 4 |
+    value = (arg->bpt_rb_3x3 & 0x01) << 0x0B | (arg->bpt_g_3x3 & 0x01) << 0x0A | \
+            (arg->bpt_incl_rb_center & 0x01) << 0x09 | (arg->bpt_incl_green_center & 0x01) << 0x08 | \
+            (arg->bpt_use_fix_set & 0x01) << 0x07 | (arg->bpt_use_set_3 & 0x01) << 0x06 | \
+            (arg->bpt_use_set_2 & 0x01) << 0x05 | (arg->bpt_use_set_1 & 0x01) << 0x04 | \
             (arg->bpt_cor_en & 0x01) << 1 | (arg->bpt_det_en & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_BPT_CTRL);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_BPT_CTRL);
@@ -192,11 +195,11 @@ static void isp_dpcc_config(struct rkisp_isp_params_vdev *params_vdev, const str
     rkisp_iowrite32(params_vdev, value, ISP_DPCC0_PDAF_SCOPE);
     rkisp_iowrite32(params_vdev, value, ISP_DPCC1_PDAF_SCOPE);
 
-    for (i = 0; i < ISP2X_DPCC_PDAF_POINT_NUM / 2; i++) {
-        value = ISP2X_PACK_4BYTE(arg->point[2 * i].x, arg->point[2 * i].y, arg->point[2 * i + 1].x,
-                                 arg->point[2 * i + 1].y);
-        rkisp_iowrite32(params_vdev, value, ISP_DPCC0_PDAF_POINT_0 + 4 * i);
-        rkisp_iowrite32(params_vdev, value, ISP_DPCC1_PDAF_POINT_0 + 4 * i);
+    for (i = 0; i < ISP2X_DPCC_PDAF_POINT_NUM / 0x02; i++) {
+        value = ISP2X_PACK_4BYTE(arg->point[0x02 * i].x, arg->point[0x02 * i].y, arg->point[0x02 * i + 0x01].x,
+                                 arg->point[0x02 * i + 0x01].y);
+        rkisp_iowrite32(params_vdev, value, ISP_DPCC0_PDAF_POINT_0 + 0x04 * i);
+        rkisp_iowrite32(params_vdev, value, ISP_DPCC1_PDAF_POINT_0 + 0x04 * i);
     }
 
     rkisp_iowrite32(params_vdev, arg->pdaf_forward_med, ISP_DPCC0_PDAF_FORWARD_MED);
@@ -339,9 +342,9 @@ static void isp_sdg_config(struct rkisp_isp_params_vdev *params_vdev, const stru
     rkisp_iowrite32(params_vdev, arg->xa_pnts.gamma_dx1, ISP_GAMMA_DX_HI);
 
     for (i = 0; i < ISP2X_DEGAMMA_CURVE_SIZE; i++) {
-        rkisp_iowrite32(params_vdev, arg->curve_r.gamma_y[i], ISP_GAMMA_R_Y_0 + i * 4);
-        rkisp_iowrite32(params_vdev, arg->curve_g.gamma_y[i], ISP_GAMMA_G_Y_0 + i * 4);
-        rkisp_iowrite32(params_vdev, arg->curve_b.gamma_y[i], ISP_GAMMA_B_Y_0 + i * 4);
+        rkisp_iowrite32(params_vdev, arg->curve_r.gamma_y[i], ISP_GAMMA_R_Y_0 + i * 0x04);
+        rkisp_iowrite32(params_vdev, arg->curve_g.gamma_y[i], ISP_GAMMA_G_Y_0 + i * 0x04);
+        rkisp_iowrite32(params_vdev, arg->curve_b.gamma_y[i], ISP_GAMMA_B_Y_0 + i * 0x04);
     }
 }
 
@@ -485,22 +488,22 @@ static void isp_lsc_config(struct rkisp_isp_params_vdev *params_vdev, const stru
         params_rec->others.lsc_cfg = *arg;
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 0x04; i++) {
         /* program x size tables */
-        data = CIF_ISP_LSC_SECT_SIZE(arg->x_size_tbl[i * 2], arg->x_size_tbl[i * 2 + 1]);
-        rkisp_iowrite32(params_vdev, data, ISP_LSC_XSIZE_01 + i * 4);
+        data = CIF_ISP_LSC_SECT_SIZE(arg->x_size_tbl[i * 0x02], arg->x_size_tbl[i * 0x02 + 0x01]);
+        rkisp_iowrite32(params_vdev, data, ISP_LSC_XSIZE_01 + i * 0x04);
 
         /* program x grad tables */
-        data = CIF_ISP_LSC_SECT_SIZE(arg->x_grad_tbl[i * 2], arg->x_grad_tbl[i * 2 + 1]);
-        rkisp_iowrite32(params_vdev, data, ISP_LSC_XGRAD_01 + i * 4);
+        data = CIF_ISP_LSC_SECT_SIZE(arg->x_grad_tbl[i * 0x02], arg->x_grad_tbl[i * 0x02 + 0x01]);
+        rkisp_iowrite32(params_vdev, data, ISP_LSC_XGRAD_01 + i * 0x04);
 
         /* program y size tables */
-        data = CIF_ISP_LSC_SECT_SIZE(arg->y_size_tbl[i * 2], arg->y_size_tbl[i * 2 + 1]);
-        rkisp_iowrite32(params_vdev, data, ISP_LSC_YSIZE_01 + i * 4);
+        data = CIF_ISP_LSC_SECT_SIZE(arg->y_size_tbl[i * 0x02], arg->y_size_tbl[i * 0x02 + 0x01]);
+        rkisp_iowrite32(params_vdev, data, ISP_LSC_YSIZE_01 + i * 0x04);
 
         /* program y grad tables */
-        data = CIF_ISP_LSC_SECT_SIZE(arg->y_grad_tbl[i * 2], arg->y_grad_tbl[i * 2 + 1]);
-        rkisp_iowrite32(params_vdev, data, ISP_LSC_YGRAD_01 + i * 4);
+        data = CIF_ISP_LSC_SECT_SIZE(arg->y_grad_tbl[i * 0x02], arg->y_grad_tbl[i * 0x02 + 0x01]);
+        rkisp_iowrite32(params_vdev, data, ISP_LSC_YGRAD_01 + i * 0x04);
     }
 
     /* restore the lsc ctrl status */
@@ -537,25 +540,28 @@ static void isp_debayer_config(struct rkisp_isp_params_vdev *params_vdev, const 
     value = rkisp_ioread32(params_vdev, ISP_DEBAYER_CONTROL);
     value &= ISP_DEBAYER_EN;
 
-    value |= (arg->filter_c_en & 0x01) << 8 | (arg->filter_g_en & 0x01) << 4;
+    value |= (arg->filter_c_en & 0x01) << 0x08 | (arg->filter_g_en & 0x01) << 0x04;
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_CONTROL);
 
-    value = (arg->thed1 & 0x0F) << 12 | (arg->thed0 & 0x0F) << 8 | (arg->dist_scale & 0x0F) << 4 |
+    value = (arg->thed1 & 0x0F) << 0x0C | (arg->thed0 & 0x0F) << 0x08 | (arg->dist_scale & 0x0F) << 0x04 |
             (arg->max_ratio & 0x07) << 1 | (arg->clip_en & 0x01);
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_G_INTERP);
 
-    value = (arg->filter1_coe5 & 0x0F) << 16 | (arg->filter1_coe4 & 0x0F) << 12 | (arg->filter1_coe3 & 0x0F) << 8 |
-            (arg->filter1_coe2 & 0x0F) << 4 | (arg->filter1_coe1 & 0x0F);
+    value = (arg->filter1_coe5 & 0x0F) << 0x10 | (arg->filter1_coe4 & 0x0F) << 0x0C | \
+            (arg->filter1_coe3 & 0x0F) << 0x08 | (arg->filter1_coe2 & 0x0F) << 0x04 | \
+            (arg->filter1_coe1 & 0x0F);
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_G_INTERP_FILTER1);
 
-    value = (arg->filter2_coe5 & 0x0F) << 16 | (arg->filter2_coe4 & 0x0F) << 12 | (arg->filter2_coe3 & 0x0F) << 8 |
-            (arg->filter2_coe2 & 0x0F) << 4 | (arg->filter2_coe1 & 0x0F);
+    value = (arg->filter2_coe5 & 0x0F) << 0x10 | (arg->filter2_coe4 & 0x0F) << 0x0C | \
+            (arg->filter2_coe3 & 0x0F) << 0x08 | (arg->filter2_coe2 & 0x0F) << 0x04 | \
+            (arg->filter2_coe1 & 0x0F);
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_G_INTERP_FILTER2);
 
-    value = (arg->hf_offset & 0xFFFF) << 16 | (arg->gain_offset & 0x0F) << 8 | (arg->offset & 0x1F);
+    value = (arg->hf_offset & 0xFFFF) << 0x10 | (arg->gain_offset & 0x0F) << 0x08 | \
+            (arg->offset & 0x1F);
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_G_FILTER);
 
-    value = (arg->shift_num & 0x03) << 16 | (arg->order_max & 0x1F) << 8 | (arg->order_min & 0x1F);
+    value = (arg->shift_num & 0x03) << 0x10 | (arg->order_max & 0x1F) << 0x08 | (arg->order_min & 0x1F);
     rkisp_iowrite32(params_vdev, value, ISP_DEBAYER_C_FILTER);
 }
 
@@ -636,12 +642,12 @@ static void isp_ccm_config(struct rkisp_isp_params_vdev *params_vdev, const stru
     value = ISP2X_PACK_2SHORT(arg->coeff2_y, 0);
     rkisp_iowrite32(params_vdev, value, ISP_CCM_COEFF1_Y);
 
-    for (i = 0; i < ISP2X_CCM_CURVE_NUM / 2; i++) {
-        value = ISP2X_PACK_2SHORT(arg->alp_y[2 * i], arg->alp_y[2 * i + 1]);
-        rkisp_iowrite32(params_vdev, value, ISP_CCM_ALP_Y0 + 4 * i);
+    for (i = 0; i < ISP2X_CCM_CURVE_NUM / 0x02; i++) {
+        value = ISP2X_PACK_2SHORT(arg->alp_y[0x02 * i], arg->alp_y[0x02 * i + 1]);
+        rkisp_iowrite32(params_vdev, value, ISP_CCM_ALP_Y0 + 0x04 * i);
     }
-    value = ISP2X_PACK_2SHORT(arg->alp_y[2 * i], 0);
-    rkisp_iowrite32(params_vdev, value, ISP_CCM_ALP_Y0 + 4 * i);
+    value = ISP2X_PACK_2SHORT(arg->alp_y[0x02 * i], 0);
+    rkisp_iowrite32(params_vdev, value, ISP_CCM_ALP_Y0 + 0x04 * i);
 
     value = arg->bound_bit & 0x0F;
     rkisp_iowrite32(params_vdev, value, ISP_CCM_BOUND_BIT);
@@ -668,12 +674,12 @@ static void isp_goc_config(struct rkisp_isp_params_vdev *params_vdev, const stru
     }
 
     rkisp_iowrite32(params_vdev, arg->offset, ISP_GAMMA_OUT_OFFSET);
-    for (i = 0; i < ISP2X_GAMMA_OUT_MAX_SAMPLES / 2; i++) {
-        value = ISP2X_PACK_2SHORT(arg->gamma_y[2 * i], arg->gamma_y[2 * i + 1]);
-        rkisp_iowrite32(params_vdev, value, ISP_GAMMA_OUT_Y0 + i * 4);
+    for (i = 0; i < ISP2X_GAMMA_OUT_MAX_SAMPLES / 0x02; i++) {
+        value = ISP2X_PACK_2SHORT(arg->gamma_y[0x02 * i], arg->gamma_y[0x02 * i + 1]);
+        rkisp_iowrite32(params_vdev, value, ISP_GAMMA_OUT_Y0 + i * 0x04);
     }
 
-    rkisp_iowrite32(params_vdev, arg->gamma_y[2 * i], ISP_GAMMA_OUT_Y0 + i * 4);
+    rkisp_iowrite32(params_vdev, arg->gamma_y[0x02 * i], ISP_GAMMA_OUT_Y0 + i * 0x04);
 }
 
 static void isp_goc_enable(struct rkisp_isp_params_vdev *params_vdev, bool en)
@@ -784,21 +790,21 @@ static void isp_rawaf_config(struct rkisp_isp_params_vdev *params_vdev, const st
     for (i = 0; i < num_of_win; i++) {
         h_size = arg->win[i].h_size;
         v_size = arg->win[i].v_size;
-        h_offs = arg->win[i].h_offs < 2 ? 2 : arg->win[i].h_offs;
+        h_offs = arg->win[i].h_offs < 0x02 ? 0x02 : arg->win[i].h_offs;
         v_offs = arg->win[i].v_offs < 1 ? 1 : arg->win[i].v_offs;
 
         if (i == 0) {
-            h_size = h_size / 15 * 15;
-            v_size = v_size / 15 * 15;
+            h_size = h_size / 0x0F * 0x0F;
+            v_size = v_size / 0x0F * 0x0F;
         }
 
         // (horizontal left row), value must be greater or equal 2
         // (vertical top line), value must be greater or equal 1
-        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(v_offs, h_offs), ISP_RAWAF_LT_A + i * 8);
+        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(v_offs, h_offs), ISP_RAWAF_LT_A + i * 0x08);
 
         // value must be smaller than [width of picture -2]
         // value must be lower than (number of lines -2)
-        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(v_size, h_size), ISP_RAWAF_RB_A + i * 8);
+        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(v_size, h_size), ISP_RAWAF_RB_A + i * 0x08);
     }
 
     var = 0;
@@ -806,7 +812,7 @@ static void isp_rawaf_config(struct rkisp_isp_params_vdev *params_vdev, const st
         if (arg->line_en[i]) {
             var |= ISP2X_RAWAF_INT_LINE0_EN << i;
         }
-        var |= ISP2X_RAWAF_INT_LINE0_NUM(arg->line_num[i]) << 4 * i;
+        var |= ISP2X_RAWAF_INT_LINE0_NUM(arg->line_num[i]) << 0x04 * i;
     }
     rkisp_iowrite32(params_vdev, var, ISP_RAWAF_INT_LINE);
 
@@ -823,9 +829,9 @@ static void isp_rawaf_config(struct rkisp_isp_params_vdev *params_vdev, const st
                         ISP2X_RAWAF_SET_SHIFT_B(arg->lum_var_shift[1], arg->afm_var_shift[1]),
                     ISP_RAWAF_VAR_SHIFT);
 
-    for (i = 0; i < ISP2X_RAWAF_GAMMA_NUM / 2; i++) {
-        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(arg->gamma_y[2 * i], arg->gamma_y[2 * i + 1]),
-                        ISP_RAWAF_GAMMA_Y0 + i * 4);
+    for (i = 0; i < ISP2X_RAWAF_GAMMA_NUM / 0x02; i++) {
+        rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(arg->gamma_y[0x02 * i], arg->gamma_y[0x02 * i + 1]),
+                        ISP_RAWAF_GAMMA_Y0 + i * 0x04);
     }
 
     rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(arg->gamma_y[16], 0), ISP_RAWAF_GAMMA_Y8);
@@ -845,7 +851,7 @@ static void isp_rawaf_config(struct rkisp_isp_params_vdev *params_vdev, const st
     rkisp_iowrite32(params_vdev, value, ISP_RAWAF_CTRL);
 
     value = rkisp_ioread32(params_vdev, CTRL_VI_ISP_PATH);
-    value &= ~(ISP2X_ISPPATH_RAWAF_SEL_SET(3));
+    value &= ~(ISP2X_ISPPATH_RAWAF_SEL_SET(0x03));
     value |= ISP2X_ISPPATH_RAWAF_SEL_SET(arg->rawaf_sel);
     rkisp_iowrite32(params_vdev, value, CTRL_VI_ISP_PATH);
 }
@@ -892,17 +898,17 @@ static void isp_rawaelite_config(struct rkisp_isp_params_vdev *params_vdev, cons
     }
     block_vsize = arg->win.v_size / ae_wnd_num[wnd_num_idx];
     value = block_vsize * ae_wnd_num[wnd_num_idx] + arg->win.v_offs;
-    if (value + 2 > out_crop->height) {
+    if (value + 0x02 > out_crop->height) {
         block_vsize -= 1;
     }
-    if (block_vsize % 2) {
+    if (block_vsize % 0x02) {
         block_vsize -= 1;
     }
     rkisp_iowrite32(params_vdev, ISP2X_RAWAE_LITE_V_SIZE_SET(block_vsize) | ISP2X_RAWAE_LITE_H_SIZE_SET(block_hsize),
                     ISP_RAWAE_LITE_BLK_SIZ);
 
     value = rkisp_ioread32(params_vdev, CTRL_VI_ISP_PATH);
-    value &= ~(ISP2X_ISPPATH_RAWAE_SWAP_SET(3));
+    value &= ~(ISP2X_ISPPATH_RAWAE_SWAP_SET(0x03));
     value |= ISP2X_ISPPATH_RAWAE_SWAP_SET(arg->rawae_sel);
     rkisp_iowrite32(params_vdev, value, CTRL_VI_ISP_PATH);
 }
@@ -936,10 +942,10 @@ static void isp_rawaebig_config(struct rkisp_isp_params_vdev *params_vdev, const
         case 0:
             addr = RAWAE_BIG1_BASE;
             break;
-        case 1:
+        case 0x01:
             addr = RAWAE_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = RAWAE_BIG3_BASE;
             break;
         default:
@@ -961,10 +967,10 @@ static void isp_rawaebig_config(struct rkisp_isp_params_vdev *params_vdev, const
     if (arg->subwin_en[1]) {
         value |= ISP2X_RAWAEBIG_SUBWIN2_EN;
     }
-    if (arg->subwin_en[2]) {
+    if (arg->subwin_en[0x02]) {
         value |= ISP2X_RAWAEBIG_SUBWIN3_EN;
     }
-    if (arg->subwin_en[3]) {
+    if (arg->subwin_en[0x03]) {
         value |= ISP2X_RAWAEBIG_SUBWIN4_EN;
     }
 
@@ -981,10 +987,10 @@ static void isp_rawaebig_config(struct rkisp_isp_params_vdev *params_vdev, const
     }
     block_vsize = arg->win.v_size / ae_wnd_num[wnd_num_idx];
     value = block_vsize * ae_wnd_num[wnd_num_idx] + arg->win.v_offs;
-    if (value + 2 > out_crop->height) {
+    if (value + 0x02 > out_crop->height) {
         block_vsize -= 1;
     }
-    if (block_vsize % 2) {
+    if (block_vsize % 0x02) {
         block_vsize -= 1;
     }
     rkisp_iowrite32(params_vdev, ISP2X_RAWAEBIG_V_SIZE_SET(block_vsize) | ISP2X_RAWAEBIG_H_SIZE_SET(block_hsize),
@@ -994,23 +1000,23 @@ static void isp_rawaebig_config(struct rkisp_isp_params_vdev *params_vdev, const
         rkisp_iowrite32(params_vdev,
                         ISP2X_RAWAEBIG_SUBWIN_V_OFFSET_SET(arg->subwin[i].v_offs) |
                             ISP2X_RAWAEBIG_SUBWIN_H_OFFSET_SET(arg->subwin[i].h_offs),
-                        addr + RAWAE_BIG_WND1_OFFSET + 8 * i);
+                        addr + RAWAE_BIG_WND1_OFFSET + 0x08 * i);
 
         v_size = arg->subwin[i].v_size + arg->subwin[i].v_offs;
         h_size = arg->subwin[i].h_size + arg->subwin[i].h_offs;
         rkisp_iowrite32(params_vdev,
                         ISP2X_RAWAEBIG_SUBWIN_V_SIZE_SET(v_size) | ISP2X_RAWAEBIG_SUBWIN_H_SIZE_SET(h_size),
-                        addr + RAWAE_BIG_WND1_SIZE + 8 * i);
+                        addr + RAWAE_BIG_WND1_SIZE + 0x08 * i);
     }
 
     if (blk_no == 0) {
         value = rkisp_ioread32(params_vdev, CTRL_VI_ISP_PATH);
-        value &= ~(ISP2X_ISPPATH_RAWAE_SEL_SET(3));
+        value &= ~(ISP2X_ISPPATH_RAWAE_SEL_SET(0x03));
         value |= ISP2X_ISPPATH_RAWAE_SEL_SET(arg->rawae_sel);
         rkisp_iowrite32(params_vdev, value, CTRL_VI_ISP_PATH);
     } else {
         value = rkisp_ioread32(params_vdev, CTRL_VI_ISP_PATH);
-        value &= ~(ISP2X_ISPPATH_RAWAE_SWAP_SET(3));
+        value &= ~(ISP2X_ISPPATH_RAWAE_SWAP_SET(0x03));
         value |= ISP2X_ISPPATH_RAWAE_SWAP_SET(arg->rawae_sel);
         rkisp_iowrite32(params_vdev, value, CTRL_VI_ISP_PATH);
     }
@@ -1028,7 +1034,7 @@ static void isp_rawaebig_enable(struct rkisp_isp_params_vdev *params_vdev, bool 
         case 1:
             addr = RAWAE_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = RAWAE_BIG3_BASE;
             break;
         default:
@@ -1064,7 +1070,7 @@ static void isp_rawae2_config(struct rkisp_isp_params_vdev *params_vdev, const s
 
 static void isp_rawae2_enable(struct rkisp_isp_params_vdev *params_vdev, bool en)
 {
-    isp_rawaebig_enable(params_vdev, en, 2);
+    isp_rawaebig_enable(params_vdev, en, 0x02);
 }
 
 static void isp_rawae3_config(struct rkisp_isp_params_vdev *params_vdev, const struct isp2x_rawaebig_meas_cfg *arg)
@@ -1084,8 +1090,8 @@ static void isp_rawawb_config(struct rkisp_isp_params_vdev *params_vdev, const s
     rkisp_iowrite32(
         params_vdev,
         (arg->sw_rawawb_blk_measure_enable & 0x1) | (arg->sw_rawawb_blk_measure_mode & 0x1) << 1 |
-            (arg->sw_rawawb_blk_measure_xytype & 0x1) << 2 | (arg->sw_rawawb_blk_rtdw_measure_en & 0x1) << 3 |
-            (arg->sw_rawawb_blk_measure_illu_idx & 0x7) << 4 | (arg->sw_rawawb_blk_with_luma_wei_en & 0x1) << 8,
+            (arg->sw_rawawb_blk_measure_xytype & 0x1) << 0x02 | (arg->sw_rawawb_blk_rtdw_measure_en & 0x1) << 0x03 |
+            (arg->sw_rawawb_blk_measure_illu_idx & 0x7) << 0x04 | (arg->sw_rawawb_blk_with_luma_wei_en & 0x1) << 0x08,
         ISP21_RAWAWB_BLK_CTRL);
 
     rkisp_iowrite32(params_vdev, ISP2X_PACK_2SHORT(arg->sw_rawawb_h_offs, arg->sw_rawawb_v_offs),
@@ -1108,8 +1114,8 @@ static void isp_rawawb_config(struct rkisp_isp_params_vdev *params_vdev, const s
 
     rkisp_iowrite32(params_vdev,
                     (arg->sw_rawawb_wp_luma_wei_en0 & 0x1) | (arg->sw_rawawb_wp_luma_wei_en1 & 0x1) << 1 |
-                        (arg->sw_rawawb_wp_blk_wei_en0 & 0x1) << 2 | (arg->sw_rawawb_wp_blk_wei_en1 & 0x1) << 3 |
-                        (arg->sw_rawawb_wp_hist_xytype & 0x1) << 4,
+                        (arg->sw_rawawb_wp_blk_wei_en0 & 0x1) << 0x02 | (arg->sw_rawawb_wp_blk_wei_en1 & 0x1) << 0x03 |
+                        (arg->sw_rawawb_wp_hist_xytype & 0x1) << 0x04,
                     ISP21_RAWAWB_WEIGHT_CURVE_CTRL);
 
     rkisp_iowrite32(params_vdev,
@@ -1509,17 +1515,27 @@ static void isp_rawawb_config(struct rkisp_isp_params_vdev *params_vdev, const s
 
     rkisp_iowrite32(
         params_vdev,
-        (arg->sw_rawawb_exc_wp_region0_excen0 & 0x1) << 0 | (arg->sw_rawawb_exc_wp_region0_excen1 & 0x1) << 1 |
-            (arg->sw_rawawb_exc_wp_region0_domain & 0x1) << 3 | (arg->sw_rawawb_exc_wp_region1_excen0 & 0x1) << 4 |
-            (arg->sw_rawawb_exc_wp_region1_excen1 & 0x1) << 5 | (arg->sw_rawawb_exc_wp_region1_domain & 0x1) << 7 |
-            (arg->sw_rawawb_exc_wp_region2_excen0 & 0x1) << 8 | (arg->sw_rawawb_exc_wp_region2_excen1 & 0x1) << 9 |
-            (arg->sw_rawawb_exc_wp_region2_domain & 0x1) << 11 | (arg->sw_rawawb_exc_wp_region3_excen0 & 0x1) << 12 |
-            (arg->sw_rawawb_exc_wp_region3_excen1 & 0x1) << 13 | (arg->sw_rawawb_exc_wp_region3_domain & 0x1) << 15 |
-            (arg->sw_rawawb_exc_wp_region4_excen0 & 0x1) << 16 | (arg->sw_rawawb_exc_wp_region4_excen1 & 0x1) << 17 |
-            (arg->sw_rawawb_exc_wp_region4_domain & 0x1) << 19 | (arg->sw_rawawb_exc_wp_region5_excen0 & 0x1) << 20 |
-            (arg->sw_rawawb_exc_wp_region5_excen1 & 0x1) << 21 | (arg->sw_rawawb_exc_wp_region5_domain & 0x1) << 23 |
-            (arg->sw_rawawb_exc_wp_region6_excen0 & 0x1) << 24 | (arg->sw_rawawb_exc_wp_region6_excen1 & 0x1) << 25 |
-            (arg->sw_rawawb_exc_wp_region6_domain & 0x1) << 27,
+        (arg->sw_rawawb_exc_wp_region0_excen0 & 0x1) << 0 | \
+        (arg->sw_rawawb_exc_wp_region0_excen1 & 0x1) << 1 | \
+        (arg->sw_rawawb_exc_wp_region0_domain & 0x1) << 0x03 | \
+        (arg->sw_rawawb_exc_wp_region1_excen0 & 0x1) << 0x04 | \
+        (arg->sw_rawawb_exc_wp_region1_excen1 & 0x1) << 0x05 | \
+        (arg->sw_rawawb_exc_wp_region1_domain & 0x1) << 0x07 | \
+        (arg->sw_rawawb_exc_wp_region2_excen0 & 0x1) << 0x08 | \
+        (arg->sw_rawawb_exc_wp_region2_excen1 & 0x1) << 0x09 | \
+        (arg->sw_rawawb_exc_wp_region2_domain & 0x1) << 0x0B | \
+        (arg->sw_rawawb_exc_wp_region3_excen0 & 0x1) << 0x0C | \
+        (arg->sw_rawawb_exc_wp_region3_excen1 & 0x1) << 0x0D | \
+        (arg->sw_rawawb_exc_wp_region3_domain & 0x1) << 0x0F | \
+        (arg->sw_rawawb_exc_wp_region4_excen0 & 0x1) << 0x10 | \
+        (arg->sw_rawawb_exc_wp_region4_excen1 & 0x1) << 0x11 | \
+        (arg->sw_rawawb_exc_wp_region4_domain & 0x1) << 0x13 | \
+        (arg->sw_rawawb_exc_wp_region5_excen0 & 0x1) << 0x14 | \
+        (arg->sw_rawawb_exc_wp_region5_excen1 & 0x1) << 0x15 | \
+        (arg->sw_rawawb_exc_wp_region5_domain & 0x1) << 0x17 | \
+        (arg->sw_rawawb_exc_wp_region6_excen0 & 0x1) << 0x18 | \
+        (arg->sw_rawawb_exc_wp_region6_excen1 & 0x1) << 0x19 | \
+        (arg->sw_rawawb_exc_wp_region6_domain & 0x1) << 0x1B, \
         ISP21_RAWAWB_MULTIWINDOW_EXC_CTRL);
 
     rkisp_iowrite32(params_vdev,
@@ -1578,13 +1594,13 @@ static void isp_rawawb_config(struct rkisp_isp_params_vdev *params_vdev, const s
                     ISP2X_PACK_2SHORT(arg->sw_rawawb_exc_wp_region6_yv0, arg->sw_rawawb_exc_wp_region6_yv1),
                     ISP21_RAWAWB_EXC_WP_REGION6_YV);
 
-    for (i = 0; i < ISP21_RAWAWB_WEIGHT_NUM / 5; i++) {
+    for (i = 0; i < ISP21_RAWAWB_WEIGHT_NUM / 0x05; i++) {
         rkisp_iowrite32(params_vdev,
-                        (arg->sw_rawawb_wp_blk_wei_w[5 * i] & 0x3f) << 0 |
-                            (arg->sw_rawawb_wp_blk_wei_w[5 * i + 1] & 0x3f) << 6 |
-                            (arg->sw_rawawb_wp_blk_wei_w[5 * i + 2] & 0x3f) << 12 |
-                            (arg->sw_rawawb_wp_blk_wei_w[5 * i + 3] & 0x3f) << 18 |
-                            (arg->sw_rawawb_wp_blk_wei_w[5 * i + 4] & 0x3f) << 24,
+                        (arg->sw_rawawb_wp_blk_wei_w[0x05 * i] & 0x3f) << 0 |
+                            (arg->sw_rawawb_wp_blk_wei_w[0x05 * i + 0x01] & 0x3f) << 0x06 |
+                            (arg->sw_rawawb_wp_blk_wei_w[0x05 * i + 0x02] & 0x3f) << 0x0B |
+                            (arg->sw_rawawb_wp_blk_wei_w[0x05 * i + 0x03] & 0x3f) << 0x12 |
+                            (arg->sw_rawawb_wp_blk_wei_w[0x05 * i + 0x04] & 0x3f) << 0x18,
                         ISP21_RAWAWB_WRAM_DATA_BASE);
     }
 
@@ -1593,17 +1609,17 @@ static void isp_rawawb_config(struct rkisp_isp_params_vdev *params_vdev, const s
     value &= ISP2X_RAWAWB_ENA;
     value &= ~ISP2X_REG_WR_MASK;
     rkisp_iowrite32(params_vdev,
-                    value | (arg->sw_rawawb_uv_en0 & 0x1) << 1 | (arg->sw_rawawb_xy_en0 & 0x1) << 2 |
-                        (arg->sw_rawawb_3dyuv_en0 & 0x1) << 3 | (arg->sw_rawawb_3dyuv_ls_idx0 & 0x7) << 4 |
-                        (arg->sw_rawawb_3dyuv_ls_idx1 & 0x7) << 7 | (arg->sw_rawawb_3dyuv_ls_idx2 & 0x7) << 10 |
-                        (arg->sw_rawawb_3dyuv_ls_idx3 & 0x7) << 13 | (arg->sw_rawawb_wind_size & 0x1) << 18 |
-                        (arg->sw_rawlsc_bypass_en & 0x1) << 19 | (arg->sw_rawawb_light_num & 0x7) << 20 |
-                        (arg->sw_rawawb_uv_en1 & 0x1) << 24 | (arg->sw_rawawb_xy_en1 & 0x1) << 25 |
-                        (arg->sw_rawawb_3dyuv_en1 & 0x1) << 26,
+                    value | (arg->sw_rawawb_uv_en0 & 0x1) << 0x01 | (arg->sw_rawawb_xy_en0 & 0x1) << 0x02 |
+                        (arg->sw_rawawb_3dyuv_en0 & 0x1) << 0x03 | (arg->sw_rawawb_3dyuv_ls_idx0 & 0x7) << 0x04 |
+                        (arg->sw_rawawb_3dyuv_ls_idx1 & 0x7) << 0x07 | (arg->sw_rawawb_3dyuv_ls_idx2 & 0x7) << 0x0A |
+                        (arg->sw_rawawb_3dyuv_ls_idx3 & 0x7) << 0x0D | (arg->sw_rawawb_wind_size & 0x1) << 0x12 |
+                        (arg->sw_rawlsc_bypass_en & 0x1) << 0x13 | (arg->sw_rawawb_light_num & 0x7) << 0x14 |
+                        (arg->sw_rawawb_uv_en1 & 0x1) << 0x18 | (arg->sw_rawawb_xy_en1 & 0x1) << 0x19 |
+                        (arg->sw_rawawb_3dyuv_en1 & 0x1) << 0x1A,
                     ISP21_RAWAWB_CTRL);
 
     value = rkisp_ioread32(params_vdev, CTRL_VI_ISP_PATH);
-    value &= ~(ISP2X_ISPPATH_RAWAWB_SEL_SET(3));
+    value &= ~(ISP2X_ISPPATH_RAWAWB_SEL_SET(0x03));
     value |= ISP2X_ISPPATH_RAWAWB_SEL_SET(arg->rawawb_sel);
     rkisp_iowrite32(params_vdev, value, CTRL_VI_ISP_PATH);
 }
@@ -1650,14 +1666,14 @@ static void isp_rawhstlite_config(struct rkisp_isp_params_vdev *params_vdev, con
 
     rkisp_iowrite32(params_vdev, ISP2X_PACK_4BYTE(arg->rcc, arg->gcc, arg->bcc, arg->off), ISP_RAWHIST_LITE_RAW2Y_CC);
 
-    for (i = 0; i < (ISP2X_RAWHSTLITE_WEIGHT_REG_SIZE / 4); i++) {
-        value = ISP2X_RAWHSTLITE_WEIGHT_SET(arg->weight[4 * i + 0], arg->weight[4 * i + 1], arg->weight[4 * i + 2],
-                                            arg->weight[4 * i + 3]);
-        rkisp_iowrite32(params_vdev, value, ISP_RAWHIST_LITE_WEIGHT + 4 * i);
+    for (i = 0; i < (ISP2X_RAWHSTLITE_WEIGHT_REG_SIZE / 0x04); i++) {
+        value = ISP2X_RAWHSTLITE_WEIGHT_SET(arg->weight[0x04 * i + 0], arg->weight[0x04 * i + 1], \
+                                            arg->weight[0x04 * i + 0x02], arg->weight[0x04 * i + 0x03]);
+        rkisp_iowrite32(params_vdev, value, ISP_RAWHIST_LITE_WEIGHT + 0x04 * i);
     }
 
-    value = ISP2X_RAWHSTLITE_WEIGHT_SET(arg->weight[4 * i + 0], 0, 0, 0);
-    rkisp_iowrite32(params_vdev, value, ISP_RAWHIST_LITE_WEIGHT + 4 * i);
+    value = ISP2X_RAWHSTLITE_WEIGHT_SET(arg->weight[0x04 * i + 0], 0, 0, 0);
+    rkisp_iowrite32(params_vdev, value, ISP_RAWHIST_LITE_WEIGHT + 0x04 * i);
 }
 
 static void isp_rawhstlite_enable(struct rkisp_isp_params_vdev *params_vdev, bool en)
@@ -1683,10 +1699,10 @@ static void isp_rawhstbig_cfg_sram(struct rkisp_isp_params_vdev *params_vdev, co
     u32 addr;
 
     switch (blk_no) {
-        case 1:
+        case 0x01:
             addr = ISP_RAWHIST_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = ISP_RAWHIST_BIG3_BASE;
             break;
         case 0:
@@ -1708,9 +1724,10 @@ static void isp_rawhstbig_cfg_sram(struct rkisp_isp_params_vdev *params_vdev, co
         }
     }
 
-    for (i = 0; i < (ISP2X_RAWHSTBIG_WEIGHT_REG_SIZE / 5); i++) {
-        value = ISP2X_RAWHSTBIG_WEIGHT_SET(weight15x15[5 * i + 0], weight15x15[5 * i + 1], weight15x15[5 * i + 2],
-                                           weight15x15[5 * i + 3], weight15x15[5 * i + 4]);
+    for (i = 0; i < (ISP2X_RAWHSTBIG_WEIGHT_REG_SIZE / 0x05); i++) {
+        value = ISP2X_RAWHSTBIG_WEIGHT_SET(weight15x15[0x05 * i + 0], weight15x15[0x05 * i + 1],\
+                                           weight15x15[0x05 * i + 0x02], weight15x15[0x05 * i + 0x03], \
+                                           weight15x15[0x05 * i + 0x04]);
         rkisp_write(params_vdev->dev, addr + ISP_RAWHIST_BIG_WEIGHT_BASE, value, true);
     }
 }
@@ -1726,11 +1743,11 @@ static void isp_rawhstbig_config(struct rkisp_isp_params_vdev *params_vdev, cons
     u32 addr;
 
     switch (blk_no) {
-        case 1:
+        case 0x01:
             addr = ISP_RAWHIST_BIG2_BASE;
             arg_rec = &params_rec->meas.rawhist1;
             break;
-        case 2:
+        case 0x02:
             addr = ISP_RAWHIST_BIG3_BASE;
             arg_rec = &params_rec->meas.rawhist2;
             break;
@@ -1779,10 +1796,10 @@ static void isp_rawhstbig_enable(struct rkisp_isp_params_vdev *params_vdev, bool
         case 0:
             addr = ISP_RAWHIST_BIG1_BASE;
             break;
-        case 1:
+        case 0x01:
             addr = ISP_RAWHIST_BIG2_BASE;
             break;
-        case 2:
+        case 0x02:
             addr = ISP_RAWHIST_BIG3_BASE;
             break;
         default:
@@ -1811,12 +1828,12 @@ static void isp_rawhst1_enable(struct rkisp_isp_params_vdev *params_vdev, bool e
 
 static void isp_rawhst2_config(struct rkisp_isp_params_vdev *params_vdev, const struct isp2x_rawhistbig_cfg *arg)
 {
-    isp_rawhstbig_config(params_vdev, arg, 2);
+    isp_rawhstbig_config(params_vdev, arg, 0x02);
 }
 
 static void isp_rawhst2_enable(struct rkisp_isp_params_vdev *params_vdev, bool en)
 {
-    isp_rawhstbig_enable(params_vdev, en, 2);
+    isp_rawhstbig_enable(params_vdev, en, 0x02);
 }
 
 static void isp_rawhst3_config(struct rkisp_isp_params_vdev *params_vdev, const struct isp2x_rawhistbig_cfg *arg)
@@ -2639,7 +2656,7 @@ static void isp_csm_config(struct rkisp_isp_params_vdev *params_vdev, const stru
     cproc_ctrl = rkisp_ioread32(params_vdev, CPROC_CTRL);
     if (cproc_ctrl & CIF_C_PROC_CTR_ENABLE) {
         val = CIF_C_PROC_YOUT_FULL | CIF_C_PROC_YIN_FULL | CIF_C_PROC_COUT_FULL;
-        if (eff_ctrl & CIF_IMG_EFF_CTRL_ENABLE || !arg->csm_full_range) {
+        if ((eff_ctrl & CIF_IMG_EFF_CTRL_ENABLE) || !arg->csm_full_range) {
             cproc_ctrl &= ~val;
         } else {
             cproc_ctrl |= val;

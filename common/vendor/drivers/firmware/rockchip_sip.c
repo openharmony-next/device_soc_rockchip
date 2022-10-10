@@ -34,7 +34,7 @@
 
 #define SIZE_PAGE(n) ((n) << 12)
 
-static struct arm_smccc_res __invoke_sip_fn_smc(unsigned long function_id, unsigned long arg0, unsigned long arg1,
+static struct arm_smccc_res invoke_sip_fn_smc(unsigned long function_id, unsigned long arg0, unsigned long arg1,
                                                 unsigned long arg2)
 {
     struct arm_smccc_res res;
@@ -45,19 +45,19 @@ static struct arm_smccc_res __invoke_sip_fn_smc(unsigned long function_id, unsig
 
 struct arm_smccc_res sip_smc_dram(u32 arg0, u32 arg1, u32 arg2)
 {
-    return __invoke_sip_fn_smc(SIP_DRAM_CONFIG, arg0, arg1, arg2);
+    return invoke_sip_fn_smc(SIP_DRAM_CONFIG, arg0, arg1, arg2);
 }
 EXPORT_SYMBOL_GPL(sip_smc_dram);
 
 struct arm_smccc_res sip_smc_get_atf_version(void)
 {
-    return __invoke_sip_fn_smc(SIP_ATF_VERSION, 0, 0, 0);
+    return invoke_sip_fn_smc(SIP_ATF_VERSION, 0, 0, 0);
 }
 EXPORT_SYMBOL_GPL(sip_smc_get_atf_version);
 
 struct arm_smccc_res sip_smc_get_sip_version(void)
 {
-    return __invoke_sip_fn_smc(SIP_SIP_VERSION, 0, 0, 0);
+    return invoke_sip_fn_smc(SIP_SIP_VERSION, 0, 0, 0);
 }
 EXPORT_SYMBOL_GPL(sip_smc_get_sip_version);
 
@@ -65,7 +65,7 @@ int sip_smc_set_suspend_mode(u32 ctrl, u32 config1, u32 config2)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SUSPEND_MODE, ctrl, config1, config2);
+    res = invoke_sip_fn_smc(SIP_SUSPEND_MODE, ctrl, config1, config2);
     return res.a0;
 }
 EXPORT_SYMBOL_GPL(sip_smc_set_suspend_mode);
@@ -74,7 +74,7 @@ struct arm_smccc_res sip_smc_get_suspend_info(u32 info)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SUSPEND_MODE, info, 0, 0);
+    res = invoke_sip_fn_smc(SIP_SUSPEND_MODE, info, 0, 0);
     return res;
 }
 EXPORT_SYMBOL_GPL(sip_smc_get_suspend_info);
@@ -83,7 +83,7 @@ int sip_smc_virtual_poweroff(void)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(PSCI_FN_NATIVE(1_0, SYSTEM_SUSPEND), 0, 0, 0);
+    res = invoke_sip_fn_smc(PSCI_FN_NATIVE(1_0, SYSTEM_SUSPEND), 0, 0, 0);
     return res.a0;
 }
 EXPORT_SYMBOL_GPL(sip_smc_virtual_poweroff);
@@ -92,7 +92,7 @@ int sip_smc_remotectl_config(u32 func, u32 data)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_REMOTECTL_CFG, func, data, 0);
+    res = invoke_sip_fn_smc(SIP_REMOTECTL_CFG, func, data, 0);
 
     return res.a0;
 }
@@ -102,7 +102,7 @@ u32 sip_smc_secure_reg_read(u32 addr_phy)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_ACCESS_REG, 0, addr_phy, SECURE_REG_RD);
+    res = invoke_sip_fn_smc(SIP_ACCESS_REG, 0, addr_phy, SECURE_REG_RD);
     if (res.a0) {
         pr_err("%s error: %d, addr phy: 0x%x\n", __func__, (int)res.a0, addr_phy);
     }
@@ -115,7 +115,7 @@ int sip_smc_secure_reg_write(u32 addr_phy, u32 val)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_ACCESS_REG, val, addr_phy, SECURE_REG_WR);
+    res = invoke_sip_fn_smc(SIP_ACCESS_REG, val, addr_phy, SECURE_REG_WR);
     if (res.a0) {
         pr_err("%s error: %d, addr phy: 0x%x\n", __func__, (int)res.a0, addr_phy);
     }
@@ -168,7 +168,7 @@ struct arm_smccc_res sip_smc_request_share_mem(u32 page_num, share_page_type_t p
     struct arm_smccc_res res;
     unsigned long share_mem_phy;
 
-    res = __invoke_sip_fn_smc(SIP_SHARE_MEM, page_num, page_type, 0);
+    res = invoke_sip_fn_smc(SIP_SHARE_MEM, page_num, page_type, 0);
     if (IS_SIP_ERROR(res.a0)) {
         goto error;
     }
@@ -183,7 +183,7 @@ EXPORT_SYMBOL_GPL(sip_smc_request_share_mem);
 
 struct arm_smccc_res sip_smc_mcu_el3fiq(u32 arg0, u32 arg1, u32 arg2)
 {
-    return __invoke_sip_fn_smc(SIP_MCU_EL3FIQ_CFG, arg0, arg1, arg2);
+    return invoke_sip_fn_smc(SIP_MCU_EL3FIQ_CFG, arg0, arg1, arg2);
 }
 EXPORT_SYMBOL_GPL(sip_smc_mcu_el3fiq);
 
@@ -191,7 +191,7 @@ struct arm_smccc_res sip_smc_vpu_reset(u32 arg0, u32 arg1, u32 arg2)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(PSCI_SIP_VPU_RESET, arg0, arg1, arg2);
+    res = invoke_sip_fn_smc(PSCI_SIP_VPU_RESET, arg0, arg1, arg2);
     return res;
 }
 EXPORT_SYMBOL_GPL(sip_smc_vpu_reset);
@@ -200,7 +200,7 @@ struct arm_smccc_res sip_smc_bus_config(u32 arg0, u32 arg1, u32 arg2)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_BUS_CFG, arg0, arg1, arg2);
+    res = invoke_sip_fn_smc(SIP_BUS_CFG, arg0, arg1, arg2);
     return res;
 }
 EXPORT_SYMBOL_GPL(sip_smc_bus_config);
@@ -239,7 +239,7 @@ struct arm_smccc_res sip_smc_lastlog_request(void)
     struct arm_smccc_res res;
     void __iomem *addr1, *addr2;
 
-    res = __invoke_sip_fn_smc(SIP_LAST_LOG, local_clock(), 0, 0);
+    res = invoke_sip_fn_smc(SIP_LAST_LOG, local_clock(), 0, 0);
     if (IS_SIP_ERROR(res.a0)) {
         return res;
     }
@@ -380,7 +380,7 @@ static void sip_fiq_debugger_uart_irq_tf_cb(unsigned long sp_el1, unsigned long 
     }
 
     /* fiq handler done, return to EL3(then EL3 return to EL1 entry) */
-    __invoke_sip_fn_smc(SIP_UARTDBG_FN, 0, 0, UARTDBG_CFG_OSHDL_TO_OS);
+    invoke_sip_fn_smc(SIP_UARTDBG_FN, 0, 0, UARTDBG_CFG_OSHDL_TO_OS);
 }
 
 int sip_fiq_debugger_uart_irq_tf_init(u32 irq_id, void *callback_fn)
@@ -391,7 +391,7 @@ int sip_fiq_debugger_uart_irq_tf_init(u32 irq_id, void *callback_fn)
 
     /* init fiq debugger callback */
     sip_fiq_debugger_uart_irq_tf = callback_fn;
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, irq_id, (unsigned long)sip_fiq_debugger_uart_irq_tf_cb, UARTDBG_CFG_INIT);
+    res = invoke_sip_fn_smc(SIP_UARTDBG_FN, irq_id, (unsigned long)sip_fiq_debugger_uart_irq_tf_cb, UARTDBG_CFG_INIT);
     if (IS_SIP_ERROR(res.a0)) {
         pr_err("%s error: %d\n", __func__, (int)res.a0);
         return res.a0;
@@ -440,7 +440,7 @@ int sip_fiq_debugger_switch_cpu(u32 cpu)
     struct arm_smccc_res res;
 
     fiq_target_cpu = cpu;
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, cpu_logical_map_mpidr(cpu), 0, UARTDBG_CFG_OSHDL_CPUSW);
+    res = invoke_sip_fn_smc(SIP_UARTDBG_FN, cpu_logical_map_mpidr(cpu), 0, UARTDBG_CFG_OSHDL_CPUSW);
     return res.a0;
 }
 
@@ -448,7 +448,7 @@ int sip_fiq_debugger_sdei_switch_cpu(u32 cur_cpu, u32 target_cpu, u32 flag)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_SWITCH_CPU, cur_cpu, target_cpu, flag);
+    res = invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_SWITCH_CPU, cur_cpu, target_cpu, flag);
     return res.a0;
 }
 
@@ -456,7 +456,7 @@ int sip_fiq_debugger_sdei_get_event_id(u32 *fiq, u32 *sw_cpu, u32 *flag)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_GET_EVENT_ID, 0, 0, 0);
+    res = invoke_sip_fn_smc(SIP_SDEI_FIQ_DBG_GET_EVENT_ID, 0, 0, 0);
     *fiq = res.a1;
     *sw_cpu = res.a2;
     if (flag) {
@@ -474,7 +474,7 @@ void sip_fiq_debugger_enable_debug(bool enable)
 
     val = enable ? UARTDBG_CFG_OSHDL_DEBUG_ENABLE : UARTDBG_CFG_OSHDL_DEBUG_DISABLE;
 
-    __invoke_sip_fn_smc(SIP_UARTDBG_FN, 0, 0, val);
+    invoke_sip_fn_smc(SIP_UARTDBG_FN, 0, 0, val);
 }
 EXPORT_SYMBOL_GPL(sip_fiq_debugger_enable_debug);
 
@@ -482,7 +482,7 @@ int sip_fiq_debugger_set_print_port(u32 port_phyaddr, u32 baudrate)
 {
     struct arm_smccc_res res;
 
-    res = __invoke_sip_fn_smc(SIP_UARTDBG_FN, port_phyaddr, baudrate, UARTDBG_CFG_PRINT_PORT);
+    res = invoke_sip_fn_smc(SIP_UARTDBG_FN, port_phyaddr, baudrate, UARTDBG_CFG_PRINT_PORT);
     return res.a0;
 }
 EXPORT_SYMBOL_GPL(sip_fiq_debugger_set_print_port);
@@ -513,7 +513,7 @@ void sip_fiq_debugger_enable_fiq(bool enable, uint32_t tgt_cpu)
 
     fiq_target_cpu = tgt_cpu;
     en = enable ? UARTDBG_CFG_FIQ_ENABEL : UARTDBG_CFG_FIQ_DISABEL;
-    __invoke_sip_fn_smc(SIP_UARTDBG_FN, tgt_cpu, 0, en);
+    invoke_sip_fn_smc(SIP_UARTDBG_FN, tgt_cpu, 0, en);
 }
 EXPORT_SYMBOL_GPL(sip_fiq_debugger_enable_fiq);
 
@@ -531,7 +531,7 @@ static __init int sip_firmware_init(void)
      * OP-TEE works on kernel 3.10 and 4.4 and we have different sip
      * implement. We should tell OP-TEE the current rockchip sip version.
      */
-    res = __invoke_sip_fn_smc(SIP_SIP_VERSION, SIP_IMPLEMENT_V2, SECURE_REG_WR, 0);
+    res = invoke_sip_fn_smc(SIP_SIP_VERSION, SIP_IMPLEMENT_V2, SECURE_REG_WR, 0);
     if (IS_SIP_ERROR(res.a0)) {
         pr_err("%s: set rockchip sip version v2 failed\n", __func__);
     }

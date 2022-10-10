@@ -613,7 +613,6 @@ static int spidev_release(struct inode *inode, struct file *filp)
     /* last close? */
     spidev->users--;
     if (!spidev->users) {
-
         kfree(spidev->tx_buffer);
         spidev->tx_buffer = NULL;
 

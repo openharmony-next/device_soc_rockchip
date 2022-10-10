@@ -279,11 +279,18 @@ static int rkisp_stream_config_rsz(struct rkisp_stream *stream, bool async)
         v4l2_err(&dev->v4l2_dev, "Not xsubs/ysubs found\n");
         return -EINVAL;
     }
+
+    if (xsubs_in == 0 || ysubs_in == 0){
+        return -1;
+    }
     in_c.width = in_y.width / xsubs_in;
     in_c.height = in_y.height / ysubs_in;
 
     if (output_isp_fmt->fmt_type == FMT_YUV) {
         rkisp_fcc_xysubs(output_isp_fmt->fourcc, &xsubs_out, &ysubs_out);
+        if (xsubs_out == 0 || ysubs_out == 0){
+            return -1;
+        }
         out_c.width = out_y.width / xsubs_out;
         out_c.height = out_y.height / ysubs_out;
     } else {
@@ -1486,7 +1493,7 @@ void rkisp_mi_v21_isr(u32 mis_val, struct rkisp_device *dev)
     unsigned int i;
     static u8 end_tx0, end_tx2;
 
-    v4l2_dbg(3, rkisp_debug, &dev->v4l2_dev, "mi isr:0x%x\n", mis_val);
+    v4l2_dbg(0x03, rkisp_debug, &dev->v4l2_dev, "mi isr:0x%x\n", mis_val);
 
     if (mis_val & CIF_MI_DMA_READY) {
         rkisp_dmarx_isr(mis_val, dev);
@@ -1572,7 +1579,7 @@ void rkisp_mipi_v21_isr(unsigned int phy, unsigned int packet, unsigned int over
     u32 state_err = RAW_WR_SIZE_ERR | RAW_RD_SIZE_ERR;
     int i, id;
 
-    v4l2_dbg(3, rkisp_debug, &dev->v4l2_dev, "csi state:0x%x\n", state);
+    v4l2_dbg(0x03, rkisp_debug, &dev->v4l2_dev, "csi state:0x%x\n", state);
     dev->csi_dev.irq_cnt++;
     if (phy && (dev->isp_inp & INP_CSI) && dev->csi_dev.err_cnt++ < RKISP_CONTI_ERR_MAX) {
         v4l2_warn(v4l2_dev, "MIPI error: phy: 0x%08x\n", phy);
@@ -1600,7 +1607,7 @@ void rkisp_mipi_v21_isr(unsigned int phy, unsigned int packet, unsigned int over
                 continue;
             }
             dev->csi_dev.tx_first[i] = true;
-            id = i ? 2 : 0;
+            id = i ? 0x02 : 0;
             rkisp_csi_sof(dev, id);
             stream = &dev->cap_dev.stream[id + RKISP_STREAM_DMATX0];
             atomic_inc(&stream->sequence);

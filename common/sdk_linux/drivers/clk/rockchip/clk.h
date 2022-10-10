@@ -282,18 +282,18 @@ enum rockchip_pll_type {
 
 #define RK3036_PLL_RATE(_rate, _refdiv, _fbdiv, _postdiv1, _postdiv2, _dsmpd, _frac)                                   \
     {                                                                                                                  \
-        .rate = _rate##U, .fbdiv = _fbdiv, .postdiv1 = _postdiv1, .refdiv = _refdiv, .postdiv2 = _postdiv2,            \
-        .dsmpd = _dsmpd, .frac = _frac,                                                                                \
+        .rate = _rate##U, .fbdiv = (_fbdiv), .postdiv1 = (_postdiv1), .refdiv = (_refdiv), .postdiv2 = (_postdiv2),            \
+        .dsmpd = (_dsmpd), .frac = (_frac),                                                                                \
     }
 
 #define RK3066_PLL_RATE(_rate, _nr, _nf, _no)                                                                          \
     {                                                                                                                  \
-        .rate = _rate##U, .nr = _nr, .nf = _nf, .no = _no, .nb = ((_nf) < 2) ? 1 : (_nf) >> 1,                         \
+        .rate = _rate##U, .nr = (_nr), .nf = (_nf), .no = (_no), .nb = ((_nf) < 2) ? 1 : (_nf) >> 1,                         \
     }
 
 #define RK3066_PLL_RATE_NB(_rate, _nr, _nf, _no, _nb)                                                                  \
     {                                                                                                                  \
-        .rate = _rate##U, .nr = _nr, .nf = _nf, .no = _no, .nb = _nb,                                                  \
+        .rate = _rate##U, .nr = (_nr), .nf = (_nf), .no = (_no), .nb = (_nb),                                                  \
     }
 
 /**
@@ -730,7 +730,7 @@ void rockchip_clk_of_add_provider(struct device_node *np, struct rockchip_clk_pr
 void rockchip_clk_add_lookup(struct rockchip_clk_provider *ctx, struct clk *clk, unsigned int id);
 void rockchip_clk_register_branches(struct rockchip_clk_provider *ctx, struct rockchip_clk_branch *list,
                                     unsigned int nr_clk);
-void rockchip_clk_register_plls(struct rockchip_clk_provider *ctx, struct rockchip_pll_clock *pll_list,
+void rockchip_clk_register_plls(struct rockchip_clk_provider *ctx, struct rockchip_pll_clock *list,
                                 unsigned int nr_pll, int grf_lock_offset);
 void __init rockchip_clk_register_armclk(struct rockchip_clk_provider *ctx, unsigned int lookup_id, const char *name,
                                          u8 num_parents, struct clk *parent, struct clk *alt_parent,

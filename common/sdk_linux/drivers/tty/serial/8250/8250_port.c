@@ -80,277 +80,277 @@
  * Here we define the default xmit fifo size used for each type of UART.
  */
 static const struct serial8250_config uart_config[] =
-    {
-        [PORT_UNKNOWN] =
-            {
-                .name = "unknown",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_8250] =
-            {
-                .name = "8250",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_16450] =
-            {
-                .name = "16450",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_16550] =
-            {
-                .name = "16550",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_16550A] =
-            {
-                .name = "16550A",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_CIRRUS] =
-            {
-                .name = "Cirrus",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_16650] =
-            {
-                .name = "ST16650",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-                .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_16650V2] =
-            {
-                .name = "ST16650V2",
-                .fifo_size = PORT_THIRTYTWO,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_00,
-                .rxtrig_bytes = {8, PORT_SIXTEEN, PORT_TWENTYFOUR, PORT_TWENTYEIGHT},
-                .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_16750] =
-            {
-                .name = "TI16750",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYFOUR,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
-                .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_FIFTYSIX},
-                .flags = UART_CAP_FIFO | UART_CAP_SLEEP | UART_CAP_AFE,
-            },
-        [PORT_STARTECH] =
-            {
-                .name = "Startech",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONE,
-            },
-        [PORT_16C950] =
-            {
-                .name = "16C950/954",
-                .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-                .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01,
-                .rxtrig_bytes = {PORT_SIXTEEN, PORT_THIRTYTWO, PORT_ONEHUNDREDTWELVE, PORT_ONEHUNDREDTWENTY},
-                /* UART_CAP_EFR breaks billionon CF bluetooth card. */
-                .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
-            },
-        [PORT_16654] =
-            {
-                .name = "ST16654",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_THIRTYTWO,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_10,
-                .rxtrig_bytes = {PORT_EIGHT, PORT_SIXTEEN, PORT_FIFTYSIX, PORT_SIXTY},
-                .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_16850] =
-            {
-                .name = "XR16850",
-                .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-                .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_RSA] =
-            {
-                .name = "RSA",
-                .fifo_size = 2048,
-                .tx_loadsz = 2048,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11,
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_NS16550A] =
-            {
-                .name = "NS16550A",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO | UART_NATSEMI,
-            },
-        [PORT_XSCALE] =
-            {
-                .name = "XScale",
-                .fifo_size = PORT_THIRTYTWO,
-                .tx_loadsz = PORT_THIRTYTWO,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO | UART_CAP_UUE | UART_CAP_RTOIE,
-            },
-        [PORT_OCTEON] =
-            {
-                .name = "OCTEON",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYFOUR,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_AR7] =
-            {
-                .name = "AR7",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_00,
-                .flags = UART_CAP_FIFO /* | UART_CAP_AFE */,
-            },
-        [PORT_U6_16550A] =
-            {
-                .name = "U6_16550A",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYFOUR,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO | UART_CAP_AFE,
-            },
-        [PORT_TEGRA] =
-            {
-                .name = "Tegra",
-                .fifo_size = PORT_THIRTYTWO,
-                .tx_loadsz = PORT_EIGHT,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_01,
-                .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-                .flags = UART_CAP_FIFO | UART_CAP_RTOIE,
-            },
-        [PORT_XR17D15X] =
-            {
-                .name = "XR17D15X",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYFOUR,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .flags = UART_CAP_FIFO | UART_CAP_AFE | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_XR17V35X] =
-            {
-                .name = "XR17V35X",
-                .fifo_size = PORT_ONEHUNDREDFIFTYSIX,
-                .tx_loadsz = PORT_ONEHUNDREDFIFTYSIX,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11 | UART_FCR_T_TRIG_11,
-                .flags = UART_CAP_FIFO | UART_CAP_AFE | UART_CAP_EFR | UART_CAP_SLEEP,
-            },
-        [PORT_LPC3220] =
-            {
-                .name = "LPC3220",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_THIRTYTWO,
-                .fcr = UART_FCR_DMA_SELECT | UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_00 | UART_FCR_T_TRIG_00,
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_BRCM_TRUMANAGE] =
-            {
-                .name = "TruManage",
-                .fifo_size = PORT_ONE,
-                .tx_loadsz = PORT_ONETHOUSANDTWENTYFOUR,
-                .flags = UART_CAP_HFIFO,
-            },
-        [PORT_8250_CIR] = {.name = "CIR port"},
-        [PORT_ALTR_16550_F32] =
-            {
-                .name = "Altera 16550 FIFO32",
-                .fifo_size = PORT_THIRTYTWO,
-                .tx_loadsz = PORT_THIRTYTWO,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_EIGHT, PORT_SIXTEEN, PORT_THIRTY},
-                .flags = UART_CAP_FIFO | UART_CAP_AFE,
-            },
-        [PORT_ALTR_16550_F64] =
-            {
-                .name = "Altera 16550 FIFO64",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYFOUR,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_SIXTYTWO},
-                .flags = UART_CAP_FIFO | UART_CAP_AFE,
-            },
-        [PORT_ALTR_16550_F128] =
-            {
-                .name = "Altera 16550 FIFO128",
-                .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-                .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_THIRTYTWO, PORT_SIXTYFOUR, PORT_ONEHUNDREDTWENTYSIX},
-                .flags = UART_CAP_FIFO | UART_CAP_AFE,
-            },
-        /*
-         * tx_loadsz is set to 63-bytes instead of 64-bytes to implement
-         * workaround of errata A-008006 which states that tx_loadsz should
-         * be configured less than Maximum supported fifo bytes.
-         */
-        [PORT_16550A_FSL64] =
-            {
-                .name = "16550A_FSL64",
-                .fifo_size = PORT_SIXTYFOUR,
-                .tx_loadsz = PORT_SIXTYTHREE,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_RT2880] =
-            {
-                .name = "Palmchip BK-3103",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_DA830] =
-            {
-                .name = "TI DA8xx/66AK2x",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_DMA_SELECT | UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-                .flags = UART_CAP_FIFO | UART_CAP_AFE,
-            },
-        [PORT_MTK_BTIF] =
-            {
-                .name = "MediaTek BTIF",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT,
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_NPCM] =
-            {
-                .name = "Nuvoton 16550",
-                .fifo_size = PORT_SIXTEEN,
-                .tx_loadsz = PORT_SIXTEEN,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT,
-                .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-                .flags = UART_CAP_FIFO,
-            },
-        [PORT_SUNIX] =
-            {
-                .name = "Sunix",
-                .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-                .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-                .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-                .rxtrig_bytes = {PORT_ONE, PORT_THIRTYTWO, PORT_SIXTYFOUR, PORT_ONEHUNDREDTWELVE},
-                .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
-            },
+{
+    [PORT_UNKNOWN] =
+        {
+            .name = "unknown",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_8250] =
+        {
+            .name = "8250",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_16450] =
+        {
+            .name = "16450",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_16550] =
+        {
+            .name = "16550",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_16550A] =
+        {
+            .name = "16550A",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_CIRRUS] =
+        {
+            .name = "Cirrus",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_16650] =
+        {
+            .name = "ST16650",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_16650V2] =
+        {
+            .name = "ST16650V2",
+            .fifo_size = PORT_THIRTYTWO,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_00,
+            .rxtrig_bytes = {8, PORT_SIXTEEN, PORT_TWENTYFOUR, PORT_TWENTYEIGHT},
+            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_16750] =
+        {
+            .name = "TI16750",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYFOUR,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
+            .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_FIFTYSIX},
+            .flags = UART_CAP_FIFO | UART_CAP_SLEEP | UART_CAP_AFE,
+        },
+    [PORT_STARTECH] =
+        {
+            .name = "Startech",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONE,
+        },
+    [PORT_16C950] =
+        {
+            .name = "16C950/954",
+            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01,
+            .rxtrig_bytes = {PORT_SIXTEEN, PORT_THIRTYTWO, PORT_ONEHUNDREDTWELVE, PORT_ONEHUNDREDTWENTY},
+            /* UART_CAP_EFR breaks billionon CF bluetooth card. */
+            .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
+        },
+    [PORT_16654] =
+        {
+            .name = "ST16654",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_THIRTYTWO,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_10,
+            .rxtrig_bytes = {PORT_EIGHT, PORT_SIXTEEN, PORT_FIFTYSIX, PORT_SIXTY},
+            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_16850] =
+        {
+            .name = "XR16850",
+            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_RSA] =
+        {
+            .name = "RSA",
+            .fifo_size = 2048,
+            .tx_loadsz = 2048,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11,
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_NS16550A] =
+        {
+            .name = "NS16550A",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO | UART_NATSEMI,
+        },
+    [PORT_XSCALE] =
+        {
+            .name = "XScale",
+            .fifo_size = PORT_THIRTYTWO,
+            .tx_loadsz = PORT_THIRTYTWO,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO | UART_CAP_UUE | UART_CAP_RTOIE,
+        },
+    [PORT_OCTEON] =
+        {
+            .name = "OCTEON",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYFOUR,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_AR7] =
+        {
+            .name = "AR7",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_00,
+            .flags = UART_CAP_FIFO /* | UART_CAP_AFE */,
+        },
+    [PORT_U6_16550A] =
+        {
+            .name = "U6_16550A",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYFOUR,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO | UART_CAP_AFE,
+        },
+    [PORT_TEGRA] =
+        {
+            .name = "Tegra",
+            .fifo_size = PORT_THIRTYTWO,
+            .tx_loadsz = PORT_EIGHT,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_01,
+            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+            .flags = UART_CAP_FIFO | UART_CAP_RTOIE,
+        },
+    [PORT_XR17D15X] =
+        {
+            .name = "XR17D15X",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYFOUR,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .flags = UART_CAP_FIFO | UART_CAP_AFE | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_XR17V35X] =
+        {
+            .name = "XR17V35X",
+            .fifo_size = PORT_ONEHUNDREDFIFTYSIX,
+            .tx_loadsz = PORT_ONEHUNDREDFIFTYSIX,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11 | UART_FCR_T_TRIG_11,
+            .flags = UART_CAP_FIFO | UART_CAP_AFE | UART_CAP_EFR | UART_CAP_SLEEP,
+        },
+    [PORT_LPC3220] =
+        {
+            .name = "LPC3220",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_THIRTYTWO,
+            .fcr = UART_FCR_DMA_SELECT | UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_00 | UART_FCR_T_TRIG_00,
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_BRCM_TRUMANAGE] =
+        {
+            .name = "TruManage",
+            .fifo_size = PORT_ONE,
+            .tx_loadsz = PORT_ONETHOUSANDTWENTYFOUR,
+            .flags = UART_CAP_HFIFO,
+        },
+    [PORT_8250_CIR] = {.name = "CIR port"},
+    [PORT_ALTR_16550_F32] =
+        {
+            .name = "Altera 16550 FIFO32",
+            .fifo_size = PORT_THIRTYTWO,
+            .tx_loadsz = PORT_THIRTYTWO,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_EIGHT, PORT_SIXTEEN, PORT_THIRTY},
+            .flags = UART_CAP_FIFO | UART_CAP_AFE,
+        },
+    [PORT_ALTR_16550_F64] =
+        {
+            .name = "Altera 16550 FIFO64",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYFOUR,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_SIXTYTWO},
+            .flags = UART_CAP_FIFO | UART_CAP_AFE,
+        },
+    [PORT_ALTR_16550_F128] =
+        {
+            .name = "Altera 16550 FIFO128",
+            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_THIRTYTWO, PORT_SIXTYFOUR, PORT_ONEHUNDREDTWENTYSIX},
+            .flags = UART_CAP_FIFO | UART_CAP_AFE,
+        },
+    /*
+        * tx_loadsz is set to 63-bytes instead of 64-bytes to implement
+        * workaround of errata A-008006 which states that tx_loadsz should
+        * be configured less than Maximum supported fifo bytes.
+        */
+    [PORT_16550A_FSL64] =
+        {
+            .name = "16550A_FSL64",
+            .fifo_size = PORT_SIXTYFOUR,
+            .tx_loadsz = PORT_SIXTYTHREE,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_RT2880] =
+        {
+            .name = "Palmchip BK-3103",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_DA830] =
+        {
+            .name = "TI DA8xx/66AK2x",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_DMA_SELECT | UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+            .flags = UART_CAP_FIFO | UART_CAP_AFE,
+        },
+    [PORT_MTK_BTIF] =
+        {
+            .name = "MediaTek BTIF",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT,
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_NPCM] =
+        {
+            .name = "Nuvoton 16550",
+            .fifo_size = PORT_SIXTEEN,
+            .tx_loadsz = PORT_SIXTEEN,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT,
+            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+            .flags = UART_CAP_FIFO,
+        },
+    [PORT_SUNIX] =
+        {
+            .name = "Sunix",
+            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+            .rxtrig_bytes = {PORT_ONE, PORT_THIRTYTWO, PORT_SIXTYFOUR, PORT_ONEHUNDREDTWELVE},
+            .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
+        },
 };
 
 /* Uart divisor latch read */
@@ -743,7 +743,6 @@ int serial8250_em485_config(struct uart_port *port, struct serial_rs485 *rs485)
      */
     if (rs485->flags & SER_RS485_ENABLED) {
         int ret = serial8250_em485_init(up);
-
         if (ret) {
             rs485->flags &= ~SER_RS485_ENABLED;
             port->rs485.flags &= ~SER_RS485_ENABLED;
@@ -918,7 +917,7 @@ static int size_fifo(struct uart_8250_port *up)
     for (count = 0; count < PORT_ONEHUNDREDFIFTYSIX; count++) {
         serial_out(up, UART_TX, count);
     }
-    mdelay(0x14); /* FIXME - schedule_timeout */
+    mdelay(0x14); /* schedule_timeout */
     for (count = 0; (serial_in(up, UART_LSR) & UART_LSR_DR) && (count < PORT_ONEHUNDREDFIFTYSIX); count++) {
         serial_in(up, UART_RX);
     }
@@ -1152,7 +1151,6 @@ static void autoconfig_16550a(struct uart_8250_port *up)
     status1 = serial8250_in_MCR(up);
     serial_out(up, UART_LCR, 0xE0);
     status2 = serial_in(up, 0x02); /* EXCR1 */
-
     if (!((status2 ^ status1) & UART_MCR_LOOP)) {
         serial_out(up, UART_LCR, 0);
         serial8250_out_MCR(up, status1 ^ UART_MCR_LOOP);
@@ -1167,7 +1165,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
             serial_out(up, UART_LCR, 0xE0);
 
             quot = serial_dl_read(up);
-            quot <<= 3;
+            quot <<= 0x3;
 
             if (ns16550a_goto_highspeed(up)) {
                 serial_dl_write(up, quot);
@@ -2009,15 +2007,11 @@ int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
 #ifndef CONFIG_ARCH_ROCKCHIP
     bool skip_rx = false;
 #endif
-
     if (iir & UART_IIR_NO_INT) {
         return 0;
     }
-
     spin_lock_irqsave(&port->lock, flags);
-
     status = serial_port_in(port, UART_LSR);
-
 #ifdef CONFIG_ARCH_ROCKCHIP
     if (status & (UART_LSR_DR | UART_LSR_BI)) {
         int dma_err = -1;
@@ -2063,7 +2057,6 @@ int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
 
 #ifdef CONFIG_ARCH_ROCKCHIP
     if (status & UART_LSR_BRK_ERROR_BITS) {
-
         if (status & UART_LSR_OE) {
             pr_err("%s: Overrun error!\n", port->name);
         }
@@ -2110,7 +2103,6 @@ static int serial8250_tx_threshold_handle_irq(struct uart_port *port)
 {
     unsigned long flags;
     unsigned int iir = serial_port_in(port, UART_IIR);
-
     /* TX Threshold IRQ triggered so load up FIFO */
     if ((iir & UART_IIR_ID) == UART_IIR_THRI) {
         struct uart_8250_port *up = up_to_u8250p(port);
@@ -2266,9 +2258,7 @@ static int serial8250_get_poll_char(struct uart_port *port)
     int status;
 
     serial8250_rpm_get(up);
-
     lsr = serial_port_in(port, UART_LSR);
-
     if (!(lsr & UART_LSR_DR)) {
         status = NO_POLL_CHAR;
         goto out;
@@ -3006,7 +2996,7 @@ void serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
     if (up->capabilities & UART_CAP_EFR) {
         unsigned char efr = 0;
         /*
-         * TI16C752/Startech hardware flow control.  FIXME:
+         * TI16C752/Startech hardware flow control.
          * - TI16C752 requires control thresholds to be set.
          * - UART_MCR_RTS is ineffective if auto-RTS mode is enabled.
          */

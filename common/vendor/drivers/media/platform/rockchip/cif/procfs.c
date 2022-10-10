@@ -12,6 +12,8 @@
 #include "dev.h"
 #include "procfs.h"
 
+#define DIR_RIGHT 0444
+
 #ifdef CONFIG_PROC_FS
 
 static const struct {
@@ -373,8 +375,7 @@ static const struct proc_ops rkcif_proc_fops = {
 
 int rkcif_proc_init(struct rkcif_device *dev)
 {
-
-    dev->proc_dir = proc_create_data(dev_name(dev->dev), 0444, NULL, &rkcif_proc_fops, dev);
+    dev->proc_dir = proc_create_data(dev_name(dev->dev), DIR_RIGHT, NULL, &rkcif_proc_fops, dev);
     if (!dev->proc_dir) {
         dev_err(dev->dev, "create proc/%s failed!\n", dev_name(dev->dev));
         return -ENODEV;

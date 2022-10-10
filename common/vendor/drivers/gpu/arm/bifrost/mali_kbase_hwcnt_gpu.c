@@ -344,7 +344,7 @@ static inline void kbasep_hwcnt_backend_gpu_block_map_from_physical(u32 phys, u6
 
     size_t dword_idx;
 
-    for (dword_idx = 0; dword_idx < 2; dword_idx++) {
+    for (dword_idx = 0; dword_idx < 0x2; dword_idx++) {
         const u16 packed = phys >> (0x10 * dword_idx);
         u64 dword = 0;
 

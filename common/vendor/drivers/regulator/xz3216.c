@@ -32,12 +32,12 @@
 #include <linux/regulator/machine.h>
 #include <linux/regmap.h>
 
-#if 0
-#define DBG(x...) pr_info(x)
-#else
-#define DBG(x...)
-#endif
 
+
+
+
+
+#define DBG(x...) pr_info(x)
 #define DBG_ERR(x...) pr_err(x)
 
 #define XZ3216_NUM_REGULATORS 1

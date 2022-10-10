@@ -714,8 +714,8 @@ static int mipidphy_get_sensor_data_rate(struct v4l2_subdev *sd)
         v4l2_err(sd, "Invalid link_freq\n");
         return -EINVAL;
     }
-    priv->data_rate_mbps = qm.value * 2;
-    do_div(priv->data_rate_mbps, 1000 * 1000);
+    priv->data_rate_mbps = qm.value * 0x02;
+    do_div(priv->data_rate_mbps, 0x3E8 * 0x3E8);
     v4l2_info(sd, "data_rate_mbps %lld\n", priv->data_rate_mbps);
     return 0;
 }
@@ -739,13 +739,13 @@ static int mipidphy_update_sensor_mbus(struct v4l2_subdev *sd)
             sensor->lanes = 1;
             break;
         case V4L2_MBUS_CSI2_2_LANE:
-            sensor->lanes = 2;
+            sensor->lanes = 0x02;
             break;
         case V4L2_MBUS_CSI2_3_LANE:
-            sensor->lanes = 3;
+            sensor->lanes = 0x03;
             break;
         case V4L2_MBUS_CSI2_4_LANE:
-            sensor->lanes = 4;
+            sensor->lanes = 0x04;
             break;
         default:
             return -EINVAL;
@@ -1112,7 +1112,7 @@ static int mipidphy_rx_stream_on(struct mipidphy_priv *priv, struct v4l2_subdev 
     /* Step3: set TESTCLEAR = 1'b1 */
     write_grf_reg(priv, GRF_DPHY_RX0_TESTCLK, 1);
     write_grf_reg(priv, GRF_DPHY_RX0_TESTCLR, 1);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /* Step4: apply REFCLK signal with the appropriate frequency */
 
@@ -1130,11 +1130,11 @@ static int mipidphy_rx_stream_on(struct mipidphy_priv *priv, struct v4l2_subdev 
     write_grf_reg(priv, GRF_DPHY_RX0_TURNDISABLE, 0xf);
     write_grf_reg(priv, GRF_DPHY_RX0_FORCERXMODE, 0);
     write_grf_reg(priv, GRF_DPHY_RX0_TURNREQUEST, 0);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /* Step9: set TESTCLR to low, need to wait 15ns */
     write_grf_reg(priv, GRF_DPHY_RX0_TESTCLR, 0);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /*
      * Step10: configure Test Code 0x44 hsfreqrange according to values
@@ -1163,7 +1163,7 @@ static int mipidphy_rx_stream_on(struct mipidphy_priv *priv, struct v4l2_subdev 
      *         outputs are asserted
      */
 
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     return 0;
 }
@@ -1214,7 +1214,7 @@ static int mipidphy_txrx_stream_on(struct mipidphy_priv *priv, struct v4l2_subde
 
     /* Step3: set TESTCLR= 1'b1,TESTCLK=1'b1 */
     write_txrx_reg(priv, TXRX_PHY_TEST_CTRL0, PHY_TESTCLR | PHY_TESTCLK);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /* Step4: apply REFCLK signal with the appropriate frequency */
 
@@ -1237,11 +1237,11 @@ static int mipidphy_txrx_stream_on(struct mipidphy_priv *priv, struct v4l2_subde
     write_grf_reg(priv, GRF_DPHY_TX1RX1_FORCETXSTOPMODE, 0);
     write_grf_reg(priv, GRF_DPHY_TX1RX1_TURNREQUEST, 0);
     write_grf_reg(priv, GRF_DPHY_TX1RX1_TURNDISABLE, 0xf);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /* Step9: set TESTCLR=1'b0,TESTCLK=1'b1 need to wait 15ns */
     write_txrx_reg(priv, TXRX_PHY_TEST_CTRL0, PHY_TESTCLK);
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     /*
      * Step10: configure Test Code 0x44 hsfreqrange according to values
@@ -1280,7 +1280,7 @@ static int mipidphy_txrx_stream_on(struct mipidphy_priv *priv, struct v4l2_subde
      *        outputs are asserted
      */
 
-    usleep_range(100, 150);
+    usleep_range(0x64, 0x96);
 
     return 0;
 }
@@ -1307,7 +1307,7 @@ static int csi_mipidphy_stream_on(struct mipidphy_priv *priv, struct v4l2_subdev
 
     /* Reset dphy analog part */
     write_csiphy_reg(priv, CSIPHY_CTRL_PWRCTL, 0xe0);
-    usleep_range(500, 1000);
+    usleep_range(0x1F4, 0x3E8);
 
     if (sensor->mbus.type == V4L2_MBUS_CSI2_DPHY) {
         /* Reset dphy digital part */
@@ -1344,7 +1344,7 @@ static int csi_mipidphy_stream_on(struct mipidphy_priv *priv, struct v4l2_subdev
     write_grf_reg(priv, GRF_DPHY_CSIPHY_FORCERXMODE, 0x0);
 
     /* enable calibration */
-    if (priv->data_rate_mbps > 1500) {
+    if (priv->data_rate_mbps > 0x5DC) {
         write_csiphy_reg(priv, CSIPHY_CLK_CALIB_ENABLE, 0x80);
         if (sensor->lanes > 0x00) {
             write_csiphy_reg(priv, CSIPHY_LANE0_CALIB_ENABLE, 0x80);
@@ -1401,7 +1401,7 @@ static int csi_mipidphy_stream_off(struct mipidphy_priv *priv, struct v4l2_subde
     write_csiphy_reg(priv, CSIPHY_CTRL_LANE_ENABLE, 0x01);
     /* disable pll and ldo */
     write_csiphy_reg(priv, CSIPHY_CTRL_PWRCTL, 0xe3);
-    usleep_range(500, 1000);
+    usleep_range(0x1F4, 0x3E8);
 
     return 0;
 }
@@ -1588,13 +1588,13 @@ static int rockchip_mipidphy_fwnode_parse(struct device *dev, struct v4l2_fwnode
         case 1:
             config->flags |= V4L2_MBUS_CSI2_1_LANE;
             break;
-        case 2:
+        case 0x02:
             config->flags |= V4L2_MBUS_CSI2_2_LANE;
             break;
-        case 3:
+        case 0x03:
             config->flags |= V4L2_MBUS_CSI2_3_LANE;
             break;
-        case 4:
+        case 0x04:
             config->flags |= V4L2_MBUS_CSI2_4_LANE;
             break;
         default:

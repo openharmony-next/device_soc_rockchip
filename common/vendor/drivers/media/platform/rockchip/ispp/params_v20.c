@@ -86,10 +86,10 @@ static void fec_config(struct rkispp_params_vdev *params_vdev, struct fec_config
 
     rkispp_write(params_vdev->dev, RKISPP_FEC_MESH_SIZE, arg->mesh_size);
 
-    val = arg->dst_width << 16 | arg->dst_height;
+    val = arg->dst_width << 0x10 | arg->dst_height;
     rkispp_write(params_vdev->dev, RKISPP_FEC_DST_SIZE, val);
 
-    val = arg->src_width << 16 | arg->src_height;
+    val = arg->src_width << 0x10 | arg->src_height;
     rkispp_write(params_vdev->dev, RKISPP_FEC_SRC_SIZE, val);
 
     val = arg->fec_bic_mode;

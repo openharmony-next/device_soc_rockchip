@@ -107,18 +107,18 @@ static int rockchip_edp_phy_set_rate(struct rockchip_edp_phy *edpphy, struct phy
     int ret;
 
     writel(EDP_PHY_TX_IDLE(0xf) | EDP_PHY_TX_PD(0xf), edpphy->regs + EDP_PHY_GRF_CON0);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
     writel(EDP_PHY_TX_MODE(0x3), edpphy->regs + EDP_PHY_GRF_CON5);
     writel(EDP_PHY_PD_PLL(0x1), edpphy->regs + EDP_PHY_GRF_CON0);
 
     switch (dp->link_rate) {
-        case 1620:
+        case 0x654:
             writel(EDP_PHY_PLL_DIV(0x4380), edpphy->regs + EDP_PHY_GRF_CON1);
             writel(EDP_PHY_TX_RTERM(0x1) | EDP_PHY_RATE(0x1) | EDP_PHY_REF_DIV(0x0), edpphy->regs + EDP_PHY_GRF_CON2);
             writel(EDP_PHY_PLL_CTL_H(0x0800), edpphy->regs + EDP_PHY_GRF_CON8);
             writel(EDP_PHY_TX_CTL(0x0000), edpphy->regs + EDP_PHY_GRF_CON9);
             break;
-        case 2700:
+        case 0xA8C:
             writel(EDP_PHY_PLL_DIV(0x3840), edpphy->regs + EDP_PHY_GRF_CON1);
             writel(EDP_PHY_TX_RTERM(0x1) | EDP_PHY_RATE(0x0) | EDP_PHY_REF_DIV(0x0), edpphy->regs + EDP_PHY_GRF_CON2);
             writel(EDP_PHY_PLL_CTL_H(0x0800), edpphy->regs + EDP_PHY_GRF_CON8);
@@ -153,8 +153,8 @@ static int rockchip_edp_phy_verify_config(struct rockchip_edp_phy *edpphy, struc
     /* If changing link rate was required, verify it's supported. */
     if (dp->set_rate) {
         switch (dp->link_rate) {
-            case 1620:
-            case 2700:
+            case 0x654:
+            case 0xA8C:
                 /* valid bit rate */
                 break;
             default:
@@ -165,8 +165,8 @@ static int rockchip_edp_phy_verify_config(struct rockchip_edp_phy *edpphy, struc
     /* Verify lane count. */
     switch (dp->lanes) {
         case 1:
-        case 2:
-        case 4:
+        case 0x02:
+        case 0x04:
             /* valid lane count. */
             break;
         default:
@@ -180,7 +180,7 @@ static int rockchip_edp_phy_verify_config(struct rockchip_edp_phy *edpphy, struc
     if (dp->set_voltages) {
         /* Lane count verified previously. */
         for (i = 0; i < dp->lanes; i++) {
-            if (dp->voltage[i] > 3 || dp->pre[i] > 3) {
+            if (dp->voltage[i] > 0x03 || dp->pre[i] > 0x03) {
                 return -EINVAL;
             }
 
@@ -188,7 +188,7 @@ static int rockchip_edp_phy_verify_config(struct rockchip_edp_phy *edpphy, struc
              * Sum of voltage swing and pre-emphasis levels cannot
              * exceed 3.
              */
-            if (dp->voltage[i] + dp->pre[i] > 3) {
+            if (dp->voltage[i] + dp->pre[i] > 0x03) {
                 return -EINVAL;
             }
         }
@@ -252,23 +252,23 @@ static int rockchip_edp_phy_power_on(struct phy *phy)
     }
 
     reset_control_assert(edpphy->apb_reset);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
     reset_control_deassert(edpphy->apb_reset);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
 
     writel(EDP_PHY_AUX_RCV_PD(0x1) | EDP_PHY_AUX_DRV_PD(0x1) | EDP_PHY_AUX_IDLE(0x1), edpphy->regs + EDP_PHY_GRF_CON10);
     writel(EDP_PHY_TX_IDLE(0xf) | EDP_PHY_TX_PD(0xf) | EDP_PHY_PD_PLL(0x1), edpphy->regs + EDP_PHY_GRF_CON0);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
 
     writel(EDP_PHY_AUX_RCV_VCM(0x4) | EDP_PHY_AUX_MODE(0x1) | EDP_PHY_AUX_AMP_SCALE(0x1) | EDP_PHY_AUX_AMP(0x3) |
                EDP_PHY_AUX_RTERM(0x1),
            edpphy->regs + EDP_PHY_GRF_CON11);
 
     writel(EDP_PHY_AUX_RCV_PD(0x0) | EDP_PHY_AUX_DRV_PD(0x0), edpphy->regs + EDP_PHY_GRF_CON10);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
 
     writel(EDP_PHY_AUX_IDLE(0x0), edpphy->regs + EDP_PHY_GRF_CON10);
-    usleep_range(10000, 11000);
+    usleep_range(0x2710, 0x2AF8);
 
     return 0;
 }
@@ -278,7 +278,7 @@ static int rockchip_edp_phy_power_off(struct phy *phy)
     struct rockchip_edp_phy *edpphy = phy_get_drvdata(phy);
 
     writel(EDP_PHY_TX_IDLE(0xf) | EDP_PHY_TX_PD(0xf), edpphy->regs + EDP_PHY_GRF_CON0);
-    usleep_range(100, 101);
+    usleep_range(0x64, 0x65);
     writel(EDP_PHY_TX_MODE(0x3), edpphy->regs + EDP_PHY_GRF_CON5);
     writel(EDP_PHY_PD_PLL(0x1), edpphy->regs + EDP_PHY_GRF_CON0);
     writel(EDP_PHY_AUX_RCV_PD(0x1) | EDP_PHY_AUX_DRV_PD(0x1) | EDP_PHY_AUX_IDLE(0x1), edpphy->regs + EDP_PHY_GRF_CON10);

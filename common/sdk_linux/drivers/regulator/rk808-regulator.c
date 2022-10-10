@@ -65,7 +65,7 @@
 /* Offset from XXX_EN_REG to SLEEP_SET_OFF_XXX */
 #define RK808_SLP_SET_OFF_REG_OFFSET 2
 
-/* max steps for increase voltage of Buck1/2, equal 25mv*/
+/* max steps for increase voltage of Buck1/2, equal 25mv */
 #define MAX_STEPS_ONE_TIME 2
 
 #define ENABLE_MASK(id) (BIT(id) | BIT(4 + (id)))
@@ -464,13 +464,10 @@ static int rk808_set_suspend_voltage(struct regulator_dev *rdev, int uv)
 {
     unsigned int reg;
     int sel = regulator_map_voltage_linear(rdev, uv, uv);
-
     if (sel < 0) {
         return -EINVAL;
     }
-
     reg = rdev->desc->vsel_reg + RK808_SLP_REG_OFFSET;
-
     return regmap_update_bits(rdev->regmap, reg, rdev->desc->vsel_mask, sel);
 }
 
@@ -478,13 +475,10 @@ static int rk808_set_suspend_voltage_range(struct regulator_dev *rdev, int uv)
 {
     unsigned int reg;
     int sel = regulator_map_voltage_linear_range(rdev, uv, uv);
-
     if (sel < 0) {
         return -EINVAL;
     }
-
     reg = rdev->desc->vsel_reg + RK808_SLP_REG_OFFSET;
-
     return regmap_update_bits(rdev->regmap, reg, rdev->desc->vsel_mask, sel);
 }
 

@@ -167,7 +167,7 @@ static int rk3066_hdmi_upload_frame(struct rk3066_hdmi *hdmi, int setup_rc, unio
         }
 
         for (i = 0; i < rc; i++) {
-            hdmi_writeb(hdmi, HDMI_CP_BUF_ACC_HB0 + i * 4, packed_frame[i]);
+            hdmi_writeb(hdmi, HDMI_CP_BUF_ACC_HB0 + i * 0x4, packed_frame[i]);
         }
 
         if (mask) {

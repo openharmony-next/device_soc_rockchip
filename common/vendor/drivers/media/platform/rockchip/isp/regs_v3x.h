@@ -3,8 +3,8 @@
  * Copyright (C) 2022 Rockchip Electronics Co., Ltd.
  */
 
-#ifndef _RKISP_REGS_ISP3X_H
-#define _RKISP_REGS_ISP3X_H
+#ifndef RKISP_REGS_ISP3X_H
+#define RKISP_REGS_ISP3X_H
 
 #define ISP3X_CTRL_BASE 0x00000000
 #define ISP3X_VI_ISP_EN (ISP3X_CTRL_BASE + 0x00000)

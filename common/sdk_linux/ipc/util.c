@@ -227,7 +227,6 @@ static inline int ipc_idr_alloc(struct ipc_ids *ids, struct kern_ipc_perm *new)
 
         /* allocate the idx, with a NULL struct kern_ipc_perm */
         idx = idr_alloc_cyclic(&ids->ipcs_idr, NULL, 0, max_idx, GFP_NOWAIT);
-
         if (idx >= 0) {
             /*
              * idx got allocated successfully.

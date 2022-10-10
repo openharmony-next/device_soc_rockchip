@@ -109,19 +109,19 @@ static int rockchip_init_wifi_mem(void)
     int j;
 
     for (i = 0; i < WLAN_SKB_BUF_NUM; i++) {
-        wlan_static_skb[i] = dev_alloc_skb(((i < (WLAN_SKB_BUF_NUM / 2)) ? (PAGE_SIZE * 1) : (PAGE_SIZE * 2)));
+        wlan_static_skb[i] = dev_alloc_skb(((i < (WLAN_SKB_BUF_NUM / 0x02)) ? (PAGE_SIZE * 1) : (PAGE_SIZE * 0x02)));
 
         if (!wlan_static_skb[i]) {
             goto err_skb_alloc;
         }
     }
 
-    wlan_static_skb[i] = dev_alloc_skb((PAGE_SIZE * 4));
+    wlan_static_skb[i] = dev_alloc_skb((PAGE_SIZE * 0x04));
     if (!wlan_static_skb[i]) {
         goto err_skb_alloc;
     }
 
-    for (i = 0; i <= 7; i++) {
+    for (i = 0; i <= 0x07; i++) {
         wifi_mem_array[i].mem_ptr = kmalloc(wifi_mem_array[i].size, GFP_KERNEL);
 
         if (!wifi_mem_array[i].mem_ptr) {
@@ -152,7 +152,7 @@ void *rockchip_mem_prealloc(int section, unsigned long size)
         return wlan_static_skb;
     }
 
-    if (section < 0 || section > 7) {
+    if (section < 0 || section > 0x07) {
         return NULL;
     }
 
@@ -266,7 +266,7 @@ int rockchip_wifi_power(int on)
             return -1;
         }
         if (on == level) {
-            regulator_set_voltage(ldo, 3000000, 3000000);
+            regulator_set_voltage(ldo, 0x2DC6C0, 0x2DC6C0);
             LOG("%s: %s enabled\n", __func__, ldostr);
             ret = regulator_enable(ldo);
             wifi_power_state = 1;
@@ -280,7 +280,7 @@ int rockchip_wifi_power(int on)
             LOG("wifi shut off power.\n");
         }
         regulator_put(ldo);
-        msleep(100);
+        msleep(0x64);
     } else {
         poweron = &mrfkill->pdata->power_n;
         reset = &mrfkill->pdata->reset_n;
@@ -288,17 +288,17 @@ int rockchip_wifi_power(int on)
         if (on) {
             if (toggle) {
                 rfkill_set_wifi_bt_power(1);
-                msleep(100);
+                msleep(0x64);
             }
 
             if (gpio_is_valid(poweron->io)) {
                 gpio_direction_output(poweron->io, poweron->enable);
-                msleep(100);
+                msleep(0x64);
             }
 
             if (gpio_is_valid(reset->io)) {
                 gpio_direction_output(reset->io, reset->enable);
-                msleep(100);
+                msleep(0x64);
             }
 
             wifi_power_state = 1;
@@ -307,7 +307,7 @@ int rockchip_wifi_power(int on)
             if (gpio_is_valid(poweron->io)) {
                 printk("wifi power off\n");
                 gpio_direction_output(poweron->io, !(poweron->enable));
-                msleep(100);
+                msleep(0x64);
             }
 
             if (gpio_is_valid(reset->io)) {
@@ -420,18 +420,18 @@ static int get_wifi_addr_vendor(unsigned char *addr)
         /* sleep 500ms wait rk vendor driver ready */
         msleep(500);
     }
-    ret = rk_vendor_read(WIFI_MAC_ID, addr, 6);
-    if (ret != 6 || is_zero_ether_addr(addr)) {
+    ret = rk_vendor_read(WIFI_MAC_ID, addr, 0x06);
+    if (ret != 0x06 || is_zero_ether_addr(addr)) {
         LOG("%s: rk_vendor_read wifi mac address failed (%d)\n", __func__, ret);
 #ifdef CONFIG_WIFI_GENERATE_RANDOM_MAC_ADDR
         random_ether_addr(addr);
         LOG("%s: generate random wifi mac address: "
             "%02x:%02x:%02x:%02x:%02x:%02x\n",
             __func__, addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
-        ret = rk_vendor_write(WIFI_MAC_ID, addr, 6);
+        ret = rk_vendor_write(WIFI_MAC_ID, addr, 0x06);
         if (ret != 0) {
             LOG("%s: rk_vendor_write failed %d\n" __func__, ret);
-            memset(addr, 0, 6);
+            memset(addr, 0, 0x06);
             return -1;
         }
 #else
@@ -459,11 +459,11 @@ int rockchip_wifi_mac_addr(unsigned char *buf)
     }
 
     sprintf(mac_buf, "%02x:%02x:%02x:%02x:%02x:%02x", wifi_custom_mac_addr[0], wifi_custom_mac_addr[1],
-            wifi_custom_mac_addr[2], wifi_custom_mac_addr[3], wifi_custom_mac_addr[4], wifi_custom_mac_addr[5]);
+            wifi_custom_mac_addr[0x02], wifi_custom_mac_addr[0x03], wifi_custom_mac_addr[0x04], wifi_custom_mac_addr[0x05]);
     LOG("falsh wifi_custom_mac_addr=[%s]\n", mac_buf);
 
     if (is_valid_ether_addr(wifi_custom_mac_addr)) {
-        if (!strncmp(wifi_chip_type_string, "rtl", 3)) {
+        if (!strncmp(wifi_chip_type_string, "rtl", 0x03)) {
             wifi_custom_mac_addr[0] &= ~0x2; // for p2p
         }
     } else {
@@ -471,7 +471,7 @@ int rockchip_wifi_mac_addr(unsigned char *buf)
         return -1;
     }
 
-    memcpy(buf, wifi_custom_mac_addr, 6);
+    memcpy(buf, wifi_custom_mac_addr, 0x06);
 
     return 0;
 }
@@ -496,7 +496,7 @@ void *rockchip_wifi_country_code(char *ccode)
 
     LOG("%s: set country code [%s]\n", __func__, ccode);
     mcloc = &country_cloc;
-    memcpy(mcloc->custom_locale, ccode, 4);
+    memcpy(mcloc->custom_locale, ccode, 0x04);
     mcloc->custom_locale_rev = 0;
 
     return mcloc;
@@ -713,7 +713,7 @@ static ssize_t wifi_power_store(struct class *cls, struct class_attribute *attr,
 {
     long poweren = 0;
 
-    if (kstrtol(_buf, 10, &poweren) < 0) {
+    if (kstrtol(_buf, 0x0A, &poweren) < 0) {
         return -EINVAL;
     }
 
@@ -739,7 +739,7 @@ static ssize_t wifi_bt_vbat_store(struct class *cls, struct class_attribute *att
 {
     long vbat = 0;
 
-    if (kstrtol(_buf, 10, &vbat) < 0) {
+    if (kstrtol(_buf, 0x0A, &vbat) < 0) {
         return -EINVAL;
     }
 
@@ -761,7 +761,7 @@ static ssize_t wifi_set_carddetect_store(struct class *cls, struct class_attribu
 {
     long val = 0;
 
-    if (kstrtol(_buf, 10, &val) < 0) {
+    if (kstrtol(_buf, 0x0A, &val) < 0) {
         return -EINVAL;
     }
 

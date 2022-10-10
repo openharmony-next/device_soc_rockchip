@@ -202,7 +202,7 @@ static int config_mode(struct rkisp_bridge_device *dev)
     v4l2_dbg(1, rkisp_debug, &dev->sd, "work mode:0x%x buf num:%d\n", dev->work_mode, dev->buf_num);
 
     if (hw->isp_ver == ISP_V20) {
-        gain_size = ALIGN(w, 64) * ALIGN(h, 128) >> 4;
+        gain_size = ALIGN(w, 0x40) * ALIGN(h, 0x80) >> 0x04;
         gain_size += RKISP_MOTION_DECT_TS_SIZE;
         pic_size += RKISP_MOTION_DECT_TS_SIZE;
         rkisp_bridge_init_ops_v20(dev);
@@ -212,15 +212,15 @@ static int config_mode(struct rkisp_bridge_device *dev)
     }
 
     if (dev->work_mode & ISP_ISPP_FBC) {
-        w = ALIGN(w, 16);
-        h = ALIGN(h, 16);
-        offs = w * h >> 4;
+        w = ALIGN(w, 0x10);
+        h = ALIGN(h, 0x10);
+        offs = w * h >> 0x04;
         pic_size = offs;
     }
     if (dev->work_mode & ISP_ISPP_422) {
-        pic_size += w * h * 2;
+        pic_size += w * h * 0x02;
     } else {
-        pic_size += w * h * 3 >> 1;
+        pic_size += w * h * 0x03 >> 1;
     }
     dev->cfg->offset = offs;
 
@@ -531,8 +531,8 @@ static int check_remote_node(struct rkisp_device *ispdev)
     struct device_node *remote = NULL;
     int i, j;
 
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 2; j++) {
+    for (i = 0; i < 0x03; i++) {
+        for (j = 0; j < 0x02; j++) {
             remote = of_graph_get_remote_node(parent, i, j);
             if (!remote) {
                 continue;

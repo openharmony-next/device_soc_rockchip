@@ -16,7 +16,7 @@ TRACE_EVENT(thermal_ipa_get_static_power,
 
             TP_STRUCT__entry(__field(u32, leakage) __field(u32, coefficient) __field(s32, temp)
                                  __field(u32, temp_scaling_factor) __field(u32, volt) __field(u32, volt_scaling_factor)
-                                     __field(u32, static_power)),
+                                    __field(u32, static_power)),
 
             TP_fast_assign(__entry->leakage = leakage; __entry->coefficient = coefficient; __entry->temp = temp;
                            __entry->temp_scaling_factor = temp_scaling_factor; __entry->volt = volt;

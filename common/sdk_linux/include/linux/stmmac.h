@@ -27,7 +27,7 @@
  * platform code.
  * This could also be configured at run time using CPU freq framework. */
 
-/* MDC Clock Selection define*/
+/* MDC Clock Selection define */
 #define STMMAC_CSR_60_100M 0x0  /* MDC = clk_scr_i/42 */
 #define STMMAC_CSR_100_150M 0x1 /* MDC = clk_scr_i/62 */
 #define STMMAC_CSR_20_35M 0x2   /* MDC = clk_scr_i/16 */
