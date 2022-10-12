@@ -113,7 +113,6 @@ void dw8250_setup_port(struct uart_port *p)
     }
 
     reg = dw8250_readl_ext(p, DW_UART_CPR);
-
 #ifdef CONFIG_ARCH_ROCKCHIP
     /*
      * The UART CPR may be 0 of some rockchip soc,

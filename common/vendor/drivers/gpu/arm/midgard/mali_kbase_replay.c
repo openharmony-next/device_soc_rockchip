@@ -271,7 +271,6 @@ static int kbasep_replay_reset_tiler_job(struct kbase_context *kctx, u64 job_hea
         u64 *job_ext;
 
         job_ext = kbase_vmap(kctx, job_header + JOB_HEADER_64_FBD_OFFSET, sizeof(*job_ext), &map);
-
         if (!job_ext) {
             dev_err(kctx->kbdev->dev, "kbasep_replay_reset_tiler_job: failed to map jc\n");
             return -EINVAL;
@@ -284,7 +283,6 @@ static int kbasep_replay_reset_tiler_job(struct kbase_context *kctx, u64 job_hea
         u32 *job_ext;
 
         job_ext = kbase_vmap(kctx, job_header + JOB_HEADER_32_FBD_OFFSET, sizeof(*job_ext), &map);
-
         if (!job_ext) {
             dev_err(kctx->kbdev->dev, "kbasep_replay_reset_tiler_job: failed to map jc\n");
             return -EINVAL;
@@ -307,7 +305,7 @@ static int kbasep_replay_reset_tiler_job(struct kbase_context *kctx, u64 job_hea
 /**
  * @brief Reset the status of a job
  *
- * This performs the following functions :
+ * This performs the following functions
  *
  * - Reset the Job Status field of each job to NOT_STARTED.
  * - Set the Job Type field of any Vertex Jobs to Null Job.
@@ -406,7 +404,6 @@ static int kbasep_replay_reset_job(struct kbase_context *kctx, u64 *job_header, 
             0) {
             goto out_unmap;
         }
-
     } else if (job->job_type == JOB_TYPE_FRAGMENT) {
         u64 fbd_address;
 
@@ -621,7 +618,7 @@ static void kbasep_replay_create_atom(struct kbase_context *kctx, struct base_jd
  *
  * Two atoms are allocated and created. The jc pointer is not set at this
  * stage. The second atom has a dependency on the first. The remaining fields
- * are set up as follows :
+ * are set up as follows
  *
  * - No external resources. Any required external resources will be held by the
  *   replay atom.
@@ -674,7 +671,6 @@ static void payload_dump(struct kbase_context *kctx, base_jd_replay_payload *pay
         base_jd_replay_jc *jc_struct;
 
         jc_struct = kbase_vmap(kctx, next, sizeof(*jc_struct), &map);
-
         if (!jc_struct) {
             return;
         }
@@ -752,11 +748,10 @@ static int kbasep_replay_parse_payload(struct kbase_context *kctx, struct kbase_
     t_atom->core_req = payload->tiler_core_req | BASEP_JD_REQ_EVENT_NEVER;
     f_atom->core_req = payload->fragment_core_req | BASEP_JD_REQ_EVENT_NEVER;
 
-    /* Sanity check core requirements*/
+    /* Sanity check core requirements */
     if ((t_atom->core_req & BASE_JD_REQ_ATOM_TYPE) != BASE_JD_REQ_T ||
         (f_atom->core_req & BASE_JD_REQ_ATOM_TYPE) != BASE_JD_REQ_FS ||
-        t_atom->core_req & BASE_JD_REQ_EXTERNAL_RESOURCES || f_atom->core_req & BASE_JD_REQ_EXTERNAL_RESOURCES) {
-
+        (t_atom->core_req & BASE_JD_REQ_EXTERNAL_RESOURCES) || (f_atom->core_req & BASE_JD_REQ_EXTERNAL_RESOURCES)) {
         int t_atom_type = t_atom->core_req & BASE_JD_REQ_ATOM_TYPE & ~BASE_JD_REQ_COHERENT_GROUP;
         int f_atom_type = f_atom->core_req & BASE_JD_REQ_ATOM_TYPE & ~BASE_JD_REQ_COHERENT_GROUP & ~BASE_JD_REQ_FS_AFBC;
         int t_has_ex_res = t_atom->core_req & BASE_JD_REQ_EXTERNAL_RESOURCES;
@@ -795,7 +790,6 @@ static int kbasep_replay_parse_payload(struct kbase_context *kctx, struct kbase_
         u64 jc;
 
         jc_struct = kbase_vmap(kctx, next, sizeof(*jc_struct), &jc_map);
-
         if (!jc_struct) {
             dev_err(kctx->kbdev->dev, "Failed to map jc struct\n");
             goto out;
@@ -867,7 +861,6 @@ static void kbase_replay_process_worker(struct work_struct *data)
     mutex_lock(&jctx->lock);
 
     atom_prio = kbasep_js_sched_prio_to_atom_prio(katom->sched_priority);
-
     if (kbasep_replay_create_atoms(kctx, &t_atom, &f_atom, atom_prio) != 0) {
         katom->event_code = BASE_JD_EVENT_JOB_CANCELLED;
         goto out;
@@ -979,7 +972,7 @@ static bool kbase_replay_fault_check(struct kbase_jd_atom *katom)
         job = kbase_vmap(kctx, job_header, sizeof(*job), &job_map);
         if (!job) {
             dev_err(dev, "failed to map jc\n");
-            /* unmap payload*/
+            /* unmap payload */
             kbase_vunmap(kctx, &map);
             return false;
         }
@@ -1010,7 +1003,7 @@ static bool kbase_replay_fault_check(struct kbase_jd_atom *katom)
         }
     }
 
-    /* unmap payload*/
+    /* unmap payload */
     kbase_vunmap(kctx, &map);
 
     return err;

@@ -400,7 +400,6 @@ static struct device_node *regulator_of_get_init_node(struct device *dev, const 
         search = of_get_child_by_name(dev->of_node, desc->regulators_node);
     } else {
         search = of_node_get(dev->of_node);
-
         if (!strcmp(desc->of_match, search->name)) {
             return search;
         }
@@ -560,13 +559,11 @@ bool of_check_coupling_data(struct regulator_dev *rdev)
         }
 
         c_node = of_parse_phandle(node, "regulator-coupled-with", i);
-
         if (!c_node) {
             ret = false;
         }
 
         c_n_phandles = of_count_phandle_with_args(c_node, "regulator-coupled-with", NULL);
-
         if (c_n_phandles != n_phandles) {
             dev_err(&rdev->dev, "number of coupled reg phandles mismatch\n");
             ret = false;

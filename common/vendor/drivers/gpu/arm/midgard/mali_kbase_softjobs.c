@@ -371,7 +371,6 @@ void kbasep_soft_job_timeout_worker(struct timer_list *t)
     {
         struct kbase_jd_atom *katom = list_entry(entry, struct kbase_jd_atom, queue);
         s64 elapsed_time = ktime_to_ms(ktime_sub(cur_time, katom->start_timestamp));
-
         if (elapsed_time < (s64)timeout_ms) {
             restarting = true;
             continue;
@@ -573,7 +572,6 @@ static int kbase_debug_copy_prepare(struct kbase_jd_atom *katom)
     katom->jc = (u64)(uintptr_t)buffers;
 
     user_buffers = kmalloc_array(nr, sizeof(*user_buffers), GFP_KERNEL);
-
     if (!user_buffers) {
         ret = -ENOMEM;
         goto out_cleanup;
@@ -632,8 +630,7 @@ static int kbase_debug_copy_prepare(struct kbase_jd_atom *katom)
         kbase_gpu_vm_lock(katom->kctx);
         reg = kbase_region_tracker_find_region_enclosing_address(katom->kctx, user_extres.ext_resource &
                                                                                   ~BASE_EXT_RES_ACCESS_EXCLUSIVE);
-
-        if (NULL == reg || NULL == reg->gpu_alloc || (reg->flags & KBASE_REG_FREE)) {
+        if (reg == NULL || reg->gpu_alloc == NULL || (reg->flags & KBASE_REG_FREE)) {
             ret = -EINVAL;
             goto out_unlock;
         }
@@ -807,7 +804,7 @@ static int kbase_mem_copy_from_extres(struct kbase_context *kctx, struct kbase_d
                 }
             }
             break;
-        } break;
+        }
 #ifdef CONFIG_DMA_SHARED_BUFFER
         case KBASE_MEM_TYPE_IMPORTED_UMM: {
             struct dma_buf *dma_buf = gpu_alloc->imported.umm.dma_buf;
@@ -825,7 +822,6 @@ static int kbase_mem_copy_from_extres(struct kbase_context *kctx, struct kbase_d
             }
 
             for (i = 0; i < buf_data->nr_extres_pages; i++) {
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
                 struct page *pg;
                 void *extres_page = dma_buf_kmap_page(gpu_alloc, i, &pg);
@@ -870,7 +866,6 @@ static int kbase_debug_copy(struct kbase_jd_atom *katom)
 
     for (i = 0; i < katom->nr_extres; i++) {
         int res = kbase_mem_copy_from_extres(katom->kctx, &buffers[i]);
-
         if (res) {
             return res;
         }
@@ -996,7 +991,6 @@ static int kbase_jit_allocate_process(struct kbase_jd_atom *katom)
             }
             if (jit_atom->core_req == BASE_JD_REQ_SOFT_JIT_FREE) {
                 u8 free_id = kbase_jit_free_get_id(jit_atom);
-
                 if (free_id && kctx->jit_alloc[free_id]) {
                     /* A JIT free which is active and
                      * submitted before this atom
@@ -1091,7 +1085,6 @@ static void kbase_jit_free_process(struct kbase_jd_atom *katom)
 {
     struct kbase_context *kctx = katom->kctx;
     u8 id = kbase_jit_free_get_id(katom);
-
     /*
      * If the ID is zero or it is not in use yet then fail the job.
      */
@@ -1287,7 +1280,6 @@ int kbase_process_soft_job(struct kbase_jd_atom *katom)
             break;
         case BASE_JD_REQ_SOFT_FENCE_WAIT: {
             int ret = kbase_sync_fence_in_wait(katom);
-
             if (ret == 1) {
 #ifdef CONFIG_MALI_FENCE_DEBUG
                 kbasep_add_waiting_with_timeout(katom);
@@ -1311,7 +1303,6 @@ int kbase_process_soft_job(struct kbase_jd_atom *katom)
             break;
         case BASE_JD_REQ_SOFT_DEBUG_COPY: {
             int res = kbase_debug_copy(katom);
-
             if (res) {
                 katom->event_code = BASE_JD_EVENT_JOB_INVALID;
             }
@@ -1357,10 +1348,11 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
 {
     switch (katom->core_req & BASE_JD_REQ_SOFT_JOB_TYPE) {
         case BASE_JD_REQ_SOFT_DUMP_CPU_GPU_TIME: {
-            if (0 != (katom->jc & KBASE_CACHE_ALIGNMENT_MASK)) {
+            if ((katom->jc & KBASE_CACHE_ALIGNMENT_MASK) != 0) {
                 return -EINVAL;
             }
-        } break;
+            break;
+        }
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
         case BASE_JD_REQ_SOFT_FENCE_TRIGGER: {
             struct base_fence fence;
@@ -1382,7 +1374,8 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
                 fence.basep.fd = -EINVAL;
                 return -EINVAL;
             }
-        } break;
+            break;
+        }
         case BASE_JD_REQ_SOFT_FENCE_WAIT: {
             struct base_fence fence;
             int ret;
@@ -1408,7 +1401,8 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
                 kbase_ctx_flag_set(katom->kctx, KCTX_NO_IMPLICIT_SYNC);
             }
 #endif /* CONFIG_MALI_DMA_FENCE */
-        } break;
+            break;
+        }
 #endif /* CONFIG_SYNC || CONFIG_SYNC_FILE */
         case BASE_JD_REQ_SOFT_JIT_ALLOC:
             return kbase_jit_allocate_prepare(katom);

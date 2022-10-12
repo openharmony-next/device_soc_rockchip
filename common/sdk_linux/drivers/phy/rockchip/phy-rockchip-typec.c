@@ -500,27 +500,29 @@ static const struct phy_reg dp_pll_hbr2_ssc_cfg[] = {
     {0x0001, CMN_DIAG_PLL1_INCLK_CTRL},
 };
 
-static const struct rockchip_usb3phy_port_cfg rk3399_usb3phy_port_cfgs[] = {{
-    .reg = 0xff7c0000,
-    .typec_conn_dir = {0xe580, 0, 16},
-    .usb3tousb2_en = {0xe580, 3, 19},
-    .external_psm = {0xe588, 14, 30},
-    .pipe_status = {0xe5c0, 0, 0},
-    .usb3_host_disable = {0x2434, 0, 16},
-    .usb3_host_port = {0x2434, 12, 28},
-    .uphy_dp_sel = {0x6268, 19, 19},
-},
-{
-    .reg = 0xff800000,
-    .typec_conn_dir = {0xe58c, 0, 16},
-    .usb3tousb2_en = {0xe58c, 3, 19},
-    .external_psm = {0xe594, 14, 30},
-    .pipe_status = {0xe5c0, 16, 16},
-    .usb3_host_disable = {0x2444, 0, 16},
-    .usb3_host_port = {0x2444, 12, 28},
-    .uphy_dp_sel = {0x6268, 3, 19},
-},
-{}};
+static const struct rockchip_usb3phy_port_cfg rk3399_usb3phy_port_cfgs[] = {
+    {
+        .reg = 0xff7c0000,
+        .typec_conn_dir = {0xe580, 0, 16},
+        .usb3tousb2_en = {0xe580, 3, 19},
+        .external_psm = {0xe588, 14, 30},
+        .pipe_status = {0xe5c0, 0, 0},
+        .usb3_host_disable = {0x2434, 0, 16},
+        .usb3_host_port = {0x2434, 12, 28},
+        .uphy_dp_sel = {0x6268, 19, 19},
+    },
+    {
+        .reg = 0xff800000,
+        .typec_conn_dir = {0xe58c, 0, 16},
+        .usb3tousb2_en = {0xe58c, 3, 19},
+        .external_psm = {0xe594, 14, 30},
+        .pipe_status = {0xe5c0, 16, 16},
+        .usb3_host_disable = {0x2444, 0, 16},
+        .usb3_host_port = {0x2444, 12, 28},
+        .uphy_dp_sel = {0x6268, 3, 19},
+    },
+    {}
+};
 
 /* default phy config */
 static const struct phy_config tcphy_default_config[3][4] = {
@@ -587,7 +589,7 @@ enum {
 
 /*
  * For the TypeC PHY, the 4 lanes are mapping to the USB TypeC receptacle pins
- * as follows:
+ * as follows
  *   -------------------------------------------------------------------
  *    PHY Lanes/Module Pins            TypeC Receptacle Pins
  *   -------------------------------------------------------------------
@@ -1414,7 +1416,8 @@ static int rockchip_dp_phy_power_on(struct phy *phy)
     property_enable(tcphy, &cfg->uphy_dp_sel, 1);
 
     ret =
-        readx_poll_timeout(readl, tcphy->base + PHY_DP_MODE_CTL, val, val & DP_MODE_A2_ACK, 0x3E8, PHY_MODE_SET_TIMEOUT);
+        readx_poll_timeout(readl, tcphy->base + PHY_DP_MODE_CTL, val, val & DP_MODE_A2_ACK, 0x3E8, \
+                           PHY_MODE_SET_TIMEOUT);
     if (ret < 0) {
         dev_err(tcphy->dev, "failed to wait TCPHY enter A2\n");
         goto power_on_finish;

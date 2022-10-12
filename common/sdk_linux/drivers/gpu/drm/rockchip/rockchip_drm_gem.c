@@ -506,7 +506,6 @@ static int rockchip_drm_gem_object_mmap_iommu(struct drm_gem_object *obj, struct
     struct rockchip_gem_object *rk_obj = to_rockchip_obj(obj);
     unsigned int count = obj->size >> PAGE_SHIFT;
     unsigned long user_count = vma_pages(vma);
-
     if (user_count == 0) {
         return -ENXIO;
     }
@@ -923,7 +922,6 @@ int rockchip_gem_get_phys_ioctl(struct drm_device *dev, void *data, struct drm_f
         return -EINVAL;
     }
     rk_obj = to_rockchip_obj(obj);
-
     if (!(rk_obj->flags & ROCKCHIP_BO_CONTIG)) {
         DRM_ERROR("Can't get phys address from non-continue buf.\n");
         ret = -EINVAL;

@@ -92,7 +92,6 @@ static int rockchip_debug_dump_edpcsr(struct fiq_debugger_output *output)
         base = rockchip_cpu_debug[i];
 
         pu = (u32)readl(base + EDPRSR) & EDPRSR_PU;
-
         if (pu != EDPRSR_PU) {
             i++;
             continue;
@@ -216,7 +215,6 @@ static int rockchip_panic_notify_edpcsr(struct notifier_block *nb, unsigned long
         base = rockchip_cpu_debug[i];
 
         pu = (u32)readl(base + EDPRSR) & EDPRSR_PU;
-
         if (pu != EDPRSR_PU) {
             i++;
             continue;
@@ -332,7 +330,7 @@ static const struct of_device_id rockchip_debug_dt_match[] __initconst = {
     {
         .compatible = "rockchip,debug",
     },
-    {/* sentinel */},
+    {},
 };
 
 static const struct of_device_id rockchip_cspmu_dt_match[] __initconst = {
@@ -340,7 +338,7 @@ static const struct of_device_id rockchip_cspmu_dt_match[] __initconst = {
     {
         .compatible = "rockchip,cspmu",
     },
-    {/* sentinel */},
+    {},
 };
 
 static int __init rockchip_debug_init(void)

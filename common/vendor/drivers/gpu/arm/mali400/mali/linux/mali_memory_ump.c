@@ -48,7 +48,7 @@ static int mali_mem_ump_map(mali_mem_backend *mem_backend)
     }
 
     ump_blocks = mali_osk_malloc(sizeof(*ump_blocks) * nr_blocks);
-    if (NULL == ump_blocks) {
+    if (ump_blocks == NULL) {
         return -ENOMEM;
     }
 
@@ -131,7 +131,7 @@ int mali_mem_bind_ump_buf(mali_mem_allocation *alloc, mali_mem_backend *mem_back
     mem_backend->ump_mem.handle = ump_mem;
 
     ret = mali_mem_ump_map(mem_backend);
-    if (0 != ret) {
+    if (ret != 0) {
         ump_dd_reference_release(ump_mem);
         return MALI_OSK_ERR_FAULT;
     }

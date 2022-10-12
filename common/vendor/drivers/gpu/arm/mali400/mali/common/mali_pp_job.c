@@ -164,7 +164,7 @@ void mali_pp_job_delete(struct mali_pp_job *job)
     session = mali_pp_job_get_session(job);
     MALI_DEBUG_ASSERT_POINTER(session);
 
-    if (NULL != job->memory_cookies) {
+    if (job->memory_cookies != NULL) {
 #if defined(CONFIG_DMA_SHARED_BUFFER) && !defined(CONFIG_MALI_DMA_BUF_MAP_ON_ATTACH)
         /* Unmap buffers attached to job */
         mali_dma_buf_unmap_job(job);
@@ -180,7 +180,7 @@ void mali_pp_job_delete(struct mali_pp_job *job)
         mali_scheduler_return_pp_job_to_user(job, job->num_pp_cores_in_virtual);
     }
 
-    if (NULL != job->finished_notification) {
+    if (job->finished_notification != NULL) {
         _mali_osk_notification_delete(job->finished_notification);
     }
 
@@ -223,7 +223,7 @@ void mali_pp_job_list_add(struct mali_pp_job *job, _mali_osk_list_t *list)
 u32 mali_pp_job_get_perf_counter_src0(struct mali_pp_job *job, u32 sub_job)
 {
     /* Virtual jobs always use the global job counter (or if there are per sub job counters at all) */
-    if (mali_pp_job_is_virtual(job) || 0 == job->perf_counter_per_sub_job_count) {
+    if (mali_pp_job_is_virtual(job) || job->perf_counter_per_sub_job_count == 0) {
         return job->uargs.perf_counter_src0;
     }
 
@@ -239,7 +239,7 @@ u32 mali_pp_job_get_perf_counter_src0(struct mali_pp_job *job, u32 sub_job)
 u32 mali_pp_job_get_perf_counter_src1(struct mali_pp_job *job, u32 sub_job)
 {
     /* Virtual jobs always use the global job counter (or if there are per sub job counters at all) */
-    if (mali_pp_job_is_virtual(job) || 0 == job->perf_counter_per_sub_job_count) {
+    if (mali_pp_job_is_virtual(job) || job->perf_counter_per_sub_job_count == 0) {
         /* Virtual jobs always use the global job counter */
         return job->uargs.perf_counter_src1;
     }

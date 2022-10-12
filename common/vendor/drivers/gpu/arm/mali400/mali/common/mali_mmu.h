@@ -89,7 +89,7 @@ void mali_mmu_page_fault_done(struct mali_mmu_core *mmu);
 MALI_STATIC_INLINE enum mali_interrupt_result mali_mmu_get_interrupt_result(struct mali_mmu_core *mmu)
 {
     u32 rawstat_used = mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_INT_RAWSTAT);
-    if (0 == rawstat_used) {
+    if (rawstat_used == 0) {
         return MALI_INTERRUPT_RESULT_NONE;
     }
 

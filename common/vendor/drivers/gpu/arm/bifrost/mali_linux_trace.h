@@ -313,7 +313,7 @@ TRACE_EVENT(
     TP_ARGS(base_addr, reg_addr, gpu_mem, flags),
     TP_STRUCT__entry(__field(u64, base_addr) __field(u64, reg_addr)
                          __array(u64, mem_values, KBASE_JIT_REPORT_GPU_MEM_SIZE / sizeof(u64))
-                             __field(unsigned int, flags)),
+                         __field(unsigned int, flags)),
     TP_fast_assign(__entry->base_addr = base_addr; __entry->reg_addr = reg_addr;
                    memcpy(__entry->mem_values, gpu_mem, sizeof(__entry->mem_values)); __entry->flags = flags;),
     TP_printk("start=0x%llx read GPU memory base=0x%llx values=%s report_flags=%s", __entry->reg_addr,

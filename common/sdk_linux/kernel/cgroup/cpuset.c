@@ -624,8 +624,7 @@ static int validate_change(struct cpuset *cur, struct cpuset *trial)
      * overlap
      */
     ret = -EINVAL;
-    cpuset_for_each_child(c, css, par)
-    {
+    cpuset_for_each_child(c, css, par) {
         if ((is_cpu_exclusive(trial) || is_cpu_exclusive(c)) && c != cur &&
             cpumask_intersects(trial->cpus_requested, c->cpus_requested)) {
             goto out;
@@ -689,8 +688,7 @@ static void update_domain_attr_tree(struct sched_domain_attr *dattr, struct cpus
     struct cgroup_subsys_state *pos_css;
 
     rcu_read_lock();
-    cpuset_for_each_descendant_pre(cp, pos_css, root_cs)
-    {
+    cpuset_for_each_descendant_pre(cp, pos_css, root_cs) {
         /* skip the whole subtree if @cp doesn't have any CPU */
         if (cpumask_empty(cp->cpus_allowed)) {
             pos_css = css_rightmost_descendant(pos_css);
@@ -809,8 +807,7 @@ static int generate_sched_domains(cpumask_var_t **domains, struct sched_domain_a
     if (root_load_balance) {
         csa[csn++] = &top_cpuset;
     }
-    cpuset_for_each_descendant_pre(cp, pos_css, &top_cpuset)
-    {
+    cpuset_for_each_descendant_pre(cp, pos_css, &top_cpuset) {
         if (cp == &top_cpuset) {
             continue;
         }
@@ -981,9 +978,7 @@ static void rebuild_root_domains(void)
      */
     dl_clear_root_domain(&def_root_domain);
 
-    cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset)
-    {
-
+    cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset) {
         if (cpumask_empty(cs->effective_cpus)) {
             pos_css = css_rightmost_descendant(pos_css);
             continue;
@@ -1051,8 +1046,7 @@ static void rebuild_sched_domains_locked(void)
      */
     if (top_cpuset.nr_subparts_cpus) {
         rcu_read_lock();
-        cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset)
-        {
+        cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset) {
             if (!is_partition_root(cs)) {
                 pos_css = css_rightmost_descendant(pos_css);
                 continue;
@@ -1368,8 +1362,7 @@ static void update_cpumasks_hier(struct cpuset *cs, struct tmpmasks *tmp)
     int new_prs;
 
     rcu_read_lock();
-    cpuset_for_each_descendant_pre(cp, pos_css, cs)
-    {
+    cpuset_for_each_descendant_pre(cp, pos_css, cs) {
         struct cpuset *parent = parent_cs(cp);
 
         compute_effective_cpumask(tmp->new_cpus, cp, parent);
@@ -1522,8 +1515,7 @@ static void update_sibling_cpumasks(struct cpuset *parent, struct cpuset *cs, st
      * to use the right effective_cpus value.
      */
     rcu_read_lock();
-    cpuset_for_each_child(sibling, pos_css, parent)
-    {
+    cpuset_for_each_child(sibling, pos_css, parent) {
         if (sibling == cs) {
             continue;
         }
@@ -1786,8 +1778,7 @@ static void update_nodemasks_hier(struct cpuset *cs, nodemask_t *new_mems)
     struct cgroup_subsys_state *pos_css;
 
     rcu_read_lock();
-    cpuset_for_each_descendant_pre(cp, pos_css, cs)
-    {
+    cpuset_for_each_descendant_pre(cp, pos_css, cs) {
         struct cpuset *parent = parent_cs(cp);
 
         nodes_and(*new_mems, cp->mems_allowed, parent->effective_mems);
@@ -2600,7 +2591,6 @@ static ssize_t sched_partition_write(struct kernfs_open_file *of, char *buf, siz
     int retval = -ENODEV;
 
     buf = strstrip(buf);
-
     /*
      * Convert "root" to ENABLED, and convert "member" to DISABLED.
      */
@@ -2869,8 +2859,7 @@ static int cpuset_css_online(struct cgroup_subsys_state *css)
      * (and likewise for mems) to the new cgroup.
      */
     rcu_read_lock();
-    cpuset_for_each_child(tmp_cs, pos_css, parent)
-    {
+    cpuset_for_each_child(tmp_cs, pos_css, parent) {
         if (is_mem_exclusive(tmp_cs) || is_cpu_exclusive(tmp_cs)) {
             rcu_read_unlock();
             goto out_unlock;
@@ -2995,7 +2984,6 @@ struct cgroup_subsys cpuset_cgrp_subsys = {
 
 int __init cpuset_init(void)
 {
-
     BUG_ON(!alloc_cpumask_var(&top_cpuset.cpus_allowed, GFP_KERNEL));
     BUG_ON(!alloc_cpumask_var(&top_cpuset.cpus_requested, GFP_KERNEL));
     BUG_ON(!alloc_cpumask_var(&top_cpuset.effective_cpus, GFP_KERNEL));
@@ -3308,8 +3296,7 @@ void cpuset_hotplug_workfn(struct work_struct *work)
         struct cgroup_subsys_state *pos_css;
 
         rcu_read_lock();
-        cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset)
-        {
+        cpuset_for_each_descendant_pre(cs, pos_css, &top_cpuset) {
             if (cs == &top_cpuset || !css_tryget_online(&cs->css)) {
                 continue;
             }
@@ -3424,7 +3411,6 @@ void cpuset_cpus_allowed_fallback(struct task_struct *tsk)
 
     rcu_read_lock();
     cs_mask = task_cs(tsk)->cpus_allowed;
-
     if (!is_in_v2_mode() || !cpumask_subset(cs_mask, possible_mask)) {
         goto unlock; /* select_fallback_rq will try harder */
     }

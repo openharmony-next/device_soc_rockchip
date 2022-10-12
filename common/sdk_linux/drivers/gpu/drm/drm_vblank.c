@@ -317,7 +317,6 @@ static void drm_update_vblank_count(struct drm_device *dev, unsigned int pipe, b
                     pipe, (long long)diff_ns, framedur_ns);
 
         diff = DIV_ROUND_CLOSEST_ULL(diff_ns, framedur_ns);
-
         if (diff == 0 && in_vblank_irq) {
             drm_dbg_vbl(dev, "crtc %u: Redundant vblirq ignored\n", pipe);
         }
@@ -680,7 +679,7 @@ EXPORT_SYMBOL(drm_calc_timestamping_constants);
  * enabling a CRTC. The atomic helpers already take care of that in
  * drm_atomic_helper_calc_timestamping_constants().
  *
- * Returns:
+ * Returns:bool
  *
  * Returns true on success, and false on failure, i.e. when no accurate
  * timestamp could be acquired.
@@ -738,7 +737,6 @@ bool drm_crtc_vblank_helper_get_vblank_timestamp_internal(struct drm_crtc *crtc,
          * and bounding timestamps stime, etime, pre/post query.
          */
         vbl_status = get_scanout_position(crtc, in_vblank_irq, &vpos, &hpos, &stime, &etime, mode);
-
         /* Return as no-op if scanout query unsupported or failed. */
         if (!vbl_status) {
             drm_dbg_core(dev, "crtc %u : scanoutpos query failed.\n", pipe);
@@ -747,7 +745,6 @@ bool drm_crtc_vblank_helper_get_vblank_timestamp_internal(struct drm_crtc *crtc,
 
         /* Compute uncertainty in timestamp of scanout position query. */
         duration_ns = ktime_to_ns(etime) - ktime_to_ns(stime);
-
         /* Accept result with <  max_error nsecs timing uncertainty. */
         if (duration_ns <= *max_error) {
             break;
@@ -815,7 +812,7 @@ EXPORT_SYMBOL(drm_crtc_vblank_helper_get_vblank_timestamp_internal);
  * enabling a CRTC. The atomic helpers already take care of that in
  * drm_atomic_helper_calc_timestamping_constants().
  *
- * Returns:
+ * Returns:bool
  *
  * Returns true on success, and false on failure, i.e. when no accurate
  * timestamp could be acquired.
@@ -1648,7 +1645,6 @@ static int drm_queue_vblank_event(struct drm_device *dev, unsigned int pipe, u64
     }
 
     ret = drm_event_reserve_init_locked(dev, file_priv, &e->base, &e->event.base);
-
     if (ret) {
         goto err_unlock;
     }
@@ -2018,7 +2014,6 @@ int drm_crtc_get_sequence_ioctl(struct drm_device *dev, void *data, struct drm_f
 
     vblank = &dev->vblank[pipe];
     vblank_enabled = dev->vblank_disable_immediate && READ_ONCE(vblank->enabled);
-
     if (!vblank_enabled) {
         ret = drm_crtc_vblank_get(crtc);
         if (ret) {
@@ -2126,7 +2121,6 @@ int drm_crtc_queue_sequence_ioctl(struct drm_device *dev, void *data, struct drm
     }
 
     ret = drm_event_reserve_init_locked(dev, file_priv, &e->base, &e->event.base);
-
     if (ret) {
         goto err_unlock;
     }

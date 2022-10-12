@@ -599,7 +599,7 @@ static void dw_mipi_dsi_init(struct dw_mipi_dsi *dsi)
     const struct dw_mipi_dsi_phy_ops *phy_ops = dsi->plat_data->phy_ops;
     unsigned int esc_rate; /* in MHz */
     u32 esc_clk_division;
-    int ret;
+    int ret, value;
 
     /*
      * The maximum permitted escape clock is 20MHz and it is derived from
@@ -620,7 +620,11 @@ static void dw_mipi_dsi_init(struct dw_mipi_dsi *dsi)
      * which is:
      *     (lane_mbps >> 3) / X > esc_clk_division
      */
-    esc_clk_division = (dsi->lane_mbps >> 0x3) / esc_rate + 1;
+    value = esc_rate + 1;
+    if (value == 0) {
+        return;
+    }
+    esc_clk_division = (dsi->lane_mbps >> 0x3) / value;
 
     dsi_write(dsi, DSI_PWR_UP, RESET);
 
@@ -772,7 +776,6 @@ static void dw_mipi_dsi_dphy_timing_config(struct dw_mipi_dsi *dsi)
      */
 
     hw_version = dsi_read(dsi, DSI_VERSION) & VERSION;
-
     if (hw_version >= HWVER_131) {
         dsi_write(dsi, DSI_PHY_TMR_CFG,
                   PHY_HS2LP_TIME_V131(timing.data_hs2lp) | PHY_LP2HS_TIME_V131(timing.data_lp2hs));
@@ -1094,7 +1097,7 @@ static void dw_mipi_dsi_debugfs_remove(struct dw_mipi_dsi *dsi)
 #endif /* CONFIG_DEBUG_FS */
 
 static struct dw_mipi_dsi *_dw_mipi_dsi_probe(struct platform_device *pdev,
-                                               const struct dw_mipi_dsi_plat_data *plat_data)
+                                              const struct dw_mipi_dsi_plat_data *plat_data)
 {
     struct device *dev = &pdev->dev;
     struct dw_mipi_dsi *dsi;
@@ -1118,7 +1121,6 @@ static struct dw_mipi_dsi *_dw_mipi_dsi_probe(struct platform_device *pdev,
         if (IS_ERR(dsi->base)) {
             return ERR_PTR(-ENODEV);
         }
-
     } else {
         dsi->base = plat_data->base;
     }
@@ -1130,7 +1132,6 @@ static struct dw_mipi_dsi *_dw_mipi_dsi_probe(struct platform_device *pdev,
     dsi->apb_rst = devm_reset_control_get_optional_exclusive(dev, "apb");
     if (IS_ERR(dsi->apb_rst)) {
         ret = PTR_ERR(dsi->apb_rst);
-
         if (ret != -EPROBE_DEFER) {
             dev_err(dev, "Unable to get reset control: %d\n", ret);
         }

@@ -94,7 +94,6 @@ static bool match_fwnode(struct v4l2_async_notifier *notifier, struct v4l2_subde
      */
     sd_fwnode_is_ep = fwnode_graph_is_endpoint(sd->fwnode);
     asd_fwnode_is_ep = fwnode_graph_is_endpoint(asd->match.fwnode);
-
     if (sd_fwnode_is_ep == asd_fwnode_is_ep) {
         return false;
     }

@@ -282,18 +282,24 @@ enum rockchip_pll_type {
 
 #define RK3036_PLL_RATE(_rate, _refdiv, _fbdiv, _postdiv1, _postdiv2, _dsmpd, _frac)                                   \
     {                                                                                                                  \
-        .rate = _rate##U, .fbdiv = (_fbdiv), .postdiv1 = (_postdiv1), .refdiv = (_refdiv), .postdiv2 = (_postdiv2),            \
-        .dsmpd = (_dsmpd), .frac = (_frac),                                                                                \
+        .rate = _rate##U, .fbdiv = (_fbdiv),                                                                           \
+        .postdiv1 = (_postdiv1), .refdiv = (_refdiv),                                                                  \
+        .postdiv2 = (_postdiv2),                                                                                       \
+        .dsmpd = (_dsmpd), .frac = (_frac),                                                                            \
     }
 
 #define RK3066_PLL_RATE(_rate, _nr, _nf, _no)                                                                          \
     {                                                                                                                  \
-        .rate = _rate##U, .nr = (_nr), .nf = (_nf), .no = (_no), .nb = ((_nf) < 2) ? 1 : (_nf) >> 1,                         \
+        .rate = _rate##U,                                                                                              \
+        .nr = (_nr),                                                                                                   \
+        .nf = (_nf),                                                                                                   \
+        .no = (_no),                                                                                                   \
+        .nb = ((_nf) < 2) ? 1 : (_nf) >> 1,                                                                            \
     }
 
 #define RK3066_PLL_RATE_NB(_rate, _nr, _nf, _no, _nb)                                                                  \
     {                                                                                                                  \
-        .rate = _rate##U, .nr = (_nr), .nf = (_nf), .no = (_no), .nb = (_nb),                                                  \
+        .rate = _rate##U, .nr = (_nr), .nf = (_nf), .no = (_no), .nb = (_nb),                                          \
     }
 
 /**
@@ -525,24 +531,26 @@ struct rockchip_clk_branch {
         .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),                                                   \
     }
 
-#define COMPOSITE_DIV_OFFSET(_id, cname, pnames, f, mo, ms, mw, mf, do, ds, dw, df, go, gs, gf)                        \
+#define COMPOSITE_DIV_OFFSET(_id, _cname, _pnames, _f, _mo, _ms, _mw, _mf, _do, _ds, _dw, _df, _go, _gs, _gf)          \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_composite, .name = (cname), .parent_names = (pnames),                       \
-        .num_parents = ARRAY_SIZE(pnames), .flags = (f), .muxdiv_offset = (mo), .mux_shift = (ms), .mux_width = (mw),  \
-        .mux_flags = (mf), .div_offset = do, .div_shift = (ds), .div_width = (dw), .div_flags = (df),                  \
-        .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),                                                   \
+        .id = (_id), .branch_type = branch_composite, .name = (_cname), .parent_names = (_pnames),                     \
+        .num_parents = ARRAY_SIZE(_pnames), .flags = (_f),                                                             \
+        .muxdiv_offset = (_mo), .mux_shift = (_ms), .mux_width = (_mw),                                                \
+        .mux_flags = (_mf), .div_offset = _do, .div_shift = (_ds), .div_width = (_dw), .div_flags = (_df),             \
+        .gate_offset = (_go), .gate_shift = (_gs), .gate_flags = (_gf),                                                \
     }
 
 #define COMPOSITE_NOMUX(_id, cname, pname, f, mo, ds, dw, df, go, gs, gf)                                              \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_composite, .name = (cname), .parent_names = (const char *[]){pname},        \
+        .id = (_id), .branch_type = branch_composite, .name = (cname),                                                 \
+        .parent_names = (const char *[]) {pname},                                                                      \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = (ds), .div_width = (dw),                   \
         .div_flags = (df), .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),                                \
     }
 
 #define COMPOSITE_NOMUX_DIVTBL(_id, cname, pname, f, mo, ds, dw, df, dt, go, gs, gf)                                   \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_composite, .name = (cname), .parent_names = (const char *[]){pname},        \
+        .id = (_id), .branch_type = branch_composite, .name = (cname), .parent_names = (const char *[]) {pname},       \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = (ds), .div_width = (dw),                   \
         .div_flags = (df), .div_table = (dt), .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),             \
     }
@@ -578,21 +586,24 @@ struct rockchip_clk_branch {
 
 #define COMPOSITE_FRAC(_id, cname, pname, f, mo, df, go, gs, gf, prate)                                                \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname), .parent_names = (const char *[]){pname}, \
+        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname),                                          \
+        .parent_names = (const char *[]) {pname},                                                                      \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = 16, .div_width = 16, .div_flags = (df),    \
         .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf), .max_prate = (prate),                             \
     }
 
 #define COMPOSITE_FRACMUX(_id, cname, pname, f, mo, df, go, gs, gf, ch, prate)                                         \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname), .parent_names = (const char *[]){pname}, \
+        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname),                                          \
+        .parent_names = (const char *[]) {pname},                                                                      \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = 16, .div_width = 16, .div_flags = (df),    \
         .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf), .child = (ch), .max_prate = (prate),              \
     }
 
 #define COMPOSITE_FRACMUX_NOGATE(_id, cname, pname, f, mo, df, ch, prate)                                              \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname), .parent_names = (const char *[]){pname}, \
+        .id = (_id), .branch_type = branch_fraction_divider, .name = (cname),                                          \
+        .parent_names = (const char *[]) {pname},                                                                      \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = 16, .div_width = 16, .div_flags = (df),    \
         .gate_offset = -1, .child = (ch), .max_prate = (prate),                                                        \
     }
@@ -634,45 +645,45 @@ struct rockchip_clk_branch {
 
 #define DIV(_id, cname, pname, f, o, s, w, df)                                                                         \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]){pname},          \
+        .id = (_id), .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]) {pname},         \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (o), .div_shift = (s), .div_width = (w), .div_flags = (df),   \
         .gate_offset = -1,                                                                                             \
     }
 
 #define DIVTBL(_id, cname, pname, f, o, s, w, df, dt)                                                                  \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]){pname},          \
+        .id = (_id), .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]) {pname},         \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (o), .div_shift = (s), .div_width = (w), .div_flags = (df),   \
         .div_table = (dt),                                                                                             \
     }
 
 #define GATE(_id, cname, pname, f, o, b, gf)                                                                           \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_gate, .name = (cname), .parent_names = (const char *[]){pname},             \
+        .id = (_id), .branch_type = branch_gate, .name = (cname), .parent_names = (const char *[]) {pname},            \
         .num_parents = 1, .flags = (f), .gate_offset = (o), .gate_shift = (b), .gate_flags = (gf),                     \
     }
 
 #define MMC(_id, cname, pname, offset, shift)                                                                          \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_mmc, .name = (cname), .parent_names = (const char *[]){pname},              \
+        .id = (_id), .branch_type = branch_mmc, .name = (cname), .parent_names = (const char *[]) {pname},             \
         .num_parents = 1, .muxdiv_offset = (offset), .div_shift = (shift),                                             \
     }
 
-#define INVERTER(_id, cname, pname, io, is, if)                                                                        \
+#define INVERTER(_id, cname, pname, io, _is, _if)                                                                      \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_inverter, .name = (cname), .parent_names = (const char *[]){pname},         \
-        .num_parents = 1, .muxdiv_offset = (io), .div_shift = (is), .div_flags = (if),                                 \
+        .id = (_id), .branch_type = branch_inverter, .name = (cname), .parent_names = (const char *[]) {pname},        \
+        .num_parents = 1, .muxdiv_offset = (io), .div_shift = (_is), .div_flags = (_if),                               \
     }
 
 #define FACTOR(_id, cname, pname, f, fm, fd)                                                                           \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]){pname},           \
+        .id = (_id), .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]) {pname},          \
         .num_parents = 1, .flags = (f), .div_shift = (fm), .div_width = (fd),                                          \
     }
 
 #define FACTOR_GATE(_id, cname, pname, f, fm, fd, go, gb, gf)                                                          \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]){pname},           \
+        .id = (_id), .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]) {pname},          \
         .num_parents = 1, .flags = (f), .div_shift = (fm), .div_width = (fd), .gate_offset = (go), .gate_shift = (gb), \
         .gate_flags = (gf),                                                                                            \
     }
@@ -685,11 +696,11 @@ struct rockchip_clk_branch {
         .gate_shift = (gs), .gate_flags = (gf),                                                                        \
     }
 
-#define COMPOSITE_HALFDIV_OFFSET(_id, cname, pnames, f, mo, ms, mw, mf, do, ds, dw, df, go, gs, gf)                    \
+#define COMPOSITE_HALFDIV_OFFSET(_id, cname, pnames, f, mo, ms, mw, mf, _do, ds, dw, df, go, gs, gf)                   \
     {                                                                                                                  \
         .id = (_id), .branch_type = branch_half_divider, .name = (cname), .parent_names = (pnames),                    \
         .num_parents = ARRAY_SIZE(pnames), .flags = (f), .muxdiv_offset = (mo), .mux_shift = (ms), .mux_width = (mw),  \
-        .mux_flags = (mf), .div_offset = do, .div_shift = (ds), .div_width = (dw), .div_flags = (df),                  \
+        .mux_flags = (mf), .div_offset = _do, .div_shift = (ds), .div_width = (dw), .div_flags = (df),                 \
         .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),                                                   \
     }
 
@@ -702,14 +713,14 @@ struct rockchip_clk_branch {
 
 #define COMPOSITE_NOMUX_HALFDIV(_id, cname, pname, f, mo, ds, dw, df, go, gs, gf)                                      \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_half_divider, .name = (cname), .parent_names = (const char *[]){pname},     \
+        .id = (_id), .branch_type = branch_half_divider, .name = (cname), .parent_names = (const char *[]) {pname},    \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (mo), .div_shift = (ds), .div_width = (dw),                   \
         .div_flags = (df), .gate_offset = (go), .gate_shift = (gs), .gate_flags = (gf),                                \
     }
 
 #define DIV_HALF(_id, cname, pname, f, o, s, w, df)                                                                    \
     {                                                                                                                  \
-        .id = (_id), .branch_type = branch_half_divider, .name = (cname), .parent_names = (const char *[]){pname},     \
+        .id = (_id), .branch_type = branch_half_divider, .name = (cname), .parent_names = (const char *[]) {pname},    \
         .num_parents = 1, .flags = (f), .muxdiv_offset = (o), .div_shift = (s), .div_width = (w), .div_flags = (df),   \
         .gate_offset = -1,                                                                                             \
     }

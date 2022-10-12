@@ -434,7 +434,6 @@ static ssize_t freezer_write(struct kernfs_open_file *of, char *buf, size_t nbyt
     bool freeze;
 
     buf = strstrip(buf);
-
     if (strcmp(buf, freezer_state_strs(0)) == 0) {
         freeze = false;
     } else if (strcmp(buf, freezer_state_strs(CGROUP_FROZEN)) == 0) {

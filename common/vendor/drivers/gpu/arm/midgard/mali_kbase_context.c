@@ -41,7 +41,6 @@ struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_c
 
     /* zero-inited as lot of code assume it's zero'ed out on create */
     kctx = vzalloc(sizeof(*kctx));
-
     if (!kctx) {
         goto out;
     }
@@ -219,10 +218,10 @@ void kbase_destroy_context(struct kbase_context *kctx)
     unsigned long pending_regions_to_clean;
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     kbdev = kctx->kbdev;
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev!= NULL);
 
     KBASE_TRACE_ADD(kbdev, CORE_CTX_DESTROY, kctx, NULL, 0u, 0u);
 
@@ -319,7 +318,7 @@ int kbase_context_set_create_flags(struct kbase_context *kctx, u32 flags)
     struct kbasep_js_kctx_info *js_kctx_info;
     unsigned long irq_flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     js_kctx_info = &kctx->jctx.sched_info;
 

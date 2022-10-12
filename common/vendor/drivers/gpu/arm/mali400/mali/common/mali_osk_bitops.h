@@ -26,7 +26,7 @@ extern "C" {
 MALI_STATIC_INLINE void _mali_internal_clear_bit(u32 bit, u32 *addr)
 {
     MALI_DEBUG_ASSERT(bit < UINT32_BITS_MAX);
-    MALI_DEBUG_ASSERT(NULL != addr);
+    MALI_DEBUG_ASSERT(addr != NULL);
 
     (*addr) &= ~(1 << bit);
 }
@@ -34,7 +34,7 @@ MALI_STATIC_INLINE void _mali_internal_clear_bit(u32 bit, u32 *addr)
 MALI_STATIC_INLINE void _mali_internal_set_bit(u32 bit, u32 *addr)
 {
     MALI_DEBUG_ASSERT(bit < UINT32_BITS_MAX);
-    MALI_DEBUG_ASSERT(NULL != addr);
+    MALI_DEBUG_ASSERT(addr != NULL);
 
     (*addr) |= (1 << bit);
 }
@@ -140,7 +140,6 @@ MALI_STATIC_INLINE u32 _mali_osk_find_first_zero_bit(const u32 *addr, u32 maxbit
     for (total = 0; total < maxbit; total += UINT32_BITS_MAX, ++addr) {
         int result;
         result = _mali_internal_find_first_zero_bit(*addr);
-
         /* non-negative signifies the bit was found */
         if (result >= 0) {
             total += (u32)result;

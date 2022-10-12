@@ -29,15 +29,14 @@ struct mali_pmu_core *mali_pmu_create(_mali_osk_resource_t *resource)
 {
     struct mali_pmu_core *pmu;
 
-    MALI_DEBUG_ASSERT(NULL == mali_global_pmu_core);
+    MALI_DEBUG_ASSERT(mali_global_pmu_core == NULL);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali PMU: Creating Mali PMU core\n"));
 
     pmu = (struct mali_pmu_core *)mali_osk_malloc(sizeof(struct mali_pmu_core));
-    if (NULL != pmu) {
+    if (pmu != NULL) {
         pmu->registered_cores_mask = 0; /* to be set later */
 
         if (MALI_OSK_ERR_OK == mali_hw_core_create(&pmu->hw_core, resource, PMU_REGISTER_ADDRESS_SPACE_SIZE)) {
-
             pmu->switch_delay = mali_osk_get_pmu_switch_delay();
 
             mali_global_pmu_core = pmu;
@@ -116,11 +115,11 @@ mali_osk_errcode_t mali_pmu_power_down(struct mali_pmu_core *pmu, u32 mask)
      * Assert that we are not powering down domains which are already
      * powered down.
      */
-    MALI_DEBUG_ASSERT(0 == (stat & mask));
+    MALI_DEBUG_ASSERT((stat & mask) == 0);
 
     mask &= ~(0x1 << MALI_DOMAIN_INDEX_DUMMY);
 
-    if (0 == mask || 0 == ((~stat) & mask)) {
+    if (mask == 0 || ((~stat) & mask) == 0) {
         return MALI_OSK_ERR_OK;
     }
 
@@ -186,7 +185,7 @@ mali_osk_errcode_t mali_pmu_power_up(struct mali_pmu_core *pmu, u32 mask)
     stat &= pmu->registered_cores_mask;
 
     mask &= ~(0x1 << MALI_DOMAIN_INDEX_DUMMY);
-    if (0 == mask || 0 == (stat & mask)) {
+    if (mask == 0 || (stat & mask) == 0) {
         return MALI_OSK_ERR_OK;
     }
 
@@ -219,7 +218,7 @@ mali_osk_errcode_t mali_pmu_power_up(struct mali_pmu_core *pmu, u32 mask)
 #if defined(DEBUG)
     /* Verify power status of domains after power up */
     stat = mali_hw_core_register_read(&pmu->hw_core, PMU_REG_ADDR_MGMT_STATUS);
-    MALI_DEBUG_ASSERT(0 == (stat & mask));
+    MALI_DEBUG_ASSERT((stat & mask) == 0);
 #endif /* defined(DEBUG) */
 
     return MALI_OSK_ERR_OK;
@@ -236,11 +235,11 @@ static mali_osk_errcode_t mali_pmu_wait_for_command_finish(struct mali_pmu_core 
     do {
         rawstat = mali_hw_core_register_read(&pmu->hw_core, PMU_REG_ADDR_MGMT_INT_RAWSTAT);
         --timeout;
-    } while (0 == (rawstat & PMU_REG_VAL_IRQ) && 0 < timeout);
+    } while ((rawstat & PMU_REG_VAL_IRQ) == 0 && timeout > 0);
 
-    MALI_DEBUG_ASSERT(0 < timeout);
+    MALI_DEBUG_ASSERT(timeout > 0);
 
-    if (0 == timeout) {
+    if (timeout == 0) {
         return MALI_OSK_ERR_TIMEOUT;
     }
 

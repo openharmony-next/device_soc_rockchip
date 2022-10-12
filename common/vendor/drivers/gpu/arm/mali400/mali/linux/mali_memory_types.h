@@ -60,7 +60,7 @@ typedef struct mali_page_node {
     struct list_head list;
     union {
         struct page *page;
-        mali_block_item *blk_it; /*pointer to block item*/
+        mali_block_item *blk_it; /* pointer to block item */
         mali_swap_item *swap_it;
     };
 
@@ -115,7 +115,7 @@ typedef struct mali_mem_virt_cpu_mapping {
 #define MALI_MEM_ALLOCATION_FREED_MAGIC 0x10101010
 
 typedef struct mali_mm_node {
-    /* MALI GPU vaddr start, use u32 for mmu only support 32bit address*/
+    /* MALI GPU vaddr start, use u32 for mmu only support 32bit address */
     uint32_t start; /* GPU vaddr */
     uint32_t size;  /* GPU allocation virtual size */
     unsigned allocated : 1;
@@ -138,8 +138,8 @@ typedef struct mali_mem_allocation {
 
     /* add for new memory system */
     struct mali_vma_node mali_vma_node;
-    u32 vsize; /* virtual size*/
-    u32 psize; /* physical backend memory size*/
+    u32 vsize; /* virtual size */
+    u32 psize; /* physical backend memory size */
     struct list_head list;
     s32 backend_handle; /* idr for mem_backend */
     _mali_osk_atomic_t mem_alloc_refcount;
@@ -163,7 +163,7 @@ extern struct mali_mem_os_allocator mali_mem_os_allocator;
 /* COW backend memory type */
 typedef struct mali_mem_cow {
     struct list_head pages; /**< all pages for this cow backend allocation,
-                                                               including new allocated pages for modified range*/
+                                                               including new allocated pages for modified range */
     u32 count;              /**< number of pages */
     s32 change_pages_nr;
 } mali_mem_cow;

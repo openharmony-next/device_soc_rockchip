@@ -47,8 +47,8 @@ static void _mali_osk_wq_work_func(struct work_struct *work);
 mali_osk_errcode_t mali_osk_wq_init(void)
 {
 #if MALI_LICENSE_IS_GPL
-    MALI_DEBUG_ASSERT(NULL == mali_wq_normal);
-    MALI_DEBUG_ASSERT(NULL == mali_wq_high);
+    MALI_DEBUG_ASSERT(mali_wq_normal == NULL);
+    MALI_DEBUG_ASSERT(mali_wq_high == NULL);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36)
     mali_wq_normal = alloc_workqueue("mali", WQ_UNBOUND, 0);
@@ -57,7 +57,7 @@ mali_osk_errcode_t mali_osk_wq_init(void)
     mali_wq_normal = create_workqueue("mali");
     mali_wq_high = create_workqueue("mali_high_pri");
 #endif
-    if (NULL == mali_wq_normal || NULL == mali_wq_high) {
+    if (mali_wq_normal == NULL || mali_wq_high == NULL) {
         MALI_PRINT_ERROR(("Unable to create Mali workqueues\n"));
 
         if (mali_wq_normal) {
@@ -90,8 +90,8 @@ void _mali_osk_wq_flush(void)
 void mali_osk_wq_term(void)
 {
 #if MALI_LICENSE_IS_GPL
-    MALI_DEBUG_ASSERT(NULL != mali_wq_normal);
-    MALI_DEBUG_ASSERT(NULL != mali_wq_high);
+    MALI_DEBUG_ASSERT(mali_wq_normal != NULL);
+    MALI_DEBUG_ASSERT(mali_wq_high != NULL);
 
     flush_workqueue(mali_wq_normal);
     destroy_workqueue(mali_wq_normal);
@@ -110,7 +110,7 @@ _mali_osk_wq_work_t *mali_osk_wq_create_work(_mali_osk_wq_work_handler_t handler
 {
     mali_osk_wq_work_object_t *work = kmalloc(sizeof(mali_osk_wq_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) {
+    if (work == NULL) {
         return NULL;
     }
 
@@ -127,7 +127,7 @@ _mali_osk_wq_work_t *_mali_osk_wq_create_work_high_pri(_mali_osk_wq_work_handler
 {
     mali_osk_wq_work_object_t *work = kmalloc(sizeof(mali_osk_wq_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) {
+    if (work == NULL) {
         return NULL;
     }
 
@@ -178,7 +178,6 @@ static void _mali_osk_wq_work_func(struct work_struct *work)
     mali_osk_wq_work_object_t *work_object;
 
     work_object = MALI_OSK_CONTAINER_OF(work, mali_osk_wq_work_object_t, work_handle);
-
 #if MALI_LICENSE_IS_GPL
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 36)
     /* We want highest Dynamic priority of the thread so that the Jobs depending
@@ -208,7 +207,7 @@ mali_osk_wq_delayed_work_object_t *_mali_osk_wq_delayed_create_work(_mali_osk_wq
 {
     mali_osk_wq_delayed_work_object_t *work = kmalloc(sizeof(mali_osk_wq_delayed_work_object_t), GFP_KERNEL);
 
-    if (NULL == work) {
+    if (work == NULL) {
         return NULL;
     }
 

@@ -27,11 +27,11 @@ typedef struct mali_block_allocator {
      * In free list, each node's ref_count is 0,
      * ref_count added when allocated or referenced in COW
      */
-    mali_block_item *items; /* information for each block item*/
-    struct list_head free;  /*free list of mali_memory_node*/
-    spinlock_t sp_lock;     /*lock for reference count & free list opertion*/
-    u32 total_num;          /* Number of total pages*/
-    atomic_t free_num;      /*number of free pages*/
+    mali_block_item *items; /* information for each block item */
+    struct list_head free;  /* free list of mali_memory_node */
+    spinlock_t sp_lock;     /* lock for reference count & free list opertion */
+    u32 total_num;          /* Number of total pages */
+    atomic_t free_num;      /* number of free pages */
 } mali_block_allocator;
 
 unsigned long _mali_blk_item_get_phy_addr(mali_block_item *item);

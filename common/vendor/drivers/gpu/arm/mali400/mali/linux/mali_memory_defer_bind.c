@@ -58,13 +58,13 @@ mali_osk_errcode_t mali_mem_defer_bind_manager_init(void)
 void mali_mem_defer_bind_manager_destory(void)
 {
     if (mali_dmem_man) {
-        MALI_DEBUG_ASSERT(0 == atomic_read(&mali_dmem_man->num_dmem));
+        MALI_DEBUG_ASSERT(atomic_read(&mali_dmem_man->num_dmem) == 0);
         kfree(mali_dmem_man);
     }
     mali_dmem_man = NULL;
 }
 
-/*allocate pages from OS memory*/
+/* allocate pages from OS memory */
 mali_osk_errcode_t mali_mem_defer_alloc_mem(u32 require, struct mali_session_data *session,
                                             mali_defer_mem_block *dblock)
 {
@@ -73,9 +73,8 @@ mali_osk_errcode_t mali_mem_defer_alloc_mem(u32 require, struct mali_session_dat
     mali_mem_os_mem os_mem;
 
     retval = mali_mem_os_alloc_pages(&os_mem, num_pages * MALI_OSK_MALI_PAGE_SIZE);
-
     /* add to free pages list */
-    if (0 == retval) {
+    if (retval == 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE,
                          ("mali_mem_defer_alloc_mem ,,*** pages allocate = 0x%x \n", num_pages));
         list_splice(&os_mem.pages, &dblock->free_pages);
@@ -120,7 +119,7 @@ mali_osk_errcode_t mali_mem_defer_bind_allocation_prepare(mali_mem_allocation *a
 {
     mali_mem_backend *mem_bkend = NULL;
     struct mali_backend_bind_list *bk_list = mali_osk_calloc(1, sizeof(struct mali_backend_bind_list));
-    if (NULL == bk_list) {
+    if (bk_list == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -135,7 +134,7 @@ mali_osk_errcode_t mali_mem_defer_bind_allocation_prepare(mali_mem_allocation *a
     }
     mutex_unlock(&mali_idr_mutex);
 
-    /* If the mem backend has already been bound, no need to bind again.*/
+    /* If the mem backend has already been bound, no need to bind again. */
     if (mem_bkend->os_mem.count > 0) {
         _mali_osk_free(bk_list);
         return MALI_OSK_ERR_OK;
@@ -160,7 +159,7 @@ mali_osk_errcode_t mali_mem_defer_bind_allocation_prepare(mali_mem_allocation *a
 }
 
 /* bind phyiscal memory to allocation
-This function will be called in IRQ handler*/
+This function will be called in IRQ handler */
 static mali_osk_errcode_t mali_mem_defer_bind_allocation(struct mali_backend_bind_list *bk_node,
                                                          struct list_head *pages)
 {

@@ -103,7 +103,6 @@ int dma_heap_bufferfd_alloc(struct dma_heap *heap, size_t len, unsigned int fd_f
     int fd;
 
     dmabuf = dma_heap_buffer_alloc(heap, len, fd_flags, heap_flags);
-
     if (IS_ERR(dmabuf)) {
         return PTR_ERR(dmabuf);
     }
@@ -185,7 +184,6 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd, unsigned long a
         out_size = 0;
     }
     ksize = max(max(in_size, out_size), drv_size);
-
     /* If necessary, allocate buffer for ioctl argument */
     if (ksize > sizeof(stack_kdata)) {
         kdata = kmalloc(ksize, GFP_KERNEL);

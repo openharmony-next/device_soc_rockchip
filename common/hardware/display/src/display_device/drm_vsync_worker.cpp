@@ -75,11 +75,14 @@ namespace OHOS {
             {
                 constexpr uint64_t SEC_TO_NSEC = 1000 * 1000 * 1000;
                 constexpr uint64_t USEC_TO_NSEC = 1000;
-                drmVBlank vblank = {.request = drmVBlankReq{
-                                        .type = DRM_VBLANK_RELATIVE,
-                                        .sequence = 1,
-                                        .signal = 0,
-                                    }};
+                drmVBlank vblank = {
+                    .request = drmVBlankReq
+                    {
+                        .type = DRM_VBLANK_RELATIVE,
+                        .sequence = 1,
+                        .signal = 0,
+                    }
+                };
                 /* The drmWaitVBlank need set the crtc pipe when there are multi crtcs in the system. */
                 if (mCallBack->GetPipe() == 1) {
                     vblank.request.type = drmVBlankSeqType((int)(vblank.request.type) | (int)DRM_VBLANK_SECONDARY);

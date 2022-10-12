@@ -136,11 +136,11 @@ uint xfs_ilock_attr_map_shared(struct xfs_inode *ip)
  * The 3 locks should always be ordered so that the IO lock is obtained first,
  * the mmap lock second and the ilock last in order to prevent deadlock.
  *
- * Basic locking order:
+ * Basic locking order
  *
  * i_rwsem -> i_mmap_lock -> page_lock -> i_ilock
  *
- * mmap_lock locking order:
+ * mmap_lock locking order
  *
  * i_rwsem -> page lock -> mmap_lock
  * mmap_lock -> i_mmap_lock -> page_lock
@@ -1049,8 +1049,7 @@ int xfs_dir_ialloc(xfs_trans_t **tpp,                                        /* 
  * link count to go to zero, move the inode to AGI unlinked list so that it can
  * be freed when the last active reference goes away via xfs_inactive().
  */
-static int /* error */
-xfs_droplink(xfs_trans_t *tp, xfs_inode_t *ip)
+static int xfs_droplink(xfs_trans_t *tp, xfs_inode_t *ip)
 {
     xfs_trans_ichgtime(tp, ip, XFS_ICHGTIME_CHG);
 

@@ -111,7 +111,7 @@ static int rkvdec2_extract_task_msg(struct mpp_session *session, struct rkvdec2_
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_READ: {
                 int req_base;
                 int max_size;
@@ -131,18 +131,18 @@ static int rkvdec2_extract_task_msg(struct mpp_session *session, struct rkvdec2_
 
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
                 break;
-            } 
+            }
             case MPP_CMD_SET_RCB_INFO: {
                 struct rkvdec2_session_priv *priv = session->priv;
                 if (priv) {
                     mpp_extract_rcb_info(&priv->rcb_inf, req);
                 }
                 break;
-            } 
+            }
             default:
                 break;
         }
@@ -530,11 +530,11 @@ static int rkvdec2_control(struct mpp_session *session, struct mpp_request *req)
                 }
             }
             break;
-        } 
+        }
         default: {
             mpp_err("unknown mpp ioctl cmd %x\n", req->cmd);
             break;
-        } 
+        }
     }
 
     return 0;

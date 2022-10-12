@@ -86,7 +86,6 @@ static unsigned long freelist_shrink_scan(struct shrinker *shrinker, struct shri
 
     while (total_freed < sc->nr_to_scan) {
         size_t pages_freed = free_one_item(DF_UNDER_PRESSURE);
-
         if (!pages_freed) {
             break;
         }

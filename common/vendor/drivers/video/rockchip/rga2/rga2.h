@@ -433,7 +433,7 @@ struct rga_req_32 {
     uint8_t bsfilter_flag;      /* [2] 0 blur 1 sharp / [1:0] filter_type */
     uint8_t palette_mode;       /* (enum) color palatte  0/1bpp, 1/2bpp 2/4bpp 3/8bpp */
     uint8_t yuv2rgb_mode;       /* (enum) BT.601 MPEG / BT.601 JPEG / BT.709  */
-    uint8_t endian_mode;        /* 0/big endian 1/little endian*/
+    uint8_t endian_mode;        /* 0/big endian 1/little endian */
     uint8_t rotate_mode;        /* (enum) rotate mode  */
                                 /* 0x0,     no rotate  */
                                 /* 0x1,     rotate     */
@@ -580,14 +580,14 @@ enum {
     BB_ROTATE_90 = 0x1,  /* rotate 90  */
     BB_ROTATE_180 = 0x2, /* rotate 180 */
     BB_ROTATE_270 = 0x3, /* rotate 270 */
-};                       /*rotate mode */
+};                       /* rotate mode */
 
 enum {
     BB_MIRROR_OFF = (0x0 << 4), /* no mirror  */
     BB_MIRROR_X = (0x1 << 4),   /* x  mirror  */
     BB_MIRROR_Y = (0x2 << 4),   /* y  mirror  */
     BB_MIRROR_XY = (0x3 << 4),  /* xy mirror  */
-};                              /*mirror mode */
+};                              /* mirror mode */
 
 enum {
     BB_COPY_USE_TILE = (0x1 << 6), /* bitblt mode copy but use Tile mode */

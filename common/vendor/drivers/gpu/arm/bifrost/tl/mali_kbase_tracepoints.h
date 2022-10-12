@@ -2059,7 +2059,9 @@ struct kbase_tlstream;
         if (enabled & BASE_TLSTREAM_ENABLE_CSF_TRACEPOINTS)    \
             mali_kbase_kbase_tlstream_tl_kbase_array_item_kcpuqueue_enqueue_jit_alloc(    \
                 MALI_KBASE_TL_DISPATCH_STREAM(kbdev, obj),    \
-                kcpu_queue, jit_alloc_gpu_alloc_addr_dest, jit_alloc_va_pages, jit_alloc_commit_pages, jit_alloc_extent, jit_alloc_jit_id, jit_alloc_bin_id, jit_alloc_max_allocations, jit_alloc_flags, jit_alloc_usage_id);    \
+                kcpu_queue, jit_alloc_gpu_alloc_addr_dest, jit_alloc_va_pages, jit_alloc_commit_pages,   \
+                jit_alloc_extent, jit_alloc_jit_id, jit_alloc_bin_id,  \
+                jit_alloc_max_allocations, jit_alloc_flags, jit_alloc_usage_id);    \
     } while (0)
 #else
 #define KBASE_TLSTREAM_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC(    \

@@ -402,7 +402,6 @@ int hibernation_snapshot(int platform_mode)
     }
 
     if (hibernation_test(TEST_FREEZER)) {
-
         /*
          * Indicate to the caller that we are returning due to a
          * successful freezer test.
@@ -421,7 +420,6 @@ int hibernation_snapshot(int platform_mode)
     pm_restrict_gfp_mask();
 
     error = dpm_suspend(PMSG_FREEZE);
-
     if (error || hibernation_test(TEST_DEVICES)) {
         platform_recover(platform_mode);
     } else {

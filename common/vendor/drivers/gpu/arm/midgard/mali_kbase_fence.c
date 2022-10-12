@@ -125,7 +125,6 @@ bool kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
              * canceling.
              */
             ret = atomic_dec_return(&katom->dma_fence.dep_count);
-
             if (unlikely(ret == 0)) {
                 res = true;
             }

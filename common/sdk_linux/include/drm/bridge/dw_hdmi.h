@@ -117,8 +117,8 @@ struct dw_hdmi_curr_ctrl {
 
 struct dw_hdmi_phy_config {
     unsigned long mpixelclock;
-    u16 sym_ctr;  /*clock symbol and transmitter control*/
-    u16 term;     /*transmission termination value*/
+    u16 sym_ctr;  /* clock symbol and transmitter control */
+    u16 term;     /* transmission termination value */
     u16 vlev_ctr; /* voltage level control */
 };
 

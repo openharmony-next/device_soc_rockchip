@@ -131,7 +131,6 @@ int kbase_ipa_model_param_add(struct kbase_ipa_model *model, const char *name, v
     struct kbase_ipa_model_param *param;
 
     param = kzalloc(sizeof(*param), GFP_KERNEL);
-
     if (!param) {
         return -ENOMEM;
     }
@@ -169,7 +168,6 @@ static void kbase_ipa_model_debugfs_init(struct kbase_ipa_model *model)
     lockdep_assert_held(&model->kbdev->ipa.lock);
 
     dir = debugfs_create_dir(model->ops->name, model->kbdev->mali_debugfs_directory);
-
     if (!dir) {
         dev_err(model->kbdev->dev, "Couldn't create mali debugfs %s directory", model->ops->name);
         return;

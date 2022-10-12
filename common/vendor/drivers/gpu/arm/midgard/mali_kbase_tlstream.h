@@ -18,8 +18,6 @@
 
 #include <mali_kbase.h>
 
-/*****************************************************************************/
-
 /**
  * kbase_tlstream_init - initialize timeline infrastructure in kernel
  * Return: zero on success, negative number on error

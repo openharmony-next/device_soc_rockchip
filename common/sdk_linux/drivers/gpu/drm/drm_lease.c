@@ -24,7 +24,7 @@ static uint64_t drm_lease_idr_object;
  * drm_lease_owner - return ancestor owner drm_master
  * @master: drm_master somewhere within tree of lessees and lessors
  *
- * RETURN:
+ * RETURN:struct drm_master *
  *
  * drm_master at the top of the tree (i.e, with lessor NULL
  */
@@ -41,7 +41,7 @@ struct drm_master *drm_lease_owner(struct drm_master *master)
  * @master: drm_master of lessor
  * @lessee_id: id
  *
- * RETURN:
+ * RETURN:static struct drm_master *
  *
  * drm_master of the lessee if valid, NULL otherwise
  */
@@ -58,7 +58,7 @@ static struct drm_master *_drm_find_lessee(struct drm_master *master, int lessee
  * @id: the id to check
  *
  * Checks if the specified master holds a lease on the object. Return
- * value:
+ * value:see below
  *
  *    true        'master' holds a lease on (or owns) the object
  *    false        'master' does not hold a lease.
@@ -78,7 +78,7 @@ static int _drm_lease_held_master(struct drm_master *master, int id)
  * @id: the id to check
  *
  * Checks if any lessee of 'master' holds a lease on 'id'. Return
- * value:
+ * value:see below
  *
  *    true        Some lessee holds a lease on the object.
  *    false        No lessee has a lease on the object.
@@ -98,7 +98,7 @@ static bool _drm_has_leased(struct drm_master *master, int id)
  * @id: the object id
  *
  * Checks if the specified master holds a lease on the object. Return
- * value:
+ * value:see below
  *
  *    true        'master' holds a lease on (or owns) the object
  *    false        'master' does not hold a lease.
@@ -118,7 +118,7 @@ bool _drm_lease_held(struct drm_file *file_priv, int id)
  * @id: the object id
  *
  * Checks if the specified master holds a lease on the object. Return
- * value:
+ * value:see below
  *
  *    true        'master' holds a lease on (or owns) the object
  *    false        'master' does not hold a lease.
@@ -550,7 +550,6 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev, void *data, struct drm_f
     DRM_DEBUG_LEASE("Creating lease\n");
     /* lessee will take the ownership of leases */
     lessee = drm_lease_create(lessor, &leases);
-
     if (IS_ERR(lessee)) {
         ret = PTR_ERR(lessee);
         idr_destroy(&leases);
@@ -745,7 +744,6 @@ int drm_mode_revoke_lease_ioctl(struct drm_device *dev, void *data, struct drm_f
     mutex_lock(&dev->mode_config.idr_mutex);
 
     lessee = _drm_find_lessee(lessor, arg->lessee_id);
-
     /* No such lessee */
     if (!lessee) {
         ret = -ENOENT;

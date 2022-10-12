@@ -222,7 +222,6 @@ typedef enum {
     /** @enum _mali_osk_lock_flags_t
      *
      * Flags from 0x10000--0x80000000 are RESERVED for User-mode */
-
 } _mali_osk_lock_flags_t;
 
 /** @brief Mutual Exclusion Lock Mode Optimization hint
@@ -327,8 +326,7 @@ typedef struct _mali_io_address *mali_io_address;
 #define MALI_OSK_MALI_PAGE_SIZE PAGE_SIZE
 /** Mali Page Mask, which masks off the offset within a page */
 #define MALI_OSK_MALI_PAGE_MASK PAGE_MASK
-/** @} */ /* end of group _MALI_OSK_MALI_PAGE*/
-
+/** @} */ /* end of group _MALI_OSK_MALI_PAGE */
 /** @brief flags for mapping a user-accessible memory range
  *
  * Where a function with prefix '_mali_osk_mem_mapregion' accepts flags as one

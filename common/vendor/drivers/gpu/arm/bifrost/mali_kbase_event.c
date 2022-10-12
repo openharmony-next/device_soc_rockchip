@@ -229,7 +229,7 @@ int kbase_event_init(struct kbase_context *kctx)
     kctx->event_coalesce_count = 0;
     kctx->event_workq = alloc_workqueue("kbase_event", WQ_MEM_RECLAIM, 1);
 
-    if (NULL == kctx->event_workq) {
+    if (kctx->event_workq == NULL) {
         return -EINVAL;
     }
 

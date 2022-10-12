@@ -74,7 +74,6 @@ KBASE_EXPORT_SYMBOL(kbase_context_debugfs_term);
 static int kbase_context_kbase_kinstr_jm_init(struct kbase_context *kctx)
 {
     int ret = kbase_kinstr_jm_init(&kctx->kinstr_jm);
-
     if (!ret) {
         return ret;
     }
@@ -172,16 +171,15 @@ struct kbase_context *kbase_create_context(struct kbase_device *kbdev, bool is_c
 
     if (is_compat) {
         kbase_ctx_flag_set(kctx, KCTX_COMPAT);
-    }
 #if defined(CONFIG_64BIT)
-    else {
+    } else {
         kbase_ctx_flag_set(kctx, KCTX_FORCE_SAME_VA);
-    }
+    
 #endif /* !defined(CONFIG_64BIT) */
+    }
 
     for (i = 0; i < ARRAY_SIZE(context_init); i++) {
         int err = context_init[i].init(kctx);
-
         if (err) {
             dev_err(kbdev->dev, "%s error = %d\n", context_init[i].err_mes, err);
             kbase_context_term_partial(kctx, i);

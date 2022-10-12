@@ -119,7 +119,8 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, signed int gop_mode)
             st_ref[0x8].ref_mode = REF_TO_TEMPORAL_LAYER;
             st_ref[0x8].ref_arg = 0;
             st_ref[0x8].repeat = 0;
-        } break;
+            break;
+        }
         case 0x2: {
             // tsvc3
             //     /-> P1      /-> P3
@@ -161,7 +162,8 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, signed int gop_mode)
             st_ref[0x4].ref_mode = REF_TO_TEMPORAL_LAYER;
             st_ref[0x4].ref_arg = 0;
             st_ref[0x4].repeat = 0;
-        } break;
+            break;
+        }
         case 1: {
             // tsvc2
             //   /-> P1
@@ -189,10 +191,12 @@ static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, signed int gop_mode)
             st_ref[0x2].ref_mode = REF_TO_PREV_REF_FRM;
             st_ref[0x2].ref_arg = 0;
             st_ref[0x2].repeat = 0;
-        } break;
+            break;
+        }
         default: {
             mpp_err_f("unsupport gop mode %d\n", gop_mode);
-        } break;
+            break;
+        }
     }
 
     if (lt_cnt || st_cnt) {
@@ -311,8 +315,8 @@ static MPP_RET test_ctx_init(MpiEncTestData **data, MpiEncTestArgs *cmd)
         case MPP_FMT_YUV420SP:
         case MPP_FMT_YUV420P: {
             p->frame_size = MPP_ALIGN(p->hor_stride, 0x40) * MPP_ALIGN(p->ver_stride, 0x40) * 0x3 / 0x2;
-        } break;
-
+            break;
+        }
         case MPP_FMT_YUV422_YUYV:
         case MPP_FMT_YUV422_YVYU:
         case MPP_FMT_YUV422_UYVY:
@@ -326,10 +330,12 @@ static MPP_RET test_ctx_init(MpiEncTestData **data, MpiEncTestArgs *cmd)
         case MPP_FMT_RGB565:
         case MPP_FMT_BGR565: {
             p->frame_size = MPP_ALIGN(p->hor_stride, 0x40) * MPP_ALIGN(p->ver_stride, 0x40) * 0x2;
-        } break;
+            break;
+        }
         default: {
             p->frame_size = MPP_ALIGN(p->hor_stride, 0x40) * MPP_ALIGN(p->ver_stride, 0x40) * 0x4;
-        } break;
+            break;
+        }
     }
     *data = p;
     return ret;
@@ -412,23 +418,27 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
     switch (p->rc_mode) {
         case MPP_ENC_RC_MODE_FIXQP: {
             /* do not setup bitrate on FIXQP mode */
-        } break;
+            break;
+        }
         case MPP_ENC_RC_MODE_CBR: {
             /* CBR mode has narrow bound */
             mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 0x11 / 0x10);
             mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 0xf / 0x10);
-        } break;
+            break;
+        }
         case MPP_ENC_RC_MODE_VBR:
         case MPP_ENC_RC_MODE_AVBR: {
             /* VBR mode has wide bound */
             mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 0x11 / 0x10);
             mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 1 / 0x10);
-        } break;
+            break;
+        }
         default: {
             /* default use CBR mode */
             mpp_enc_cfg_set_s32(cfg, "rc:bps_max", p->bps_max ? p->bps_max : p->bps * 0x11 / 0x10);
             mpp_enc_cfg_set_s32(cfg, "rc:bps_min", p->bps_min ? p->bps_min : p->bps * 0xf / 0x10);
-        } break;
+            break;
+        }
     }
 
     /* setup qp for different codec and rc_mode */
@@ -443,7 +453,8 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_max_i", 0x14); // 20:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_min_i", 0x14); // 20:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_ip", 0x2);
-                } break;
+                    break;
+                }
                 case MPP_ENC_RC_MODE_CBR:
                 case MPP_ENC_RC_MODE_VBR:
                 case MPP_ENC_RC_MODE_AVBR: {
@@ -453,12 +464,15 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_max_i", 0x33); // 51:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_min_i", 0xa);  // 10:mpp cfg value
                     mpp_enc_cfg_set_s32(cfg, "rc:qp_ip", 0x2);
-                } break;
+                    break;
+                }
                 default: {
                     mpp_err_f("unsupport encoder rc mode %d\n", p->rc_mode);
-                } break;
+                    break;
+                }
             }
-        } break;
+            break;
+        }
         case MPP_VIDEO_CodingVP8: {
             /* vp8 only setup base qp range */
             mpp_enc_cfg_set_s32(cfg, "rc:qp_init", 0x28); // 40:mpp cfg value
@@ -467,15 +481,18 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
             mpp_enc_cfg_set_s32(cfg, "rc:qp_max_i", 0x7f); // 127:mpp cfg value
             mpp_enc_cfg_set_s32(cfg, "rc:qp_min_i", 0);
             mpp_enc_cfg_set_s32(cfg, "rc:qp_ip", 0x6); // 6:mpp cfg value
-        } break;
+            break;
+        }
         case MPP_VIDEO_CodingMJPEG: {
             /* jpeg use special codec config to control qtable */
             mpp_enc_cfg_set_s32(cfg, "jpeg:q_factor", 0x50); // 80:mpp cfg value
             mpp_enc_cfg_set_s32(cfg, "jpeg:qf_max", 0x63);   // 99:mpp cfg value
             mpp_enc_cfg_set_s32(cfg, "jpeg:qf_min", 1);
-        } break;
+            break;
+        }
         default: {
-        } break;
+            break;
+        }
     }
 
     /* setup codec  */
@@ -501,14 +518,17 @@ static MPP_RET test_mpp_enc_cfg_setup(MpiEncTestData *p)
             mpp_enc_cfg_set_s32(cfg, "h264:cabac_en", 0x1);
             mpp_enc_cfg_set_s32(cfg, "h264:cabac_idc", 0x0);
             mpp_enc_cfg_set_s32(cfg, "h264:trans8x8", 0x1);
-        } break;
+            break;
+        }
         case MPP_VIDEO_CodingHEVC:
         case MPP_VIDEO_CodingMJPEG:
         case MPP_VIDEO_CodingVP8: {
-        } break;
+            break;
+        }
         default: {
             mpp_err_f("unsupport encoder coding type %d\n", p->type);
-        } break;
+            break;
+        }
     }
 
     p->split_mode = 0;

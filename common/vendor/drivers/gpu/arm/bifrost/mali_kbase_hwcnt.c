@@ -567,7 +567,6 @@ int kbase_hwcnt_accumulator_acquire(struct kbase_hwcnt_context *hctx, struct kba
     }
 
     errcode = kbasep_hwcnt_accumulator_init(hctx);
-
     if (errcode) {
         mutex_lock(&hctx->accum_lock);
         spin_lock_irqsave(&hctx->state_lock, flags);

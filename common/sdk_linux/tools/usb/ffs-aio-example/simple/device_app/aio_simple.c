@@ -71,8 +71,7 @@ static const struct {
     struct usb_os_desc_header os_header;
     struct usb_ext_compat_desc os_desc;
 
-} __attribute__((__packed__)) descriptors =
-    {
+} __attribute__((__packed__)) descriptors = {
         .header =
             {
                 .magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC_V2),
@@ -253,7 +252,6 @@ static void handle_ep0(int ep0, bool *ready)
     pfds[0].events = POLLIN;
 
     ret = poll(pfds, 1, 0);
-
     if (ret && (pfds[0].revents & POLLIN)) {
         ret = read(ep0, &event, sizeof(event));
         if (!ret) {
@@ -306,15 +304,15 @@ int main(int argc, char *argv[])
         printf("ffs directory not specified!\n");
         return EPERM;
     }
-
-    ep_path = malloc(strlen(argv[1]) + sizeof(int) /* "/ep#" */ + 1 /* '\0' */);
+                                       /* "/ep#" */ /* '\0' */
+    ep_path = malloc(strlen(argv[1]) + sizeof(int) + 1);
     if (!ep_path) {
         perror("malloc");
         return EPERM;
     }
 
     /* open endpoint files */
-    sprintf(ep_path, "%s/ep0", argv[1]);
+    (void)sprintf(ep_path, "%s/ep0", argv[1]);
     ep0 = open(ep_path, O_RDWR);
     if (ep0 < 0) {
         perror("unable to open ep0");
@@ -329,7 +327,7 @@ int main(int argc, char *argv[])
         return EPERM;
     }
     for (i = 0; i < AIO_PARAMS_MAX; ++i) {
-        sprintf(ep_path, "%s/ep%d", argv[1], i + 1);
+        (void)sprintf(ep_path, "%s/ep%d", argv[1], i + 1);
         ep[i] = open(ep_path, O_RDWR);
         if (ep[i] < 0) {
             printf("unable to open ep%d: %s\n", i + 1, strerror(errno));
@@ -405,7 +403,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (!req_in) { /* if IN transfer not requested*/
+        if (!req_in) { /* if IN transfer not requested */
             /* prepare write request */
             io_prep_pwrite(iocb_in, ep[0], buf_in, BUF_LEN, 0);
             /* enable eventfd notification */

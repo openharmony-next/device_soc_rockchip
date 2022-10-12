@@ -163,7 +163,7 @@ static const struct edid_quirk {
     /* Panel in Samsung NP700G7A-S01PL notebook reports 6bpc */
     {"SEC", 0xd033, EDID_QUIRK_FORCE_8BPC},
 
-    /* Rotel RSX-1058 forwards sink's EDID but only does HDMI 1.1*/
+    /* Rotel RSX-1058 forwards sink's EDID but only does HDMI 1.1 */
     {"ETR", 13896, EDID_QUIRK_FORCE_8BPC},
 
     /* Valve Index Headset */
@@ -1694,7 +1694,6 @@ bool drm_edid_block_valid(u8 *raw_edid, int block, bool print_bad_edid, bool *ed
 
     if (block == 0) {
         int score = drm_edid_header_is_valid(raw_edid);
-
         if (score == 0x8) {
             if (edid_corrupt) {
                 *edid_corrupt = false;
@@ -1824,31 +1823,32 @@ static int drm_do_probe_ddc_edid(void *data, u8 *buf, unsigned int block, size_t
      * of the individual block a few times seems to overcome this.
      */
     do {
-        struct i2c_msg msgs[] = {{
-                                     .addr = DDC_SEGMENT_ADDR,
-                                     .flags = 0,
-                                     .len = 1,
-                                     .buf = &segment,
-                                 },
-                                 {
-                                     .addr = DDC_ADDR,
-                                     .flags = 0,
-                                     .len = 1,
-                                     .buf = &start,
-                                 },
-                                 {
-                                     .addr = DDC_ADDR,
-                                     .flags = I2C_M_RD,
-                                     .len = len,
-                                     .buf = buf,
-                                 }};
+        struct i2c_msg msgs[] = {
+            {
+                .addr = DDC_SEGMENT_ADDR,
+                .flags = 0,
+                .len = 1,
+                .buf = &segment,
+            },
+            {
+                .addr = DDC_ADDR,
+                .flags = 0,
+                .len = 1,
+                .buf = &start,
+            },
+            {
+                .addr = DDC_ADDR,
+                .flags = I2C_M_RD,
+                .len = len,
+                .buf = buf,
+            }
+        };
 
         /*
          * Avoid sending the segment addr to not upset non-compliant
          * DDC monitors.
          */
         ret = i2c_transfer(adapter, &msgs[0x3 - xfers], xfers);
-
         if (ret == -ENXIO) {
             DRM_DEBUG_KMS("drm: skipping non-existent adapter %s\n", adapter->name);
             break;
@@ -3401,7 +3401,6 @@ static u8 drm_match_cea_mode_clock_tolerance(const struct drm_display_mode *to_m
         /* Check both 60Hz and 59.94Hz */
         clock1 = cea_mode.clock;
         clock2 = cea_mode_alternate_clock(&cea_mode);
-
         if (abs(to_match->clock - clock1) > clock_tolerance && abs(to_match->clock - clock2) > clock_tolerance) {
             continue;
         }
@@ -3443,7 +3442,6 @@ u8 drm_match_cea_mode(const struct drm_display_mode *to_match)
         /* Check both 60Hz and 59.94Hz */
         clock1 = cea_mode.clock;
         clock2 = cea_mode_alternate_clock(&cea_mode);
-
         if (KHZ2PICOS(to_match->clock) != KHZ2PICOS(clock1) && KHZ2PICOS(to_match->clock) != KHZ2PICOS(clock2)) {
             continue;
         }
@@ -3509,7 +3507,6 @@ static u8 drm_match_hdmi_mode_clock_tolerance(const struct drm_display_mode *to_
         /* Make sure to also match alternate clocks */
         clock1 = hdmi_mode->clock;
         clock2 = hdmi_mode_alternate_clock(hdmi_mode);
-
         if (abs(to_match->clock - clock1) > clock_tolerance && abs(to_match->clock - clock2) > clock_tolerance) {
             continue;
         }
@@ -3550,7 +3547,6 @@ static u8 drm_match_hdmi_mode(const struct drm_display_mode *to_match)
         /* Make sure to also match alternate clocks */
         clock1 = hdmi_mode->clock;
         clock2 = hdmi_mode_alternate_clock(hdmi_mode);
-
         if ((KHZ2PICOS(to_match->clock) == KHZ2PICOS(clock1) || KHZ2PICOS(to_match->clock) == KHZ2PICOS(clock2)) &&
             drm_mode_match(to_match, hdmi_mode, match_flags)) {
             return vic;
@@ -4042,7 +4038,6 @@ static int do_hdmi_vsdb_modes(struct drm_connector *connector, const u8 *db, u8 
 
         if (newflag != 0) {
             newmode = drm_display_mode_from_vic_index(connector, video_db, video_len, vic_index);
-
             if (newmode) {
                 newmode->flags |= newflag;
                 drm_mode_probed_add(connector, newmode);
@@ -4161,7 +4156,7 @@ static bool cea_db_is_hdmi_forum_vsdb(const u8 *db)
         return false;
     }
 
-    oui = db[0x3] << 0x10 | db[0x2] << 0x8 | db[0x1];
+    oui = (db[0x3] << 0x10) | (db[0x2] << 0x8) | db[0x1];
 
     return oui == HDMI_FORUM_IEEE_OUI;
 }
@@ -4217,8 +4212,8 @@ static bool cea_db_is_y420vdb(const u8 *db)
     return true;
 }
 
-#define for_each_cea_db(cea, i, start, end)                                                                            \
-    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end);                                  \
+#define for_each_cea_db(cea, i, start, end)                                           \
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
          (i) += cea_db_payload_len(&(cea)[(i)]) + 1)
 
 static void drm_parse_y420cmdb_bitmap(struct drm_connector *connector, const u8 *db)
@@ -4230,7 +4225,7 @@ static void drm_parse_y420cmdb_bitmap(struct drm_connector *connector, const u8 
     u64 map = 0;
 
     if (map_len == 0) {
-        /* All CEA modes support ycbcr420 sampling also.*/
+        /* All CEA modes support ycbcr420 sampling also. */
         hdmi->y420_cmdb_map = U64_MAX;
         info->color_formats |= DRM_COLOR_FORMAT_YCRCB420;
         return;
@@ -4277,8 +4272,7 @@ static int add_cea_modes(struct drm_connector *connector, struct edid *edid)
             return 0;
         }
 
-        for_each_cea_db(cea, i, start, end)
-        {
+        for_each_cea_db(cea, i, start, end) {
             db = &cea[i];
             dbl = cea_db_payload_len(db);
 
@@ -4404,7 +4398,6 @@ static void drm_parse_hdr_metadata_block(struct drm_connector *connector, const 
 static void drm_parse_hdmi_vsdb_audio(struct drm_connector *connector, const u8 *db)
 {
     u8 len = cea_db_payload_len(db);
-
     if (len >= 0x6 && (db[0x6] & (1 << 0x7))) {
         connector->eld[DRM_ELD_SAD_COUNT_CONN_TYPE] |= DRM_ELD_SUPPORTS_AI;
     }
@@ -4547,8 +4540,7 @@ static void drm_edid_to_eld(struct drm_connector *connector, struct edid *edid)
             end = 0;
         }
 
-        for_each_cea_db(cea, i, start, end)
-        {
+        for_each_cea_db(cea, i, start, end) {
             db = &cea[i];
             dbl = cea_db_payload_len(db);
 
@@ -4625,8 +4617,7 @@ int drm_edid_to_sad(struct edid *edid, struct cea_sad **sads)
         return -EPROTO;
     }
 
-    for_each_cea_db(cea, i, start, end)
-    {
+    for_each_cea_db(cea, i, start, end) {
         u8 *db = &cea[i];
 
         if (cea_db_tag(db) == AUDIO_BLOCK) {
@@ -4689,13 +4680,11 @@ int drm_edid_to_speaker_allocation(struct edid *edid, u8 **sadb)
         return -EPROTO;
     }
 
-    for_each_cea_db(cea, i, start, end)
-    {
+    for_each_cea_db(cea, i, start, end) {
         const u8 *db = &cea[i];
 
         if (cea_db_tag(db) == SPEAKER_BLOCK) {
             dbl = cea_db_payload_len(db);
-
             /* Speaker Allocation Data Block */
             if (dbl == 0x3) {
                 *sadb = kmemdup(&db[1], dbl, GFP_KERNEL);
@@ -4787,8 +4776,7 @@ bool drm_detect_hdmi_monitor(struct edid *edid)
      * Because HDMI identifier is in Vendor Specific Block,
      * search it from all data blocks of CEA extension.
      */
-    for_each_cea_db(edid_ext, i, start_offset, end_offset)
-    {
+    for_each_cea_db(edid_ext, i, start_offset, end_offset) {
         if (cea_db_is_hdmi_vsdb(&edid_ext[i])) {
             return true;
         }
@@ -4833,8 +4821,7 @@ bool drm_detect_monitor_audio(struct edid *edid)
         goto end;
     }
 
-    for_each_cea_db(edid_ext, i, start_offset, end_offset)
-    {
+    for_each_cea_db(edid_ext, i, start_offset, end_offset) {
         if (cea_db_tag(&edid_ext[i]) == AUDIO_BLOCK) {
             has_audio = true;
             for (j = 1; j < cea_db_payload_len(&edid_ext[i]) + 1; j += 0x3) {
@@ -5142,8 +5129,7 @@ static void drm_parse_cea_ext(struct drm_connector *connector, const struct edid
         return;
     }
 
-    for_each_cea_db(edid_ext, i, start, end)
-    {
+    for_each_cea_db(edid_ext, i, start, end) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_vsdb(db)) {
@@ -5260,7 +5246,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
      * tells us to assume 8 bpc color depth if the EDID doesn't have
      * extensions which tell otherwise.
      */
-    if (info->bpc == 0x0 && edid->revision == 0x3 && edid->input & DRM_EDID_DIGITAL_DFP_1_X) {
+    if ((info->bpc == 0x0) && (edid->revision == 0x3) && (edid->input & DRM_EDID_DIGITAL_DFP_1_X)) {
         info->bpc = 0x8;
         DRM_DEBUG("%s: Assigning DFP sink color depth as %d bpc.\n", connector->name, info->bpc);
     }
@@ -5635,7 +5621,7 @@ static bool is_hdmi2_sink(const struct drm_connector *connector)
     }
 
     return connector->display_info.hdmi.scdc.supported ||
-           connector->display_info.color_formats & DRM_COLOR_FORMAT_YCRCB420;
+           (connector->display_info.color_formats & DRM_COLOR_FORMAT_YCRCB420);
 }
 
 static inline bool is_eotf_supported(u8 output_eotf, u8 sink_eotf)
@@ -5735,7 +5721,6 @@ static u8 drm_mode_cea_vic(const struct drm_connector *connector, const struct d
     }
 
     vic = drm_match_cea_mode(mode);
-
     /*
      * HDMI 1.4 VIC range: 1 <= VIC <= 64 (CEA-861-D) but
      * HDMI 2.0 VIC range: 1 <= VIC <= 107 (CEA-861-F). So we

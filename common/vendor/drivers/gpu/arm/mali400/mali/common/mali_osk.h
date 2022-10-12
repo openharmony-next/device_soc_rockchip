@@ -59,7 +59,7 @@ extern "C" {
 /** @brief Macro for asserting that the current thread holds a given lock
  */
 #define MALI_DEBUG_ASSERT_LOCK_HELD(l)                                                                                 \
-    MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == mali_osk_get_tid());
+    MALI_DEBUG_ASSERT(_mali_osk_lock_get_owner((_mali_osk_lock_debug_t *)l) == mali_osk_get_tid())
 
 /** @brief returns a lock's owner (thread id) if debugging is enabled
  */
@@ -834,7 +834,7 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size);
 /** @brief Delete a notification object
  *
  * This must be called to reclaim the resources of a notification object. This
- * includes:
+ * includes
  * - The _mali_osk_notification_t::result_buffer
  * - The \ref _mali_osk_notification_t itself.
  *

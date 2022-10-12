@@ -337,7 +337,6 @@ void bpf_map_init_from_attr(struct bpf_map *map, union bpf_attr *attr)
 static int bpf_charge_memlock(struct user_struct *user, u32 pages)
 {
     unsigned long memlock_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
-
     if (atomic_long_add_return(pages, &user->locked_vm) > memlock_limit) {
         atomic_long_sub(pages, &user->locked_vm);
         return -EPERM;
@@ -1928,7 +1927,6 @@ struct bpf_prog *bpf_prog_inc_not_zero(struct bpf_prog *prog)
     int refold;
 
     refold = atomic64_fetch_add_unless(&prog->aux->refcnt, 1, 0);
-
     if (!refold) {
         return ERR_PTR(-ENOENT);
     }
@@ -4354,7 +4352,6 @@ static int bpf_enable_runtime_stats(void)
 
 static int bpf_enable_stats(union bpf_attr *attr)
 {
-
     if (CHECK_ATTR(BPF_ENABLE_STATS)) {
         return -EINVAL;
     }

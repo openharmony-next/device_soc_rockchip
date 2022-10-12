@@ -23,7 +23,7 @@ typedef enum {
 
 extern mali_bool mali_executor_hints[MALI_EXECUTOR_HINT_MAX];
 
-/*Add for voltage scan function*/
+/* Add for voltage scan function */
 extern u32 mali_group_error;
 
 /* forward declare struct instead of using include */
@@ -33,7 +33,7 @@ struct mali_pp_core;
 
 extern _mali_osk_spinlock_irq_t *mali_executor_lock_obj;
 
-#define MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD() MALI_DEBUG_ASSERT_LOCK_HELD(mali_executor_lock_obj);
+#define MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD() MALI_DEBUG_ASSERT_LOCK_HELD(mali_executor_lock_obj)
 
 mali_osk_errcode_t mali_executor_initialize(void);
 void mali_executor_terminate(void);

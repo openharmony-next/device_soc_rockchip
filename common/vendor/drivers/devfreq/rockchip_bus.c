@@ -332,7 +332,6 @@ static int rockchip_bus_cpufreq_notifier(struct notifier_block *nb, unsigned lon
     struct rockchip_bus *bus = to_rockchip_bus_cpufreq_nb(nb);
     struct cpufreq_freqs *freqs = data;
     int id = topology_physical_package_id(freqs->policy->cpu);
-
     if (id < 0 || id >= MAX_CLUSTERS) {
         return NOTIFY_DONE;
     }
@@ -399,13 +398,13 @@ static int rockchip_bus_cpufreq(struct rockchip_bus *bus)
         dev_err(dev, "failed to get cci-high-freq\n");
         return ret;
     }
-    bus->high_rate = freq * 0x3e8;
+    bus->high_rate = (unsigned long)freq * 0x3e8;
     ret = of_property_read_u32(np, "cci-low-freq", &freq);
     if (ret) {
         dev_err(dev, "failed to get cci-low-freq\n");
         return ret;
     }
-    bus->low_rate = freq * 0x3e8;
+    bus->low_rate = (unsigned long)freq * 0x3e8;
 
     bus->cpufreq_nb.notifier_call = rockchip_bus_cpufreq_notifier;
     ret = cpufreq_register_notifier(&bus->cpufreq_nb, CPUFREQ_TRANSITION_NOTIFIER);

@@ -95,7 +95,7 @@ void fiq_debugger_dump_regs(struct fiq_debugger_output *output, const struct pt_
 }
 
 #define READ_SPECIAL_REG(x)                                                                                            \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         u64 val;                                                                                                       \
         asm volatile("mrs %0, " #x : "=r"(val));                                                                       \
         val;                                                                                                           \

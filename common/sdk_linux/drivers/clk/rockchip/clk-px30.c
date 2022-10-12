@@ -53,7 +53,7 @@ static struct rockchip_pll_rate_table px30_pll_rates[] = {
     RK3036_PLL_RATE(594000000, 2, 99, 2, 1, 1, 0),  RK3036_PLL_RATE(504000000, 1, 63, 3, 1, 1, 0),
     RK3036_PLL_RATE(500000000, 6, 250, 2, 1, 1, 0), RK3036_PLL_RATE(408000000, 1, 68, 2, 2, 1, 0),
     RK3036_PLL_RATE(312000000, 1, 52, 2, 2, 1, 0),  RK3036_PLL_RATE(216000000, 1, 72, 4, 2, 1, 0),
-    RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),   {/* sentinel */},
+    RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0), { },
 };
 
 #define PX30_DIV_ACLKM_MASK 0x7
@@ -813,15 +813,17 @@ static const struct clk_px30_inits clk_px30_pmu_init = {
     .inits = px30_pmu_clk_init,
 };
 
-static const struct of_device_id clk_px30_match_table[] = {{
-                                                               .compatible = "rockchip,px30-cru",
-                                                               .data = &clk_px30_init,
-                                                           },
-                                                           {
-                                                               .compatible = "rockchip,px30-pmucru",
-                                                               .data = &clk_px30_pmu_init,
-                                                           },
-                                                           {}};
+static const struct of_device_id clk_px30_match_table[] = {
+    {
+        .compatible = "rockchip,px30-cru",
+        .data = &clk_px30_init,
+    },
+    {
+        .compatible = "rockchip,px30-pmucru",
+        .data = &clk_px30_pmu_init,
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_px30_match_table);
 
 static int __init clk_px30_probe(struct platform_device *pdev)

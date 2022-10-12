@@ -29,7 +29,7 @@
 typedef enum mali_l2_cache_register {
     MALI400_L2_CACHE_REGISTER_SIZE = 0x0004,
     MALI400_L2_CACHE_REGISTER_STATUS = 0x0008,
-    /*unused                               = 0x000C */
+    /* unused                               = 0x000C */
     MALI400_L2_CACHE_REGISTER_COMMAND = 0x0010,
     MALI400_L2_CACHE_REGISTER_CLEAR_PAGE = 0x0014,
     MALI400_L2_CACHE_REGISTER_MAX_READS = 0x0018,
@@ -110,7 +110,7 @@ struct mali_l2_cache_core *mali_l2_cache_create(_mali_osk_resource_t *resource, 
     }
 
     cache = mali_osk_malloc(sizeof(struct mali_l2_cache_core));
-    if (NULL == cache) {
+    if (cache == NULL) {
         MALI_PRINT_ERROR(("Mali L2 cache: Failed to allocate memory for L2 cache core\n"));
         return NULL;
     }
@@ -134,7 +134,7 @@ struct mali_l2_cache_core *mali_l2_cache_create(_mali_osk_resource_t *resource, 
 #endif
 
     cache->lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_L2);
-    if (NULL == cache->lock) {
+    if (cache->lock == NULL) {
         MALI_PRINT_ERROR(
             ("Mali L2 cache: Failed to create counter lock for L2 cache core %s\n", cache->hw_core.description));
         mali_hw_core_delete(&cache->hw_core);
@@ -245,7 +245,7 @@ void mali_l2_cache_core_set_counter_src(struct mali_l2_cache_core *cache, u32 so
 
     mali_l2_cache_lock(cache);
 
-    if (0 == source_id) {
+    if (source_id == 0) {
         /* start counting from 0 */
         cache->counter_value0_base = 0;
         cache->counter_src0 = counter;
@@ -282,10 +282,10 @@ void mali_l2_cache_core_get_counter_values(struct mali_l2_cache_core *cache, u32
                                            u32 *value1)
 {
     MALI_DEBUG_ASSERT_POINTER(cache);
-    MALI_DEBUG_ASSERT(NULL != src0);
-    MALI_DEBUG_ASSERT(NULL != value0);
-    MALI_DEBUG_ASSERT(NULL != src1);
-    MALI_DEBUG_ASSERT(NULL != value1);
+    MALI_DEBUG_ASSERT(src0 != NULL);
+    MALI_DEBUG_ASSERT(value0 != NULL);
+    MALI_DEBUG_ASSERT(src1 != NULL);
+    MALI_DEBUG_ASSERT(value1 != NULL);
 
     mali_l2_cache_lock(cache);
 
@@ -335,7 +335,7 @@ void mali_l2_cache_invalidate(struct mali_l2_cache_core *cache)
 {
     MALI_DEBUG_ASSERT_POINTER(cache);
 
-    if (NULL == cache) {
+    if (cache == NULL) {
         return;
     }
 
@@ -351,7 +351,7 @@ void mali_l2_cache_invalidate_conditional(struct mali_l2_cache_core *cache, u32 
 {
     MALI_DEBUG_ASSERT_POINTER(cache);
 
-    if (NULL == cache) {
+    if (cache == NULL) {
         return;
     }
 
@@ -451,7 +451,6 @@ static void mali_l2_cache_reset(struct mali_l2_cache_core *cache)
 
     /* Restart any performance counters (if enabled) */
     if (cache->counter_src0 != MALI_HW_CORE_NO_COUNTER) {
-
         mali_hw_core_register_write(&cache->hw_core, MALI400_L2_CACHE_REGISTER_PERFCNT_SRC0, cache->counter_src0);
     }
 

@@ -48,7 +48,6 @@ int kbase_mem_pool_group_init(struct kbase_mem_pool_group *const mem_pools, stru
     for (gid = 0; gid < MEMORY_GROUP_MANAGER_NR_GROUPS; ++gid) {
         err = kbase_mem_pool_init(&mem_pools->small[gid], &configs->small[gid], KBASE_MEM_POOL_4KB_PAGE_TABLE_ORDER,
                                   gid, kbdev, next_pools ? &next_pools->small[gid] : NULL);
-
         if (!err) {
             err = kbase_mem_pool_init(&mem_pools->large[gid], &configs->large[gid], KBASE_MEM_POOL_2MB_PAGE_TABLE_ORDER,
                                       gid, kbdev, next_pools ? &next_pools->large[gid] : NULL);

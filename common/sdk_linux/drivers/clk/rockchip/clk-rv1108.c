@@ -69,7 +69,7 @@ static struct rockchip_pll_rate_table rv1108_pll_rates[] = {
     RK3036_PLL_RATE(312000000, 1, 52, 2, 2, 1, 0),
     RK3036_PLL_RATE(216000000, 1, 72, 4, 2, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),
-    {/* sentinel */},
+    {},
 };
 
 #define RV1108_DIV_CORE_MASK 0xf
@@ -600,10 +600,12 @@ static int __init clk_rv1108_probe(struct platform_device *pdev)
     return 0;
 }
 
-static const struct of_device_id clk_rv1108_match_table[] = {{
-                                                                 .compatible = "rockchip,rv1108-cru",
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rv1108_match_table[] = {
+    {
+        .compatible = "rockchip,rv1108-cru",
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rv1108_match_table);
 
 static struct platform_driver clk_rv1108_driver = {

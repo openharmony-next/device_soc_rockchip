@@ -30,8 +30,7 @@ _mali_osk_wait_queue_t *_mali_osk_wait_queue_init(void)
     _mali_osk_wait_queue_t *ret = NULL;
 
     ret = kmalloc(sizeof(_mali_osk_wait_queue_t), GFP_KERNEL);
-
-    if (NULL == ret) {
+    if (ret == NULL) {
         return ret;
     }
 

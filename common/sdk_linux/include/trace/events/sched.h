@@ -83,7 +83,7 @@ DEFINE_EVENT(sched_wakeup_template, sched_wakeup, TP_PROTO(struct task_struct *p
 DEFINE_EVENT(sched_wakeup_template, sched_wakeup_new, TP_PROTO(struct task_struct *p), TP_ARGS(p));
 
 #ifdef CREATE_TRACE_POINTS
-static inline long __trace_sched_switch_state(bool preempt, struct task_struct *p)
+static inline long trace_sched_switch_state(bool preempt, struct task_struct *p)
 {
     unsigned int state;
 
@@ -126,7 +126,7 @@ TRACE_EVENT(sched_switch,
 
             TP_fast_assign(memcpy(__entry->next_comm, next->comm, TASK_COMM_LEN); __entry->prev_pid = prev->pid;
                            __entry->prev_prio = prev->prio;
-                           __entry->prev_state = __trace_sched_switch_state(preempt, prev);
+                           __entry->prev_state = trace_sched_switch_state(preempt, prev);
                            memcpy(__entry->prev_comm, prev->comm, TASK_COMM_LEN); __entry->next_pid = next->pid;
                            __entry->next_prio = next->prio;
                            /* XXX SCHED_DEADLINE */
@@ -138,10 +138,10 @@ TRACE_EVENT(sched_switch,
                       (__entry->prev_state & (TASK_REPORT_MAX - 1))
                           ? __print_flags(__entry->prev_state &(TASK_REPORT_MAX - 1), "|", {TASK_INTERRUPTIBLE, "S"},
                                           {TASK_UNINTERRUPTIBLE, "D"}, {__TASK_STOPPED, "T"}, {__TASK_TRACED, "t"},
-                                          {EXIT_DEAD, "X"}, {EXIT_ZOMBIE, "Z"}, {TASK_PARKED, "P"}, {TASK_DEAD, "I"})
+                                            {EXIT_DEAD, "X"}, {EXIT_ZOMBIE, "Z"}, {TASK_PARKED, "P"}, {TASK_DEAD, "I"})
                           : "R",
 
-                      __entry->prev_state &TASK_REPORT_MAX ? "+" : "", __entry->next_comm, __entry->next_pid,
+                        __entry->prev_state &TASK_REPORT_MAX ? "+" : "", __entry->next_comm, __entry->next_pid,
                       __entry->next_prio));
 
 /*

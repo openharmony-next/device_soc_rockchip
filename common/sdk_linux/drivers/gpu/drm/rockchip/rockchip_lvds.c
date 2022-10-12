@@ -559,7 +559,6 @@ static void rk3288_lvds_enable(struct rockchip_lvds *lvds)
         } else {
             val |= RK3288_LVDS_CON_STARTPHASE(0);
         }
-
     } else {
         val |= RK3288_LVDS_CON_ENABLE_2(0) | RK3288_LVDS_CON_ENABLE_1(1);
     }

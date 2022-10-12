@@ -603,7 +603,7 @@ static int uvc_parse_format(struct uvc_device *dev, struct uvc_streaming *stream
         case UVC_VS_FORMAT_FRAME_BASED:
             n = buffer[UVC_BUFER_INDEX_TWO] == UVC_VS_FORMAT_UNCOMPRESSED ? UVC_BUFER_INDEX_TWENTY_SEVEN
                                                                           : UVC_BUFER_INDEX_TWENTY_EIGHT;
-            if (buflen < n) {
+            if (buflen < (int)n) {
                 uvc_trace(UVC_TRACE_DESCR,
                           "device %d videostreaming "
                           "interface %d FORMAT error\n",
@@ -1544,7 +1544,7 @@ static int uvc_parse_control(struct uvc_device *dev)
 
 /*
  * Scan the UVC descriptors to locate a chain starting at an Output Terminal
- * and containing the following units:
+ * and containing the following units
  *
  * - one or more Output Terminals (USB Streaming or Display)
  * - zero or one Processing Unit
@@ -2211,7 +2211,7 @@ int uvc_register_video_device(struct uvc_device *dev, struct uvc_streaming *stre
             break;
     }
 
-    snprintf(vdev->name, sizeof(vdev->name), "%s %u", name, stream->header.bTerminalLink);
+    ret = snprintf(vdev->name, sizeof(vdev->name), "%s %u", name, stream->header.bTerminalLink);
 
     /*
      * Set the driver data before calling video_register_device, otherwise
@@ -2453,7 +2453,7 @@ static int uvc_probe(struct usb_interface *intf, const struct usb_device_id *id)
     }
 
     uvc_trace(UVC_TRACE_PROBE, "UVC device initialized.\n");
-    if (udev->quirks & USB_QUIRK_AUTO_SUSPEND || udev->parent->quirks & USB_QUIRK_AUTO_SUSPEND) {
+    if ((udev->quirks & USB_QUIRK_AUTO_SUSPEND) || (udev->parent->quirks & USB_QUIRK_AUTO_SUSPEND)) {
         uvc_printk(KERN_INFO, "auto-suspend is blacklisted for this device\n");
     } else {
         usb_enable_autosuspend(udev);

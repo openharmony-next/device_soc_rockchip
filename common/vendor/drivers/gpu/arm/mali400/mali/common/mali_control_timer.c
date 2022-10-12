@@ -48,7 +48,6 @@ static void mali_control_timer_callback(void *arg)
 
         /* Calculate gpu utilization */
         util_data = mali_utilization_calculate(&period_start_time, &time_period, &need_add_timer);
-
         if (util_data) {
 #if defined(CONFIG_MALI_DVFS)
             mali_dvfs_policy_realize(util_data, time_period);
@@ -56,10 +55,8 @@ static void mali_control_timer_callback(void *arg)
             mali_utilization_platform_realize(util_data);
 #endif
 
-            if (MALI_TRUE == timer_running) {
-                if (MALI_TRUE == need_add_timer) {
-                    mali_control_timer_mod(mali_control_timeout);
-                }
+            if (MALI_TRUE == timer_running && MALI_TRUE == need_add_timer) {
+                mali_control_timer_mod(mali_control_timeout);
             }
         }
     }
@@ -72,13 +69,13 @@ mali_osk_errcode_t mali_control_timer_init(void)
 
     if (MALI_OSK_ERR_OK == mali_osk_device_data_get(&data)) {
         /* Use device specific settings (if defined) */
-        if (0 != data.control_interval) {
+        if (data.control_interval != 0) {
             mali_control_timeout = data.control_interval;
         }
     }
 
     mali_control_timer = _mali_osk_timer_init(mali_control_timer_callback);
-    if (NULL == mali_control_timer) {
+    if (mali_control_timer == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
     _mali_osk_timer_setcallback(mali_control_timer, mali_control_timer_callback, NULL);
@@ -88,7 +85,7 @@ mali_osk_errcode_t mali_control_timer_init(void)
 
 void mali_control_timer_term(void)
 {
-    if (NULL != mali_control_timer) {
+    if (mali_control_timer != NULL) {
         _mali_osk_timer_del(mali_control_timer);
         timer_running = MALI_FALSE;
         _mali_osk_timer_term(mali_control_timer);

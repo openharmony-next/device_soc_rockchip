@@ -122,7 +122,6 @@ enum regulator_status {
  * regulator chip drivers.
  */
 struct regulator_ops {
-
     /* enumerate supported voltages */
     int (*list_voltage)(struct regulator_dev *, unsigned selector);
 

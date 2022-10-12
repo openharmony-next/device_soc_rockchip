@@ -14,6 +14,7 @@
 #include <soc/rockchip/rockchip_sip.h>
 #include <soc/rockchip/scpi.h>
 #include <uapi/drm/drm_mode.h>
+
 #ifdef CONFIG_ARM
 #include <asm/psci.h>
 #endif
@@ -168,7 +169,6 @@ static int rockchip_ddrclk_sip_set_rate_v2(struct clk_hw *hw, unsigned long drat
     }
 
     res = sip_smc_dram(SHARE_PAGE_TYPE_DDR, 0, ROCKCHIP_SIP_CONFIG_DRAM_SET_RATE);
-
     if ((int)res.a1 == SIP_RET_SET_RATE_TIMEOUT) {
         if (ddr_data.dmcfreq_wait_complete) {
             ddr_data.dmcfreq_wait_complete();

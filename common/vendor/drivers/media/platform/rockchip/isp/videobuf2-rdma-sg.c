@@ -487,9 +487,7 @@ static struct dma_buf *vb2_dma_sg_get_dmabuf(void *buf_priv, unsigned long flags
     return dbuf;
 }
 
-/*********************************************/
 /*       callbacks for DMABUF buffers        */
-/*********************************************/
 
 static int vb2_dma_sg_map_dmabuf(void *mem_priv)
 {

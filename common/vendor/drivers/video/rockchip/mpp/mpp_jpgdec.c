@@ -165,7 +165,7 @@ static int jpgdec_extract_task_msg(struct jpgdec_task *task, struct mpp_task_msg
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_READ: {
                 off_s = hw_info->reg_start * sizeof(u32);
                 off_e = hw_info->reg_end * sizeof(u32);
@@ -175,11 +175,11 @@ static int jpgdec_extract_task_msg(struct jpgdec_task *task, struct mpp_task_msg
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
                 break;
-            } 
+            }
             default:
                 break;
         }

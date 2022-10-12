@@ -240,7 +240,6 @@ static int __shm_open(struct vm_area_struct *vma)
     struct shmid_kernel *shp;
 
     shp = shm_lock(sfd->ns, sfd->id);
-
     if (IS_ERR(shp)) {
         return PTR_ERR(shp);
     }
@@ -329,7 +328,6 @@ static void shm_close(struct vm_area_struct *vma)
     down_write(&shm_ids(ns).rwsem);
     /* remove from the list of attaches of the shm segment */
     shp = shm_lock(ns, sfd->id);
-
     /*
      * We raced in the idr lookup or with shm_destroy().
      * Either way, the ID is busted.
@@ -621,7 +619,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
         return -EINVAL;
     }
 
-    if (numpages << PAGE_SHIFT < size) {
+    if ((numpages << PAGE_SHIFT) < size) {
         return -ENOSPC;
     }
 
@@ -645,7 +643,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
         return error;
     }
 
-    sprintf(name, "SYSV%08x", key);
+    (void)sprintf(name, "SYSV%08x", key);
     if (shmflg & SHM_HUGETLB) {
         struct hstate *hs;
         size_t hugesize;
@@ -1103,7 +1101,6 @@ static int shmctl_do_lock(struct ipc_namespace *ns, int shmid, int cmd)
 
     if (!ns_capable(ns->user_ns, CAP_IPC_LOCK)) {
         kuid_t euid = current_euid();
-
         if (!uid_eq(euid, shp->shm_perm.uid) && !uid_eq(euid, shp->shm_perm.cuid)) {
             err = -EPERM;
             goto out_unlock0;

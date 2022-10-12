@@ -494,7 +494,7 @@ static int rkvenc_extract_task_msg(struct mpp_session *session, struct rkvenc_ta
                     task->w_req_cnt++;
                 }
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_READ: {
                 struct mpp_request *rreq;
                 for (j = 0; j < hw->reg_class; j++) {
@@ -523,7 +523,7 @@ static int rkvenc_extract_task_msg(struct mpp_session *session, struct rkvenc_ta
                     rkvenc2_extract_rcb_info(&priv->rcb_inf, req);
                 }
                 break;
-            } 
+            }
             default:
                 break;
         }

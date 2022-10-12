@@ -53,13 +53,13 @@
 #define CIFISP_BLS_START_V_MAX 0x00000FFF
 /* maximum value for vertical stop address */
 #define CIFISP_BLS_STOP_V_MAX 0x00000FFF
-/* maximum is 2^18 = 262144*/
+/* maximum is 2^18 = 262144 */
 #define CIFISP_BLS_SAMPLES_MAX 0x00000012
 /* maximum value for fixed black level */
 #define CIFISP_BLS_FIX_SUB_MAX 0x00000FFF
 /* minimum value for fixed black level */
 #define CIFISP_BLS_FIX_SUB_MIN 0xFFFFF000
-/* 13 bit range (signed)*/
+/* 13 bit range (signed) */
 #define CIFISP_BLS_FIX_MASK 0x00001FFF
 
 /*

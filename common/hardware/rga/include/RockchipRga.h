@@ -38,8 +38,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 #include "RgaSingleton.h"
 
-class RockchipRga : public RgaSingleton<RockchipRga>
-{
+class RockchipRga : public RgaSingleton<RockchipRga> {
 public:
     static inline RockchipRga &get()
     {

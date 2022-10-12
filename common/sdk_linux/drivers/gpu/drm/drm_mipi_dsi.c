@@ -477,7 +477,7 @@ int mipi_dsi_shutdown_peripheral(struct mipi_dsi_device *dsi)
     struct mipi_dsi_msg msg = {
         .channel = dsi->channel,
         .type = MIPI_DSI_SHUTDOWN_PERIPHERAL,
-        .tx_buf = (u8[2]){0, 0},
+        .tx_buf = (u8[2]) {0, 0},
         .tx_len = 2,
     };
     int ret = mipi_dsi_device_transfer(dsi, &msg);
@@ -497,7 +497,7 @@ int mipi_dsi_turn_on_peripheral(struct mipi_dsi_device *dsi)
     struct mipi_dsi_msg msg = {
         .channel = dsi->channel,
         .type = MIPI_DSI_TURN_ON_PERIPHERAL,
-        .tx_buf = (u8[2]){0, 0},
+        .tx_buf = (u8[2]) {0, 0},
         .tx_len = 2,
     };
     int ret = mipi_dsi_device_transfer(dsi, &msg);

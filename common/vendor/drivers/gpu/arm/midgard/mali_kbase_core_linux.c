@@ -80,7 +80,7 @@
 #include <platform/mali_kbase_platform_common.h>
 #ifdef CONFIG_MALI_PLATFORM_FAKE
 #include <platform/mali_kbase_platform_fake.h>
-#endif /*CONFIG_MALI_PLATFORM_FAKE */
+#endif /* CONFIG_MALI_PLATFORM_FAKE */
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
 #include <mali_kbase_sync.h>
 #endif /* CONFIG_SYNC || CONFIG_SYNC_FILE */
@@ -418,7 +418,6 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 user_ai = alias->ai.value;
 
             ai = vmalloc(sizeof(*ai) * alias->nents);
-
             if (!ai) {
                 ukh->ret = MALI_ERROR_OUT_OF_MEMORY;
                 break;
@@ -458,7 +457,6 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
             } else if (ret == -ENOMEM) {
                 commit->result_subcode = BASE_BACKING_THRESHOLD_ERROR_OOM;
             }
-
             break;
         }
 
@@ -475,7 +473,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 ukh->ret = MALI_ERROR_NONE;
             }
             break;
-        } break;
+        }
 
         case KBASE_FUNC_MEM_FLAGS_CHANGE: {
             struct kbase_uk_mem_flags_change *fc = args;
@@ -660,7 +658,6 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 int err;
 
                 err = kbasep_find_enclosing_cpu_mapping_offset(kctx, find->cpu_addr, find->size, &find->offset);
-
                 if (err) {
                     ukh->ret = MALI_ERROR_FUNCTION_FAILED;
                 }
@@ -739,7 +736,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
             unsigned long flags;
             struct kbase_error_params params = ((struct kbase_uk_error_params *)args)->params;
 
-            /*mutex lock */
+            /* mutex lock */
             spin_lock_irqsave(&kbdev->reg_op_lock, flags);
             if (job_atom_inject_error(&params) != 0) {
                 ukh->ret = MALI_ERROR_OUT_OF_MEMORY;
@@ -747,7 +744,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 ukh->ret = MALI_ERROR_NONE;
             }
             spin_unlock_irqrestore(&kbdev->reg_op_lock, flags);
-            /*mutex unlock */
+            /* mutex unlock */
 #endif /* CONFIG_MALI_ERROR_INJECT */
             break;
         }
@@ -757,7 +754,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
             unsigned long flags;
             struct kbase_model_control_params params = ((struct kbase_uk_model_control_params *)args)->params;
 
-            /*mutex lock */
+            /* mutex lock */
             spin_lock_irqsave(&kbdev->reg_op_lock, flags);
             if (gpu_model_control(kbdev->model, &params) != 0) {
                 ukh->ret = MALI_ERROR_FUNCTION_FAILED;
@@ -765,7 +762,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 ukh->ret = MALI_ERROR_NONE;
             }
             spin_unlock_irqrestore(&kbdev->reg_op_lock, flags);
-            /*mutex unlock */
+            /* mutex unlock */
 #endif /* CONFIG_MALI_NO_MALI */
             break;
         }
@@ -836,7 +833,7 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 goto out_bad;
             }
 
-            if (0 != copy_from_user(buf, user_buf, add_data->len)) {
+            if (copy_from_user(buf, user_buf, add_data->len) != 0) {
                 ukh->ret = MALI_ERROR_FUNCTION_FAILED;
                 kfree(buf);
                 goto out_bad;
@@ -852,7 +849,6 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
 
 #ifdef CONFIG_MALI_NO_MALI
         case KBASE_FUNC_SET_PRFCNT_VALUES: {
-
             struct kbase_uk_prfcnt_values *params = ((struct kbase_uk_prfcnt_values *)args);
             gpu_model_set_dummy_prfcnt_sample(params->data, params->size);
 
@@ -1134,7 +1130,6 @@ static int kbase_open(struct inode *inode, struct file *filp)
 #endif
 
     kbdev = kbase_find_device(iminor(inode));
-
     if (!kbdev) {
         return -ENODEV;
     }
@@ -1363,7 +1358,6 @@ static int kbase_api_mem_alloc(struct kbase_context *kctx, union kbase_ioctl_mem
 #endif
 
     reg = kbase_mem_alloc(kctx, alloc->in.va_pages, alloc->in.commit_pages, alloc->in.extent, &flags, &gpu_va);
-
     if (!reg) {
         return -ENOMEM;
     }
@@ -1599,7 +1593,6 @@ static int kbase_api_stream_create(struct kbase_context *kctx, struct kbase_ioct
     }
 
     ret = kbase_sync_fence_stream_create(stream->name, &fd);
-
     if (ret) {
         return ret;
     }
@@ -1903,7 +1896,7 @@ static int kbase_check_flags(int flags)
     /* Enforce that the driver keeps the O_CLOEXEC flag so that execve() always
      * closes the file descriptor in a child process.
      */
-    if (0 == (flags & O_CLOEXEC)) {
+    if ((flags & O_CLOEXEC) == 0) {
         return -EINVAL;
     }
 
@@ -1933,10 +1926,10 @@ static bool align_and_check(unsigned long *gap_end, unsigned long gap_start, str
 
     if (is_shader_code) {
         /* Check for 4GB boundary */
-        if (0 == (*gap_end & BASE_MEM_MASK_4GB)) {
+        if ((*gap_end & BASE_MEM_MASK_4GB) == 0) {
             (*gap_end) -= (info->align_offset ? info->align_offset : info->length);
         }
-        if (0 == ((*gap_end + info->length) & BASE_MEM_MASK_4GB)) {
+        if (((*gap_end + info->length) & BASE_MEM_MASK_4GB) == 0) {
             (*gap_end) -= (info->align_offset ? info->align_offset : info->length);
         }
 
@@ -2084,7 +2077,6 @@ static unsigned long kbase_get_unmapped_area(struct file *filp, const unsigned l
     }
 
     if (!kbase_ctx_flag(kctx, KCTX_COMPAT)) {
-
         if (kbase_hw_has_feature(kctx->kbdev, BASE_HW_FEATURE_33BIT_VA)) {
             high_limit = kctx->same_va_end << PAGE_SHIFT;
         } else {
@@ -2102,11 +2094,9 @@ static unsigned long kbase_get_unmapped_area(struct file *filp, const unsigned l
 #endif /* CONFIG_64BIT */
     if ((PFN_DOWN(BASE_MEM_COOKIE_BASE) <= pgoff) && (PFN_DOWN(BASE_MEM_FIRST_FREE_ADDRESS) > pgoff)) {
         int cookie = pgoff - PFN_DOWN(BASE_MEM_COOKIE_BASE);
-
         if (!kctx->pending_regions[cookie]) {
             return -EINVAL;
         }
-
         if (!(kctx->pending_regions[cookie]->flags & KBASE_REG_GPU_NX)) {
             if (cpu_va_bits > gpu_pc_bits) {
                 align_offset = 1ULL << gpu_pc_bits;
@@ -2128,12 +2118,10 @@ static unsigned long kbase_get_unmapped_area(struct file *filp, const unsigned l
     info.align_mask = align_mask;
 
     ret = kbase_unmapped_area_topdown(&info, is_shader_code);
-
     if (IS_ERR_VALUE(ret) && high_limit == mm->mmap_base && high_limit < (kctx->same_va_end << PAGE_SHIFT)) {
         /* Retry above mmap_base */
         info.low_limit = mm->mmap_base;
         info.high_limit = min_t(u64, TASK_SIZE, (kctx->same_va_end << PAGE_SHIFT));
-
         ret = kbase_unmapped_area_topdown(&info, is_shader_code);
     }
 
@@ -2188,15 +2176,12 @@ static ssize_t show_policy(struct device *dev, struct device_attribute *attr, ch
     ssize_t ret = 0;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
 
     current_policy = kbase_pm_get_policy(kbdev);
-
     policy_count = kbase_pm_list_policies(&policy_list);
-
     for (i = 0; i < policy_count && ret < PAGE_SIZE; i++) {
         if (policy_list[i] == current_policy) {
             ret += scnprintf(buf + ret, PAGE_SIZE - ret, "[%s] ", policy_list[i]->name);
@@ -2240,13 +2225,11 @@ static ssize_t set_policy(struct device *dev, struct device_attribute *attr, con
     int i;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
 
     policy_count = kbase_pm_list_policies(&policy_list);
-
     for (i = 0; i < policy_count; i++) {
         if (sysfs_streq(policy_list[i]->name, buf)) {
             new_policy = policy_list[i];
@@ -2296,15 +2279,12 @@ static ssize_t show_ca_policy(struct device *dev, struct device_attribute *attr,
     ssize_t ret = 0;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
-
     current_policy = kbase_pm_ca_get_policy(kbdev);
 
     policy_count = kbase_pm_ca_list_policies(&policy_list);
-
     for (i = 0; i < policy_count && ret < PAGE_SIZE; i++) {
         if (policy_list[i] == current_policy) {
             ret += scnprintf(buf + ret, PAGE_SIZE - ret, "[%s] ", policy_list[i]->name);
@@ -2348,13 +2328,10 @@ static ssize_t set_ca_policy(struct device *dev, struct device_attribute *attr, 
     int i;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
-
     policy_count = kbase_pm_ca_list_policies(&policy_list);
-
     for (i = 0; i < policy_count; i++) {
         if (sysfs_streq(policy_list[i]->name, buf)) {
             new_policy = policy_list[i];
@@ -2398,17 +2375,14 @@ static ssize_t show_core_mask(struct device *dev, struct device_attribute *attr,
     ssize_t ret = 0;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
-
     ret += scnprintf(buf + ret, PAGE_SIZE - ret, "Current core mask (JS0) : 0x%llX\n", kbdev->pm.debug_core_mask[0]);
     ret += scnprintf(buf + ret, PAGE_SIZE - ret, "Current core mask (JS1) : 0x%llX\n", kbdev->pm.debug_core_mask[1]);
-    ret += scnprintf(buf + ret, PAGE_SIZE - ret, "Current core mask (JS2) : 0x%llX\n", kbdev->pm.debug_core_mask[2]);
+    ret += scnprintf(buf + ret, PAGE_SIZE - ret, "Current core mask (JS2) : 0x%llX\n", kbdev->pm.debug_core_mask[0x2]);
     ret += scnprintf(buf + ret, PAGE_SIZE - ret, "Available core mask : 0x%llX\n",
                      kbdev->gpu_props.props.raw_props.shader_present);
-
     return ret;
 }
 
@@ -2431,35 +2405,29 @@ static ssize_t set_core_mask(struct device *dev, struct device_attribute *attr, 
     int items;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
-
-    items = sscanf(buf, "%llx %llx %llx", &new_core_mask[0], &new_core_mask[1], &new_core_mask[2]);
-
+    items = sscanf(buf, "%llx %llx %llx", &new_core_mask[0], &new_core_mask[1], &new_core_mask[0x2]);
     if (items == 1) {
-        new_core_mask[1] = new_core_mask[2] = new_core_mask[0];
+        new_core_mask[1] = new_core_mask[0x2] = new_core_mask[0];
     }
-
     if (items == 1 || items == 0x3) {
         u64 shader_present = kbdev->gpu_props.props.raw_props.shader_present;
         u64 group0_core_mask = kbdev->gpu_props.props.coherency_info.group[0].core_mask;
-
         if ((new_core_mask[0] & shader_present) != new_core_mask[0] || !(new_core_mask[0] & group0_core_mask) ||
             (new_core_mask[1] & shader_present) != new_core_mask[1] || !(new_core_mask[1] & group0_core_mask) ||
-            (new_core_mask[2] & shader_present) != new_core_mask[2] || !(new_core_mask[2] & group0_core_mask)) {
+            (new_core_mask[2] & shader_present) != new_core_mask[0x2] || !(new_core_mask[2] & group0_core_mask)) {
             dev_err(dev, "power_policy: invalid core specification\n");
             return -EINVAL;
         }
-
         if (kbdev->pm.debug_core_mask[0] != new_core_mask[0] || kbdev->pm.debug_core_mask[1] != new_core_mask[1] ||
-            kbdev->pm.debug_core_mask[2] != new_core_mask[2]) {
+            kbdev->pm.debug_core_mask[0x2] != new_core_mask[0x2]) {
             unsigned long flags;
 
             spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
 
-            kbase_pm_set_debug_core_mask(kbdev, new_core_mask[0], new_core_mask[1], new_core_mask[2]);
+            kbase_pm_set_debug_core_mask(kbdev, new_core_mask[0], new_core_mask[1], new_core_mask[0x2]);
 
             spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
         }
@@ -2602,7 +2570,6 @@ static ssize_t set_js_timeouts(struct device *dev, struct device_attribute *attr
     items =
         sscanf(buf, "%ld %ld %ld %ld %ld %ld %ld %ld", &js_soft_stop_ms, &js_soft_stop_ms_cl, &js_hard_stop_ms_ss,
                &js_hard_stop_ms_cl, &js_hard_stop_ms_dumping, &js_reset_ms_ss, &js_reset_ms_cl, &js_reset_ms_dumping);
-
     if (items == 0x8) {
         struct kbasep_js_device_data *js_data = &kbdev->js_data;
         unsigned long flags;
@@ -2615,7 +2582,6 @@ static ssize_t set_js_timeouts(struct device *dev, struct device_attribute *attr
         dev_dbg(kbdev->dev, "Overriding " #ticks_name " with %lu ticks (%lu ms)\n",                                    \
                 (unsigned long)js_data->ticks_name, ms_name);                                                          \
     } while (0)
-
         UPDATE_TIMEOUT(soft_stop_ticks, js_soft_stop_ms, DEFAULT_JS_SOFT_STOP_TICKS);
         UPDATE_TIMEOUT(soft_stop_ticks_cl, js_soft_stop_ms_cl, DEFAULT_JS_SOFT_STOP_TICKS_CL);
         UPDATE_TIMEOUT(hard_stop_ticks_ss, js_hard_stop_ms_ss,
@@ -2701,13 +2667,11 @@ static ssize_t show_js_timeouts(struct device *dev, struct device_attribute *att
     ret = scnprintf(buf, PAGE_SIZE, "%lu %lu %lu %lu %lu %lu %lu %lu\n", js_soft_stop_ms, js_soft_stop_ms_cl,
                     js_hard_stop_ms_ss, js_hard_stop_ms_cl, js_hard_stop_ms_dumping, js_reset_ms_ss, js_reset_ms_cl,
                     js_reset_ms_dumping);
-
     if (ret >= PAGE_SIZE) {
         buf[PAGE_SIZE - 0x2] = '\n';
         buf[PAGE_SIZE - 1] = '\0';
         ret = PAGE_SIZE - 1;
     }
-
     return ret;
 }
 
@@ -2866,12 +2830,10 @@ static ssize_t set_force_replay(struct device *dev, struct device_attribute *att
     if (!strncmp("limit=", buf, MIN(0x6, count))) {
         int force_replay_limit;
         int items = sscanf(buf, "limit=%u", &force_replay_limit);
-
         if (items == 1) {
             kbdev->force_replay_random = false;
             kbdev->force_replay_limit = force_replay_limit;
             kbdev->force_replay_count = 0;
-
             return count;
         }
     } else if (!strncmp("random_limit", buf, MIN(0xC, count))) {
@@ -2888,7 +2850,6 @@ static ssize_t set_force_replay(struct device *dev, struct device_attribute *att
     } else if (!strncmp("core_req=", buf, MIN(0x9, count))) {
         unsigned int core_req;
         int items = sscanf(buf, "core_req=%x", &core_req);
-
         if (items == 1) {
             kbdev->force_replay_core_req = (base_jd_core_req)core_req;
 
@@ -2981,13 +2942,11 @@ static ssize_t show_js_softstop_always(struct device *dev, struct device_attribu
     }
 
     ret = scnprintf(buf, PAGE_SIZE, "%d\n", kbdev->js_data.softstop_always);
-
     if (ret >= PAGE_SIZE) {
         buf[PAGE_SIZE - 0x2] = '\n';
         buf[PAGE_SIZE - 1] = '\0';
         ret = PAGE_SIZE - 1;
     }
-
     return ret;
 }
 
@@ -3040,7 +2999,6 @@ static ssize_t show_debug(struct device *dev, struct device_attribute *attr, cha
     ssize_t ret = 0;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
@@ -3048,7 +3006,6 @@ static ssize_t show_debug(struct device *dev, struct device_attribute *attr, cha
     for (i = 0; i < KBASEP_DEBUG_COMMAND_COUNT && ret < PAGE_SIZE; i++) {
         ret += scnprintf(buf + ret, PAGE_SIZE - ret, "%s\n", debug_commands[i].str);
     }
-
     if (ret >= PAGE_SIZE) {
         buf[PAGE_SIZE - 0x2] = '\n';
         buf[PAGE_SIZE - 1] = '\0';
@@ -3079,18 +3036,15 @@ static ssize_t issue_debug(struct device *dev, struct device_attribute *attr, co
     int i;
 
     kbdev = to_kbase_device(dev);
-
     if (!kbdev) {
         return -ENODEV;
     }
-
     for (i = 0; i < KBASEP_DEBUG_COMMAND_COUNT; i++) {
         if (sysfs_streq(debug_commands[i].str, buf)) {
             debug_commands[i].func(kbdev);
             return count;
         }
     }
-
     /* Debug Command not found */
     dev_err(dev, "debug_command: command not known\n");
     return -EINVAL;
@@ -3591,11 +3545,9 @@ static int kbasep_protected_mode_init(struct kbase_device *kbdev)
 
 #ifdef CONFIG_OF
     protected_node = of_parse_phandle(kbdev->dev->of_node, "protected-mode-switcher", 0);
-
     if (!protected_node) {
         protected_node = of_parse_phandle(kbdev->dev->of_node, "secure-mode-switcher", 0);
     }
-
     if (!protected_node) {
         /* If protected_node cannot be looked up then we assume
          * protected mode is not supported on this platform. */
@@ -3686,7 +3638,6 @@ static void kbase_common_reg_unmap(struct kbase_device *const kbdev)
 
 static int registers_map(struct kbase_device *const kbdev)
 {
-
     /* the first memory resource is the physical address of the GPU
      * registers */
     struct platform_device *pdev = to_platform_device(kbdev->dev);
@@ -3772,7 +3723,7 @@ fail:
     }
 
 #ifdef CONFIG_REGULATOR
-    if (NULL != kbdev->regulator) {
+    if (kbdev->regulator != NULL) {
         regulator_put(kbdev->regulator);
         kbdev->regulator = NULL;
     }
@@ -4010,14 +3961,10 @@ static void kbase_device_coherency_init(struct kbase_device *kbdev, unsigned pro
 #ifdef CONFIG_OF
     coherency_override_dts = of_get_property(kbdev->dev->of_node, "system-coherency", NULL);
     if (coherency_override_dts) {
-
         override_coherency = be32_to_cpup(coherency_override_dts);
-
         if ((override_coherency <= COHERENCY_NONE) &&
             (supported_coherency_bitmap & COHERENCY_FEATURE_BIT(override_coherency))) {
-
             kbdev->system_coherency = override_coherency;
-
             dev_info(kbdev->dev, "Using coherency mode %u set from dtb", override_coherency);
         } else {
             dev_warn(kbdev->dev, "Ignoring unsupported coherency mode %u set from dtb", override_coherency);
@@ -4656,7 +4603,7 @@ static const struct dev_pm_ops kbase_pm_ops = {
 
 #ifdef CONFIG_OF
 static const struct of_device_id kbase_dt_ids[] = {
-    {.compatible = "arm,malit7xx"}, {.compatible = "arm,mali-midgard"}, {/* sentinel */}};
+    {.compatible = "arm,malit7xx"}, {.compatible = "arm,mali-midgard"}, {}};
 MODULE_DEVICE_TABLE(of, kbase_dt_ids);
 #endif
 

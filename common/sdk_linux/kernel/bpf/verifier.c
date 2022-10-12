@@ -518,7 +518,7 @@ static const char *reg_type_str(struct bpf_verifier_env *env, enum bpf_reg_type 
         strncpy(prefix, "alloc_", VERIFIER_SIXTEEN);
     }
 
-    snprintf(env->type_str_buf, TYPE_STR_BUF_LEN, "%s%s%s", prefix, str[base_type(type)], postfix);
+    (void)snprintf(env->type_str_buf, TYPE_STR_BUF_LEN, "%s%s%s", prefix, str[base_type(type)], postfix);
     return env->type_str_buf;
 }
 
@@ -1532,7 +1532,7 @@ static int mark_reg_read(struct bpf_verifier_env *env, const struct bpf_reg_stat
 
     while (parent) {
         /* if read wasn't screened by an earlier write ... */
-        if (writes && state->live & REG_LIVE_WRITTEN) {
+        if (writes && (state->live & REG_LIVE_WRITTEN)) {
             break;
         }
         if (parent->live & REG_LIVE_DONE) {
@@ -1543,7 +1543,7 @@ static int mark_reg_read(struct bpf_verifier_env *env, const struct bpf_reg_stat
         /* The first condition is more likely to be true than the
          * second, checked it first.
          */
-        if ((parent->live & REG_LIVE_READ) == flag || parent->live & REG_LIVE_READ64) {
+        if ((parent->live & REG_LIVE_READ) == flag || (parent->live & REG_LIVE_READ64)) {
             /* The parentage chain never changes and
              * this parent was already marked as LIVE_READ.
              * There is no need to keep walking the chain again and
@@ -4467,7 +4467,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg, struct bpf_call
             break;
         /* All the rest must be rejected: */
         default:
-        force_off_check:
+            force_off_check:
             err = __check_ptr_off_reg(env, reg, regno, type == PTR_TO_BTF_ID);
             if (err < 0) {
                 return err;
@@ -5987,7 +5987,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env, struct bpf_insn
         case PTR_TO_SOCK_COMMON:
         case PTR_TO_TCP_SOCK:
         case PTR_TO_XDP_SOCK:
-        reject:
+            reject:
             verbose(env, "R%d pointer arithmetic on %s prohibited\n", dst, reg_type_str(env, ptr_reg->type));
             return -EACCES;
         default:
@@ -9704,7 +9704,7 @@ static int do_check(struct bpf_verifier_env *env)
             cond_resched();
         }
 
-        if (env->log.level & BPF_LOG_LEVEL2 || (env->log.level & BPF_LOG_LEVEL && do_print_state)) {
+        if ((env->log.level & BPF_LOG_LEVEL2) || ((env->log.level & BPF_LOG_LEVEL) && do_print_state)) {
             if (env->log.level & BPF_LOG_LEVEL2) {
                 verbose(env, "%d:", env->insn_idx);
             } else {
@@ -10938,12 +10938,12 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
                 if (shift) {
                     insn_buf[cnt++] = BPF_ALU32_IMM(BPF_RSH, insn->dst_reg, shift);
                 }
-                insn_buf[cnt++] = BPF_ALU32_IMM(BPF_AND, insn->dst_reg, (1 << size * VERIFIER_EIGHT) - 1);
+                insn_buf[cnt++] = BPF_ALU32_IMM(BPF_AND, insn->dst_reg, ((1 << size) * VERIFIER_EIGHT) - 1);
             } else {
                 if (shift) {
                     insn_buf[cnt++] = BPF_ALU64_IMM(BPF_RSH, insn->dst_reg, shift);
                 }
-                insn_buf[cnt++] = BPF_ALU64_IMM(BPF_AND, insn->dst_reg, (1ULL << size * VERIFIER_EIGHT) - 1);
+                insn_buf[cnt++] = BPF_ALU64_IMM(BPF_AND, insn->dst_reg, ((1ULL << size) * VERIFIER_EIGHT) - 1);
             }
         }
 

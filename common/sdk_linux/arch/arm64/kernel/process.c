@@ -417,6 +417,7 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start, unsigned l
         }
     } else {
         memset(childregs, 0, sizeof(struct pt_regs));
+
         childregs->pstate = PSR_MODE_EL1h;
         if (IS_ENABLED(CONFIG_ARM64_UAO) && cpus_have_const_cap(ARM64_HAS_UAO)) {
             childregs->pstate |= PSR_UAO_BIT;
@@ -526,7 +527,6 @@ static void erratum_1418040_thread_switch(struct task_struct *prev, struct task_
 
     prev32 = is_compat_thread(task_thread_info(prev));
     next32 = is_compat_thread(task_thread_info(next));
-
     if (prev32 == next32 || !this_cpu_has_cap(ARM64_WORKAROUND_1418040)) {
         return;
     }
@@ -659,7 +659,7 @@ long set_tagged_addr_ctrl(struct task_struct *task, unsigned long arg)
      * Do not allow the enabling of the tagged address ABI if globally
      * disabled via sysctl abi.tagged_addr_disabled.
      */
-    if (arg & PR_TAGGED_ADDR_ENABLE && tagged_addr_disabled) {
+    if ((arg & PR_TAGGED_ADDR_ENABLE) && tagged_addr_disabled) {
         return -EINVAL;
     }
 
@@ -696,16 +696,18 @@ long get_tagged_addr_ctrl(struct task_struct *task)
  * disable it for tasks that already opted in to the relaxed ABI.
  */
 
-static struct ctl_table tagged_addr_sysctl_table[] = {{
-                                                          .procname = "tagged_addr_disabled",
-                                                          .mode = 0644,
-                                                          .data = &tagged_addr_disabled,
-                                                          .maxlen = sizeof(int),
-                                                          .proc_handler = proc_dointvec_minmax,
-                                                          .extra1 = SYSCTL_ZERO,
-                                                          .extra2 = SYSCTL_ONE,
-                                                      },
-                                                      {}};
+static struct ctl_table tagged_addr_sysctl_table[] = {
+    {
+        .procname = "tagged_addr_disabled",
+        .mode = 0644,
+        .data = &tagged_addr_disabled,
+        .maxlen = sizeof(int),
+        .proc_handler = proc_dointvec_minmax,
+        .extra1 = SYSCTL_ZERO,
+        .extra2 = SYSCTL_ONE,
+    },
+    {}
+};
 
 static int __init tagged_addr_init(void)
 {

@@ -19,12 +19,12 @@ struct mali_spinlock_reentrant *mali_spinlock_reentrant_init(_mali_osk_lock_orde
     struct mali_spinlock_reentrant *spinlock;
 
     spinlock = mali_osk_calloc(1, sizeof(struct mali_spinlock_reentrant));
-    if (NULL == spinlock) {
+    if (spinlock == NULL) {
         return NULL;
     }
 
     spinlock->lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, lock_order);
-    if (NULL == spinlock->lock) {
+    if (spinlock->lock == NULL) {
         mali_spinlock_reentrant_term(spinlock);
         return NULL;
     }
@@ -35,9 +35,9 @@ struct mali_spinlock_reentrant *mali_spinlock_reentrant_init(_mali_osk_lock_orde
 void mali_spinlock_reentrant_term(struct mali_spinlock_reentrant *spinlock)
 {
     MALI_DEBUG_ASSERT_POINTER(spinlock);
-    MALI_DEBUG_ASSERT(0 == spinlock->counter && 0 == spinlock->owner);
+    MALI_DEBUG_ASSERT(spinlock->counter == 0 && spinlock->owner == 0);
 
-    if (NULL != spinlock->lock) {
+    if (spinlock->lock != NULL) {
         _mali_osk_spinlock_irq_term(spinlock->lock);
     }
 
@@ -48,13 +48,13 @@ void mali_spinlock_reentrant_wait(struct mali_spinlock_reentrant *spinlock, u32 
 {
     MALI_DEBUG_ASSERT_POINTER(spinlock);
     MALI_DEBUG_ASSERT_POINTER(spinlock->lock);
-    MALI_DEBUG_ASSERT(0 != tid);
+    MALI_DEBUG_ASSERT(tid != 0);
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("%s ^\n", __FUNCTION__));
 
     if (tid != spinlock->owner) {
         mali_osk_spinlock_irq_lock(spinlock->lock);
-        MALI_DEBUG_ASSERT(0 == spinlock->owner && 0 == spinlock->counter);
+        MALI_DEBUG_ASSERT(spinlock->owner == 0 && spinlock->counter == 0);
         spinlock->owner = tid;
     }
 
@@ -67,10 +67,10 @@ void mali_spinlock_reentrant_signal(struct mali_spinlock_reentrant *spinlock, u3
 {
     MALI_DEBUG_ASSERT_POINTER(spinlock);
     MALI_DEBUG_ASSERT_POINTER(spinlock->lock);
-    MALI_DEBUG_ASSERT(0 != tid && tid == spinlock->owner);
+    MALI_DEBUG_ASSERT(tid != 0 && tid == spinlock->owner);
 
     --spinlock->counter;
-    if (0 == spinlock->counter) {
+    if (spinlock->counter == 0) {
         spinlock->owner = 0;
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("%s release last\n", __FUNCTION__));
         mali_osk_spinlock_irq_unlock(spinlock->lock);

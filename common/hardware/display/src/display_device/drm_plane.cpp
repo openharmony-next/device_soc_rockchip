@@ -159,8 +159,8 @@ namespace OHOS {
                 ret = drmDevice.GetPlaneProperty(*this, "NAME", prop);
                 DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
                                    DISPLAY_LOGE("cat not get pane crtc prop id"));
-
-                for (int i = 0; i < static_cast<int> ARRAY_SIZE(planeTypeNames); i++) {
+                int count = static_cast<int> ARRAY_SIZE(planeTypeNames);
+                for (int i = 0; i < count; i++) {
                     find_name = 0;
 
                     for (auto &drmEnum : prop.enums) {

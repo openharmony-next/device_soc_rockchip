@@ -29,4 +29,4 @@
  */
 void kbase_mem_pool_debugfs_init(struct dentry *parent, struct kbase_mem_pool *pool);
 
-#endif /*_KBASE_MEM_POOL_DEBUGFS_H*/
+#endif /* _KBASE_MEM_POOL_DEBUGFS_H */

@@ -240,14 +240,15 @@ static int rockchip_pmu_set_idle_request(struct rockchip_pm_domain *pd, bool idl
 
     /* Wait util idle_ack = 1 */
     target_ack = idle ? pd_info->ack_mask : 0;
-    ret = readx_poll_timeout_atomic(rockchip_pmu_read_ack, pmu, val, (val & pd_info->ack_mask) == target_ack, 0, 10000);
+    ret = readx_poll_timeout_atomic(rockchip_pmu_read_ack, pmu,
+                                    val, (val & pd_info->ack_mask) == target_ack, 0, 0x2710);
     if (ret) {
         dev_err(pmu->dev, "failed to get ack on domain '%s', target_idle = %d, target_ack = %d, val=0x%x\n",
                 genpd->name, idle, target_ack, val);
         goto error;
     }
 
-    ret = readx_poll_timeout_atomic(rockchip_pmu_domain_is_idle, pd, is_idle, is_idle == idle, 0, 10000);
+    ret = readx_poll_timeout_atomic(rockchip_pmu_domain_is_idle, pd, is_idle, is_idle == idle, 0, 0x2710);
     if (ret) {
         dev_err(pmu->dev, "failed to set idle on domain '%s',  target_idle = %d, val=%d\n", genpd->name, idle, is_idle);
         goto error;
@@ -291,9 +292,9 @@ static int rockchip_pmu_save_qos(struct rockchip_pm_domain *pd)
     for (i = 0; i < pd->num_qos; i++) {
         regmap_read(pd->qos_regmap[i], QOS_PRIORITY, &pd->qos_save_regs[0][i]);
         regmap_read(pd->qos_regmap[i], QOS_MODE, &pd->qos_save_regs[1][i]);
-        regmap_read(pd->qos_regmap[i], QOS_BANDWIDTH, &pd->qos_save_regs[2][i]);
-        regmap_read(pd->qos_regmap[i], QOS_SATURATION, &pd->qos_save_regs[3][i]);
-        regmap_read(pd->qos_regmap[i], QOS_EXTCONTROL, &pd->qos_save_regs[4][i]);
+        regmap_read(pd->qos_regmap[i], QOS_BANDWIDTH, &pd->qos_save_regs[0x2][i]);
+        regmap_read(pd->qos_regmap[i], QOS_SATURATION, &pd->qos_save_regs[0x3][i]);
+        regmap_read(pd->qos_regmap[i], QOS_EXTCONTROL, &pd->qos_save_regs[0x4][i]);
     }
     return 0;
 }
@@ -305,9 +306,9 @@ static int rockchip_pmu_restore_qos(struct rockchip_pm_domain *pd)
     for (i = 0; i < pd->num_qos; i++) {
         regmap_write(pd->qos_regmap[i], QOS_PRIORITY, pd->qos_save_regs[0][i]);
         regmap_write(pd->qos_regmap[i], QOS_MODE, pd->qos_save_regs[1][i]);
-        regmap_write(pd->qos_regmap[i], QOS_BANDWIDTH, pd->qos_save_regs[2][i]);
-        regmap_write(pd->qos_regmap[i], QOS_SATURATION, pd->qos_save_regs[3][i]);
-        regmap_write(pd->qos_regmap[i], QOS_EXTCONTROL, pd->qos_save_regs[4][i]);
+        regmap_write(pd->qos_regmap[i], QOS_BANDWIDTH, pd->qos_save_regs[0x2][i]);
+        regmap_write(pd->qos_regmap[i], QOS_SATURATION, pd->qos_save_regs[0x3][i]);
+        regmap_write(pd->qos_regmap[i], QOS_EXTCONTROL, pd->qos_save_regs[0x4][i]);
     }
 
     return 0;
@@ -408,7 +409,7 @@ static int rockchip_do_pmu_set_power_domain(struct rockchip_pm_domain *pd, bool 
 
     dsb(sy);
 
-    ret = readx_poll_timeout_atomic(rockchip_pmu_domain_is_on, pd, is_on, is_on == on, 0, 10000);
+    ret = readx_poll_timeout_atomic(rockchip_pmu_domain_is_on, pd, is_on, is_on == on, 0, 0x2710);
     if (ret) {
         dev_err(pmu->dev, "failed to set domain '%s', target_on= %d, val=%d\n", genpd->name, on, is_on);
         goto error;
@@ -637,16 +638,16 @@ static void rockchip_pd_qos_init(struct rockchip_pm_domain *pd, bool **qos_is_ne
             regmap_write(pd->qos_regmap[i], QOS_MODE, pd->qos_save_regs[1][i]);
         }
 
-        if (qos_is_need_init[2][i]) {
-            regmap_write(pd->qos_regmap[i], QOS_BANDWIDTH, pd->qos_save_regs[2][i]);
+        if (qos_is_need_init[0x2][i]) {
+            regmap_write(pd->qos_regmap[i], QOS_BANDWIDTH, pd->qos_save_regs[0x2][i]);
         }
 
-        if (qos_is_need_init[3][i]) {
-            regmap_write(pd->qos_regmap[i], QOS_SATURATION, pd->qos_save_regs[3][i]);
+        if (qos_is_need_init[0x3][i]) {
+            regmap_write(pd->qos_regmap[i], QOS_SATURATION, pd->qos_save_regs[0x3][i]);
         }
 
-        if (qos_is_need_init[4][i]) {
-            regmap_write(pd->qos_regmap[i], QOS_EXTCONTROL, pd->qos_save_regs[4][i]);
+        if (qos_is_need_init[0x4][i]) {
+            regmap_write(pd->qos_regmap[i], QOS_EXTCONTROL, pd->qos_save_regs[0x4][i]);
         }
     }
 
@@ -781,20 +782,20 @@ static int rockchip_pm_add_one_domain(struct rockchip_pmu *pmu, struct device_no
                 }
 
                 if (!of_property_read_u32(qos_node, "bandwidth-init", &val)) {
-                    pd->qos_save_regs[2][j] = val;
-                    qos_is_need_init[2][j] = true;
+                    pd->qos_save_regs[0x2][j] = val;
+                    qos_is_need_init[0x2][j] = true;
                     is_qos_need_init = true;
                 }
 
                 if (!of_property_read_u32(qos_node, "saturation-init", &val)) {
-                    pd->qos_save_regs[3][j] = val;
-                    qos_is_need_init[3][j] = true;
+                    pd->qos_save_regs[0x3][j] = val;
+                    qos_is_need_init[0x3][j] = true;
                     is_qos_need_init = true;
                 }
 
                 if (!of_property_read_u32(qos_node, "extcontrol-init", &val)) {
-                    pd->qos_save_regs[4][j] = val;
-                    qos_is_need_init[4][j] = true;
+                    pd->qos_save_regs[0x4][j] = val;
+                    qos_is_need_init[0x4][j] = true;
                     is_qos_need_init = true;
                 }
 
@@ -896,7 +897,7 @@ static void rockchip_configure_pd_cnt(struct rockchip_pmu *pmu, u32 domain_reg_o
     /* First configure domain power down transition count ... */
     regmap_write(pmu->regmap, domain_reg_offset, count);
     /* ... and then power up count. */
-    regmap_write(pmu->regmap, domain_reg_offset + 4, count);
+    regmap_write(pmu->regmap, domain_reg_offset + 0x4, count);
 }
 
 static int rockchip_pm_add_subdomain(struct rockchip_pmu *pmu, struct device_node *parent)
@@ -1014,7 +1015,7 @@ void rockchip_dump_pmu(void)
 {
     if (pd_base) {
         pr_warn("PMU:\n");
-        print_hex_dump(KERN_WARNING, "", DUMP_PREFIX_OFFSET, 32, 4, pd_base, 0x100, false);
+        print_hex_dump(KERN_WARNING, "", DUMP_PREFIX_OFFSET, 0x20, 0x4, pd_base, 0x100, false);
     }
 }
 EXPORT_SYMBOL_GPL(rockchip_dump_pmu);
@@ -1570,7 +1571,7 @@ static const struct of_device_id rockchip_pm_domain_dt_match[] = {
         .compatible = "rockchip,rk3588-power-controller",
         .data = (void *)&rk3588_pmu,
     },
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_pm_domain_dt_match);
 

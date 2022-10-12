@@ -323,7 +323,6 @@ void kbase_pm_update_active(struct kbase_device *kbdev)
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
 
     active = backend->pm_current_policy->get_core_active(kbdev);
-
     if (active) {
         if (backend->gpu_poweroff_pending) {
             /* Cancel any pending power off request */
@@ -435,15 +434,16 @@ void kbase_pm_update_cores_state_nolock(struct kbase_device *kbdev)
         KBASE_TRACE_ADD(kbdev, PM_CORES_CHANGE_DESIRED, NULL, NULL, 0u, (u32)desired_bitmap);
     }
     /* Are any cores being powered on? */
-    if (~kbdev->pm.backend.desired_shader_state & desired_bitmap ||
-        ~kbdev->pm.backend.desired_tiler_state & desired_tiler_bitmap || kbdev->pm.backend.ca_in_transition) {
+    if (((~kbdev->pm.backend.desired_shader_state) & desired_bitmap) ||
+        ((~kbdev->pm.backend.desired_tiler_state) & desired_tiler_bitmap) || kbdev->pm.backend.ca_in_transition) {
         /* Check if we are powering off any cores before updating shader
          * state */
-        if (kbdev->pm.backend.desired_shader_state & ~desired_bitmap ||
-            kbdev->pm.backend.desired_tiler_state & ~desired_tiler_bitmap) {
+        if ((kbdev->pm.backend.desired_shader_state & (~desired_bitmap)) ||
+            (kbdev->pm.backend.desired_tiler_state & (~desired_tiler_bitmap))) {
             /* Start timer to power off cores */
-            kbdev->pm.backend.shader_poweroff_pending |= (kbdev->pm.backend.desired_shader_state & ~desired_bitmap);
-            kbdev->pm.backend.tiler_poweroff_pending |= (kbdev->pm.backend.desired_tiler_state & ~desired_tiler_bitmap);
+            kbdev->pm.backend.shader_poweroff_pending |= (kbdev->pm.backend.desired_shader_state & (~desired_bitmap));
+            kbdev->pm.backend.tiler_poweroff_pending |= (kbdev->pm.backend.desired_tiler_state & \
+                (~desired_tiler_bitmap));
 
             if (kbdev->pm.poweroff_shader_ticks && !kbdev->protected_mode_transition) {
                 kbdev->pm.backend.shader_poweroff_pending_time = kbdev->pm.poweroff_shader_ticks;
@@ -457,8 +457,8 @@ void kbase_pm_update_cores_state_nolock(struct kbase_device *kbdev)
 
         /* If any cores are being powered on, transition immediately */
         cores_are_available = kbase_pm_check_transitions_nolock(kbdev);
-    } else if (kbdev->pm.backend.desired_shader_state & ~desired_bitmap ||
-               kbdev->pm.backend.desired_tiler_state & ~desired_tiler_bitmap) {
+    } else if ((kbdev->pm.backend.desired_shader_state & (~desired_bitmap)) ||
+               (kbdev->pm.backend.desired_tiler_state & (~desired_tiler_bitmap))) {
         /* Start timer to power off cores */
         kbdev->pm.backend.shader_poweroff_pending |= (kbdev->pm.backend.desired_shader_state & ~desired_bitmap);
         kbdev->pm.backend.tiler_poweroff_pending |= (kbdev->pm.backend.desired_tiler_state & ~desired_tiler_bitmap);
@@ -590,10 +590,10 @@ KBASE_EXPORT_TEST_API(kbase_pm_set_policy);
 /* Check whether a state change has finished, and trace it as completed */
 static void kbase_pm_trace_check_and_finish_state_change(struct kbase_device *kbdev)
 {
-    if ((kbdev->shader_available_bitmap & kbdev->pm.backend.desired_shader_state) ==
-            kbdev->pm.backend.desired_shader_state &&
-        (kbdev->tiler_available_bitmap & kbdev->pm.backend.desired_tiler_state) ==
-            kbdev->pm.backend.desired_tiler_state) {
+    if (((kbdev->shader_available_bitmap & kbdev->pm.backend.desired_shader_state) ==
+        (kbdev->pm.backend.desired_shader_state)) &&
+        ((kbdev->tiler_available_bitmap & kbdev->pm.backend.desired_tiler_state) ==
+        (kbdev->pm.backend.desired_tiler_state))) {
         kbase_timeline_pm_check_handle_event(kbdev, KBASE_TIMELINE_PM_EVENT_GPU_STATE_CHANGED);
     }
 }
@@ -620,7 +620,7 @@ void kbase_pm_request_cores(struct kbase_device *kbdev, bool tiler_required, u64
          * unlikely on a 64-bit system. */
         int cnt = ++kbdev->shader_needed_cnt[bitnum];
 
-        if (1 == cnt) {
+        if (cnt == 1) {
             kbdev->shader_needed_bitmap |= bit;
             change_gpu_state |= KBASE_PM_CHANGE_STATE_SHADER;
         }
@@ -631,7 +631,7 @@ void kbase_pm_request_cores(struct kbase_device *kbdev, bool tiler_required, u64
     if (tiler_required) {
         int cnt = ++kbdev->tiler_needed_cnt;
 
-        if (1 == cnt) {
+        if (cnt == 1) {
             change_gpu_state |= KBASE_PM_CHANGE_STATE_TILER;
         }
 
@@ -666,7 +666,7 @@ void kbase_pm_unrequest_cores(struct kbase_device *kbdev, bool tiler_required, u
 
         cnt = --kbdev->shader_needed_cnt[bitnum];
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             kbdev->shader_needed_bitmap &= ~bit;
 
             change_gpu_state |= KBASE_PM_CHANGE_STATE_SHADER;
@@ -682,7 +682,7 @@ void kbase_pm_unrequest_cores(struct kbase_device *kbdev, bool tiler_required, u
 
         cnt = --kbdev->tiler_needed_cnt;
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             change_gpu_state |= KBASE_PM_CHANGE_STATE_TILER;
         }
     }
@@ -743,7 +743,7 @@ enum kbase_pm_cores_ready kbase_pm_register_inuse_cores(struct kbase_device *kbd
 
         cnt = --kbdev->shader_needed_cnt[bitnum];
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             kbdev->shader_needed_bitmap &= ~bit;
         }
 
@@ -796,7 +796,7 @@ void kbase_pm_release_cores(struct kbase_device *kbdev, bool tiler_required, u64
 
         cnt = --kbdev->shader_inuse_cnt[bitnum];
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             kbdev->shader_inuse_bitmap &= ~bit;
             change_gpu_state |= KBASE_PM_CHANGE_STATE_SHADER;
         }
@@ -811,7 +811,7 @@ void kbase_pm_release_cores(struct kbase_device *kbdev, bool tiler_required, u64
 
         cnt = --kbdev->tiler_inuse_cnt;
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             change_gpu_state |= KBASE_PM_CHANGE_STATE_TILER;
         }
     }

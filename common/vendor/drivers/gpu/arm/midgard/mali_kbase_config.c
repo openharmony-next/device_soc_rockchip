@@ -41,7 +41,7 @@ void kbasep_platform_device_term(struct kbase_device *kbdev)
 
 int kbase_cpuprops_get_default_clock_speed(u32 *const clock_speed)
 {
-    KBASE_DEBUG_ASSERT(NULL != clock_speed);
+    KBASE_DEBUG_ASSERT(clock_speed != NULL);
 
     *clock_speed = DEFAULT_PM_DVFS_PERIOD;
     return 0;

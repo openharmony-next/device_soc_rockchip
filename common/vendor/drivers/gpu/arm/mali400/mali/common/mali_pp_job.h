@@ -139,7 +139,7 @@ u32 mali_pp_job_get_pp_counter_sub_job_src1(u32 sub_job);
 MALI_STATIC_INLINE u32 mali_pp_job_get_id(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (NULL == job) ? 0 : job->id;
+    return (job == NULL) ? 0 : job->id;
 }
 
 MALI_STATIC_INLINE void mali_pp_job_set_cache_order(struct mali_pp_job *job, u32 cache_order)
@@ -152,7 +152,7 @@ MALI_STATIC_INLINE void mali_pp_job_set_cache_order(struct mali_pp_job *job, u32
 MALI_STATIC_INLINE u32 mali_pp_job_get_cache_order(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (NULL == job) ? 0 : job->cache_order;
+    return (job == NULL) ? 0 : job->cache_order;
 }
 
 MALI_STATIC_INLINE u64 mali_pp_job_get_user_id(struct mali_pp_job *job)
@@ -201,7 +201,7 @@ MALI_STATIC_INLINE mali_bool mali_pp_job_is_virtual(struct mali_pp_job *job)
 {
 #if (defined(CONFIG_MALI450) || defined(CONFIG_MALI470))
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (0 == job->uargs.num_cores) ? MALI_TRUE : MALI_FALSE;
+    return (job->uargs.num_cores == 0) ? MALI_TRUE : MALI_FALSE;
 #else
     return MALI_FALSE;
 #endif
@@ -213,7 +213,7 @@ MALI_STATIC_INLINE u32 mali_pp_job_get_addr_frame(struct mali_pp_job *job, u32 s
 
     if (mali_pp_job_is_virtual(job)) {
         return MALI_DLBU_VIRT_ADDR;
-    } else if (0 == sub_job) {
+    } else if (sub_job == 0) {
         return job->uargs.frame_registers[MALI200_REG_ADDR_FRAME / sizeof(u32)];
     } else if (sub_job < MALI_PP_MAX_SUB_JOBS) {
         return job->uargs.frame_registers_addr_frame[sub_job - 1];
@@ -463,7 +463,7 @@ MALI_STATIC_INLINE void mali_pp_job_mark_sub_job_completed(struct mali_pp_job *j
 MALI_STATIC_INLINE mali_bool mali_pp_job_was_success(struct mali_pp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    if (0 == mali_osk_atomic_read(&job->sub_job_errors)) {
+    if (mali_osk_atomic_read(&job->sub_job_errors) == 0) {
         return MALI_TRUE;
     }
     return MALI_FALSE;

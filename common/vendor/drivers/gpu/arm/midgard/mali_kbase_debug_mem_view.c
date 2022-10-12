@@ -215,19 +215,19 @@ static int debug_mem_open(struct inode *i, struct file *file)
     kbase_gpu_vm_lock(kctx);
 
     ret = debug_mem_zone_open(&kctx->reg_rbtree_same, mem_data);
-    if (0 != ret) {
+    if (ret != 0) {
         kbase_gpu_vm_unlock(kctx);
         goto out;
     }
 
     ret = debug_mem_zone_open(&kctx->reg_rbtree_exec, mem_data);
-    if (0 != ret) {
+    if (ret != 0) {
         kbase_gpu_vm_unlock(kctx);
         goto out;
     }
 
     ret = debug_mem_zone_open(&kctx->reg_rbtree_custom, mem_data);
-    if (0 != ret) {
+    if (ret != 0) {
         kbase_gpu_vm_unlock(kctx);
         goto out;
     }

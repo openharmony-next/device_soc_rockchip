@@ -251,9 +251,7 @@ bool kbase_debug_job_fault_process(struct kbase_jd_atom *katom, u32 completion_c
     }
 
     if (atomic_read(&kctx->kbdev->job_fault_debug) > 0) {
-
         if (completion_code != BASE_JD_EVENT_DONE) {
-
             if (kbase_job_fault_get_reg_snapshot(kctx) == false) {
                 dev_warn(kctx->kbdev->dev, "get reg dump failed\n");
                 return false;
@@ -360,7 +358,6 @@ static void debug_job_fault_stop(struct seq_file *m, void *v)
     if (v != NULL) {
         kfree(v);
         dev_info(kbdev->dev, "debug job fault seq stop stage 1");
-
     } else {
         unsigned long flags;
 
@@ -454,7 +451,6 @@ void kbase_debug_job_fault_debugfs_init(struct kbase_device *kbdev)
 
 int kbase_debug_job_fault_dev_init(struct kbase_device *kbdev)
 {
-
     INIT_LIST_HEAD(&kbdev->job_fault_event_list);
 
     init_waitqueue_head(&(kbdev->job_fault_wq));
@@ -484,7 +480,6 @@ void kbase_debug_job_fault_dev_term(struct kbase_device *kbdev)
  */
 void kbase_debug_job_fault_context_init(struct kbase_context *kctx)
 {
-
     /* We need allocate double size register range
      * Because this memory will keep the register address and value
      */

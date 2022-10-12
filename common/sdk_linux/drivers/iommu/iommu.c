@@ -1054,7 +1054,7 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
  * fault event and data as argument. The handler should return 0 on success. If
  * the fault is recoverable (IOMMU_FAULT_PAGE_REQ), the consumer should also
  * complete the fault by calling iommu_page_response() with one of the following
- * response code:
+ * response code
  * - IOMMU_PAGE_RESP_SUCCESS: retry the translation
  * - IOMMU_PAGE_RESP_INVALID: terminate the fault
  * - IOMMU_PAGE_RESP_FAILURE: terminate the fault and stop reporting
@@ -1209,7 +1209,7 @@ int iommu_page_response(struct device *dev, struct iommu_page_response *msg)
         return -EINVAL;
     }
 
-    if (msg->version != IOMMU_PAGE_RESP_VERSION_1 || msg->flags & ~IOMMU_PAGE_RESP_PASID_VALID) {
+    if ((msg->version != IOMMU_PAGE_RESP_VERSION_1) || (msg->flags & ~IOMMU_PAGE_RESP_PASID_VALID)) {
         return -EINVAL;
     }
 

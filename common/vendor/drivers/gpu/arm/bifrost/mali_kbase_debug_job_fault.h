@@ -114,4 +114,4 @@ bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx, int reg
  */
 bool kbase_job_fault_get_reg_snapshot(struct kbase_context *kctx);
 
-#endif /*_KBASE_DEBUG_JOB_FAULT_H*/
+#endif /* _KBASE_DEBUG_JOB_FAULT_H */

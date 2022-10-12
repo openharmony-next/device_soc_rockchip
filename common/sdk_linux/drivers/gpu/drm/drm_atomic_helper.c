@@ -78,7 +78,6 @@ static void drm_atomic_helper_plane_changed(struct drm_atomic_state *state, stru
 
     if (old_plane_state->crtc) {
         crtc_state = drm_atomic_get_new_crtc_state(state, old_plane_state->crtc);
-
         if (WARN_ON(!crtc_state)) {
             return;
         }
@@ -88,7 +87,6 @@ static void drm_atomic_helper_plane_changed(struct drm_atomic_state *state, stru
 
     if (plane_state->crtc) {
         crtc_state = drm_atomic_get_new_crtc_state(state, plane_state->crtc);
-
         if (WARN_ON(!crtc_state)) {
             return;
         }
@@ -563,7 +561,7 @@ static int mode_valid(struct drm_atomic_state *state)
  * &drm_crtc_state.no_vblank is set from the result of drm_dev_has_vblank().
  * See also: drm_atomic_crtc_needs_modeset()
  *
- * IMPORTANT:
+ * IMPORTANT:See below
  *
  * Drivers which set &drm_crtc_state.mode_changed (e.g. in their
  * &drm_plane_helper_funcs.atomic_check hooks if a plane update can't be done
@@ -573,7 +571,7 @@ static int mode_valid(struct drm_atomic_state *state)
  * upon the adjusted dotclock for fifo space allocation and watermark
  * computation.
  *
- * RETURNS:
+ * RETURNS:See below
  * Zero for success or -errno
  */
 int drm_atomic_helper_check_modeset(struct drm_device *dev, struct drm_atomic_state *state)
@@ -1109,7 +1107,6 @@ void drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev, struc
         crtc->enabled = new_crtc_state->enable;
 
         new_plane_state = drm_atomic_get_new_plane_state(old_state, primary);
-
         if (new_plane_state && new_plane_state->crtc == crtc) {
             crtc->x = new_plane_state->src_x >> 16;
             crtc->y = new_plane_state->src_y >> 16;
@@ -1796,7 +1793,7 @@ EXPORT_SYMBOL(drm_atomic_helper_async_commit);
  * asynchronous context used to commit the hardware state.
  *
  * drm_atomic_helper_commit() implements the recommended sequence for
- * nonblocking commits, using drm_atomic_helper_setup_commit() internally:
+ * nonblocking commits, using drm_atomic_helper_setup_commit() internally: see below
  *
  * 1. Run drm_atomic_helper_prepare_planes(). Since this can fail and we
  * need to propagate out of memory/VRAM errors to userspace, it must be called
@@ -1962,7 +1959,7 @@ static struct drm_crtc_commit *crtc_or_fake_commit(struct drm_atomic_state *stat
  * explicitly: drm_atomic_state_default_clear() will take care of that
  * automatically.
  *
- * Returns:
+ * Returns:See below
  *
  * 0 on success. -EBUSY when userspace schedules nonblocking commits too fast,
  * -ENOMEM on allocation failures and -EINTR when a signal is pending.
@@ -2774,7 +2771,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
  * the current atomic helpers this is almost always the case, since the helpers
  * don't pass the right state structures to the callbacks.
  *
- * Returns:
+ * Returns:See below
  *
  * Returns 0 on success. Can return -ERESTARTSYS when @stall is true and the
  * waiting for the previous commits has been interrupted.

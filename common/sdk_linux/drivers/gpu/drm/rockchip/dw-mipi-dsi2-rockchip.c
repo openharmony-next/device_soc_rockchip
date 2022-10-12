@@ -378,9 +378,7 @@ static void dw_mipi_dsi2_set_vid_mode(struct dw_mipi_dsi2 *dsi2)
         val |= VID_MODE_TYPE_BURST;
     } else if (dsi2->mode_flags & MIPI_DSI_MODE_VIDEO_SYNC_PULSE) {
         val |= VID_MODE_TYPE_NON_BURST_SYNC_PULSES;
-    }
-
-    else {
+    } else {
         val |= VID_MODE_TYPE_NON_BURST_SYNC_EVENTS;
     }
 
@@ -847,7 +845,6 @@ static void dw_mipi_dsi2_encoder_enable(struct drm_encoder *encoder)
 static int dw_mipi_dsi2_encoder_atomic_check(struct drm_encoder *encoder, struct drm_crtc_state *crtc_state,
                                              struct drm_connector_state *conn_state)
 {
-
     struct rockchip_crtc_state *s = to_rockchip_crtc_state(crtc_state);
     struct dw_mipi_dsi2 *dsi2 = encoder_to_dsi2(encoder);
     struct drm_connector *connector = conn_state->connector;
@@ -1250,7 +1247,6 @@ static const struct dsi2_irq_data dw_mipi_dsi2_irq_data[] = {
 
 static irqreturn_t dw_mipi_dsi2_irq_handler(int irq, void *dev_id)
 {
-
     struct dw_mipi_dsi2 *dsi2 = dev_id;
     u32 int_st;
     unsigned int i;
@@ -1572,11 +1568,14 @@ static const struct dw_mipi_dsi2_plat_data rk3588_mipi_dsi2_plat_data = {
     .cphy_max_symbol_rate_per_lane = 2000000000ULL,
 };
 
-static const struct of_device_id dw_mipi_dsi2_dt_ids[] = {{
-                                                              .compatible = "rockchip,rk3588-mipi-dsi2",
-                                                              .data = &rk3588_mipi_dsi2_plat_data,
-                                                          },
-                                                          {}};
+static const struct of_device_id dw_mipi_dsi2_dt_ids[] = {
+    {
+        .compatible = "rockchip,rk3588-mipi-dsi2",
+        .data = &rk3588_mipi_dsi2_plat_data,
+    },
+    {}
+};
+
 MODULE_DEVICE_TABLE(of, dw_mipi_dsi2_dt_ids);
 
 struct platform_driver dw_mipi_dsi2_rockchip_driver = {

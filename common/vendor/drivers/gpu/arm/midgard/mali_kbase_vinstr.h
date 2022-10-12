@@ -24,8 +24,6 @@
 struct kbase_vinstr_context;
 struct kbase_vinstr_client;
 
-/*****************************************************************************/
-
 /**
  * kbase_vinstr_init() - initialize the vinstr core
  * @kbdev: kbase device

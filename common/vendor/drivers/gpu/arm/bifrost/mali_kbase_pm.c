@@ -222,8 +222,9 @@ void kbase_pm_driver_resume(struct kbase_device *kbdev, bool arb_gpu_start)
 
     /* Initial active call, to power on the GPU/cores if needed */
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbase_pm_context_active_handle_suspend(
-            kbdev, (arb_gpu_start ? KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED : KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE))) {
+    if (kbase_pm_context_active_handle_suspend(kbdev, (arb_gpu_start ?
+                                               KBASE_PM_SUSPEND_HANDLER_VM_GPU_GRANTED :
+                                               KBASE_PM_SUSPEND_HANDLER_NOT_POSSIBLE))) {
         return;
     }
 #else

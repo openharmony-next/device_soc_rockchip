@@ -16,7 +16,7 @@
 #define HDR_DMA2 2
 
 #define IS_HDR_RDBK(x)                                                                                                 \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         typeof(x) __x = (x);                                                                                           \
         (__x == HDR_RDBK_FRAME1 || __x == HDR_RDBK_FRAME2 || __x == HDR_RDBK_FRAME3);                                  \
     })

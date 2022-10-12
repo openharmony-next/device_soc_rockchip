@@ -616,7 +616,6 @@ static unsigned int hdmi_compute_n(struct dw_hdmi_qp *hdmi, unsigned long pixel_
 
     for (n = min_n; n <= max_n; n++) {
         u64 diff = hdmi_audio_math_diff(freq, n, pixel_clk);
-
         if (diff < best_diff || (diff == best_diff && abs(n - ideal_n) < best_n_distance)) {
             best_n = n;
             best_diff = diff;
@@ -660,7 +659,7 @@ static unsigned int hdmi_find_n(struct dw_hdmi_qp *hdmi, unsigned long pixel_clk
 void dw_hdmi_qp_set_channel_status(struct dw_hdmi_qp *hdmi, u8 *channel_status)
 {
     /* Set channel status */
-    hdmi_writel(hdmi, channel_status[3] | (channel_status[4] << 0x8), AUDPKT_CHSTATUS_OVR1);
+    hdmi_writel(hdmi, channel_status[0x3] | (channel_status[0x4] << 0x8), AUDPKT_CHSTATUS_OVR1);
     hdmi_modb(hdmi, AUDPKT_CHSTATUS_OVR_EN, AUDPKT_CHSTATUS_OVR_EN_MASK, AUDPKT_CONTROL0);
 }
 EXPORT_SYMBOL_GPL(dw_hdmi_qp_set_channel_status);
@@ -1268,14 +1267,14 @@ static void hdmi_config_CVTEM(struct dw_hdmi_qp *hdmi)
     hfront = mode->hsync_start - mode->hdisplay;
 
     for (i = 0; i < 6; i++) {
-        val = i << 16 | hb1[i] << 8;
+        val = (i << 16) | (hb1[i] << 8);
         hdmi_writel(hdmi, val, PKT0_EMP_CVTEM_CONTENTS0 + i * 0x20);
     }
 
-    val = new << 7 | end << 6 | ds_type << 4 | afr << 3 | vfr << 2 | sync << 1;
+    val = (new << 7) | (end << 6) | (ds_type << 4) | (afr << 3) | (vfr << 2) | (sync << 1);
     hdmi_writel(hdmi, val, PKT0_EMP_CVTEM_CONTENTS1);
 
-    val = data_set_length << 16 | pps_body[0] << 24;
+    val = (data_set_length << 16) | (pps_body[0] << 24);
     hdmi_writel(hdmi, val, PKT0_EMP_CVTEM_CONTENTS2);
 
     reg = PKT0_EMP_CVTEM_CONTENTS3;
@@ -1302,7 +1301,7 @@ static void hdmi_config_CVTEM(struct dw_hdmi_qp *hdmi)
         }
     }
 
-    val = (hfront & 0xff) << 24 | pps_body[127] << 16 | pps_body[126] << 8 | pps_body[125];
+    val = ((hfront & 0xff) << 24) | (pps_body[127] << 16) | (pps_body[126] << 8) | pps_body[125];
     hdmi_writel(hdmi, val, PKT4_EMP_CVTEM_CONTENTS6);
 
     val = (hback & 0xff) << 24 | ((hsync >> 8) & 0xff) << 16 | (hsync & 0xff) << 8 | ((hfront >> 8) & 0xff);
@@ -2121,7 +2120,6 @@ static irqreturn_t dw_hdmi_qp_main_hardirq(int irq, void *dev_id)
         dev_dbg(hdmi->dev, "i2c scdc irq:%#x\n", hdmi->scdc_intr);
         hdmi_writel(hdmi, hdmi->scdc_intr, MAINUNIT_1_INT_CLEAR);
         val = hdmi_readl(hdmi, SCDC_STATUS0);
-
         /* frl start */
         if (val & BIT(0x4)) {
             hdmi_modb(hdmi, 0, SCDC_UPD_FLAGS_POLL_EN | SCDC_UPD_FLAGS_AUTO_CLR, SCDC_CONFIG0);
@@ -2175,7 +2173,6 @@ static irqreturn_t dw_hdmi_qp_avp_irq(int irq, void *dev_id)
     u32 stat;
 
     stat = hdmi_readl(hdmi, AVP_1_INT_STATUS);
-
     if (!stat) {
         return IRQ_NONE;
     }
@@ -2191,7 +2188,6 @@ static irqreturn_t dw_hdmi_qp_earc_irq(int irq, void *dev_id)
     u32 stat;
 
     stat = hdmi_readl(hdmi, EARCRX_0_INT_STATUS);
-
     if (!stat) {
         return IRQ_NONE;
     }
@@ -2285,11 +2281,9 @@ static struct dw_hdmi_qp *_dw_hdmi_probe(struct platform_device *pdev, const str
             dev_dbg(hdmi->dev, "failed to read ddc node\n");
             return ERR_PTR(-EPROBE_DEFER);
         }
-
     } else {
         dev_dbg(hdmi->dev, "no ddc property found\n");
     }
-
     if (!plat_data->regm) {
         const struct regmap_config *reg_config;
 

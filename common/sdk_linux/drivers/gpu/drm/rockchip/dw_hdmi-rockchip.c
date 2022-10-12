@@ -27,7 +27,7 @@
 #include "rockchip_drm_drv.h"
 #include "rockchip_drm_vop.h"
 
-#define HIWORD_UPDATE(val, mask) ((val) | (mask) << 16)
+#define HIWORD_UPDATE(val, mask) ((val) | ((mask) << 16))
 
 #define RK3228_GRF_SOC_CON2 0x0408
 #define RK3228_HDMI_SDAIN_MSK BIT(14)
@@ -296,216 +296,221 @@ static const struct dw_hdmi_audio_tmds_n rockchip_werid_tmds_n_table[] = {
     },
 };
 
-static const struct dw_hdmi_mpll_config rockchip_mpll_cfg[] = {{
-                                                                   30666000,
-                                                                   {
-                                                                       {0x00b3, 0x0000},
-                                                                       {0x2153, 0x0000},
-                                                                       {0x40f3, 0x0000},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   36800000,
-                                                                   {
-                                                                       {0x00b3, 0x0000},
-                                                                       {0x2153, 0x0000},
-                                                                       {0x40a2, 0x0001},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   46000000,
-                                                                   {
-                                                                       {0x00b3, 0x0000},
-                                                                       {0x2142, 0x0001},
-                                                                       {0x40a2, 0x0001},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   61333000,
-                                                                   {
-                                                                       {0x0072, 0x0001},
-                                                                       {0x2142, 0x0001},
-                                                                       {0x40a2, 0x0001},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   73600000,
-                                                                   {
-                                                                       {0x0072, 0x0001},
-                                                                       {0x2142, 0x0001},
-                                                                       {0x4061, 0x0002},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   92000000,
-                                                                   {
-                                                                       {0x0072, 0x0001},
-                                                                       {0x2145, 0x0002},
-                                                                       {0x4061, 0x0002},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   122666000,
-                                                                   {
-                                                                       {0x0051, 0x0002},
-                                                                       {0x2145, 0x0002},
-                                                                       {0x4061, 0x0002},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   147200000,
-                                                                   {
-                                                                       {0x0051, 0x0002},
-                                                                       {0x2145, 0x0002},
-                                                                       {0x4064, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   184000000,
-                                                                   {
-                                                                       {0x0051, 0x0002},
-                                                                       {0x214c, 0x0003},
-                                                                       {0x4064, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   226666000,
-                                                                   {
-                                                                       {0x0040, 0x0003},
-                                                                       {0x214c, 0x0003},
-                                                                       {0x4064, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   272000000,
-                                                                   {
-                                                                       {0x0040, 0x0003},
-                                                                       {0x214c, 0x0003},
-                                                                       {0x5a64, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   340000000,
-                                                                   {
-                                                                       {0x0040, 0x0003},
-                                                                       {0x3b4c, 0x0003},
-                                                                       {0x5a64, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   600000000,
-                                                                   {
-                                                                       {0x1a40, 0x0003},
-                                                                       {0x3b4c, 0x0003},
-                                                                       {0x5a64, 0x0003},
-                                                                   },
-                                                               },
-                                                               {
-                                                                   ~0UL,
-                                                                   {
-                                                                       {0x0000, 0x0000},
-                                                                       {0x0000, 0x0000},
-                                                                       {0x0000, 0x0000},
-                                                                   },
-                                                               }};
+static const struct dw_hdmi_mpll_config rockchip_mpll_cfg[] = {
+    {
+        30666000,
+        {
+            {0x00b3, 0x0000},
+            {0x2153, 0x0000},
+            {0x40f3, 0x0000},
+        },
+    },
+    {
+        36800000,
+        {
+            {0x00b3, 0x0000},
+            {0x2153, 0x0000},
+            {0x40a2, 0x0001},
+        },
+    },
+    {
+        46000000,
+        {
+            {0x00b3, 0x0000},
+            {0x2142, 0x0001},
+            {0x40a2, 0x0001},
+        },
+    },
+    {
+        61333000,
+        {
+            {0x0072, 0x0001},
+            {0x2142, 0x0001},
+            {0x40a2, 0x0001},
+        },
+    },
+    {
+        73600000,
+        {
+            {0x0072, 0x0001},
+            {0x2142, 0x0001},
+            {0x4061, 0x0002},
+        },
+    },
+    {
+        92000000,
+        {
+            {0x0072, 0x0001},
+            {0x2145, 0x0002},
+            {0x4061, 0x0002},
+        },
+    },
+    {
+        122666000,
+        {
+            {0x0051, 0x0002},
+            {0x2145, 0x0002},
+            {0x4061, 0x0002},
+        },
+    },
+    {
+        147200000,
+        {
+            {0x0051, 0x0002},
+            {0x2145, 0x0002},
+            {0x4064, 0x0003},
+        },
+    },
+    {
+        184000000,
+        {
+            {0x0051, 0x0002},
+            {0x214c, 0x0003},
+            {0x4064, 0x0003},
+        },
+    },
+    {
+        226666000,
+        {
+            {0x0040, 0x0003},
+            {0x214c, 0x0003},
+            {0x4064, 0x0003},
+        },
+    },
+    {
+        272000000,
+        {
+            {0x0040, 0x0003},
+            {0x214c, 0x0003},
+            {0x5a64, 0x0003},
+        },
+    },
+    {
+        340000000,
+        {
+            {0x0040, 0x0003},
+            {0x3b4c, 0x0003},
+            {0x5a64, 0x0003},
+        },
+    },
+    {
+        600000000,
+        {
+            {0x1a40, 0x0003},
+            {0x3b4c, 0x0003},
+            {0x5a64, 0x0003},
+        },
+    },
+    {
+        ~0UL,
+        {
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+        },
+    }};
 
-static const struct dw_hdmi_mpll_config rockchip_mpll_cfg_420[] = {{
-                                                                       30666000,
-                                                                       {
-                                                                           {0x00b7, 0x0000},
-                                                                           {0x2157, 0x0000},
-                                                                           {0x40f7, 0x0000},
-                                                                       },
-                                                                   },
-                                                                   {
-                                                                       92000000,
-                                                                       {
-                                                                           {0x00b7, 0x0000},
-                                                                           {0x2143, 0x0001},
-                                                                           {0x40a3, 0x0001},
-                                                                       },
-                                                                   },
-                                                                   {
-                                                                       184000000,
-                                                                       {
-                                                                           {0x0073, 0x0001},
-                                                                           {0x2146, 0x0002},
-                                                                           {0x4062, 0x0002},
-                                                                       },
-                                                                   },
-                                                                   {
-                                                                       340000000,
-                                                                       {
-                                                                           {0x0052, 0x0003},
-                                                                           {0x214d, 0x0003},
-                                                                           {0x4065, 0x0003},
-                                                                       },
-                                                                   },
-                                                                   {
-                                                                       600000000,
-                                                                       {
-                                                                           {0x0041, 0x0003},
-                                                                           {0x3b4d, 0x0003},
-                                                                           {0x5a65, 0x0003},
-                                                                       },
-                                                                   },
-                                                                   {
-                                                                       ~0UL,
-                                                                       {
-                                                                           {0x0000, 0x0000},
-                                                                           {0x0000, 0x0000},
-                                                                           {0x0000, 0x0000},
-                                                                       },
-                                                                   }};
+static const struct dw_hdmi_mpll_config rockchip_mpll_cfg_420[] = {
+    {
+        30666000,
+        {
+            {0x00b7, 0x0000},
+            {0x2157, 0x0000},
+            {0x40f7, 0x0000},
+        },
+    },
+    {
+        92000000,
+        {
+            {0x00b7, 0x0000},
+            {0x2143, 0x0001},
+            {0x40a3, 0x0001},
+        },
+    },
+    {
+        184000000,
+        {
+            {0x0073, 0x0001},
+            {0x2146, 0x0002},
+            {0x4062, 0x0002},
+        },
+    },
+    {
+        340000000,
+        {
+            {0x0052, 0x0003},
+            {0x214d, 0x0003},
+            {0x4065, 0x0003},
+        },
+    },
+    {
+        600000000,
+        {
+            {0x0041, 0x0003},
+            {0x3b4d, 0x0003},
+            {0x5a65, 0x0003},
+        },
+    },
+    {
+        ~0UL,
+        {
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+        },
+    }
+};
 
-static const struct dw_hdmi_mpll_config rockchip_rk3288w_mpll_cfg_420[] = {{
-                                                                               30666000,
-                                                                               {
-                                                                                   {0x00b7, 0x0000},
-                                                                                   {0x2157, 0x0000},
-                                                                                   {0x40f7, 0x0000},
-                                                                               },
-                                                                           },
-                                                                           {
-                                                                               92000000,
-                                                                               {
-                                                                                   {0x00b7, 0x0000},
-                                                                                   {0x2143, 0x0001},
-                                                                                   {0x40a3, 0x0001},
-                                                                               },
-                                                                           },
-                                                                           {
-                                                                               184000000,
-                                                                               {
-                                                                                   {0x0073, 0x0001},
-                                                                                   {0x2146, 0x0002},
-                                                                                   {0x4062, 0x0002},
-                                                                               },
-                                                                           },
-                                                                           {
-                                                                               340000000,
-                                                                               {
-                                                                                   {0x0052, 0x0003},
-                                                                                   {0x214d, 0x0003},
-                                                                                   {0x4065, 0x0003},
-                                                                               },
-                                                                           },
-                                                                           {
-                                                                               600000000,
-                                                                               {
-                                                                                   {0x0040, 0x0003},
-                                                                                   {0x3b4c, 0x0003},
-                                                                                   {0x5a65, 0x0003},
-                                                                               },
-                                                                           },
-                                                                           {
-                                                                               ~0UL,
-                                                                               {
-                                                                                   {0x0000, 0x0000},
-                                                                                   {0x0000, 0x0000},
-                                                                                   {0x0000, 0x0000},
-                                                                               },
-                                                                           }};
+static const struct dw_hdmi_mpll_config rockchip_rk3288w_mpll_cfg_420[] = {
+    {
+        30666000,
+        {
+            {0x00b7, 0x0000},
+            {0x2157, 0x0000},
+            {0x40f7, 0x0000},
+        },
+    },
+    {
+        92000000,
+        {
+            {0x00b7, 0x0000},
+            {0x2143, 0x0001},
+            {0x40a3, 0x0001},
+        },
+    },
+    {
+        184000000,
+        {
+            {0x0073, 0x0001},
+            {0x2146, 0x0002},
+            {0x4062, 0x0002},
+        },
+    },
+    {
+        340000000,
+        {
+            {0x0052, 0x0003},
+            {0x214d, 0x0003},
+            {0x4065, 0x0003},
+        },
+    },
+    {
+        600000000,
+        {
+            {0x0040, 0x0003},
+            {0x3b4c, 0x0003},
+            {0x5a65, 0x0003},
+        },
+    },
+    {
+        ~0UL,
+        {
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+            {0x0000, 0x0000},
+        },
+    }
+};
 
 static const struct dw_hdmi_curr_ctrl rockchip_cur_ctr[] = {
     /*      pixelclk    bpp8    bpp10   bpp12 */
@@ -519,7 +524,7 @@ static const struct dw_hdmi_curr_ctrl rockchip_cur_ctr[] = {
     }};
 
 static struct dw_hdmi_phy_config rockchip_phy_config[] = {
-    /*pixelclk   symbol   term   vlev*/
+    /* pixelclk   symbol   term   vlev */
     {74250000, 0x8009, 0x0004, 0x0272},  {165000000, 0x802b, 0x0004, 0x0209}, {297000000, 0x8039, 0x0005, 0x028d},
     {594000000, 0x8039, 0x0000, 0x019d}, {~0UL, 0x0000, 0x0000, 0x0000},      {~0UL, 0x0000, 0x0000, 0x0000},
 };
@@ -927,8 +932,6 @@ static void hdmi_select_link_config(struct rockchip_hdmi *hdmi, struct drm_crtc_
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-
 static int hdmi_dsc_get_slice_height(int vactive)
 {
     int slice_height;
@@ -998,7 +1001,6 @@ static int hdmi_dsc_get_num_slices(struct rockchip_hdmi *hdmi, struct drm_crtc_s
      */
 
     adjusted_clk_khz = DIV_ROUND_UP(kslice_adjust * pixel_clock, 0xa);
-
     if (adjusted_clk_khz <= HDMI_DSC_PEAK_PIXEL_RATE) {
         max_throughput = HDMI_DSC_MAX_ENC_THROUGHPUT_0;
     } else {
@@ -1163,6 +1165,10 @@ static int dw_hdmi_qp_set_link_cfg(struct rockchip_hdmi *hdmi, u16 pic_width, u1
     }
 
     memcpy(hdmi->link_cfg.pps_payload, pps_datas[i].raw_pps, 0x80);
+
+    if (slice_width == 0) {
+        return -EPEPM;
+    }
     hdmi->link_cfg.hcactive = DIV_ROUND_UP(slice_width * (bits_per_pixel / 0x10), 0x8) * (pic_width / slice_width);
 
     return 0;
@@ -1208,7 +1214,6 @@ static void dw_hdmi_qp_dsc_configure(struct rockchip_hdmi *hdmi, struct rockchip
 
     ret = dw_hdmi_qp_set_link_cfg(hdmi, crtc_state->mode.hdisplay, crtc_state->mode.vdisplay, slice_width, slice_height,
                                   bits_per_pixel, depth);
-
     if (ret) {
         dev_err(hdmi->dev, "set vdsc cfg failed\n");
         return;
@@ -1225,7 +1230,6 @@ static void dw_hdmi_qp_dsc_configure(struct rockchip_hdmi *hdmi, struct rockchip
 
     memcpy(&s->pps, hdmi->link_cfg.pps_payload, 0x80);
 }
-/////////////////////////////////////////////////////////////////////////////////////////
 
 static int rockchip_hdmi_update_phy_table(struct rockchip_hdmi *hdmi, u32 *config, int phy_table_size)
 {
@@ -1453,6 +1457,9 @@ static int rockchip_hdmi_parse_dt(struct rockchip_hdmi *hdmi)
     hdmi->skip_check_420_mode = of_property_read_bool(np, "skip-check-420-mode");
 
     if (of_get_property(np, "rockchip,phy-table", &val)) {
+        if (val <= 0) {
+            return -EPERM ;
+        }
         phy_config = kmalloc(val, GFP_KERNEL);
         if (!phy_config) {
             /* use default table when kmalloc failed. */
@@ -1742,17 +1749,17 @@ static void dw_hdmi_rockchip_select_output(struct drm_connector_state *conn_stat
             break;
     }
 
-    if (*color_format == DRM_HDMI_OUTPUT_DEFAULT_RGB && info->edid_hdmi_dc_modes & DRM_EDID_HDMI_DC_30) {
+    if ((*color_format == DRM_HDMI_OUTPUT_DEFAULT_RGB) && (info->edid_hdmi_dc_modes & DRM_EDID_HDMI_DC_30)) {
         support_dc = true;
     }
-    if (*color_format == DRM_HDMI_OUTPUT_YCBCR444 &&
-        info->edid_hdmi_dc_modes & (DRM_EDID_HDMI_DC_Y444 | DRM_EDID_HDMI_DC_30)) {
+    if ((*color_format == DRM_HDMI_OUTPUT_YCBCR444) &&
+        (info->edid_hdmi_dc_modes & (DRM_EDID_HDMI_DC_Y444 | DRM_EDID_HDMI_DC_30))) {
         support_dc = true;
     }
     if (*color_format == DRM_HDMI_OUTPUT_YCBCR422) {
         support_dc = true;
     }
-    if (*color_format == DRM_HDMI_OUTPUT_YCBCR420 && info->hdmi.y420_dc_modes & DRM_EDID_YCBCR420_DC_30) {
+    if ((*color_format == DRM_HDMI_OUTPUT_YCBCR420) && (info->hdmi.y420_dc_modes & DRM_EDID_YCBCR420_DC_30)) {
         support_dc = true;
     }
 
@@ -1776,8 +1783,8 @@ static void dw_hdmi_rockchip_select_output(struct drm_connector_state *conn_stat
         }
     }
 
-    if ((*eotf > HDMI_EOTF_TRADITIONAL_GAMMA_SDR &&
-         conn_state->connector->hdr_sink_metadata.hdmi_type1.eotf & BIT(*eotf)) ||
+    if (((*eotf > HDMI_EOTF_TRADITIONAL_GAMMA_SDR) &&
+         (conn_state->connector->hdr_sink_metadata.hdmi_type1.eotf & BIT(*eotf))) ||
         (hdmi->colorimetry == RK_HDMI_COLORIMETRY_BT2020)) {
         *enc_out_encoding = V4L2_YCBCR_ENC_BT2020;
     } else if ((vic == 0x6) || (vic == 0x7) || (vic == 0x15) || (vic == 0x16) || (vic == 0x2) || (vic == 0x3) ||
@@ -1826,7 +1833,6 @@ static void dw_hdmi_rockchip_select_output(struct drm_connector_state *conn_stat
     }
 
     max_tmds_clock = min(max_tmds_clock, hdmi->max_tmdsclk);
-
     if ((tmdsclock > max_tmds_clock) && !hdmi->is_hdmi_qp) {
         if (max_tmds_clock >= 0x91050) {
             color_depth = 0x8;
@@ -2425,7 +2431,7 @@ static int dw_hdmi_rockchip_get_property(struct drm_connector *connector, const 
         if (info->color_formats & DRM_COLOR_FORMAT_YCRCB422) {
             *val |= BIT(DRM_HDMI_OUTPUT_YCBCR422);
         }
-        if (connector->ycbcr_420_allowed && info->color_formats & DRM_COLOR_FORMAT_YCRCB420) {
+        if (connector->ycbcr_420_allowed && (info->color_formats & DRM_COLOR_FORMAT_YCRCB420)) {
             *val |= BIT(DRM_HDMI_OUTPUT_YCBCR420);
         }
         return 0;
@@ -2525,7 +2531,6 @@ static enum drm_connector_status dw_hdmi_rk3328_read_hpd(struct dw_hdmi *dw_hdmi
     enum drm_connector_status status;
 
     status = dw_hdmi_phy_read_hpd(dw_hdmi, data);
-
     if (status == connector_status_connected) {
         regmap_write(hdmi->regmap, RK3328_GRF_SOC_CON4,
                      HIWORD_UPDATE(RK3328_HDMI_SDA_5V | RK3328_HDMI_SCL_5V, RK3328_HDMI_SDA_5V | RK3328_HDMI_SCL_5V));

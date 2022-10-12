@@ -65,7 +65,7 @@
 /*
  * CTX events
  */
-/* Separate timelines for each context 'instance'*/
+/* Separate timelines for each context 'instance' */
 KBASE_TIMELINE_TRACE_CODE(CTX_SET_NR_ATOMS_IN_FLIGHT, "CTX: Atoms in flight", "%d,%d",
                           "_instance_tgid,_value_number_of_atoms"),
     KBASE_TIMELINE_TRACE_CODE(CTX_FLOW_ATOM_READY, "CTX: Atoms Ready to Run", "%d,%d,%d",

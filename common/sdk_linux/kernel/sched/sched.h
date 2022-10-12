@@ -369,7 +369,7 @@ static inline void __dl_add(struct dl_bw *dl_b, u64 tsk_bw, int cpus)
 
 static inline bool __dl_overflow(struct dl_bw *dl_b, unsigned long cap, u64 old_bw, u64 new_bw)
 {
-    return dl_b->bw != -1 && cap_scale(dl_b->bw, cap) < dl_b->total_bw - old_bw + new_bw;
+    return (dl_b->bw != -1) && (cap_scale(dl_b->bw, cap) < (dl_b->total_bw - old_bw + new_bw));
 }
 
 /*
@@ -384,7 +384,7 @@ static inline bool dl_task_fits_capacity(struct task_struct *p, int cpu)
 {
     unsigned long cap = arch_scale_cpu_capacity(cpu);
 
-    return cap_scale(p->dl.dl_deadline, cap) >= p->dl.dl_runtime;
+    return ((cap_scale(p->dl.dl_deadline, cap)) >= (p->dl.dl_runtime));
 }
 
 extern void init_dl_bw(struct dl_bw *dl_b);
@@ -1504,8 +1504,7 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 {
     struct sched_domain *sd, *hsd = NULL;
 
-    for_each_domain(cpu, sd)
-    {
+    for_each_domain(cpu, sd) {
         if (!(sd->flags & flag)) {
             break;
         }
@@ -1519,8 +1518,7 @@ static inline struct sched_domain *lowest_flag_domain(int cpu, int flag)
 {
     struct sched_domain *sd;
 
-    for_each_domain(cpu, sd)
-    {
+    for_each_domain(cpu, sd) {
         if (sd->flags & flag) {
             break;
         }
@@ -1865,7 +1863,6 @@ extern const u32 sched_prio_to_wmult[40];
 #define RETRY_TASK ((void *)-1UL)
 
 struct sched_class {
-
 #ifdef CONFIG_UCLAMP_TASK
     int uclamp_enabled;
 #endif
@@ -2056,7 +2053,6 @@ extern int __init sched_tick_offload_init(void);
 static inline void sched_update_tick_dependency(struct rq *rq)
 {
     int cpu = cpu_of(rq);
-
     if (!tick_nohz_full_cpu(cpu)) {
         return;
     }

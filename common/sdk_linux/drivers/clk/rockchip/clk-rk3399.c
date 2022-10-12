@@ -75,7 +75,7 @@ static struct rockchip_pll_rate_table rk3399_pll_rates[] = {
     RK3036_PLL_RATE(148500000, 1, 99, 4, 4, 1, 0),   RK3036_PLL_RATE(106500000, 1, 71, 4, 4, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),    RK3036_PLL_RATE(74250000, 2, 99, 4, 4, 1, 0),
     RK3036_PLL_RATE(65000000, 1, 65, 6, 4, 1, 0),    RK3036_PLL_RATE(54000000, 1, 54, 6, 4, 1, 0),
-    RK3036_PLL_RATE(27000000, 1, 27, 6, 4, 1, 0),    {/* sentinel */},
+    RK3036_PLL_RATE(27000000, 1, 27, 6, 4, 1, 0),    {},
 };
 
 static struct rockchip_pll_rate_table rk3399_vpll_rates[] = {
@@ -94,7 +94,7 @@ static struct rockchip_pll_rate_table rk3399_vpll_rates[] = {
     RK3036_PLL_RATE(54000000, 1, 110, 7, 7, 0, 4194304),   /* vco = 2646000000 */
     RK3036_PLL_RATE(27000000, 1, 55, 7, 7, 0, 2097152),    /* vco = 1323000000 */
     RK3036_PLL_RATE(26973027, 1, 55, 7, 7, 0, 1173232),    /* vco = 1321678323 */
-    {/* sentinel */},
+    {},
 };
 
 /* CRU parents */
@@ -1288,15 +1288,17 @@ static const struct clk_rk3399_inits clk_rk3399_cru_init = {
     .inits = rk3399_clk_init,
 };
 
-static const struct of_device_id clk_rk3399_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3399-cru",
-                                                                 .data = &clk_rk3399_cru_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3399-pmucru",
-                                                                 .data = &clk_rk3399_pmucru_init,
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3399_match_table[] = {
+    {
+        .compatible = "rockchip,rk3399-cru",
+        .data = &clk_rk3399_cru_init,
+    },
+    {
+    .compatible = "rockchip,rk3399-pmucru",
+    .data = &clk_rk3399_pmucru_init,
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3399_match_table);
 
 static int __init clk_rk3399_probe(struct platform_device *pdev)

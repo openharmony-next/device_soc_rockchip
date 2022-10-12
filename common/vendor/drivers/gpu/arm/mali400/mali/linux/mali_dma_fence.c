@@ -95,7 +95,7 @@ static void mali_dma_fence_context_cleanup(struct mali_dma_fence_context *dma_fe
         }
     }
 
-    if (NULL != dma_fence_context->mali_dma_fence_waiters) {
+    if (dma_fence_context->mali_dma_fence_waiters != NULL) {
         kfree(dma_fence_context->mali_dma_fence_waiters);
     }
 
@@ -156,8 +156,7 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
     dma_fence_waiters =
         krealloc(dma_fence_context->mali_dma_fence_waiters,
                  (dma_fence_context->num_dma_fence_waiter + 1) * sizeof(struct mali_dma_fence_waiter *), GFP_KERNEL);
-
-    if (NULL == dma_fence_waiters) {
+    if (dma_fence_waiters == NULL) {
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to realloc the dma fence waiters.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
@@ -165,8 +164,7 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
     dma_fence_context->mali_dma_fence_waiters = dma_fence_waiters;
 
     dma_fence_waiter = kzalloc(sizeof(struct mali_dma_fence_waiter), GFP_KERNEL);
-
-    if (NULL == dma_fence_waiter) {
+    if (dma_fence_waiter == NULL) {
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to create mali dma fence waiter.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
@@ -184,7 +182,7 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
 #else
     ret = fence_add_callback(fence, &dma_fence_waiter->base, mali_dma_fence_callback);
 #endif
-    if (0 > ret) {
+    if (ret < 0) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
         dma_fence_put(fence);
 #else
@@ -193,10 +191,10 @@ static mali_osk_errcode_t mali_dma_fence_add_callback(struct mali_dma_fence_cont
         kfree(dma_fence_waiter);
         atomic_dec(&dma_fence_context->count);
         if (-ENOENT == ret) {
-            /*-ENOENT if fence has already been signaled, return MALI_OSK_ERR_OK*/
+            /* -ENOENT if fence has already been signaled, return MALI_OSK_ERR_OK */
             return MALI_OSK_ERR_OK;
         }
-        /* Failed to add the fence callback into fence, return MALI_OSK_ERR_FAULT*/
+        /* Failed to add the fence callback into fence, return MALI_OSK_ERR_FAULT */
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to add callback into fence.\n"));
         return MALI_OSK_ERR_FAULT;
     }
@@ -220,7 +218,7 @@ struct fence *mali_dma_fence_new(u32 context, u32 seqno)
     struct fence *fence = NULL;
     fence = kzalloc(sizeof(struct fence), GFP_KERNEL);
 #endif
-    if (NULL == fence) {
+    if (fence == NULL) {
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to create dma fence.\n"));
         return fence;
     }
@@ -278,7 +276,7 @@ mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_cont
     MALI_DEBUG_ASSERT_POINTER(dma_fence_context);
     MALI_DEBUG_ASSERT_POINTER(dma_reservation_object);
 
-    /* Get all the shared/exclusive fences in the reservation object of dma buf*/
+    /* Get all the shared/exclusive fences in the reservation object of dma buf */
     ret = reservation_object_get_fences_rcu(dma_reservation_object, &exclusive_fence, &shared_count, &shared_fences);
     if (ret < 0) {
         MALI_DEBUG_PRINT(1, ("Mali dma fence: failed to get  shared or exclusive_fence dma fences from  the "
@@ -388,17 +386,16 @@ again:
         }
 
         ret = ww_mutex_lock(&dma_reservation_object_list[i]->lock, ww_actx);
-
         if (ret < 0) {
             u32 slow_lock_index = i;
 
-            /* unlock all pre locks we have already locked.*/
+            /* unlock all pre locks we have already locked. */
             while (i > 0) {
                 i--;
                 ww_mutex_unlock(&dma_reservation_object_list[i]->lock);
             }
 
-            if (NULL != reservation_object_to_slow_lock) {
+            if (reservation_object_to_slow_lock != NULL) {
                 ww_mutex_unlock(&reservation_object_to_slow_lock->lock);
             }
 

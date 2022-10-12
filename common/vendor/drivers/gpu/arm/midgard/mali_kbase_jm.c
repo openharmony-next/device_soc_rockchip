@@ -63,7 +63,6 @@ u32 kbase_jm_kick(struct kbase_device *kbdev, u32 js_mask)
     while (js_mask) {
         int js = ffs(js_mask) - 1;
         int nr_jobs_to_submit = kbase_backend_slot_free(kbdev, js);
-
         if (kbase_jm_next_job(kbdev, js, nr_jobs_to_submit)) {
             ret_mask |= (1 << js);
         }

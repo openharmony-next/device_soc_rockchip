@@ -1898,7 +1898,6 @@ struct dev_pm_opp *devfreq_recommended_opp(struct device *dev, unsigned long *fr
     if (flags & DEVFREQ_FLAG_LEAST_UPPER_BOUND) {
         /* The freq is an upper bound. opp should be lower */
         opp = dev_pm_opp_find_freq_floor(dev, freq);
-
         /* If not available, use the closest opp */
         if (opp == ERR_PTR(-ERANGE)) {
             opp = dev_pm_opp_find_freq_ceil(dev, freq);
@@ -1906,7 +1905,6 @@ struct dev_pm_opp *devfreq_recommended_opp(struct device *dev, unsigned long *fr
     } else {
         /* The freq is an lower bound. opp should be higher */
         opp = dev_pm_opp_find_freq_ceil(dev, freq);
-
         /* If not available, use the closest opp */
         if (opp == ERR_PTR(-ERANGE)) {
             opp = dev_pm_opp_find_freq_floor(dev, freq);

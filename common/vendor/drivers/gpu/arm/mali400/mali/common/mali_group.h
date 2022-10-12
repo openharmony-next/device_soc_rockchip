@@ -111,7 +111,7 @@ void mali_group_remove_pp_core(struct mali_group *group);
 MALI_STATIC_INLINE const char *mali_group_core_description(struct mali_group *group)
 {
     MALI_DEBUG_ASSERT_POINTER(group);
-    if (NULL != group->pp_core) {
+    if (group->pp_core != NULL) {
         return mali_pp_core_description(group->pp_core);
     } else {
         MALI_DEBUG_ASSERT_POINTER(group->gp_core);
@@ -124,7 +124,7 @@ MALI_STATIC_INLINE mali_bool mali_group_is_virtual(struct mali_group *group)
     MALI_DEBUG_ASSERT_POINTER(group);
 
 #if (defined(CONFIG_MALI450) || defined(CONFIG_MALI470))
-    return (NULL != group->dlbu_core);
+    return (group->dlbu_core != NULL);
 #else
     return MALI_FALSE;
 #endif
@@ -138,7 +138,7 @@ MALI_STATIC_INLINE mali_bool mali_group_is_in_virtual(struct mali_group *group)
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
 
 #if (defined(CONFIG_MALI450) || defined(CONFIG_MALI470))
-    return (NULL != group->parent_group) ? MALI_TRUE : MALI_FALSE;
+    return (group->parent_group != NULL) ? MALI_TRUE : MALI_FALSE;
 #else
     return MALI_FALSE;
 #endif
@@ -166,7 +166,7 @@ MALI_STATIC_INLINE void mali_group_clear_session(struct mali_group *group)
     MALI_DEBUG_ASSERT_POINTER(group);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
 
-    if (NULL != group->session) {
+    if (group->session != NULL) {
         mali_mmu_activate_empty_page_directory(group->mmu);
         group->session = NULL;
     }
@@ -215,7 +215,7 @@ MALI_STATIC_INLINE void mali_group_set_disable_request(struct mali_group *group,
      * While, the disable_request of parent group should only be set to FALSE
      * only when all of its child group's disable_request are set to FALSE.
      */
-    if (NULL != group->parent_group && MALI_TRUE == disable) {
+    if (group->parent_group != NULL && MALI_TRUE == disable) {
         group->parent_group->disable_requested = disable;
     }
 }

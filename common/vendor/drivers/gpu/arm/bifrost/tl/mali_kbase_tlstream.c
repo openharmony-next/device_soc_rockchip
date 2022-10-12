@@ -267,7 +267,6 @@ void kbase_tlstream_flush_stream(struct kbase_tlstream *stream)
     wb_idx_raw = atomic_read(&stream->wbi);
     wb_idx = wb_idx_raw % PACKET_COUNT;
     wb_size = atomic_read(&stream->buffer[wb_idx].size);
-
     if (wb_size > min_size) {
         wb_size = kbasep_tlstream_msgbuf_submit(stream, wb_idx_raw, wb_size);
         wb_idx = (wb_idx_raw + 1) % PACKET_COUNT;

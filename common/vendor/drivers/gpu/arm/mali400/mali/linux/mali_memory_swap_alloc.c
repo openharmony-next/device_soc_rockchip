@@ -86,7 +86,7 @@ mali_osk_errcode_t mali_mem_swap_init(void)
     global_swap_space = global_swap_file->f_path.dentry->d_inode->i_mapping;
 
     mali_mem_swap_out_workq = mali_osk_wq_create_work(mali_mem_swap_swapped_bkend_pool_check_for_low_utilization, NULL);
-    if (NULL == mali_mem_swap_out_workq) {
+    if (mali_mem_swap_out_workq == NULL) {
         _mali_osk_bitmap_term(&idx_mgr);
         fput(global_swap_file);
         return MALI_OSK_ERR_NOMEM;
@@ -110,7 +110,7 @@ mali_osk_errcode_t mali_mem_swap_init(void)
 #endif
 
     /* When we use shmem_read_mapping_page to allocate/swap-in, it will
-     * use these flags to allocate new page if need.*/
+     * use these flags to allocate new page if need. */
     mapping_set_gfp_mask(global_swap_space, flags);
 
     mem_backend_swapped_pool_size = 0;
@@ -135,7 +135,7 @@ void mali_mem_swap_term(void)
     _mali_osk_wq_delete_work(mali_mem_swap_out_workq);
 
     MALI_DEBUG_ASSERT(list_empty(&mem_backend_swapped_pool));
-    MALI_DEBUG_ASSERT(0 == mem_backend_swapped_pool_size);
+    MALI_DEBUG_ASSERT(mem_backend_swapped_pool_size == 0);
 
     return;
 }
@@ -190,7 +190,7 @@ void mali_mem_swap_unlock_single_mem_backend(mali_mem_backend *mem_bkend)
 {
     mali_page_node *m_page;
 
-    MALI_DEBUG_ASSERT(1 == mutex_is_locked(&mem_bkend->mutex));
+    MALI_DEBUG_ASSERT(mutex_is_locked(&mem_bkend->mutex) == 1);
 
     if (MALI_MEM_BACKEND_FLAG_UNSWAPPED_IN == (mem_bkend->flags & MALI_MEM_BACKEND_FLAG_UNSWAPPED_IN)) {
         return;
@@ -210,7 +210,7 @@ static void mali_mem_swap_unlock_partial_locked_mem_backend(mali_mem_backend *me
 {
     mali_page_node *m_page;
 
-    MALI_DEBUG_ASSERT(1 == mutex_is_locked(&mem_bkend->mutex));
+    MALI_DEBUG_ASSERT(mutex_is_locked(&mem_bkend->mutex) == 1);
 
     list_for_each_entry(m_page, &mem_bkend->swap_mem.pages, list)
     {
@@ -227,7 +227,7 @@ static void mali_mem_swap_swapped_bkend_pool_shrink(_mali_mem_swap_pool_shrink_t
     long system_free_size;
     u32 last_gpu_utilization, gpu_utilization_threshold_value, temp_swap_out_threshold_value;
 
-    MALI_DEBUG_ASSERT(1 == mutex_is_locked(&mem_backend_swapped_pool_lock));
+    MALI_DEBUG_ASSERT(mutex_is_locked(&mem_backend_swapped_pool_lock) == 1);
 
     if (MALI_MEM_SWAP_SHRINK_WITH_LOW_UTILIZATION == shrink_type) {
         /**
@@ -252,7 +252,6 @@ static void mali_mem_swap_swapped_bkend_pool_shrink(_mali_mem_swap_pool_shrink_t
     /* Get system free pages number. */
     system_free_size = global_zone_page_state(NR_FREE_PAGES) * PAGE_SIZE;
     last_gpu_utilization = _mali_ukk_utilization_gp_pp();
-
     if ((last_gpu_utilization < gpu_utilization_threshold_value) &&
         (system_free_size < mali_mem_swap_out_threshold_value) &&
         (mem_backend_swapped_pool_size > temp_swap_out_threshold_value)) {
@@ -354,8 +353,7 @@ struct mali_swap_item *mali_mem_swap_alloc_swap_item(void)
     mali_swap_item *swap_item;
 
     swap_item = kzalloc(sizeof(mali_swap_item), GFP_KERNEL);
-
-    if (NULL == swap_item) {
+    if (swap_item == NULL) {
         return NULL;
     }
 
@@ -394,14 +392,13 @@ struct mali_page_node *_mali_mem_swap_page_node_allocate(void)
     struct mali_page_node *m_page;
 
     m_page = _mali_page_node_allocate(MALI_PAGE_NODE_SWAP);
-
-    if (NULL == m_page) {
+    if (m_page == NULL) {
         return NULL;
     }
 
     m_page->swap_it = mali_mem_swap_alloc_swap_item();
 
-    if (NULL == m_page->swap_it) {
+    if (m_page->swap_it == NULL) {
         kfree(m_page);
         return NULL;
     }
@@ -411,7 +408,6 @@ struct mali_page_node *_mali_mem_swap_page_node_allocate(void)
 
 mali_osk_errcode_t mali_mem_swap_put_page_node(struct mali_page_node *m_page)
 {
-
     mali_mem_swap_free_swap_item(m_page->swap_it);
 
     return MALI_OSK_ERR_OK;
@@ -440,7 +436,7 @@ u32 mali_mem_swap_free(mali_mem_swap *swap_mem)
         /* free the page node and release the swap item, if the ref count is 1,
          * then need also free the swap item. */
         list_del(&m_page->list);
-        if (1 == mali_page_node_get_ref_count(m_page)) {
+        if (mali_page_node_get_ref_count(m_page) == 1) {
             free_pages_nr++;
         }
 
@@ -464,7 +460,7 @@ static u32 mali_mem_swap_cow_free(mali_mem_cow *cow_mem)
         /* free the page node and release the swap item, if the ref count is 1,
          * then need also free the swap item. */
         list_del(&m_page->list);
-        if (1 == mali_page_node_get_ref_count(m_page)) {
+        if (mali_page_node_get_ref_count(m_page) == 1) {
             free_pages_nr++;
         }
 
@@ -506,7 +502,7 @@ u32 mali_mem_swap_release(mali_mem_backend *mem_bkend, mali_bool is_mali_mapped)
 
 mali_bool mali_mem_swap_in_page_node(struct mali_page_node *page_node)
 {
-    MALI_DEBUG_ASSERT(NULL != page_node);
+    MALI_DEBUG_ASSERT(page_node != NULL);
 
     page_node->swap_it->page = shmem_read_mapping_page(global_swap_space, page_node->swap_it->idx);
 
@@ -530,8 +526,8 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
     u32 i, index;
     mali_bool ret;
 
-    MALI_DEBUG_ASSERT(NULL != swap_mem);
-    MALI_DEBUG_ASSERT(NULL != bkend_idx);
+    MALI_DEBUG_ASSERT(swap_mem != NULL);
+    MALI_DEBUG_ASSERT(bkend_idx != NULL);
     MALI_DEBUG_ASSERT(page_count <= MALI_SWAP_GLOBAL_SWAP_FILE_INDEX_RESERVE);
 
     if (atomic_read(&mali_mem_os_allocator.allocated_pages) * MALI_OSK_MALI_PAGE_SIZE + size >
@@ -546,7 +542,6 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
     INIT_LIST_HEAD(&swap_mem->pages);
     swap_mem->count = page_count;
     index = mali_mem_swap_idx_range_alloc(page_count);
-
     if (MALI_OSK_BITMAP_INVALIDATE_INDEX == index) {
         MALI_PRINT_ERROR(("Mali Swap: Failed to allocate continuous index for swappable Mali memory."));
         return MALI_OSK_ERR_FAULT;
@@ -554,8 +549,7 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
 
     for (i = 0; i < page_count; i++) {
         m_page = _mali_mem_swap_page_node_allocate();
-
-        if (NULL == m_page) {
+        if (m_page == NULL) {
             MALI_DEBUG_PRINT_ERROR(("SWAP Mem: Failed to allocate mali page node."));
             swap_mem->count = i;
 
@@ -567,7 +561,6 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
         m_page->swap_it->idx = index + i;
 
         ret = mali_mem_swap_in_page_node(m_page);
-
         if (MALI_FALSE == ret) {
             MALI_DEBUG_PRINT_ERROR(("SWAP Mem: Allocate new page from SHMEM file failed."));
             mali_mem_swap_page_node_free(m_page);
@@ -582,7 +575,6 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
     }
 
     system_free_size = global_zone_page_state(NR_FREE_PAGES) * PAGE_SIZE;
-
     if ((system_free_size < mali_mem_swap_out_threshold_value) &&
         (mem_backend_swapped_pool_size > (mali_mem_swap_out_threshold_value >> MALI_MEM_SWAP_THRESHOLD_SHFIT)) &&
         mali_utilization_enabled()) {
@@ -606,7 +598,7 @@ void mali_mem_swap_mali_unmap(mali_mem_allocation *alloc)
     mali_session_memory_unlock(session);
 }
 
-/* Insert these pages from shmem to mali page table*/
+/* Insert these pages from shmem to mali page table */
 mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_session_data *session, u32 vaddr,
                                           u32 props)
 {
@@ -618,7 +610,7 @@ mali_osk_errcode_t mali_mem_swap_mali_map(mali_mem_swap *swap_mem, struct mali_s
 
     list_for_each_entry(m_page, &swap_mem->pages, list)
     {
-        MALI_DEBUG_ASSERT(NULL != m_page->swap_it->page);
+        MALI_DEBUG_ASSERT(m_page->swap_it->page != NULL);
         phys = m_page->swap_it->dma_addr;
 
         mali_mmu_pagedir_update(pagedir, virt, phys, MALI_MMU_PAGE_SIZE, prop);
@@ -647,11 +639,10 @@ int mali_mem_swap_in_pages(struct mali_pp_job *job)
     MALI_DEBUG_ASSERT_POINTER(session);
 
     for (i = 0; i < num_memory_cookies; i++) {
-
         u32 mali_addr = mali_pp_job_get_memory_cookie(job, i);
 
         mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_addr, 0);
-        if (NULL == mali_vma_node) {
+        if (mali_vma_node == NULL) {
             job->memory_cookies[i] = MALI_SWAP_INVALIDATE_MALI_ADDRESS;
             swap_in_success = MALI_FALSE;
             MALI_PRINT_ERROR(("SWAP Mem: failed to find mali_vma_node through Mali address: 0x%08x.\n", mali_addr));
@@ -659,7 +650,7 @@ int mali_mem_swap_in_pages(struct mali_pp_job *job)
         }
 
         mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
-        MALI_DEBUG_ASSERT(NULL != mali_alloc);
+        MALI_DEBUG_ASSERT(mali_alloc != NULL);
 
         if (MALI_MEM_SWAP != mali_alloc->type && MALI_MEM_COW != mali_alloc->type) {
             continue;
@@ -669,9 +660,9 @@ int mali_mem_swap_in_pages(struct mali_pp_job *job)
         mutex_lock(&mali_idr_mutex);
         mem_bkend = idr_find(&mali_backend_idr, mali_alloc->backend_handle);
         mutex_unlock(&mali_idr_mutex);
-        MALI_DEBUG_ASSERT(NULL != mem_bkend);
+        MALI_DEBUG_ASSERT(mem_bkend != NULL);
 
-        /* We neednot hold backend's lock here, race safe.*/
+        /* We neednot hold backend's lock here, race safe. */
         if ((MALI_MEM_COW == mem_bkend->type) && (!(mem_bkend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED))) {
             continue;
         }
@@ -756,20 +747,18 @@ int mali_mem_swap_out_pages(struct mali_pp_job *job)
 
     for (i = 0; i < num_memory_cookies; i++) {
         u32 mali_addr = mali_pp_job_get_memory_cookie(job, i);
-
         if (MALI_SWAP_INVALIDATE_MALI_ADDRESS == mali_addr) {
             continue;
         }
 
         mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_addr, 0);
-
-        if (NULL == mali_vma_node) {
+        if (mali_vma_node == NULL) {
             MALI_PRINT_ERROR(("SWAP Mem: failed to find mali_vma_node through Mali address: 0x%08x.\n", mali_addr));
             continue;
         }
 
         mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
-        MALI_DEBUG_ASSERT(NULL != mali_alloc);
+        MALI_DEBUG_ASSERT(mali_alloc != NULL);
 
         if (MALI_MEM_SWAP != mali_alloc->type && MALI_MEM_COW != mali_alloc->type) {
             continue;
@@ -778,9 +767,9 @@ int mali_mem_swap_out_pages(struct mali_pp_job *job)
         mutex_lock(&mali_idr_mutex);
         mem_bkend = idr_find(&mali_backend_idr, mali_alloc->backend_handle);
         mutex_unlock(&mali_idr_mutex);
-        MALI_DEBUG_ASSERT(NULL != mem_bkend);
+        MALI_DEBUG_ASSERT(mem_bkend != NULL);
 
-        /* We neednot hold backend's lock here, race safe.*/
+        /* We neednot hold backend's lock here, race safe. */
         if ((MALI_MEM_COW == mem_bkend->type) && (!(mem_bkend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED))) {
             continue;
         }
@@ -839,12 +828,11 @@ int mali_mem_swap_allocate_page_on_demand(mali_mem_backend *mem_bkend, u32 offse
         }
     }
 
-    if (NULL == found_node) {
+    if (found_node == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
     found_page = shmem_read_mapping_page(global_swap_space, found_node->swap_it->idx);
-
     if (!IS_ERR(found_page)) {
         lock_page(found_page);
         dma_addr = dma_map_page(&mali_platform_device->dev, found_page, 0, MALI_OSK_MALI_PAGE_SIZE, DMA_TO_DEVICE);
@@ -879,13 +867,12 @@ int mali_mem_swap_cow_page_on_demand(mali_mem_backend *mem_bkend, u32 offset, st
         i++;
     }
 
-    if (NULL == found_node) {
+    if (found_node == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
     new_node = _mali_mem_swap_page_node_allocate();
-
-    if (NULL == new_node) {
+    if (new_node == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -914,7 +901,7 @@ int mali_mem_swap_cow_page_on_demand(mali_mem_backend *mem_bkend, u32 offset, st
 
     list_replace(&found_node->list, &new_node->list);
 
-    if (1 != mali_page_node_get_ref_count(found_node)) {
+    if (mali_page_node_get_ref_count(found_node) != 1) {
         atomic_add(1, &mem_bkend->mali_allocation->session->mali_mem_allocated_pages);
         if (atomic_read(&mem_bkend->mali_allocation->session->mali_mem_allocated_pages) * MALI_MMU_PAGE_SIZE >
             mem_bkend->mali_allocation->session->max_mali_mem_allocated_size) {

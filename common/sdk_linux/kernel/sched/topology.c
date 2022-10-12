@@ -114,7 +114,6 @@ static int sched_domain_debug_one(struct sched_domain *sd, int cpu, int level, s
         if (group != sd->groups) {
             printk(KERN_CONT ",");
         }
-
     } while (group != sd->groups);
     printk(KERN_CONT "\n");
 
@@ -452,7 +451,7 @@ free:
 static void free_pd(struct perf_domain *pd)
 {
 }
-#endif /* CONFIG_ENERGY_MODEL && CONFIG_CPU_FREQ_GOV_SCHEDUTIL*/
+#endif /* CONFIG_ENERGY_MODEL && CONFIG_CPU_FREQ_GOV_SCHEDUTIL */
 
 static void free_rootdomain(struct rcu_head *rcu)
 {
@@ -907,7 +906,6 @@ static void build_balance_mask(struct sched_domain *sd, struct sched_group *sg, 
     for_each_cpu(i, sg_span)
     {
         sibling = *per_cpu_ptr(sdd->sd, i);
-
         /*
          * Can happen in the asymmetric case, where these siblings are
          * unused. The mask will not be empty because those CPUs that
@@ -940,7 +938,6 @@ static struct sched_group *build_group_from_child_sched_domain(struct sched_doma
     struct cpumask *sg_span;
 
     sg = kzalloc_node(sizeof(struct sched_group) + cpumask_size(), GFP_KERNEL, cpu_to_node(cpu));
-
     if (!sg) {
         return NULL;
     }
@@ -1026,7 +1023,6 @@ static int build_overlap_sched_groups(struct sched_domain *sd, int cpu)
         }
 
         sibling = *per_cpu_ptr(sdd->sd, i);
-
         /*
          * Asymmetric node setups can result in situations where the
          * domain tree is of unequal depth, make sure to skip domains
@@ -1474,7 +1470,7 @@ static struct sched_domain *sd_init(struct sched_domain_topology_level *tl, cons
     /* Apply detected topology flags */
     sd_flags |= dflags;
 
-    *sd = (struct sched_domain){
+    *sd = (struct sched_domain) {
         .min_interval = sd_weight,
         .max_interval = 2 * sd_weight,
         .busy_factor = 16,
@@ -1510,7 +1506,6 @@ static struct sched_domain *sd_init(struct sched_domain_topology_level *tl, cons
 
     if (sd->flags & SD_SHARE_CPUCAPACITY) {
         sd->imbalance_pct = IMBALANCE_SD_SHARE_CPUCAPACITY;
-
     } else if (sd->flags & SD_SHARE_PKG_RESOURCES) {
         sd->imbalance_pct = IMBALANCE_SD_SHARE_PKG;
         sd->cache_nice_tries = 1;
@@ -1697,7 +1692,6 @@ void sched_init_numa(void)
     for (i = 0; i < nr_node_ids; i++) {
         for (j = 0; j < nr_node_ids; j++) {
             int distance = node_distance(i, j);
-
             if (distance < LOCAL_DISTANCE || distance >= NR_DISTANCE_VALUES) {
                 sched_numa_warn("Invalid distance value range");
                 return;
@@ -1877,8 +1871,7 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
     struct sched_domain_topology_level *tl;
     int j;
 
-    for_each_sd_topology(tl)
-    {
+    for_each_sd_topology(tl) {
         struct sd_data *sdd = &tl->data;
 
         sdd->sd = alloc_percpu(struct sched_domain *);
@@ -1952,12 +1945,10 @@ static void __sdt_free(const struct cpumask *cpu_map)
     struct sched_domain_topology_level *tl;
     int j;
 
-    for_each_sd_topology(tl)
-    {
+    for_each_sd_topology(tl) {
         struct sd_data *sdd = &tl->data;
 
-        for_each_cpu(j, cpu_map)
-        {
+        for_each_cpu(j, cpu_map) {
             struct sched_domain *sd;
 
             if (sdd->sd) {
@@ -2088,18 +2079,15 @@ static struct sched_domain_topology_level *asym_cpu_capacity_level(const struct 
         unsigned long max_capacity = arch_scale_cpu_capacity(i);
         int tl_id = 0;
 
-        for_each_sd_topology(tl)
-        {
+        for_each_sd_topology(tl) {
             if (tl_id < asym_level) {
                 goto next_level;
             }
 
-            for_each_cpu_and(j, tl->mask(i), cpu_map)
-            {
+            for_each_cpu_and(j, tl->mask(i), cpu_map) {
                 unsigned long capacity;
 
                 capacity = arch_scale_cpu_capacity(j);
-
                 if (capacity <= max_capacity) {
                     continue;
                 }
@@ -2148,8 +2136,7 @@ static int build_sched_domains(const struct cpumask *cpu_map, struct sched_domai
         int dflags = 0;
 
         sd = NULL;
-        for_each_sd_topology(tl)
-        {
+        for_each_sd_topology(tl) {
             if (tl == tl_asym) {
                 dflags |= SD_ASYM_CPUCAPACITY;
                 has_asym = true;

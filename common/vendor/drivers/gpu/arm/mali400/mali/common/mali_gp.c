@@ -30,16 +30,15 @@ struct mali_gp_core *mali_gp_create(const _mali_osk_resource_t *resource, struct
 {
     struct mali_gp_core *core = NULL;
 
-    MALI_DEBUG_ASSERT(NULL == mali_global_gp_core);
+    MALI_DEBUG_ASSERT(mali_global_gp_core == NULL);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali GP: Creating Mali GP core: %s\n", resource->description));
 
     core = mali_osk_malloc(sizeof(struct mali_gp_core));
-    if (NULL != core) {
+    if (core != NULL) {
         if (MALI_OSK_ERR_OK == mali_hw_core_create(&core->hw_core, resource, MALIGP2_REGISTER_ADDRESS_SPACE_SIZE)) {
             mali_osk_errcode_t ret;
 
             ret = mali_gp_reset(core);
-
             if (MALI_OSK_ERR_OK == ret) {
                 ret = mali_group_add_gp_core(group, core);
                 if (MALI_OSK_ERR_OK == ret) {
@@ -47,7 +46,7 @@ struct mali_gp_core *mali_gp_create(const _mali_osk_resource_t *resource, struct
                     core->irq =
                         _mali_osk_irq_init(resource->irq, mali_group_upper_half_gp, group, mali_gp_irq_probe_trigger,
                                            mali_gp_irq_probe_ack, core, resource->description);
-                    if (NULL != core->irq) {
+                    if (core->irq != NULL) {
                         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali GP: set global gp core from 0x%08X to 0x%08X\n",
                                                                   mali_global_gp_core, core));
                         mali_global_gp_core = core;
@@ -207,7 +206,7 @@ void mali_gp_job_start(struct mali_gp_core *core, struct mali_gp_job *job)
         startcmd |= (u32)MALIGP2_REG_VAL_CMD_START_PLBU;
     }
 
-    MALI_DEBUG_ASSERT(0 != startcmd);
+    MALI_DEBUG_ASSERT(startcmd != 0);
 
     mali_hw_core_register_write_array_relaxed(&core->hw_core, MALIGP2_REG_ADDR_MGMT_VSCL_START_ADDR, frame_registers,
                                               MALIGP2_NUM_REGS_FRAME);
@@ -263,9 +262,7 @@ void mali_gp_resume_with_new_heap(struct mali_gp_core *core, u32 start_addr, u32
     u32 irq_readout;
 
     MALI_DEBUG_ASSERT_POINTER(core);
-
     irq_readout = mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_RAWSTAT);
-
     if (irq_readout & MALIGP2_REG_VAL_IRQ_PLBU_OUT_OF_MEM) {
         mali_hw_core_register_write(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_CLEAR,
                                     (MALIGP2_REG_VAL_IRQ_PLBU_OUT_OF_MEM | MALIGP2_REG_VAL_IRQ_HANG));

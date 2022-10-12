@@ -49,7 +49,7 @@ static struct kbase_process *find_process_node(struct rb_node *node, pid_t tgid)
 {
     struct kbase_process *kprcs = NULL;
 
-    /* Check if the kctx creation request is from a existing process.*/
+    /* Check if the kctx creation request is from a existing process. */
     while (node) {
         struct kbase_process *prcs_node = rb_entry(node, struct kbase_process, kprcs_node);
         if (prcs_node->tgid == tgid) {
@@ -89,7 +89,6 @@ static int kbase_insert_kctx_to_process(struct kbase_context *kctx)
     lockdep_assert_held(&kctx->kbdev->kctx_list_lock);
 
     kprcs = find_process_node(prcs_root->rb_node, tgid);
-
     /* if the kctx is from new process then create a new kbase_process
      * and add it to the &kbase_device->rb_tree
      */
@@ -313,7 +312,6 @@ void kbase_context_sticky_resource_term(struct kbase_context *kctx)
     bitmap_andnot(&pending_regions_to_clean, &pending_regions_to_clean, kctx->cookies, BITS_PER_LONG);
     while (pending_regions_to_clean) {
         unsigned int cookie = find_first_bit(&pending_regions_to_clean, BITS_PER_LONG);
-
         if (!WARN_ON(!kctx->pending_regions[cookie])) {
             dev_dbg(kctx->kbdev->dev, "Freeing pending unmapped region\n");
             kbase_mem_phy_alloc_put(kctx->pending_regions[cookie]->cpu_alloc);

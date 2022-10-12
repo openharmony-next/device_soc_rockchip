@@ -1216,12 +1216,11 @@ static const struct clk_rk3568_inits clk_3568_cru_init = {
 static const struct of_device_id clk_rk3568_match_table[] = {{
     .compatible = "rockchip,rk3568-cru",
     .data = &clk_3568_cru_init,
-},
-{
+}, {
     .compatible = "rockchip,rk3568-pmucru",
     .data = &clk_rk3568_pmucru_init,
-},
-{}};
+}, {
+}};
 MODULE_DEVICE_TABLE(of, clk_rk3568_match_table);
 
 static int __init clk_rk3568_probe(struct platform_device *pdev)

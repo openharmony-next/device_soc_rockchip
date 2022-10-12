@@ -377,7 +377,6 @@ void kbasep_soft_job_timeout_worker(struct timer_list *timer)
     {
         struct kbase_jd_atom *katom = list_entry(entry, struct kbase_jd_atom, queue);
         s64 elapsed_time = ktime_to_ms(ktime_sub(cur_time, katom->start_timestamp));
-
         if (elapsed_time < (s64)timeout_ms) {
             restarting = true;
             continue;
@@ -552,7 +551,6 @@ static int kbase_debug_copy_prepare(struct kbase_jd_atom *katom)
     katom->softjob_data = buffers;
 
     user_buffers = kmalloc_array(nr, sizeof(*user_buffers), GFP_KERNEL);
-
     if (!user_buffers) {
         ret = -ENOMEM;
         goto out_cleanup;
@@ -634,7 +632,6 @@ static int kbase_debug_copy_prepare(struct kbase_jd_atom *katom)
         kbase_gpu_vm_lock(katom->kctx);
         reg = kbase_region_tracker_find_region_enclosing_address(katom->kctx, user_extres.ext_resource &
                                                                                   ~BASE_EXT_RES_ACCESS_EXCLUSIVE);
-
         if (kbase_is_region_invalid_or_free(reg) || reg->gpu_alloc == NULL) {
             ret = -EINVAL;
             goto out_unlock;
@@ -770,10 +767,10 @@ int kbase_mem_copy_from_extres(struct kbase_context *kctx, struct kbase_debug_co
                     }
                 }
             }
-        } break;
+            break;
+        }
         case KBASE_MEM_TYPE_IMPORTED_UMM: {
             struct dma_buf *dma_buf = gpu_alloc->imported.umm.dma_buf;
-
             KBASE_DEBUG_ASSERT(dma_buf != NULL);
             if (dma_buf->size > buf_data->nr_extres_pages * PAGE_SIZE) {
                 dev_warn(kctx->kbdev->dev, "External resources buffer size mismatch");
@@ -837,7 +834,6 @@ static int kbase_debug_copy(struct kbase_jd_atom *katom)
 
     for (i = 0; i < katom->nr_extres; i++) {
         int res = kbase_mem_copy_from_extres(katom->kctx, &buffers[i]);
-
         if (res) {
             return res;
         }
@@ -1198,7 +1194,7 @@ static int kbase_jit_allocate_process(struct kbase_jd_atom *katom)
          * Retrieve the mmu flags for JIT allocation
          * only if dumping is enabled
          */
-        entry_mmu_flags = kbase_mmu_create_ate(kbdev, (struct tagged_addr){0}, reg->flags, MIDGARD_MMU_BOTTOMLEVEL,
+        entry_mmu_flags = kbase_mmu_create_ate(kbdev, (struct tagged_addr) {0}, reg->flags, MIDGARD_MMU_BOTTOMLEVEL,
                                                kctx->jit_group_id);
 #endif
 
@@ -1537,7 +1533,6 @@ int kbase_process_soft_job(struct kbase_jd_atom *katom)
             break;
         case BASE_JD_REQ_SOFT_FENCE_WAIT: {
             ret = kbase_sync_fence_in_wait(katom);
-
             if (ret == 1) {
 #ifdef CONFIG_MALI_BIFROST_FENCE_DEBUG
                 kbasep_add_waiting_with_timeout(katom);
@@ -1559,7 +1554,6 @@ int kbase_process_soft_job(struct kbase_jd_atom *katom)
             break;
         case BASE_JD_REQ_SOFT_DEBUG_COPY: {
             int res = kbase_debug_copy(katom);
-
             if (res) {
                 katom->event_code = BASE_JD_EVENT_JOB_INVALID;
             }
@@ -1611,7 +1605,8 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
             if (!IS_ALIGNED(katom->jc, cache_line_size())) {
                 return -EINVAL;
             }
-        } break;
+            break;
+        }
 #if defined(CONFIG_SYNC) || defined(CONFIG_SYNC_FILE)
         case BASE_JD_REQ_SOFT_FENCE_TRIGGER: {
             struct base_fence fence;
@@ -1633,7 +1628,8 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
                 fence.basep.fd = -EINVAL;
                 return -EINVAL;
             }
-        } break;
+            break;
+        }
         case BASE_JD_REQ_SOFT_FENCE_WAIT: {
             struct base_fence fence;
             int ret;
@@ -1659,7 +1655,8 @@ int kbase_prepare_soft_job(struct kbase_jd_atom *katom)
                 kbase_ctx_flag_set(katom->kctx, KCTX_NO_IMPLICIT_SYNC);
             }
 #endif /* CONFIG_MALI_BIFROST_DMA_FENCE */
-        } break;
+            break;
+        }
 #endif /* CONFIG_SYNC || CONFIG_SYNC_FILE */
         case BASE_JD_REQ_SOFT_JIT_ALLOC:
             return kbase_jit_allocate_prepare(katom);

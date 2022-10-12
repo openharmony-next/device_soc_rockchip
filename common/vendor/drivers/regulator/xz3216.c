@@ -32,11 +32,6 @@
 #include <linux/regulator/machine.h>
 #include <linux/regmap.h>
 
-
-
-
-
-
 #define DBG(x...) pr_info(x)
 #define DBG_ERR(x...) pr_err(x)
 

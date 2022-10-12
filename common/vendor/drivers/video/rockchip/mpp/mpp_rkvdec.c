@@ -478,7 +478,7 @@ static int power_model_simple_init(struct mpp_dev *mpp)
     cooling_power_data.dyn_power_coeff = (unsigned long)temp;
 
     if (of_property_read_u32_array(power_model_node, "ts", (u32 *)dec->ts,
-                                   4)) { /* Number of element arrays to read for 4*/
+                                   4)) { /* Number of element arrays to read for 4 */
         dev_err(mpp->dev, "ts in power_model not available\n");
         return -EINVAL;
     }
@@ -724,7 +724,8 @@ static int rkvdec_extract_task_msg(struct rkvdec_task *task, struct mpp_task_msg
                     return -EIO;
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_READ: {
                 off_s = hw_info->reg_start * sizeof(u32);
                 off_e = hw_info->reg_end * sizeof(u32);
@@ -733,10 +734,12 @@ static int rkvdec_extract_task_msg(struct rkvdec_task *task, struct mpp_task_msg
                     continue;
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            }
             default:
                 break;
         }
@@ -870,7 +873,8 @@ static int rkvdec_run(struct mpp_dev *mpp, struct mpp_task *mpp_task)
             /* Flush the register before the start the device */
             wmb();
             mpp_write(mpp, RKVDEC_REG_INT_EN, task->reg[reg_en] | RKVDEC_DEC_START);
-        } break;
+            break;
+        }
         default:
             break;
     }
@@ -938,7 +942,7 @@ static int rkvdec_isr(struct mpp_dev *mpp)
     struct mpp_task *mpp_task = mpp->cur_task;
 
     mpp_debug_enter();
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp_task) {
         dev_err(mpp->dev, "no current task\n");
         goto done;
@@ -953,13 +957,12 @@ static int rkvdec_isr(struct mpp_dev *mpp)
 
             err_mask = RKVDEC_INT_BUF_EMPTY | RKVDEC_INT_BUS_ERROR | RKVDEC_INT_COLMV_REF_ERROR |
                        RKVDEC_INT_STRM_ERROR | RKVDEC_INT_TIMEOUT;
-
             if (err_mask & task->irq_status) {
                 atomic_inc(&mpp->reset_request);
             }
-
             mpp_task_finish(mpp_task->session, mpp_task);
-        } break;
+            break;
+        }
         default:
             break;
     }
@@ -976,7 +979,7 @@ static int rkvdec_3328_isr(struct mpp_dev *mpp)
     struct rkvdec_dev *dec = to_rkvdec_dev(mpp);
 
     mpp_debug_enter();
-    /* FIXME use a spin lock here */
+    /* use a spin lock here */
     if (!mpp_task) {
         dev_err(mpp->dev, "no current task\n");
         goto done;
@@ -1033,7 +1036,8 @@ static int rkvdec_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
             dec_length = dec_get - task->strm_addr;
             task->reg[RKVDEC_REG_RLC_BASE_INDEX] = dec_length << DEVIATION_TEN;
             mpp_debug(DEBUG_REGISTER, "dec_get %08x dec_length %d\n", dec_get, dec_length);
-        } break;
+            break;
+        }
         default:
             break;
     }
@@ -1061,7 +1065,7 @@ static int rkvdec_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct 
     struct mpp_request *req;
     struct rkvdec_task *task = to_rkvdec_task(mpp_task);
 
-    /* FIXME may overflow the kernel */
+    /* may overflow the kernel */
     for (i = 0; i < task->r_req_cnt; i++) {
         req = &task->r_reqs[i];
 

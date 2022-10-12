@@ -56,7 +56,6 @@ static int lock_region(u64 pfn, u32 num_pages, u64 *lockaddr)
      * the possibility that some pages might spill into the next region.
      */
     lockaddr_size_log2 = fls(num_pages) + PAGE_SHIFT - 1;
-
     /* Round up if the number of pages is not a power of 2. */
     if (num_pages != ((u32)1 << (lockaddr_size_log2 - PAGE_SHIFT))) {
         lockaddr_size_log2 += 1;
@@ -72,7 +71,6 @@ static int lock_region(u64 pfn, u32 num_pages, u64 *lockaddr)
 
     /* Represent the size according to the HW specification. */
     lockaddr_size_log2 = MAX(lockaddr_size_log2, KBASE_LOCK_REGION_MIN_SIZE_LOG2);
-
     if (lockaddr_size_log2 > KBASE_LOCK_REGION_MAX_SIZE_LOG2) {
         return -EINVAL;
     }
@@ -186,7 +184,6 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as, u
         u64 lock_addr;
 
         ret = lock_region(vpfn, nr, &lock_addr);
-
         if (!ret) {
             /* Lock the region that needs to be updated */
             kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_LO), lock_addr & 0xFFFFFFFFUL);

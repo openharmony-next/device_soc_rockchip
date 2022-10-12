@@ -418,7 +418,6 @@ static int kbase_gpu_protected_mode_enter(struct kbase_device *kbdev)
     if (kbdev->protected_ops) {
         /* Switch GPU to protected mode */
         err = kbdev->protected_ops->protected_mode_enable(kbdev->protected_dev);
-
         if (err) {
             dev_warn(kbdev->dev, "Failed to enable protected mode: %d\n", err);
         } else {
@@ -649,7 +648,6 @@ static int kbase_jm_enter_protected_mode(struct kbase_device *kbdev, struct kbas
                     }
 
                     err = kbase_jm_protected_entry(kbdev, katom, idx, js);
-
                     if (err) {
                         return err;
                     }
@@ -661,7 +659,6 @@ static int kbase_jm_enter_protected_mode(struct kbase_device *kbdev, struct kbas
                 }
             } else {
                 err = kbase_jm_protected_entry(kbdev, katom, idx, js);
-
                 if (err) {
                     return err;
                 }
@@ -714,7 +711,6 @@ static int kbase_jm_exit_protected_mode(struct kbase_device *kbdev, struct kbase
         case KBASE_ATOM_EXIT_PROTECTED_RESET:
             /* Issue the reset to the GPU */
             err = kbase_gpu_protected_mode_reset(kbdev);
-
             if (err == -EAGAIN) {
                 return -EAGAIN;
             }
@@ -972,9 +968,8 @@ bool kbase_gpu_irq_evict(struct kbase_device *kbdev, int js, u32 completion_code
 
     katom = kbase_gpu_inspect(kbdev, js, 0);
     next_katom = kbase_gpu_inspect(kbdev, js, 1);
-
-    if (next_katom && katom->kctx == next_katom->kctx && next_katom->gpu_rb_state == KBASE_ATOM_GPU_RB_SUBMITTED &&
-        (HAS_DEP(next_katom) || next_katom->sched_priority == katom->sched_priority) &&
+    if (next_katom && (katom->kctx == next_katom->kctx) && (next_katom->gpu_rb_state == KBASE_ATOM_GPU_RB_SUBMITTED) &&
+        (HAS_DEP(next_katom) || (next_katom->sched_priority == katom->sched_priority)) &&
         (kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_HEAD_NEXT_LO)) != 0 ||
          kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_HEAD_NEXT_HI)) != 0)) {
         kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_COMMAND_NEXT), JS_COMMAND_NOP);
@@ -1069,8 +1064,8 @@ void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js, u32 completion_co
             struct kbase_jd_atom *katom_idx0 = kbase_gpu_inspect(kbdev, i, 0);
             struct kbase_jd_atom *katom_idx1 = kbase_gpu_inspect(kbdev, i, 1);
 
-            if (katom_idx0 && katom_idx0->kctx == katom->kctx && HAS_DEP(katom_idx0) &&
-                katom_idx0->gpu_rb_state != KBASE_ATOM_GPU_RB_SUBMITTED) {
+            if (katom_idx0 && (katom_idx0->kctx == katom->kctx) && HAS_DEP(katom_idx0) &&
+                (katom_idx0->gpu_rb_state != KBASE_ATOM_GPU_RB_SUBMITTED)) {
                 /* Dequeue katom_idx0 from ringbuffer */
                 kbase_gpu_dequeue_atom(kbdev, i, end_timestamp);
 
@@ -1084,7 +1079,6 @@ void kbase_gpu_complete_hw(struct kbase_device *kbdev, int js, u32 completion_co
                 }
                 katom_idx0->event_code = BASE_JD_EVENT_STOPPED;
                 kbase_jm_return_atom_to_js(kbdev, katom_idx0);
-
             } else if (katom_idx1 && katom_idx1->kctx == katom->kctx && HAS_DEP(katom_idx1) &&
                        katom_idx1->gpu_rb_state != KBASE_ATOM_GPU_RB_SUBMITTED) {
                 /* Can not dequeue this atom yet - will be
@@ -1344,7 +1338,7 @@ bool kbase_backend_soft_hard_stop_slot(struct kbase_device *kbdev, struct kbase_
 
                 if (kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_COMMAND_NEXT)) == 0) {
                     /* idx0 has already completed - stop
-                     * idx1 if needed*/
+                     * idx1 if needed */
                     if (katom_idx1_valid) {
                         kbase_gpu_stop_atom(kbdev, js, katom_idx1, action);
                         ret = true;
@@ -1372,7 +1366,7 @@ bool kbase_backend_soft_hard_stop_slot(struct kbase_device *kbdev, struct kbase_
                     }
                 }
             } else if (katom_idx1_valid) {
-                /* idx1 not on GPU but must be dequeued*/
+                /* idx1 not on GPU but must be dequeued */
 
                 /* idx1 will be handled in IRQ */
                 kbase_gpu_remove_atom(kbdev, katom_idx1, action, false);

@@ -110,7 +110,6 @@ int kbase_ctx_sched_retain_ctx(struct kbase_context *kctx)
 
     if (atomic_inc_return(&kctx->refcount) == 1) {
         int const free_as = kbasep_ctx_sched_find_as_for_ctx(kctx);
-
         if (free_as != KBASEP_AS_NR_INVALID) {
             kbdev->as_free &= ~(1u << free_as);
             /* Only program the MMU if the context has not been

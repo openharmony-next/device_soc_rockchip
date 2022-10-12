@@ -25,7 +25,7 @@ mali_osk_errcode_t mali_hw_core_create(struct mali_hw_core *core, const _mali_os
 
     if (MALI_OSK_ERR_OK == _mali_osk_mem_reqregion(core->phys_addr, core->size, core->description)) {
         core->mapped_registers = _mali_osk_mem_mapioregion(core->phys_addr, core->size, core->description);
-        if (NULL != core->mapped_registers) {
+        if (core->mapped_registers != NULL) {
             return MALI_OSK_ERR_OK;
         } else {
             MALI_PRINT_ERROR(
@@ -42,7 +42,7 @@ mali_osk_errcode_t mali_hw_core_create(struct mali_hw_core *core, const _mali_os
 
 void mali_hw_core_delete(struct mali_hw_core *core)
 {
-    if (NULL != core->mapped_registers) {
+    if (core->mapped_registers != NULL) {
         _mali_osk_mem_unmapioregion(core->phys_addr, core->size, core->mapped_registers);
         core->mapped_registers = NULL;
     }

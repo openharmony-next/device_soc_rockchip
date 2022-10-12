@@ -72,7 +72,7 @@ static struct rockchip_pll_rate_table rk3036_pll_rates[] = {
     RK3036_PLL_RATE(312000000, 1, 52, 2, 2, 1, 0),
     RK3036_PLL_RATE(216000000, 1, 72, 4, 2, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),
-    {/* sentinel */},
+    { },
 };
 
 #define RK3036_DIV_CPU_MASK 0x1f
@@ -439,10 +439,12 @@ static int __init clk_rk3036_probe(struct platform_device *pdev)
     return 0;
 }
 
-static const struct of_device_id clk_rk3036_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3036-cru",
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3036_match_table[] = {
+    {
+        .compatible = "rockchip,rk3036-cru",
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3036_match_table);
 
 static struct platform_driver clk_rk3036_driver = {

@@ -273,7 +273,6 @@ int of_get_named_gpio_flags(struct device_node *np, const char *list_name, int i
     struct gpio_desc *desc;
 
     desc = of_get_named_gpiod_flags(np, list_name, index, flags);
-
     if (IS_ERR(desc)) {
         return PTR_ERR(desc);
     } else {
@@ -309,7 +308,6 @@ struct gpio_desc *gpiod_get_from_of_node(struct device_node *node, const char *p
     int ret;
 
     desc = of_get_named_gpiod_flags(node, propname, index, &flags);
-
     if (!desc || IS_ERR(desc)) {
         return desc;
     }
@@ -371,7 +369,7 @@ static struct gpio_desc *of_find_spi_gpio(struct device *dev, const char *con_id
     char prop_name[32]; /* 32 is max size of property name */
     struct device_node *np = dev->of_node;
     struct gpio_desc *desc;
-
+    int ret = 0;
     /*
      * Hopefully the compiler stubs the rest of the function if this
      * is false.
@@ -386,7 +384,7 @@ static struct gpio_desc *of_find_spi_gpio(struct device *dev, const char *con_id
     }
 
     /* Will be "gpio-sck", "gpio-mosi" or "gpio-miso" */
-    snprintf(prop_name, sizeof(prop_name), "%s-%s", "gpio", con_id);
+    ret = snprintf(prop_name, sizeof(prop_name), "%s-%s", "gpio", con_id);
 
     desc = of_get_named_gpiod_flags(np, prop_name, 0, of_flags);
     return desc;
@@ -505,7 +503,6 @@ struct gpio_desc *of_find_gpio(struct device *dev, const char *con_id, unsigned 
         }
 
         desc = of_get_named_gpiod_flags(dev->of_node, prop_name, idx, &of_flags);
-
         if (!IS_ERR(desc) || PTR_ERR(desc) != -ENOENT) {
             break;
         }

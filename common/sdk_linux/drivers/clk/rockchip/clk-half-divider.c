@@ -60,12 +60,14 @@ static int clk_half_divider_bestdiv(struct clk_hw *hw, unsigned long rate, unsig
      * The maximum divider we can use without overflowing
      * unsigned long in rate * i below
      */
+    if (rate == 0) {
+        return -1;
+    }
     maxdiv = min(ULONG_MAX / rate, maxdiv);
 
     for (i = 0; i <= maxdiv; i++) {
         parent_rate = clk_hw_round_rate(clk_hw_get_parent(hw), ((u64)rate * (i * 0x2 + 0x3)) / 0x2);
         now = DIV_ROUND_UP_ULL(((u64)parent_rate * 0x2), (i * 0x2 + 0x3));
-
         if (_is_best_half_div(rate, now, best, flags)) {
             is_bestdiv = true;
             bestdiv = i;

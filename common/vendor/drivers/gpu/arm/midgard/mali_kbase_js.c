@@ -64,9 +64,9 @@ const base_jd_prio kbasep_js_relative_priority_to_atom[KBASE_JS_ATOM_SCHED_PRIO_
 /*
  * Private function prototypes
  */
-static kbasep_js_release_result
-kbasep_js_runpool_release_ctx_internal(struct kbase_device *kbdev, struct kbase_context *kctx,
-                                       struct kbasep_js_atom_retained_state *katom_retained_state);
+static kbasep_js_release_result kbasep_js_runpool_release_ctx_internal(
+    struct kbase_device *kbdev, struct kbase_context *kctx,
+    struct kbasep_js_atom_retained_state *katom_retained_state);
 
 static int kbase_js_get_slot(struct kbase_device *kbdev, struct kbase_jd_atom *katom);
 
@@ -981,11 +981,9 @@ static bool kbase_js_dep_validate(struct kbase_context *kctx, struct kbase_jd_at
 
             if (dep_atom) {
                 int dep_js = kbase_js_get_slot(kbdev, dep_atom);
-
                 if ((js != dep_js) && (dep_atom->status != KBASE_JD_ATOM_STATE_COMPLETED) &&
                     (dep_atom->status != KBASE_JD_ATOM_STATE_HW_COMPLETED) &&
                     (dep_atom->status != KBASE_JD_ATOM_STATE_UNUSED)) {
-
                     katom->atom_flags |= KBASE_KATOM_FLAG_X_DEP_BLOCKED;
                     katom->x_pre_dep = dep_atom;
                     dep_atom->x_post_dep = katom;
@@ -1188,7 +1186,7 @@ struct kbase_context *kbasep_js_runpool_lookup_ctx(struct kbase_device *kbdev, i
     struct kbase_context *found_kctx = NULL;
 
     KBASE_DEBUG_ASSERT(kbdev != NULL);
-    KBASE_DEBUG_ASSERT(0 <= as_nr && as_nr < BASE_MAX_NR_AS);
+    KBASE_DEBUG_ASSERT(as_nr >= 0 && as_nr < BASE_MAX_NR_AS);
     js_devdata = &kbdev->js_data;
 
     spin_lock_irqsave(&kbdev->hwaccess_lock, flags);
@@ -1228,10 +1226,10 @@ struct kbase_context *kbasep_js_runpool_lookup_ctx(struct kbase_device *kbdev, i
  * Return: %KBASEP_JS_RELEASE_RESULT_SCHED_ALL if context attributes were
  *         changed. The caller should try scheduling all contexts
  */
-static kbasep_js_release_result
-kbasep_js_run_jobs_after_ctx_and_atom_release(struct kbase_device *kbdev, struct kbase_context *kctx,
-                                              struct kbasep_js_atom_retained_state *katom_retained_state,
-                                              bool runpool_ctx_attr_change)
+static kbasep_js_release_result kbasep_js_run_jobs_after_ctx_and_atom_release(
+    struct kbase_device *kbdev, struct kbase_context *kctx,
+    struct kbasep_js_atom_retained_state *katom_retained_state,
+    bool runpool_ctx_attr_change)
 {
     struct kbasep_js_device_data *js_devdata;
     kbasep_js_release_result result = 0;
@@ -1283,9 +1281,9 @@ kbasep_js_run_jobs_after_ctx_and_atom_release(struct kbase_device *kbdev, struct
  * - Caller holds js_kctx_info->ctx.jsctx_mutex
  * - Caller holds js_devdata->runpool_mutex
  */
-static kbasep_js_release_result
-kbasep_js_runpool_release_ctx_internal(struct kbase_device *kbdev, struct kbase_context *kctx,
-                                       struct kbasep_js_atom_retained_state *katom_retained_state)
+static kbasep_js_release_result kbasep_js_runpool_release_ctx_internal(
+    struct kbase_device *kbdev, struct kbase_context *kctx,
+    struct kbasep_js_atom_retained_state *katom_retained_state)
 {
     unsigned long flags;
     struct kbasep_js_device_data *js_devdata;
@@ -1991,7 +1989,7 @@ static void kbase_js_evict_deps(struct kbase_context *kctx, struct kbase_jd_atom
 
     /* Has cross slot depenency. */
     if (x_dep && (x_dep->atom_flags & (KBASE_KATOM_FLAG_JSCTX_IN_TREE | KBASE_KATOM_FLAG_JSCTX_IN_X_DEP_LIST))) {
-        /* Remove dependency.*/
+        /* Remove dependency. */
         x_dep->atom_flags &= ~KBASE_KATOM_FLAG_X_DEP_BLOCKED;
 
         /* Fail if it had a data dependency. */
@@ -2197,7 +2195,7 @@ void kbase_js_unpull(struct kbase_context *kctx, struct kbase_jd_atom *katom)
 
     kbase_job_check_leave_disjoint(kctx->kbdev, katom);
 
-    KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&katom->work));
+    KBASE_DEBUG_ASSERT(object_is_on_stack(&katom->work) == 0);
     INIT_WORK(&katom->work, js_return_worker);
     queue_work(kctx->jctx.job_done_wq, &katom->work);
 }
@@ -2382,7 +2380,6 @@ void kbase_js_sched(struct kbase_device *kbdev, int js_mask)
             bool context_idle = false;
 
             kctx = kbase_js_ctx_list_pop_head(kbdev, js);
-
             if (!kctx) {
                 js_mask &= ~(1 << js);
                 break; /* No contexts on pullable list */
@@ -2439,7 +2436,6 @@ void kbase_js_sched(struct kbase_device *kbdev, int js_mask)
 
             if (!kbase_ctx_flag(kctx, KCTX_PULLED)) {
                 bool pullable = kbase_js_ctx_pullable(kctx, js, true);
-
                 /* Failed to pull jobs - push to head of list.
                  * Unless this context is already 'active', in
                  * which case it's effectively already scheduled

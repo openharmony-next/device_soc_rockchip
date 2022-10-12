@@ -46,7 +46,7 @@ typedef u32 mali_dma_addr;
    The clock source is configured on the CPU during mali module load,
    but will not give useful output after a CPU has been power cycled.
    It is therefore important to configure the system to not turn of
-   the cpu cores when using this functionallity.*/
+   the cpu cores when using this functionallity. */
 static inline unsigned int mali_get_cpu_cyclecount(void)
 {
     unsigned int value;

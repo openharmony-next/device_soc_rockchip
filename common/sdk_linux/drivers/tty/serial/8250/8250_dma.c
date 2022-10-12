@@ -335,7 +335,7 @@ int serial8250_request_dma(struct uart_8250_port *p)
     }
 
 #if defined(CONFIG_ARCH_ROCKCHIP) && defined(CONFIG_NO_GKI)
-    /* start dma for rx*/
+    /* start dma for rx */
     serial8250_start_rx_dma(p);
 #endif
     return 0;

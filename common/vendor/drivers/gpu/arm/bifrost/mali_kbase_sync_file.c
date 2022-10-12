@@ -141,8 +141,7 @@ int kbase_sync_fence_validate(int fd)
 }
 
 #if !MALI_USE_CSF
-enum base_jd_event_code
-kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
+enum base_jd_event_code kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom, int result)
 {
     int res;
 
@@ -373,4 +372,4 @@ void kbase_sync_fence_in_dump(struct kbase_jd_atom *katom)
     /* Not implemented */
 }
 #endif
-#endif /* !MALI_USE_CSF*/
+#endif /* !MALI_USE_CSF */

@@ -264,9 +264,12 @@ static void check_duplicate_node_names(struct check *c, struct dt_info *dti, str
 {
     struct node *child, *child2;
 
-    for_each_child(node, child) for (child2 = child->next_sibling; child2;
-                                     child2 = child2->next_sibling) if (streq(child->name, child2->name))
-        FAIL(c, dti, child2, "Duplicate node name");
+    for_each_child(node, child) {
+        for (child2 = child->next_sibling; child2;
+                                     child2 = child2->next_sibling)
+            if (streq(child->name, child2->name))
+                FAIL(c, dti, child2, "Duplicate node name");
+    }
 }
 ERROR(duplicate_node_names, check_duplicate_node_names, NULL);
 
@@ -297,7 +300,6 @@ ERROR(duplicate_property_names, check_duplicate_property_names, NULL);
 static void check_node_name_chars(struct check *c, struct dt_info *dti, struct node *node)
 {
     int n = strspn(node->name, c->data);
-
     if (n < strlen(node->name)) {
         FAIL(c, dti, node, "Bad character '%c' in node name", node->name[n]);
     }
@@ -307,7 +309,6 @@ ERROR(node_name_chars, check_node_name_chars, PROPNODECHARS "@");
 static void check_node_name_chars_strict(struct check *c, struct dt_info *dti, struct node *node)
 {
     int n = strspn(node->name, c->data);
-
     if (n < node->basenamelen) {
         FAIL(c, dti, node, "Character '%c' not recommended in node name", node->name[n]);
     }
@@ -358,7 +359,6 @@ static void check_property_name_chars(struct check *c, struct dt_info *dti, stru
     for_each_property(node, prop)
     {
         int n = strspn(prop->name, c->data);
-
         if (n < strlen(prop->name)) {
             FAIL_PROP(c, dti, node, prop, "Bad character '%c' in property name", prop->name[n]);
         }
@@ -374,7 +374,6 @@ static void check_property_name_chars_strict(struct check *c, struct dt_info *dt
     {
         const char *name = prop->name;
         int n = strspn(name, c->data);
-
         if (n == strlen(prop->name)) {
             continue;
         }
@@ -413,7 +412,6 @@ static void check_duplicate_label(struct check *c, struct dt_info *dti, const ch
     struct marker *othermark = NULL;
 
     othernode = get_node_by_label(dt, label);
-
     if (!othernode) {
         otherprop = get_property_by_label(dt, label, &othernode);
     }
@@ -470,11 +468,10 @@ static cell_t check_phandle_prop(struct check *c, struct dt_info *dti, struct no
     for_each_marker_of_type(m, REF_PHANDLE)
     {
         assert(m->offset == 0);
-        if (node != get_node_by_ref(root, m->ref))
+        if (node != get_node_by_ref(root, m->ref)) {
         /* "Set this node's phandle equal to some
          * other node's phandle".  That's nonsensical
          * by construction. */
-        {
             FAIL(c, dti, node, "%s is a reference to another node", prop->name);
         }
         /* But setting this node's phandle equal to its own
@@ -486,7 +483,6 @@ static cell_t check_phandle_prop(struct check *c, struct dt_info *dti, struct no
     }
 
     phandle = propval_cell(prop);
-
     if ((phandle == 0) || (phandle == -1)) {
         FAIL_PROP(c, dti, node, prop, "bad value (0x%x) in %s property", phandle, prop->name);
         return 0;
@@ -507,7 +503,6 @@ static void check_explicit_phandles(struct check *c, struct dt_info *dti, struct
     phandle = check_phandle_prop(c, dti, node, "phandle");
 
     linux_phandle = check_phandle_prop(c, dti, node, "linux,phandle");
-
     if (!phandle && !linux_phandle) {
         /* No valid phandles; nothing further to check */
         return;
@@ -968,7 +963,7 @@ static void check_pci_device_reg(struct check *c, struct dt_info *dti, struct no
         }
     }
 
-    snprintf(unit_addr, sizeof(unit_addr), "%x,%x", dev, func);
+    (void)snprintf(unit_addr, sizeof(unit_addr), "%x,%x", dev, func);
     if (streq(unitname, unit_addr)) {
         return;
     }
@@ -1114,7 +1109,7 @@ static void check_i2c_bus_reg(struct check *c, struct dt_info *dti, struct node 
     reg = fdt32_to_cpu(*cells);
     /* Ignore I2C_OWN_SLAVE_ADDRESS */
     reg &= ~I2C_OWN_SLAVE_ADDRESS;
-    snprintf(unit_addr, sizeof(unit_addr), "%x", reg);
+    (void)snprintf(unit_addr, sizeof(unit_addr), "%x", reg);
     if (!streq(unitname, unit_addr)) {
         FAIL(c, dti, node, "I2C bus unit address format error, expected \"%s\"", unit_addr);
     }
@@ -1216,7 +1211,7 @@ static void check_spi_bus_reg(struct check *c, struct dt_info *dti, struct node 
     }
 
     reg = fdt32_to_cpu(*cells);
-    snprintf(unit_addr, sizeof(unit_addr), "%x", reg);
+    (void)snprintf(unit_addr, sizeof(unit_addr), "%x", reg);
     if (!streq(unitname, unit_addr)) {
         FAIL(c, dti, node, "SPI bus unit address format error, expected \"%s\"", unit_addr);
     }
@@ -1260,7 +1255,6 @@ static void check_avoid_default_addr_size(struct check *c, struct dt_info *dti, 
 
     reg = get_property(node, "reg");
     ranges = get_property(node, "ranges");
-
     if (!reg && !ranges) {
         return;
     }
@@ -1538,7 +1532,7 @@ static void check_provider_cells_property(struct check *c, struct dt_info *dti, 
 }
 #define WARNING_PROPERTY_PHANDLE_CELLS(nm, propname, cells_name, ...)                                                  \
     static struct provider nm##_provider = {(propname), (cells_name), __VA_ARGS__};                                    \
-    WARNING(nm##_property, check_provider_cells_property, &nm##_provider, &phandle_references);
+    WARNING(nm##_property, check_provider_cells_property, &nm##_provider, &phandle_references)
 
 WARNING_PROPERTY_PHANDLE_CELLS(clocks, "clocks", "#clock-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(cooling_device, "cooling-device", "#cooling-cells");
@@ -1810,7 +1804,7 @@ static void check_graph_reg(struct check *c, struct dt_info *dti, struct node *n
         return;
     }
 
-    snprintf(unit_addr, sizeof(unit_addr), "%x", propval_cell(prop));
+    (void)snprintf(unit_addr, sizeof(unit_addr), "%x", propval_cell(prop));
     if (!streq(unitname, unit_addr)) {
         FAIL(c, dti, node, "graph node unit address error, expected \"%s\"", unit_addr);
     }

@@ -866,13 +866,15 @@ static void rga2_try_set_reg(void)
                     p = rga2_service.cmd_buff;
                     INFO("CMD_REG\n");
                     for (i = 0; i < 0x8; i++) {
-                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
+                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4],
+                             p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
                     }
 
                     p = reg->csc_reg;
                     INFO("CSC_REG\n");
-                    for (i = 0; i < 3; i++) {
-                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4], p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
+                    for (i = 0; i < 0x3; i++) {
+                        INFO("%.8x %.8x %.8x %.8x\n", p[0 + i * 0x4],
+                             p[1 + i * 0x4], p[0x2 + i * 0x4], p[0x3 + i * 0x4]);
                     }
                 }
             }
@@ -1702,7 +1704,7 @@ static int rga2_drv_probe(struct platform_device *pdev)
     rga2_ioctl_kernel_p = rga2_ioctl_kernel;
 
     data = devm_kzalloc(&pdev->dev, sizeof(struct rga2_drvdata_t), GFP_KERNEL);
-    if (NULL == data) {
+    if (data == NULL) {
         ERR("failed to allocate driver data.\n");
         return -ENOMEM;
     }
@@ -2081,7 +2083,7 @@ void rga2_test_0(void)
                     sp[i * 0x5 / 0x4 + 1] = 0x4;
                 } else if ((i & 0x3) == 0x2) {
                     sp[i * 0x5 / 0x4 + 1] = 0x10;
-                } else if ((i & 0x3) == 3) {
+                } else if ((i & 0x3) == 0x3) {
                     sp[i * 0x5 / 0x4 + 1] = 0x40;
                 }
             }

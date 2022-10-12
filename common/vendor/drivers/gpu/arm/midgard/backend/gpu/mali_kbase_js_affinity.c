@@ -94,12 +94,11 @@ bool kbase_js_choose_affinity(u64 *const affinity, struct kbase_device *kbdev, s
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     core_availability_mask = kbase_pm_ca_get_core_mask(kbdev);
-
     /*
      * If no cores are currently available (core availability policy is
      * transitioning) then fail.
      */
-    if (0 == core_availability_mask) {
+    if (core_availability_mask == 0) {
         *affinity = 0;
         return false;
     }
@@ -258,7 +257,7 @@ void kbase_js_affinity_release_slot_cores(struct kbase_device *kbdev, int js, u6
 
         cnt = --(js_devdata->runpool_irq.slot_affinity_refcount[js][bitnum]);
 
-        if (0 == cnt) {
+        if (cnt == 0) {
             js_devdata->runpool_irq.slot_affinities[js] &= ~bit;
         }
 
@@ -275,7 +274,7 @@ void kbase_js_debug_log_current_affinities(struct kbase_device *kbdev)
     KBASE_DEBUG_ASSERT(kbdev != NULL);
     js_devdata = &kbdev->js_data;
 
-    for (slot_nr = 0; slot_nr < 3; ++slot_nr) {
+    for (slot_nr = 0; slot_nr < 0x03; ++slot_nr) {
         KBASE_TRACE_ADD_SLOT_INFO(kbdev, JS_AFFINITY_CURRENT, NULL, NULL, 0u, slot_nr,
                                   (u32)js_devdata->runpool_irq.slot_affinities[slot_nr]);
     }

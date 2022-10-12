@@ -48,7 +48,6 @@ int get_each_dmabuf(int (*callback)(const struct dma_buf *dmabuf, void *private)
 {
     struct dma_buf *buf;
     int ret = mutex_lock_interruptible(&db_list.lock);
-
     if (ret) {
         return ret;
     }
@@ -186,7 +185,6 @@ static int dma_buf_do_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma)
 {
     /* call this first because the exporter might override vma->vm_ops */
     int ret = dmabuf->ops->mmap(dmabuf, vma);
-
     if (ret) {
         return ret;
     }
@@ -225,7 +223,7 @@ static int dma_buf_mmap_internal(struct file *file, struct vm_area_struct *vma)
     }
 
     /* check for overflowing the buffer's size */
-    if (vma->vm_pgoff + vma_pages(vma) > dmabuf->size >> PAGE_SHIFT) {
+    if ((vma->vm_pgoff + vma_pages(vma)) > (dmabuf->size >> PAGE_SHIFT)) {
         return -EINVAL;
     }
 
@@ -270,7 +268,7 @@ static loff_t dma_buf_llseek(struct file *file, loff_t offset, int whence)
  * provided in the &dma_resv structure.
  *
  * Userspace can query the state of these implicitly tracked fences using poll()
- * and related system calls:
+ * and related system calls
  *
  * - Checking for EPOLLIN, i.e. read access, can be use to query the state of the
  *   most recent write or exclusive fence.
@@ -575,7 +573,7 @@ err_alloc_file:
  * DOC: dma buf device access
  *
  * For device DMA access to a shared DMA buffer the usual sequence of operations
- * is fairly simple:
+ * is fairly simple
  *
  * 1. The exporter defines his exporter instance using
  *    DEFINE_DMA_BUF_EXPORT_INFO() and calls dma_buf_export() to wrap a private
@@ -752,7 +750,6 @@ struct dma_buf *dma_buf_get(int fd)
     struct file *file;
 
     file = fget(fd);
-
     if (!file) {
         return ERR_PTR(-EBADF);
     }
@@ -820,7 +817,7 @@ EXPORT_SYMBOL_GPL(dma_buf_pin);
  * Returns struct dma_buf_attachment pointer for this attachment. Attachments
  * must be cleaned up by calling dma_buf_detach().
  *
- * Returns:
+ * Returns
  *
  * A pointer to newly created &dma_buf_attachment on success, or a negative
  * error code wrapped into a pointer on failure.
@@ -1351,7 +1348,7 @@ int dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma, unsigned lo
     }
 
     /* check for overflowing the buffer's size */
-    if (pgoff + vma_pages(vma) > dmabuf->size >> PAGE_SHIFT) {
+    if ((pgoff + vma_pages(vma)) > (dmabuf->size >> PAGE_SHIFT)) {
         return -EINVAL;
     }
 
@@ -1496,7 +1493,6 @@ static int dma_buf_debug_show(struct seq_file *s, void *unused)
     size_t size = 0;
 
     ret = mutex_lock_interruptible(&db_list.lock);
-
     if (ret) {
         return ret;
     }
@@ -1509,7 +1505,6 @@ static int dma_buf_debug_show(struct seq_file *s, void *unused)
 
     list_for_each_entry(buf_obj, &db_list.head, list_node)
     {
-
         ret = dma_resv_lock_interruptible(buf_obj->resv, NULL);
         if (ret) {
             goto error_unlock;

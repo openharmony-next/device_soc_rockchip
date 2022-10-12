@@ -138,7 +138,6 @@ int thermal_register_governor(struct thermal_governor *governor)
         err = 0;
         list_add(&governor->governor_list, &thermal_governor_list);
         match_default = !strncmp(governor->name, DEFAULT_THERMAL_GOVERNOR, THERMAL_NAME_LENGTH);
-
         if (!def_governor && match_default) {
             def_governor = governor;
         }
@@ -891,13 +890,13 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, s
     }
 
     dev->id = result;
-    sprintf(dev->name, "cdev%d", dev->id);
+    ret = sprintf(dev->name, "cdev%d", dev->id);
     result = sysfs_create_link(&tz->device.kobj, &cdev->device.kobj, dev->name);
     if (result) {
         goto release_ida;
     }
 
-    sprintf(dev->attr_name, "cdev%d_trip_point", dev->id);
+    ret = sprintf(dev->attr_name, "cdev%d_trip_point", dev->id);
     sysfs_attr_init(&dev->attr.attr);
     dev->attr.attr.name = dev->attr_name;
     dev->attr.attr.mode = 0444;
@@ -907,7 +906,7 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, s
         goto remove_symbol_link;
     }
 
-    sprintf(dev->weight_attr_name, "cdev%d_weight", dev->id);
+    ret = sprintf(dev->weight_attr_name, "cdev%d_weight", dev->id);
     sysfs_attr_init(&dev->weight_attr.attr);
     dev->weight_attr.attr.name = dev->weight_attr_name;
     dev->weight_attr.attr.mode = S_IWUSR | S_IRUGO;
@@ -921,8 +920,7 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, s
     mutex_lock(&tz->lock);
     mutex_lock(&cdev->lock);
     list_for_each_entry(pos, &tz->thermal_instances,
-                        tz_node) if (pos->tz == tz && pos->trip == trip && pos->cdev == cdev)
-    {
+                        tz_node) if (pos->tz == tz && pos->trip == trip && pos->cdev == cdev) {
         result = -EEXIST;
         break;
     }
@@ -1618,8 +1616,7 @@ struct thermal_zone_device *thermal_zone_get_zone_by_name(const char *name)
     }
 
     mutex_lock(&thermal_list_lock);
-    list_for_each_entry(pos, &thermal_tz_list, node) if (!strncasecmp(name, pos->type, THERMAL_NAME_LENGTH))
-    {
+    list_for_each_entry(pos, &thermal_tz_list, node) if (!strncasecmp(name, pos->type, THERMAL_NAME_LENGTH)) {
         found++;
         ref = pos;
     }

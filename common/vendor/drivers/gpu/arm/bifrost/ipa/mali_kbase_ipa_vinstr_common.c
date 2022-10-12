@@ -188,7 +188,6 @@ int kbase_ipa_vinstr_dynamic_coeff(struct kbase_ipa_model *model, u32 *coeffp)
      * 0 <= active_cycles < 2^31
      */
     active_cycles = model_data->get_active_cycles(model_data);
-
     if (active_cycles < (u32)max(model_data->min_sample_cycles, 0)) {
         err = -ENODATA;
         goto err0;

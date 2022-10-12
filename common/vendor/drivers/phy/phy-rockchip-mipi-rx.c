@@ -1192,10 +1192,10 @@ static int mipidphy_txrx_stream_on(struct mipidphy_priv *priv, struct v4l2_subde
     }
 
     /*
-     *Config rk3288:
-     *step1:rk3288 isp connected to phy1-rx
-     *step2:rk3288 phy1-rx test bus connected to csi host
-     *step3:rk3288 phy1-rx source selected as: isp = 1'b1,csi-host = 1'b0
+     * Config rk3288
+     * step1:rk3288 isp connected to phy1-rx
+     * step2:rk3288 phy1-rx test bus connected to csi host
+     * step3:rk3288 phy1-rx source selected as: isp = 1'b1,csi-host = 1'b0
      */
     write_grf_reg(priv, GRF_CON_ISP_DPHY_SEL, 1);
     write_grf_reg(priv, GRF_DSI_CSI_TESTBUS_SEL, 1);
@@ -1273,7 +1273,7 @@ static int mipidphy_txrx_stream_on(struct mipidphy_priv *priv, struct v4l2_subde
      *        need to wait 5ns
      */
 
-    /* Step14:Set RSTZ=1'b1, phy1-rx controlled by isp*/
+    /* Step14:Set RSTZ=1'b1, phy1-rx controlled by isp */
 
     /*
      * Step15:Wait until STOPSTATEDATA_N & STOPSTATECLK
@@ -1478,30 +1478,25 @@ static const struct dphy_drv_data rv1126_mipidphy_drv_data = {
 };
 
 static const struct of_device_id rockchip_mipidphy_match_id[] = {{
-                                                                     .compatible = "rockchip,rk1808-mipi-dphy-rx",
-                                                                     .data = &rk1808_mipidphy_drv_data,
-                                                                 },
-                                                                 {
-                                                                     .compatible = "rockchip,rk3288-mipi-dphy",
-                                                                     .data = &rk3288_mipidphy_drv_data,
-                                                                 },
-                                                                 {
-                                                                     .compatible = "rockchip,rk3326-mipi-dphy",
-                                                                     .data = &rk3326_mipidphy_drv_data,
-                                                                 },
-                                                                 {
-                                                                     .compatible = "rockchip,rk3368-mipi-dphy",
-                                                                     .data = &rk3368_mipidphy_drv_data,
-                                                                 },
-                                                                 {
-                                                                     .compatible = "rockchip,rk3399-mipi-dphy",
-                                                                     .data = &rk3399_mipidphy_drv_data,
-                                                                 },
-                                                                 {
-                                                                     .compatible = "rockchip,rv1126-csi-dphy",
-                                                                     .data = &rv1126_mipidphy_drv_data,
-                                                                 },
-                                                                 {}};
+    .compatible = "rockchip,rk1808-mipi-dphy-rx",
+    .data = &rk1808_mipidphy_drv_data,
+}, {
+    .compatible = "rockchip,rk3288-mipi-dphy",
+    .data = &rk3288_mipidphy_drv_data,
+}, {
+    .compatible = "rockchip,rk3326-mipi-dphy",
+    .data = &rk3326_mipidphy_drv_data,
+}, {
+    .compatible = "rockchip,rk3368-mipi-dphy",
+    .data = &rk3368_mipidphy_drv_data,
+}, {
+    .compatible = "rockchip,rk3399-mipi-dphy",
+    .data = &rk3399_mipidphy_drv_data,
+}, {
+    .compatible = "rockchip,rv1126-csi-dphy",
+    .data = &rv1126_mipidphy_drv_data,
+}, {
+}};
 MODULE_DEVICE_TABLE(of, rockchip_mipidphy_match_id);
 
 /* The .bound() notifier callback when a match is found */

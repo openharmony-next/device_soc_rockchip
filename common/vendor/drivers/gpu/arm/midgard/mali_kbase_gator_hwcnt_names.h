@@ -37,7 +37,7 @@ static const char *const hardware_counters_mali_t60x[] = {
     "T60x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T60x_TI_JOBS_PROCESSED", "T60x_TI_TRIANGLES", "T60x_TI_QUADS", "T60x_TI_POLYGONS", "T60x_TI_POINTS",
     "T60x_TI_LINES", "T60x_TI_VCACHE_HIT", "T60x_TI_VCACHE_MISS", "T60x_TI_FRONT_FACING", "T60x_TI_BACK_FACING",
     "T60x_TI_PRIM_VISIBLE", "T60x_TI_PRIM_CULLED", "T60x_TI_PRIM_CLIPPED", "T60x_TI_LEVEL0", "T60x_TI_LEVEL1",
@@ -67,7 +67,7 @@ static const char *const hardware_counters_mali_t60x[] = {
     "T60x_LSC_DIRTY_LINE", "T60x_LSC_SNOOPS", "T60x_AXI_TLB_STALL", "T60x_AXI_TLB_MISS", "T60x_AXI_TLB_TRANSACTION",
     "T60x_LS_TLB_MISS", "T60x_LS_TLB_HIT", "T60x_AXI_BEATS_READ", "T60x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T60x_MMU_HIT", "T60x_MMU_NEW_MISS", "T60x_MMU_REPLAY_FULL", "T60x_MMU_REPLAY_MISS",
     "T60x_MMU_TABLE_WALK", "", "", "", "", "", "", "", "T60x_UTLB_HIT", "T60x_UTLB_NEW_MISS", "T60x_UTLB_REPLAY_FULL",
     "T60x_UTLB_REPLAY_MISS", "T60x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "T60x_L2_EXT_WRITE_BEATS",
@@ -89,7 +89,7 @@ static const char *const hardware_counters_mali_t62x[] = {
     "T62x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T62x_TI_JOBS_PROCESSED", "T62x_TI_TRIANGLES", "T62x_TI_QUADS", "T62x_TI_POLYGONS", "T62x_TI_POINTS",
     "T62x_TI_LINES", "T62x_TI_VCACHE_HIT", "T62x_TI_VCACHE_MISS", "T62x_TI_FRONT_FACING", "T62x_TI_BACK_FACING",
     "T62x_TI_PRIM_VISIBLE", "T62x_TI_PRIM_CULLED", "T62x_TI_PRIM_CLIPPED", "T62x_TI_LEVEL0", "T62x_TI_LEVEL1",
@@ -120,7 +120,7 @@ static const char *const hardware_counters_mali_t62x[] = {
     "T62x_AXI_TLB_MISS", "T62x_AXI_TLB_TRANSACTION", "T62x_LS_TLB_MISS", "T62x_LS_TLB_HIT", "T62x_AXI_BEATS_READ",
     "T62x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T62x_MMU_HIT", "T62x_MMU_NEW_MISS", "T62x_MMU_REPLAY_FULL", "T62x_MMU_REPLAY_MISS",
     "T62x_MMU_TABLE_WALK", "", "", "", "", "", "", "", "T62x_UTLB_HIT", "T62x_UTLB_NEW_MISS", "T62x_UTLB_REPLAY_FULL",
     "T62x_UTLB_REPLAY_MISS", "T62x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "T62x_L2_EXT_WRITE_BEATS",
@@ -140,7 +140,7 @@ static const char *const hardware_counters_mali_t72x[] = {
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T72x_TI_JOBS_PROCESSED", "T72x_TI_TRIANGLES", "T72x_TI_QUADS", "T72x_TI_POLYGONS", "T72x_TI_POINTS",
     "T72x_TI_LINES", "T72x_TI_FRONT_FACING", "T72x_TI_BACK_FACING", "T72x_TI_PRIM_VISIBLE", "T72x_TI_PRIM_CULLED",
     "T72x_TI_PRIM_CLIPPED", "", "", "", "", "", "", "", "", "T72x_TI_ACTIVE", "", "", "", "", "", "", "", "", "", "",
@@ -158,7 +158,7 @@ static const char *const hardware_counters_mali_t72x[] = {
     "T72x_LSC_ATOMIC_MISSES", "T72x_LSC_LINE_FETCHES", "T72x_LSC_DIRTY_LINE", "T72x_LSC_SNOOPS", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T72x_L2_EXT_WRITE_BEAT", "T72x_L2_EXT_READ_BEAT", "T72x_L2_READ_SNOOP", "T72x_L2_READ_HIT",
     "T72x_L2_WRITE_SNOOP", "T72x_L2_WRITE_HIT", "T72x_L2_EXT_WRITE_SMALL", "T72x_L2_EXT_BARRIER",
     "T72x_L2_EXT_AR_STALL", "T72x_L2_EXT_W_STALL", "T72x_L2_SNOOP_FULL", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -175,7 +175,7 @@ static const char *const hardware_counters_mali_t76x[] = {
     "T76x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T76x_TI_JOBS_PROCESSED", "T76x_TI_TRIANGLES", "T76x_TI_QUADS", "T76x_TI_POLYGONS", "T76x_TI_POINTS",
     "T76x_TI_LINES", "T76x_TI_VCACHE_HIT", "T76x_TI_VCACHE_MISS", "T76x_TI_FRONT_FACING", "T76x_TI_BACK_FACING",
     "T76x_TI_PRIM_VISIBLE", "T76x_TI_PRIM_CULLED", "T76x_TI_PRIM_CLIPPED", "T76x_TI_LEVEL0", "T76x_TI_LEVEL1",
@@ -205,7 +205,7 @@ static const char *const hardware_counters_mali_t76x[] = {
     "T76x_AXI_TLB_STALL", "T76x_AXI_TLB_MISS", "T76x_AXI_TLB_TRANSACTION", "T76x_LS_TLB_MISS", "T76x_LS_TLB_HIT",
     "T76x_AXI_BEATS_READ", "T76x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T76x_MMU_HIT", "T76x_MMU_NEW_MISS", "T76x_MMU_REPLAY_FULL", "T76x_MMU_REPLAY_MISS",
     "T76x_MMU_TABLE_WALK", "T76x_MMU_REQUESTS", "", "", "T76x_UTLB_HIT", "T76x_UTLB_NEW_MISS", "T76x_UTLB_REPLAY_FULL",
     "T76x_UTLB_REPLAY_MISS", "T76x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -228,7 +228,7 @@ static const char *const hardware_counters_mali_t82x[] = {
     "T82x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T82x_TI_JOBS_PROCESSED", "T82x_TI_TRIANGLES", "T82x_TI_QUADS", "T82x_TI_POLYGONS", "T82x_TI_POINTS",
     "T82x_TI_LINES", "T82x_TI_FRONT_FACING", "T82x_TI_BACK_FACING", "T82x_TI_PRIM_VISIBLE", "T82x_TI_PRIM_CULLED",
     "T82x_TI_PRIM_CLIPPED", "", "", "", "", "", "", "", "", "T82x_TI_ACTIVE", "", "", "", "", "", "", "", "", "", "",
@@ -251,7 +251,7 @@ static const char *const hardware_counters_mali_t82x[] = {
     "T82x_AXI_TLB_STALL", "T82x_AXI_TLB_MISS", "T82x_AXI_TLB_TRANSACTION", "T82x_LS_TLB_MISS", "T82x_LS_TLB_HIT",
     "T82x_AXI_BEATS_READ", "T82x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T82x_MMU_HIT", "T82x_MMU_NEW_MISS", "T82x_MMU_REPLAY_FULL", "T82x_MMU_REPLAY_MISS",
     "T82x_MMU_TABLE_WALK", "T82x_MMU_REQUESTS", "", "", "T82x_UTLB_HIT", "T82x_UTLB_NEW_MISS", "T82x_UTLB_REPLAY_FULL",
     "T82x_UTLB_REPLAY_MISS", "T82x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -274,7 +274,7 @@ static const char *const hardware_counters_mali_t83x[] = {
     "T83x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T83x_TI_JOBS_PROCESSED", "T83x_TI_TRIANGLES", "T83x_TI_QUADS", "T83x_TI_POLYGONS", "T83x_TI_POINTS",
     "T83x_TI_LINES", "T83x_TI_FRONT_FACING", "T83x_TI_BACK_FACING", "T83x_TI_PRIM_VISIBLE", "T83x_TI_PRIM_CULLED",
     "T83x_TI_PRIM_CLIPPED", "", "", "", "", "", "", "", "", "T83x_TI_ACTIVE", "", "", "", "", "", "", "", "", "", "",
@@ -297,7 +297,7 @@ static const char *const hardware_counters_mali_t83x[] = {
     "T83x_AXI_TLB_STALL", "T83x_AXI_TLB_MISS", "T83x_AXI_TLB_TRANSACTION", "T83x_LS_TLB_MISS", "T83x_LS_TLB_HIT",
     "T83x_AXI_BEATS_READ", "T83x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T83x_MMU_HIT", "T83x_MMU_NEW_MISS", "T83x_MMU_REPLAY_FULL", "T83x_MMU_REPLAY_MISS",
     "T83x_MMU_TABLE_WALK", "T83x_MMU_REQUESTS", "", "", "T83x_UTLB_HIT", "T83x_UTLB_NEW_MISS", "T83x_UTLB_REPLAY_FULL",
     "T83x_UTLB_REPLAY_MISS", "T83x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -320,7 +320,7 @@ static const char *const hardware_counters_mali_t86x[] = {
     "T86x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T86x_TI_JOBS_PROCESSED", "T86x_TI_TRIANGLES", "T86x_TI_QUADS", "T86x_TI_POLYGONS", "T86x_TI_POINTS",
     "T86x_TI_LINES", "T86x_TI_VCACHE_HIT", "T86x_TI_VCACHE_MISS", "T86x_TI_FRONT_FACING", "T86x_TI_BACK_FACING",
     "T86x_TI_PRIM_VISIBLE", "T86x_TI_PRIM_CULLED", "T86x_TI_PRIM_CLIPPED", "T86x_TI_LEVEL0", "T86x_TI_LEVEL1",
@@ -350,7 +350,7 @@ static const char *const hardware_counters_mali_t86x[] = {
     "T86x_AXI_TLB_STALL", "T86x_AXI_TLB_MISS", "T86x_AXI_TLB_TRANSACTION", "T86x_LS_TLB_MISS", "T86x_LS_TLB_HIT",
     "T86x_AXI_BEATS_READ", "T86x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T86x_MMU_HIT", "T86x_MMU_NEW_MISS", "T86x_MMU_REPLAY_FULL", "T86x_MMU_REPLAY_MISS",
     "T86x_MMU_TABLE_WALK", "T86x_MMU_REQUESTS", "", "", "T86x_UTLB_HIT", "T86x_UTLB_NEW_MISS", "T86x_UTLB_REPLAY_FULL",
     "T86x_UTLB_REPLAY_MISS", "T86x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -373,7 +373,7 @@ static const char *const hardware_counters_mali_t88x[] = {
     "T88x_JS2_WAIT_FINISH", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
 
-    /*Tiler */
+    /* Tiler */
     "", "", "", "T88x_TI_JOBS_PROCESSED", "T88x_TI_TRIANGLES", "T88x_TI_QUADS", "T88x_TI_POLYGONS", "T88x_TI_POINTS",
     "T88x_TI_LINES", "T88x_TI_VCACHE_HIT", "T88x_TI_VCACHE_MISS", "T88x_TI_FRONT_FACING", "T88x_TI_BACK_FACING",
     "T88x_TI_PRIM_VISIBLE", "T88x_TI_PRIM_CULLED", "T88x_TI_PRIM_CLIPPED", "T88x_TI_LEVEL0", "T88x_TI_LEVEL1",
@@ -403,7 +403,7 @@ static const char *const hardware_counters_mali_t88x[] = {
     "T88x_AXI_TLB_STALL", "T88x_AXI_TLB_MISS", "T88x_AXI_TLB_TRANSACTION", "T88x_LS_TLB_MISS", "T88x_LS_TLB_HIT",
     "T88x_AXI_BEATS_READ", "T88x_AXI_BEATS_WRITTEN",
 
-    /*L2 and MMU */
+    /* L2 and MMU */
     "", "", "", "", "T88x_MMU_HIT", "T88x_MMU_NEW_MISS", "T88x_MMU_REPLAY_FULL", "T88x_MMU_REPLAY_MISS",
     "T88x_MMU_TABLE_WALK", "T88x_MMU_REQUESTS", "", "", "T88x_UTLB_HIT", "T88x_UTLB_NEW_MISS", "T88x_UTLB_REPLAY_FULL",
     "T88x_UTLB_REPLAY_MISS", "T88x_UTLB_STALL", "", "", "", "", "", "", "", "", "", "", "", "", "",

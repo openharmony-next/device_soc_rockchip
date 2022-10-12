@@ -43,7 +43,7 @@ mali_osk_errcode_t mali_pm_metrics_init(struct mali_device *mdev)
     mdev->mali_metrics.gpu_active = MALI_FALSE;
 
     mdev->mali_metrics.lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_UNORDERED, _MALI_OSK_LOCK_ORDER_FIRST);
-    if (NULL == mdev->mali_metrics.lock) {
+    if (mdev->mali_metrics.lock == NULL) {
         return MALI_OSK_ERR_NOMEM;
     }
 
@@ -55,7 +55,7 @@ void mali_pm_metrics_term(struct mali_device *mdev)
     _mali_osk_spinlock_irq_term(mdev->mali_metrics.lock);
 }
 
-/*caller needs to hold mdev->mali_metrics.lock before calling this function*/
+/* caller needs to hold mdev->mali_metrics.lock before calling this function */
 void mali_pm_record_job_status(struct mali_device *mdev)
 {
     ktime_t now;
@@ -86,13 +86,13 @@ void mali_pm_record_gpu_idle(mali_bool is_gp)
 
     if (MALI_TRUE == is_gp) {
         --mdev->mali_metrics.num_running_gp_cores;
-        if (0 == mdev->mali_metrics.num_running_gp_cores) {
+        if (mdev->mali_metrics.num_running_gp_cores == 0) {
             diff = ktime_sub(now, mdev->mali_metrics.time_period_start_gp);
             ns_time = (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
             mdev->mali_metrics.time_busy_gp += ns_time;
             mdev->mali_metrics.time_period_start_gp = now;
 
-            if (0 == mdev->mali_metrics.num_running_pp_cores) {
+            if (mdev->mali_metrics.num_running_pp_cores == 0) {
                 MALI_DEBUG_ASSERT(mdev->mali_metrics.gpu_active == MALI_TRUE);
                 diff = ktime_sub(now, mdev->mali_metrics.time_period_start);
                 ns_time = (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
@@ -103,13 +103,13 @@ void mali_pm_record_gpu_idle(mali_bool is_gp)
         }
     } else {
         --mdev->mali_metrics.num_running_pp_cores;
-        if (0 == mdev->mali_metrics.num_running_pp_cores) {
+        if (mdev->mali_metrics.num_running_pp_cores == 0) {
             diff = ktime_sub(now, mdev->mali_metrics.time_period_start_pp);
             ns_time = (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
             mdev->mali_metrics.time_busy_pp[0] += ns_time;
             mdev->mali_metrics.time_period_start_pp = now;
 
-            if (0 == mdev->mali_metrics.num_running_gp_cores) {
+            if (mdev->mali_metrics.num_running_gp_cores == 0) {
                 MALI_DEBUG_ASSERT(mdev->mali_metrics.gpu_active == MALI_TRUE);
                 diff = ktime_sub(now, mdev->mali_metrics.time_period_start);
                 ns_time = (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
@@ -136,11 +136,11 @@ void mali_pm_record_gpu_active(mali_bool is_gp)
 
     if (MALI_TRUE == is_gp) {
         mdev->mali_metrics.num_running_gp_cores++;
-        if (1 == mdev->mali_metrics.num_running_gp_cores) {
+        if (mdev->mali_metrics.num_running_gp_cores == 1) {
             diff = ktime_sub(now, mdev->mali_metrics.time_period_start_gp);
             mdev->mali_metrics.time_idle_gp += (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
             mdev->mali_metrics.time_period_start_gp = now;
-            if (0 == mdev->mali_metrics.num_running_pp_cores) {
+            if (mdev->mali_metrics.num_running_pp_cores == 0) {
                 MALI_DEBUG_ASSERT(mdev->mali_metrics.gpu_active == MALI_FALSE);
                 diff = ktime_sub(now, mdev->mali_metrics.time_period_start);
                 mdev->mali_metrics.time_idle += (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
@@ -152,11 +152,11 @@ void mali_pm_record_gpu_active(mali_bool is_gp)
         }
     } else {
         mdev->mali_metrics.num_running_pp_cores++;
-        if (1 == mdev->mali_metrics.num_running_pp_cores) {
+        if (mdev->mali_metrics.num_running_pp_cores == 1) {
             diff = ktime_sub(now, mdev->mali_metrics.time_period_start_pp);
             mdev->mali_metrics.time_idle_pp[0] += (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
             mdev->mali_metrics.time_period_start_pp = now;
-            if (0 == mdev->mali_metrics.num_running_gp_cores) {
+            if (mdev->mali_metrics.num_running_gp_cores == 0) {
                 MALI_DEBUG_ASSERT(mdev->mali_metrics.gpu_active == MALI_FALSE);
                 diff = ktime_sub(now, mdev->mali_metrics.time_period_start);
                 mdev->mali_metrics.time_idle += (u64)(ktime_to_ns(diff) >> MALI_PM_TIME_SHIFT);
@@ -171,7 +171,7 @@ void mali_pm_record_gpu_active(mali_bool is_gp)
     mali_osk_spinlock_irq_unlock(mdev->mali_metrics.lock);
 }
 
-/*caller needs to hold mdev->mali_metrics.lock before calling this function*/
+/* caller needs to hold mdev->mali_metrics.lock before calling this function */
 static void mali_pm_get_dvfs_utilisation_calc(struct mali_device *mdev, ktime_t now)
 {
     ktime_t diff;

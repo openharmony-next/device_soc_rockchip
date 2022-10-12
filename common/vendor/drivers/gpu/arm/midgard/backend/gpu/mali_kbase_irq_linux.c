@@ -175,7 +175,7 @@ int kbase_set_custom_irq_handler(struct kbase_device *kbdev, irq_handler_t custo
     int result = 0;
     irq_handler_t requested_irq_handler = NULL;
 
-    KBASE_DEBUG_ASSERT((JOB_IRQ_HANDLER <= irq_type) && (GPU_IRQ_HANDLER >= irq_type));
+    KBASE_DEBUG_ASSERT((irq_type >= JOB_IRQ_HANDLER) && (irq_type <= GPU_IRQ_HANDLER));
 
     /* Release previous handler */
     if (kbdev->irqs[irq_type].irq) {

@@ -129,7 +129,7 @@
 #define USB_DEVICE_TEST_MODE 2         /* (wired high speed only) */
 #define USB_DEVICE_BATTERY 2           /* (wireless) */
 #define USB_DEVICE_B_HNP_ENABLE 3      /* (otg) dev may initiate HNP */
-#define USB_DEVICE_WUSB_DEVICE 3       /* (wireless)*/
+#define USB_DEVICE_WUSB_DEVICE 3       /* (wireless) */
 #define USB_DEVICE_A_HNP_SUPPORT 4     /* (otg) RH port supports HNP */
 #define USB_DEVICE_A_ALT_HNP_SUPPORT 5 /* (otg) other RH port does */
 #define USB_DEVICE_DEBUG_MODE 6        /* (special devices only) */
@@ -877,7 +877,7 @@ struct usb_ext_cap_descriptor { /* Link Power Management */
     __le32 bmAttributes;
 #define USB_LPM_SUPPORT (1 << 1)         /* supports LPM */
 #define USB_BESL_SUPPORT (1 << 2)        /* supports BESL */
-#define USB_BESL_BASELINE_VALID (1 << 3) /* Baseline BESL valid*/
+#define USB_BESL_BASELINE_VALID (1 << 3) /* Baseline BESL valid */
 #define USB_BESL_DEEP_VALID (1 << 4)     /* Deep BESL valid */
 #define USB_SET_BESL_BASELINE(p) (((p)&0xf) << 8)
 #define USB_SET_BESL_DEEP(p) (((p)&0xf) << 12)

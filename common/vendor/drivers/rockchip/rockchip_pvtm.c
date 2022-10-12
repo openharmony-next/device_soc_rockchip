@@ -251,8 +251,7 @@ static void rockchip_pvtm_delay(unsigned int delay)
 static void px30_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)
 {
     unsigned int id = pvtm->info->id;
-
-    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(ring_sel, (id * (0x4) + (0x2)), (0x3)));
+    regmap_write(pvtm->grf, pvtm->con, wr_mask_bit(ring_sel, (id * 0x4 + 0x2), 0x3));
 }
 
 static void rk1808_pvtm_set_ring_sel(struct rockchip_pvtm *pvtm, unsigned int ring_sel)

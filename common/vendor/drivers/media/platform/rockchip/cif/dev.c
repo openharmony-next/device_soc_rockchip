@@ -618,7 +618,6 @@ void rkcif_enable_dvp_clk_dual_edge(struct rkcif_device *dev, bool on)
     u32 val = 0x0;
 
     if (!IS_ERR(cif_hw->grf)) {
-
         if (dev->chip_id == CHIP_RK3568_CIF) {
             if (on) {
                 val = RK3568_CIF_PCLK_DUAL_EDGE;
@@ -913,7 +912,6 @@ static int rkcif_pipeline_set_stream(struct rkcif_pipeline *p, bool on)
             /* phy -> sensor */
             for (i = 0; i < p->num_subdevs; i++) {
                 ret = v4l2_subdev_call(p->subdevs[i], video, s_stream, on);
-
                 if (on && ret < 0 && ret != -ENOIOCTLCMD && ret != -ENODEV) {
                     goto err_stream_off;
                 }
@@ -1123,7 +1121,6 @@ static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
 
         if (sensor->mbus.type == V4L2_MBUS_CCP2 || sensor->mbus.type == V4L2_MBUS_CSI2_DPHY ||
             sensor->mbus.type == V4L2_MBUS_CSI2_CPHY) {
-
             switch (sensor->mbus.flags & V4L2_MBUS_CSI2_LANES) {
                 case V4L2_MBUS_CSI2_1_LANE:
                     sensor->lanes = 1;
@@ -1253,7 +1250,6 @@ static int cif_subdev_notifier(struct rkcif_device *cif_dev)
     v4l2_async_notifier_init(ntf);
 
     ret = v4l2_async_notifier_parse_fwnode_endpoints(dev, ntf, sizeof(struct rkcif_async_subdev), rkcif_fwnode_parse);
-
     if (ret < 0) {
         v4l2_err(&cif_dev->v4l2_dev, "%s: parse fwnode failed\n", __func__);
         return ret;
@@ -1292,7 +1288,6 @@ static int rkcif_register_platform_subdevs(struct rkcif_device *cif_dev)
 
     if (cif_dev->chip_id == CHIP_RK3588_CIF) {
         ret = rkcif_register_scale_vdevs(cif_dev, RKCIF_MAX_SCALE_CH, true);
-
         if (ret < 0) {
             dev_err(cif_dev->dev, "cif register scale_vdev[%d] failed!\n", stream_num);
             goto err_unreg_stream_vdev;

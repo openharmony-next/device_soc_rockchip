@@ -39,4 +39,4 @@ static inline void kbase_as_fault_debugfs_new(struct kbase_device *kbdev, int as
     return;
 }
 
-#endif /*_KBASE_AS_FAULT_DEBUG_FS_H*/
+#endif /* _KBASE_AS_FAULT_DEBUG_FS_H */

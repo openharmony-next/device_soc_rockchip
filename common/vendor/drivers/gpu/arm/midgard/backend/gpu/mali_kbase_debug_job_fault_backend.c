@@ -19,7 +19,7 @@
 
 #ifdef CONFIG_DEBUG_FS
 
-/*GPU_CONTROL_REG(r)*/
+/* GPU_CONTROL_REG(r) */
 static int gpu_control_reg_snapshot[] = {GPU_ID,         SHADER_READY_LO, SHADER_READY_HI, TILER_READY_LO,
                                          TILER_READY_HI, L2_READY_LO,     L2_READY_HI};
 
@@ -31,7 +31,7 @@ static int job_slot_reg_snapshot[] = {
     JS_HEAD_LO, JS_HEAD_HI,      JS_TAIL_LO,      JS_TAIL_HI,          JS_AFFINITY_LO,      JS_AFFINITY_HI, JS_CONFIG,
     JS_STATUS,  JS_HEAD_NEXT_LO, JS_HEAD_NEXT_HI, JS_AFFINITY_NEXT_LO, JS_AFFINITY_NEXT_HI, JS_CONFIG_NEXT};
 
-/*MMU_REG(r)*/
+/* MMU_REG(r) */
 static int mmu_reg_snapshot[] = {MMU_IRQ_MASK, MMU_IRQ_STATUS};
 
 /* MMU_AS_REG(n,r) */
@@ -52,19 +52,19 @@ bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx, int reg
     slot_number = kctx->kbdev->gpu_props.num_job_slots;
     as_number = kctx->kbdev->gpu_props.num_address_spaces;
 
-    /* get the GPU control registers*/
+    /* get the GPU control registers */
     for (i = 0; i < sizeof(gpu_control_reg_snapshot) / 0x4; i++) {
         kctx->reg_dump[offset] = GPU_CONTROL_REG(gpu_control_reg_snapshot[i]);
         offset += 0x2;
     }
 
-    /* get the Job control registers*/
+    /* get the Job control registers */
     for (i = 0; i < sizeof(job_control_reg_snapshot) / 0x4; i++) {
         kctx->reg_dump[offset] = JOB_CONTROL_REG(job_control_reg_snapshot[i]);
         offset += 0x2;
     }
 
-    /* get the Job Slot registers*/
+    /* get the Job Slot registers */
     for (j = 0; j < slot_number; j++) {
         for (i = 0; i < sizeof(job_slot_reg_snapshot) / 0x4; i++) {
             kctx->reg_dump[offset] = JOB_SLOT_REG(j, job_slot_reg_snapshot[i]);
@@ -72,13 +72,13 @@ bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx, int reg
         }
     }
 
-    /* get the MMU registers*/
+    /* get the MMU registers */
     for (i = 0; i < sizeof(mmu_reg_snapshot) / 0x4; i++) {
         kctx->reg_dump[offset] = MMU_REG(mmu_reg_snapshot[i]);
         offset += 0x2;
     }
 
-    /* get the Address space registers*/
+    /* get the Address space registers */
     for (j = 0; j < as_number; j++) {
         for (i = 0; i < sizeof(as_reg_snapshot) / 0x4; i++) {
             kctx->reg_dump[offset] = MMU_AS_REG(j, as_reg_snapshot[i]);
@@ -88,7 +88,7 @@ bool kbase_debug_job_fault_reg_snapshot_init(struct kbase_context *kctx, int reg
 
     WARN_ON(offset >= (reg_range * 0x2 / 0x4));
 
-    /* set the termination flag*/
+    /* set the termination flag */
     kctx->reg_dump[offset] = REGISTER_DUMP_TERMINATION_FLAG;
     kctx->reg_dump[offset + 1] = REGISTER_DUMP_TERMINATION_FLAG;
 

@@ -361,7 +361,6 @@ static struct rockchip_drm_mode_set *of_parse_display_resource(struct drm_device
     crtc = find_crtc_by_node(drm_dev, connect);
 
     sub_dev = find_sub_dev_by_node(drm_dev, connect);
-
     if (!sub_dev) {
         sub_dev = find_sub_dev_by_bridge(drm_dev, connect);
     }

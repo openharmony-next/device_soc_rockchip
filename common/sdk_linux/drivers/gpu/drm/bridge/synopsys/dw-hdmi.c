@@ -1071,7 +1071,6 @@ static unsigned int hdmi_compute_n(struct dw_hdmi *hdmi, unsigned long pixel_clk
 
     for (n = min_n; n <= max_n; n++) {
         u64 diff = hdmi_audio_math_diff(freq, n, pixel_clk);
-
         if (diff < best_diff || (diff == best_diff && abs(n - ideal_n) < best_n_distance)) {
             best_n = n;
             best_diff = diff;
@@ -1133,7 +1132,6 @@ static void hdmi_set_clk_regenerator(struct dw_hdmi *hdmi, unsigned long pixel_c
     n = hdmi_find_n(hdmi, pixel_clk, sample_rate);
 
     config3 = hdmi_readb(hdmi, HDMI_CONFIG3_ID);
-
     /* Only compute CTS when using internal AHB audio */
     if (config3 & HDMI_CONFIG3_AHBAUDDMA) {
         /*
@@ -1497,7 +1495,6 @@ static void dw_hdmi_update_csc_coeffs(struct dw_hdmi *hdmi)
 
     is_input_rgb = hdmi_bus_fmt_is_rgb(hdmi->hdmi_data.enc_in_bus_format);
     is_output_rgb = hdmi_bus_fmt_is_rgb(hdmi->hdmi_data.enc_out_bus_format);
-
     if (!is_input_rgb && is_output_rgb) {
         if (hdmi->hdmi_data.enc_out_encoding == V4L2_YCBCR_ENC_601) {
             csc_coeff = &csc_coeff_rgb_out_eitu601;
@@ -2195,7 +2192,7 @@ static void hdmi_config_AVI(struct dw_hdmi *hdmi, const struct drm_connector *co
      * scan info in bits 4,5 rather than 0,1 and active aspect present in
      * bit 6 rather than 4.
      */
-    val = (frame.scan_mode & 0x3) << 0x4 | (frame.colorspace & 0x3);
+    val = ((frame.scan_mode & 0x3) << 0x4) | (frame.colorspace & 0x3);
     if (frame.active_aspect & 0xf) {
         val |= HDMI_FC_AVICONF0_ACTIVE_FMT_INFO_PRESENT;
     }
@@ -3410,7 +3407,6 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
      */
     if (conn->ycbcr_420_allowed &&
         (drm_mode_is_420_only(info, mode) || (is_hdmi2_sink && drm_mode_is_420_also(info, mode)))) {
-
         /* Order bus formats from 16bit to 8bit if supported */
         if (max_bpc >= 0x10 && info->bpc == 0x10 && (info->hdmi.y420_dc_modes & DRM_EDID_YCBCR420_DC_48)) {
             output_fmts[i++] = MEDIA_BUS_FMT_UYYVYY16_0_5X48;
@@ -3587,8 +3583,7 @@ static u32 *dw_hdmi_bridge_atomic_get_input_bus_fmts(struct drm_bridge *bridge, 
             input_fmts[i++] = MEDIA_BUS_FMT_YUV16_1X48;
             input_fmts[i++] = MEDIA_BUS_FMT_RGB161616_1X48;
             break;
-
-        /*YUV 4:2:0 */
+        /* YUV 4:2:0 */
         case MEDIA_BUS_FMT_UYYVYY8_0_5X24:
         case MEDIA_BUS_FMT_UYYVYY10_0_5X30:
         case MEDIA_BUS_FMT_UYYVYY12_0_5X36:
@@ -3912,48 +3907,50 @@ static irqreturn_t dw_hdmi_irq(int irq, void *dev_id)
     return IRQ_HANDLED;
 }
 
-static const struct dw_hdmi_phy_data dw_hdmi_phys[] = {{
-                                                           .type = DW_HDMI_PHY_DWC_HDMI_TX_PHY,
-                                                           .name = "DWC HDMI TX PHY",
-                                                           .gen = 1,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_DWC_MHL_PHY_HEAC,
-                                                           .name = "DWC MHL PHY + HEAC PHY",
-                                                           .gen = 2,
-                                                           .has_svsret = true,
-                                                           .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_DWC_MHL_PHY,
-                                                           .name = "DWC MHL PHY",
-                                                           .gen = 2,
-                                                           .has_svsret = true,
-                                                           .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_DWC_HDMI_3D_TX_PHY_HEAC,
-                                                           .name = "DWC HDMI 3D TX PHY + HEAC PHY",
-                                                           .gen = 2,
-                                                           .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_DWC_HDMI_3D_TX_PHY,
-                                                           .name = "DWC HDMI 3D TX PHY",
-                                                           .gen = 2,
-                                                           .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_DWC_HDMI20_TX_PHY,
-                                                           .name = "DWC HDMI 2.0 TX PHY",
-                                                           .gen = 2,
-                                                           .has_svsret = true,
-                                                           .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
-                                                       },
-                                                       {
-                                                           .type = DW_HDMI_PHY_VENDOR_PHY,
-                                                           .name = "Vendor PHY",
-                                                       }};
+static const struct dw_hdmi_phy_data dw_hdmi_phys[] = {
+    {
+        .type = DW_HDMI_PHY_DWC_HDMI_TX_PHY,
+        .name = "DWC HDMI TX PHY",
+        .gen = 1,
+    },
+    {
+        .type = DW_HDMI_PHY_DWC_MHL_PHY_HEAC,
+        .name = "DWC MHL PHY + HEAC PHY",
+        .gen = 2,
+        .has_svsret = true,
+        .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
+    },
+    {
+        .type = DW_HDMI_PHY_DWC_MHL_PHY,
+        .name = "DWC MHL PHY",
+        .gen = 2,
+        .has_svsret = true,
+        .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
+    },
+    {
+        .type = DW_HDMI_PHY_DWC_HDMI_3D_TX_PHY_HEAC,
+        .name = "DWC HDMI 3D TX PHY + HEAC PHY",
+        .gen = 2,
+        .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
+    },
+    {
+        .type = DW_HDMI_PHY_DWC_HDMI_3D_TX_PHY,
+        .name = "DWC HDMI 3D TX PHY",
+        .gen = 2,
+        .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
+    },
+    {
+        .type = DW_HDMI_PHY_DWC_HDMI20_TX_PHY,
+        .name = "DWC HDMI 2.0 TX PHY",
+        .gen = 2,
+        .has_svsret = true,
+        .configure = hdmi_phy_configure_dwc_hdmi_3d_tx,
+    },
+    {
+        .type = DW_HDMI_PHY_VENDOR_PHY,
+        .name = "Vendor PHY",
+    }
+};
 
 static int dw_hdmi_detect_phy(struct dw_hdmi *hdmi)
 {
@@ -3961,7 +3958,6 @@ static int dw_hdmi_detect_phy(struct dw_hdmi *hdmi)
     u8 phy_type;
 
     phy_type = hdmi->plat_data->phy_force_vendor ? DW_HDMI_PHY_VENDOR_PHY : hdmi_readb(hdmi, HDMI_CONFIG2_ID);
-
     if (phy_type == DW_HDMI_PHY_VENDOR_PHY) {
         /* Vendor PHYs require support from the glue layer. */
         if (!hdmi->plat_data->phy_ops || !hdmi->plat_data->phy_name) {
@@ -4447,7 +4443,6 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev, const struct dw_hdmi
             dev_dbg(hdmi->dev, "failed to read ddc node\n");
             return ERR_PTR(-EPROBE_DEFER);
         }
-
     } else {
         dev_dbg(hdmi->dev, "no ddc property found\n");
     }
@@ -4535,7 +4530,6 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev, const struct dw_hdmi
     hdmi->version = (hdmi_readb(hdmi, HDMI_DESIGN_ID) << 0x8) | (hdmi_readb(hdmi, HDMI_REVISION_ID) << 0);
     prod_id0 = hdmi_readb(hdmi, HDMI_PRODUCT_ID0);
     prod_id1 = hdmi_readb(hdmi, HDMI_PRODUCT_ID1);
-
     if (prod_id0 != HDMI_PRODUCT_ID0_HDMI_TX || (prod_id1 & ~HDMI_PRODUCT_ID1_HDCP) != HDMI_PRODUCT_ID1_HDMI_TX) {
         dev_err(dev, "Unsupported HDMI controller (%04x:%02x:%02x)\n", hdmi->version, prod_id0, prod_id1);
         ret = -ENODEV;
@@ -4660,10 +4654,8 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev, const struct dw_hdmi
 
     config0 = hdmi_readb(hdmi, HDMI_CONFIG0_ID);
     config3 = hdmi_readb(hdmi, HDMI_CONFIG3_ID);
-
-    if (iores && config3 & HDMI_CONFIG3_AHBAUDDMA) {
+    if (iores && (config3 & HDMI_CONFIG3_AHBAUDDMA)) {
         struct dw_hdmi_audio_data audio;
-
         audio.phys = iores->start;
         audio.base = hdmi->regs;
         audio.irq = irq;

@@ -168,9 +168,7 @@ struct page *kbase_mem_alloc_page(struct kbase_mem_pool *pool)
     if (!p) {
         return NULL;
     }
-
     dma_addr = dma_map_page(dev, p, 0, (PAGE_SIZE << pool->order), DMA_BIDIRECTIONAL);
-
     if (dma_mapping_error(dev, dma_addr)) {
         kbdev->mgm_dev->ops.mgm_free_page(kbdev->mgm_dev, pool->group_id, p, pool->order);
         return NULL;
@@ -466,7 +464,6 @@ struct page *kbase_mem_pool_alloc(struct kbase_mem_pool *pool)
     do {
         pool_dbg(pool, "alloc()\n");
         p = kbase_mem_pool_remove(pool);
-
         if (p) {
             return p;
         }
@@ -485,7 +482,6 @@ struct page *kbase_mem_pool_alloc_locked(struct kbase_mem_pool *pool)
 
     pool_dbg(pool, "alloc_locked()\n");
     p = kbase_mem_pool_remove_locked(pool);
-
     if (p) {
         return p;
     }
@@ -572,7 +568,6 @@ int kbase_mem_pool_alloc_pages(struct kbase_mem_pool *pool, size_t nr_4k_pages, 
     if (i != nr_4k_pages && pool->next_pool) {
         /* Allocate via next pool */
         err = kbase_mem_pool_alloc_pages(pool->next_pool, nr_4k_pages - i, pages + i, partial_allowed);
-
         if (err < 0) {
             goto err_rollback;
         }

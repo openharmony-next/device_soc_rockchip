@@ -154,7 +154,7 @@ static u32 calculate_temp_scaling_factor(s32 ts[4], s64 t)
     s64 res_unclamped = div_s64(res_big, 10000);
 
     /* Clamp to range of 0x to 10x the static power */
-    return clamp(res_unclamped, (s64)0, (s64)10000000);
+    return clamp(res_unclamped, (s64)0, (s64)0x989680);
 }
 
 /**
@@ -202,9 +202,9 @@ unsigned long rockchip_ipa_get_static_power(struct ipa_power_model_data *data, u
     volt_scaling_factor = calculate_volt_scaling_factor((u32)voltage_mv);
 
     power_big = (u64)data->static_coefficient * (u64)temp_scaling_factor;
-    static_power = div_u64(power_big, 1000000);
+    static_power = div_u64(power_big, 0xF4240);
     power_big = (u64)static_power * (u64)volt_scaling_factor;
-    static_power = div_u64(power_big, 1000000);
+    static_power = div_u64(power_big, 0xF4240);
 
     trace_thermal_ipa_get_static_power(data->leakage, data->static_coefficient, temp, temp_scaling_factor,
                                        (u32)voltage_mv, volt_scaling_factor, static_power);

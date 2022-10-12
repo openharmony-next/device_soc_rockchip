@@ -61,7 +61,6 @@ static int kbasep_hwcnt_backend_gpu_metadata_v5_create(const struct kbase_hwcnt_
     non_sc_block_count = 0x2 + v5_info->l2_count;
     /* Calculate number of block instances that are shader cores */
     sc_block_count = fls64(v5_info->core_mask);
-
     /*
      * A system can have up to 64 shader cores, but the 64-bit
      * availability mask can't physically represent that many cores as well

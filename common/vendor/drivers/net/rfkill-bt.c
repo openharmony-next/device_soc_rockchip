@@ -685,7 +685,6 @@ static int rfkill_rk_probe(struct platform_device *pdev)
 
     INIT_DELAYED_WORK(&rfkill->bt_sleep_delay_work, rfkill_rk_delay_sleep_bt);
 
-    
     //  bt turn off power
     if (gpio_is_valid(pdata->poweron_gpio.io)) {
         gpio_direction_output(pdata->poweron_gpio.io, !pdata->poweron_gpio.enable);

@@ -193,7 +193,7 @@ static int nouveau_cli_init(struct nouveau_drm *drm, const char *sname, struct n
     u64 device = nouveau_name(drm->dev);
     int ret;
 
-    snprintf(cli->name, sizeof(cli->name), "%s", sname);
+    ret = snprintf(cli->name, sizeof(cli->name), "%s", sname);
     cli->drm = drm;
     mutex_init(&cli->mutex);
     usif_client_init(cli);
@@ -215,7 +215,7 @@ static int nouveau_cli_init(struct nouveau_drm *drm, const char *sname, struct n
     }
 
     ret = nvif_device_ctor(&cli->base.object, "drmDevice", 0, NV_DEVICE,
-                           &(struct nv_device_v0){
+                           &(struct nv_device_v0) {
                                .device = ~0,
                            },
                            sizeof(struct nv_device_v0), &cli->device);
@@ -359,7 +359,7 @@ static void nouveau_accel_gr_init(struct nouveau_drm *drm)
         }
 
         ret = nvif_object_ctor(&drm->channel->user, "drmM2mfNtfy", NvNotify0, NV_DMA_IN_MEMORY,
-                               &(struct nv_dma_v0){.target = NV_DMA_V0_TARGET_VRAM,
+                               &(struct nv_dma_v0) {.target = NV_DMA_V0_TARGET_VRAM,
                                                    .access = NV_DMA_V0_ACCESS_RDWR,
                                                    .start = drm->notify->addr,
                                                    .limit = drm->notify->addr + 0x1f},
@@ -396,7 +396,7 @@ static void nouveau_accel_init(struct nouveau_drm *drm)
         return;
     }
 
-    /*XXX: this is crap, but the fence/channel stuff is a little
+    /* XXX: this is crap, but the fence/channel stuff is a little
      *     backwards in some places.  this will be fixed.
      */
     ret = n = nvif_object_sclass_get(&device->object, &sclass);
@@ -1042,7 +1042,7 @@ static int nouveau_drm_open(struct drm_device *dev, struct drm_file *fpriv)
     }
 
     get_task_comm(tmpname, current);
-    snprintf(name, sizeof(name), "%s[%d]", tmpname, pid_nr(fpriv->pid));
+    ret = snprintf(name, sizeof(name), "%s[%d]", tmpname, pid_nr(fpriv->pid));
 
     if (!(cli = kzalloc(sizeof(*cli), GFP_KERNEL))) {
         ret = -ENOMEM;
@@ -1154,12 +1154,11 @@ static const struct file_operations nouveau_driver_fops = {
 };
 
 static struct drm_driver driver_stub = {
-    .driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_RENDER
 #if defined(CONFIG_NOUVEAU_LEGACY_CTX_SUPPORT)
-                       | DRIVER_KMS_LEGACY_CONTEXT
+    .driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_RENDER | DRIVER_KMS_LEGACY_CONTEXT,
+#else
+    .driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_RENDER,
 #endif
-    ,
-
     .open = nouveau_drm_open,
     .postclose = nouveau_drm_postclose,
     .lastclose = nouveau_vga_lastclose,
@@ -1200,17 +1199,19 @@ static struct drm_driver driver_stub = {
     .patchlevel = DRIVER_PATCHLEVEL,
 };
 
-static struct pci_device_id nouveau_drm_pci_table[] = {{
-                                                           PCI_DEVICE(PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID),
-                                                           .class = PCI_BASE_CLASS_DISPLAY << 16,
-                                                           .class_mask = 0xff << 16,
-                                                       },
-                                                       {
-                                                           PCI_DEVICE(PCI_VENDOR_ID_NVIDIA_SGS, PCI_ANY_ID),
-                                                           .class = PCI_BASE_CLASS_DISPLAY << 16,
-                                                           .class_mask = 0xff << 16,
-                                                       },
-                                                       {}};
+static struct pci_device_id nouveau_drm_pci_table[] = {
+    {
+        PCI_DEVICE(PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID),
+        .class = PCI_BASE_CLASS_DISPLAY << 16,
+        .class_mask = 0xff << 16,
+    },
+    {
+        PCI_DEVICE(PCI_VENDOR_ID_NVIDIA_SGS, PCI_ANY_ID),
+        .class = PCI_BASE_CLASS_DISPLAY << 16,
+        .class_mask = 0xff << 16,
+    },
+    {}
+};
 
 static void nouveau_display_options(void)
 {

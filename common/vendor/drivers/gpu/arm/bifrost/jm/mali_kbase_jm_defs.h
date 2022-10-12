@@ -146,7 +146,6 @@
  *                  for the faulty atom.
  */
 struct base_job_fault_event {
-
     u32 event_code;
     struct kbase_jd_atom *katom;
     struct work_struct job_fault_work;

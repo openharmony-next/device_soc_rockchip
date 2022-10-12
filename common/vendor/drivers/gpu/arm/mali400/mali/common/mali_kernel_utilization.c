@@ -156,8 +156,8 @@ struct mali_gpu_utilization_data *mali_utilization_calculate(u64 *start_time, u6
     last_utilization_gp = utilization_gp;
     last_utilization_pp = utilization_pp;
 
-    if ((MALI_GP_BOUND_GP_UTILIZATION_THRESHOLD < last_utilization_gp) &&
-        (MALI_GP_BOUND_PP_UTILIZATION_THRESHOLD > last_utilization_pp)) {
+    if ((last_utilization_gp > MALI_GP_BOUND_GP_UTILIZATION_THRESHOLD) &&
+        (last_utilization_pp < MALI_GP_BOUND_PP_UTILIZATION_THRESHOLD)) {
         mali_executor_hint_enable(MALI_EXECUTOR_HINT_GP_BOUND);
     } else {
         mali_executor_hint_disable(MALI_EXECUTOR_HINT_GP_BOUND);
@@ -191,19 +191,19 @@ mali_osk_errcode_t mali_utilization_init(void)
     mali_osk_device_data data;
 
     if (MALI_OSK_ERR_OK == mali_osk_device_data_get(&data)) {
-        if (NULL != data.utilization_callback) {
+        if (data.utilization_callback != NULL) {
             mali_utilization_callback = data.utilization_callback;
-            MALI_DEBUG_PRINT(2, ("Mali GPU Utilization: Utilization handler installed \n"));
+            MALI_DEBUG_PRINT(0x2, ("Mali GPU Utilization: Utilization handler installed \n"));
         }
     }
 #endif /* defined(USING_GPU_UTILIZATION) */
 
-    if (NULL == mali_utilization_callback) {
-        MALI_DEBUG_PRINT(2, ("Mali GPU Utilization: No platform utilization handler installed\n"));
+    if (mali_utilization_callback == NULL) {
+        MALI_DEBUG_PRINT(0x2, ("Mali GPU Utilization: No platform utilization handler installed\n"));
     }
 
     utilization_data_lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_UTILIZATION);
-    if (NULL == utilization_data_lock) {
+    if (utilization_data_lock == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -215,7 +215,7 @@ mali_osk_errcode_t mali_utilization_init(void)
 
 void mali_utilization_term(void)
 {
-    if (NULL != utilization_data_lock) {
+    if (utilization_data_lock != NULL) {
         _mali_osk_spinlock_irq_term(utilization_data_lock);
     }
 }
@@ -225,13 +225,13 @@ void mali_utilization_gp_start(void)
     mali_utilization_data_lock();
 
     ++num_running_gp_cores;
-    if (1 == num_running_gp_cores) {
+    if (num_running_gp_cores == 1) {
         u64 time_now = _mali_osk_time_get_ns();
 
         /* First GP core started, consider GP busy from now and onwards */
         work_start_time_gp = time_now;
 
-        if (0 == num_running_pp_cores) {
+        if (num_running_pp_cores == 0) {
             mali_bool is_resume = MALI_FALSE;
             /*
              * There are no PP cores running, so this is also the point
@@ -248,7 +248,7 @@ void mali_utilization_gp_start(void)
 #if defined(CONFIG_MALI_DVFS)
                 /* Clear session->number_of_window_jobs, prepare parameter for dvfs */
                 mali_session_max_window_num();
-                if (0 == last_utilization_gpu) {
+                if (last_utilization_gpu == 0) {
                     /*
                      * for mali_dev_pause is called in set clock,
                      * so each time we change clock, we will set clock to
@@ -271,7 +271,6 @@ void mali_utilization_gp_start(void)
         } else {
             mali_utilization_data_unlock();
         }
-
     } else {
         /* Nothing to do */
         mali_utilization_data_unlock();
@@ -283,13 +282,13 @@ void mali_utilization_pp_start(void)
     mali_utilization_data_lock();
 
     ++num_running_pp_cores;
-    if (1 == num_running_pp_cores) {
+    if (num_running_pp_cores == 1) {
         u64 time_now = _mali_osk_time_get_ns();
 
         /* First PP core started, consider PP busy from now and onwards */
         work_start_time_pp = time_now;
 
-        if (0 == num_running_gp_cores) {
+        if (num_running_gp_cores == 0) {
             mali_bool is_resume = MALI_FALSE;
             /*
              * There are no GP cores running, so this is also the point
@@ -306,7 +305,7 @@ void mali_utilization_pp_start(void)
 #if defined(CONFIG_MALI_DVFS)
                 /* Clear session->number_of_window_jobs, prepare parameter for dvfs */
                 mali_session_max_window_num();
-                if (0 == last_utilization_gpu) {
+                if (last_utilization_gpu == 0) {
                     /*
                      * for mali_dev_pause is called in set clock,
                      * so each time we change clock, we will set clock to
@@ -341,14 +340,14 @@ void mali_utilization_gp_end(void)
     mali_utilization_data_lock();
 
     --num_running_gp_cores;
-    if (0 == num_running_gp_cores) {
+    if (num_running_gp_cores == 0) {
         u64 time_now = _mali_osk_time_get_ns();
 
         /* Last GP core ended, consider GP idle from now and onwards */
         accumulated_work_time_gp += (time_now - work_start_time_gp);
         work_start_time_gp = 0;
 
-        if (0 == num_running_pp_cores) {
+        if (num_running_pp_cores == 0) {
             /*
              * There are no PP cores running, so this is also the point
              * at which we consider the GPU to be idle as well.
@@ -366,14 +365,14 @@ void mali_utilization_pp_end(void)
     mali_utilization_data_lock();
 
     --num_running_pp_cores;
-    if (0 == num_running_pp_cores) {
+    if (num_running_pp_cores == 0) {
         u64 time_now = _mali_osk_time_get_ns();
 
         /* Last PP core ended, consider PP idle from now and onwards */
         accumulated_work_time_pp += (time_now - work_start_time_pp);
         work_start_time_pp = 0;
 
-        if (0 == num_running_gp_cores) {
+        if (num_running_gp_cores == 0) {
             /*
              * There are no GP cores running, so this is also the point
              * at which we consider the GPU to be idle as well.
@@ -391,7 +390,7 @@ mali_bool mali_utilization_enabled(void)
 #if defined(CONFIG_MALI_DVFS)
     return mali_dvfs_policy_enabled();
 #else
-    return (NULL != mali_utilization_callback);
+    return (mali_utilization_callback != NULL);
 #endif /* defined(CONFIG_MALI_DVFS) */
 }
 

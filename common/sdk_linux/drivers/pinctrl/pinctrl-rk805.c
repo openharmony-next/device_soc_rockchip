@@ -227,21 +227,23 @@ static const struct rk805_pin_function rk817_pin_functions[] = {
 };
 
 /* for rk809 only a sleep pin */
-static const struct rk805_pin_group rk817_pin_groups[] = {{
-    .name = "gpio_slp",
-    .pins = {RK817_GPIO_SLP},
-    .npins = 1,
-},
-{
-    .name = "gpio_ts",
-    .pins = {RK817_GPIO_TS},
-    .npins = 1,
-},
-{
-    .name = "gpio_gt",
-    .pins = {RK817_GPIO_GT},
-    .npins = 1,
-}};
+static const struct rk805_pin_group rk817_pin_groups[] = {
+    {
+        .name = "gpio_slp",
+        .pins = {RK817_GPIO_SLP},
+        .npins = 1,
+    },
+    {
+        .name = "gpio_ts",
+        .pins = {RK817_GPIO_TS},
+        .npins = 1,
+    },
+    {
+        .name = "gpio_gt",
+        .pins = {RK817_GPIO_GT},
+        .npins = 1,
+    }
+};
 
 #define RK817_GPIOTS_VAL_MSK BIT(3)
 #define RK817_GPIOGT_VAL_MSK BIT(6)

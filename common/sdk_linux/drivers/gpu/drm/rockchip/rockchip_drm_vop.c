@@ -54,21 +54,22 @@
 
 #define VOP_REG_SUPPORT(vop, reg)                                                                                      \
     ((reg).mask &&                                                                                                     \
-     (!(reg).major || ((reg).major == VOP_MAJOR((vop)->version) && (reg).begin_minor <= VOP_MINOR((vop)->version) &&       \
+     (!(reg).major || ((reg).major == VOP_MAJOR((vop)->version) && (reg).begin_minor <= VOP_MINOR((vop)->version) &&   \
                        (reg).end_minor >= VOP_MINOR((vop)->version))))
 
 #define VOP_WIN_SUPPORT(vop, win, name) VOP_REG_SUPPORT(vop, (win)->phy->name)
 
-#define VOP_WIN_SCL_EXT_SUPPORT(vop, win, name) ((win)->phy->scl->ext && VOP_REG_SUPPORT(vop, (win)->phy->scl->ext->name))
+#define VOP_WIN_SCL_EXT_SUPPORT(vop, win, name) ((win)->phy->scl->ext && \
+        VOP_REG_SUPPORT(vop, (win)->phy->scl->ext->name))
 
 #define VOP_CTRL_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, (vop)->data->ctrl->name)
 
 #define VOP_INTR_SUPPORT(vop, name) VOP_REG_SUPPORT(vop, (vop)->data->intr->name)
 
-#define REG_SET_EX(x, off, mask, shift, v, write_mask, relaxed)                                                         \
+#define REG_SET_EX(x, off, mask, shift, v, write_mask, relaxed)                                                        \
     vop_mask_write((x), (off), (mask), (shift), (v), (write_mask), (relaxed))
 
-#define REG_SET_E(vop, name, off, reg, mask, v, relaxed)                                                                \
+#define REG_SET_E(vop, name, off, reg, mask, v, relaxed)                                                               \
     do {                                                                                                               \
         if (VOP_REG_SUPPORT(vop, reg))                                                                                 \
             REG_SET_EX(vop, (off) + (reg).offset, mask, (reg).shift, v, (reg).write_mask, relaxed);                    \
@@ -399,7 +400,7 @@ static inline uint32_t vop_get_intr_type(struct vop *vop, const struct vop_reg *
     uint32_t regs = vop_read_reg(vop, 0, reg);
 
     for (i = 0; i < vop->data->intr->nintrs; i++) {
-        if ((type & vop->data->intr->intrs[i]) && (regs & 1 << i)) {
+        if ((type & vop->data->intr->intrs[i]) && (regs & (1 << i))) {
             ret |= vop->data->intr->intrs[i];
         }
     }
@@ -1506,7 +1507,6 @@ static void vop_power_enable(struct drm_crtc *crtc)
 
     if (VOP_CTRL_SUPPORT(vop, version)) {
         uint32_t version = VOP_CTRL_GET(vop, version);
-
         /*
          * Fixup rk3288w version.
          */
@@ -1547,7 +1547,7 @@ static void vop_initial(struct drm_crtc *crtc)
         struct vop_win *win = &vop->win[i];
         int channel = i * 0x2 + 1;
 
-        VOP_WIN_SET(vop, win, channel, (channel + 1) << 0x4 | channel);
+        VOP_WIN_SET(vop, win, channel, ((channel + 1) << 0x4) | channel);
     }
     VOP_CTRL_SET(vop, afbdc_en, 0);
     vop_enable_debug_irq(crtc);
@@ -1695,8 +1695,8 @@ static int vop_plane_atomic_check(struct drm_plane *plane, struct drm_plane_stat
         return -EINVAL;
     }
 
-    if (drm_rect_width(src) >> 0x10 > vop_data->max_input.width ||
-        drm_rect_height(src) >> 0x10 > vop_data->max_input.height) {
+    if (((drm_rect_width(src) >> 0x10) > vop_data->max_input.width) ||
+        ((drm_rect_height(src) >> 0x10) > vop_data->max_input.height)) {
         DRM_ERROR("Invalid source: %dx%d. max input: %dx%d\n", drm_rect_width(src) >> 0x10,
                   drm_rect_height(src) >> 0x10, vop_data->max_input.width, vop_data->max_input.height);
         return -EINVAL;
@@ -1711,7 +1711,7 @@ static int vop_plane_atomic_check(struct drm_plane *plane, struct drm_plane_stat
         return -EINVAL;
     }
 
-    if (fb->format->is_yuv && state->rotation & DRM_MODE_REFLECT_Y) {
+    if (fb->format->is_yuv && (state->rotation & DRM_MODE_REFLECT_Y)) {
         DRM_ERROR("Invalid Source: Yuv format does not support this rotation\n");
         return -EINVAL;
     }
@@ -1864,14 +1864,14 @@ static void vop_plane_atomic_update(struct drm_plane *plane, struct drm_plane_st
         actual_h = dsp_h * actual_h / drm_rect_height(dest);
     }
 
-    act_info = (actual_h - 1) << 0x10 | ((actual_w - 1) & 0xffff);
+    act_info = ((actual_h - 1) << 0x10) | ((actual_w - 1) & 0xffff);
 
     dsp_info = (dsp_h - 1) << 0x10;
     dsp_info |= (dsp_w - 1) & 0xffff;
 
     dsp_stx = dest->x1 + mode->crtc_htotal - mode->crtc_hsync_start;
     dsp_sty = dest->y1 + mode->crtc_vtotal - mode->crtc_vsync_start;
-    dsp_st = dsp_sty << 0x10 | (dsp_stx & 0xffff);
+    dsp_st = (dsp_sty << 0x10) | (dsp_stx & 0xffff);
 
     s = to_rockchip_crtc_state(crtc->state);
     spin_lock(&vop->reg_lock);
@@ -2444,7 +2444,8 @@ static int vop_crtc_debugfs_dump(struct drm_crtc *crtc, struct seq_file *s)
     DEBUG_PRINT_S(s, " color_space[%d]\n", state->color_space);
     DEBUG_PRINT_S(s, "    Display mode: %dx%d%s%d\n", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "p",
                 drm_mode_vrefresh(mode));
-    DEBUG_PRINT_S(s, "\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, mode->flags);
+    DEBUG_PRINT_S(s, "\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, \
+                  mode->flags);
     DEBUG_PRINT_S(s, "\tH: %d %d %d %d\n", mode->hdisplay, mode->hsync_start, mode->hsync_end, mode->htotal);
     DEBUG_PRINT_S(s, "\tV: %d %d %d %d\n", mode->vdisplay, mode->vsync_start, mode->vsync_end, mode->vtotal);
 
@@ -2605,9 +2606,11 @@ static size_t vop_plane_line_bandwidth(struct drm_plane_state *pstate)
     if (src_width <= 0 || src_height <= 0 || dest_width <= 0 || dest_height <= 0) {
         return 0;
     }
-
     bandwidth = src_width * bpp / 0x8;
 
+    if (dest_width == 0 || dest_height == 0) {
+        return 0;
+    }
     bandwidth = bandwidth * src_width / dest_width;
     bandwidth = bandwidth * src_height / dest_height;
     if (vskiplines == 0x2 && VOP_WIN_SCL_EXT_SUPPORT(vop, win, vsd_yrgb_gt2)) {
@@ -2632,7 +2635,6 @@ static u64 vop_calc_max_bandwidth(struct vop_bandwidth *bw, int start, int count
         }
         bandwidth = bw[i].bandwidth;
         bandwidth += vop_calc_max_bandwidth(bw, i + 1, count, min(bw[i].y2, y2));
-
         if (bandwidth > max_bandwidth) {
             max_bandwidth = bandwidth;
         }
@@ -2949,10 +2951,10 @@ static bool vop_crtc_mode_update(struct drm_crtc *crtc)
     u16 vsync_len = adjusted_mode->crtc_vsync_end - adjusted_mode->crtc_vsync_start;
     u16 vact_st = adjusted_mode->crtc_vtotal - adjusted_mode->crtc_vsync_start;
     u16 vact_end = vact_st + vdisplay;
-    u32 htotal_sync = htotal << 0x10 | hsync_len;
-    u32 hactive_st_end = hact_st << 0x10 | hact_end;
-    u32 vtotal_sync = vtotal << 0x10 | vsync_len;
-    u32 vactive_st_end = vact_st << 0x10 | vact_end;
+    u32 htotal_sync = (htotal << 0x10) | hsync_len;
+    u32 hactive_st_end = (hact_st << 0x10) | hact_end;
+    u32 vtotal_sync = (vtotal << 0x10) | vsync_len;
+    u32 vactive_st_end = (vact_st << 0x10) | vact_end;
     u32 crtc_clock = adjusted_mode->crtc_clock * 0x64;
 
     if (htotal_sync != VOP_CTRL_GET(vop, htotal_pw) || hactive_st_end != VOP_CTRL_GET(vop, hact_st_end) ||
@@ -3109,11 +3111,11 @@ static void vop_crtc_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state 
         u16 vact_st_f1 = vtotal + vact_st + 1;
         u16 vact_end_f1 = vact_st_f1 + vdisplay;
 
-        val = vact_st_f1 << 0x10 | vact_end_f1;
+        val = (vact_st_f1 << 0x10) | vact_end_f1;
         VOP_CTRL_SET(vop, vact_st_end_f1, val);
         VOP_CTRL_SET(vop, vpost_st_end_f1, val);
 
-        val = vtotal << 0x10 | (vtotal + vsync_len);
+        val = (vtotal << 0x10) | (vtotal + vsync_len);
         VOP_CTRL_SET(vop, vs_st_end_f1, val);
         VOP_CTRL_SET(vop, dsp_interlace, 1);
         VOP_CTRL_SET(vop, p2i_en, 1);
@@ -3131,7 +3133,7 @@ static void vop_crtc_atomic_enable(struct drm_crtc *crtc, struct drm_crtc_state 
     VOP_INTR_SET(vop, line_flag_num[0], act_end);
     VOP_INTR_SET(vop, line_flag_num[1], act_end - us_to_vertical_line(adjusted_mode, for_ddr_freq));
 
-    VOP_CTRL_SET(vop, vtotal_pw, vtotal << 0x10 | vsync_len);
+    VOP_CTRL_SET(vop, vtotal_pw, (vtotal << 0x10) | vsync_len);
 
     VOP_CTRL_SET(vop, core_dclk_div, !!(adjusted_mode->flags & DRM_MODE_FLAG_DBLCLK));
 
@@ -3459,7 +3461,7 @@ static void vop_post_config(struct drm_crtc *crtc)
         u16 vact_st_f1 = vtotal + vact_st + 1;
         u16 vact_end_f1 = vact_st_f1 + vsize;
 
-        val = vact_st_f1 << 0x10 | vact_end_f1;
+        val = (vact_st_f1 << 0x10) | vact_end_f1;
         VOP_CTRL_SET(vop, vpost_st_end_f1, val);
     }
 }
@@ -3589,7 +3591,6 @@ static void vop_tv_config_update(struct drm_crtc *crtc, struct drm_crtc_state *o
         sin_hue = fixp_sin32(hue) >> 0x17;
         cos_hue = fixp_cos32(hue) >> 0x17;
         VOP_CTRL_SET(vop, bcsh_sat_con, saturation * contrast / 0x100);
-
     } else {
         contrast = interpolate(0, 0, 0x64, 0xff, s->tv_state->contrast);
         saturation = interpolate(0, 0, 0x64, 0xff, s->tv_state->saturation);
@@ -4139,7 +4140,6 @@ static void vop_plane_add_properties(struct vop *vop, struct drm_plane *plane, c
 
     flags |= (VOP_WIN_SUPPORT(vop, win, xmirror)) ? DRM_MODE_REFLECT_X : 0;
     flags |= (VOP_WIN_SUPPORT(vop, win, ymirror)) ? DRM_MODE_REFLECT_Y : 0;
-
     if (flags) {
         drm_plane_create_rotation_property(plane, DRM_MODE_ROTATE_0, DRM_MODE_ROTATE_0 | flags);
     }
@@ -4285,6 +4285,9 @@ static int vop_of_init_display_lut(struct vop *vop)
             return -EINVAL;
         }
 
+        if (lut_len == 0 || length == 0) {
+            return  -EPERM;
+        }
         for (i = 0; i < lut_len; i++) {
             j = i * length / lut_len;
             r = lut[j] / length / length * lut_len / length;
@@ -4547,7 +4550,7 @@ static int vop_plane_get_zpos(enum drm_plane_type type, unsigned int size)
 static int vop_win_init(struct vop *vop)
 {
     const struct vop_data *vop_data = vop->data;
-    unsigned int i, j;
+    unsigned int i, j, ret;
     unsigned int num_wins = 0;
     char name[DRM_PROP_NAME_LEN];
     uint8_t plane_id = 0;
@@ -4578,7 +4581,7 @@ static int vop_win_init(struct vop *vop)
         vop_win->win_id = i;
         vop_win->area_id = 0;
         vop_win->plane_id = plane_id++;
-        snprintf(name, sizeof(name), "VOP%d-win%d-%d", vop->id, vop_win->win_id, vop_win->area_id);
+        ret = snprintf(name, sizeof(name), "VOP%d-win%d-%d", vop->id, vop_win->win_id, vop_win->area_id);
         vop_win->name = devm_kstrdup(vop->dev, name, GFP_KERNEL);
         vop_win->zpos = vop_plane_get_zpos(win_data->type, vop_data->win_size);
 
@@ -4603,7 +4606,7 @@ static int vop_win_init(struct vop *vop)
             vop_area->win_id = i;
             vop_area->area_id = j + 1;
             vop_area->plane_id = plane_id++;
-            snprintf(name, sizeof(name), "VOP%d-win%d-%d", vop->id, vop_area->win_id, vop_area->area_id);
+            ret = snprintf(name, sizeof(name), "VOP%d-win%d-%d", vop->id, vop_area->win_id, vop_area->area_id);
             vop_area->name = devm_kstrdup(vop->dev, name, GFP_KERNEL);
             num_wins++;
         }

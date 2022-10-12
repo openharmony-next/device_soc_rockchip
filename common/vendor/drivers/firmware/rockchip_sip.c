@@ -35,7 +35,7 @@
 #define SIZE_PAGE(n) ((n) << 12)
 
 static struct arm_smccc_res invoke_sip_fn_smc(unsigned long function_id, unsigned long arg0, unsigned long arg1,
-                                                unsigned long arg2)
+                                              unsigned long arg2)
 {
     struct arm_smccc_res res;
 

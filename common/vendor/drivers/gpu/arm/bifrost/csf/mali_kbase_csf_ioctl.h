@@ -153,7 +153,6 @@ union kbase_ioctl_cs_queue_group_create {
         __u8 fragment_max;
         __u8 compute_max;
         __u8 padding[3];
-
     } in;
     struct {
         __u8 group_handle;

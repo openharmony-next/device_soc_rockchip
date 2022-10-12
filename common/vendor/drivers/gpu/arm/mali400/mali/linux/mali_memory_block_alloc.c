@@ -81,12 +81,11 @@ static mali_block_allocator *mali_mem_block_allocator_create(u32 base_address, u
         spin_lock_init(&info->sp_lock);
         info->total_num = num_blocks;
         mali_blk_items = mali_osk_calloc(1, sizeof(mali_block_item) * num_blocks);
-
         if (mali_blk_items) {
             info->items = mali_blk_items;
-            /* add blocks(4k size) to free list*/
+            /* add blocks(4k size) to free list */
             for (i = 0; i < num_blocks; i++) {
-                /* add block information*/
+                /* add block information */
                 mali_blk_items[i].phy_addr = base_address + (i * MALI_BLOCK_SIZE);
                 /* add  to free list */
                 m_node = _mali_page_node_allocate(MALI_PAGE_NODE_BLOCK);
@@ -112,7 +111,7 @@ void mali_mem_block_allocator_destroy(void)
     MALI_DEBUG_ASSERT_POINTER(info);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Memory block destroy !\n"));
 
-    if (NULL == info) {
+    if (info == NULL) {
         return;
     }
 
@@ -149,11 +148,11 @@ int mali_mem_block_alloc(mali_mem_block_mem *block_mem, u32 size)
     MALI_DEBUG_ASSERT_POINTER(info);
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("BLOCK Mem: Allocate size = 0x%x\n", size));
-    /*do some init */
+    /* do some init */
     INIT_LIST_HEAD(&block_mem->pfns);
 
     spin_lock(&info->sp_lock);
-    /*check if have enough space*/
+    /* check if have enough space */
     if (atomic_read(&info->free_num) > page_count) {
         list_for_each_entry_safe(m_page, m_tmp, &info->free, list)
         {
@@ -170,7 +169,7 @@ int mali_mem_block_alloc(mali_mem_block_mem *block_mem, u32 size)
             page_count--;
         }
     } else {
-        /* can't allocate from BLOCK memory*/
+        /* can't allocate from BLOCK memory */
         spin_unlock(&info->sp_lock);
         return -1;
     }
@@ -203,7 +202,7 @@ u32 mali_mem_block_free_list(struct list_head *list)
         spin_lock(&info->sp_lock);
         list_for_each_entry_safe(m_page, m_tmp, list, list)
         {
-            if (1 == mali_page_node_get_ref_count(m_page)) {
+            if (mali_page_node_get_ref_count(m_page) == 1) {
                 free_pages_nr++;
             }
             mali_mem_block_free_node(m_page);
@@ -213,16 +212,16 @@ u32 mali_mem_block_free_list(struct list_head *list)
     return free_pages_nr;
 }
 
-/* free the node,*/
+/* free the node, */
 void mali_mem_block_free_node(struct mali_page_node *node)
 {
     mali_block_allocator *info = mali_mem_block_gobal_allocator;
 
     /* only handle BLOCK node */
     if (node->type == MALI_PAGE_NODE_BLOCK && info) {
-        /*Need to make this atomic?*/
-        if (1 == mali_page_node_get_ref_count(node)) {
-            /*Move to free list*/
+        /* Need to make this atomic? */
+        if (mali_page_node_get_ref_count(node) == 1) {
+            /* Move to free list */
             _mali_page_node_unref(node);
             list_move_tail(&node->list, &info->free);
             atomic_add(1, &info->free_num);
@@ -242,9 +241,9 @@ mali_osk_errcode_t mali_mem_block_unref_node(struct mali_page_node *node)
 
     /* only handle BLOCK node */
     if (node->type == MALI_PAGE_NODE_BLOCK && info) {
-        /*Need to make this atomic?*/
-        if (1 == mali_page_node_get_ref_count(node)) {
-            /* allocate a  new node, Add to free list, keep the old node*/
+        /* Need to make this atomic? */
+        if (mali_page_node_get_ref_count(node) == 1) {
+            /* allocate a  new node, Add to free list, keep the old node */
             _mali_page_node_unref(node);
             new_node = _mali_page_node_allocate(MALI_PAGE_NODE_BLOCK);
             if (new_node) {
@@ -254,7 +253,6 @@ mali_osk_errcode_t mali_mem_block_unref_node(struct mali_page_node *node)
             } else {
                 return MALI_OSK_ERR_FAULT;
             }
-
         } else {
             _mali_page_node_unref(node);
         }
@@ -311,7 +309,6 @@ int mali_mem_block_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *v
     {
         MALI_DEBUG_ASSERT(m_page->type == MALI_PAGE_NODE_BLOCK);
         ret = vmf_insert_pfn(vma, addr, _mali_page_node_get_pfn(m_page));
-
         if (unlikely(0 != ret)) {
             return -EFAULT;
         }
@@ -336,8 +333,7 @@ mali_osk_errcode_t mali_memory_core_resource_dedicated_memory(u32 start, u32 siz
 
     /* Create generic block allocator object to handle it */
     allocator = mali_mem_block_allocator_create(start, size);
-
-    if (NULL == allocator) {
+    if (allocator == NULL) {
         MALI_DEBUG_PRINT(1, ("Memory bank registration failed\n"));
         _mali_osk_mem_unreqregion(start, size);
         MALI_ERROR(MALI_OSK_ERR_FAULT);

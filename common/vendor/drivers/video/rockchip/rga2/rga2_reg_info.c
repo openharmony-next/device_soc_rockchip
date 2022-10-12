@@ -83,7 +83,7 @@ static void RGA2_reg_get_param(unsigned char *base, struct rga2_req *msg)
 #endif
         *bRGA_SRC_X_FACTOR |= ((param_x & 0xffff) << RGA2_INDEX_SIX);
     } else {
-        *bRGA_SRC_X_FACTOR = 0; //((1 << 14) << RGA2_INDEX_SIX) | (1 << 14);
+        *bRGA_SRC_X_FACTOR = 0; // ((1 << 14) << RGA2_INDEX_SIX) | (1 << 14);
     }
 
     if (sh > dh) {
@@ -103,7 +103,7 @@ static void RGA2_reg_get_param(unsigned char *base, struct rga2_req *msg)
 #endif
         *bRGA_SRC_Y_FACTOR |= ((param_y & 0xffff) << RGA2_INDEX_SIX);
     } else {
-        *bRGA_SRC_Y_FACTOR = 0; //((1 << 14) << RGA2_INDEX_SIX) | (1 << 14);
+        *bRGA_SRC_Y_FACTOR = 0; // ((1 << 14) << RGA2_INDEX_SIX) | (1 << 14);
     }
 
     reg = ((reg & (~m_RGA2_SRC_INFO_SW_SW_SRC_HSCL_MODE)) | (s_RGA2_SRC_INFO_SW_SW_SRC_HSCL_MODE(x_flag)));
@@ -997,7 +997,7 @@ static void RGA2_set_reg_dst_info(u8 *base, struct rga2_req *msg)
 
     if (msg->dst.format < 0x18 ||
         (msg->dst.format >= RGA2_FORMAT_ARGB_8888 && msg->dst.format <= RGA2_FORMAT_ABGR_4444)) {
-        /* 270 degree & Mirror V*/
+        /* 270 degree & Mirror V */
         y_ld_addr = yrgb_addr + (msg->dst.act_h - 1) * (d_stride);
         /* 90 degree & Mirror H  */
         y_rt_addr = yrgb_addr + (line_width_real - 1) * dpw;

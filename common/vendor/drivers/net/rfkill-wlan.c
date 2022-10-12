@@ -75,7 +75,7 @@ static char wifi_chip_type_string[64];
 #else
 #define BCM_STATIC_MEMORY_SUPPORT 0
 #endif
-//===========================
+// ===========================
 #if BCM_STATIC_MEMORY_SUPPORT
 #define PREALLOC_WLAN_SEC_NUM 4
 #define PREALLOC_WLAN_BUF_NUM 160
@@ -459,7 +459,8 @@ int rockchip_wifi_mac_addr(unsigned char *buf)
     }
 
     sprintf(mac_buf, "%02x:%02x:%02x:%02x:%02x:%02x", wifi_custom_mac_addr[0], wifi_custom_mac_addr[1],
-            wifi_custom_mac_addr[0x02], wifi_custom_mac_addr[0x03], wifi_custom_mac_addr[0x04], wifi_custom_mac_addr[0x05]);
+            wifi_custom_mac_addr[0x02], wifi_custom_mac_addr[0x03],
+            wifi_custom_mac_addr[0x04], wifi_custom_mac_addr[0x05]);
     LOG("falsh wifi_custom_mac_addr=[%s]\n", mac_buf);
 
     if (is_valid_ether_addr(wifi_custom_mac_addr)) {
@@ -502,7 +503,6 @@ void *rockchip_wifi_country_code(char *ccode)
     return mcloc;
 }
 EXPORT_SYMBOL(rockchip_wifi_country_code);
-/**************************************************************************/
 
 static int rfkill_rk_setup_gpio(struct rksdmmc_gpio *gpio, const char *prefix, const char *name)
 {

@@ -86,7 +86,6 @@ static void sync_print_fence(struct seq_file *s, struct dma_fence *fence, bool s
 
         fence->ops->fence_value_str(fence, value, sizeof(value));
         success = strlen(value);
-
         if (success) {
             seq_printf(s, ": %s", value);
 

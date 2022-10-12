@@ -197,7 +197,7 @@ static struct rockchip_pll_rate_table *rockchip_pll_clk_set_by_auto(struct rockc
                                                                     unsigned long fout_hz)
 {
     struct rockchip_pll_rate_table *rate_table = rk_pll_rate_table_get();
-    /* FIXME set postdiv1/2 always 1*/
+    /* FIXME set postdiv1/2 always 1 */
     u32 foutvco = fout_hz;
     u64 fin_64, frac_64;
     u32 f_frac, postdiv1, postdiv2;
@@ -216,6 +216,9 @@ static struct rockchip_pll_rate_table *rockchip_pll_clk_set_by_auto(struct rockc
         fin_hz /= MHZ;
         foutvco /= MHZ;
         clk_gcd = gcd(fin_hz, foutvco);
+        if (clk_gcd == 0) {
+            return -1;
+        }
         rate_table->refdiv = fin_hz / clk_gcd;
         rate_table->fbdiv = foutvco / clk_gcd;
 
@@ -271,7 +274,9 @@ static struct rockchip_pll_rate_table *rockchip_rk3066_pll_clk_set_by_auto(struc
     }
 
     clk_gcd = gcd(fin_hz, fout_hz);
-
+    if (clk_gcd == 0) {
+        return NULL;
+    }
     numerator = fout_hz / clk_gcd;
     denominator = fin_hz / clk_gcd;
 
@@ -591,7 +596,6 @@ static int rockchip_rk3036_pll_init(struct clk_hw *hw)
 
     drate = clk_hw_get_rate(hw);
     rate = rockchip_get_pll_settings(pll, drate);
-
     /* when no rate setting for the current rate, rely on clk_set_rate */
     if (!rate) {
         return 0;
@@ -819,7 +823,6 @@ static int rockchip_rk3066_pll_init(struct clk_hw *hw)
 
     drate = clk_hw_get_rate(hw);
     rate = rockchip_get_pll_settings(pll, drate);
-
     /* when no rate setting for the current rate, rely on clk_set_rate */
     if (!rate) {
         return 0;
@@ -1063,7 +1066,6 @@ static int rockchip_rk3399_pll_init(struct clk_hw *hw)
 
     drate = clk_hw_get_rate(hw);
     rate = rockchip_get_pll_settings(pll, drate);
-
     /* when no rate setting for the current rate, rely on clk_set_rate */
     if (!rate) {
         return 0;
@@ -1203,6 +1205,7 @@ struct clk *rockchip_clk_register_pll(struct rockchip_clk_provider *ctx, enum ro
     struct clk_mux *pll_mux;
     struct clk *pll_clk, *mux_clk;
     char pll_name[20];
+    int ret = 0;
 
     if ((pll_type != pll_rk3328 && num_parents != 0x2) || (pll_type == pll_rk3328 && num_parents != 0x1)) {
         pr_err("%s: needs two parent clocks\n", __func__);
@@ -1210,7 +1213,7 @@ struct clk *rockchip_clk_register_pll(struct rockchip_clk_provider *ctx, enum ro
     }
 
     /* name the actual pll */
-    snprintf(pll_name, sizeof(pll_name), "pll_%s", name);
+    ret = snprintf(pll_name, sizeof(pll_name), "pll_%s", name);
 
     pll = kzalloc(sizeof(*pll), GFP_KERNEL);
     if (!pll) {

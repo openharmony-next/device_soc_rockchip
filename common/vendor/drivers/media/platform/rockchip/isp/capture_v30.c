@@ -18,54 +18,50 @@
 static int mi_frame_end(struct rkisp_stream *stream);
 
 static const struct capture_fmt fbc_fmts[] = {{
-                                                  .fourcc = V4L2_PIX_FMT_FBC0,
-                                                  .fmt_type = FMT_FBC,
-                                                  .bpp = {8, 16},
-                                                  .cplanes = 2,
-                                                  .mplanes = 1,
-                                                  .write_format = ISP3X_MPFBC_YUV420,
-                                              },
-                                              {
-                                                  .fourcc = V4L2_PIX_FMT_FBC2,
-                                                  .fmt_type = FMT_FBC,
-                                                  .bpp = {8, 16},
-                                                  .cplanes = 2,
-                                                  .mplanes = 1,
-                                                  .write_format = ISP3X_MPFBC_YUV422,
-                                              }};
+    .fourcc = V4L2_PIX_FMT_FBC0,
+    .fmt_type = FMT_FBC,
+    .bpp = {8, 16},
+    .cplanes = 2,
+    .mplanes = 1,
+    .write_format = ISP3X_MPFBC_YUV420,
+}, {
+    .fourcc = V4L2_PIX_FMT_FBC2,
+    .fmt_type = FMT_FBC,
+    .bpp = {8, 16},
+    .cplanes = 2,
+    .mplanes = 1,
+    .write_format = ISP3X_MPFBC_YUV422,
+}};
 
 static const struct capture_fmt bp_fmts[] = {{
-                                                 .fourcc = V4L2_PIX_FMT_UYVY,
-                                                 .fmt_type = FMT_YUV,
-                                                 .bpp = {16},
-                                                 .cplanes = 1,
-                                                 .mplanes = 1,
-                                                 .write_format = ISP3X_BP_FORMAT_INT,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_NV16,
-                                                 .fmt_type = FMT_YUV,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .write_format = ISP3X_BP_FORMAT_SPLA,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_NV12,
-                                                 .fmt_type = FMT_YUV,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 1,
-                                                 .write_format = ISP3X_BP_FORMAT_SPLA,
-                                             },
-                                             {
-                                                 .fourcc = V4L2_PIX_FMT_NV12M,
-                                                 .fmt_type = FMT_YUV,
-                                                 .bpp = {8, 16},
-                                                 .cplanes = 2,
-                                                 .mplanes = 2,
-                                                 .write_format = ISP3X_BP_FORMAT_SPLA,
-                                             }};
+    .fourcc = V4L2_PIX_FMT_UYVY,
+    .fmt_type = FMT_YUV,
+    .bpp = {16},
+    .cplanes = 1,
+    .mplanes = 1,
+    .write_format = ISP3X_BP_FORMAT_INT,
+}, {
+    .fourcc = V4L2_PIX_FMT_NV16,
+    .fmt_type = FMT_YUV,
+    .bpp = {8, 16},
+    .cplanes = 2,
+    .mplanes = 1,
+    .write_format = ISP3X_BP_FORMAT_SPLA,
+}, {
+    .fourcc = V4L2_PIX_FMT_NV12,
+    .fmt_type = FMT_YUV,
+    .bpp = {8, 16},
+    .cplanes = 2,
+    .mplanes = 1,
+    .write_format = ISP3X_BP_FORMAT_SPLA,
+}, {
+    .fourcc = V4L2_PIX_FMT_NV12M,
+    .fmt_type = FMT_YUV,
+    .bpp = {8, 16},
+    .cplanes = 2,
+    .mplanes = 2,
+    .write_format = ISP3X_BP_FORMAT_SPLA,
+}};
 
 struct stream_config rkisp_fbc_stream_config = {
     .fmts = fbc_fmts,
@@ -151,7 +147,6 @@ static int rkisp_stream_config_dcrop(struct rkisp_stream *stream, bool async)
 
     /* dual-crop unit get data from isp */
     input_win = rkisp_get_isp_sd_win(&dev->isp_sdev);
-
     if (dcrop->width == input_win->width && dcrop->height == input_win->height && dcrop->left == 0 && dcrop->top == 0 &&
         !dev->hw_dev->is_unite) {
         rkisp_disable_dcrop(stream, async);
@@ -715,7 +710,6 @@ static int mi_frame_end(struct rkisp_stream *stream)
         stream->dbg.delay = ns - dev->isp_sdev.frm_timestamp;
 
         if (vir->streaming && vir->conn_id == stream->id) {
-
             spin_lock_irqsave(&vir->vbq_lock, lock_flags);
             if (vir->streaming) {
                 list_add_tail(&stream->curr_buf->queue, &dev->cap_dev.vir_cpy.queue);
@@ -728,7 +722,6 @@ static int mi_frame_end(struct rkisp_stream *stream)
             if (!vir->streaming) {
                 vb2_buffer_done(vb2_buf, VB2_BUF_STATE_DONE);
             }
-
         } else {
             vb2_buffer_done(vb2_buf, VB2_BUF_STATE_DONE);
         }
@@ -766,7 +759,7 @@ static void rkisp_stream_stop(struct rkisp_stream *stream)
     if (dev->hw_dev->is_single) {
         stream->ops->disable_mi(stream);
     }
-    if (dev->isp_state & ISP_START && !stream->ops->is_stream_stopped(dev->base_addr)) {
+    if ((dev->isp_state & ISP_START) && !stream->ops->is_stream_stopped(dev->base_addr)) {
         ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(0x1F4));
         if (!ret) {
             v4l2_warn(v4l2_dev, "%s id:%d timeout\n", __func__, stream->id);
@@ -888,7 +881,8 @@ static void rkisp_buf_queue(struct vb2_buffer *vb)
         }
     }
 
-    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev, "stream:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
+    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev,
+             "stream:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
 
     spin_lock_irqsave(&stream->vbq_lock, lock_flags);
     list_add_tail(&ispbuf->queue, &stream->buf_queue);
@@ -1371,7 +1365,6 @@ void rkisp_mi_v30_isr(u32 mis_val, struct rkisp_device *dev)
 
     if (dev->hw_dev->is_unite) {
         u32 val = rkisp_read(dev, ISP3X_MI_RIS, true);
-
         if (val) {
             rkisp_write(dev, ISP3X_MI_ICR, val, true);
             v4l2_dbg(0x03, rkisp_debug, &dev->v4l2_dev, "left mi isr:0x%x\n", val);

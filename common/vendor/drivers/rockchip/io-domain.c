@@ -426,8 +426,8 @@ static const struct rockchip_iodomain_soc_data soc_data_rk3368_pmu = {
     .grf_offset = 0x100,
     .supply_names =
         {
-            NULL, NULL, NULL, NULL, "pmu", /*PMU IO domain*/
-            "vop",                         /*LCDC IO domain*/
+            NULL, NULL, NULL, NULL, "pmu", /* PMU IO domain */
+            "vop",                         /* LCDC IO domain */
         },
 };
 
@@ -531,7 +531,7 @@ static const struct of_device_id rockchip_iodomain_match[] = {
     {.compatible = "rockchip,rv1108-io-voltage-domain", .data = &soc_data_rv1108},
     {.compatible = "rockchip,rv1108-pmu-io-voltage-domain", .data = &soc_data_rv1108_pmu},
     {.compatible = "rockchip,rv1126-pmu-io-voltage-domain", .data = &soc_data_rv1126_pmu},
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_iodomain_match);
 
@@ -590,7 +590,6 @@ static int rockchip_iodomain_probe(struct platform_device *pdev)
         reg = devm_regulator_get_optional(iod->dev, supply_name);
         if (IS_ERR(reg)) {
             ret = PTR_ERR(reg);
-
             /* If a supply wasn't specified, that's OK */
             if (ret == -ENODEV) {
                 continue;
@@ -602,7 +601,6 @@ static int rockchip_iodomain_probe(struct platform_device *pdev)
 
         /* set initial correct value */
         uV = regulator_get_voltage(reg);
-
         /* must be a regulator we can get the voltage of */
         if (uV < 0) {
             dev_err(iod->dev, "Can't determine voltage: %s\n", supply_name);

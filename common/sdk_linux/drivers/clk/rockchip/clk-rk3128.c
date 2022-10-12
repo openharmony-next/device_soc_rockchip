@@ -71,7 +71,7 @@ static struct rockchip_pll_rate_table rk3128_pll_rates[] = {
     RK3036_PLL_RATE(312000000, 1, 52, 2, 2, 1, 0),
     RK3036_PLL_RATE(216000000, 1, 72, 4, 2, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),
-    {/* sentinel */},
+    { },
 };
 
 #define RK3128_DIV_CPU_MASK 0x1f
@@ -564,15 +564,17 @@ static const struct clk_rk3128_inits clk_rk3128_init = {
     .inits = rk3128_clk_init,
 };
 
-static const struct of_device_id clk_rk3128_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3126-cru",
-                                                                 .data = &clk_rk3126_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3128-cru",
-                                                                 .data = &clk_rk3128_init,
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3128_match_table[] = {
+    {
+        .compatible = "rockchip,rk3126-cru",
+        .data = &clk_rk3126_init,
+    },
+    {
+        .compatible = "rockchip,rk3128-cru",
+        .data = &clk_rk3128_init,
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3128_match_table);
 
 static int __init clk_rk3128_probe(struct platform_device *pdev)

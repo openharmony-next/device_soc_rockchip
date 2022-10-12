@@ -26,8 +26,7 @@
 #pragma clang diagnostic ignored "-Wundefined-var-template"
 #endif
 
-template <typename TYPE> class RgaSingleton
-{
+template <typename TYPE> class RgaSingleton {
 public:
     static TYPE &getInstance()
     {

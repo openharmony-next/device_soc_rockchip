@@ -139,7 +139,6 @@ int intel_guc_ads_create(struct intel_guc *guc)
     GEM_BUG_ON(guc->ads_vma);
 
     ret = intel_guc_allocate_and_map_vma(guc, size, &guc->ads_vma, (void **)&guc->ads_blob);
-
     if (ret) {
         return ret;
     }

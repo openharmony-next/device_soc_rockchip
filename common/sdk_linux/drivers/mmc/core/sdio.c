@@ -453,7 +453,6 @@ static void sdio_select_driver_type(struct mmc_card *card)
     card_drv_type = card->sw_caps.sd3_drv_type | SD_DRIVER_TYPE_B;
 
     drive_strength = mmc_select_drive_strength(card, card->sw_caps.uhs_max_dtr, card_drv_type, &drv_type);
-
     if (drive_strength) {
         /* if error just use default for drive strength B */
         err = mmc_io_rw_direct(card, 0, 0, SDIO_CCCR_DRIVE_STRENGTH, 0, &card_strength);
@@ -868,7 +867,7 @@ static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr, struct mmc_card *o
         }
     }
 
-    if (host->caps2 & MMC_CAP2_AVOID_3_3V && host->ios.signal_voltage == MMC_SIGNAL_VOLTAGE_330) {
+    if ((host->caps2 & MMC_CAP2_AVOID_3_3V) && (host->ios.signal_voltage == MMC_SIGNAL_VOLTAGE_330)) {
         pr_err("%s: Host failed to negotiate down from 3.3V\n", mmc_hostname(host));
         err = -EINVAL;
         goto remove;
@@ -1206,7 +1205,6 @@ int mmc_attach_sdio(struct mmc_host *host)
     }
 
     rocr = mmc_select_voltage(host, ocr);
-
     /*
      * Can we support the voltage(s) of the card(s)?
      */

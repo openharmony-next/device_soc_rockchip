@@ -91,7 +91,7 @@ MALI_STATIC_INLINE enum mali_interrupt_result mali_pp_get_interrupt_result(struc
 {
     u32 rawstat_used =
         mali_hw_core_register_read(&core->hw_core, MALI200_REG_ADDR_MGMT_INT_RAWSTAT) & MALI200_REG_VAL_IRQ_MASK_USED;
-    if (0 == rawstat_used) {
+    if (rawstat_used == 0) {
         return MALI_INTERRUPT_RESULT_NONE;
     } else if (MALI200_REG_VAL_IRQ_END_OF_FRAME == rawstat_used) {
         return MALI_INTERRUPT_RESULT_SUCCESS;

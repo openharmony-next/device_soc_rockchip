@@ -46,7 +46,7 @@ struct drm_display_mode;
  */
 struct drm_mode_config_funcs {
     /**
-     * @fb_create:
+     * @fb_create
      *
      * Create a new framebuffer object. The core does basic checks on the
      * requested metadata, but most of that is left to the driver. See
@@ -69,7 +69,7 @@ struct drm_mode_config_funcs {
      * which registers the framebuffer and makes it accessible to other
      * threads.
      *
-     * RETURNS:
+     * RETURNS
      *
      * A new framebuffer with an initial reference count of 1 or a negative
      * error code encoded with ERR_PTR().
@@ -78,12 +78,12 @@ struct drm_mode_config_funcs {
                                          const struct drm_mode_fb_cmd2 *mode_cmd);
 
     /**
-     * @get_format_info:
+     * @get_format_info
      *
      * Allows a driver to return custom format information for special
      * fb layouts (eg. ones with auxiliary compression control planes).
      *
-     * RETURNS:
+     * RETURNS
      *
      * The format information specific to the given fb metadata, or
      * NULL if none is found.
@@ -91,7 +91,7 @@ struct drm_mode_config_funcs {
     const struct drm_format_info *(*get_format_info)(const struct drm_mode_fb_cmd2 *mode_cmd);
 
     /**
-     * @output_poll_changed:
+     * @output_poll_changed
      *
      * Callback used by helpers to inform the driver of output configuration
      * changes.
@@ -100,7 +100,7 @@ struct drm_mode_config_funcs {
      * drm_fb_helper_hotplug_changed from this hook to inform the fbdev
      * helper of output changes.
      *
-     * FIXME:
+     * FIXME
      *
      * Except that there's no vtable for device-level helper callbacks
      * there's no reason this is a core function.
@@ -108,7 +108,7 @@ struct drm_mode_config_funcs {
     void (*output_poll_changed)(struct drm_device *dev);
 
     /**
-     * @mode_valid:
+     * @mode_valid
      *
      * Device specific validation of display modes. Can be used to reject
      * modes that can never be supported. Only device wide constraints can
@@ -118,12 +118,12 @@ struct drm_mode_config_funcs {
     enum drm_mode_status (*mode_valid)(struct drm_device *dev, const struct drm_display_mode *mode);
 
     /**
-     * @atomic_check:
+     * @atomic_check
      *
      * This is the only hook to validate an atomic modeset update. This
      * function must reject any modeset and state changes which the hardware
      * or driver doesn't support. This includes but is of course not limited
-     * to:
+     * to
      *
      *  - Checking that the modes, framebuffers, scaling and placement
      *    requirements and so on are within the limits of the hardware.
@@ -173,7 +173,7 @@ struct drm_mode_config_funcs {
      * drm_atomic_helper_check(), or one of the exported sub-functions of
      * it.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or one of the below negative error codes:
      *
@@ -194,7 +194,7 @@ struct drm_mode_config_funcs {
     int (*atomic_check)(struct drm_device *dev, struct drm_atomic_state *state);
 
     /**
-     * @atomic_commit:
+     * @atomic_commit
      *
      * This is the only hook to commit an atomic modeset update. The core
      * guarantees that @atomic_check has been called successfully before
@@ -233,14 +233,14 @@ struct drm_mode_config_funcs {
      * &drm_crtc_state.event for more details about the precise semantics of
      * this event.
      *
-     * NOTE:
+     * NOTE
      *
      * Drivers are not allowed to shut down any display pipe successfully
      * enabled through an atomic commit on their own. Doing so can result in
      * compositors crashing if a page flip is suddenly rejected because the
      * pipe is off.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or one of the below negative error codes:
      *
@@ -275,7 +275,7 @@ struct drm_mode_config_funcs {
     int (*atomic_commit)(struct drm_device *dev, struct drm_atomic_state *state, bool nonblock);
 
     /**
-     * @atomic_state_alloc:
+     * @atomic_state_alloc
      *
      * This optional hook can be used by drivers that want to subclass struct
      * &drm_atomic_state to be able to track their own driver-private global
@@ -285,14 +285,14 @@ struct drm_mode_config_funcs {
      * Subclassing of &drm_atomic_state is deprecated in favour of using
      * &drm_private_state and &drm_private_obj.
      *
-     * RETURNS:
+     * RETURNS
      *
      * A new &drm_atomic_state on success or NULL on failure.
      */
     struct drm_atomic_state *(*atomic_state_alloc)(struct drm_device *dev);
 
     /**
-     * @atomic_state_clear:
+     * @atomic_state_clear
      *
      * This hook must clear any driver private state duplicated into the
      * passed-in &drm_atomic_state. This hook is called when the caller
@@ -313,7 +313,7 @@ struct drm_mode_config_funcs {
     void (*atomic_state_clear)(struct drm_atomic_state *state);
 
     /**
-     * @atomic_state_free:
+     * @atomic_state_free
      *
      * This hook needs driver private resources and the &drm_atomic_state
      * itself. Note that the core first calls drm_atomic_state_clear() to

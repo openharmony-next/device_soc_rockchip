@@ -1236,7 +1236,7 @@ void smp_shutdown_nonboot_cpus(unsigned int primary_cpu)
 
 #else
 #define takedown_cpu NULL
-#endif /*CONFIG_HOTPLUG_CPU*/
+#endif /* CONFIG_HOTPLUG_CPU */
 
 /**
  * notify_cpu_starting(cpu) - Invoke the callbacks on the starting CPU
@@ -1578,7 +1578,6 @@ core_initcall(alloc_frozen_cpus);
 static int cpu_hotplug_pm_callback(struct notifier_block *nb, unsigned long action, void *ptr)
 {
     switch (action) {
-
         case PM_SUSPEND_PREPARE:
         case PM_HIBERNATION_PREPARE:
             cpu_hotplug_disable();

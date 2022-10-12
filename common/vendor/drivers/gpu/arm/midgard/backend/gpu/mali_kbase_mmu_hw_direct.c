@@ -43,12 +43,12 @@ static inline u64 lock_region(struct kbase_device *kbdev, u64 pfn, u32 num_pages
 
     /* gracefully handle num_pages being zero */
     if (0 == num_pages) {
-        region |= 11;
+        region |= 0x0B;
     } else {
         u8 region_width;
 
-        region_width = 10 + fls(num_pages);
-        if (num_pages != (1ul << (region_width - 11))) {
+        region_width = 0x0A + fls(num_pages);
+        if (num_pages != (1ul << (region_width - 0x0B))) {
             /* not pow2, so must go up to the next pow2 */
             region_width += 1;
         }
@@ -134,7 +134,7 @@ void kbase_mmu_interrupt(struct kbase_device *kbdev, u32 irq_stat)
     /* page faults (note: Ignore ASes with both pf and bf) */
     u32 pf_bits = ((irq_stat >> pf_shift) & as_bit_mask) & ~bf_bits;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
 
     /* remember current mask */
     spin_lock_irqsave(&kbdev->mmu_mask_change, flags);
@@ -169,7 +169,7 @@ void kbase_mmu_interrupt(struct kbase_device *kbdev, u32 irq_stat)
 
         /* find faulting address */
         as->fault_addr = kbase_reg_read(kbdev, MMU_AS_REG(as_no, AS_FAULTADDRESS_HI), kctx);
-        as->fault_addr <<= 32;
+        as->fault_addr <<= 0x20;
         as->fault_addr |= kbase_reg_read(kbdev, MMU_AS_REG(as_no, AS_FAULTADDRESS_LO), kctx);
 
         /* Mark the fault protected or not */
@@ -191,7 +191,7 @@ void kbase_mmu_interrupt(struct kbase_device *kbdev, u32 irq_stat)
 
         if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_AARCH64_MMU)) {
             as->fault_extra_addr = kbase_reg_read(kbdev, MMU_AS_REG(as_no, AS_FAULTEXTRA_HI), kctx);
-            as->fault_extra_addr <<= 32;
+            as->fault_extra_addr <<= 0x20;
             as->fault_extra_addr |= kbase_reg_read(kbdev, MMU_AS_REG(as_no, AS_FAULTEXTRA_LO), kctx);
         }
 
@@ -249,7 +249,7 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev, struct kbase_as *as, str
         }
 
         kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_LO), transcfg, kctx);
-        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_HI), (current_setup->transcfg >> 32) & 0xFFFFFFFFUL,
+        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSCFG_HI), (current_setup->transcfg >> 0x20) & 0xFFFFFFFFUL,
                         kctx);
     } else {
         if (kbdev->system_coherency == COHERENCY_ACE) {
@@ -258,11 +258,12 @@ void kbase_mmu_hw_configure(struct kbase_device *kbdev, struct kbase_as *as, str
     }
 
     kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_LO), current_setup->transtab & 0xFFFFFFFFUL, kctx);
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_HI), (current_setup->transtab >> 32) & 0xFFFFFFFFUL,
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_TRANSTAB_HI), (current_setup->transtab >> 0x20) & 0xFFFFFFFFUL,
                     kctx);
 
     kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_LO), current_setup->memattr & 0xFFFFFFFFUL, kctx);
-    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_HI), (current_setup->memattr >> 32) & 0xFFFFFFFFUL, kctx);
+    kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_MEMATTR_HI), (current_setup->memattr >> 0x20) & \
+                    0xFFFFFFFFUL, kctx);
 
     KBASE_TLSTREAM_TL_ATTRIB_AS_CONFIG(as, current_setup->transtab, current_setup->memattr, transcfg);
 
@@ -284,7 +285,7 @@ int kbase_mmu_hw_do_operation(struct kbase_device *kbdev, struct kbase_as *as, s
 
         /* Lock the region that needs to be updated */
         kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_LO), lock_addr & 0xFFFFFFFFUL, kctx);
-        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_HI), (lock_addr >> 32) & 0xFFFFFFFFUL, kctx);
+        kbase_reg_write(kbdev, MMU_AS_REG(as->number, AS_LOCKADDR_HI), (lock_addr >> 0x20) & 0xFFFFFFFFUL, kctx);
         write_cmd(kbdev, as->number, AS_COMMAND_LOCK, kctx);
 
         /* Run the MMU operation */

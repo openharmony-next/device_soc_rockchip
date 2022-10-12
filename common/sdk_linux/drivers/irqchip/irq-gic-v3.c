@@ -134,7 +134,7 @@ EXPORT_SYMBOL(gic_nonsecure_priorities);
  * against the value returned by ICC_RPR_EL1.
  */
 #define GICD_INT_RPR_PRI(priority)                                                                                     \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         u32 __priority = (priority);                                                                                   \
         if (static_branch_unlikely(&gic_nonsecure_priorities))                                                         \
             __priority = 0x80 | (__priority >> 1);                                                                     \
@@ -646,8 +646,8 @@ static u64 gic_mpidr_to_affinity(unsigned long mpidr)
 {
     u64 aff;
 
-    aff = ((u64)MPIDR_AFFINITY_LEVEL(mpidr, 0x3) << 0x20 | MPIDR_AFFINITY_LEVEL(mpidr, 0x2) << 0x10 |
-           MPIDR_AFFINITY_LEVEL(mpidr, 0x1) << 0x8 | MPIDR_AFFINITY_LEVEL(mpidr, 0));
+    aff = (((u64)MPIDR_AFFINITY_LEVEL(mpidr, 0x3) << 0x20) | (MPIDR_AFFINITY_LEVEL(mpidr, 0x2) << 0x10) |
+           (MPIDR_AFFINITY_LEVEL(mpidr, 0x1) << 0x8) | MPIDR_AFFINITY_LEVEL(mpidr, 0));
 
     return aff;
 }
@@ -1204,8 +1204,9 @@ static void gic_send_sgi(u64 cluster_id, u16 tlist, unsigned int irq)
 {
     u64 val;
 
-    val = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3) | MPIDR_TO_SGI_AFFINITY(cluster_id, 2) | irq << ICC_SGI1R_SGI_ID_SHIFT |
-           MPIDR_TO_SGI_AFFINITY(cluster_id, 1) | MPIDR_TO_SGI_RS(cluster_id) | tlist << ICC_SGI1R_TARGET_LIST_SHIFT);
+    val = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3) | MPIDR_TO_SGI_AFFINITY(cluster_id, 2) | \
+           (irq << ICC_SGI1R_SGI_ID_SHIFT) | MPIDR_TO_SGI_AFFINITY(cluster_id, 1) | \
+           MPIDR_TO_SGI_RS(cluster_id) | (tlist << ICC_SGI1R_TARGET_LIST_SHIFT));
 
     pr_devel("CPU%d: ICC_SGI1R_EL1 %llx\n", smp_processor_id(), val);
     gic_write_sgi1r(val);
@@ -1649,37 +1650,39 @@ static bool gic_enable_quirk_hip06_07(void *data)
     return false;
 }
 
-static const struct gic_quirk gic_quirks[] = {{
-    .desc = "GICv3: Qualcomm MSM8996 broken firmware",
-    .compatible = "qcom,msm8996-gic-v3",
-    .init = gic_enable_quirk_msm8996,
-},
-{
-    .desc = "GICv3: HIP06 erratum 161010803",
-    .iidr = 0x0204043b,
-    .mask = 0xffffffff,
-    .init = gic_enable_quirk_hip06_07,
-},
-{
-    .desc = "GICv3: HIP07 erratum 161010803",
-    .iidr = 0x00000000,
-    .mask = 0xffffffff,
-    .init = gic_enable_quirk_hip06_07,
-},
-{
-    /*
-    * Reserved register accesses generate a Synchronous
-    * External Abort. This erratum applies to:
-    * - ThunderX: CN88xx
-    * - OCTEON TX: CN83xx, CN81xx
-    * - OCTEON TX2: CN93xx, CN96xx, CN98xx, CNF95xx*
-    */
-    .desc = "GICv3: Cavium erratum 38539",
-    .iidr = 0xa000034c,
-    .mask = 0xe8f00fff,
-    .init = gic_enable_quirk_cavium_38539,
-},
-{}};
+static const struct gic_quirk gic_quirks[] = {
+    {
+        .desc = "GICv3: Qualcomm MSM8996 broken firmware",
+        .compatible = "qcom,msm8996-gic-v3",
+        .init = gic_enable_quirk_msm8996,
+    },
+    {
+        .desc = "GICv3: HIP06 erratum 161010803",
+        .iidr = 0x0204043b,
+        .mask = 0xffffffff,
+        .init = gic_enable_quirk_hip06_07,
+    },
+    {
+        .desc = "GICv3: HIP07 erratum 161010803",
+        .iidr = 0x00000000,
+        .mask = 0xffffffff,
+        .init = gic_enable_quirk_hip06_07,
+    },
+    {
+        /*
+        * Reserved register accesses generate a Synchronous
+        * External Abort. This erratum applies to:
+        * - ThunderX: CN88xx
+        * - OCTEON TX: CN83xx, CN81xx
+        * - OCTEON TX2: CN93xx, CN96xx, CN98xx, CNF95xx*
+        */
+        .desc = "GICv3: Cavium erratum 38539",
+        .iidr = 0xa000034c,
+        .mask = 0xe8f00fff,
+        .init = gic_enable_quirk_cavium_38539,
+    },
+    {}
+};
 
 static void gic_enable_nmi_support(void)
 {

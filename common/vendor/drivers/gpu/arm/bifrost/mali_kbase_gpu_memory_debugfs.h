@@ -48,4 +48,4 @@ void kbase_io_history_add(struct kbase_io_history *h, void __iomem const *addr, 
  */
 void kbasep_gpu_memory_debugfs_init(struct kbase_device *kbdev);
 
-#endif /*_KBASE_GPU_MEMORY_DEBUGFS_H*/
+#endif /* _KBASE_GPU_MEMORY_DEBUGFS_H */

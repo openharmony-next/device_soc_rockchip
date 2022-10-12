@@ -345,7 +345,6 @@ static int rockchip_ddr_set_rate(unsigned long target_rate)
     ddr_psci_param->wait_flag0 = 1;
 
     res = sip_smc_dram(SHARE_PAGE_TYPE_DDR, 0, ROCKCHIP_SIP_CONFIG_DRAM_SET_RATE);
-
     if ((int)res.a1 == SIP_RET_SET_RATE_TIMEOUT) {
         rockchip_dmcfreq_wait_complete();
     }
@@ -419,7 +418,6 @@ static int rockchip_dmcfreq_target(struct device *dev, unsigned long *freq, u32 
     }
     down_write(&policy->rwsem);
     cpufreq_cur = cpufreq_quick_get(cpu_cur);
-
     if (dmcfreq->min_cpu_freq && cpufreq_cur < dmcfreq->min_cpu_freq) {
         if (policy->max >= dmcfreq->min_cpu_freq) {
             __cpufreq_driver_target(policy, dmcfreq->min_cpu_freq, CPUFREQ_RELATION_L);
@@ -1959,46 +1957,46 @@ static int rockchip_get_system_status_rate(struct device_node *np, char *porp_na
         of_property_read_u32_index(np, porp_name, 0x2 * i + 1, &freq);
         switch (status) {
             case SYS_STATUS_NORMAL:
-                dmcfreq->normal_rate = freq * 0x3e8;
+                dmcfreq->normal_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_SUSPEND:
-                dmcfreq->suspend_rate = freq * 0x3e8;
+                dmcfreq->suspend_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_VIDEO_1080P:
-                dmcfreq->video_1080p_rate = freq * 0x3e8;
+                dmcfreq->video_1080p_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_VIDEO_4K:
-                dmcfreq->video_4k_rate = freq * 0x3e8;
+                dmcfreq->video_4k_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_VIDEO_4K_10B:
-                dmcfreq->video_4k_10b_rate = freq * 0x3e8;
+                dmcfreq->video_4k_10b_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_PERFORMANCE:
-                dmcfreq->performance_rate = freq * 0x3e8;
+                dmcfreq->performance_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_HDMI:
-                dmcfreq->hdmi_rate = freq * 0x3e8;
+                dmcfreq->hdmi_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_IDLE:
-                dmcfreq->idle_rate = freq * 0x3e8;
+                dmcfreq->idle_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_REBOOT:
-                dmcfreq->reboot_rate = freq * 0x3e8;
+                dmcfreq->reboot_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_BOOST:
-                dmcfreq->boost_rate = freq * 0x3e8;
+                dmcfreq->boost_rate = (unsigned long)freq * 0x3e8;
                 break;
             case SYS_STATUS_ISP:
             case SYS_STATUS_CIF0:
             case SYS_STATUS_CIF1:
             case SYS_STATUS_DUALVIEW:
-                temp_rate = freq * 0x3e8;
+                temp_rate = (unsigned long)freq * 0x3e8;
                 if (dmcfreq->fixed_rate < temp_rate) {
                     dmcfreq->fixed_rate = temp_rate;
                 }
                 break;
             case SYS_STATUS_LOW_POWER:
-                dmcfreq->low_power_rate = freq * 0x3e8;
+                dmcfreq->low_power_rate = (unsigned long)freq * 0x3e8;
                 break;
             default:
                 break;

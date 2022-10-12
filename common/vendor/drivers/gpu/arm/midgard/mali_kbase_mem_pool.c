@@ -389,7 +389,6 @@ struct page *kbase_mem_pool_alloc(struct kbase_mem_pool *pool)
     do {
         pool_dbg(pool, "alloc()\n");
         p = kbase_mem_pool_remove(pool);
-
         if (p) {
             return p;
         }
@@ -443,7 +442,6 @@ int kbase_mem_pool_alloc_pages(struct kbase_mem_pool *pool, size_t nr_pages, phy
     if (i != nr_pages && pool->next_pool) {
         /* Allocate via next pool */
         err = kbase_mem_pool_alloc_pages(pool->next_pool, nr_pages - i, pages + i);
-
         if (err) {
             goto err_rollback;
         }

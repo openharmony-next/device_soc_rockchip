@@ -408,7 +408,7 @@ struct drm_crtc_state {
  */
 struct drm_crtc_funcs {
     /**
-     * @reset:
+     * @reset
      *
      * Reset CRTC hardware and software state to off. This function isn't
      * called by the core directly, only through drm_mode_config_reset().
@@ -420,7 +420,7 @@ struct drm_crtc_funcs {
     void (*reset)(struct drm_crtc *crtc);
 
     /**
-     * @cursor_set:
+     * @cursor_set
      *
      * Update the cursor image. The cursor position is relative to the CRTC
      * and can be partially or fully outside of the visible area.
@@ -436,7 +436,7 @@ struct drm_crtc_funcs {
      *
      * This callback is optional
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
@@ -444,7 +444,7 @@ struct drm_crtc_funcs {
                       uint32_t height);
 
     /**
-     * @cursor_set2:
+     * @cursor_set2
      *
      * Update the cursor image, including hotspot information. The hotspot
      * must not affect the cursor position in CRTC coordinates, but is only
@@ -458,7 +458,7 @@ struct drm_crtc_funcs {
      *
      * This callback is optional.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
@@ -466,7 +466,7 @@ struct drm_crtc_funcs {
                        uint32_t height, int32_t hot_x, int32_t hot_y);
 
     /**
-     * @cursor_move:
+     * @cursor_move
      *
      * Update the cursor position. The cursor does not need to be visible
      * when this hook is called.
@@ -477,14 +477,14 @@ struct drm_crtc_funcs {
      *
      * This callback is optional.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*cursor_move)(struct drm_crtc *crtc, int x, int y);
 
     /**
-     * @gamma_set:
+     * @gamma_set
      *
      * Set gamma on the CRTC.
      *
@@ -499,7 +499,7 @@ struct drm_crtc_funcs {
     int (*gamma_set)(struct drm_crtc *crtc, u16 *r, u16 *g, u16 *b, uint32_t size, struct drm_modeset_acquire_ctx *ctx);
 
     /**
-     * @destroy:
+     * @destroy
      *
      * Clean up CRTC resources. This is only called at driver unload time
      * through drm_mode_config_cleanup() since a CRTC cannot be hotplugged
@@ -508,7 +508,7 @@ struct drm_crtc_funcs {
     void (*destroy)(struct drm_crtc *crtc);
 
     /**
-     * @set_config:
+     * @set_config
      *
      * This is the main legacy entry point to change the modeset state on a
      * CRTC. All the details of the desired configuration are passed in a
@@ -517,14 +517,14 @@ struct drm_crtc_funcs {
      * Drivers implementing atomic modeset should use
      * drm_atomic_helper_set_config() to implement this hook.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*set_config)(struct drm_mode_set *set, struct drm_modeset_acquire_ctx *ctx);
 
     /**
-     * @page_flip:
+     * @page_flip
      *
      * Legacy entry point to schedule a flip to the given framebuffer.
      *
@@ -558,7 +558,7 @@ struct drm_crtc_funcs {
      *
      * This callback is optional.
      *
-     * NOTE:
+     * NOTE
      *
      * Very early versions of the KMS ABI mandated that the driver must
      * block (but not reject) any rendering to the old framebuffer until the
@@ -567,7 +567,7 @@ struct drm_crtc_funcs {
      * expected to request delivery of an event and wait with recycling old
      * buffers until such has been received.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure. Note that if a
      * page flip operation is already pending the callback should return
@@ -580,7 +580,7 @@ struct drm_crtc_funcs {
                      uint32_t flags, struct drm_modeset_acquire_ctx *ctx);
 
     /**
-     * @page_flip_target:
+     * @page_flip_target
      *
      * Same as @page_flip but with an additional parameter specifying the
      * absolute target vertical blank period (as reported by
@@ -596,7 +596,7 @@ struct drm_crtc_funcs {
                             uint32_t flags, uint32_t target, struct drm_modeset_acquire_ctx *ctx);
 
     /**
-     * @set_property:
+     * @set_property
      *
      * This is the legacy entry point to update a property attached to the
      * CRTC.
@@ -605,14 +605,14 @@ struct drm_crtc_funcs {
      * driver-private properties. For atomic drivers it is not used because
      * property handling is done entirely in the DRM core.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*set_property)(struct drm_crtc *crtc, struct drm_property *property, uint64_t val);
 
     /**
-     * @atomic_duplicate_state:
+     * @atomic_duplicate_state
      *
      * Duplicate the current atomic state for this CRTC and return it.
      * The core and helpers guarantee that any atomic state duplicated with
@@ -632,20 +632,20 @@ struct drm_crtc_funcs {
      * It is an error to call this hook before &drm_crtc.state has been
      * initialized correctly.
      *
-     * NOTE:
+     * NOTE
      *
      * If the duplicate state references refcounted resources this hook must
      * acquire a reference for each of them. The driver must release these
      * references again in @atomic_destroy_state.
      *
-     * RETURNS:
+     * RETURNS
      *
      * Duplicated atomic state or NULL when the allocation failed.
      */
     struct drm_crtc_state *(*atomic_duplicate_state)(struct drm_crtc *crtc);
 
     /**
-     * @atomic_destroy_state:
+     * @atomic_destroy_state
      *
      * Destroy a state duplicated with @atomic_duplicate_state and release
      * or unreference all resources it references
@@ -655,7 +655,7 @@ struct drm_crtc_funcs {
     void (*atomic_destroy_state)(struct drm_crtc *crtc, struct drm_crtc_state *state);
 
     /**
-     * @atomic_set_property:
+     * @atomic_set_property
      *
      * Decode a driver-private property value and store the decoded value
      * into the passed-in state structure. Since the atomic core decodes all
@@ -674,7 +674,7 @@ struct drm_crtc_funcs {
      * This callback is optional if the driver does not support any
      * driver-private atomic properties.
      *
-     * NOTE:
+     * NOTE
      *
      * This function is called in the state assembly phase of atomic
      * modesets, which can be aborted for any reason (including on
@@ -687,7 +687,7 @@ struct drm_crtc_funcs {
      * incomplete and hence likely inconsistent). Instead any such input
      * validation must be done in the various atomic_check callbacks.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 if the property has been found, -EINVAL if the property isn't
      * implemented by the driver (which should never happen, the core only
@@ -699,7 +699,7 @@ struct drm_crtc_funcs {
     int (*atomic_set_property)(struct drm_crtc *crtc, struct drm_crtc_state *state, struct drm_property *property,
                                uint64_t val);
     /**
-     * @atomic_get_property:
+     * @atomic_get_property
      *
      * Reads out the decoded driver-private property. This is used to
      * implement the GETCRTC IOCTL.
@@ -710,7 +710,7 @@ struct drm_crtc_funcs {
      * This callback is optional if the driver does not support any
      * driver-private atomic properties.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success, -EINVAL if the property isn't implemented by the
      * driver (which should never happen, the core only asks for
@@ -720,7 +720,7 @@ struct drm_crtc_funcs {
                                uint64_t *val);
 
     /**
-     * @late_register:
+     * @late_register
      *
      * This optional hook can be used to register additional userspace
      * interfaces attached to the crtc like debugfs interfaces.
@@ -728,14 +728,14 @@ struct drm_crtc_funcs {
      * Everything added from this callback should be unregistered in
      * the early_unregister callback.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success, or a negative error code on failure.
      */
     int (*late_register)(struct drm_crtc *crtc);
 
     /**
-     * @early_unregister:
+     * @early_unregister
      *
      * This optional hook should be used to unregister the additional
      * userspace interfaces attached to the crtc from
@@ -746,7 +746,7 @@ struct drm_crtc_funcs {
     void (*early_unregister)(struct drm_crtc *crtc);
 
     /**
-     * @set_crc_source:
+     * @set_crc_source
      *
      * Changes the source of CRC checksums of frames at the request of
      * userspace, typically for testing purposes. The sources available are
@@ -768,14 +768,14 @@ struct drm_crtc_funcs {
      * This callback is optional if the driver does not support any CRC
      * generation functionality.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*set_crc_source)(struct drm_crtc *crtc, const char *source);
 
     /**
-     * @verify_crc_source:
+     * @verify_crc_source
      *
      * verifies the source of CRC checksums of frames before setting the
      * source for CRC and during crc open. Source parameter can be NULL
@@ -784,13 +784,13 @@ struct drm_crtc_funcs {
      * This callback is optional if the driver does not support any CRC
      * generation functionality.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*verify_crc_source)(struct drm_crtc *crtc, const char *source, size_t *values_cnt);
     /**
-     * @get_crc_sources:
+     * @get_crc_sources
      *
      * Driver callback for getting a list of all the available sources for
      * CRC generation. This callback depends upon verify_crc_source, So
@@ -802,7 +802,7 @@ struct drm_crtc_funcs {
      * This callback is optional if the driver does not support exporting of
      * possible CRC sources list.
      *
-     * RETURNS:
+     * RETURNS
      *
      * a constant character pointer to the list of all the available CRC
      * sources. On failure driver should return NULL. count should be
@@ -812,7 +812,7 @@ struct drm_crtc_funcs {
     const char *const *(*get_crc_sources)(struct drm_crtc *crtc, size_t *count);
 
     /**
-     * @atomic_print_state:
+     * @atomic_print_state
      *
      * If driver subclasses &struct drm_crtc_state, it should implement
      * this optional hook for printing additional driver specific state.
@@ -823,7 +823,7 @@ struct drm_crtc_funcs {
     void (*atomic_print_state)(struct drm_printer *p, const struct drm_crtc_state *state);
 
     /**
-     * @get_vblank_counter:
+     * @get_vblank_counter
      *
      * Driver callback for fetching a raw hardware vblank counter for the
      * CRTC. It's meant to be used by new drivers as the replacement of
@@ -842,19 +842,19 @@ struct drm_crtc_funcs {
      * See also &drm_device.vblank_disable_immediate and
      * &drm_device.max_vblank_count.
      *
-     * Returns:
+     * Returns
      *
      * Raw vblank counter value.
      */
     u32 (*get_vblank_counter)(struct drm_crtc *crtc);
 
     /**
-     * @enable_vblank:
+     * @enable_vblank
      *
      * Enable vblank interrupts for the CRTC. It's meant to be used by
      * new drivers as the replacement of &drm_driver.enable_vblank hook.
      *
-     * Returns:
+     * Returns
      *
      * Zero on success, appropriate errno if the vblank interrupt cannot
      * be enabled.
@@ -862,7 +862,7 @@ struct drm_crtc_funcs {
     int (*enable_vblank)(struct drm_crtc *crtc);
 
     /**
-     * @disable_vblank:
+     * @disable_vblank
      *
      * Disable vblank interrupts for the CRTC. It's meant to be used by
      * new drivers as the replacement of &drm_driver.disable_vblank hook.
@@ -870,7 +870,7 @@ struct drm_crtc_funcs {
     void (*disable_vblank)(struct drm_crtc *crtc);
 
     /**
-     * @get_vblank_timestamp:
+     * @get_vblank_timestamp
      *
      * Called by drm_get_last_vbltimestamp(). Should return a precise
      * timestamp when the most recent vblank interval ended or will end.
@@ -884,7 +884,7 @@ struct drm_crtc_funcs {
      * past start time of the current scanout. This is meant to adhere
      * to the OpenML OML_sync_control extension specification.
      *
-     * Parameters:
+     * Parameters
      *
      * crtc:
      *     CRTC for which timestamp should be returned.
@@ -900,7 +900,7 @@ struct drm_crtc_funcs {
      *     need to apply some workarounds for gpu-specific vblank irq quirks
      *     if flag is set.
      *
-     * Returns:
+     * Returns
      *
      * True on success, false on failure, which means the core should
      * fallback to a simple timestamp taken in drm_crtc_handle_vblank().

@@ -464,7 +464,6 @@ static int kbase_devfreq_init_core_mask_table(struct kbase_device *kbdev)
             core_mask = shader_present;
         }
         if (core_mask != shader_present && corestack_driver_control) {
-
             dev_warn(kbdev->dev, "Ignoring OPP %llu - Dynamic Core Scaling not supported on this GPU\n", opp_freq);
             continue;
         }
@@ -478,7 +477,6 @@ static int kbase_devfreq_init_core_mask_table(struct kbase_device *kbdev)
 
             for (; core_count > 0; core_count--) {
                 int core = ffs(remaining_core_mask);
-
                 if (!core) {
                     dev_err(kbdev->dev, "OPP has more cores than GPU\n");
                     return -ENODEV;

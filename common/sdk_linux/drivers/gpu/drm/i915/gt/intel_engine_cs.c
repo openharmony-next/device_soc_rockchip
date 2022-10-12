@@ -89,9 +89,10 @@ static const struct engine_info intel_engines[] = {
             .hw_id = VCS0_HW,
             .class = VIDEO_DECODE_CLASS,
             .instance = 0,
-            .mmio_bases = {{.gen = 11, .base = GEN11_BSD_RING_BASE},
-                           {.gen = 6, .base = GEN6_BSD_RING_BASE},
-                           {.gen = 4, .base = BSD_RING_BASE}},
+            .mmio_bases = {
+                {.gen = 11, .base = GEN11_BSD_RING_BASE},
+                {.gen = 6, .base = GEN6_BSD_RING_BASE},
+                {.gen = 4, .base = BSD_RING_BASE}},
         },
     [VCS1] =
         {

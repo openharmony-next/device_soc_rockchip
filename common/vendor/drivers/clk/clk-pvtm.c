@@ -207,10 +207,10 @@ static const struct rockchip_clock_pvtm_info rk3368_pvtm_data = {
 };
 
 static const struct of_device_id rockchip_clock_pvtm_match[] = {{
-                                                                    .compatible = "rockchip,rk3368-pvtm-clock",
-                                                                    .data = (void *)&rk3368_pvtm_data,
-                                                                },
-                                                                {}};
+    .compatible = "rockchip,rk3368-pvtm-clock",
+    .data = (void *)&rk3368_pvtm_data,
+    },
+    {}};
 MODULE_DEVICE_TABLE(of, rockchip_clock_pvtm_match);
 
 static int rockchip_clock_pvtm_probe(struct platform_device *pdev)

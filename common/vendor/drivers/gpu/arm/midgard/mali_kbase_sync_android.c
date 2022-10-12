@@ -86,7 +86,6 @@ static int timeline_has_signaled(struct sync_pt *pt)
     int result = mpt->result;
 
     int diff = atomic_read(&mtl->signaled) - mpt->order;
-
     if (diff >= 0) {
         return (result < 0) ? result : 1;
     }
@@ -386,7 +385,6 @@ enum base_jd_event_code kbase_sync_fence_out_trigger(struct kbase_jd_atom *katom
     pt = container_of(katom->fence->cbs[0].sync_pt, struct sync_pt, base);
 #endif
     timeline = sync_pt_parent(pt);
-
     if (!kbase_sync_timeline_is_ours(timeline)) {
         /* Fence has a sync_pt which isn't ours! */
         return BASE_JD_EVENT_JOB_CANCELLED;
@@ -445,7 +443,6 @@ int kbase_sync_fence_in_wait(struct kbase_jd_atom *katom)
     sync_fence_waiter_init(&katom->sync_waiter, kbase_fence_wait_callback);
 
     ret = sync_fence_wait_async(katom->fence, &katom->sync_waiter);
-
     if (ret == 1) {
         /* Already signaled */
         return 0;

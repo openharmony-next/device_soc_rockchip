@@ -552,8 +552,8 @@ static inline u16 get_default_bcdDevice(void)
 {
     u16 bcdDevice;
 
-    bcdDevice = bin2bcd((LINUX_VERSION_CODE >> 0x10 & 0xff)) << 0x8;
-    bcdDevice |= bin2bcd((LINUX_VERSION_CODE >> 0x8 & 0xff));
+    bcdDevice = bin2bcd(((LINUX_VERSION_CODE >> 0x10) & 0xff)) << 0x8;
+    bcdDevice |= bin2bcd(((LINUX_VERSION_CODE >> 0x8) & 0xff));
     return bcdDevice;
 }
 

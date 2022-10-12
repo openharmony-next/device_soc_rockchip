@@ -105,7 +105,7 @@ static ssize_t utilisation_show(struct device *dev, struct device_attribute *att
     unsigned long utilisation;
 
     mali_pm_reset_dvfs_utilisation(mdev);
-    usleep_range(period_in_us, period_in_us + 100);
+    usleep_range(period_in_us, period_in_us + 0x64);
     mali_pm_get_dvfs_utilisation(mdev, &total_time, &busy_time);
 
     /* 'devfreq_dev_profile' instance registered to devfreq
@@ -115,7 +115,7 @@ static ssize_t utilisation_show(struct device *dev, struct device_attribute *att
      */
     D("total_time : %lu, busy_time : %lu.", total_time, busy_time);
 
-    utilisation = busy_time / (total_time / 100);
+    utilisation = busy_time / (total_time / 0x64);
     ret += snprintf(buf, PAGE_SIZE, "%lu\n", utilisation);
 
     return ret;
@@ -191,7 +191,7 @@ static int rk_context_init(struct platform_device *pdev)
 
     s_rk_context = platform;
 
-    pm_runtime_set_autosuspend_delay(dev, 1000);
+    pm_runtime_set_autosuspend_delay(dev, 0x3E8);
     pm_runtime_use_autosuspend(dev);
     pm_runtime_enable(dev);
 
@@ -273,12 +273,12 @@ static int power_model_simple_init(struct platform_device *pdev)
         dev_err(&pdev->dev, "frequency in power_model not available\n");
         return -EINVAL;
     }
-    voltage_squared = (voltage * voltage) / 1000;
+    voltage_squared = (voltage * voltage) / 0x3E8;
     voltage_cubed = voltage * voltage * voltage;
-    static_coefficient = (static_power << 20) / (voltage_cubed >> 10);
-    dynamic_coefficient = (((dynamic_power * 1000) / voltage_squared) * 1000) / frequency;
+    static_coefficient = (static_power << 0x14) / (voltage_cubed >> 0x0A);
+    dynamic_coefficient = (((dynamic_power * 0x3E8) / voltage_squared) * 0x3E8) / frequency;
 
-    if (of_property_read_u32_array(power_model_node, "ts", (u32 *)ts, 4)) {
+    if (of_property_read_u32_array(power_model_node, "ts", (u32 *)ts, 0x04)) {
         dev_err(&pdev->dev, "ts in power_model not available\n");
         return -EINVAL;
     }
@@ -308,12 +308,12 @@ static unsigned long rk_model_static_power(struct devfreq *devfreq, unsigned lon
     /* Calculate the temperature scaling factor. To be applied to the
      * voltage scaled power.
      */
-    temp = temperature / 1000;
+    temp = temperature / 0x3E8;
     temp_squared = temp * temp;
     temp_cubed = temp_squared * temp;
-    temp_scaling_factor = (ts[3] * temp_cubed) + (ts[2] * temp_squared) + (ts[1] * temp) + ts[0];
+    temp_scaling_factor = (ts[0x03] * temp_cubed) + (ts[0x02] * temp_squared) + (ts[1] * temp) + ts[0];
 
-    static_power = (((static_coefficient * voltage_cubed) >> 20) * temp_scaling_factor) / DEFAULT_MHZ;
+    static_power = (((static_coefficient * voltage_cubed) >> 0x14) * temp_scaling_factor) / DEFAULT_MHZ;
 
     return static_power;
 }
@@ -622,6 +622,5 @@ add_data_failed:
 
 void mali_platform_device_deinit(struct platform_device *pdev)
 {
-
     rk_context_deinit(pdev);
 }

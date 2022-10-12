@@ -11,33 +11,33 @@
 #define PWM_REG_HPR 0x04     /* Period Register */
 #define PWM_REG_LPR 0x08     /* Duty Cycle Register */
 #define PWM_REG_CTRL 0x0c    /* Control Register */
-#define PWM3_REG_INTSTS 0x10 /* Interrupt Status Refister For Pwm3*/
-#define PWM2_REG_INTSTS 0x20 /* Interrupt Status Refister For Pwm2*/
-#define PWM1_REG_INTSTS 0x30 /* Interrupt Status Refister For Pwm1*/
-#define PWM0_REG_INTSTS 0x40 /* Interrupt Status Refister For Pwm0*/
-#define PWM3_REG_INT_EN 0x14 /* Interrupt Enable Refister For Pwm3*/
-#define PWM2_REG_INT_EN 0x24 /* Interrupt Enable Refister For Pwm2*/
-#define PWM1_REG_INT_EN 0x34 /* Interrupt Enable Refister For Pwm1*/
-#define PWM0_REG_INT_EN 0x44 /* Interrupt Enable Refister For Pwm0*/
+#define PWM3_REG_INTSTS 0x10 /* Interrupt Status Refister For Pwm3 */
+#define PWM2_REG_INTSTS 0x20 /* Interrupt Status Refister For Pwm2 */
+#define PWM1_REG_INTSTS 0x30 /* Interrupt Status Refister For Pwm1 */
+#define PWM0_REG_INTSTS 0x40 /* Interrupt Status Refister For Pwm0 */
+#define PWM3_REG_INT_EN 0x14 /* Interrupt Enable Refister For Pwm3 */
+#define PWM2_REG_INT_EN 0x24 /* Interrupt Enable Refister For Pwm2 */
+#define PWM1_REG_INT_EN 0x34 /* Interrupt Enable Refister For Pwm1 */
+#define PWM0_REG_INT_EN 0x44 /* Interrupt Enable Refister For Pwm0 */
 
-/*REG_CTRL bits definitions*/
+/* REG_CTRL bits definitions */
 #define PWM_ENABLE (1 << 0)
 #define PWM_DISABLE (0 << 0)
 
-/*operation mode*/
+/* operation mode */
 #define PWM_MODE_ONESHOT (0x00 << 1)
 #define PWM_MODE_CONTINUMOUS (0x01 << 1)
 #define PWM_MODE_CAPTURE (0x02 << 1)
 
-/*duty cycle output polarity*/
+/* duty cycle output polarity */
 #define PWM_DUTY_POSTIVE (0x01 << 3)
 #define PWM_DUTY_NEGATIVE (0x00 << 3)
 
-/*incative state output polarity*/
+/* incative state output polarity */
 #define PWM_INACTIVE_POSTIVE (0x01 << 4)
 #define PWM_INACTIVE_NEGATIVE (0x00 << 4)
 
-/*clock source select*/
+/* clock source select */
 #define PWM_CLK_SCALE (1 << 9)
 #define PWM_CLK_NON_SCALE (0 << 9)
 
@@ -67,7 +67,7 @@
 #define PWM_INT_ENABLE 1
 #define PWM_INT_DISABLE 0
 
-/*prescale factor*/
+/* prescale factor */
 #define PWMCR_MIN_PRESCALE 0x00
 #define PWMCR_MAX_PRESCALE 0x07
 

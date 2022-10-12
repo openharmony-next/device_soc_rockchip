@@ -353,7 +353,7 @@ static void kbase_pm_l2_clock_slow(struct kbase_device *kbdev)
     /* Keep the current freq to restore it upon resume */
     kbdev->previous_frequency = kbdev->current_nominal_freq;
 
-    /* Slow down GPU clock to the suspend clock*/
+    /* Slow down GPU clock to the suspend clock */
     kbase_devfreq_force_freq(kbdev, kbdev->pm.backend.gpu_clock_suspend_freq);
 
 #elif defined(CONFIG_MALI_BIFROST_DVFS) /* CONFIG_MALI_BIFROST_DEVFREQ */
@@ -370,7 +370,7 @@ static void kbase_pm_l2_clock_slow(struct kbase_device *kbdev)
     /* Keep the current freq to restore it upon resume */
     kbdev->previous_frequency = clk_get_rate(clk);
 
-    /* Slow down GPU clock to the suspend clock*/
+    /* Slow down GPU clock to the suspend clock */
     if (WARN_ON_ONCE(clk_set_rate(clk, kbdev->pm.backend.gpu_clock_suspend_freq))) {
         dev_err(kbdev->dev, "Failed to set suspend freq\n");
     }

@@ -28,7 +28,6 @@ void kbase_hw_set_features_mask(struct kbase_device *kbdev)
     const enum base_hw_feature *features;
     u32 gpu_id;
     u32 product_id;
-
     gpu_id = kbdev->gpu_props.props.raw_props.gpu_id;
     product_id = gpu_id & GPU_ID_VERSION_PRODUCT_ID;
     product_id >>= GPU_ID_VERSION_PRODUCT_ID_SHIFT;
@@ -176,7 +175,6 @@ static const enum base_hw_issue *kbase_hw_get_issues_for_new_id(struct kbase_dev
 
         /* Stop when we reach the end of the map. */
         for (v = 0; product->map[v].version != U32_MAX; ++v) {
-
             if (version == product->map[v].version) {
                 /* Exact match so stop. */
                 issues = product->map[v].issues;
@@ -238,7 +236,6 @@ int kbase_hw_set_issues_mask(struct kbase_device *kbdev)
             /* The GPU ID might have been replaced with the last
                known version of the same GPU. */
             gpu_id = kbdev->gpu_props.props.raw_props.gpu_id;
-
         } else {
             switch (gpu_id) {
                 case GPU_ID_MAKE(GPU_ID_PI_T60X, 0, 0, GPU_ID_S_15DEV0):

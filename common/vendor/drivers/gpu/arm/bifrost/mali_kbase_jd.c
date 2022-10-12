@@ -212,7 +212,7 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
      * fences.
      */
     const bool implicit_sync = !kbase_ctx_flag(katom->kctx, KCTX_NO_IMPLICIT_SYNC);
-#else  /* CONFIG_SYNC || CONFIG_SYNC_FILE*/
+#else  /* CONFIG_SYNC || CONFIG_SYNC_FILE */
     const bool implicit_sync = true;
 #endif /* CONFIG_SYNC || CONFIG_SYNC_FILE */
 #endif /* CONFIG_MALI_BIFROST_DMA_FENCE */
@@ -409,7 +409,6 @@ static inline void jd_resolve_dep(struct list_head *out_list, struct kbase_jd_at
             dep_atom->will_fail_event_code = dep_atom->event_code;
         }
         other_dep_atom = (struct kbase_jd_atom *)kbase_jd_katom_dep_atom(&dep_atom->dep[other_d]);
-
         if (!dep_atom->in_jd_list &&
             (!other_dep_atom || (IS_GPU_ATOM(dep_atom) && !ctx_is_dying && !dep_atom->will_fail_event_code &&
                                  !other_dep_atom->will_fail_event_code))) {
@@ -495,7 +494,7 @@ static void jd_try_submitting_deps(struct list_head *out_list, struct kbase_jd_a
             struct kbase_jd_atom *dep_atom = list_entry(pos, struct kbase_jd_atom, dep_item[i]);
 
             if (IS_GPU_ATOM(dep_atom) && !dep_atom->in_jd_list) {
-                /*Check if atom deps look sane*/
+                /* Check if atom deps look sane */
                 bool dep0_valid = is_dep_valid(dep_atom->dep[0].atom);
                 bool dep1_valid = is_dep_valid(dep_atom->dep[1].atom);
                 bool dep_satisfied = true;
@@ -588,7 +587,6 @@ static void jd_update_jit_usage(struct kbase_jd_atom *katom)
         }
 
         ptr = kbase_vmap(kctx, reg->heap_info_gpu_addr, size_to_read, &mapping);
-
         if (!ptr) {
             dev_warn(kctx->kbdev->dev, "%s: JIT id[%u]=%u start=0x%llx unable to map end marker %llx\n", __func__, idx,
                      katom->jit_ids[idx], reg->start_pfn << PAGE_SHIFT, reg->heap_info_gpu_addr);
@@ -955,7 +953,6 @@ static bool jd_submit_atom(struct kbase_context *const kctx, const struct base_j
         }
 
         if (dep_atom->status == KBASE_JD_ATOM_STATE_UNUSED || dep_atom->status == KBASE_JD_ATOM_STATE_COMPLETED) {
-
             if (dep_atom->event_code == BASE_JD_EVENT_DONE) {
                 continue;
             }
@@ -978,7 +975,6 @@ static bool jd_submit_atom(struct kbase_context *const kctx, const struct base_j
             jd_trace_atom_submit(kctx, katom, NULL);
 
             will_fail = true;
-
         } else {
             /* Atom is in progress, add this atom to the list */
             list_add_tail(&katom->dep_item[i], &dep_atom->dep_head[i]);
@@ -995,7 +991,6 @@ static bool jd_submit_atom(struct kbase_context *const kctx, const struct base_j
                  * prepare & finish functions
                  */
                 int err = kbase_prepare_soft_job(katom);
-
                 if (err >= 0) {
                     kbase_finish_soft_job(katom);
                 }
@@ -1587,7 +1582,7 @@ void kbase_jd_done(struct kbase_jd_atom *katom, int slot_nr, ktime_t *end_timest
     atomic_inc(&kctx->work_count);
 
 #ifdef CONFIG_DEBUG_FS
-    /* a failed job happened and is waiting for dumping*/
+    /* a failed job happened and is waiting for dumping */
     if (!katom->will_fail_event_code && kbase_debug_job_fault_process(katom, katom->event_code)) {
         return;
     }
@@ -1604,10 +1599,10 @@ void kbase_jd_cancel(struct kbase_device *kbdev, struct kbase_jd_atom *katom)
 {
     struct kbase_context *kctx;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
-    KBASE_DEBUG_ASSERT(NULL != katom);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(katom != NULL);
     kctx = katom->kctx;
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     dev_dbg(kbdev->dev, "JD: cancelling atom %p\n", (void *)katom);
     KBASE_KTRACE_ADD_JM(kbdev, JD_CANCEL, kctx, katom, katom->jc, 0);
@@ -1681,7 +1676,7 @@ int kbase_jd_init(struct kbase_context *kctx)
     KBASE_DEBUG_ASSERT(kctx);
 
     kctx->jctx.job_done_wq = alloc_workqueue("mali_jd", WQ_HIGHPRI | WQ_UNBOUND, 1);
-    if (NULL == kctx->jctx.job_done_wq) {
+    if (kctx->jctx.job_done_wq == NULL) {
         mali_err = -ENOMEM;
         goto out1;
     }

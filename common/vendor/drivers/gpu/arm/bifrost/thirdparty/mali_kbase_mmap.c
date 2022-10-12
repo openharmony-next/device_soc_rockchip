@@ -63,10 +63,10 @@ static bool align_and_check(unsigned long *gap_end, unsigned long gap_start, str
 
     if (is_shader_code) {
         /* Check for 4GB boundary */
-        if (0 == (*gap_end & BASE_MEM_MASK_4GB)) {
+        if ((*gap_end & BASE_MEM_MASK_4GB) == 0) {
             (*gap_end) -= (info->align_offset ? info->align_offset : info->length);
         }
-        if (0 == ((*gap_end + info->length) & BASE_MEM_MASK_4GB)) {
+        if (((*gap_end + info->length) & BASE_MEM_MASK_4GB) == 0) {
             (*gap_end) -= (info->align_offset ? info->align_offset : info->length);
         }
 
@@ -278,7 +278,6 @@ unsigned long kbase_context_get_unmapped_area(struct kbase_context *const kctx, 
     }
 
     if (!kbase_ctx_flag(kctx, KCTX_COMPAT)) {
-
         high_limit = min_t(unsigned long, mm->mmap_base, (kctx->same_va_end << PAGE_SHIFT));
 
         /* If there's enough (> 33 bits) of GPU VA space, align
@@ -344,7 +343,6 @@ unsigned long kbase_context_get_unmapped_area(struct kbase_context *const kctx, 
     info.align_mask = align_mask;
 
     ret = kbase_unmapped_area_topdown(&info, is_shader_code, is_same_4gb_page);
-
     if (IS_ERR_VALUE(ret) && high_limit == mm->mmap_base && high_limit < (kctx->same_va_end << PAGE_SHIFT)) {
         /* Retry above mmap_base */
         info.low_limit = mm->mmap_base;

@@ -194,7 +194,6 @@ void kbase_timeline_pm_send_event(struct kbase_device *kbdev, enum kbase_timelin
 void kbase_timeline_pm_check_handle_event(struct kbase_device *kbdev, enum kbase_timeline_pm_event event)
 {
     int uid = atomic_read(&kbdev->timeline.pm_event_uid[event]);
-
     if (uid != 0) {
         if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0)) {
             /* If it changed, raced with another consumer: we've lost this UID */
@@ -208,7 +207,6 @@ void kbase_timeline_pm_check_handle_event(struct kbase_device *kbdev, enum kbase
 void kbase_timeline_pm_handle_event(struct kbase_device *kbdev, enum kbase_timeline_pm_event event)
 {
     int uid = atomic_read(&kbdev->timeline.pm_event_uid[event]);
-
     if (uid != atomic_cmpxchg(&kbdev->timeline.pm_event_uid[event], uid, 0)) {
         /* If it changed, raced with another consumer: we've lost this UID */
         uid = 0;

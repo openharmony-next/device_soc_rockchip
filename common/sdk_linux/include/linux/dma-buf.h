@@ -43,7 +43,7 @@ struct dma_buf_ops {
     bool cache_sgt_mapping;
 
     /**
-     * @attach:
+     * @attach
      *
      * This is called from dma_buf_attach() to make sure that a given
      * &dma_buf_attachment.dev can access the provided &dma_buf. Exporters
@@ -62,7 +62,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success, negative error code on failure. It might return -EBUSY
      * to signal that backing storage is already allocated and incompatible
@@ -71,7 +71,7 @@ struct dma_buf_ops {
     int (*attach)(struct dma_buf *, struct dma_buf_attachment *);
 
     /**
-     * @detach:
+     * @detach
      *
      * This is called by dma_buf_detach() to release a &dma_buf_attachment.
      * Provided so that exporters can clean up any housekeeping for an
@@ -82,7 +82,7 @@ struct dma_buf_ops {
     void (*detach)(struct dma_buf *, struct dma_buf_attachment *);
 
     /**
-     * @pin:
+     * @pin
      *
      * This is called by dma_buf_pin and lets the exporter know that the
      * DMA-buf can't be moved any more.
@@ -93,14 +93,14 @@ struct dma_buf_ops {
      * This callback is optional and should only be used in limited use
      * cases like scanout and not for temporary pin operations.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success, negative error code on failure.
      */
     int (*pin)(struct dma_buf_attachment *attach);
 
     /**
-     * @unpin:
+     * @unpin
      *
      * This is called by dma_buf_unpin and lets the exporter know that the
      * DMA-buf can be moved again.
@@ -113,7 +113,7 @@ struct dma_buf_ops {
     void (*unpin)(struct dma_buf_attachment *attach);
 
     /**
-     * @map_dma_buf:
+     * @map_dma_buf
      *
      * This is called by dma_buf_map_attachment() and is used to map a
      * shared &dma_buf into device address space, and it is mandatory. It
@@ -141,7 +141,7 @@ struct dma_buf_ops {
      * This is always called with the dmabuf->resv object locked when
      * the dynamic_mapping flag is true.
      *
-     * Returns:
+     * Returns
      *
      * A &sg_table scatter list of or the backing storage of the DMA buffer,
      * already mapped into the device address space of the &device attached
@@ -153,7 +153,7 @@ struct dma_buf_ops {
      */
     struct sg_table *(*map_dma_buf)(struct dma_buf_attachment *, enum dma_data_direction);
     /**
-     * @unmap_dma_buf:
+     * @unmap_dma_buf
      *
      * This is called by dma_buf_unmap_attachment() and should unmap and
      * release the &sg_table allocated in @map_dma_buf, and it is mandatory.
@@ -167,7 +167,7 @@ struct dma_buf_ops {
      */
 
     /**
-     * @release:
+     * @release
      *
      * Called after the last dma_buf_put to release the &dma_buf, and
      * mandatory.
@@ -175,7 +175,7 @@ struct dma_buf_ops {
     void (*release)(struct dma_buf *);
 
     /**
-     * @begin_cpu_access:
+     * @begin_cpu_access
      *
      * This is called from dma_buf_begin_cpu_access() and allows the
      * exporter to ensure that the memory is actually available for cpu
@@ -197,7 +197,7 @@ struct dma_buf_ops {
      * there's no in-kernel users of the kmap interfaces yet this isn't a
      * real problem.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. This can for
      * example fail when the backing storage can't be allocated. Can also
@@ -207,7 +207,7 @@ struct dma_buf_ops {
     int (*begin_cpu_access)(struct dma_buf *, enum dma_data_direction);
 
     /**
-     * @begin_cpu_access_partial:
+     * @begin_cpu_access_partial
      *
      * This is called from dma_buf_begin_cpu_access_partial() and allows the
      * exporter to ensure that the memory specified in the range is
@@ -230,7 +230,7 @@ struct dma_buf_ops {
      * there's no in-kernel users of the kmap interfaces yet this isn't a
      * real problem.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. This can for
      * example fail when the backing storage can't be allocated. Can also
@@ -241,7 +241,7 @@ struct dma_buf_ops {
                                     unsigned int len);
 
     /**
-     * @end_cpu_access:
+     * @end_cpu_access
      *
      * This is called from dma_buf_end_cpu_access() when the importer is
      * done accessing the CPU. The exporter can use this to flush caches and
@@ -251,7 +251,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. Can return
      * -ERESTARTSYS or -EINTR when the call has been interrupted and needs
@@ -260,7 +260,7 @@ struct dma_buf_ops {
     int (*end_cpu_access)(struct dma_buf *, enum dma_data_direction);
 
     /**
-     * @end_cpu_access_partial:
+     * @end_cpu_access_partial
      *
      * This is called from dma_buf_end_cpu_access_partial() when the
      * importer is done accessing the CPU. The exporter can use to limit
@@ -271,7 +271,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. Can return
      * -ERESTARTSYS or -EINTR when the call has been interrupted and needs
@@ -281,7 +281,7 @@ struct dma_buf_ops {
                                   unsigned int len);
 
     /**
-     * @mmap:
+     * @mmap
      *
      * This callback is used by the dma_buf_mmap() function
      *
@@ -311,7 +311,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure.
      */
@@ -328,7 +328,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. On success uuid
      * will be populated with the buffer's UUID.
@@ -336,13 +336,13 @@ struct dma_buf_ops {
     int (*get_uuid)(struct dma_buf *dmabuf, uuid_t *uuid);
 
     /**
-     * @get_flags:
+     * @get_flags
      *
      * This is called by dma_buf_get_flags and is used to get the buffer's
      * flags.
      * This callback is optional.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success or a negative error code on failure. On success flags
      * will be populated with the buffer's flags.

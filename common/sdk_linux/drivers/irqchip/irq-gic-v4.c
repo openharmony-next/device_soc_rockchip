@@ -194,7 +194,6 @@ static void its_free_sgi_irqs(struct its_vm *vm)
 
     for (i = 0; i < vm->nr_vpes; i++) {
         unsigned int irq = irq_find_mapping(vm->vpes[i]->sgi_domain, 0);
-
         if (WARN_ON(!irq)) {
             continue;
         }

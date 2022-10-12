@@ -30,7 +30,7 @@
 struct mali_gp_job;
 
 typedef struct mali_defer_mem {
-    struct list_head node; /*dlist node in bind manager */
+    struct list_head node; /* dlist node in bind manager */
     u32 flag;
 } mali_defer_mem;
 

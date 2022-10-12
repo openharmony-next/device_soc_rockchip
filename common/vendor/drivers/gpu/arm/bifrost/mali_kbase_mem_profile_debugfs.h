@@ -57,4 +57,4 @@ void kbasep_mem_profile_debugfs_remove(struct kbase_context *kctx);
  */
 int kbasep_mem_profile_debugfs_insert(struct kbase_context *kctx, char *data, size_t size);
 
-#endif /*_KBASE_MEM_PROFILE_DEBUGFS_H*/
+#endif /* _KBASE_MEM_PROFILE_DEBUGFS_H */

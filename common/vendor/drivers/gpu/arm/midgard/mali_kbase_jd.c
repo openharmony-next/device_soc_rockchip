@@ -308,7 +308,7 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
     }
 
     katom->extres = kmalloc_array(katom->nr_extres, sizeof(*katom->extres), GFP_KERNEL);
-    if (NULL == katom->extres) {
+    if (katom->extres == NULL) {
         err_ret_val = -ENOMEM;
         goto early_err_out;
     }
@@ -328,15 +328,14 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
     }
 #ifdef CONFIG_KDS
     /* assume we have to wait for all */
-    KBASE_DEBUG_ASSERT(0 != katom->nr_extres);
+    KBASE_DEBUG_ASSERT(katom->nr_extres != 0);
     kds_resources = kmalloc_array(katom->nr_extres, sizeof(struct kds_resource *), GFP_KERNEL);
-
     if (!kds_resources) {
         err_ret_val = -ENOMEM;
         goto early_err_out;
     }
 
-    KBASE_DEBUG_ASSERT(0 != katom->nr_extres);
+    KBASE_DEBUG_ASSERT(katom->nr_extres != 0);
     kds_access_bitmap = kcalloc(BITS_TO_LONGS(katom->nr_extres), sizeof(unsigned long), GFP_KERNEL);
     if (!kds_access_bitmap) {
         err_ret_val = -ENOMEM;
@@ -376,7 +375,7 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
         reg = kbase_region_tracker_find_region_enclosing_address(katom->kctx,
                                                                  res->ext_resource & ~BASE_EXT_RES_ACCESS_EXCLUSIVE);
         /* did we find a matching region object? */
-        if (NULL == reg || (reg->flags & KBASE_REG_FREE)) {
+        if (reg == NULL || (reg->flags & KBASE_REG_FREE)) {
             /* roll back */
             goto failed_loop;
         }
@@ -385,12 +384,12 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
             katom->atom_flags |= KBASE_KATOM_FLAG_PROTECTED;
         }
 
-        alloc = kbase_map_external_resource(katom->kctx, reg, current->mm
-#ifdef CONFIG_KDS
-                                            ,
-                                            &kds_res_count, kds_resources, kds_access_bitmap, exclusive
+#ifndef CONFIG_KDS
+        alloc = kbase_map_external_resource(katom->kctx, reg, current->mm);
+#else
+        alloc = kbase_map_external_resource(katom->kctx, reg, current->mm,
+                                            &kds_res_count, kds_resources, kds_access_bitmap, exclusive);
 #endif
-        );
         if (!alloc) {
             err_ret_val = -EINVAL;
             goto failed_loop;
@@ -433,7 +432,6 @@ static int kbase_jd_pre_external_resources(struct kbase_jd_atom *katom, const st
 
         wait_failed = kds_async_waitall(&katom->kds_rset, &katom->kctx->jctx.kds_cb, katom, NULL, kds_res_count,
                                         kds_access_bitmap, kds_resources);
-
         if (wait_failed) {
             goto failed_kds_setup;
         } else {
@@ -562,7 +560,6 @@ static inline void jd_resolve_dep(struct list_head *out_list, struct kbase_jd_at
             }
         }
         other_dep_atom = (struct kbase_jd_atom *)kbase_jd_katom_dep_atom(&dep_atom->dep[other_d]);
-
         if (!dep_atom->in_jd_list &&
             (!other_dep_atom || (IS_GPU_ATOM(dep_atom) && !ctx_is_dying && !dep_atom->will_fail_event_code &&
                                  !other_dep_atom->will_fail_event_code))) {
@@ -699,7 +696,7 @@ static void jd_try_submitting_deps(struct list_head *out_list, struct kbase_jd_a
             struct kbase_jd_atom *dep_atom = list_entry(pos, struct kbase_jd_atom, dep_item[i]);
 
             if (IS_GPU_ATOM(dep_atom) && !dep_atom->in_jd_list) {
-                /*Check if atom deps look sane*/
+                /* Check if atom deps look sane */
                 bool dep0_valid = is_dep_valid(dep_atom->dep[0].atom);
                 bool dep1_valid = is_dep_valid(dep_atom->dep[1].atom);
                 bool dep_satisfied = true;
@@ -1022,7 +1019,6 @@ bool jd_submit_atom(struct kbase_context *kctx, const struct base_jd_atom_v2 *us
         }
 
         if (dep_atom->status == KBASE_JD_ATOM_STATE_UNUSED || dep_atom->status == KBASE_JD_ATOM_STATE_COMPLETED) {
-
             if (dep_atom->event_code == BASE_JD_EVENT_DONE) {
                 continue;
             }
@@ -1052,7 +1048,6 @@ bool jd_submit_atom(struct kbase_context *kctx, const struct base_jd_atom_v2 *us
                 }
             }
             will_fail = true;
-
         } else {
             /* Atom is in progress, add this atom to the list */
             list_add_tail(&katom->dep_item[i], &dep_atom->dep_head[i]);
@@ -1652,14 +1647,14 @@ void kbase_jd_done(struct kbase_jd_atom *katom, int slot_nr, ktime_t *end_timest
     atomic_inc(&kctx->work_count);
 
 #ifdef CONFIG_DEBUG_FS
-    /* a failed job happened and is waiting for dumping*/
+    /* a failed job happened and is waiting for dumping */
     if (!katom->will_fail_event_code && kbase_debug_job_fault_process(katom, katom->event_code)) {
         return;
     }
 #endif
 
     WARN_ON(work_pending(&katom->work));
-    KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&katom->work));
+    KBASE_DEBUG_ASSERT(object_is_on_stack(&katom->work) == 0);
     INIT_WORK(&katom->work, kbase_jd_done_worker);
     queue_work(kctx->jctx.job_done_wq, &katom->work);
 }
@@ -1670,10 +1665,10 @@ void kbase_jd_cancel(struct kbase_device *kbdev, struct kbase_jd_atom *katom)
 {
     struct kbase_context *kctx;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
-    KBASE_DEBUG_ASSERT(NULL != katom);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(katom != NULL);
     kctx = katom->kctx;
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     KBASE_TRACE_ADD(kbdev, JD_CANCEL, kctx, katom, katom->jc, 0);
 
@@ -1684,7 +1679,7 @@ void kbase_jd_cancel(struct kbase_device *kbdev, struct kbase_jd_atom *katom)
 
     katom->event_code = BASE_JD_EVENT_JOB_CANCELLED;
 
-    KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&katom->work));
+    KBASE_DEBUG_ASSERT(object_is_on_stack(&katom->work) == 0);
     INIT_WORK(&katom->work, jd_cancel_worker);
     queue_work(kctx->jctx.job_done_wq, &katom->work);
 }
@@ -1765,7 +1760,7 @@ int kbase_jd_init(struct kbase_context *kctx)
     KBASE_DEBUG_ASSERT(kctx);
 
     kctx->jctx.job_done_wq = alloc_workqueue("mali_jd", WQ_HIGHPRI | WQ_UNBOUND, 1);
-    if (NULL == kctx->jctx.job_done_wq) {
+    if (kctx->jctx.job_done_wq == NULL) {
         mali_err = -ENOMEM;
         goto out1;
     }
@@ -1795,7 +1790,7 @@ int kbase_jd_init(struct kbase_context *kctx)
 
 #ifdef CONFIG_KDS
     err = kds_callback_init(&kctx->jctx.kds_cb, 0, kds_dep_clear);
-    if (0 != err) {
+    if (err != 0) {
         mali_err = -EINVAL;
         goto out2;
     }

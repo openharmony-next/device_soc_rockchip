@@ -237,7 +237,7 @@ static void _log_abort_or_abnormal_wake(bool abort, const char *fmt, va_list arg
         wakeup_reason = RESUME_ABNORMAL;
     }
 
-    vsnprintf(non_irq_wake_reason, MAX_SUSPEND_ABORT_LEN, fmt, args);
+    (void)vsnprintf(non_irq_wake_reason, MAX_SUSPEND_ABORT_LEN, fmt, args);
 
     spin_unlock_irqrestore(&wakeup_reason_lock, flags);
 }
@@ -366,7 +366,7 @@ static struct attribute_group attr_group = {
     .attrs = attrs,
 };
 
-/* Detects a suspend and clears all the previous wake up reasons*/
+/* Detects a suspend and clears all the previous wake up reasons */
 static int wakeup_reason_pm_event(struct notifier_block *notifier, unsigned long pm_event, void *unused)
 {
     switch (pm_event) {

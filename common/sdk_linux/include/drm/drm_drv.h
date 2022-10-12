@@ -162,7 +162,7 @@ enum drm_driver_feature {
  */
 struct drm_driver {
     /**
-     * @load:
+     * @load
      *
      * Backward-compatible driver callback to complete initialization steps
      * after the driver is registered.  For this reason, may suffer from
@@ -173,14 +173,14 @@ struct drm_driver {
      *
      * This is deprecated, do not use!
      *
-     * Returns:
+     * Returns
      *
      * Zero on success, non-zero value on failure.
      */
     int (*load)(struct drm_device *, unsigned long flags);
 
     /**
-     * @open:
+     * @open
      *
      * Driver callback when a new &struct drm_file is opened. Useful for
      * setting up driver-private data structures like buffer allocators,
@@ -192,7 +192,7 @@ struct drm_driver {
      * there should never be a need to set up any modeset related resources
      * in this callback. Doing so would be a driver design bug.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success, a negative error code on failure, which will be
      * promoted to userspace as the result of the open() system call.
@@ -200,7 +200,7 @@ struct drm_driver {
     int (*open)(struct drm_device *, struct drm_file *);
 
     /**
-     * @postclose:
+     * @postclose
      *
      * One of the driver callbacks when a new &struct drm_file is closed.
      * Useful for tearing down driver-private data structures allocated in
@@ -214,7 +214,7 @@ struct drm_driver {
     void (*postclose)(struct drm_device *, struct drm_file *);
 
     /**
-     * @lastclose:
+     * @lastclose
      *
      * Called when the last &struct drm_file has been closed and there's
      * currently no userspace client for the &struct drm_device.
@@ -228,7 +228,7 @@ struct drm_driver {
      *
      * This is called after @postclose hook has been called.
      *
-     * NOTE:
+     * NOTE
      *
      * All legacy drivers use this callback to de-initialize the hardware.
      * This is purely because of the shadow-attach model, where the DRM
@@ -242,7 +242,7 @@ struct drm_driver {
     void (*lastclose)(struct drm_device *);
 
     /**
-     * @unload:
+     * @unload
      *
      * Reverse the effects of the driver load callback.  Ideally,
      * the clean up performed by the driver should happen in the
@@ -259,7 +259,7 @@ struct drm_driver {
     void (*unload)(struct drm_device *);
 
     /**
-     * @release:
+     * @release
      *
      * Optional callback for destroying device data after the final
      * reference is released, i.e. the device is being destroyed.
@@ -271,7 +271,7 @@ struct drm_driver {
     void (*release)(struct drm_device *);
 
     /**
-     * @irq_handler:
+     * @irq_handler
      *
      * Interrupt handler called when using drm_irq_install(). Not used by
      * drivers which implement their own interrupt handling.
@@ -279,7 +279,7 @@ struct drm_driver {
     irqreturn_t (*irq_handler)(int irq, void *arg);
 
     /**
-     * @irq_preinstall:
+     * @irq_preinstall
      *
      * Optional callback used by drm_irq_install() which is called before
      * the interrupt handler is registered. This should be used to clear out
@@ -289,7 +289,7 @@ struct drm_driver {
     void (*irq_preinstall)(struct drm_device *dev);
 
     /**
-     * @irq_postinstall:
+     * @irq_postinstall
      *
      * Optional callback used by drm_irq_install() which is called after
      * the interrupt handler is registered. This should be used to enable
@@ -298,7 +298,7 @@ struct drm_driver {
     int (*irq_postinstall)(struct drm_device *dev);
 
     /**
-     * @irq_uninstall:
+     * @irq_uninstall
      *
      * Optional callback used by drm_irq_uninstall() which is called before
      * the interrupt handler is unregistered. This should be used to disable
@@ -307,20 +307,20 @@ struct drm_driver {
     void (*irq_uninstall)(struct drm_device *dev);
 
     /**
-     * @master_set:
+     * @master_set
      *
      * Called whenever the minor master is set. Only used by vmwgfx.
      */
     void (*master_set)(struct drm_device *dev, struct drm_file *file_priv, bool from_open);
     /**
-     * @master_drop:
+     * @master_drop
      *
      * Called whenever the minor master is dropped. Only used by vmwgfx.
      */
     void (*master_drop)(struct drm_device *dev, struct drm_file *file_priv);
 
     /**
-     * @debugfs_init:
+     * @debugfs_init
      *
      * Allows drivers to create driver-specific debugfs files.
      */
@@ -335,7 +335,7 @@ struct drm_driver {
     void (*gem_free_object_unlocked)(struct drm_gem_object *obj);
 
     /**
-     * @gem_open_object:
+     * @gem_open_object
      *
      * This callback is deprecated in favour of &drm_gem_object_funcs.open.
      *
@@ -344,7 +344,7 @@ struct drm_driver {
     int (*gem_open_object)(struct drm_gem_object *, struct drm_file *);
 
     /**
-     * @gem_close_object:
+     * @gem_close_object
      *
      * This callback is deprecated in favour of &drm_gem_object_funcs.close.
      *
@@ -360,7 +360,7 @@ struct drm_driver {
      */
     struct drm_gem_object *(*gem_create_object)(struct drm_device *dev, size_t size);
     /**
-     * @prime_handle_to_fd:
+     * @prime_handle_to_fd
      *
      * Main PRIME export function. Should be implemented with
      * drm_gem_prime_handle_to_fd() for GEM based drivers.
@@ -371,7 +371,7 @@ struct drm_driver {
     int (*prime_handle_to_fd)(struct drm_device *dev, struct drm_file *file_priv, uint32_t handle, uint32_t flags,
                               int *prime_fd);
     /**
-     * @prime_fd_to_handle:
+     * @prime_fd_to_handle
      *
      * Main PRIME import function. Should be implemented with
      * drm_gem_prime_fd_to_handle() for GEM based drivers.
@@ -381,14 +381,14 @@ struct drm_driver {
      */
     int (*prime_fd_to_handle)(struct drm_device *dev, struct drm_file *file_priv, int prime_fd, uint32_t *handle);
     /**
-     * @gem_prime_export:
+     * @gem_prime_export
      *
      * Export hook for GEM drivers. Deprecated in favour of
      * &drm_gem_object_funcs.export.
      */
     struct dma_buf *(*gem_prime_export)(struct drm_gem_object *obj, int flags);
     /**
-     * @gem_prime_import:
+     * @gem_prime_import
      *
      * Import hook for GEM drivers.
      *
@@ -397,28 +397,28 @@ struct drm_driver {
     struct drm_gem_object *(*gem_prime_import)(struct drm_device *dev, struct dma_buf *dma_buf);
 
     /**
-     * @gem_prime_pin:
+     * @gem_prime_pin
      *
      * Deprecated hook in favour of &drm_gem_object_funcs.pin.
      */
     int (*gem_prime_pin)(struct drm_gem_object *obj);
 
     /**
-     * @gem_prime_unpin:
+     * @gem_prime_unpin
      *
      * Deprecated hook in favour of &drm_gem_object_funcs.unpin.
      */
     void (*gem_prime_unpin)(struct drm_gem_object *obj);
 
     /**
-     * @gem_prime_get_sg_table:
+     * @gem_prime_get_sg_table
      *
      * Deprecated hook in favour of &drm_gem_object_funcs.get_sg_table.
      */
     struct sg_table *(*gem_prime_get_sg_table)(struct drm_gem_object *obj);
 
     /**
-     * @gem_prime_import_sg_table:
+     * @gem_prime_import_sg_table
      *
      * Optional hook used by the PRIME helper functions
      * drm_gem_prime_import() respectively drm_gem_prime_import_dev().
@@ -426,7 +426,7 @@ struct drm_driver {
     struct drm_gem_object *(*gem_prime_import_sg_table)(struct drm_device *dev, struct dma_buf_attachment *attach,
                                                         struct sg_table *sgt);
     /**
-     * @gem_prime_vmap:
+     * @gem_prime_vmap
      *
      * Deprecated vmap hook for GEM drivers. Please use
      * &drm_gem_object_funcs.vmap instead.
@@ -434,7 +434,7 @@ struct drm_driver {
     void *(*gem_prime_vmap)(struct drm_gem_object *obj);
 
     /**
-     * @gem_prime_vunmap:
+     * @gem_prime_vunmap
      *
      * Deprecated vunmap hook for GEM drivers. Please use
      * &drm_gem_object_funcs.vunmap instead.
@@ -442,7 +442,7 @@ struct drm_driver {
     void (*gem_prime_vunmap)(struct drm_gem_object *obj, void *vaddr);
 
     /**
-     * @gem_prime_mmap:
+     * @gem_prime_mmap
      *
      * mmap hook for GEM drivers, used to implement dma-buf mmap in the
      * PRIME helpers.
@@ -461,7 +461,7 @@ struct drm_driver {
     int (*gem_prime_get_uuid)(struct drm_gem_object *obj, uuid_t *uuid);
 
     /**
-     * @dumb_create:
+     * @dumb_create
      *
      * This creates a new dumb buffer in the driver's backing storage manager (GEM,
      * TTM or something else entirely) and returns the resulting buffer handle. This
@@ -477,13 +477,13 @@ struct drm_driver {
      *
      * Called by the user via ioctl.
      *
-     * Returns:
+     * Returns
      *
      * Zero on success, negative errno on failure.
      */
     int (*dumb_create)(struct drm_file *file_priv, struct drm_device *dev, struct drm_mode_create_dumb *args);
     /**
-     * @dumb_map_offset:
+     * @dumb_map_offset
      *
      * Allocate an offset in the drm device node's address space to be able to
      * memory map a dumb buffer.
@@ -493,13 +493,13 @@ struct drm_driver {
      *
      * Called by the user via ioctl.
      *
-     * Returns:
+     * Returns
      *
      * Zero on success, negative errno on failure.
      */
     int (*dumb_map_offset)(struct drm_file *file_priv, struct drm_device *dev, uint32_t handle, uint64_t *offset);
     /**
-     * @dumb_destroy:
+     * @dumb_destroy
      *
      * This destroys the userspace handle for the given dumb backing storage buffer.
      * Since buffer objects must be reference counted in the kernel a buffer object
@@ -510,7 +510,7 @@ struct drm_driver {
      * The default implementation is drm_gem_dumb_destroy(). GEM based drivers
      * must not overwrite this.
      *
-     * Returns:
+     * Returns
      *
      * Zero on success, negative errno on failure.
      */

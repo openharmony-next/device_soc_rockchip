@@ -34,4 +34,4 @@
  */
 void kbasep_jd_debugfs_ctx_init(struct kbase_context *kctx);
 
-#endif /*_KBASE_JD_DEBUGFS_H*/
+#endif /* _KBASE_JD_DEBUGFS_H */

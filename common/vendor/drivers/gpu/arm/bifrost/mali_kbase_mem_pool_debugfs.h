@@ -116,4 +116,4 @@ void kbase_mem_pool_config_debugfs_set_max_size(void *array, size_t index, size_
  */
 size_t kbase_mem_pool_config_debugfs_max_size(void *array, size_t index);
 
-#endif /*_KBASE_MEM_POOL_DEBUGFS_H_ */
+#endif /* _KBASE_MEM_POOL_DEBUGFS_H_ */

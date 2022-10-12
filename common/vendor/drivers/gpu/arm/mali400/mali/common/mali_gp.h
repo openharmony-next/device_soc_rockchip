@@ -63,8 +63,7 @@ MALI_STATIC_INLINE enum mali_interrupt_result mali_gp_get_interrupt_result(struc
 {
     u32 stat_used =
         mali_hw_core_register_read(&core->hw_core, MALIGP2_REG_ADDR_MGMT_INT_STAT) & MALIGP2_REG_VAL_IRQ_MASK_USED;
-
-    if (0 == stat_used) {
+    if (stat_used == 0) {
         return MALI_INTERRUPT_RESULT_NONE;
     } else if ((MALIGP2_REG_VAL_IRQ_VS_END_CMD_LST | MALIGP2_REG_VAL_IRQ_PLBU_END_CMD_LST) == stat_used) {
         return MALI_INTERRUPT_RESULT_SUCCESS;

@@ -497,7 +497,6 @@ static int panel_simple_get_hpd_gpio(struct device *dev, struct panel_simple *p,
     p->hpd_gpio = devm_gpiod_get_optional(dev, "hpd", GPIOD_IN);
     if (IS_ERR(p->hpd_gpio)) {
         err = PTR_ERR(p->hpd_gpio);
-
         /*
          * If we're called from probe we won't consider '-EPROBE_DEFER'
          * to be an error--we'll leave the error code in "hpd_gpio".

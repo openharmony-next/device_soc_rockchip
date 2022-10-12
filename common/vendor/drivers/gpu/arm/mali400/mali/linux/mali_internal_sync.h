@@ -140,8 +140,7 @@ struct mali_internal_sync_fence_waiter {
  * @param name The sync_timeline name
  * @return The new mali internal sync timeline if successful, NULL if not.
  */
-struct mali_internal_sync_timeline *
-mali_internal_sync_timeline_create(const struct mali_internal_sync_timeline_ops *ops, int size, const char *name);
+struct mali_internal_sync_timeline *mali_internal_sync_timeline_create(const struct mali_internal_sync_timeline_ops *ops, int size, const char *name);
 
 /**
  * Destroy one mali internal sync timeline.
@@ -188,5 +187,5 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
 int mali_internal_sync_fence_cancel_async(struct mali_internal_sync_fence *sync_fence,
                                           struct mali_internal_sync_fence_waiter *waiter);
 
-#endif /*LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0)*/
+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0) */
 #endif /* _MALI_INTERNAL_SYNC_H */

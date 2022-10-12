@@ -761,10 +761,10 @@ typedef struct {
 /** @defgroup _mali_uk_memory U/K Memory
  * @{ */
 
-#define MALI_MEMORY_ALLOCATE_RESIZEABLE (1 << 4)  /* BUFFER can trim dow/grow*/
-#define MALI_MEMORY_ALLOCATE_NO_BIND_GPU (1 << 5) /*Not map to GPU when allocate, must call bind later*/
+#define MALI_MEMORY_ALLOCATE_RESIZEABLE (1 << 4)  /* BUFFER can trim dow/grow */
+#define MALI_MEMORY_ALLOCATE_NO_BIND_GPU (1 << 5) /* Not map to GPU when allocate, must call bind later */
 #define MALI_MEMORY_ALLOCATE_SWAPPABLE (1 << 6)   /* Allocate swappale memory. */
-#define MALI_MEMORY_ALLOCATE_DEFER_BIND (1 << 7)  /*Not map to GPU when allocate, must call bind later*/
+#define MALI_MEMORY_ALLOCATE_DEFER_BIND (1 << 7)  /* Not map to GPU when allocate, must call bind later */
 #define MALI_MEMORY_ALLOCATE_SECURE (1 << 8)      /* Allocate secure memory. */
 
 typedef struct {
@@ -832,7 +832,7 @@ typedef struct {
     u64 ctx;           /**< [in,out] user-kernel context (trashed on output) */
     u32 target_handle; /**< [in] handle of allocation need to do COW */
     u32 target_offset; /**< [in] offset in target allocation to do COW(for support COW  a memory allocated from
-                          memory_bank, PAGE_SIZE align)*/
+                          memory_bank, PAGE_SIZE align) */
     u32 target_size;   /**< [in] size of target allocation to do COW (for support memory bank, PAGE_SIZE align)(in byte)
                         */
     u32 range_start;   /**< [in] re allocate range start offset, offset from the start of allocation (PAGE_SIZE align)*/
@@ -861,7 +861,7 @@ typedef struct {
 
 typedef struct {
     u64 ctx;   /**< [in,out] user-kernel context (trashed on output) */
-    u64 vaddr; /* the buffer to do resize*/
+    u64 vaddr; /* the buffer to do resize */
     u32 psize; /* wanted physical size of this memory */
 } mali_uk_mem_resize_s;
 

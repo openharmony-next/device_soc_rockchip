@@ -416,7 +416,7 @@ static inline struct iommu_device *dev_to_iommu_device(struct device *dev)
 
 static inline void iommu_iotlb_gather_init(struct iommu_iotlb_gather *gather)
 {
-    *gather = (struct iommu_iotlb_gather){
+    *gather = (struct iommu_iotlb_gather) {
         .start = ULONG_MAX,
     };
 }

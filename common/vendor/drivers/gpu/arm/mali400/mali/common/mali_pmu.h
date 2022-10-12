@@ -32,14 +32,14 @@ struct mali_pmu_core {
 /** @brief Register layout for hardware PMU
  */
 typedef enum {
-    PMU_REG_ADDR_MGMT_POWER_UP = 0x00,      /*< Power up register */
-    PMU_REG_ADDR_MGMT_POWER_DOWN = 0x04,    /*< Power down register */
-    PMU_REG_ADDR_MGMT_STATUS = 0x08,        /*< Core sleep status register */
-    PMU_REG_ADDR_MGMT_INT_MASK = 0x0C,      /*< Interrupt mask register */
-    PMU_REG_ADDR_MGMT_INT_RAWSTAT = 0x10,   /*< Interrupt raw status register */
-    PMU_REG_ADDR_MGMT_INT_CLEAR = 0x18,     /*< Interrupt clear register */
-    PMU_REG_ADDR_MGMT_SW_DELAY = 0x1C,      /*< Switch delay register */
-    PMU_REGISTER_ADDRESS_SPACE_SIZE = 0x28, /*< Size of register space */
+    PMU_REG_ADDR_MGMT_POWER_UP = 0x00,      /* < Power up register */
+    PMU_REG_ADDR_MGMT_POWER_DOWN = 0x04,    /* < Power down register */
+    PMU_REG_ADDR_MGMT_STATUS = 0x08,        /* < Core sleep status register */
+    PMU_REG_ADDR_MGMT_INT_MASK = 0x0C,      /* < Interrupt mask register */
+    PMU_REG_ADDR_MGMT_INT_RAWSTAT = 0x10,   /* < Interrupt raw status register */
+    PMU_REG_ADDR_MGMT_INT_CLEAR = 0x18,     /* < Interrupt clear register */
+    PMU_REG_ADDR_MGMT_SW_DELAY = 0x1C,      /* < Switch delay register */
+    PMU_REGISTER_ADDRESS_SPACE_SIZE = 0x28, /* < Size of register space */
 } pmu_reg_addr_mgmt_addr;
 
 #define PMU_REG_VAL_IRQ 1

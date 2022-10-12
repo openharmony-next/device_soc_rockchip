@@ -170,7 +170,6 @@ EXPORT_SYMBOL(iommu_put_dma_cookie);
  */
 void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list)
 {
-
     if (!is_of_node(dev_iommu_fwspec_get(dev)->iommu_fwnode)) {
         iort_iommu_msi_get_resv_regions(dev, list);
     }
@@ -612,7 +611,7 @@ static struct page **iommu_dma_alloc_pages_ext(struct device *dev, unsigned int 
             gfp_t alloc_flags = gfp;
 
             order_size = 1U << order;
-            if (order_mask > order_size) {
+            if (order_mask > (unsigned long)order_size) {
                 alloc_flags |= __GFP_NORETRY;
             }
             page = alloc_pages_node(nid, alloc_flags, order);
@@ -1353,7 +1352,6 @@ void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
     const struct iommu_dma_msi_page *msi_page;
 
     msi_page = msi_desc_get_iommu_cookie(desc);
-
     if (!domain || !domain->iova_cookie || WARN_ON(!msi_page)) {
         return;
     }

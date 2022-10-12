@@ -134,7 +134,7 @@ static int rockchip_edp_phy_set_rate(struct rockchip_edp_phy *edpphy, struct phy
 
     writel(EDP_PHY_PD_PLL(0x0), edpphy->regs + EDP_PHY_GRF_CON0);
     writel(EDP_PHY_TX_PD(~GENMASK(dp->lanes - 1, 0)), edpphy->regs + EDP_PHY_GRF_CON0);
-    ret = readl_poll_timeout(edpphy->regs + EDP_PHY_GRF_STATUS0, value, value & PLL_RDY, 100, 1000);
+    ret = readl_poll_timeout(edpphy->regs + EDP_PHY_GRF_STATUS0, value, value & PLL_RDY, 0x64, 0x3E8);
     if (ret) {
         dev_err(edpphy->dev, "pll is not ready: %d\n", ret);
         return ret;
@@ -232,7 +232,6 @@ static bool rockchip_edp_phy_enabled(struct rockchip_edp_phy *edpphy)
     u32 val;
 
     val = readl(edpphy->regs + EDP_PHY_GRF_CON10);
-
     if (val & EDP_PHY_AUX_IDLE_MASK) {
         return false;
     }
@@ -358,9 +357,9 @@ static int rockchip_edp_phy_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id rockchip_edp_phy_of_match[] = {{
-                                                                    .compatible = "rockchip,rk3568-edp-phy",
-                                                                },
-                                                                {}};
+    .compatible = "rockchip,rk3568-edp-phy",
+}, {
+}};
 MODULE_DEVICE_TABLE(of, rockchip_edp_phy_of_match);
 
 static struct platform_driver rockchip_edp_phy_driver = {

@@ -630,7 +630,7 @@ EXPORT_SYMBOL(mmc_free_host);
  */
 int mmc_host_rescan(struct mmc_host *host, int val, int is_cap_sdio_irq)
 {
-    if (NULL != primary_sdio_host) {
+    if (primary_sdio_host != NULL) {
         if (!host) {
             host = primary_sdio_host;
         } else {

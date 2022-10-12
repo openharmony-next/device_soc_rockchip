@@ -83,8 +83,7 @@ class Condition;
  * The mutex must be unlocked by the thread that locked it.  They are not
  * recursive, i.e. the same thread can't lock it multiple times.
  */
-class CAPABILITY("mutex") Mutex
-{
+class CAPABILITY("mutex") Mutex {
 public:
     enum { PRIVATE = 0, SHARED = 1 };
 
@@ -104,8 +103,7 @@ public:
 
     // Manages the mutex automatically. It'll be locked when Autolock is
     // constructed and released when Autolock goes out of scope.
-    class SCOPED_CAPABILITY Autolock
-    {
+    class SCOPED_CAPABILITY Autolock {
     public:
         inline explicit Autolock(Mutex &mutex) ACQUIRE(mutex) : mLock(mutex)
         {

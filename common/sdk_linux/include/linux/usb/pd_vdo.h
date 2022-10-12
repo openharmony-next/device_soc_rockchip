@@ -384,7 +384,7 @@
  * <0>     :: USB gen (0b == gen1, 1b == gen2+)
  */
 
-/* U3/CLd Power*/
+/* U3/CLd Power */
 #define ACAB2_U3_CLD_10MW_PLUS 0
 #define ACAB2_U3_CLD_10MW 1
 #define ACAB2_U3_CLD_5MW 2

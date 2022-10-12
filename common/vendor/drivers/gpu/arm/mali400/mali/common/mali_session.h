@@ -24,7 +24,7 @@ struct mali_soft_system;
 /* Number of frame builder job lists per session. */
 #define MALI_PP_JOB_FB_LOOKUP_LIST_SIZE 16
 #define MALI_PP_JOB_FB_LOOKUP_LIST_MASK (MALI_PP_JOB_FB_LOOKUP_LIST_SIZE - 1)
-/*Max pending big job allowed in kernel*/
+/* Max pending big job allowed in kernel */
 #define MALI_MAX_PENDING_BIG_JOB (2)
 
 struct mali_session_data {
@@ -57,7 +57,7 @@ struct mali_session_data {
     char *comm;
     atomic_t mali_mem_array[MALI_MEM_TYPE_MAX]; /**< The array to record mem types' usage for this session. */
     atomic_t mali_mem_allocated_pages;  /** The current allocated mali memory pages, which include mali os memory and
-                                           mali dedicated memory.*/
+                                           mali dedicated memory. */
     size_t max_mali_mem_allocated_size; /**< The past max mali memory allocated size, which include mali os memory and
                                            mali dedicated memory. */
     /* Added for new memroy system */

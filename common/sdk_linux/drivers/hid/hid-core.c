@@ -1495,7 +1495,7 @@ static void hid_process_event(struct hid_device *hid, struct hid_field *field, s
     if (hid->claimed & HID_CLAIMED_INPUT) {
         hidinput_hid_event(hid, field, usage, value);
     }
-    if (hid->claimed & HID_CLAIMED_HIDDEV && interrupt && hid->hiddev_hid_event) {
+    if ((hid->claimed & HID_CLAIMED_HIDDEV) && interrupt && hid->hiddev_hid_event) {
         hid->hiddev_hid_event(hid, field, usage, value);
     }
 }
@@ -1723,7 +1723,6 @@ int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, u32 size, i
     }
 
     rsize = hid_compute_report_size(report);
-
     if (report_enum->numbered && rsize >= HID_MAX_BUFFER_SIZE) {
         rsize = HID_MAX_BUFFER_SIZE - 1;
     } else if (rsize > HID_MAX_BUFFER_SIZE) {

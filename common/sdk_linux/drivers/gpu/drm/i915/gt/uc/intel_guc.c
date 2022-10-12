@@ -612,9 +612,7 @@ int intel_guc_resume(struct intel_guc *guc)
  * instead re-mapped by the GuC HW to memory location of the FW itself (WOPCM)
  * or other parts of the HW. The driver must take care not to place objects that
  * the GuC is going to access in these reserved ranges. The layout of the GuC
- * address space is shown below:
- *
- * ::
+ * address space is shown below
  *
  *     +===========> +====================+ <== FFFF_FFFF
  *     ^             |      Reserved      |

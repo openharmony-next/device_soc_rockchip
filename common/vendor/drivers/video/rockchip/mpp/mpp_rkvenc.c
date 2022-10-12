@@ -279,7 +279,7 @@ static int rkvenc_extract_task_msg(struct rkvenc_task *task, struct mpp_task_msg
                 }
                 memcpy(&task->w_reqs[task->w_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_READ: {
                 int req_base;
                 int max_size;
@@ -296,11 +296,11 @@ static int rkvenc_extract_task_msg(struct rkvenc_task *task, struct mpp_task_msg
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
                 break;
-            } 
+            }
             default:
                 break;
         }
@@ -448,13 +448,13 @@ static int rkvenc_run(struct mpp_dev *mpp, struct mpp_task *mpp_task)
             wmb();
             mpp_write(mpp, RKVENC_ENC_START_BASE, task->reg[reg_en]);
             break;
-        } 
+        }
         case RKVENC_MODE_LINKTABLE_FIX:
         case RKVENC_MODE_LINKTABLE_UPDATE:
         default: {
             mpp_err("link_mode %d failed.\n", task->link_mode);
             break;
-        } 
+        }
     }
     mpp_debug_leave();
     return 0;
@@ -546,7 +546,7 @@ static int rkvenc_finish(struct mpp_dev *mpp, struct mpp_task *mpp_task)
             }
             task->reg[RKVENC_INT_STATUS_INDEX] = task->irq_status;
             break;
-        } 
+        }
         case RKVENC_MODE_LINKTABLE_FIX:
         case RKVENC_MODE_LINKTABLE_UPDATE:
         default: {

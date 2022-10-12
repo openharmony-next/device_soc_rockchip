@@ -873,7 +873,6 @@ unsigned long drm_prime_get_contiguous_size(struct sg_table *sgt)
     for_each_sgtable_dma_sg(sgt, sg, i)
     {
         unsigned int len = sg_dma_len(sg);
-
         if (!len) {
             break;
         }

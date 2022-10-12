@@ -343,7 +343,7 @@ static int rockchip_get_pvtm_specific_value(struct device *dev, struct device_no
         goto restore_clk;
     }
 
-    /* The first few values may be fluctuant, if error is too big, retry*/
+    /* The first few values may be fluctuant, if error is too big, retry */
     while (retry--) {
         total_value = 0;
         min_value = INT_MAX;

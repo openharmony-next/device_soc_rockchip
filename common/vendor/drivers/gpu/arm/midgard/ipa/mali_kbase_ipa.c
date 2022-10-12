@@ -119,14 +119,13 @@ int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model, const char *nam
     char *origin;
 
     err = of_property_read_u32_array(model_dt_node, name, addr, num_elems);
-
     if (err && dt_required) {
         memset(addr, 0, sizeof(s32) * num_elems);
         dev_warn(model->kbdev->dev, "Error %d, no DT entry: %s.%s = %zu*[0]\n", err, model->ops->name, name, num_elems);
         origin = "zero";
     } else if (err && !dt_required) {
         origin = "default";
-    } else /* !err */ {
+    } else {
         origin = "DT";
     }
 
@@ -167,7 +166,7 @@ int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model, const char *
         origin = "zero";
     } else if (err && !dt_required) {
         origin = "default";
-    } else /* !err */ {
+    } else {
         strncpy(addr, string_prop_value, size - 1);
         origin = "DT";
     }
@@ -254,7 +253,6 @@ static void kbase_ipa_term_locked(struct kbase_device *kbdev)
 
 int kbase_ipa_init(struct kbase_device *kbdev)
 {
-
     const char *model_name;
     struct kbase_ipa_model_ops *ops;
     struct kbase_ipa_model *default_model = NULL;
@@ -267,9 +265,8 @@ int kbase_ipa_init(struct kbase_device *kbdev)
      */
     mutex_lock(&kbdev->ipa.lock);
 
-    /* The simple IPA model must *always* be present.*/
+    /* The simple IPA model must *always* be present. */
     ops = kbase_ipa_model_ops_find(kbdev, KBASE_IPA_FALLBACK_MODEL_NAME);
-
     if (!ops->do_utilization_scaling_in_framework) {
         dev_err(kbdev->dev, "Fallback IPA model %s should not account for utilization\n", ops->name);
         err = -EINVAL;
@@ -479,7 +476,6 @@ static unsigned long kbase_get_dynamic_power(unsigned long freq, unsigned long v
     model = kbdev->ipa.fallback_model;
 
     err = model->ops->get_dynamic_coeff(model, &power_coeff, freq);
-
     if (!err) {
         power = kbase_scale_dynamic_power(power_coeff, freq, voltage);
     } else {
@@ -507,7 +503,6 @@ int kbase_get_real_power(struct devfreq *df, u32 *power, unsigned long freq, uns
     model = get_current_model(kbdev);
 
     err = model->ops->get_dynamic_coeff(model, &power_coeff, freq);
-
     /* If we switch to protected model between get_current_model() and
      * get_dynamic_coeff(), counter reading could fail. If that happens
      * (unlikely, but possible), revert to the fallback model. */

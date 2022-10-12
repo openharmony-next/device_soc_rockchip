@@ -47,7 +47,7 @@ mali_osk_errcode_t inline _mali_osk_mem_reqregion(uintptr_t phys, u32 size, cons
 #if MALI_LICENSE_IS_GPL
     return MALI_OSK_ERR_OK; /* GPL driver gets the mem region for the resources registered automatically */
 #else
-    return ((NULL == request_mem_region(phys, size, description)) ? MALI_OSK_ERR_NOMEM : MALI_OSK_ERR_OK);
+    return ((request_mem_region(phys, size, description) == NULL) ? MALI_OSK_ERR_NOMEM : MALI_OSK_ERR_OK);
 #endif
 }
 
@@ -134,7 +134,7 @@ mali_osk_errcode_t _mali_ukk_mem_write_safe(mali_uk_mem_write_safe_s *args)
 
     session = (struct mali_session_data *)(uintptr_t)args->ctx;
 
-    if (NULL == session) {
+    if (session == NULL) {
         return MALI_OSK_ERR_INVALID_ARGS;
     }
 

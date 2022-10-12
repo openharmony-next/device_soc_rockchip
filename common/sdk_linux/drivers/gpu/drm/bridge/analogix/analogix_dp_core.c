@@ -327,7 +327,7 @@ static int analogix_dp_link_start(struct analogix_dp_device *dp)
         dp->link_train.cr_loop[lane] = 0;
     }
 
-    /* Set link rate and count as you want to establish*/
+    /* Set link rate and count as you want to establish */
     analogix_dp_set_link_bandwidth(dp, dp->link_train.link_rate);
     analogix_dp_set_lane_count(dp, dp->link_train.lane_count);
 
@@ -525,7 +525,6 @@ static int analogix_dp_process_clock_recovery(struct analogix_dp_device *dp)
             training_lane = analogix_dp_get_lane_link_training(dp, lane);
             voltage_swing = analogix_dp_get_adjust_request_voltage(adjust_request, lane);
             pre_emphasis = analogix_dp_get_adjust_request_pre_emphasis(adjust_request, lane);
-
             if (DPCD_VOLTAGE_SWING_GET(training_lane) == voltage_swing &&
                 DPCD_PRE_EMPHASIS_GET(training_lane) == pre_emphasis) {
                 dp->link_train.cr_loop[lane]++;
@@ -947,7 +946,7 @@ static irqreturn_t analogix_dp_irq_thread(int irq, void *arg)
     }
 
     irq_type = analogix_dp_get_irq_type(dp);
-    if (irq_type & DP_IRQ_TYPE_HP_CABLE_IN || irq_type & DP_IRQ_TYPE_HP_CABLE_OUT) {
+    if ((irq_type & DP_IRQ_TYPE_HP_CABLE_IN) || (irq_type & DP_IRQ_TYPE_HP_CABLE_OUT)) {
         dev_dbg(dp->dev, "Detected cable status changed!\n");
         if (dp->drm_dev) {
             drm_helper_hpd_irq_event(dp->drm_dev);
@@ -1539,8 +1538,8 @@ static void analogix_dp_bridge_mode_set(struct drm_bridge *bridge, const struct 
 
     /* Input video dynamic_range & colorimetry */
     vic = drm_match_cea_mode(mode);
-    if ((vic == 0x6) || (vic == 0x7) || (vic == 0x15) || (vic == 0x16) || (vic == 0x2) || (vic == 0x3) || (vic == 0x11) ||
-        (vic == 0x12)) {
+    if ((vic == 0x6) || (vic == 0x7) || (vic == 0x15) || (vic == 0x16) || (vic == 0x2) || \
+        (vic == 0x3) || (vic == 0x11) || (vic == 0x12)) {
         video->dynamic_range = CEA;
         video->ycbcr_coeff = COLOR_YCBCR601;
     } else if (vic) {

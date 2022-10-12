@@ -241,8 +241,8 @@ static int rockchip_combphy_init(struct phy *phy)
     }
 
     if (priv->mode == PHY_TYPE_USB3) {
-        ret = readx_poll_timeout_atomic(rockchip_combphy_is_ready, priv, val, val == cfg->pipe_phy_status.enable, 10,
-                                        1000);
+        ret = readx_poll_timeout_atomic(rockchip_combphy_is_ready, priv, val, val == cfg->pipe_phy_status.enable, 0xA,
+                                        0x3E8);
         if (ret) {
             dev_warn(priv->dev, "wait phy status ready timeout\n");
         }
@@ -333,7 +333,6 @@ static int rockchip_combphy_parse_dt(struct device *dev, struct rockchip_combphy
     priv->apb_rst = devm_reset_control_get_optional(dev, "combphy-apb");
     if (IS_ERR(priv->apb_rst)) {
         ret = PTR_ERR(priv->apb_rst);
-
         if (ret != -EPROBE_DEFER) {
             dev_warn(dev, "failed to get apb reset\n");
         }
@@ -344,7 +343,6 @@ static int rockchip_combphy_parse_dt(struct device *dev, struct rockchip_combphy
     priv->phy_rst = devm_reset_control_get_optional(dev, "combphy");
     if (IS_ERR(priv->phy_rst)) {
         ret = PTR_ERR(priv->phy_rst);
-
         if (ret != -EPROBE_DEFER) {
             dev_warn(dev, "failed to get phy reset\n");
         }
@@ -423,7 +421,7 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
 
     /* Configure PHY reference clock frequency */
     for (i = 0; i < priv->num_clks; i++) {
-        if (!strncmp(priv->clks[i].id, "refclk", 6)) {
+        if (!strncmp(priv->clks[i].id, "refclk", 0x6)) {
             refclk = priv->clks[i].clk;
             break;
         }
@@ -569,7 +567,7 @@ static int rk3568_combphy_cfg(struct rockchip_combphy_priv *priv)
         param_write(priv->phy_grf, &cfg->pipe_clk_ext, true);
         if (priv->mode == PHY_TYPE_PCIE && rate == 0x5F5E100) {
             val = readl(priv->mmio + (0xc << 0x02));
-            val |= 0x3 << 0x04 | 0x1 << 0x07;
+            val |= (0x3 << 0x04) | (0x1 << 0x07);
             writel(val, priv->mmio + (0xc << 0x02));
 
             val = readl(priv->mmio + (0xd << 0x02));

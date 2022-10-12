@@ -85,7 +85,6 @@ struct page *dmabuf_page_pool_alloc(struct dmabuf_page_pool *pool)
     }
 
     page = dmabuf_page_pool_fetch(pool);
-
     if (!page) {
         page = dmabuf_page_pool_alloc_pages(pool);
     }

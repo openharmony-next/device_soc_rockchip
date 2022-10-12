@@ -359,7 +359,9 @@ enum tl_msg_id_aux {
     TRACEPOINT_DESC(KBASE_TL_KBASE_ARRAY_ITEM_KCPUQUEUE_ENQUEUE_JIT_ALLOC, \
         "Array item of KCPU Queue enqueues JIT Alloc", \
         "@pLLLLIIIII", \
-        "kcpu_queue,jit_alloc_gpu_alloc_addr_dest,jit_alloc_va_pages,jit_alloc_commit_pages,jit_alloc_extent,jit_alloc_jit_id,jit_alloc_bin_id,jit_alloc_max_allocations,jit_alloc_flags,jit_alloc_usage_id") \
+        "kcpu_queue,jit_alloc_gpu_alloc_addr_dest,jit_alloc_va_pages,jit_alloc_commit_pages," \
+        "jit_alloc_extent,jit_alloc_jit_id,jit_alloc_bin_id,jit_alloc_max_allocations," \
+        "jit_alloc_flags,jit_alloc_usage_id") \
     TRACEPOINT_DESC(KBASE_TL_KBASE_ARRAY_END_KCPUQUEUE_ENQUEUE_JIT_ALLOC, \
         "End array of KCPU Queue enqueues JIT Alloc", \
         "@p", \

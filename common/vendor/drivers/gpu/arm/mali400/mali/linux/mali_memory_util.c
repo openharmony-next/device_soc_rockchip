@@ -39,7 +39,7 @@
 #include "mali_memory_swap_alloc.h"
 
 /**
- *function @_mali_free_allocation_mem - free a memory allocation
+ * function @_mali_free_allocation_mem - free a memory allocation
  */
 static u32 _mali_free_allocation_mem(mali_mem_allocation *mali_alloc)
 {
@@ -48,7 +48,7 @@ static u32 _mali_free_allocation_mem(mali_mem_allocation *mali_alloc)
 
     struct mali_session_data *session = mali_alloc->session;
     MALI_DEBUG_PRINT(0x4, (" _mali_free_allocation_mem, psize =0x%x! \n", mali_alloc->psize));
-    if (0 == mali_alloc->psize) {
+    if (mali_alloc->psize == 0) {
         goto out;
     }
 
@@ -56,7 +56,7 @@ static u32 _mali_free_allocation_mem(mali_mem_allocation *mali_alloc)
     mutex_lock(&mali_idr_mutex);
     mem_bkend = idr_find(&mali_backend_idr, mali_alloc->backend_handle);
     mutex_unlock(&mali_idr_mutex);
-    MALI_DEBUG_ASSERT(NULL != mem_bkend);
+    MALI_DEBUG_ASSERT(mem_bkend != NULL);
 
     switch (mem_bkend->type) {
         case MALI_MEM_OS:
@@ -115,7 +115,7 @@ static u32 _mali_free_allocation_mem(mali_mem_allocation *mali_alloc)
             break;
     }
 
-    /*Remove backend memory idex */
+    /* Remove backend memory idex */
     mutex_lock(&mali_idr_mutex);
     idr_remove(&mali_backend_idr, mali_alloc->backend_handle);
     mutex_unlock(&mali_idr_mutex);
@@ -135,7 +135,7 @@ u32 mali_allocation_unref(struct mali_mem_allocation **alloc)
     u32 free_pages_nr = 0;
     mali_mem_allocation *mali_alloc = *alloc;
     *alloc = NULL;
-    if (0 == mali_osk_atomic_dec_return(&mali_alloc->mem_alloc_refcount)) {
+    if (mali_osk_atomic_dec_return(&mali_alloc->mem_alloc_refcount) == 0) {
         free_pages_nr = _mali_free_allocation_mem(mali_alloc);
     }
     return free_pages_nr;

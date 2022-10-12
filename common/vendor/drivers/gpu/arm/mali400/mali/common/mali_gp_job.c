@@ -35,9 +35,8 @@ static int _mali_gp_add_varying_allocations(struct mali_session_data *session, s
         alloc_node = mali_osk_calloc(1, sizeof(struct mali_gp_allocation_node));
         if (alloc_node) {
             INIT_LIST_HEAD(&alloc_node->node);
-            /* find mali allocation structure by vaddress*/
+            /* find mali allocation structure by vaddress */
             mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, alloc[i], 0);
-
             if (likely(mali_vma_node)) {
                 mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
                 MALI_DEBUG_ASSERT(alloc[i] == mali_vma_node->vm_node.start);
@@ -49,7 +48,7 @@ static int _mali_gp_add_varying_allocations(struct mali_session_data *session, s
                 goto fail;
             }
             alloc_node->alloc = mali_alloc;
-            /* add to gp job varying alloc list*/
+            /* add to gp job varying alloc list */
             list_move(&alloc_node->node, &job->varying_alloc);
         } else {
             goto fail;
@@ -85,25 +84,24 @@ struct mali_gp_job *mali_gp_job_create(struct mali_session_data *session, mali_u
     mali_uk_gp_start_job_s copy_of_uargs;
 
     job = mali_osk_calloc(1, sizeof(struct mali_gp_job));
-    if (NULL != job) {
+    if (job != NULL) {
         job->finished_notification =
             _mali_osk_notification_create(MALI_NOTIFICATION_GP_FINISHED, sizeof(mali_uk_gp_job_finished_s));
-        if (NULL == job->finished_notification) {
+        if (job->finished_notification == NULL) {
             goto fail3;
         }
 
         job->oom_notification =
             _mali_osk_notification_create(MALI_NOTIFICATION_GP_STALLED, sizeof(mali_uk_gp_job_suspended_s));
-        if (NULL == job->oom_notification) {
+        if (job->oom_notification == NULL) {
             goto fail2;
         }
 
-        if (0 != _mali_osk_copy_from_user(&job->uargs, uargs, sizeof(mali_uk_gp_start_job_s))) {
+        if (_mali_osk_copy_from_user(&job->uargs, uargs, sizeof(mali_uk_gp_start_job_s)) != 0) {
             goto fail1;
         }
 
         perf_counter_flag = mali_gp_job_get_perf_counter_flag(job);
-
         /* case when no counters came from user space
          * so pass the debugfs / DS-5 provided global ones to the job object */
         if (!((perf_counter_flag & MALI_PERFORMANCE_COUNTER_FLAG_SRC0_ENABLE) ||
@@ -130,9 +128,9 @@ struct mali_gp_job *mali_gp_job_create(struct mali_session_data *session, mali_u
             goto fail1;
         }
 
-        /* add varying allocation list*/
+        /* add varying allocation list */
         if (job->uargs.deferred_mem_num > 0) {
-            /* copy varying list from user space*/
+            /* copy varying list from user space */
             job->varying_list = mali_osk_calloc(1, sizeof(u32) * job->uargs.deferred_mem_num);
             if (!job->varying_list) {
                 MALI_PRINT_ERROR(("Mali GP job: allocate varying_list failed varying_alloc_num = %d !\n",
@@ -140,19 +138,19 @@ struct mali_gp_job *mali_gp_job_create(struct mali_session_data *session, mali_u
                 goto fail1;
             }
 
-            if (0 != _mali_osk_copy_from_user(&copy_of_uargs, uargs, sizeof(mali_uk_gp_start_job_s))) {
+            if (_mali_osk_copy_from_user(&copy_of_uargs, uargs, sizeof(mali_uk_gp_start_job_s)) != 0) {
                 goto fail1;
             }
             memory_list = (u32 __user *)(uintptr_t)copy_of_uargs.deferred_mem_list;
 
-            if (0 !=
-                _mali_osk_copy_from_user(job->varying_list, memory_list, sizeof(u32) * job->uargs.deferred_mem_num)) {
+            if (_mali_osk_copy_from_user(job->varying_list, memory_list,
+                                         sizeof(u32) * job->uargs.deferred_mem_num) != 0) {
                 MALI_PRINT_ERROR(("Mali GP job: Failed to copy varying list from user space!\n"));
                 goto fail;
             }
 
-            if (unlikely(
-                    _mali_gp_add_varying_allocations(session, job, job->varying_list, job->uargs.deferred_mem_num))) {
+            if (unlikely(_mali_gp_add_varying_allocations(session,
+                                                          job, job->varying_list, job->uargs.deferred_mem_num))) {
                 MALI_PRINT_ERROR(("Mali GP job: _mali_gp_add_varying_allocations failed!\n"));
                 goto fail;
             }
@@ -192,7 +190,7 @@ struct mali_gp_job *mali_gp_job_create(struct mali_session_data *session, mali_u
             }
         }
         job->pp_tracker = pp_tracker;
-        if (NULL != job->pp_tracker) {
+        if (job->pp_tracker != NULL) {
             /* Take a reference on PP job's tracker that will be released when the GP
                job is done. */
             mali_timeline_system_tracker_get(session->timeline_system, pp_tracker);
@@ -231,7 +229,7 @@ void mali_gp_job_delete(struct mali_gp_job *job)
 {
     struct mali_backend_bind_list *bkn, *bkn_tmp;
     MALI_DEBUG_ASSERT_POINTER(job);
-    MALI_DEBUG_ASSERT(NULL == job->pp_tracker);
+    MALI_DEBUG_ASSERT(job->pp_tracker == NULL);
     MALI_DEBUG_ASSERT(_mali_osk_list_empty(&job->list));
     _mali_osk_free(job->varying_list);
 
@@ -245,11 +243,11 @@ void mali_gp_job_delete(struct mali_gp_job *job)
     mali_mem_defer_dmem_free(job);
 
     /* de-allocate the pre-allocated oom notifications */
-    if (NULL != job->oom_notification) {
+    if (job->oom_notification != NULL) {
         _mali_osk_notification_delete(job->oom_notification);
         job->oom_notification = NULL;
     }
-    if (NULL != job->finished_notification) {
+    if (job->finished_notification != NULL) {
         _mali_osk_notification_delete(job->finished_notification);
         job->finished_notification = NULL;
     }
@@ -268,7 +266,6 @@ void mali_gp_job_list_add(struct mali_gp_job *job, _mali_osk_list_t *list)
     /* Find position in list/queue where job should be added. */
     MALI_OSK_LIST_FOREACHENTRY_REVERSE(iter, tmp, list, struct mali_gp_job, list)
     {
-
         /* A span is used to handle job ID wrapping. */
         bool job_is_after = (mali_gp_job_get_id(job) - mali_gp_job_get_id(iter)) < MALI_SCHEDULER_JOB_ID_SPAN;
 
@@ -306,7 +303,7 @@ mali_scheduler_mask mali_gp_job_signal_pp_tracker(struct mali_gp_job *job, mali_
 
     MALI_DEBUG_ASSERT_POINTER(job);
 
-    if (NULL != job->pp_tracker) {
+    if (job->pp_tracker != NULL) {
         schedule_mask |=
             mali_timeline_system_tracker_put(job->session->timeline_system, job->pp_tracker, MALI_FALSE == success);
         job->pp_tracker = NULL;

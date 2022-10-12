@@ -554,8 +554,9 @@ static inline void kbase_hwcnt_enable_map_enable_all(struct kbase_hwcnt_enable_m
 {
     size_t grp, blk, blk_inst;
 
-    kbase_hwcnt_metadata_for_each_block(dst->metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_for_each_block(dst->metadata, grp, blk, blk_inst) {
         kbase_hwcnt_enable_map_block_enable_all(dst, grp, blk, blk_inst);
+    }
 
     dst->clk_enable_map = (1ull << dst->metadata->clk_cnt) - 1;
 }
@@ -648,8 +649,7 @@ static inline bool kbase_hwcnt_enable_map_any_enabled(const struct kbase_hwcnt_e
         return true;
     }
 
-    kbase_hwcnt_metadata_for_each_block(enable_map->metadata, grp, blk, blk_inst)
-    {
+    kbase_hwcnt_metadata_for_each_block(enable_map->metadata, grp, blk, blk_inst) {
         if (kbase_hwcnt_enable_map_block_enabled(enable_map, grp, blk, blk_inst)) {
             return true;
         }

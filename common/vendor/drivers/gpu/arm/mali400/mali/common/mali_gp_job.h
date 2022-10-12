@@ -98,7 +98,7 @@ void mali_gp_job_set_gp_counter_src1(u32 counter);
 MALI_STATIC_INLINE u32 mali_gp_job_get_id(struct mali_gp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (NULL == job) ? 0 : job->id;
+    return (job == NULL) ? 0 : job->id;
 }
 
 MALI_STATIC_INLINE void mali_gp_job_set_cache_order(struct mali_gp_job *job, u32 cache_order)
@@ -111,7 +111,7 @@ MALI_STATIC_INLINE void mali_gp_job_set_cache_order(struct mali_gp_job *job, u32
 MALI_STATIC_INLINE u32 mali_gp_job_get_cache_order(struct mali_gp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (NULL == job) ? 0 : job->cache_order;
+    return (job == NULL) ? 0 : job->cache_order;
 }
 
 MALI_STATIC_INLINE u64 mali_gp_job_get_user_id(struct mali_gp_job *job)
@@ -165,7 +165,7 @@ MALI_STATIC_INLINE mali_bool mali_gp_job_has_vs_job(struct mali_gp_job *job)
 MALI_STATIC_INLINE mali_bool mali_gp_job_has_plbu_job(struct mali_gp_job *job)
 {
     MALI_DEBUG_ASSERT_POINTER(job);
-    return (job->uargs.frame_registers[2] != job->uargs.frame_registers[3]) ? MALI_TRUE : MALI_FALSE;
+    return (job->uargs.frame_registers[0x2] != job->uargs.frame_registers[0x3]) ? MALI_TRUE : MALI_FALSE;
 }
 
 MALI_STATIC_INLINE u32 mali_gp_job_get_current_heap_addr(struct mali_gp_job *job)
@@ -286,7 +286,7 @@ MALI_STATIC_INLINE void mali_gp_job_set_oom_notification(struct mali_gp_job *job
 {
     MALI_DEBUG_ASSERT_POINTER(job);
     MALI_DEBUG_ASSERT_EXECUTOR_LOCK_HELD();
-    MALI_DEBUG_ASSERT(NULL == job->oom_notification);
+    MALI_DEBUG_ASSERT(job->oom_notification == NULL);
     job->oom_notification = notification;
 }
 

@@ -82,4 +82,4 @@ void kbasep_regs_history_debugfs_init(struct kbase_device *kbdev);
 
 #endif /* defined(CONFIG_DEBUG_FS) && !defined(CONFIG_MALI_BIFROST_NO_MALI) */
 
-#endif /*_KBASE_REGS_HISTORY_DEBUGFS_H*/
+#endif /* _KBASE_REGS_HISTORY_DEBUGFS_H */

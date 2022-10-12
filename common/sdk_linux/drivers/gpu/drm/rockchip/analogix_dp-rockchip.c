@@ -639,46 +639,54 @@ static __maybe_unused int rockchip_dp_runtime_resume(struct device *dev)
 static const struct dev_pm_ops rockchip_dp_pm_ops = {
     SET_RUNTIME_PM_OPS(rockchip_dp_runtime_suspend, rockchip_dp_runtime_resume, NULL)};
 
-static const struct rockchip_dp_chip_data rk3399_edp[] = {{
-                                                              .chip_type = RK3399_EDP,
-                                                              .lcdc_sel = GRF_REG_FIELD(0x6250, 5, 5),
-                                                              .ssc = true,
-                                                          },
-                                                          {/* sentinel */}};
+static const struct rockchip_dp_chip_data rk3399_edp[] = {
+    {
+        .chip_type = RK3399_EDP,
+        .lcdc_sel = GRF_REG_FIELD(0x6250, 5, 5),
+        .ssc = true,
+    },
+    {}
+};
 
-static const struct rockchip_dp_chip_data rk3288_dp[] = {{
-                                                             .chip_type = RK3288_DP,
-                                                             .lcdc_sel = GRF_REG_FIELD(0x025c, 5, 5),
-                                                             .ssc = true,
-                                                         },
-                                                         {/* sentinel */}};
+static const struct rockchip_dp_chip_data rk3288_dp[] = {
+    {
+        .chip_type = RK3288_DP,
+        .lcdc_sel = GRF_REG_FIELD(0x025c, 5, 5),
+        .ssc = true,
+    },
+    {}
+};
 
-static const struct rockchip_dp_chip_data rk3568_edp[] = {{
-                                                              .chip_type = RK3568_EDP,
-                                                              .ssc = true,
-                                                              .audio = true,
-                                                          },
-                                                          {/* sentinel */}};
+static const struct rockchip_dp_chip_data rk3568_edp[] = {
+    {
+        .chip_type = RK3568_EDP,
+        .ssc = true,
+        .audio = true,
+    },
+    {}
+};
 
-static const struct rockchip_dp_chip_data rk3588_edp[] = {{
-                                                              .chip_type = RK3588_EDP,
-                                                              .spdif_sel = GRF_REG_FIELD(0x0000, 4, 4),
-                                                              .i2s_sel = GRF_REG_FIELD(0x0000, 3, 3),
-                                                              .edp_mode = GRF_REG_FIELD(0x0000, 0, 0),
-                                                              .ssc = true,
-                                                              .audio = true,
-                                                              .split_mode = true,
-                                                          },
-                                                          {
-                                                              .chip_type = RK3588_EDP,
-                                                              .spdif_sel = GRF_REG_FIELD(0x0004, 4, 4),
-                                                              .i2s_sel = GRF_REG_FIELD(0x0004, 3, 3),
-                                                              .edp_mode = GRF_REG_FIELD(0x0004, 0, 0),
-                                                              .ssc = true,
-                                                              .audio = true,
-                                                              .split_mode = true,
-                                                          },
-                                                          {/* sentinel */}};
+static const struct rockchip_dp_chip_data rk3588_edp[] = {
+    {
+        .chip_type = RK3588_EDP,
+        .spdif_sel = GRF_REG_FIELD(0x0000, 4, 4),
+        .i2s_sel = GRF_REG_FIELD(0x0000, 3, 3),
+        .edp_mode = GRF_REG_FIELD(0x0000, 0, 0),
+        .ssc = true,
+        .audio = true,
+        .split_mode = true,
+    },
+    {
+        .chip_type = RK3588_EDP,
+        .spdif_sel = GRF_REG_FIELD(0x0004, 4, 4),
+        .i2s_sel = GRF_REG_FIELD(0x0004, 3, 3),
+        .edp_mode = GRF_REG_FIELD(0x0004, 0, 0),
+        .ssc = true,
+        .audio = true,
+        .split_mode = true,
+    },
+    {}
+};
 
 static const struct of_device_id rockchip_dp_dt_ids[] = {{.compatible = "rockchip,rk3288-dp", .data = &rk3288_dp},
                                                          {.compatible = "rockchip,rk3399-edp", .data = &rk3399_edp},

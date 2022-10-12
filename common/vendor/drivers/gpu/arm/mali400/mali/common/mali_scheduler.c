@@ -119,33 +119,33 @@ mali_osk_errcode_t mali_scheduler_initialize(void)
     job_queue_pp.big_job_num = 0;
 
     mali_scheduler_lock_obj = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER);
-    if (NULL == mali_scheduler_lock_obj) {
+    if (mali_scheduler_lock_obj == NULL) {
         mali_scheduler_terminate();
     }
 
     scheduler_wq_pp_job_delete = mali_osk_wq_create_work(mali_scheduler_do_pp_job_delete, NULL);
-    if (NULL == scheduler_wq_pp_job_delete) {
+    if (scheduler_wq_pp_job_delete == NULL) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
     scheduler_pp_job_delete_lock =
         mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
-    if (NULL == scheduler_pp_job_delete_lock) {
+    if (scheduler_pp_job_delete_lock == NULL) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
 #if defined(MALI_SCHEDULER_USE_DEFERRED_PP_JOB_QUEUE)
     scheduler_wq_pp_job_queue = mali_osk_wq_create_work(mali_scheduler_do_pp_job_queue, NULL);
-    if (NULL == scheduler_wq_pp_job_queue) {
+    if (scheduler_wq_pp_job_queue == NULL) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
 
     scheduler_pp_job_queue_lock =
         mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER_DEFERRED);
-    if (NULL == scheduler_pp_job_queue_lock) {
+    if (scheduler_pp_job_queue_lock == NULL) {
         mali_scheduler_terminate();
         return MALI_OSK_ERR_FAULT;
     }
@@ -157,28 +157,28 @@ mali_osk_errcode_t mali_scheduler_initialize(void)
 void mali_scheduler_terminate(void)
 {
 #if defined(MALI_SCHEDULER_USE_DEFERRED_PP_JOB_QUEUE)
-    if (NULL != scheduler_pp_job_queue_lock) {
+    if (scheduler_pp_job_queue_lock != NULL) {
         _mali_osk_spinlock_irq_term(scheduler_pp_job_queue_lock);
         scheduler_pp_job_queue_lock = NULL;
     }
 
-    if (NULL != scheduler_wq_pp_job_queue) {
+    if (scheduler_wq_pp_job_queue != NULL) {
         _mali_osk_wq_delete_work(scheduler_wq_pp_job_queue);
         scheduler_wq_pp_job_queue = NULL;
     }
 #endif /* defined(MALI_SCHEDULER_USE_DEFERRED_PP_JOB_QUEUE) */
 
-    if (NULL != scheduler_pp_job_delete_lock) {
+    if (scheduler_pp_job_delete_lock != NULL) {
         _mali_osk_spinlock_irq_term(scheduler_pp_job_delete_lock);
         scheduler_pp_job_delete_lock = NULL;
     }
 
-    if (NULL != scheduler_wq_pp_job_delete) {
+    if (scheduler_wq_pp_job_delete != NULL) {
         _mali_osk_wq_delete_work(scheduler_wq_pp_job_delete);
         scheduler_wq_pp_job_delete = NULL;
     }
 
-    if (NULL != mali_scheduler_lock_obj) {
+    if (mali_scheduler_lock_obj != NULL) {
         _mali_osk_spinlock_irq_term(mali_scheduler_lock_obj);
         mali_scheduler_lock_obj = NULL;
     }
@@ -200,7 +200,7 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
 
     /* Check for partially started normal pri jobs */
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
-        MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+        MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
         job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
@@ -213,7 +213,6 @@ u32 mali_scheduler_job_physical_head_count(mali_bool gpu_mode_is_secure)
              */
             if ((MALI_FALSE == gpu_mode_is_secure && MALI_FALSE == mali_pp_job_is_protected_job(job)) ||
                 (MALI_TRUE == gpu_mode_is_secure && MALI_TRUE == mali_pp_job_is_protected_job(job))) {
-
                 count += mali_pp_job_unstarted_sub_job_count(job);
                 if (MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS <= count) {
                     return MALI_MAX_NUMBER_OF_PHYSICAL_PP_GROUPS;
@@ -265,7 +264,7 @@ struct mali_pp_job *mali_scheduler_job_pp_next(void)
 
     /* Check for partially started normal pri jobs */
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
-        MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+        MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
         job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
@@ -294,7 +293,7 @@ mali_bool mali_scheduler_job_next_is_virtual(void)
     struct mali_pp_job *job;
 
     job = mali_scheduler_job_pp_virtual_peek();
-    if (NULL != job) {
+    if (job != NULL) {
         MALI_DEBUG_ASSERT(mali_pp_job_is_virtual(job));
 
         return MALI_TRUE;
@@ -309,7 +308,7 @@ struct mali_gp_job *mali_scheduler_job_gp_get(void)
     struct mali_gp_job *job = NULL;
 
     MALI_DEBUG_ASSERT_LOCK_HELD(mali_scheduler_lock_obj);
-    MALI_DEBUG_ASSERT(0 < job_queue_gp.depth);
+    MALI_DEBUG_ASSERT(job_queue_gp.depth > 0);
     MALI_DEBUG_ASSERT(job_queue_gp.big_job_num <= job_queue_gp.depth);
 
     if (!_mali_osk_list_empty(&job_queue_gp.high_pri)) {
@@ -349,26 +348,26 @@ struct mali_pp_job *mali_scheduler_job_pp_physical_peek(void)
      */
 
     if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
-        MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+        MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
         tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
-        MALI_DEBUG_ASSERT(NULL != tmp_job);
+        MALI_DEBUG_ASSERT(tmp_job != NULL);
 
         if (MALI_FALSE == mali_pp_job_is_virtual(tmp_job)) {
             job = tmp_job;
         }
     }
 
-    if (NULL == job || MALI_FALSE == mali_pp_job_has_started_sub_jobs(job)) {
+    if (job == NULL || MALI_FALSE == mali_pp_job_has_started_sub_jobs(job)) {
         /*
          * There isn't a partially started job in normal queue, so
          * look in high priority queue.
          */
         if (!_mali_osk_list_empty(&job_queue_pp.high_pri)) {
-            MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+            MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
             tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next, struct mali_pp_job, list);
-            MALI_DEBUG_ASSERT(NULL != tmp_job);
+            MALI_DEBUG_ASSERT(tmp_job != NULL);
 
             if (MALI_FALSE == mali_pp_job_is_virtual(tmp_job)) {
                 job = tmp_job;
@@ -387,7 +386,7 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_peek(void)
     MALI_DEBUG_ASSERT_LOCK_HELD(mali_scheduler_lock_obj);
 
     if (!_mali_osk_list_empty(&job_queue_pp.high_pri)) {
-        MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+        MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
         tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.high_pri.next, struct mali_pp_job, list);
 
@@ -396,9 +395,9 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_peek(void)
         }
     }
 
-    if (NULL == job) {
+    if (job == NULL) {
         if (!_mali_osk_list_empty(&job_queue_pp.normal_pri)) {
-            MALI_DEBUG_ASSERT(0 < job_queue_pp.depth);
+            MALI_DEBUG_ASSERT(job_queue_pp.depth > 0);
 
             tmp_job = MALI_OSK_LIST_ENTRY(job_queue_pp.normal_pri.next, struct mali_pp_job, list);
 
@@ -417,7 +416,7 @@ struct mali_pp_job *mali_scheduler_job_pp_physical_get(u32 *sub_job)
 
     MALI_DEBUG_ASSERT(MALI_FALSE == mali_pp_job_is_virtual(job));
 
-    if (NULL != job) {
+    if (job != NULL) {
         *sub_job = mali_pp_job_get_first_unstarted_sub_job(job);
 
         mali_pp_job_mark_sub_job_started(job, *sub_job);
@@ -444,9 +443,9 @@ struct mali_pp_job *mali_scheduler_job_pp_virtual_get(void)
 
     MALI_DEBUG_ASSERT(MALI_TRUE == mali_pp_job_is_virtual(job));
 
-    if (NULL != job) {
-        MALI_DEBUG_ASSERT(0 == mali_pp_job_get_first_unstarted_sub_job(job));
-        MALI_DEBUG_ASSERT(1 == mali_pp_job_get_sub_job_count(job));
+    if (job != NULL) {
+        MALI_DEBUG_ASSERT(mali_pp_job_get_first_unstarted_sub_job(job) == 0);
+        MALI_DEBUG_ASSERT(mali_pp_job_get_sub_job_count(job) == 1);
 
         mali_pp_job_mark_sub_job_started(job, 0);
 
@@ -570,7 +569,7 @@ void mali_scheduler_complete_pp_job(struct mali_pp_job *job, u32 num_cores_in_vi
     job->num_pp_cores_in_virtual = num_cores_in_virtual;
 
 #if defined(CONFIG_MALI_DMA_BUF_FENCE)
-    if (NULL != job->rendered_dma_fence) {
+    if (job->rendered_dma_fence != NULL) {
         mali_dma_fence_signal_and_put(&job->rendered_dma_fence);
     }
 #endif
@@ -707,7 +706,7 @@ mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx, mali_uk_gp_start_job_s *uar
     session = (struct mali_session_data *)(uintptr_t)ctx;
 
     job = mali_gp_job_create(session, uargs, mali_scheduler_get_new_id(), NULL);
-    if (NULL == job) {
+    if (job == NULL) {
         MALI_PRINT_ERROR(("Failed to create GP job.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
@@ -715,8 +714,7 @@ mali_osk_errcode_t _mali_ukk_gp_start_job(void *ctx, mali_uk_gp_start_job_s *uar
     point_ptr = (u32 __user *)(uintptr_t)mali_gp_job_get_timeline_point_ptr(job);
 
     point = mali_scheduler_submit_gp_job(session, job);
-
-    if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
+    if (_mali_osk_put_user(((u32)point), point_ptr) != 0) {
         /*
          * Let user space know that something failed
          * after the job was started.
@@ -741,7 +739,7 @@ mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx, mali_uk_pp_start_job_s *uar
     session = (struct mali_session_data *)(uintptr_t)ctx;
 
     job = mali_pp_job_create(session, uargs, mali_scheduler_get_new_id());
-    if (NULL == job) {
+    if (job == NULL) {
         MALI_PRINT_ERROR(("Failed to create PP job.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
@@ -753,7 +751,7 @@ mali_osk_errcode_t _mali_ukk_pp_start_job(void *ctx, mali_uk_pp_start_job_s *uar
     job = NULL;
 
     if (MALI_OSK_ERR_OK == ret) {
-        if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
+        if (_mali_osk_put_user(((u32)point), point_ptr) != 0) {
             /*
              * Let user space know that something failed
              * after the jobs were started.
@@ -782,7 +780,7 @@ mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx, mali_uk_pp_and_gp_st
 
     session = (struct mali_session_data *)ctx;
 
-    if (0 != _mali_osk_copy_from_user(&kargs, uargs, sizeof(mali_uk_pp_and_gp_start_job_s))) {
+    if (_mali_osk_copy_from_user(&kargs, uargs, sizeof(mali_uk_pp_and_gp_start_job_s)) != 0) {
         return MALI_OSK_ERR_NOMEM;
     }
 
@@ -790,13 +788,13 @@ mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx, mali_uk_pp_and_gp_st
     gp_args = (mali_uk_gp_start_job_s __user *)(uintptr_t)kargs.gp_args;
 
     pp_job = mali_pp_job_create(session, pp_args, mali_scheduler_get_new_id());
-    if (NULL == pp_job) {
+    if (pp_job == NULL) {
         MALI_PRINT_ERROR(("Failed to create PP job.\n"));
         return MALI_OSK_ERR_NOMEM;
     }
 
     gp_job = mali_gp_job_create(session, gp_args, mali_scheduler_get_new_id(), mali_pp_job_get_tracker(pp_job));
-    if (NULL == gp_job) {
+    if (gp_job == NULL) {
         MALI_PRINT_ERROR(("Failed to create GP job.\n"));
         mali_pp_job_delete(pp_job);
         return MALI_OSK_ERR_NOMEM;
@@ -813,7 +811,7 @@ mali_osk_errcode_t _mali_ukk_pp_and_gp_start_job(void *ctx, mali_uk_pp_and_gp_st
     pp_job = NULL;
 
     if (MALI_OSK_ERR_OK == ret) {
-        if (0 != _mali_osk_put_user(((u32)point), point_ptr)) {
+        if (_mali_osk_put_user(((u32)point), point_ptr) != 0) {
             /*
              * Let user space know that something failed
              * after the jobs were started.
@@ -833,7 +831,7 @@ void _mali_ukk_pp_job_disable_wb(mali_uk_pp_disable_wb_s *args)
     u32 fb_lookup_id;
 
     MALI_DEBUG_ASSERT_POINTER(args);
-    MALI_DEBUG_ASSERT(NULL != (void *)(uintptr_t)args->ctx);
+    MALI_DEBUG_ASSERT((void *)(uintptr_t)args->ctx != NULL);
 
     session = (struct mali_session_data *)(uintptr_t)args->ctx;
 
@@ -945,16 +943,16 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data 
 
     /* Allocate the reservation_object_list to list the dma reservation object of dependent dma buffer */
     num_memory_cookies = mali_pp_job_num_memory_cookies(job);
-    if (0 < num_memory_cookies) {
+    if (num_memory_cookies > 0) {
         reservation_object_list = kzalloc(sizeof(struct reservation_object *) * num_memory_cookies, GFP_KERNEL);
-        if (NULL == reservation_object_list) {
+        if (reservation_object_list == NULL) {
             MALI_PRINT_ERROR(("Failed to alloc the reservation object list.\n"));
             ret = MALI_OSK_ERR_NOMEM;
             goto failed_to_alloc_reservation_object_list;
         }
     }
 
-    /* Add the dma reservation object into reservation_object_list*/
+    /* Add the dma reservation object into reservation_object_list */
     for (i = 0; i < num_memory_cookies; i++) {
         mali_mem_backend *mem_backend = NULL;
         struct reservation_object *tmp_reservation_object = NULL;
@@ -964,7 +962,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data 
 
         MALI_DEBUG_ASSERT_POINTER(mem_backend);
 
-        if (NULL == mem_backend) {
+        if (mem_backend == NULL) {
             MALI_PRINT_ERROR(("Failed to find the memory backend for memory cookie[%d].\n", i));
             goto failed_to_find_mem_backend;
         }
@@ -975,7 +973,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data 
 
         tmp_reservation_object = mem_backend->dma_buf.attachment->buf->resv;
 
-        if (NULL != tmp_reservation_object) {
+        if (tmp_reservation_object != NULL) {
             mali_dma_fence_add_reservation_object_list(tmp_reservation_object, reservation_object_list,
                                                        &num_reservation_object);
         }
@@ -986,24 +984,22 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data 
      * and extend the timeline system to support dma fence,
      * then create the new internal dma fence to replace all last dma fence for dependent dma buf.
      */
-    if (0 < num_reservation_object) {
+    if (num_reservation_object > 0) {
         int error;
         int num_dma_fence_waiter = 0;
-        /* Create one new dma fence.*/
+        /* Create one new dma fence. */
         job->rendered_dma_fence =
             mali_dma_fence_new(job->session->fence_context, mali_osk_atomic_inc_return(&job->session->fence_seqno));
 
-        if (NULL == job->rendered_dma_fence) {
+        if (job->rendered_dma_fence == NULL) {
             MALI_PRINT_ERROR(("Failed to creat one new dma fence.\n"));
             ret = MALI_OSK_ERR_FAULT;
             goto failed_to_create_dma_fence;
         }
 
-        /* In order to avoid deadlock, wait/wound mutex lock to lock all dma buffers*/
-
+        /* In order to avoid deadlock, wait/wound mutex lock to lock all dma buffers */
         error = mali_dma_fence_lock_reservation_object_list(reservation_object_list, num_reservation_object, &ww_actx);
-
-        if (0 != error) {
+        if (error != 0) {
             MALI_PRINT_ERROR(("Failed to lock all reservation objects.\n"));
             ret = MALI_OSK_ERR_FAULT;
             goto failed_to_lock_reservation_object_list;
@@ -1030,7 +1026,7 @@ static mali_osk_errcode_t mali_scheduler_submit_pp_job(struct mali_session_data 
         (*point) =
             mali_timeline_system_add_tracker(session->timeline_system, mali_pp_job_get_tracker(job), MALI_TIMELINE_PP);
 
-        if (0 != num_dma_fence_waiter) {
+        if (num_dma_fence_waiter != 0) {
             mali_dma_fence_context_dec_count(&job->dma_fence_context);
         }
 
@@ -1058,7 +1054,7 @@ failed_to_lock_reservation_object_list:
     mali_dma_fence_signal_and_put(&job->rendered_dma_fence);
 failed_to_create_dma_fence:
 failed_to_find_mem_backend:
-    if (NULL != reservation_object_list) {
+    if (reservation_object_list != NULL) {
         kfree(reservation_object_list);
     }
 failed_to_alloc_reservation_object_list:
@@ -1376,10 +1372,8 @@ static void mali_scheduler_do_pp_job_queue(void *arg)
     /* Then loop through all jobs again to queue them (lock needed) */
     MALI_OSK_LIST_FOREACHENTRY(job, tmp, &list, struct mali_pp_job, list)
     {
-
         /* Remove from scheduler_pp_job_queue_list before queueing */
         mali_pp_job_list_remove(job);
-
         if (mali_scheduler_queue_pp_job(job)) {
             /* Job queued successfully */
             schedule_mask |= MALI_SCHEDULER_MASK_PP;
@@ -1419,7 +1413,7 @@ void mali_scheduler_gp_pp_job_queue_print(void)
     MALI_DEBUG_ASSERT_LOCK_HELD(mali_executor_lock_obj);
 
     /* dump job queup status */
-    if ((0 == job_queue_gp.depth) && (0 == job_queue_pp.depth)) {
+    if ((job_queue_gp.depth == 0) && (job_queue_pp.depth == 0)) {
         MALI_PRINT(("No GP&PP job in the job queue.\n"));
         return;
     }

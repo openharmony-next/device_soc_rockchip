@@ -682,7 +682,7 @@ static inline void kbasep_js_clear_job_retry_submit(struct kbase_jd_atom *atom)
  */
 static inline void kbasep_js_set_job_retry_submit_slot(struct kbase_jd_atom *atom, int js)
 {
-    KBASE_DEBUG_ASSERT(0 <= js && js <= BASE_JM_MAX_NR_SLOTS);
+    KBASE_DEBUG_ASSERT(js >= 0 && js <= BASE_JM_MAX_NR_SLOTS);
     KBASE_DEBUG_ASSERT((atom->retry_submit_on_slot == KBASEP_JS_RETRY_SUBMIT_SLOT_INVALID) ||
                        (atom->retry_submit_on_slot == js));
 
@@ -742,14 +742,14 @@ static inline bool kbasep_js_has_atom_finished(const struct kbasep_js_atom_retai
  * @return    false if the retained state is invalid, and can be ignored
  * @return    !=false if the retained state is valid
  */
-static inline bool
-kbasep_js_atom_retained_state_is_valid(const struct kbasep_js_atom_retained_state *katom_retained_state)
+static inline bool kbasep_js_atom_retained_state_is_valid(
+    const struct kbasep_js_atom_retained_state *katom_retained_state)
 {
     return (bool)(katom_retained_state->core_req != KBASEP_JS_ATOM_RETAINED_STATE_CORE_REQ_INVALID);
 }
 
-static inline bool
-kbasep_js_get_atom_retry_submit_slot(const struct kbasep_js_atom_retained_state *katom_retained_state, int *res)
+static inline bool kbasep_js_get_atom_retry_submit_slot(
+    const struct kbasep_js_atom_retained_state *katom_retained_state, int *res)
 {
     int js = katom_retained_state->retry_submit_on_slot;
 
@@ -777,7 +777,7 @@ static inline struct kbase_context *kbasep_js_runpool_lookup_ctx_noretain(struct
     struct kbase_context *found_kctx;
 
     KBASE_DEBUG_ASSERT(kbdev != NULL);
-    KBASE_DEBUG_ASSERT(0 <= as_nr && as_nr < BASE_MAX_NR_AS);
+    KBASE_DEBUG_ASSERT(as_nr >= 0 && as_nr < BASE_MAX_NR_AS);
 
     found_kctx = kbdev->as_to_kctx[as_nr];
     KBASE_DEBUG_ASSERT(found_kctx == NULL || atomic_read(&found_kctx->refcount) > 0);
@@ -898,7 +898,7 @@ static inline base_jd_prio kbasep_js_sched_prio_to_atom_prio(int sched_prio)
 {
     unsigned int prio_idx;
 
-    KBASE_DEBUG_ASSERT(0 <= sched_prio && sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
+    KBASE_DEBUG_ASSERT(sched_prio >= 0 && sched_prio < KBASE_JS_ATOM_SCHED_PRIO_COUNT);
 
     prio_idx = (unsigned int)sched_prio;
 

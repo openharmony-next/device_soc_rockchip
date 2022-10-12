@@ -136,7 +136,7 @@ void kbasep_trace_timeline_debugfs_init(struct kbase_device *kbdev);
         trace_mali_timeline_gpu_power_active(ts.tv_sec, ts.tv_nsec, SW_SET_GPU_POWER_L2_ACTIVE, hweight64(bitmap));    \
     } while (0)
 
-/* Trace state of L2 cache*/
+/* Trace state of L2 cache */
 #define KBASE_TIMELINE_POWERING_L2(kbdev)                                                                              \
     do {                                                                                                               \
         struct timespec64 ts;                                                                                          \

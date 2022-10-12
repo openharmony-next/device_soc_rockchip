@@ -99,14 +99,6 @@ static const char *const gc2093_supply_names[] = {
 
 #define to_gc2093(sd) container_of(sd, struct gc2093, subdev)
 
-/*enum {
-    PAD0,
-    PAD1,
-    PAD2,
-    PAD3,
-    PAD_MAX,
-};*/
-
 enum {
     LINK_FREQ_150M_INDEX,
     LINK_FREQ_300M_INDEX,
@@ -379,7 +371,7 @@ static const struct reg_sequence gc2093_1080p_hdr_settings[] = {
     {0x0104, 0x01},
     {0x010e, 0x01},
     {0x0158, 0x00},
-    /* Dark sun*/
+    /* Dark sun */
     {0x0123, 0x08},
     {0x0123, 0x00},
     {0x0120, 0x01},
@@ -755,7 +747,7 @@ static int gc2093_check_sensor_id(struct gc2093 *gc2093)
         return ret;
     }
 
-    id = id_h << PI_REG_VALUE_EI | id_l;
+    id = (id_h << PI_REG_VALUE_EI) | id_l;
     if (id != GC2093_CHIP_ID) {
         dev_err(gc2093->dev, "sensor id: %04X mismatched\n", id);
         return -ENODEV;
@@ -821,7 +813,7 @@ static long gc2093_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
                 dev_err(gc2093->dev, "Failed to read vb data)\n");
                 return ret;
             }
-            vb = vb_h << PI_REG_VALUE_EI | vb_l;
+            vb = (vb_h << PI_REG_VALUE_EI) | vb_l;
 
             /* max short exposure limit to 3 ms */
             if (hdrae_exp->short_exp_reg <= (vb - PI_REG_VALUE_EI)) {
@@ -1075,14 +1067,10 @@ static int gc2093_g_frame_interval(struct v4l2_subdev *sd, struct v4l2_subdev_fr
 int gc2093_g_mbus_config(struct v4l2_subdev *sd, unsigned int pad, struct v4l2_mbus_config *config)
 {
     struct gc2093 *gc2093 = to_gc2093(sd);
-    // u32 val = 1 << (GC2093_LANES - 1) | V4L2_MBUS_CSI2_CHANNEL_0 |
-    //       V4L2_MBUS_CSI2_CONTINUOUS_CLOCK;
     u32 val = V4L2_MBUS_CSI2_2_LANE | V4L2_MBUS_CSI2_CHANNEL_0 | V4L2_MBUS_CSI2_CONTINUOUS_CLOCK;
     config->flags = val;
 
     config->type = V4L2_MBUS_CSI2_DPHY; // V4L2_MBUS_CSI2;
-    // config->flags = (gc2093->cur_mode->hdr_mode == NO_HDR) ?
-    //         val : (val | V4L2_MBUS_CSI2_CHANNEL_1);
 
     return 0;
 }
@@ -1188,13 +1176,6 @@ static int gc2093_get_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_pad_config 
         fmt->format.height = mode->height;
         fmt->format.code = GC2093_MEDIA_BUS_FMT;
         fmt->format.field = V4L2_FIELD_NONE;
-#if 0
-        /* format info: width/height/data type/virctual channel */
-        if (fmt->pad < PAD_MAX && mode->hdr_mode != NO_HDR)
-            fmt->reserved[0] = mode->vc[fmt->pad];
-        else
-            fmt->reserved[0] = mode->vc[PAD0];
-#endif
     }
     mutex_unlock(&gc2093->lock);
     return 0;

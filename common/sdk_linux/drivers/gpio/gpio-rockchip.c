@@ -198,8 +198,11 @@ static int rockchip_gpio_set_debounce(struct gpio_chip *gc, unsigned int offset,
     if (!IS_ERR(bank->db_clk)) {
         div_debounce_support = true;
         freq = clk_get_rate(bank->db_clk);
+        if (freq == 0) {
+            return -EINVAL;
+        }
         max_debounce = (GENMASK(0x17, 0) + 1) * 0x2 * 0xf4240 / freq;
-        if (debounce > max_debounce) {
+        if ((unsigned long)debounce > max_debounce) {
             return -EINVAL;
         }
 
@@ -216,7 +219,7 @@ static int rockchip_gpio_set_debounce(struct gpio_chip *gc, unsigned int offset,
         if (div_debounce_support) {
             /* Configure the max debounce from consumers */
             cur_div_reg = readl(bank->reg_base + reg->dbclk_div_con);
-            if (cur_div_reg < div_reg) {
+            if ((unsigned long)cur_div_reg < div_reg) {
                 writel(div_reg, bank->reg_base + reg->dbclk_div_con);
             }
             rockchip_gpio_writel_bit(bank, offset, 1, reg->dbclk_div_en);
@@ -330,7 +333,6 @@ static void rockchip_irq_demux(struct irq_desc *desc)
         irq = __ffs(pend);
         pend &= ~BIT(irq);
         virq = irq_find_mapping(bank->domain, irq);
-
         if (!virq) {
             dev_err(bank->dev, "unmapped irq %d\n", irq);
             continue;
@@ -617,7 +619,6 @@ static int rockchip_get_bank_data(struct rockchip_pin_bank *bank)
 
     clk_prepare_enable(bank->clk);
     id = readl(bank->reg_base + gpio_regs_v2.version_id);
-
     /* If not gpio v2, that is default to v1. */
     if (id == GPIO_TYPE_V2) {
         bank->gpio_regs = &gpio_regs_v2;

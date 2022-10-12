@@ -73,7 +73,7 @@ u32 mali_osk_get_tid(void)
 
     /* If the pid is 0 the core was idle.  Instead of returning 0 we return a special number
      * identifying which core we are on. */
-    if (0 == tid) {
+    if (tid == 0) {
         tid = -(1 + raw_smp_processor_id());
     }
 

@@ -216,7 +216,6 @@
 
 #ifdef CONFIG_DEBUG_FS
 struct base_job_fault_event {
-
     u32 event_code;
     struct kbase_jd_atom *katom;
     struct work_struct job_fault_work;
@@ -502,7 +501,7 @@ struct kbase_jd_atom {
          */
         atomic_t dep_count;
     } dma_fence;
-#endif /* CONFIG_MALI_DMA_FENCE || CONFIG_SYNC_FILE*/
+#endif /* CONFIG_MALI_DMA_FENCE || CONFIG_SYNC_FILE */
 
     /* Note: refer to kbasep_js_atom_retained_state, which will take a copy of some of the following members */
     enum base_jd_event_code event_code;
@@ -1261,7 +1260,7 @@ struct jsctx_queue {
     struct list_head x_dep_head;
 };
 
-#define KBASE_API_VERSION(major, minor) ((((major)&0xFFF) << 20) | (((minor)&0xFFF) << 8) | ((0 & 0xFF) << 0))
+#define KBASE_API_VERSION(major, minor) ((((major) & 0xFFF) << 20) | (((minor) & 0xFFF) << 8) | ((0 & 0xFF) << 0))
 
 /**
  * enum kbase_context_flags - Flags for kbase contexts

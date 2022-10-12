@@ -455,7 +455,6 @@ static inline vm_fault_t vmf_insert_pfn_prot(struct vm_area_struct *vma,
 #else
     err = vm_insert_pfn_prot(vma, addr, pfn, pgprot);
 #endif
-
     if (unlikely(err == -ENOMEM)) {
         return VM_FAULT_OOM;
     }

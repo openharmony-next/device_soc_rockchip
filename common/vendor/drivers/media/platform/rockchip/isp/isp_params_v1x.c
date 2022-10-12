@@ -480,7 +480,7 @@ static void isp_awb_meas_enable_v10(struct rkisp_isp_params_vdev *params_vdev, c
         rkisp1_iowrite32(params_vdev, reg_val, CIF_ISP_AWB_PROP_V10);
 
         /* Measurements require AWB block be active. */
-        /* TODO: need to enable here ? awb_gain_enable has done this */
+        /* need to enable here ? awb_gain_enable has done this */
         isp_param_set_bits(params_vdev, CIF_ISP_CTRL, CIF_ISP_CTRL_ISP_AWB_ENA);
     } else {
         rkisp1_iowrite32(params_vdev, reg_val, CIF_ISP_AWB_PROP_V10);
@@ -506,7 +506,7 @@ static void isp_awb_meas_enable_v12(struct rkisp_isp_params_vdev *params_vdev, c
         rkisp1_iowrite32(params_vdev, reg_val, CIF_ISP_AWB_PROP_V12);
 
         /* Measurements require AWB block be active. */
-        /* TODO: need to enable here ? awb_gain_enable has done this */
+        /* need to enable here ? awb_gain_enable has done this */
         isp_param_set_bits(params_vdev, CIF_ISP_CTRL, CIF_ISP_CTRL_ISP_AWB_ENA);
     } else {
         rkisp1_iowrite32(params_vdev, reg_val, CIF_ISP_AWB_PROP_V12);

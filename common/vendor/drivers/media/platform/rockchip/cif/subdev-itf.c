@@ -187,7 +187,8 @@ static void sditf_reinit_mode(struct sditf_priv *priv, struct rkisp_vicap_mode *
             v4l2_err(&priv->cif_dev->v4l2_dev, "%s, mode name err, mode name: %s\n", __func__, mode->name);
         }
     }
-    v4l2_dbg(0x03, rkcif_debug, &priv->cif_dev->v4l2_dev, "%s, mode->is_rdbk %d, mode->name %s, link_mode %d\n", __func__,
+    v4l2_dbg(0x03, rkcif_debug, &priv->cif_dev->v4l2_dev,
+             "%s, mode->is_rdbk %d, mode->name %s, link_mode %d\n", __func__,
              mode->is_rdbk, mode->name, priv->toisp_inf.link_mode);
 }
 
@@ -608,9 +609,9 @@ static const struct dev_pm_ops rkcif_subdev_pm_ops = {
     SET_RUNTIME_PM_OPS(sditf_runtime_suspend, sditf_runtime_resume, NULL)};
 
 static const struct of_device_id rkcif_subdev_match_id[] = {{
-                                                                .compatible = "rockchip,rkcif-sditf",
-                                                            },
-                                                            {}};
+    .compatible = "rockchip,rkcif-sditf",
+}, {
+}};
 MODULE_DEVICE_TABLE(of, rkcif_subdev_match_id);
 
 struct platform_driver rkcif_subdev_driver = {

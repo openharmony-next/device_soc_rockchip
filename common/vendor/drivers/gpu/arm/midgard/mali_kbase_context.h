@@ -59,7 +59,6 @@ static inline void kbase_ctx_flag_clear(struct kbase_context *kctx, enum kbase_c
     do {
         old = atomic_read(&kctx->flags);
         new = old & ~flag;
-
     } while (atomic_cmpxchg(&kctx->flags, old, new) != old);
 #else
     atomic_andnot(flag, &kctx->flags);

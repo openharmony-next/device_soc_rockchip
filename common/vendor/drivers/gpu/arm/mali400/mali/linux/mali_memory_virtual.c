@@ -29,7 +29,7 @@
 #include "mali_memory_virtual.h"
 
 /**
- *internal helper to link node into the rb-tree
+ * internal helper to link node into the rb-tree
  */
 static inline void _mali_vma_offset_add_rb(struct mali_allocation_manager *mgr, struct mali_vma_node *node)
 {

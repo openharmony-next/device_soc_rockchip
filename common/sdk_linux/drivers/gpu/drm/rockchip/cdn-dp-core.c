@@ -1092,7 +1092,6 @@ static int cdn_dp_probe(struct platform_device *pdev)
 
     for (i = 0; i < dp_data->max_phy; i++) {
         phy = devm_of_phy_get_by_index(dev, dev->of_node, i);
-
         if (PTR_ERR(phy) == -EPROBE_DEFER) {
             return -EPROBE_DEFER;
         }

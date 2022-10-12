@@ -70,7 +70,6 @@ static void kbasep_timeline_autoflush_timer_callback(struct timer_list *timer)
         struct kbase_tlstream *stream = &timeline->streams[stype];
 
         int af_cnt = atomic_read(&stream->autoflush_counter);
-
         /* Check if stream contain unflushed data. */
         if (af_cnt < 0) {
             continue;
@@ -93,8 +92,6 @@ static void kbasep_timeline_autoflush_timer_callback(struct timer_list *timer)
     }
     CSTD_UNUSED(rcode);
 }
-
-/*****************************************************************************/
 
 int kbase_timeline_init(struct kbase_timeline **timeline, atomic_t *timeline_flags)
 {
@@ -239,7 +236,6 @@ int kbase_timeline_io_acquire(struct kbase_device *kbdev, u32 flags)
          */
         kbase_tlstream_current_devfreq_target(kbdev);
 #endif /* CONFIG_MALI_BIFROST_DEVFREQ */
-
     } else {
         ret = -EBUSY;
     }

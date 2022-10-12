@@ -80,7 +80,7 @@ static vm_fault_t mali_mem_vma_fault(struct vm_fault *vmf)
     if ((mem_bkend->type == MALI_MEM_COW &&
          (MALI_MEM_BACKEND_FLAG_SWAP_COWED != (mem_bkend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED))) &&
         (mem_bkend->flags & MALI_MEM_BACKEND_FLAG_COW_CPU_NO_WRITE)) {
-        /*check if use page fault to do COW*/
+        /* check if use page fault to do COW */
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE,
                          ("mali_vma_fault: do cow allocate on demand!, address=0x%x\n", address));
         mutex_lock(&mem_bkend->mutex);
@@ -94,7 +94,7 @@ static vm_fault_t mali_mem_vma_fault(struct vm_fault *vmf)
 
         /* handle COW modified range cpu mapping
          we zap the mapping in cow_modify_range, it will trigger page fault
-         when CPU access it, so here we map it to CPU*/
+         when CPU access it, so here we map it to CPU */
         mutex_lock(&mem_bkend->mutex);
         ret = mali_mem_cow_cpu_map_pages_locked(mem_bkend, vma, address, prefetch_num);
         mutex_unlock(&mem_bkend->mutex);
@@ -124,7 +124,7 @@ static vm_fault_t mali_mem_vma_fault(struct vm_fault *vmf)
         }
     } else {
         MALI_PRINT_ERROR(("Mali vma fault! It never happen, indicating some logic errors in caller.\n"));
-        /*NOT support yet or OOM*/
+        /* NOT support yet or OOM */
         return VM_FAULT_OOM;
     }
     return VM_FAULT_NOPAGE;
@@ -141,7 +141,7 @@ static struct vm_operations_struct mali_kernel_vm_ops = {
  * Supported backend types:
  * --MALI_MEM_OS
  * -- need to add COW?
- *Not supported backend types:
+ * Not supported backend types:
  * -MALI_MEMORY_BIND_BACKEND_UMP
  * -MALI_MEMORY_BIND_BACKEND_DMA_BUF
  * -MALI_MEMORY_BIND_BACKEND_EXTERNAL_MEMORY
@@ -157,7 +157,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
     int ret = -EFAULT;
 
     session = (struct mali_session_data *)filp->private_data;
-    if (NULL == session) {
+    if (session == NULL) {
         MALI_PRINT_ERROR(("mmap called without any session data available\n"));
         return -EFAULT;
     }
@@ -170,7 +170,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
     /* Operations used on any memory system */
     /* do not need to anything in vm open/close now */
 
-    /* find mali allocation structure by vaddress*/
+    /* find mali allocation structure by vaddress */
     mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_addr, 0);
     if (likely(mali_vma_node)) {
         mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
@@ -181,7 +181,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
             return -EFAULT;
         }
     } else {
-        MALI_DEBUG_ASSERT(NULL == mali_vma_node);
+        MALI_DEBUG_ASSERT(mali_vma_node == NULL);
         return -EFAULT;
     }
 
@@ -248,7 +248,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
     } else if ((mem_bkend->type == MALI_MEM_SWAP) ||
                (mem_bkend->type == MALI_MEM_COW &&
                 (MALI_MEM_BACKEND_FLAG_SWAP_COWED == (mem_bkend->flags & MALI_MEM_BACKEND_FLAG_SWAP_COWED)))) {
-        /*For swappable memory, CPU page table will be created by page fault handler. */
+        /* For swappable memory, CPU page table will be created by page fault handler. */
         ret = 0;
     } else if (mem_bkend->type == MALI_MEM_SECURE) {
 #if defined(CONFIG_DMA_SHARED_BUFFER)
@@ -258,7 +258,7 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
         return -EFAULT;
 #endif
     } else {
-        /* Not support yet*/
+        /* Not support yet */
         MALI_DEBUG_PRINT_ERROR(("Invalid type of backend memory! \n"));
         return -EFAULT;
     }
@@ -354,12 +354,12 @@ mali_osk_errcode_t mali_memory_session_begin(struct mali_session_data *session_d
 
     session_data->memory_lock = _mali_osk_mutex_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_MEM_SESSION);
 
-    if (NULL == session_data->memory_lock) {
+    if (session_data->memory_lock == NULL) {
         MALI_ERROR(MALI_OSK_ERR_FAULT);
     }
 
     session_data->cow_lock = _mali_osk_mutex_init(_MALI_OSK_LOCKFLAG_UNORDERED, 0);
-    if (NULL == session_data->cow_lock) {
+    if (session_data->cow_lock == NULL) {
         _mali_osk_mutex_term(session_data->memory_lock);
         MALI_ERROR(MALI_OSK_ERR_FAULT);
     }
@@ -374,13 +374,13 @@ void mali_memory_session_end(struct mali_session_data *session)
 {
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("MMU session end\n"));
 
-    if (NULL == session) {
+    if (session == NULL) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("No session data found during session end\n"));
         return;
     }
     /* free allocation */
     mali_free_session_allocations(session);
-    /* do some check in unint*/
+    /* do some check in unint */
     mali_memory_manager_uninit(&session->allocation_mgr);
 
     /* Free the lock */
@@ -423,7 +423,7 @@ struct mali_page_node *_mali_page_node_allocate(mali_page_node_type type)
     mali_page_node *page_node = NULL;
 
     page_node = kzalloc(sizeof(mali_page_node), GFP_KERNEL);
-    MALI_DEBUG_ASSERT(NULL != page_node);
+    MALI_DEBUG_ASSERT(page_node != NULL);
 
     if (page_node) {
         page_node->type = type;
@@ -511,7 +511,7 @@ unsigned long _mali_page_node_get_pfn(struct mali_page_node *node)
     if (node->type == MALI_PAGE_NODE_OS) {
         return page_to_pfn(node->page);
     } else if (node->type == MALI_PAGE_NODE_BLOCK) {
-        /* get phy addr for BLOCK page*/
+        /* get phy addr for BLOCK page */
         return _mali_blk_item_get_pfn(node->blk_it);
     } else if (node->type == MALI_PAGE_NODE_SWAP) {
         return page_to_pfn(node->swap_it->page);

@@ -261,16 +261,16 @@ struct kbasep_js_device_data {
      * @note This is a write-once member, and so no locking is required to read */
     base_jd_core_req js_reqs[BASE_JM_MAX_NR_SLOTS];
 
-    u32 scheduling_period_ns;    /*< Value for JS_SCHEDULING_PERIOD_NS */
-    u32 soft_stop_ticks;         /*< Value for JS_SOFT_STOP_TICKS */
-    u32 soft_stop_ticks_cl;      /*< Value for JS_SOFT_STOP_TICKS_CL */
-    u32 hard_stop_ticks_ss;      /*< Value for JS_HARD_STOP_TICKS_SS */
-    u32 hard_stop_ticks_cl;      /*< Value for JS_HARD_STOP_TICKS_CL */
-    u32 hard_stop_ticks_dumping; /*< Value for JS_HARD_STOP_TICKS_DUMPING */
-    u32 gpu_reset_ticks_ss;      /*< Value for JS_RESET_TICKS_SS */
-    u32 gpu_reset_ticks_cl;      /*< Value for JS_RESET_TICKS_CL */
-    u32 gpu_reset_ticks_dumping; /*< Value for JS_RESET_TICKS_DUMPING */
-    u32 ctx_timeslice_ns;        /**< Value for JS_CTX_TIMESLICE_NS */
+    u32 scheduling_period_ns;    /* < Value for JS_SCHEDULING_PERIOD_NS */
+    u32 soft_stop_ticks;         /* < Value for JS_SOFT_STOP_TICKS */
+    u32 soft_stop_ticks_cl;      /* < Value for JS_SOFT_STOP_TICKS_CL */
+    u32 hard_stop_ticks_ss;      /* < Value for JS_HARD_STOP_TICKS_SS */
+    u32 hard_stop_ticks_cl;      /* < Value for JS_HARD_STOP_TICKS_CL */
+    u32 hard_stop_ticks_dumping; /* < Value for JS_HARD_STOP_TICKS_DUMPING */
+    u32 gpu_reset_ticks_ss;      /* < Value for JS_RESET_TICKS_SS */
+    u32 gpu_reset_ticks_cl;      /* < Value for JS_RESET_TICKS_CL */
+    u32 gpu_reset_ticks_dumping; /* < Value for JS_RESET_TICKS_DUMPING */
+    u32 ctx_timeslice_ns;        /* < Value for JS_CTX_TIMESLICE_NS */
 
     /** List of suspended soft jobs */
     struct list_head suspended_soft_jobs_list;
@@ -321,7 +321,6 @@ struct kbasep_js_device_data {
  * scheduling information.
  */
 struct kbasep_js_kctx_info {
-
     /**
      * Job Scheduler Context information sub-structure. These members are
      * accessed regardless of whether the context is:
@@ -339,7 +338,7 @@ struct kbasep_js_kctx_info {
 
         /** Number of jobs <b>ready to run</b> - does \em not include the jobs waiting in
          * the dispatcher, and dependency-only jobs. See kbase_jd_context::job_nr
-         * for such jobs*/
+         * for such jobs */
         u32 nr_jobs;
 
         /** Context Attributes:

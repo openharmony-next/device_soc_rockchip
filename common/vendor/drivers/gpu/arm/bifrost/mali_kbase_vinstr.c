@@ -184,7 +184,6 @@ static int kbasep_vinstr_client_dump(struct kbase_vinstr_client *vcli, enum base
 
     write_idx = atomic_read(&vcli->write_idx);
     read_idx = atomic_read(&vcli->read_idx);
-
     /* Check if there is a place to copy HWC block into. */
     if (write_idx - read_idx == vcli->dump_bufs.buf_cnt) {
         return -EBUSY;
@@ -274,7 +273,6 @@ static void kbasep_vinstr_reschedule_worker(struct kbase_vinstr_context *vctx)
     list_for_each_entry(pos, &vctx->clients, node)
     {
         const u64 cli_next_ns = kbasep_vinstr_next_dump_time_ns(cur_ts_ns, pos->dump_interval_ns);
-
         /* Non-zero next dump time implies a periodic client */
         if ((cli_next_ns != 0) && (cli_next_ns < earliest_next_ns)) {
             earliest_next_ns = cli_next_ns;

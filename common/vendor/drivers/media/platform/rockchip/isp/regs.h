@@ -218,7 +218,7 @@
 
 /* MI_IMSC - MI_MIS - MI_RIS - MI_ICR - MI_ISR */
 #define CIF_MI_FRAME(stream)                                                                                           \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         typeof(stream) __stream = (stream);                                                                            \
         !__stream->config ? 0 : __stream->config->frame_end_id;                                                        \
     })
@@ -415,11 +415,11 @@
 #define CIF_CSI2_DT_SPD 0x2F
 
 /* MIPI_IMSC, MIPI_RIS, MIPI_MIS, MIPI_ICR, MIPI_ISR */
-#define CIF_MIPI_SYNC_FIFO_OVFLW(a) (((a)&0xF) << 0)
-#define CIF_MIPI_ERR_SOT(a) (((a)&0xF) << 4)
-#define CIF_MIPI_ERR_SOT_SYNC(a) (((a)&0xF) << 8)
-#define CIF_MIPI_ERR_EOT_SYNC(a) (((a)&0xF) << 12)
-#define CIF_MIPI_ERR_CTRL(a) (((a)&0xF) << 16)
+#define CIF_MIPI_SYNC_FIFO_OVFLW(a) (((a) & 0xF) << 0)
+#define CIF_MIPI_ERR_SOT(a) (((a) & 0xF) << 4)
+#define CIF_MIPI_ERR_SOT_SYNC(a) (((a) & 0xF) << 8)
+#define CIF_MIPI_ERR_EOT_SYNC(a) (((a) & 0xF) << 12)
+#define CIF_MIPI_ERR_CTRL(a) (((a) & 0xF) << 16)
 #define CIF_MIPI_ERR_PROTOCOL BIT(20)
 #define CIF_MIPI_ERR_ECC1 BIT(21)
 #define CIF_MIPI_ERR_ECC2 BIT(22)

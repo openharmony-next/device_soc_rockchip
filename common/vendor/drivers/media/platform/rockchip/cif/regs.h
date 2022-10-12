@@ -510,7 +510,7 @@ enum cif_reg_index {
 #define DVP_SW_HURRY_VALUE(val) (((val)&0x7) << 9)
 
 #define DVP_DMA_END_INTEN(id)                                                                                          \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned int mask;                                                                                             \
         switch (id) {                                                                                                  \
             case 0:                                                                                                    \
@@ -526,7 +526,7 @@ enum cif_reg_index {
 #define DVP_LINE_INTEN (0x01 << 10)
 
 #define DVP_DMA_END_INTSTAT(id)                                                                                        \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned int mask;                                                                                             \
         switch (id) {                                                                                                  \
             case 0:                                                                                                    \
@@ -679,7 +679,7 @@ enum cif_reg_index {
 #define DVP_FRM_STS_ID3(x) (((x) & (0x3 << 12)) >> 12)
 
 #define DVP_SW_MULTI_ID(channel, id, bits)                                                                             \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned int mask;                                                                                             \
         switch (channel) {                                                                                             \
             case 0:                                                                                                    \
@@ -705,7 +705,7 @@ enum cif_reg_index {
 #define CIF_CROP_Y_SHIFT 16
 #define CIF_CROP_X_SHIFT 0
 
-/* CIF SCALE*/
+/* CIF SCALE */
 #define SCALE_END_INTSTAT(ch) (0x3 << (((ch) + 1) * 2))
 #define SCALE_FIFO_OVERFLOW(ch) (1 << (10 + (ch)))
 #define SCALE_TOISP_AXI0_ERR (1 << 0)
@@ -771,7 +771,7 @@ enum cif_reg_index {
 #define LVDS_ENABLE_CAPTURE (0x1 << 16)
 #define LVDS_MODE(mode) (((mode)&0x7) << 17)
 #define LVDS_LANES_ENABLED(lanes)                                                                                      \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned int mask;                                                                                             \
         switch (lanes) {                                                                                               \
             case 1:                                                                                                    \
@@ -868,7 +868,7 @@ enum cif_reg_index {
     (CSI_DMA_Y_FIFO_OVERFLOW | CSI_DMA_UV_FIFO_OVERFLOW | CSI_CONFIG_FIFO_OVERFLOW | CSI_RX_FIFO_OVERFLOW |            \
      CSI_DMA_LVDS_ID2_FIFO_OVERFLOW | CSI_DMA_LVDS_ID3_FIFO_OVERFLOW)
 
-/*mask for rk3588*/
+/* mask for rk3588 */
 #define CSI_RX_FIFO_OVERFLOW_V1 (0x1 << 19)
 #define CSI_BANDWIDTH_LACK_V1 (0x1 << 18)
 #define CSI_ALL_ERROR_INTEN_V1 (0xf0f << 16)
@@ -878,15 +878,15 @@ enum cif_reg_index {
 
 /* CIF_MIPI_LVDS_CTRL */
 #define CIF_MIPI_LVDS_SW_DMA_IDLE (0x1 << 16)
-#define CIF_MIPI_LVDS_SW_PRESS_VALUE(val) (((val)&0x3) << 13)
-#define CIF_MIPI_LVDS_SW_PRESS_VALUE_RK3588(val) (((val)&0x7) << 13)
+#define CIF_MIPI_LVDS_SW_PRESS_VALUE(val) (((val) & 0x3) << 13)
+#define CIF_MIPI_LVDS_SW_PRESS_VALUE_RK3588(val) (((val) & 0x7) << 13)
 #define CIF_MIPI_LVDS_SW_PRESS_ENABLE (0x1 << 12)
 #define CIF_MIPI_LVDS_SW_LVDS_WIDTH_8BITS (0x0 << 9)
 #define CIF_MIPI_LVDS_SW_LVDS_WIDTH_10BITS (0x1 << 9)
 #define CIF_MIPI_LVDS_SW_LVDS_WIDTH_12BITS (0x2 << 9)
 #define CIF_MIPI_LVDS_SW_SEL_LVDS (0x1 << 8)
-#define CIF_MIPI_LVDS_SW_HURRY_VALUE(val) (((val)&0x3) << 5)
-#define CIF_MIPI_LVDS_SW_HURRY_VALUE_RK3588(val) (((val)&0x7) << 5)
+#define CIF_MIPI_LVDS_SW_HURRY_VALUE(val) (((val) & 0x3) << 5)
+#define CIF_MIPI_LVDS_SW_HURRY_VALUE_RK3588(val) (((val) & 0x7) << 5)
 #define CIF_MIPI_LVDS_SW_HURRY_ENABLE (0x1 << 4)
 #define CIF_MIPI_LVDS_SW_WATER_LINE_75 (0x0 << 1)
 #define CIF_MIPI_LVDS_SW_WATER_LINE_50 (0x1 << 1)
@@ -919,10 +919,10 @@ enum cif_reg_index {
 #define SW_DATATYPE_LS(x) ((x) << 20)
 #define SW_DATATYPE_LE(x) ((x) << 26)
 
-#define SW_FRM_END_ID0(x) (((x)&CSI_FRAME_END_ID0) >> 8)
-#define SW_FRM_END_ID1(x) (((x)&CSI_FRAME_END_ID1) >> 10)
-#define SW_FRM_END_ID2(x) (((x)&CSI_FRAME_END_ID2) >> 12)
-#define SW_FRM_END_ID3(x) (((x)&CSI_FRAME_END_ID3) >> 14)
+#define SW_FRM_END_ID0(x) (((x) & CSI_FRAME_END_ID0) >> 8)
+#define SW_FRM_END_ID1(x) (((x) & CSI_FRAME_END_ID1) >> 10)
+#define SW_FRM_END_ID2(x) (((x) & CSI_FRAME_END_ID2) >> 12)
+#define SW_FRM_END_ID3(x) (((x) & CSI_FRAME_END_ID3) >> 14)
 
 /* CIF LVDS SAV EAV Define */
 #define SW_LVDS_EAV_ACT(code) (((code)&0xfff) << 16)
@@ -951,9 +951,9 @@ enum cif_reg_index {
 #define RK3588_CIF_PCLK_SINGLE_EDGE (0x00200000)
 #define RK3588_CIF_PCLK_DUAL_EDGE (0x00200020)
 
-/*toisp*/
-#define TOISP_END_CH0(index) (0x1 << (20 + (index)*3))
-#define TOISP_END_CH1(index) (0x1 << (21 + (index)*3))
-#define TOISP_END_CH2(index) (0x1 << (22 + (index)*3))
+/* toisp */
+#define TOISP_END_CH0(index) (0x1 << (20 + (index) * 3))
+#define TOISP_END_CH1(index) (0x1 << (21 + (index) * 3))
+#define TOISP_END_CH2(index) (0x1 << (22 + (index) * 3))
 
 #endif

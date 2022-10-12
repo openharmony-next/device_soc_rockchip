@@ -42,7 +42,7 @@ struct mali_pm_domain *mali_pm_domain_create(u32 pmu_mask)
     u32 domain_id = 0;
 
     domain = mali_pm_domain_get_from_mask(pmu_mask);
-    if (NULL != domain) {
+    if (domain != NULL) {
         return domain;
     }
 
@@ -50,7 +50,7 @@ struct mali_pm_domain *mali_pm_domain_create(u32 pmu_mask)
                      ("Mali PM domain: Creating Mali PM domain (mask=0x%08X)\n", pmu_mask));
 
     domain = (struct mali_pm_domain *)mali_osk_malloc(sizeof(struct mali_pm_domain));
-    if (NULL != domain) {
+    if (domain != NULL) {
         domain->power_is_on = MALI_FALSE;
         domain->pmu_mask = pmu_mask;
         domain->use_count = 0;
@@ -74,7 +74,7 @@ struct mali_pm_domain *mali_pm_domain_create(u32 pmu_mask)
 
 void mali_pm_domain_delete(struct mali_pm_domain *domain)
 {
-    if (NULL == domain) {
+    if (domain == NULL) {
         return;
     }
 
@@ -108,7 +108,7 @@ struct mali_pm_domain *mali_pm_domain_get_from_mask(u32 mask)
 {
     u32 id = 0;
 
-    if (0 == mask) {
+    if (mask == 0) {
         return NULL;
     }
 
@@ -132,7 +132,7 @@ u32 mali_pm_domain_ref_get(struct mali_pm_domain *domain)
 {
     MALI_DEBUG_ASSERT_POINTER(domain);
 
-    if (0 == domain->use_count) {
+    if (domain->use_count == 0) {
         _mali_osk_pm_dev_ref_get_async();
     }
 
@@ -150,7 +150,7 @@ u32 mali_pm_domain_ref_put(struct mali_pm_domain *domain)
     --domain->use_count;
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("PM domain %p: ref_put, use_count => %u\n", domain, domain->use_count));
 
-    if (0 == domain->use_count) {
+    if (domain->use_count == 0) {
         _mali_osk_pm_dev_ref_put();
     }
 
@@ -159,7 +159,7 @@ u32 mali_pm_domain_ref_put(struct mali_pm_domain *domain)
      * (the bit for this domain).
      * This is the responsibility of the caller (mali_pm)
      */
-    return (0 == domain->use_count ? domain->pmu_mask : 0);
+    return (domain->use_count == 0 ? domain->pmu_mask : 0);
 }
 
 #if MALI_STATE_TRACKING
@@ -168,7 +168,7 @@ u32 mali_pm_domain_get_id(struct mali_pm_domain *domain)
     u32 id = 0;
 
     MALI_DEBUG_ASSERT_POINTER(domain);
-    MALI_DEBUG_ASSERT(0 != domain->pmu_mask);
+    MALI_DEBUG_ASSERT(domain->pmu_mask != 0);
 
     id = _mali_osk_fls(domain->pmu_mask) - 1;
 
@@ -188,7 +188,7 @@ mali_bool mali_pm_domain_all_unused(void)
     int i;
 
     for (i = 0; i < MALI_MAX_NUMBER_OF_DOMAINS; i++) {
-        if (NULL == mali_pm_domains[i]) {
+        if (mali_pm_domains[i] == NULL) {
             /* Nothing to check */
             continue;
         }
@@ -198,7 +198,7 @@ mali_bool mali_pm_domain_all_unused(void)
             return MALI_FALSE;
         }
 
-        if (0 != mali_pm_domains[i]->use_count) {
+        if (mali_pm_domains[i]->use_count != 0) {
             /* Not ready for suspend! */
             return MALI_FALSE;
         }

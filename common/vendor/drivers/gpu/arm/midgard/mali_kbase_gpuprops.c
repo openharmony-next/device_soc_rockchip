@@ -44,8 +44,8 @@ int kbase_gpuprops_uk_get_props(struct kbase_context *kctx, struct kbase_uk_gpup
     u32 gpu_speed_mhz;
     int rc = 1;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(NULL != kbase_props);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kbase_props != NULL);
 
     /* Current GPU speed is requested from the system integrator via the GPU_SPEED_FUNC function.
      * If that function fails, or the function is not provided by the system integrator, we report the maximum
@@ -98,7 +98,7 @@ static void kbase_gpuprops_construct_coherent_groups(base_gpu_props *const props
     u64 first_set, first_set_prev;
     u32 num_groups = 0;
 
-    KBASE_DEBUG_ASSERT(NULL != props);
+    KBASE_DEBUG_ASSERT(props != NULL);
 
     props->coherency_info.coherency = props->raw_props.mem_features;
     props->coherency_info.num_core_groups = hweight64(props->raw_props.l2_present);
@@ -171,8 +171,8 @@ static void kbase_gpuprops_get_props(base_gpu_props *const gpu_props, struct kba
     struct kbase_gpuprops_regdump regdump;
     int i;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
-    KBASE_DEBUG_ASSERT(NULL != gpu_props);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
+    KBASE_DEBUG_ASSERT(gpu_props != NULL);
 
     /* Dump relevant registers */
     kbase_backend_gpuprops_get(kbdev, &regdump);
@@ -287,7 +287,7 @@ void kbase_gpuprops_set(struct kbase_device *kbdev)
     struct kbase_gpu_props *gpu_props;
     struct gpu_raw_gpu_props *raw;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     gpu_props = &kbdev->gpu_props;
     raw = &gpu_props->props.raw_props;
 

@@ -45,6 +45,9 @@
 #define MOCKABLE(function) function
 #endif /* MALI_MOCK_TEST */
 
+#define INDEX_2 2
+#define INDEX_3 3
+
 /**
  * enum kbasep_pm_action - Actions that can be performed on a core.
  *
@@ -628,7 +631,7 @@ bool MOCKABLE(kbase_pm_check_transitions_nolock)(struct kbase_device *kbdev)
     u64 prev_l2_available_bitmap;
     u64 l2_inuse_bitmap;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     spin_lock(&kbdev->pm.backend.gpu_powered_lock);
@@ -683,7 +686,7 @@ bool MOCKABLE(kbase_pm_check_transitions_nolock)(struct kbase_device *kbdev)
 #endif /* CONFIG_MALI_CORESTACK */
 
     /* If any l2 cache is on, then enable l2 #0, for use by job manager */
-    if (0 != desired_l2_state) {
+    if (desired_l2_state != 0) {
         desired_l2_state |= 1;
     }
 
@@ -726,7 +729,6 @@ bool MOCKABLE(kbase_pm_check_transitions_nolock)(struct kbase_device *kbdev)
         }
 
         kbdev->tiler_available_bitmap = tiler_available_bitmap;
-
     } else if ((l2_available_bitmap & kbdev->gpu_props.props.raw_props.tiler_present) !=
                kbdev->gpu_props.props.raw_props.tiler_present) {
         tiler_available_bitmap = 0;
@@ -748,9 +750,9 @@ bool MOCKABLE(kbase_pm_check_transitions_nolock)(struct kbase_device *kbdev)
      * available cores is empty). Note that they can be available even if
      * we've not finished transitioning to the desired state */
     if ((kbdev->shader_available_bitmap & kbdev->pm.backend.desired_shader_state) ==
-            kbdev->pm.backend.desired_shader_state &&
-        (kbdev->tiler_available_bitmap & kbdev->pm.backend.desired_tiler_state) ==
-            kbdev->pm.backend.desired_tiler_state) {
+         kbdev->pm.backend.desired_shader_state &&
+         (kbdev->tiler_available_bitmap & kbdev->pm.backend.desired_tiler_state) ==
+         kbdev->pm.backend.desired_tiler_state) {
         cores_are_available = true;
 
         KBASE_TRACE_ADD(kbdev, PM_CORES_AVAILABLE, NULL, NULL, 0u,
@@ -860,7 +862,6 @@ void kbase_pm_check_transitions_sync(struct kbase_device *kbdev)
 
     /* Wait for cores */
     ret = wait_event_killable(kbdev->pm.backend.gpu_in_desired_state_wait, kbdev->pm.backend.gpu_in_desired_state);
-
     if (ret < 0 && time_after(jiffies, timeout)) {
         dev_err(kbdev->dev, "Power transition timed out unexpectedly\n");
         dev_err(kbdev->dev, "Desired state :\n");
@@ -898,7 +899,7 @@ void kbase_pm_enable_interrupts(struct kbase_device *kbdev)
 {
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     /*
      * Clear all interrupts,
      * and unmask them all.
@@ -919,7 +920,7 @@ KBASE_EXPORT_TEST_API(kbase_pm_enable_interrupts);
 
 void kbase_pm_disable_interrupts_nolock(struct kbase_device *kbdev)
 {
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     /*
      * Mask all interrupts,
      * and clear them all.
@@ -947,7 +948,7 @@ void kbase_pm_disable_interrupts(struct kbase_device *kbdev)
 KBASE_EXPORT_TEST_API(kbase_pm_disable_interrupts);
 
 /*
- * pmu layout:
+ * pmu layout
  * 0x0000: PMU TAG (RO) (0xCAFECAFE)
  * 0x0004: PMU VERSION ID (RO) (0x00000000)
  * 0x0008: CLOCK ENABLE (RW) (31:1 SBZ, 0 CLOCK STATE)
@@ -958,7 +959,7 @@ void kbase_pm_clock_on(struct kbase_device *kbdev, bool is_resume)
     struct kbasep_js_device_data *js_devdata = &kbdev->js_data;
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&js_devdata->runpool_mutex);
     lockdep_assert_held(&kbdev->pm.lock);
 
@@ -1014,7 +1015,7 @@ bool kbase_pm_clock_off(struct kbase_device *kbdev, bool is_suspend)
 {
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&kbdev->pm.lock);
 
     /* ASSERT that the cores should now be unavailable. No lock needed. */
@@ -1179,33 +1180,30 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
     kbdev->hw_quirks_jm = 0;
     /* Only for T86x/T88x-based products after r2p0 */
     if (prod_id >= 0x860 && prod_id <= 0x880 && major >= 2) {
-
         if (of_property_read_u32_array(np, "jm_config", &jm_values[0], ARRAY_SIZE(jm_values))) {
             /* Entry not in device tree, use defaults  */
             jm_values[0] = 0;
             jm_values[1] = 0;
-            jm_values[2] = 0;
-            jm_values[3] = JM_MAX_JOB_THROTTLE_LIMIT;
+            jm_values[INDEX_2] = 0;
+            jm_values[INDEX_3] = JM_MAX_JOB_THROTTLE_LIMIT;
         }
 
-        /* Limit throttle limit to 6 bits*/
-        if (jm_values[3] > JM_MAX_JOB_THROTTLE_LIMIT) {
+        /* Limit throttle limit to 6 bits */
+        if (jm_values[INDEX_3] > JM_MAX_JOB_THROTTLE_LIMIT) {
             dev_dbg(kbdev->dev, "JOB_THROTTLE_LIMIT supplied in device tree is too large. Limiting to MAX (63).");
-            jm_values[3] = JM_MAX_JOB_THROTTLE_LIMIT;
+            jm_values[INDEX_3] = JM_MAX_JOB_THROTTLE_LIMIT;
         }
 
         /* Aggregate to one integer. */
         kbdev->hw_quirks_jm |= (jm_values[0] ? JM_TIMESTAMP_OVERRIDE : 0);
         kbdev->hw_quirks_jm |= (jm_values[1] ? JM_CLOCK_GATE_OVERRIDE : 0);
-        kbdev->hw_quirks_jm |= (jm_values[2] ? JM_JOB_THROTTLE_ENABLE : 0);
-        kbdev->hw_quirks_jm |= (jm_values[3] << JM_JOB_THROTTLE_LIMIT_SHIFT);
-
+        kbdev->hw_quirks_jm |= (jm_values[INDEX_2] ? JM_JOB_THROTTLE_ENABLE : 0);
+        kbdev->hw_quirks_jm |= (jm_values[INDEX_3] << JM_JOB_THROTTLE_LIMIT_SHIFT);
     } else if (GPU_ID_IS_NEW_FORMAT(prod_id) && (GPU_ID2_MODEL_MATCH_VALUE(prod_id) == GPU_ID2_PRODUCT_TMIX)) {
         /* Only for tMIx */
         u32 coherency_features;
 
         coherency_features = kbase_reg_read(kbdev, GPU_CONTROL_REG(COHERENCY_FEATURES), NULL);
-
         /* (COHERENCY_ACE_LITE | COHERENCY_ACE) was incorrectly
          * documented for tMIx so force correct value here.
          */
@@ -1361,7 +1359,7 @@ int kbase_pm_init_hw(struct kbase_device *kbdev, unsigned int flags)
     int err;
     bool resume_vinstr = false;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&kbdev->pm.lock);
 
     /* Ensure the clock is on before attempting to access the hardware */
@@ -1488,7 +1486,7 @@ static void kbase_pm_request_gpu_cycle_counter_do_request(struct kbase_device *k
 
     ++kbdev->pm.backend.gpu_cycle_counter_requests;
 
-    if (1 == kbdev->pm.backend.gpu_cycle_counter_requests) {
+    if (kbdev->pm.backend.gpu_cycle_counter_requests == 1) {
         kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CYCLE_COUNT_START, NULL);
     }
 
@@ -1539,7 +1537,7 @@ void kbase_pm_release_gpu_cycle_counter_nolock(struct kbase_device *kbdev)
 
     --kbdev->pm.backend.gpu_cycle_counter_requests;
 
-    if (0 == kbdev->pm.backend.gpu_cycle_counter_requests) {
+    if (kbdev->pm.backend.gpu_cycle_counter_requests == 0) {
         kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CYCLE_COUNT_STOP, NULL);
     }
 

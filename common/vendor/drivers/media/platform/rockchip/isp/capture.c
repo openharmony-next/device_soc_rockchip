@@ -1349,7 +1349,7 @@ static int rkisp_enum_frameintervals(struct file *file, void *fh, struct v4l2_fr
     }
 
     if (!sensor) {
-        /* TODO: active_sensor is NULL if using DMARX path */
+        /* active_sensor is NULL if using DMARX path */
         v4l2_err(&dev->v4l2_dev, "%s Not active sensor\n", __func__);
         return -ENODEV;
     }

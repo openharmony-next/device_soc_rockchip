@@ -985,7 +985,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 return -EFAULT;
             }
             break;
-        } 
+        }
         case MPP_CMD_QUERY_HW_ID: {
             struct mpp_hw_info *hw_info;
             mpp = NULL;
@@ -1011,7 +1011,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 return -EFAULT;
             }
             break;
-        } 
+        }
         case MPP_CMD_QUERY_CMD_SUPPORT: {
             __u32 cmd = 0;
 
@@ -1023,7 +1023,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 return -EFAULT;
             }
             break;
-        } 
+        }
         case MPP_CMD_INIT_CLIENT_TYPE: {
             u32 client_type;
 
@@ -1066,7 +1066,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             }
             mpp_session_attach_workqueue(session, mpp->queue);
             break;
-        } 
+        }
         case MPP_CMD_INIT_DRIVER_DATA: {
             u32 val;
 
@@ -1081,7 +1081,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 regmap_write(mpp->grf_info->grf, 0x5d8, val);
             }
             break;
-        } 
+        }
         case MPP_CMD_INIT_TRANS_TABLE: {
             if (session && req->size) {
                 int trans_tbl_size = sizeof(session->trans_table);
@@ -1098,7 +1098,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 session->trans_count = req->size / sizeof(session->trans_table[0]);
             }
             break;
-        } 
+        }
         case MPP_CMD_SET_REG_WRITE:
         case MPP_CMD_SET_REG_READ:
         case MPP_CMD_SET_REG_ADDR_OFFSET:
@@ -1106,12 +1106,12 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             msgs->flags |= req->flags;
             msgs->set_cnt++;
             break;
-        } 
+        }
         case MPP_CMD_POLL_HW_FINISH: {
             msgs->flags |= req->flags;
             msgs->poll_cnt++;
             break;
-        } 
+        }
         case MPP_CMD_RESET_SESSION: {
             int ret2;
             int val;
@@ -1132,7 +1132,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
             }
             return ret2;
             break;
-        } 
+        }
         case MPP_CMD_TRANS_FD_TO_IOVA: {
             u32 i;
             u32 count;
@@ -1172,7 +1172,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 return -EINVAL;
             }
             break;
-        } 
+        }
         case MPP_CMD_RELEASE_FD: {
             u32 i;
             int ret2;
@@ -1197,7 +1197,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
                 }
             }
             break;
-        } 
+        }
         default: {
             mpp = session->mpp;
             if (!mpp) {
@@ -1210,7 +1210,7 @@ static int mpp_process_request(struct mpp_session *session, struct mpp_service *
 
             mpp_debug(DEBUG_IOCTL, "unknown mpp ioctl cmd %x\n", req->cmd);
             break;
-        } 
+        }
     }
     return 0;
 }
@@ -1245,23 +1245,20 @@ static long mpp_dev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg
     do {
         req = &task_msgs.reqs[task_msgs.req_cnt];
         /* first, parse to fixed struct */
-        switch (cmd) {
-            case MPP_IOC_CFG_V1: {
-                struct mpp_msg_v1 msg_v1;
-                memset(&msg_v1, 0, sizeof(msg_v1));
-                if (copy_from_user(&msg_v1, msg, sizeof(msg_v1))) {
-                    return -EFAULT;
-                }
-                ret = mpp_parse_msg_v1(&msg_v1, req);
-                if (ret) {
-                    return -EFAULT;
-                }
-                msg += sizeof(msg_v1);
-                break;
-            } 
-            default:
-                mpp_err("unknown ioctl cmd %x\n", cmd);
-                return -EINVAL;
+        if (cmd == MPP_IOC_CFG_V1) {
+            struct mpp_msg_v1 msg_v1;
+            memset(&msg_v1, 0, sizeof(msg_v1));
+            if (copy_from_user(&msg_v1, msg, sizeof(msg_v1))) {
+                return -EFAULT;
+            }
+            ret = mpp_parse_msg_v1(&msg_v1, req);
+            if (ret) {
+                return -EFAULT;
+            }
+            msg += sizeof(msg_v1);
+        } else {
+            mpp_err("unknown ioctl cmd %x\n", cmd);
+            return -EINVAL;
         }
         task_msgs.req_cnt++;
         /* check loop times */
@@ -2036,7 +2033,7 @@ unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_C
                 clk_rate_hz = MPP_REDUCE_RATE_HZ;
             }
             break;
-        } 
+        }
         case CLK_MODE_NORMAL: {
             if (clk_info->normal_rate_hz) {
                 clk_rate_hz = clk_info->normal_rate_hz;
@@ -2044,7 +2041,7 @@ unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_C
                 clk_rate_hz = clk_info->default_rate_hz;
             }
             break;
-        } 
+        }
         case CLK_MODE_ADVANCED: {
             if (clk_info->advanced_rate_hz) {
                 clk_rate_hz = clk_info->advanced_rate_hz;
@@ -2054,12 +2051,12 @@ unsigned long mpp_get_clk_info_rate_hz(struct mpp_clk_info *clk_info, enum MPP_C
                 clk_rate_hz = clk_info->default_rate_hz;
             }
             break;
-        } 
+        }
         case CLK_MODE_DEFAULT:
         default: {
             clk_rate_hz = clk_info->default_rate_hz;
             break;
-        } 
+        }
     }
     return clk_rate_hz;
 }

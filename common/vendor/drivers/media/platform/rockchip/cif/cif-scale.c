@@ -29,37 +29,34 @@
 #define DELAY_TIMEOUT 1000
 
 static const struct cif_output_fmt scale_out_fmts[] = {{
-                                                           .fourcc = V4L2_PIX_FMT_SRGGB16,
-                                                           .cplanes = 1,
-                                                           .mplanes = 1,
-                                                           .bpp = {16},
-                                                           .raw_bpp = 16,
-                                                           .fmt_type = CIF_FMT_TYPE_RAW,
-                                                       },
-                                                       {
-                                                           .fourcc = V4L2_PIX_FMT_SGRBG16,
-                                                           .cplanes = 1,
-                                                           .mplanes = 1,
-                                                           .bpp = {16},
-                                                           .raw_bpp = 16,
-                                                           .fmt_type = CIF_FMT_TYPE_RAW,
-                                                       },
-                                                       {
-                                                           .fourcc = V4L2_PIX_FMT_SGBRG16,
-                                                           .cplanes = 1,
-                                                           .mplanes = 1,
-                                                           .bpp = {16},
-                                                           .raw_bpp = 16,
-                                                           .fmt_type = CIF_FMT_TYPE_RAW,
-                                                       },
-                                                       {
-                                                           .fourcc = V4L2_PIX_FMT_SBGGR16,
-                                                           .cplanes = 1,
-                                                           .mplanes = 1,
-                                                           .bpp = {16},
-                                                           .raw_bpp = 16,
-                                                           .fmt_type = CIF_FMT_TYPE_RAW,
-                                                       }};
+    .fourcc = V4L2_PIX_FMT_SRGGB16,
+    .cplanes = 1,
+    .mplanes = 1,
+    .bpp = {16},
+    .raw_bpp = 16,
+    .fmt_type = CIF_FMT_TYPE_RAW,
+}, {
+    .fourcc = V4L2_PIX_FMT_SGRBG16,
+    .cplanes = 1,
+    .mplanes = 1,
+    .bpp = {16},
+    .raw_bpp = 16,
+    .fmt_type = CIF_FMT_TYPE_RAW,
+}, {
+    .fourcc = V4L2_PIX_FMT_SGBRG16,
+    .cplanes = 1,
+    .mplanes = 1,
+    .bpp = {16},
+    .raw_bpp = 16,
+    .fmt_type = CIF_FMT_TYPE_RAW,
+}, {
+    .fourcc = V4L2_PIX_FMT_SBGGR16,
+    .cplanes = 1,
+    .mplanes = 1,
+    .bpp = {16},
+    .raw_bpp = 16,
+    .fmt_type = CIF_FMT_TYPE_RAW,
+}};
 
 static int rkcif_scale_enum_fmt_vid_cap(struct file *file, void *priv, struct v4l2_fmtdesc *f)
 {
@@ -207,7 +204,8 @@ static int rkcif_scale_set_fmt(struct rkcif_scale_vdev *scale_vdev, struct v4l2_
         scale_vdev->scale_out_fmt = fmt;
         scale_vdev->pixm = *pixm;
 
-        v4l2_dbg(0x03, rkcif_debug, &stream->cifdev->v4l2_dev, "%s: req(%d, %d) src out(%d, %d)\n", __func__, pixm->width,
+        v4l2_dbg(0x03, rkcif_debug, &stream->cifdev->v4l2_dev,
+                 "%s: req(%d, %d) src out(%d, %d)\n", __func__, pixm->width,
                  pixm->height, scale_vdev->src_res.width, scale_vdev->src_res.height);
     }
     return 0;
@@ -267,7 +265,6 @@ static long rkcif_scale_ioctl_default(struct file *file, void *fh, bool valid_pr
 
 static int rkcif_scale_enum_input(struct file *file, void *priv, struct v4l2_input *input)
 {
-
     if (input->index > 0) {
         return -EINVAL;
     }
@@ -301,7 +298,7 @@ static int rkcif_scale_enum_frameintervals(struct file *file, void *fh, struct v
     }
 
     if (!sensor || !sensor->sd) {
-        /* TODO: active_sensor is NULL if using DMARX path */
+        /* active_sensor is NULL if using DMARX path */
         v4l2_err(&dev->v4l2_dev, "%s Not active sensor\n", __func__);
         return -ENODEV;
     }
@@ -546,7 +543,8 @@ static void rkcif_scale_vb2_stop_streaming(struct vb2_queue *vq)
     /* Make sure no new work queued in isr before draining wq */
     scale_vdev->stopping = true;
     ret =
-        wait_event_timeout(scale_vdev->wq_stopped, scale_vdev->state != RKCIF_STATE_STREAMING, msecs_to_jiffies(DELAY_TIMEOUT));
+        wait_event_timeout(scale_vdev->wq_stopped,
+                           scale_vdev->state != RKCIF_STATE_STREAMING, msecs_to_jiffies(DELAY_TIMEOUT));
     if (!ret) {
         rkcif_scale_stop(scale_vdev);
         scale_vdev->stopping = false;
@@ -944,7 +942,6 @@ static void rkcif_scale_update_stream(struct rkcif_scale_vdev *scale_vdev, int c
     }
 
     ret = rkcif_assign_scale_buffer_pingpong(scale_vdev, RKCIF_YUV_ADDR_STATE_UPDATE, ch);
-
     if (active_buf && (!ret)) {
         vb_done = &active_buf->vb;
         vb_done->vb2_buf.timestamp = ktime_get_ns();

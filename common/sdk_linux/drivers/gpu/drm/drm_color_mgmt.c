@@ -147,7 +147,7 @@
  * the range of value is [-2^(m-1), 2^(m-1) - 2^-n]
  *
  * For example
- * A Q3.12 format number:
+ * A Q3.12 format number: see below
  * - required bit: 3 + 12 = 15bits
  * - range: [-2^2, 2^2 - 2^−15]
  *
@@ -525,7 +525,7 @@ int drm_color_lut_check(const struct drm_property_blob *lut, u32 tests)
             }
         }
 
-        if (i > 0 && tests & DRM_COLOR_LUT_NON_DECREASING) {
+        if (i > 0 && (tests & DRM_COLOR_LUT_NON_DECREASING)) {
             if (entry[i].red < entry[i - 1].red || entry[i].green < entry[i - 1].green ||
                 entry[i].blue < entry[i - 1].blue) {
                 DRM_DEBUG_KMS("LUT entries must never decrease.\n");

@@ -86,11 +86,11 @@ struct hw_cdc_tlp_tmp {
     unsigned short pktlength;
     unsigned short bytesneeded;
 };
-/*max ethernet pkt size 1514*/
+/* max ethernet pkt size 1514 */
 #define HW_USB_RECEIVE_BUFFER_SIZE 1600L
-/*for Tin-layer-protocol (TLP)*/
+/* for Tin-layer-protocol (TLP) */
 #define HW_USB_MRECEIVE_BUFFER_SIZE 4096L
-/*for TLP*/
+/* for TLP */
 #define HW_USB_MRECEIVE_MAX_BUFFER_SIZE (1024 * 16)
 
 #define HW_JUNGO_BCDDEVICE_VALUE 0x0102
@@ -166,7 +166,7 @@ bool deviceisBalong = false;
 #define USB_CDC_NCM_TYPE 0x1a
 
 /* NCM Functional Descriptor */
-/* change usb_cdc_ncm_desc -> usb_cdc_ncm_desc_hw ,prevent cdc.h redefinition 11-05*/
+/* change usb_cdc_ncm_desc -> usb_cdc_ncm_desc_hw ,prevent cdc.h redefinition 11-05 */
 struct usb_cdc_ncm_desc_hw {
     __u8 bLength;
     __u8 bDescriptorType;
@@ -421,34 +421,33 @@ static inline unsigned get_ncm(__le16 **p, unsigned size)
 #endif
 
 #define NCM_CONTROL_TIMEOUT (5 * 1000)
-/*#endif*/
 
 /* 'u' must be of unsigned type */
 #define IS_POWER2(u) (((u) > 0) && !((u) & ((u)-1)))
 
 /* 'p' must designate a variable of type * __le16 (in all get/put_ncm_leXX) */
 #define get_ncm_le16(p)                                                                                                \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         __le16 val = get_unaligned_le16(p);                                                                            \
         p += 1;                                                                                                        \
         val;                                                                                                           \
     })
 
 #define get_ncm_le32(p)                                                                                                \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         __le32 val = get_unaligned_le32(p);                                                                            \
         p += 2;                                                                                                        \
         val;                                                                                                           \
     })
 
 #define put_ncm_le16(val, p)                                                                                           \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         put_unaligned_le16((val), p);                                                                                  \
         p += 1;                                                                                                        \
     })
 
 #define put_ncm_le32(val, p)                                                                                           \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         put_unaligned_le32((val), p);                                                                                  \
         p += 2;                                                                                                        \
     })
@@ -600,13 +599,13 @@ struct hw_cdc_net {
     int qmi_sync;
     unsigned long flags;
 
-    /*The state and buffer for the data of TLP*/
+    /* The state and buffer for the data of TLP */
     HW_TLP_BUF_STATE hw_tlp_buffer_state;
     struct hw_cdc_tlp_tmp hw_tlp_tmp_buf;
-    /*indicate the download tlp feature is activated or not*/
+    /* indicate the download tlp feature is activated or not */
     int hw_tlp_download_is_actived;
 
-    /*Add for ncm */
+    /* Add for ncm */
     int is_ncm;
     struct ncm_ctx *ncm_ctx;
 };
@@ -643,16 +642,15 @@ struct skb_data { /* skb->cb is one of these */
 #define deverr(hw_cdc_net, fmt, arg...) printk(KERN_ERR "%s: " fmt "\n", (hw_cdc_net)->net->name, ##arg)
 #define devwarn(hw_cdc_net, fmt, arg...) printk(KERN_WARNING "%s: " fmt "\n", (hw_cdc_net)->net->name, ##arg)
 
-#define devinfo(hw_cdc_net, fmt, arg...) printk(KERN_INFO "%s: " fmt "\n", (hw_cdc_net)->net->name, ##arg);
+#define devinfo(hw_cdc_net, fmt, arg...) printk(KERN_INFO "%s: " fmt "\n", (hw_cdc_net)->net->name, ##arg)
 
-////////////////////////////////////////////////////////////////////////////////
 static void hw_cdc_status(struct hw_cdc_net *dev, struct urb *urb);
 static inline int hw_get_ethernet_addr(struct hw_cdc_net *dev);
 static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf);
 void hw_cdc_unbind(struct hw_cdc_net *dev, struct usb_interface *intf);
 static int cdc_ncm_rx_fixup(struct hw_cdc_net *dev, struct sk_buff *skb);
 static struct sk_buff *cdc_ncm_tx_fixup(struct hw_cdc_net *dev, struct sk_buff *skb, gfp_t mem_flags);
-///////////////////////////
+
 int hw_get_endpoints(struct hw_cdc_net *dev, struct usb_interface *intf);
 void hw_skb_return(struct hw_cdc_net *dev, struct sk_buff *skb);
 void hw_unlink_rx_urbs(struct hw_cdc_net *dev);
@@ -668,12 +666,8 @@ void hw_disconnect(struct usb_interface *intf);
 int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod);
 int hw_resume(struct usb_interface *intf);
 int hw_suspend(struct usb_interface *intf, pm_message_t message);
-//////////////////////////
 
 static void hw_cdc_check_status_work(struct work_struct *work);
-/*{
-    struct delayed_work *option_suspend_wq
-}*/
 
 /* handles CDC Ethernet and many other network "bulk data" interfaces */
 int hw_get_endpoints(struct hw_cdc_net *dev, struct usb_interface *intf)
@@ -685,8 +679,6 @@ int hw_get_endpoints(struct hw_cdc_net *dev, struct usb_interface *intf)
 
     for (tmp = 0; tmp < intf->num_altsetting; tmp++) {
         unsigned ep;
-
-        
         in = NULL;
         out = NULL;
         status = NULL;
@@ -697,7 +689,6 @@ int hw_get_endpoints(struct hw_cdc_net *dev, struct usb_interface *intf)
          * ignore other endpoints and altsetttings.
          */
         for (ep = 0; ep < alt->desc.bNumEndpoints; ep++) {
-
             struct usb_host_endpoint *e;
             int intr = 0;
 
@@ -775,7 +766,7 @@ static int init_status(struct hw_cdc_net *dev, struct usb_interface *intf)
     }
     return 0;
 }
-/*[zhaopf@meigsmart.com-2020-0903] add for higher version kernel support { */
+/* [zhaopf@meigsmart.com-2020-0903] add for higher version kernel support { */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 struct timespec64 current_kernel_time(void)
 {
@@ -784,7 +775,7 @@ struct timespec64 current_kernel_time(void)
     return lTime;
 }
 #endif
-/*[zhaopf@meigsmart.com-2020-0903] add for higher version kernel support } */
+/* [zhaopf@meigsmart.com-2020-0903] add for higher version kernel support } */
 
 /* Passes this packet up the stack, updating its accounting.
  * Some link protocols batch packets, so their rx_fixup paths
@@ -922,7 +913,7 @@ static void tx_defer_bh(struct hw_cdc_net *dev, struct sk_buff *skb, struct sk_b
     }
     spin_unlock_irqrestore(&dev->done.lock, flags);
 }
-////////////////////////////////////////////
+
 static HW_TLP_BUF_STATE submit_skb(struct hw_cdc_net *dev, unsigned char *data, unsigned int len)
 {
     struct sk_buff *skb;
@@ -973,7 +964,7 @@ static void rx_tlp_parse(struct hw_cdc_net *dev, struct sk_buff *skb)
     unsigned char *buf_end = buf_start + skb->len;
     unsigned char *ptr = NULL;
 
-    /*decoding the TLP packets into the ether packet*/
+    /* decoding the TLP packets into the ether packet */
     while (remain_bytes > 0) {
         switch (dev->hw_tlp_buffer_state) {
             case HW_TLP_BUF_STATE_IDLE: {
@@ -983,18 +974,18 @@ static void rx_tlp_parse(struct hw_cdc_net *dev, struct sk_buff *skb)
                     payload_ptr = (unsigned char *)&(tlp->payload);
 
                     // validate the tlp packet header
-                    if (HW_TLP_BITS_SYNC != (tlp->pktlength & HW_TLP_MASK_SYNC)) {
+                    if ((tlp->pktlength & HW_TLP_MASK_SYNC) != HW_TLP_BITS_SYNC) {
                         devdbg(dev, "The pktlength is error");
                         dev->hw_tlp_buffer_state = HW_TLP_BUF_STATE_ERROR;
                         break;
                     }
-                    /*The receiced buffer has the whole ether packet */
+                    /* The receiced buffer has the whole ether packet */
                     if ((payload_ptr + pktlen) <= buf_end) {
-                        /*Get the ether packet from the TLP packet, and put it into the done queue*/
+                        /* Get the ether packet from the TLP packet, and put it into the done queue */
                         submit_skb(dev, payload_ptr, pktlen);
                         cur_ptr = payload_ptr + pktlen;
                         remain_bytes = buf_end - cur_ptr;
-                    } else { /*has the part of the ether packet*/
+                    } else { /* has the part of the ether packet */
                         if (pktlen > dev->rx_urb_size) {
                             devdbg(dev, "The pktlen is invalid");
                             dev->hw_tlp_buffer_state = HW_TLP_BUF_STATE_ERROR;
@@ -1028,8 +1019,8 @@ static void rx_tlp_parse(struct hw_cdc_net *dev, struct sk_buff *skb)
                 pktlen = (tlp->pktlength & HW_TLP_MASK_LENGTH);
                 payload_ptr = cur_ptr;
                 reset_tlp_tmp_buf(dev);
-                /*validate the tlp packet header*/
-                if (HW_TLP_BITS_SYNC != (tlp->pktlength & HW_TLP_MASK_SYNC)) {
+                /* validate the tlp packet header */
+                if ((tlp->pktlength & HW_TLP_MASK_SYNC) != HW_TLP_BITS_SYNC) {
                     devdbg(dev, "The pktlength is error");
                     dev->hw_tlp_buffer_state = HW_TLP_BUF_STATE_ERROR;
                     break;
@@ -1074,13 +1065,12 @@ static void rx_tlp_parse(struct hw_cdc_net *dev, struct sk_buff *skb)
                         devdbg(dev, "The tlp length is larger than 1600");
                         ptr = (unsigned char *)kmalloc(dev->hw_tlp_tmp_buf.bytesneeded + dev->hw_tlp_tmp_buf.pktlength,
                                                        GFP_KERNEL);
-                        if (NULL != ptr) {
+                        if (ptr != NULL) {
                             memcpy(ptr, dev->hw_tlp_tmp_buf.buffer, dev->hw_tlp_tmp_buf.pktlength);
                             memcpy(ptr + dev->hw_tlp_tmp_buf.pktlength, cur_ptr, dev->hw_tlp_tmp_buf.bytesneeded);
                             submit_skb(dev, ptr, tmplen);
                             kfree(ptr);
                         }
-
                     } else {
                         memcpy(dev->hw_tlp_tmp_buf.buffer + dev->hw_tlp_tmp_buf.pktlength, cur_ptr,
                                dev->hw_tlp_tmp_buf.bytesneeded);
@@ -1111,7 +1101,7 @@ static void rx_defer_bh(struct hw_cdc_net *dev, struct sk_buff *skb, struct sk_b
     __skb_unlink(skb, list);
     spin_unlock_irqrestore(&list->lock, flags);
 
-    /*deal with the download tlp feature*/
+    /* deal with the download tlp feature */
     if (1 == dev->hw_tlp_download_is_actived) {
         rx_tlp_parse(dev, skb);
         dev_kfree_skb_any(skb);
@@ -1124,7 +1114,6 @@ static void rx_defer_bh(struct hw_cdc_net *dev, struct sk_buff *skb, struct sk_b
         spin_unlock_irqrestore(&dev->done.lock, flags);
     }
 }
-////////////////////////
 
 /* some work can't be done in tasklets, so we use keventd
  *
@@ -1173,7 +1162,6 @@ static void rx_submit(struct hw_cdc_net *dev, struct urb *urb, gfp_t flags)
 
     if (netif_running(dev->net) && netif_device_present(dev->net) && !test_bit(EVENT_RX_HALT, &dev->flags)) {
         switch (retval = usb_submit_urb(urb, GFP_ATOMIC)) {
-
             case 0: // submit successfully
                 __skb_queue_tail(&dev->rxq, skb);
                 break;
@@ -1208,7 +1196,6 @@ static void rx_submit(struct hw_cdc_net *dev, struct urb *urb, gfp_t flags)
            current_kernel_time().tv_nsec);
 
     if (retval) {
-
         dev_kfree_skb_any(skb);
         usb_free_urb(urb);
     }
@@ -1218,7 +1205,6 @@ static void rx_submit(struct hw_cdc_net *dev, struct urb *urb, gfp_t flags)
 
 static inline void rx_process(struct hw_cdc_net *dev, struct sk_buff *skb)
 {
-
     if (dev->is_ncm) {
         if (!cdc_ncm_rx_fixup(dev, skb)) {
             goto error;
@@ -1400,9 +1386,9 @@ static int hw_stop(struct net_device *net)
     dev->wait = NULL;
     remove_wait_queue(&unlink_wakeup, &wait);
 
-    /*cleanup the data for TLP*/
+    /* cleanup the data for TLP */
     dev->hw_tlp_buffer_state = HW_TLP_BUF_STATE_IDLE;
-    if (NULL != dev->hw_tlp_tmp_buf.buffer) {
+    if (dev->hw_tlp_tmp_buf.buffer != NULL) {
         kfree(dev->hw_tlp_tmp_buf.buffer);
         dev->hw_tlp_tmp_buf.buffer = NULL;
     }
@@ -1441,10 +1427,10 @@ static int hw_open(struct net_device *net)
         goto done_nopm;
     }
 
-    /*Initialized the data for TLP*/
+    /* Initialized the data for TLP */
     dev->hw_tlp_buffer_state = HW_TLP_BUF_STATE_IDLE;
     dev->hw_tlp_tmp_buf.buffer = kmalloc(HW_USB_RECEIVE_BUFFER_SIZE, GFP_KERNEL);
-    if (NULL != dev->hw_tlp_tmp_buf.buffer) {
+    if (dev->hw_tlp_tmp_buf.buffer != NULL) {
         memset(dev->hw_tlp_tmp_buf.buffer, 0, HW_USB_RECEIVE_BUFFER_SIZE);
     }
     dev->hw_tlp_tmp_buf.pktlength = 0;
@@ -1560,12 +1546,12 @@ EXPORT_SYMBOL_GPL(hw_set_msglevel);
 
 /* drivers may override default ethtool_ops in their bind() routine */
 static struct ethtool_ops hw_ethtool_ops = {
-/*[zhaopf@meigsmart.com-2020-0903] add for higher version kernel support { */
+/* [zhaopf@meigsmart.com-2020-0903] add for higher version kernel support { */
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 19, 0))
     .get_settings = hw_get_settings,
     .set_settings = hw_set_settings,
 #endif
-    /*[zhaopf@meigsmart.com-2020-0903] add for higher version kernel support } */
+    /* [zhaopf@meigsmart.com-2020-0903] add for higher version kernel support } */
     .get_link = hw_get_link,
     .nway_reset = hw_nway_reset,
     .get_drvinfo = hw_get_drvinfo,
@@ -1700,7 +1686,7 @@ static void hw_tx_timeout(struct net_device *net, unsigned int data)
     unlink_urbs(dev, &dev->txq);
     tasklet_schedule(&dev->bh);
 
-    // FIXME: device recovery -- reset?
+    // device recovery -- reset?
 }
 
 #if LINUX_VERSION37_LATER
@@ -1716,7 +1702,7 @@ static void hw_netif_trans_update(struct net_device *dev)
 {
     struct netdev_queue *txq = NULL;
 
-    if (NULL == dev) {
+    if (dev == NULL) {
         printk(KERN_ERR "%s invalid dev paramter\n", __FUNCTION__);
         return;
     }
@@ -1724,12 +1710,10 @@ static void hw_netif_trans_update(struct net_device *dev)
     // netdev_get_tx_queue(const struct net_device *dev,unsigned int index) only returned netdev_queue's address,
     // so linux kernel trans index 0 to get netdev_queue's address
     txq = netdev_get_tx_queue(dev, 0);
-
-    if (NULL == txq) {
+    if (txq == NULL) {
         printk(KERN_ERR "%s invalid txq paramter\n", __FUNCTION__);
         return;
     }
-
     if (txq->trans_start != jiffies) {
         txq->trans_start = jiffies;
     }
@@ -1897,7 +1881,6 @@ static void hw_bh(unsigned long param)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 static void hw_bh_timer_call(struct timer_list *t)
 {
-
     struct hw_cdc_net *dev = from_timer(dev, t, delay);
     hw_bh((unsigned long)dev);
 }
@@ -1930,13 +1913,13 @@ void hw_disconnect(struct usb_interface *intf)
                 dev->driver_desc);
     }
 
-    /*[zhaopf@meigsmart-2020-1127] balong device ignore cancel delayed work { */
+    /* [zhaopf@meigsmart-2020-1127] balong device ignore cancel delayed work { */
     if (deviceisBalong) {
         devinfo(dev, "balong device ignore cancel delayed work");
     } else {
         cancel_delayed_work_sync(&dev->status_work);
     }
-    /*[zhaopf@meigsmart-2020-1127] balong device ignore cancel delayed work } */
+    /* [zhaopf@meigsmart-2020-1127] balong device ignore cancel delayed work } */
     net = dev->net;
     unregister_netdev(net);
 
@@ -2159,7 +2142,7 @@ exit:
 #undef NCM_MAX_CONTROL_MSG
 }
 
-/* TODO: add crc support */
+/* add crc support */
 static int cdc_ncm_rx_fixup(struct hw_cdc_net *dev, struct sk_buff *skb)
 {
 #define NCM_BITS(ctx) (((ctx)->bit_mode == NCM_BIT_MODE_16) ? 16 : 32)
@@ -2355,7 +2338,7 @@ static inline int ntb_add_dgram(struct ncm_ctx *ctx, struct ntb *n, unsigned dgr
         return -EINVAL;
     }
 
-    /* TODO: optimize to use a kernel lookaside cache (kmem_cache) */
+    /* optimize to use a kernel lookaside cache (kmem_cache) */
     entry = kmalloc(sizeof(*entry), flags);
     if (unlikely(entry == NULL)) {
         return -ENOMEM;
@@ -2399,7 +2382,7 @@ static struct sk_buff *ntb_finalize(struct ncm_ctx *ctx, struct ntb *n)
     put_ncm_le32(popts->nth_sign, p);
     put_ncm_le16(popts->nth_size, p);
 
-    /* TODO: add sequence numbers */
+    /* add sequence numbers */
     put_ncm_le16(0, p);
 
     put_ncm(&p, popts->block_length, NTB_LEN(n));
@@ -2637,12 +2620,12 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
 #if LINUX_VERSION37_LATER
     struct usb_driver *driver = NULL;
 
-    if (NULL == udev) {
+    if (udev == NULL) {
         return -EINVAL;
     }
 
     driver = to_usb_driver(udev->dev.driver);
-    if (NULL == driver) {
+    if (driver == NULL) {
         return -EINVAL;
     }
 
@@ -2666,7 +2649,6 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     // set up our own records
     net = alloc_etherdev(sizeof(*dev));
     if (!net) {
-        
         goto out;
     }
 
@@ -2757,7 +2739,7 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
     // ok, it's ready to go.
     usb_set_intfdata(udev, dev);
 
-    /*activate the download tlp feature*/
+    /* activate the download tlp feature */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0))
     dev->hw_tlp_download_is_actived = 0; // activated failed
     devdbg(dev, "kernel-4.14.x later default not active tlp");
@@ -2771,20 +2753,13 @@ int hw_cdc_probe(struct usb_interface *udev, const struct usb_device_id *prod)
 #endif
 
     netif_device_attach(net);
-
-    
-
-    /*set the carrier off as default*/
+    /* set the carrier off as default */
     netif_carrier_off(net);
-
     if (!deviceisBalong) {
         dev->qmi_sync = 0;
         INIT_DELAYED_WORK(&dev->status_work, hw_cdc_check_status_work);
         schedule_delayed_work(&dev->status_work, 0x0A * HZ);
     }
-    
-    //
-
     return 0;
 
 out3:
@@ -2859,8 +2834,8 @@ int hw_send_tlp_download_request(struct usb_interface *intf)
     req.timeout = 0x3E8;
     retval = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), req.bRequest, req.bRequestType, req.wValue, req.wIndex,
                              buf, req.wLength, req.timeout);
-    /*check the TLP feature is activated or not, response value 0x01 indicates success*/
-    if (0 < retval && 0x01 == buf[0]) {
+    /* check the TLP feature is activated or not, response value 0x01 indicates success */
+    if (retval > 0 && buf[0] == 1) {
         return retval;
     } else {
         return 0;
@@ -2976,17 +2951,17 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
                     }
                 }
 
-                /*For Jungo solution, the NDIS device has no data interface, so needn't detect data interface*/
-                if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice &&
-                     BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass &&
-                     BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass) ||
-                    ((NULL != info->u) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
+                /* For Jungo solution, the NDIS device has no data interface, so needn't detect data interface */
+                if ((dev->udev->descriptor.bcdDevice != HW_JUNGO_BCDDEVICE_VALUE &&
+                     intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS &&
+                     intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS_HW) ||
+                    ((info->u != NULL) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
                     printk("L[%d]", __LINE__);
                     /* a data interface altsetting does the real i/o */
                     d = &info->data->cur_altsetting->desc;
-                    // if (d->bInterfaceClass != USB_CLASS_CDC_DATA) { /*delete the standard CDC slave class detect*/
+                    // if (d->bInterfaceClass != USB_CLASS_CDC_DATA) { /* delete the standard CDC slave class detect */
                     if (d->bInterfaceClass != USB_DEVICE_HUAWEI_DATA && d->bInterfaceClass != USB_CLASS_CDC_DATA) {
-                        /*Add to detect CDC slave class either Huawei defined or standard*/
+                        /* Add to detect CDC slave class either Huawei defined or standard */
                         dev_dbg(&intf->dev, "slave class %u\n", d->bInterfaceClass);
                         goto bad_desc;
                     }
@@ -3059,13 +3034,11 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
         ntb_clear(&ctx->curr_ntb);
     }
 
-    /*if the NDIS device is not Jungo solution, then assume that it has the data interface, and claim for it*/
-    if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice &&
-         BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass &&
-         BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass) ||
-        ((NULL != info->u) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0)))
-
-    {
+    /* if the NDIS device is not Jungo solution, then assume that it has the data interface, and claim for it */
+    if ((dev->udev->descriptor.bcdDevice != HW_JUNGO_BCDDEVICE_VALUE &&
+        intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS &&
+        intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS_HW) ||
+        ((info->u != NULL) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
         /* claim data interface and set it up ... with side effects.
          * network traffic can't flow until an altsetting is enabled.
          */
@@ -3089,11 +3062,11 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
     /* status endpoint: optional for CDC Ethernet, */
     dev->status = NULL;
 
-    if (HW_JUNGO_BCDDEVICE_VALUE == dev->udev->descriptor.bcdDevice ||
-        BINTERFACESUBCLASS == intf->cur_altsetting->desc.bInterfaceSubClass ||
-        BINTERFACESUBCLASS_HW == intf->cur_altsetting->desc.bInterfaceSubClass ||
+    if (dev->udev->descriptor.bcdDevice == HW_JUNGO_BCDDEVICE_VALUE ||
+        intf->cur_altsetting->desc.bInterfaceSubClass == BINTERFACESUBCLASS ||
+        intf->cur_altsetting->desc.bInterfaceSubClass == BINTERFACESUBCLASS_HW ||
         info->control->cur_altsetting->desc.bNumEndpoints == 1 ||
-        ((NULL != info->u) && (info->u->bMasterInterface0 == info->u->bSlaveInterface0))) {
+        ((info->u != NULL) && (info->u->bMasterInterface0 == info->u->bSlaveInterface0))) {
         struct usb_endpoint_descriptor *desc;
         dev->status = &info->control->cur_altsetting->endpoint[0];
         desc = &dev->status->desc;
@@ -3105,10 +3078,10 @@ static int hw_cdc_bind(struct hw_cdc_net *dev, struct usb_interface *intf)
         }
     }
 
-    if ((HW_JUNGO_BCDDEVICE_VALUE != dev->udev->descriptor.bcdDevice &&
-         BINTERFACESUBCLASS != intf->cur_altsetting->desc.bInterfaceSubClass &&
-         BINTERFACESUBCLASS_HW != intf->cur_altsetting->desc.bInterfaceSubClass) ||
-        ((NULL != info->u) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
+    if ((dev->udev->descriptor.bcdDevice != HW_JUNGO_BCDDEVICE_VALUE &&
+        intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS &&
+        intf->cur_altsetting->desc.bInterfaceSubClass != BINTERFACESUBCLASS_HW) ||
+        ((info->u != NULL) && (info->u->bMasterInterface0 != info->u->bSlaveInterface0))) {
         printk(KERN_ERR "Qualcomm device bcdDevice=%x,InterfaceSubClass=%x\n", dev->udev->descriptor.bcdDevice,
                intf->cur_altsetting->desc.bInterfaceSubClass);
         deviceisBalong = false;
@@ -3154,10 +3127,7 @@ void hw_cdc_unbind(struct hw_cdc_net *dev, struct usb_interface *intf)
         usb_set_intfdata(info->data, NULL);
         usb_driver_release_interface(driver, info->data);
         info->data = NULL;
-    }
-
-    /* and vice versa (just in case) */
-    else if (intf == info->data && info->control) {
+    } else if (intf == info->data && info->control) {
         /* ensure immediate exit from usbnet_disconnect */
         usb_set_intfdata(info->control, NULL);
         usb_driver_release_interface(driver, info->control);
@@ -3200,14 +3170,13 @@ static void dumpspeed(struct hw_cdc_net *dev, __le32 *speeds)
 
 static inline int hw_get_ethernet_addr(struct hw_cdc_net *dev)
 {
-
     dev->net->dev_addr[0] = 0x00;
     dev->net->dev_addr[1] = 0x1e;
 
     dev->net->dev_addr[0x02] = 0x10;
     dev->net->dev_addr[0x03] = 0x1f;
     dev->net->dev_addr[0x04] = 0x00;
-    dev->net->dev_addr[0x05] = 0x01; /*change 0x04 into 0x01 20100129*/
+    dev->net->dev_addr[0x05] = 0x01; /* change 0x04 into 0x01 20100129 */
 
     return 0;
 }
@@ -3216,8 +3185,8 @@ enum { WRITE_REQUEST = 0x21, READ_RESPONSE = 0xa1 };
 #define HW_CDC_OK 0
 #define HW_CDC_FAIL (-1)
 /*-------------------------------------------------------------------------*/
-/*The ioctl is called to send the qmi request to the device
- * or get the qmi response from the device*/
+/* The ioctl is called to send the qmi request to the device
+ * or get the qmi response from the device */
 static int hw_cdc_ioctl(struct usb_interface *intf, unsigned int code, void *buf)
 {
     struct usb_device *udev = interface_to_usbdev(intf);
@@ -3227,20 +3196,20 @@ static int hw_cdc_ioctl(struct usb_interface *intf, unsigned int code, void *buf
     char *pbuf = NULL;
     int ret = -1;
     if (!deviceisBalong) {
-        if (1 == hwnet->qmi_sync) {
+        if (hwnet->qmi_sync == 1) {
             deverr(hwnet, "%s: The ndis port is busy.", __FUNCTION__);
             return HW_CDC_FAIL;
         }
     }
 
-    if (USBDEVFS_CONTROL != code || NULL == req) {
+    if (code != USBDEVFS_CONTROL || req == NULL) {
         deverr(hwnet, "%s: The request is not supported.", __FUNCTION__);
         return HW_CDC_FAIL;
     }
 
-    if (0 < req->wLength) {
+    if (req->wLength > 0) {
         pbuf = (char *)kmalloc(req->wLength + 1, GFP_KERNEL);
-        if (NULL == pbuf) {
+        if (pbuf == NULL) {
             deverr(hwnet, "%s: Kmalloc the buffer failed.", __FUNCTION__);
             return HW_CDC_FAIL;
         }
@@ -3264,18 +3233,17 @@ static int hw_cdc_ioctl(struct usb_interface *intf, unsigned int code, void *buf
             break;
         }
         case READ_RESPONSE: {
-            if (NULL == req->data || 0 >= req->wLength || NULL == pbuf) {
+            if (req->data == NULL || req->wLength <= 0 || pbuf == NULL) {
                 deverr(hwnet, "%s: The buffer is null, can not read the response.", __FUNCTION__);
                 goto op_error;
             }
             ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), req->bRequest, req->bRequestType, req->wValue,
                                   interface->desc.bInterfaceNumber, pbuf, req->wLength, req->timeout);
-
             if (0 < ret) {
                 if (!deviceisBalong) {
-                    /*check the connection indication*/
-                    if (0x04 == pbuf[6] && 0x22 == pbuf[9] && 0x00 == pbuf[10]) {
-                        if (0x02 == pbuf[16]) {
+                    /* check the connection indication */
+                    if (pbuf[0x6] == 0x04  && pbuf[0x9] == 0x22 && pbuf[0xA] == 0) {
+                        if (pbuf[0x10] == 0x02) {
                             if (hwnet) {
                                 netif_carrier_on(hwnet->net);
                             }
@@ -3297,7 +3265,7 @@ static int hw_cdc_ioctl(struct usb_interface *intf, unsigned int code, void *buf
             break;
     }
 
-    if (NULL != pbuf) {
+    if (pbuf != NULL) {
         kfree(pbuf);
         pbuf = NULL;
     }
@@ -3305,7 +3273,7 @@ static int hw_cdc_ioctl(struct usb_interface *intf, unsigned int code, void *buf
     return HW_CDC_OK;
 
 op_error:
-    if (NULL != pbuf) {
+    if (pbuf != NULL) {
         kfree(pbuf);
         pbuf = NULL;
     }
@@ -3411,15 +3379,6 @@ op_error:
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x03, .bInterfaceProtocol = 0x76
 
 static const struct usb_device_id hw_products[] = {
-    /*ɾ����PRODUCT ID�ıȽϣ�Ĭ���ܹ�֧������HUAWEI_ETHER_INTERFACE �ӿ����͵�NDIS�豸*/
-
-    /*
-    {
-        .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-              | USB_DEVICE_ID_MATCH_VENDOR,
-        .idVendor        = 0x12d1,
-        HUAWEI_ETHER_INTERFACE,
-    },*/
     {
         .match_flags = USB_DEVICE_ID_MATCH_INT_INFO | USB_DEVICE_ID_MATCH_VENDOR,
         .idVendor = 0x2dee,
@@ -3639,10 +3598,7 @@ static int hw_send_qmi_request_no_resp(struct usb_interface *intf, unsigned char
 static void hw_cdc_check_status_work(struct work_struct *work)
 
 {
-    
-    
     struct hw_cdc_net *dev = container_of(work, struct hw_cdc_net, status_work.work);
-
     int ret;
     int repeat = 0;
     unsigned char resp_buf[56] = {0};
@@ -3658,29 +3614,25 @@ static void hw_cdc_check_status_work(struct work_struct *work)
     hw_send_qmi_request_no_resp(dev->intf, set_instance_req, 0x10, resp_buf, 0x38);
 
     ret = hw_send_qmi_request(dev->intf, client_id_req, 0x10, resp_buf, 0x38);
-    if (0 == ret) {
+    if (ret == 0) {
         printk(KERN_ERR "%s: Get client ID failed\n", __FUNCTION__);
         goto failed;
     }
     status_req[0x05] = resp_buf[0x17];
     memset(resp_buf, 0, 0x38 * sizeof(unsigned char));
-
-    
-    for (repeat = 0; repeat < 3; repeat++) {
+    for (repeat = 0; repeat < 0x3; repeat++) {
         ret = hw_send_qmi_request(dev->intf, status_req, 0x0D, resp_buf, 0x38);
-        if (0 == ret) {
+        if (ret == 0) {
             printk(KERN_ERR "%s: Get connection status failed\n", __FUNCTION__);
             continue;
         }
 
-        if (0x02 == resp_buf[0x17]) {
+        if (resp_buf[0x17] == 0x02) {
             printk(KERN_ERR "%s: carrier on\n", __FUNCTION__);
             netif_carrier_on(dev->net);
             break;
         } else {
-
             printk(KERN_ERR "%s: carrier off\n", __FUNCTION__);
-            
         }
     }
 failed:
@@ -3724,12 +3676,10 @@ static int hw_send_qmi_request(struct usb_interface *intf, unsigned char *snd_re
 
     ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0x00, 0x21, 0x00, intf->cur_altsetting->desc.bInterfaceNumber,
                           snd_req, snd_len, 0x1388);
-
     if (ret < 0) {
         printk(KERN_ERR "%s: send the qmi request failed\n", __FUNCTION__);
         return ret;
     }
-
     while (index < 0x0A) {
         ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), 0x01, 0xA1, 0x00,
                               intf->cur_altsetting->desc.bInterfaceNumber, read_resp, resp_len, 0x3E8);
@@ -3737,21 +3687,21 @@ static int hw_send_qmi_request(struct usb_interface *intf, unsigned char *snd_re
             printk(KERN_ERR "%s: %d Get response failed\n", __FUNCTION__, index);
             msleep(0x0A);
         } else {
-            if (0x00 == read_resp[0x04]) {
-                if (0x01 == read_resp[0x06] && snd_req[0x05] == read_resp[0x05] && snd_req[0x08] == read_resp[0x08] &&
-                    snd_req[0x09] == read_resp[0x09]) {
+            if (read_resp[0x04] == 0) {
+                if (read_resp[0x6] == 1 && snd_req[0x5] == read_resp[0x5] && snd_req[0x8] == read_resp[0x8] &&
+                    snd_req[0x9] == read_resp[0x9]) {
                     ret = 1;
                     break;
                 }
-            } else if (0x01 == read_resp[0x04]) {
-                if (0x02 == read_resp[0x06] && snd_req[0x05] == read_resp[0x05] && snd_req[0x09] == read_resp[0x09] &&
-                    snd_req[0x0A] == read_resp[0x0A]) {
+            } else if (read_resp[0x04] == 1) {
+                if (read_resp[0x06] == 0x2 && snd_req[0x5] == read_resp[0x5] && snd_req[0x9] == read_resp[0x9] &&
+                    snd_req[0xA] == read_resp[0xA]) {
                     printk(KERN_ERR "%s: get the conn status req=%02x resp\n", __FUNCTION__, snd_req[9]);
                     ret = 1;
                     break;
                 }
-            } else if (0x04 == read_resp[0x04]) {
-                if (snd_req[0x09] == read_resp[0x09] && snd_req[0x0A] == read_resp[0x0A] && 0x02 == read_resp[0x10]) {
+            } else if (read_resp[0x04] == 0x4) {
+                if (snd_req[0x09] == read_resp[0x09] && snd_req[0x0A] == read_resp[0x0A] && read_resp[0x10] == 0x2) {
                     printk(KERN_ERR "%s: get the conn status ind= carrier on\n", __FUNCTION__);
                     netif_carrier_on(net->net);
                 }

@@ -238,7 +238,6 @@ static int rkisp_stream_config_dcrop(struct rkisp_stream *stream, bool async)
 
     /* dual-crop unit get data from isp */
     input_win = rkisp_get_isp_sd_win(&dev->isp_sdev);
-
     if (dcrop->width == input_win->width && dcrop->height == input_win->height && dcrop->left == 0 && dcrop->top == 0) {
         rkisp_disable_dcrop(stream, async);
         v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "stream %d crop disabled\n", stream->id);
@@ -280,7 +279,7 @@ static int rkisp_stream_config_rsz(struct rkisp_stream *stream, bool async)
         return -EINVAL;
     }
 
-    if (xsubs_in == 0 || ysubs_in == 0){
+    if (xsubs_in == 0 || ysubs_in == 0) {
         return -1;
     }
     in_c.width = in_y.width / xsubs_in;
@@ -288,7 +287,7 @@ static int rkisp_stream_config_rsz(struct rkisp_stream *stream, bool async)
 
     if (output_isp_fmt->fmt_type == FMT_YUV) {
         rkisp_fcc_xysubs(output_isp_fmt->fourcc, &xsubs_out, &ysubs_out);
-        if (xsubs_out == 0 || ysubs_out == 0){
+        if (xsubs_out == 0 || ysubs_out == 0) {
             return -1;
         }
         out_c.width = out_y.width / xsubs_out;
@@ -971,7 +970,7 @@ static void rkisp_stream_stop(struct rkisp_stream *stream)
         hdr_stop_dmatx(dev);
     }
 
-    if (dev->isp_state & ISP_START && !stream->ops->is_stream_stopped(dev->base_addr)) {
+    if ((dev->isp_state & ISP_START) && !stream->ops->is_stream_stopped(dev->base_addr)) {
         ret = wait_event_timeout(stream->done, !stream->streaming, msecs_to_jiffies(BRIDGE_FI_HUN));
         if (!ret) {
             v4l2_warn(v4l2_dev, "%s id:%d timeout\n", __func__, stream->id);
@@ -1268,7 +1267,7 @@ static int rkisp_start_streaming(struct vb2_queue *queue, unsigned int count)
         goto buffer_done;
     }
 
-    if (atomic_read(&dev->cap_dev.refcnt) == 1 && (dev->isp_inp & INP_CSI || dev->isp_inp & INP_DVP)) {
+    if (atomic_read(&dev->cap_dev.refcnt) == 1 && ((dev->isp_inp & INP_CSI) || (dev->isp_inp & INP_DVP))) {
         /* update sensor info when first streaming */
         ret = rkisp_update_sensor_info(dev);
         if (ret < 0) {

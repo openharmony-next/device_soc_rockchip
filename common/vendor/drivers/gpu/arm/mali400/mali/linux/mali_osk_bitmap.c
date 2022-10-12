@@ -35,7 +35,6 @@ u32 _mali_osk_bitmap_alloc(struct _mali_osk_bitmap *bitmap)
     _mali_osk_spinlock_lock(bitmap->lock);
 
     obj = find_next_zero_bit(bitmap->table, bitmap->max, bitmap->reserve);
-
     if (obj < bitmap->max) {
         set_bit(obj, bitmap->table);
     } else {
@@ -63,17 +62,16 @@ u32 _mali_osk_bitmap_alloc_range(struct _mali_osk_bitmap *bitmap, int cnt)
 
     MALI_DEBUG_ASSERT_POINTER(bitmap);
 
-    if (0 >= cnt) {
+    if (cnt <= 0) {
         return -1;
     }
 
-    if (1 == cnt) {
+    if (cnt == 1) {
         return _mali_osk_bitmap_alloc(bitmap);
     }
 
     _mali_osk_spinlock_lock(bitmap->lock);
     obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max, bitmap->last, cnt, 0);
-
     if (obj >= bitmap->max) {
         obj = bitmap_find_next_zero_area(bitmap->table, bitmap->max, bitmap->reserve, cnt, 0);
     }
@@ -143,11 +141,11 @@ void _mali_osk_bitmap_term(struct _mali_osk_bitmap *bitmap)
 {
     MALI_DEBUG_ASSERT_POINTER(bitmap);
 
-    if (NULL != bitmap->lock) {
+    if (bitmap->lock != NULL) {
         _mali_osk_spinlock_term(bitmap->lock);
     }
 
-    if (NULL != bitmap->table) {
+    if (bitmap->table != NULL) {
         kfree(bitmap->table);
     }
 }

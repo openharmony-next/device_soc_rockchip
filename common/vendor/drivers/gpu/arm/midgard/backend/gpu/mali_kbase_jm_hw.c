@@ -64,10 +64,10 @@ void kbase_job_hw_submit(struct kbase_device *kbdev, struct kbase_jd_atom *katom
     KBASE_DEBUG_ASSERT(!kbase_js_affinity_would_violate(kbdev, js, katom->affinity));
 
     kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_HEAD_NEXT_LO), jc_head & 0xFFFFFFFF, kctx);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_HEAD_NEXT_HI), jc_head >> 32, kctx);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_HEAD_NEXT_HI), jc_head >> 0x20, kctx);
 
     kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_AFFINITY_NEXT_LO), katom->affinity & 0xFFFFFFFF, kctx);
-    kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_AFFINITY_NEXT_HI), katom->affinity >> 32, kctx);
+    kbase_reg_write(kbdev, JOB_SLOT_REG(js, JS_AFFINITY_NEXT_HI), katom->affinity >> 0x20, kctx);
 
     /* start MMU, medium priority, cache clean/flush on end, clean/flush on
      * start */
@@ -78,13 +78,13 @@ void kbase_job_hw_submit(struct kbase_device *kbdev, struct kbase_jd_atom *katom
     }
 
 #ifndef CONFIG_MALI_COH_GPU
-    if (0 != (katom->core_req & BASE_JD_REQ_SKIP_CACHE_START)) {
+    if ((katom->core_req & BASE_JD_REQ_SKIP_CACHE_START) != 0) {
         cfg |= JS_CONFIG_START_FLUSH_NO_ACTION;
     } else {
         cfg |= JS_CONFIG_START_FLUSH_CLEAN_INVALIDATE;
     }
 
-    if (0 != (katom->core_req & BASE_JD_REQ_SKIP_CACHE_END)) {
+    if ((katom->core_req & BASE_JD_REQ_SKIP_CACHE_END) != 0) {
         cfg |= JS_CONFIG_END_FLUSH_NO_ACTION;
     } else {
         cfg |= JS_CONFIG_END_FLUSH_CLEAN_INVALIDATE;
@@ -225,7 +225,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
 
         /* Note: This is inherently unfair, as we always check
          * for lower numbered interrupts before the higher
-         * numbered ones.*/
+         * numbered ones. */
         i = ffs(finished) - 1;
         KBASE_DEBUG_ASSERT(i >= 0);
 
@@ -252,7 +252,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
                          * JS<n>_TAIL so that the job chain can
                          * be resumed */
                         job_tail = (u64)kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_TAIL_LO), NULL) |
-                                   ((u64)kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_TAIL_HI), NULL) << 32);
+                                   ((u64)kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_TAIL_HI), NULL) << 0x20);
                         break;
                     case BASE_JD_EVENT_NOT_STARTED:
                         /* PRLAM-10673 can cause a TERMINATED
@@ -269,10 +269,9 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
                 kbase_gpu_irq_evict(kbdev, i);
             }
 
-            kbase_reg_write(kbdev, JOB_CONTROL_REG(JOB_IRQ_CLEAR), done & ((1 << i) | (1 << (i + 16))), NULL);
+            kbase_reg_write(kbdev, JOB_CONTROL_REG(JOB_IRQ_CLEAR), done & ((1 << i) | (1 << (i + 0x10))), NULL);
             active = kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_JS_STATE), NULL);
-
-            if (((active >> i) & 1) == 0 && (((done >> (i + 16)) & 1) == 0)) {
+            if (((active >> i) & 1) == 0 && (((done >> (i + 0x10)) & 1) == 0)) {
                 /* There is a potential race we must work
                  * around:
                  *
@@ -314,8 +313,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
                  * execution.
                  */
                 u32 rawstat = kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_RAWSTAT), NULL);
-
-                if ((rawstat >> (i + 16)) & 1) {
+                if ((rawstat >> (i + 0x10)) & 1) {
                     /* There is a failed job that we've
                      * missed - add it back to active */
                     active |= (1u << i);
@@ -326,7 +324,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
 
             nr_done = kbase_backend_nr_atoms_submitted(kbdev, i);
             nr_done -= (active >> i) & 1;
-            nr_done -= (active >> (i + 16)) & 1;
+            nr_done -= (active >> (i + 0x10)) & 1;
 
             if (nr_done <= 0) {
                 dev_warn(kbdev->dev, "Spurious interrupt on slot %d", i);
@@ -359,14 +357,14 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
             if (kbase_hw_has_issue(kbdev, BASE_HW_ISSUE_10883)) {
                 /* Workaround for missing interrupt caused by
                  * PRLAM-10883 */
-                if (((active >> i) & 1) && (0 == kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_STATUS), NULL))) {
+                if (((active >> i) & 1) && (kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_STATUS), NULL)) == 0) {
                     /* Force job slot to be processed again
                      */
                     done |= (1u << i);
                 }
             }
 
-            failed = done >> 16;
+            failed = done >> 0x10;
             finished = (done & 0xFFFF) | failed;
             if (done) {
                 end_timestamp = ktime_get();
@@ -429,13 +427,12 @@ void kbasep_job_slot_soft_or_hard_stop_do_action(struct kbase_device *kbdev, int
 
     /* Check the head pointer */
     job_in_head_before = ((u64)kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_HEAD_LO), NULL)) |
-                         (((u64)kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_HEAD_HI), NULL)) << 32);
+                         (((u64)kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_HEAD_HI), NULL)) << 0x20);
     status_reg_before = kbase_reg_read(kbdev, JOB_SLOT_REG(js, JS_STATUS), NULL);
 #endif
 
     if (action == JS_COMMAND_SOFT_STOP) {
         bool soft_stop_allowed = kbasep_soft_stop_allowed(kbdev, target_katom);
-
         if (!soft_stop_allowed) {
 #ifdef CONFIG_MALI_DEBUG
             dev_dbg(kbdev->dev, "Attempt made to soft-stop a job that cannot be soft-stopped. core_reqs = 0x%X",
@@ -486,7 +483,6 @@ void kbasep_job_slot_soft_or_hard_stop_do_action(struct kbase_device *kbdev, int
         }
     } else if (action == JS_COMMAND_HARD_STOP) {
         bool hard_stop_allowed = kbasep_hard_stop_allowed(kbdev, core_reqs);
-
         if (!hard_stop_allowed) {
             /* Jobs can be hard-stopped for the following reasons:
              *  * CFS decides the job has been running too long (and
@@ -697,7 +693,7 @@ static enum hrtimer_restart zap_timeout_callback(struct hrtimer *timer)
         kbase_reset_gpu(kbdev);
     }
 #endif /* KBASE_GPU_RESET_EN */
-    reset_data->stage = 2;
+    reset_data->stage = 0x02;
 
 out:
     spin_unlock_irqrestore(&reset_data->lock, flags);
@@ -736,7 +732,7 @@ void kbase_jm_wait_for_zero_jobs(struct kbase_context *kctx)
 
     hrtimer_cancel(&reset_data.timer);
 
-    if (reset_data.stage == 2) {
+    if (reset_data.stage == 0x02) {
         /* The reset has already started.
          * Wait for the reset to complete
          */
@@ -773,11 +769,11 @@ int kbase_job_slot_init(struct kbase_device *kbdev)
 {
 #if KBASE_GPU_RESET_EN
     kbdev->hwaccess.backend.reset_workq = alloc_workqueue("Mali reset workqueue", 0, 1);
-    if (NULL == kbdev->hwaccess.backend.reset_workq) {
+    if (kbdev->hwaccess.backend.reset_workq == NULL) {
         return -EINVAL;
     }
 
-    KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&kbdev->hwaccess.backend.reset_work));
+    KBASE_DEBUG_ASSERT(object_is_on_stack(&kbdev->hwaccess.backend.reset_work) == 0);
     INIT_WORK(&kbdev->hwaccess.backend.reset_work, kbasep_reset_timeout_worker);
 
     hrtimer_init(&kbdev->hwaccess.backend.reset_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
@@ -932,7 +928,7 @@ void kbase_job_slot_hardstop(struct kbase_context *kctx, int js, struct kbase_jd
          * clear the GPU status.
          * Workaround for HW issue 8401 has an issue,so after
          * hard-stopping just reset the GPU. This will ensure that the
-         * jobs leave the GPU.*/
+         * jobs leave the GPU. */
         if (kbase_prepare_to_reset_gpu_locked(kbdev)) {
             dev_err(kbdev->dev, "Issueing GPU soft-reset after hard stopping due to hardware issue");
             kbase_reset_gpu_locked(kbdev);
@@ -1017,7 +1013,7 @@ static void kbase_debug_dump_registers(struct kbase_device *kbdev)
     dev_err(kbdev->dev, "  JOB_IRQ_RAWSTAT=0x%08x JOB_IRQ_JS_STATE=0x%08x",
             kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_RAWSTAT), NULL),
             kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_JS_STATE), NULL));
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 0x03; i++) {
         dev_err(kbdev->dev, "  JS%d_STATUS=0x%08x      JS%d_HEAD_LO=0x%08x", i,
                 kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_STATUS), NULL), i,
                 kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_HEAD_LO), NULL));

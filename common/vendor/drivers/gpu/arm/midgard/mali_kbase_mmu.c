@@ -90,7 +90,7 @@ static void kbase_mmu_sync_pgd(struct kbase_device *kbdev, dma_addr_t handle, si
 }
 
 /*
- * Definitions:
+ * Definitions
  * - PGD: Page Directory.
  * - PTE: Page Table Entry. A 64bit value pointing to the next
  *        level of translation
@@ -151,7 +151,6 @@ void page_fault_worker(struct work_struct *data)
 
     fault_status = faulting_as->fault_status;
     switch (fault_status & AS_FAULTSTATUS_EXCEPTION_CODE_MASK) {
-
         case AS_FAULTSTATUS_EXCEPTION_CODE_TRANSLATION_FAULT:
             /* need to check against the region to handle this one */
             break;
@@ -195,7 +194,7 @@ void page_fault_worker(struct work_struct *data)
     kbase_gpu_vm_lock(kctx);
 
     region = kbase_region_tracker_find_region_enclosing_address(kctx, faulting_as->fault_addr);
-    if (!region || region->flags & KBASE_REG_FREE) {
+    if (!region || (region->flags & KBASE_REG_FREE)) {
         kbase_gpu_vm_unlock(kctx);
         kbase_mmu_report_fault_and_kill(kctx, faulting_as, "Memory is not mapped on the GPU");
         goto fault_done;
@@ -250,13 +249,12 @@ void page_fault_worker(struct work_struct *data)
     }
 
     new_pages = make_multiple(fault_rel_pfn - kbase_reg_current_backed_size(region) + 1, region->extent);
-
     /* cap to max vsize */
     if (new_pages + kbase_reg_current_backed_size(region) > region->nr_pages) {
         new_pages = region->nr_pages - kbase_reg_current_backed_size(region);
     }
 
-    if (0 == new_pages) {
+    if (new_pages == 0) {
         mutex_lock(&kbdev->mmu_hw_mutex);
 
         /* Duplicate of a fault we've already handled, nothing to do */
@@ -368,7 +366,7 @@ phys_addr_t kbase_mmu_alloc_pgd(struct kbase_context *kctx)
     struct page *p;
     int new_page_count __maybe_unused;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
     new_page_count = kbase_atomic_add_pages(1, &kctx->used_pages);
     kbase_atomic_add_pages(1, &kctx->kbdev->memdev.used_pages);
 
@@ -380,7 +378,7 @@ phys_addr_t kbase_mmu_alloc_pgd(struct kbase_context *kctx)
     KBASE_TLSTREAM_AUX_PAGESALLOC((u32)kctx->id, (u64)new_page_count);
 
     page = kmap(p);
-    if (NULL == page) {
+    if (page == NULL) {
         goto alloc_free;
     }
 
@@ -416,7 +414,7 @@ static int mmu_get_next_pgd(struct kbase_context *kctx, phys_addr_t *pgd, u64 vp
     struct page *p;
 
     KBASE_DEBUG_ASSERT(*pgd);
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     lockdep_assert_held(&kctx->mmu_lock);
 
@@ -429,13 +427,12 @@ static int mmu_get_next_pgd(struct kbase_context *kctx, phys_addr_t *pgd, u64 vp
 
     p = pfn_to_page(PFN_DOWN(*pgd));
     page = kmap(p);
-    if (NULL == page) {
+    if (page == NULL) {
         dev_warn(kctx->kbdev->dev, "mmu_get_next_pgd: kmap failure\n");
         return -EINVAL;
     }
 
     target_pgd = kctx->kbdev->mmu_mode->pte_to_phy_addr(page[vpfn]);
-
     if (!target_pgd) {
         target_pgd = kbase_mmu_alloc_pgd(kctx);
         if (!target_pgd) {
@@ -485,7 +482,7 @@ static phys_addr_t mmu_insert_pages_recover_get_next_pgd(struct kbase_context *k
     phys_addr_t target_pgd;
 
     KBASE_DEBUG_ASSERT(pgd);
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
 
     lockdep_assert_held(&kctx->mmu_lock);
     lockdep_assert_held(&kctx->reg_lock);
@@ -499,11 +496,11 @@ static phys_addr_t mmu_insert_pages_recover_get_next_pgd(struct kbase_context *k
 
     page = kmap_atomic(pfn_to_page(PFN_DOWN(pgd)));
     /* kmap_atomic should NEVER fail */
-    KBASE_DEBUG_ASSERT(NULL != page);
+    KBASE_DEBUG_ASSERT(page != NULL);
 
     target_pgd = kctx->kbdev->mmu_mode->pte_to_phy_addr(page[vpfn]);
     /* As we are recovering from what has already been set up, we should have a target_pgd */
-    KBASE_DEBUG_ASSERT(0 != target_pgd);
+    KBASE_DEBUG_ASSERT(target_pgd != 0);
     kunmap_atomic(page);
     return target_pgd;
 }
@@ -520,7 +517,7 @@ static phys_addr_t mmu_insert_pages_recover_get_bottom_pgd(struct kbase_context 
     for (l = MIDGARD_MMU_TOPLEVEL; l < MIDGARD_MMU_BOTTOMLEVEL; l++) {
         pgd = mmu_insert_pages_recover_get_next_pgd(kctx, pgd, vpfn, l);
         /* Should never fail */
-        KBASE_DEBUG_ASSERT(0 != pgd);
+        KBASE_DEBUG_ASSERT(pgd != 0);
     }
 
     return pgd;
@@ -532,8 +529,8 @@ static void mmu_insert_pages_failure_recovery(struct kbase_context *kctx, u64 vp
     u64 *pgd_page;
     struct kbase_mmu_mode const *mmu_mode;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(0 != vpfn);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(vpfn != 0);
     /* 64-bit address range is the max */
     KBASE_DEBUG_ASSERT(vpfn <= (U64_MAX / PAGE_SIZE));
 
@@ -553,12 +550,12 @@ static void mmu_insert_pages_failure_recovery(struct kbase_context *kctx, u64 vp
         }
 
         pgd = mmu_insert_pages_recover_get_bottom_pgd(kctx, vpfn);
-        KBASE_DEBUG_ASSERT(0 != pgd);
+        KBASE_DEBUG_ASSERT(pgd != 0);
 
         p = pfn_to_page(PFN_DOWN(pgd));
 
         pgd_page = kmap_atomic(p);
-        KBASE_DEBUG_ASSERT(NULL != pgd_page);
+        KBASE_DEBUG_ASSERT(pgd_page != NULL);
 
         /* Invalidate the entries we added */
         for (i = 0; i < count; i++) {
@@ -589,8 +586,8 @@ int kbase_mmu_insert_single_page(struct kbase_context *kctx, u64 vpfn, phys_addr
     size_t remain = nr;
     int err;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(0 != vpfn);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(vpfn != 0);
     /* 64-bit address range is the max */
     KBASE_DEBUG_ASSERT(vpfn <= (U64_MAX / PAGE_SIZE));
 
@@ -656,7 +653,7 @@ int kbase_mmu_insert_single_page(struct kbase_context *kctx, u64 vpfn, phys_addr
         for (i = 0; i < count; i++) {
             unsigned int ofs = index + i;
 
-            KBASE_DEBUG_ASSERT(0 == (pgd_page[ofs] & 1UL));
+            KBASE_DEBUG_ASSERT((pgd_page[ofs] & 1UL) == 0);
             kctx->kbdev->mmu_mode->entry_set_ate(&pgd_page[ofs], phys, flags);
         }
 
@@ -695,8 +692,8 @@ int kbase_mmu_insert_pages_no_flush(struct kbase_context *kctx, u64 vpfn, phys_a
     size_t remain = nr;
     int err;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(0 != vpfn);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(vpfn != 0);
     /* 64-bit address range is the max */
     KBASE_DEBUG_ASSERT(vpfn <= (U64_MAX / PAGE_SIZE));
 
@@ -762,7 +759,7 @@ int kbase_mmu_insert_pages_no_flush(struct kbase_context *kctx, u64 vpfn, phys_a
         for (i = 0; i < count; i++) {
             unsigned int ofs = index + i;
 
-            KBASE_DEBUG_ASSERT(0 == (pgd_page[ofs] & 1UL));
+            KBASE_DEBUG_ASSERT((pgd_page[ofs] & 1UL) == 0);
             kctx->kbdev->mmu_mode->entry_set_ate(&pgd_page[ofs], phys[i], flags);
         }
 
@@ -895,7 +892,6 @@ static void kbase_mmu_flush_invalidate(struct kbase_context *kctx, u64 vpfn, siz
             }
 
             err = kbase_mmu_hw_do_operation(kbdev, &kbdev->as[kctx->as_nr], kctx, vpfn, nr, op, 0);
-
 #if KBASE_GPU_RESET_EN
             if (err) {
                 /* Flush failed to complete, assume the
@@ -999,10 +995,10 @@ int kbase_mmu_teardown_pages(struct kbase_context *kctx, u64 vpfn, size_t nr)
     struct kbase_mmu_mode const *mmu_mode;
     int err;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
     beenthere(kctx, "kctx %p vpfn %lx nr %zd", (void *)kctx, (unsigned long)vpfn, nr);
 
-    if (0 == nr) {
+    if (nr == 0) {
         /* early out if nothing to do */
         return 0;
     }
@@ -1081,8 +1077,8 @@ int kbase_mmu_update_pages(struct kbase_context *kctx, u64 vpfn, phys_addr_t *ph
     struct kbase_mmu_mode const *mmu_mode;
     int err;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(0 != vpfn);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(vpfn != 0);
     KBASE_DEBUG_ASSERT(vpfn <= (U64_MAX / PAGE_SIZE));
 
     /* Early out if there is nothing to do */
@@ -1166,7 +1162,7 @@ static void mmu_check_unused(struct kbase_context *kctx, phys_addr_t pgd)
 
     page = kmap_atomic(pfn_to_page(PFN_DOWN(pgd)));
     /* kmap_atomic should NEVER fail. */
-    KBASE_DEBUG_ASSERT(NULL != page);
+    KBASE_DEBUG_ASSERT(page != NULL);
 
     for (i = 0; i < KBASE_MMU_PAGE_ENTRIES; i++) {
         if (kctx->kbdev->mmu_mode->ate_is_valid(page[i])) {
@@ -1183,13 +1179,13 @@ static void mmu_teardown_level(struct kbase_context *kctx, phys_addr_t pgd, int 
     int i;
     struct kbase_mmu_mode const *mmu_mode;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
     lockdep_assert_held(&kctx->mmu_lock);
     lockdep_assert_held(&kctx->reg_lock);
 
     pgd_page = kmap_atomic(pfn_to_page(PFN_DOWN(pgd)));
     /* kmap_atomic should NEVER fail. */
-    KBASE_DEBUG_ASSERT(NULL != pgd_page);
+    KBASE_DEBUG_ASSERT(pgd_page != NULL);
     /* Copy the page to our preallocated buffer so that we can minimize kmap_atomic usage */
     memcpy(pgd_page_buffer, pgd_page, PAGE_SIZE);
     kunmap_atomic(pgd_page);
@@ -1199,7 +1195,6 @@ static void mmu_teardown_level(struct kbase_context *kctx, phys_addr_t pgd, int 
 
     for (i = 0; i < KBASE_MMU_PAGE_ENTRIES; i++) {
         target_pgd = mmu_mode->pte_to_phy_addr(pgd_page[i]);
-
         if (target_pgd) {
             if (level < (MIDGARD_MMU_BOTTOMLEVEL - 1)) {
                 mmu_teardown_level(kctx, target_pgd, level + 1, zap, pgd_page_buffer + (PAGE_SIZE / sizeof(u64)));
@@ -1227,15 +1222,15 @@ static void mmu_teardown_level(struct kbase_context *kctx, phys_addr_t pgd, int 
 
 int kbase_mmu_init(struct kbase_context *kctx)
 {
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(NULL == kctx->mmu_teardown_pages);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kctx->mmu_teardown_pages == NULL);
 
     mutex_init(&kctx->mmu_lock);
 
     /* Preallocate MMU depth of four pages for mmu_teardown_level to use */
     kctx->mmu_teardown_pages = kmalloc(PAGE_SIZE * MMU_MALLOC_BLOCK, GFP_KERNEL);
 
-    if (NULL == kctx->mmu_teardown_pages) {
+    if (kctx->mmu_teardown_pages == NULL) {
         return -ENOMEM;
     }
 
@@ -1244,8 +1239,8 @@ int kbase_mmu_init(struct kbase_context *kctx)
 
 void kbase_mmu_term(struct kbase_context *kctx)
 {
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(NULL != kctx->mmu_teardown_pages);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kctx->mmu_teardown_pages != NULL);
 
     kfree(kctx->mmu_teardown_pages);
     kctx->mmu_teardown_pages = NULL;
@@ -1255,8 +1250,8 @@ void kbase_mmu_free_pgd(struct kbase_context *kctx)
 {
     int new_page_count __maybe_unused;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
-    KBASE_DEBUG_ASSERT(NULL != kctx->mmu_teardown_pages);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
+    KBASE_DEBUG_ASSERT(kctx->mmu_teardown_pages != NULL);
 
     mutex_lock(&kctx->mmu_lock);
     mmu_teardown_level(kctx, kctx->pgd, MIDGARD_MMU_TOPLEVEL, 1, kctx->mmu_teardown_pages);
@@ -1283,7 +1278,7 @@ static size_t kbasep_mmu_dump_level(struct kbase_context *kctx, phys_addr_t pgd,
     size_t dump_size;
     struct kbase_mmu_mode const *mmu_mode;
 
-    KBASE_DEBUG_ASSERT(NULL != kctx);
+    KBASE_DEBUG_ASSERT(kctx != NULL);
     lockdep_assert_held(&kctx->mmu_lock);
 
     mmu_mode = kctx->kbdev->mmu_mode;
@@ -1336,14 +1331,14 @@ void *kbase_mmu_dump(struct kbase_context *kctx, int nr_pages)
 
     KBASE_DEBUG_ASSERT(kctx);
 
-    if (0 == nr_pages) {
+    if (nr_pages == 0) {
         /* can't dump in a 0 sized buffer, early out */
         return NULL;
     }
 
     size_left = nr_pages * PAGE_SIZE;
 
-    KBASE_DEBUG_ASSERT(0 != size_left);
+    KBASE_DEBUG_ASSERT(size_left != 0);
     kaddr = vmalloc_user(size_left);
 
     mutex_lock(&kctx->mmu_lock);
@@ -1371,7 +1366,6 @@ void *kbase_mmu_dump(struct kbase_context *kctx, int nr_pages)
         }
 
         size = kbasep_mmu_dump_level(kctx, kctx->pgd, MIDGARD_MMU_TOPLEVEL, &mmu_dump_buffer, &size_left);
-
         if (!size) {
             goto fail_free;
         }
@@ -1809,7 +1803,7 @@ enum hrtimer_restart kbasep_as_poke_timer_callback(struct hrtimer *timer)
     struct kbase_as *as;
     int queue_work_ret;
 
-    KBASE_DEBUG_ASSERT(NULL != timer);
+    KBASE_DEBUG_ASSERT(timer != NULL);
     as = container_of(timer, struct kbase_as, poke_timer);
     KBASE_DEBUG_ASSERT(as->poke_state & KBASE_AS_POKE_STATE_IN_FLIGHT);
 
@@ -1996,13 +1990,13 @@ void kbase_mmu_interrupt_process(struct kbase_device *kbdev, struct kbase_contex
          * worker so that we can sleep
          */
         kbdev->kbase_group_error++;
-        KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&as->work_busfault));
+        KBASE_DEBUG_ASSERT(object_is_on_stack(&as->work_busfault) == 0);
         WARN_ON(work_pending(&as->work_busfault));
         queue_work(as->pf_wq, &as->work_busfault);
         atomic_inc(&kbdev->faults_pending);
     } else {
         kbdev->kbase_group_error++;
-        KBASE_DEBUG_ASSERT(0 == object_is_on_stack(&as->work_pagefault));
+        KBASE_DEBUG_ASSERT(object_is_on_stack(&as->work_pagefault) == 0);
         WARN_ON(work_pending(&as->work_pagefault));
         queue_work(as->pf_wq, &as->work_pagefault);
         atomic_inc(&kbdev->faults_pending);

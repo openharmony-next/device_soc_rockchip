@@ -77,7 +77,6 @@ bool kbase_fence_free_callbacks(struct kbase_jd_atom *katom)
              * canceling.
              */
             ret = atomic_dec_return(&katom->dma_fence.dep_count);
-
             if (unlikely(ret == 0)) {
                 res = true;
             }
@@ -122,7 +121,6 @@ int kbase_fence_add_callback(struct kbase_jd_atom *katom, struct dma_fence *fenc
     if (err == -ENOENT) {
         /* Fence signaled, get the completion result */
         err = dma_fence_get_status(fence);
-
         /* remap success completion to err code */
         if (err == 1) {
             err = 0;

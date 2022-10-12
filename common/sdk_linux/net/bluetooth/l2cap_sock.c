@@ -1306,7 +1306,6 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
             err = -ENOLINK;
             break;
         }
-
     } while (chan->unacked_frames > 0 && chan->state == BT_CONNECTED);
 
     set_current_state(TASK_RUNNING);
@@ -1526,7 +1525,6 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
     }
 
     err = __sock_queue_rcv_skb(sk, skb);
-
     /* For ERTM, handle one skb that doesn't fit into the recv
      * buffer.  This is important to do because the data frames
      * have already been acked, so the skb cannot be discarded.

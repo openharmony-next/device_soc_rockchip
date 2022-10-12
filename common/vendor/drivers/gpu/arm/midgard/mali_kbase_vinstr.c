@@ -168,8 +168,6 @@ struct kbasep_vinstr_wake_up_timer {
     struct kbase_vinstr_context *vinstr_ctx;
 };
 
-/*****************************************************************************/
-
 static int kbasep_vinstr_service_task(void *data);
 
 static unsigned int kbasep_vinstr_hwcnt_reader_poll(struct file *filp, poll_table *wait);
@@ -185,8 +183,6 @@ static const struct file_operations vinstr_client_fops = {
     .mmap = kbasep_vinstr_hwcnt_reader_mmap,
     .release = kbasep_vinstr_hwcnt_reader_release,
 };
-
-/*****************************************************************************/
 
 static int enable_hwcnt(struct kbase_vinstr_context *vinstr_ctx)
 {
@@ -539,7 +535,7 @@ static struct kbase_vinstr_client *kbasep_vinstr_attach_client(struct kbase_vins
 
         /* Create descriptor for user-kernel data exchange. */
         *fd = anon_inode_getfd("[mali_vinstr_desc]", &vinstr_client_fops, cli, O_RDONLY | O_CLOEXEC);
-        if (0 > *fd) {
+        if (*fd < 0) {
             goto error;
         }
     } else if (kernel_buffer) {
@@ -771,9 +767,9 @@ static void patch_dump_buffer_hdr_v5(struct kbase_vinstr_context *vinstr_ctx, st
 
     /* copy and patch shader core headers */
     core_mask = kbdev->gpu_props.props.coherency_info.group[0].core_mask;
-    while (0ull != core_mask) {
+    while (core_mask != 0ull) {
         memcpy(dst, src, NR_BYTES_PER_HDR);
-        if (0ull != (core_mask & 1ull)) {
+        if ((core_mask & 1ull) != 0ull) {
             /* if block is not reserved update header */
             mask = (u32 *)&dst[PRFCNT_EN_MASK_OFFSET];
             *mask &= cli->bitmap[SHADER_HWCNT_BM];
@@ -827,8 +823,6 @@ static void accum_clients(struct kbase_vinstr_context *vinstr_ctx)
         accum_dump_buffer(iter->accum_buffer, vinstr_ctx->cpu_va, iter->dump_size);
     }
 }
-
-/*****************************************************************************/
 
 /**
  * kbasep_vinstr_get_timestamp - return timestamp
@@ -1192,9 +1186,9 @@ static int kbasep_vinstr_service_task(void *data)
         {
             /* Ensure that legacy buffer will not be used from
              * this kthread context. */
-            BUG_ON(0 == cli->buffer_count);
+            BUG_ON(cli->buffer_count == 0);
             /* Expect only periodically sampled clients. */
-            BUG_ON(0 == cli->dump_interval);
+            BUG_ON(cli->dump_interval == 0);
 
             if (!rcode) {
                 kbasep_vinstr_update_client(cli, timestamp, BASE_HWCNT_READER_EVENT_PERIODIC);
@@ -1225,8 +1219,6 @@ static int kbasep_vinstr_service_task(void *data)
 
     return 0;
 }
-
-/*****************************************************************************/
 
 /**
  * kbasep_vinstr_hwcnt_reader_buffer_ready - check if client has ready buffers
@@ -1607,8 +1599,6 @@ static int kbasep_vinstr_hwcnt_reader_release(struct inode *inode, struct file *
     return 0;
 }
 
-/*****************************************************************************/
-
 /**
  * kbasep_vinstr_kick_scheduler - trigger scheduler cycle
  * @kbdev: pointer to kbase device structure
@@ -1684,8 +1674,6 @@ static void kbasep_vinstr_resume_worker(struct work_struct *data)
      * This must happen after vinstr was release. */
     kbasep_vinstr_kick_scheduler(vinstr_ctx->kbdev);
 }
-
-/*****************************************************************************/
 
 struct kbase_vinstr_context *kbase_vinstr_init(struct kbase_device *kbdev)
 {
@@ -1765,7 +1753,6 @@ int kbase_vinstr_hwcnt_reader_setup(struct kbase_vinstr_context *vinstr_ctx, str
     bitmap[JM_HWCNT_BM] = setup->jm_bm;
 
     cli = kbasep_vinstr_attach_client(vinstr_ctx, setup->buffer_count, bitmap, &setup->fd, NULL);
-
     if (!cli) {
         return -ENOMEM;
     }
@@ -1913,7 +1900,7 @@ int kbase_vinstr_try_suspend(struct kbase_vinstr_context *vinstr_ctx)
         case VINSTR_SUSPENDED:
             vinstr_ctx->suspend_cnt++;
             /* overflow shall not happen */
-            BUG_ON(0 == vinstr_ctx->suspend_cnt);
+            BUG_ON(vinstr_ctx->suspend_cnt == 0);
             ret = 0;
             break;
 
@@ -1942,7 +1929,7 @@ int kbase_vinstr_try_suspend(struct kbase_vinstr_context *vinstr_ctx)
 
 void kbase_vinstr_suspend(struct kbase_vinstr_context *vinstr_ctx)
 {
-    wait_event(vinstr_ctx->suspend_waitq, (0 == kbase_vinstr_try_suspend(vinstr_ctx)));
+    wait_event(vinstr_ctx->suspend_waitq, (kbase_vinstr_try_suspend(vinstr_ctx)) == 0);
 }
 
 void kbase_vinstr_resume(struct kbase_vinstr_context *vinstr_ctx)
@@ -1954,9 +1941,9 @@ void kbase_vinstr_resume(struct kbase_vinstr_context *vinstr_ctx)
     spin_lock_irqsave(&vinstr_ctx->state_lock, flags);
     BUG_ON(VINSTR_SUSPENDING == vinstr_ctx->state);
     if (VINSTR_SUSPENDED == vinstr_ctx->state) {
-        BUG_ON(0 == vinstr_ctx->suspend_cnt);
+        BUG_ON(vinstr_ctx->suspend_cnt == 0);
         vinstr_ctx->suspend_cnt--;
-        if (0 == vinstr_ctx->suspend_cnt) {
+        if (vinstr_ctx->suspend_cnt == 0) {
             vinstr_ctx->state = VINSTR_RESUMING;
             schedule_work(&vinstr_ctx->resume_work);
         }

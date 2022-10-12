@@ -156,7 +156,6 @@ typedef struct _ump_uk_switch_hw_usage_s {
     void *ctx;            /**< [in,out] user-kernel context (trashed on output) */
     u32 secure_id;        /**< [in] secure_id that identifies the ump buffer */
     ump_uk_user new_user; /**< [in] cookie stored with reference to the kernel mapping internals */
-
 } _ump_uk_switch_hw_usage_s;
 
 typedef struct _ump_uk_lock_s {

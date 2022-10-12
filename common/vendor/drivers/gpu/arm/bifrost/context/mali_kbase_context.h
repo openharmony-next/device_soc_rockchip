@@ -18,7 +18,7 @@
  *
  * SPDX-License-Identifier: GPL-2.0
  *
- *//* SPDX-License-Identifier: GPL-2.0 */
+ * //* SPDX-License-Identifier: GPL-2.0 */
 /*
  *
  * (C) COPYRIGHT 2011-2017, 2019 ARM Limited. All rights reserved.
@@ -127,7 +127,6 @@ static inline void kbase_ctx_flag_clear(struct kbase_context *kctx, enum kbase_c
     do {
         old = atomic_read(&kctx->flags);
         new = old & ~flag;
-
     } while (atomic_cmpxchg(&kctx->flags, old, new) != old);
 #else
     atomic_andnot(flag, &kctx->flags);

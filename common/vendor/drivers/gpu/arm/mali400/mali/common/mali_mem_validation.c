@@ -25,13 +25,13 @@ static _mali_mem_validation_t mali_mem_validator = {MALI_INVALID_MEM_ADDR, MALI_
 mali_osk_errcode_t mali_mem_validation_add_range(u32 start, u32 size)
 {
     /* Check that no other MEM_VALIDATION resources exist */
-    if (MALI_INVALID_MEM_ADDR != mali_mem_validator.phys_base) {
+    if (mali_mem_validator.phys_base != MALI_INVALID_MEM_ADDR) {
         MALI_PRINT_ERROR(("Failed to add frame buffer memory; another range is already specified\n"));
         return MALI_OSK_ERR_FAULT;
     }
 
     /* Check restrictions on page alignment */
-    if ((0 != (start & (~MALI_OSK_CPU_PAGE_MASK))) || (0 != (size & (~MALI_OSK_CPU_PAGE_MASK)))) {
+    if (((start & (~MALI_OSK_CPU_PAGE_MASK)) != 0) || ((size & (~MALI_OSK_CPU_PAGE_MASK)) != 0)) {
         MALI_PRINT_ERROR(("Failed to add frame buffer memory; incorrect alignment\n"));
         return MALI_OSK_ERR_FAULT;
     }

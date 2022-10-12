@@ -404,7 +404,7 @@ static bool page_fault_try_alloc(struct kbase_context *kctx, struct kbase_va_reg
 
         kbase_mem_pool_lock(pool);
 
-        /* Allocate as much as possible from this pool*/
+        /* Allocate as much as possible from this pool */
         pool_size_4k = kbase_mem_pool_size(pool) << pool->order;
         pages_to_alloc_4k = MIN(new_pages, pool_size_4k);
         if (region->gpu_alloc == region->cpu_alloc) {
@@ -575,7 +575,6 @@ void kbase_mmu_page_fault_worker(struct work_struct *data)
 
     fault_status = fault->status;
     switch (fault_status & AS_FAULTSTATUS_EXCEPTION_CODE_MASK) {
-
         case AS_FAULTSTATUS_EXCEPTION_CODE_TRANSLATION_FAULT:
             /* need to check against the region to handle this one */
             break;
@@ -681,7 +680,6 @@ void kbase_mmu_page_fault_worker(struct work_struct *data)
         fault_rel_pfn = fault_pfn - region->start_pfn;
 
         current_backed_size = kbase_reg_current_backed_size(region);
-
         if (fault_rel_pfn < current_backed_size) {
             dev_dbg(kbdev->dev, "Page fault @ 0x%llx in allocated region 0x%llx-0x%llx of growable TMEM: Ignoring",
                     fault->addr, region->start_pfn, region->start_pfn + current_backed_size);
@@ -781,7 +779,6 @@ void kbase_mmu_page_fault_worker(struct work_struct *data)
              * memory in a JIT memory allocation.
              */
             if (region->threshold_pages && kbase_reg_current_backed_size(region) > region->threshold_pages) {
-
                 dev_dbg(kctx->kbdev->dev, "%zu pages exceeded IR threshold %zu\n", new_pages + current_backed_size,
                         region->threshold_pages);
 
@@ -979,7 +976,6 @@ static int mmu_get_next_pgd(struct kbase_device *kbdev, struct kbase_mmu_table *
     }
 
     target_pgd = kbdev->mmu_mode->pte_to_phy_addr(page[vpfn]);
-
     if (!target_pgd) {
         target_pgd = kbase_mmu_alloc_pgd(kbdev, mmut);
         if (!target_pgd) {
@@ -1191,7 +1187,7 @@ int kbase_mmu_insert_single_page(struct kbase_context *kctx, u64 vpfn, struct ta
             unsigned int ofs = index + i;
 
             /* Fail if the current page is a valid ATE entry */
-            KBASE_DEBUG_ASSERT(0 == (pgd_page[ofs] & 1UL));
+            KBASE_DEBUG_ASSERT((pgd_page[ofs] & 1UL) == 0);
 
             pgd_page[ofs] = kbase_mmu_create_ate(kbdev, phys, flags, MIDGARD_MMU_BOTTOMLEVEL, group_id);
         }
@@ -1462,7 +1458,6 @@ static void kbase_mmu_flush_invalidate_as(struct kbase_device *kbdev, struct kba
     }
 
     err = kbase_mmu_hw_do_operation(kbdev, as, vpfn, nr, op, 0);
-
     if (err) {
         /* Flush failed to complete, assume the GPU has hung and
          * perform a reset to recover
@@ -1825,7 +1820,6 @@ static void mmu_teardown_level(struct kbase_device *kbdev, struct kbase_mmu_tabl
 
     for (i = 0; i < KBASE_MMU_PAGE_ENTRIES; i++) {
         target_pgd = mmu_mode->pte_to_phy_addr(pgd_page[i]);
-
         if (target_pgd) {
             if (mmu_mode->pte_is_valid(pgd_page[i], level)) {
                 mmu_teardown_level(kbdev, mmut, target_pgd, level + 1, pgd_page_buffer + (PAGE_SIZE / sizeof(u64)));
@@ -2015,7 +2009,6 @@ void *kbase_mmu_dump(struct kbase_context *kctx, int nr_pages)
         size += sizeof(config);
 
         dump_size = kbasep_mmu_dump_level(kctx, kctx->mmu.pgd, MIDGARD_MMU_TOPLEVEL, &mmu_dump_buffer, &size_left);
-
         if (!dump_size) {
             goto fail_free;
         }

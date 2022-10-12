@@ -82,7 +82,7 @@ static struct rockchip_pll_rate_table rk3288_pll_rates[] = {
     RK3066_PLL_RATE_NB(216000000, 1, 144, 16, 1), RK3066_PLL_RATE_NB(213000000, 1, 142, 16, 1),
     RK3066_PLL_RATE(195428571, 1, 114, 14),       RK3066_PLL_RATE(160000000, 1, 80, 12),
     RK3066_PLL_RATE(157500000, 1, 105, 16),       RK3066_PLL_RATE(148500000, 1, 99, 16),
-    RK3066_PLL_RATE(126000000, 1, 84, 16),        {/* sentinel */},
+    RK3066_PLL_RATE(126000000, 1, 84, 16),        {},
 };
 
 #define RK3288_DIV_ACLK_CORE_M0_MASK 0xf
@@ -187,7 +187,7 @@ static struct clk_div_table div_hclk_cpu_t[] = {
     {.val = 0, .div = 1},
     {.val = 1, .div = 2},
     {.val = 3, .div = 4},
-    {/* sentinel */},
+    {},
 };
 
 #define MFLAGS CLK_MUX_HIWORD_MASK
@@ -798,15 +798,17 @@ static const struct clk_rk3288_inits clk_rk3288w_init = {
     .inits = rk3288w_clk_init,
 };
 
-static const struct of_device_id clk_rk3288_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3288-cru",
-                                                                 .data = &clk_rk3288_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3288w-cru",
-                                                                 .data = &clk_rk3288w_init,
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3288_match_table[] = {
+    {
+        .compatible = "rockchip,rk3288-cru",
+        .data = &clk_rk3288_init,
+    },
+    {
+        .compatible = "rockchip,rk3288w-cru",
+        .data = &clk_rk3288w_init,
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3288_match_table);
 
 static int __init clk_rk3288_probe(struct platform_device *pdev)

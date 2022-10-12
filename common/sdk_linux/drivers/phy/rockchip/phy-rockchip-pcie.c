@@ -23,7 +23,7 @@
  * The higher 16-bit of this register is used for write protection
  * only if BIT(x + 16) set to 1 the BIT(x) can be written.
  */
-#define HIWORD_UPDATE(val, mask, shift) ((val) << (shift) | (mask) << ((shift) + 16))
+#define HIWORD_UPDATE(val, mask, shift) (((val) << (shift)) | ((mask) << ((shift) + 16)))
 
 #define PHY_MAX_LANE_NUM 4
 #define PHY_CFG_DATA_SHIFT 7
@@ -320,11 +320,13 @@ static const struct rockchip_pcie_data rk3399_pcie_data = {
     .pcie_laneoff = 0xe214,
 };
 
-static const struct of_device_id rockchip_pcie_phy_dt_ids[] = {{
-    .compatible = "rockchip,rk3399-pcie-phy",
-    .data = &rk3399_pcie_data,
-},
-{}};
+static const struct of_device_id rockchip_pcie_phy_dt_ids[] = {
+    {
+        .compatible = "rockchip,rk3399-pcie-phy",
+        .data = &rk3399_pcie_data,
+    },
+    {}
+};
 
 MODULE_DEVICE_TABLE(of, rockchip_pcie_phy_dt_ids);
 

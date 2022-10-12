@@ -350,7 +350,7 @@ void kbase_device_trace_register_access(struct kbase_context *kctx, enum kbase_r
         u32 header_word;
 
         header_word = tb[1];
-        KBASE_DEBUG_ASSERT(0 == (header_word & 0x1));
+        KBASE_DEBUG_ASSERT((header_word & 0x1) == 0);
 
         wrap_count = (header_word >> 1) & 0x7FFF;
         write_offset = (header_word >> 0x10) & 0xFFFF;
@@ -390,7 +390,6 @@ static int kbasep_trace_init(struct kbase_device *kbdev)
     struct kbase_trace *rbuf;
 
     rbuf = kmalloc_array(KBASE_TRACE_SIZE, sizeof(*rbuf), GFP_KERNEL);
-
     if (!rbuf) {
         return -EINVAL;
     }
@@ -470,7 +469,7 @@ void kbasep_trace_add(struct kbase_device *kbdev, enum kbase_trace_code code, vo
     trace_msg->code = code;
     trace_msg->ctx = ctx;
 
-    if (NULL == katom) {
+    if (katom == NULL) {
         trace_msg->katom = false;
     } else {
         trace_msg->katom = true;
@@ -689,8 +688,7 @@ void mali_profiling_control(u32 action, u32 value)
 
     /* find the first i.e. call with -1 */
     kbdev = kbase_find_device(-1);
-
-    if (NULL != kbdev) {
+    if (kbdev != NULL) {
         kbase_set_profiling_control(kbdev, action, value);
     }
 }

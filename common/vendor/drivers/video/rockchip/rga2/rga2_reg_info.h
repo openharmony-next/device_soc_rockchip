@@ -29,7 +29,7 @@
 #define rRGA_MMU_CMD_BASE (*(volatile u32 *)(RGA2_BASE + RGA2_MMU_CMD_BASE_OFFSET))
 #define rRGA_CMD_ADDR (*(volatile u32 *)(RGA2_BASE + RGA2_CMD_ADDR))
 
-/*RGA_INT*/
+/* RGA_INT */
 #define m_RGA2_INT_ALL_CMD_DONE_INT_EN (1 << 10)
 #define m_RGA2_INT_MMU_INT_EN (1 << 9)
 #define m_RGA2_INT_ERROR_INT_EN (1 << 8)
@@ -42,13 +42,13 @@
 #define m_RGA2_INT_MMU_INT_FLAG (1 << 1)
 #define m_RGA2_INT_ERROR_INT_FLAG (1 << 0)
 
-#define s_RGA2_INT_ALL_CMD_DONE_INT_EN(x) (((x)&0x1) << 10)
-#define s_RGA2_INT_MMU_INT_EN(x) (((x)&0x1) << 9)
-#define s_RGA2_INT_ERROR_INT_EN(x) (((x)&0x1) << 8)
-#define s_RGA2_INT_NOW_CMD_DONE_INT_CLEAR(x) (((x)&0x1) << 7)
-#define s_RGA2_INT_ALL_CMD_DONE_INT_CLEAR(x) (((x)&0x1) << 6)
-#define s_RGA2_INT_MMU_INT_CLEAR(x) (((x)&0x1) << 5)
-#define s_RGA2_INT_ERROR_INT_CLEAR(x) (((x)&0x1) << 4)
+#define s_RGA2_INT_ALL_CMD_DONE_INT_EN(x) (((x) & 0x1) << 10)
+#define s_RGA2_INT_MMU_INT_EN(x) (((x) & 0x1) << 9)
+#define s_RGA2_INT_ERROR_INT_EN(x) (((x) & 0x1) << 8)
+#define s_RGA2_INT_NOW_CMD_DONE_INT_CLEAR(x) (((x) & 0x1) << 7)
+#define s_RGA2_INT_ALL_CMD_DONE_INT_CLEAR(x) (((x) & 0x1) << 6)
+#define s_RGA2_INT_MMU_INT_CLEAR(x) (((x) & 0x1) << 5)
+#define s_RGA2_INT_ERROR_INT_CLEAR(x) (((x) & 0x1) << 4)
 
 /* RGA_MODE_CTRL */
 #define m_RGA2_MODE_CTRL_SW_RENDER_MODE (0x7 << 0)
@@ -58,12 +58,12 @@
 #define m_RGA2_MODE_CTRL_SW_GRADIENT_SAT (0x1 << 6)
 #define m_RGA2_MODE_CTRL_SW_INTR_CF_E (0x1 << 7)
 
-#define s_RGA2_MODE_CTRL_SW_RENDER_MODE(x) (((x)&0x7) << 0)
-#define s_RGA2_MODE_CTRL_SW_BITBLT_MODE(x) (((x)&0x1) << 3)
-#define s_RGA2_MODE_CTRL_SW_CF_ROP4_PAT(x) (((x)&0x1) << 4)
-#define s_RGA2_MODE_CTRL_SW_ALPHA_ZERO_KET(x) (((x)&0x1) << 5)
-#define s_RGA2_MODE_CTRL_SW_GRADIENT_SAT(x) (((x)&0x1) << 6)
-#define s_RGA2_MODE_CTRL_SW_INTR_CF_E(x) (((x)&0x1) << 7)
+#define s_RGA2_MODE_CTRL_SW_RENDER_MODE(x) (((x) & 0x7) << 0)
+#define s_RGA2_MODE_CTRL_SW_BITBLT_MODE(x) (((x) & 0x1) << 3)
+#define s_RGA2_MODE_CTRL_SW_CF_ROP4_PAT(x) (((x) & 0x1) << 4)
+#define s_RGA2_MODE_CTRL_SW_ALPHA_ZERO_KET(x) (((x) & 0x1) << 5)
+#define s_RGA2_MODE_CTRL_SW_GRADIENT_SAT(x) (((x) & 0x1) << 6)
+#define s_RGA2_MODE_CTRL_SW_INTR_CF_E(x) (((x) & 0x1) << 7)
 
 /* RGA_SRC_INFO */
 #define m_RGA2_SRC_INFO_SW_SRC_FMT (0xf << 0)
@@ -84,38 +84,38 @@
 #define m_RGA2_SRC_INFO_SW_SW_YUV10_E (0x1 << 27)
 #define m_RGA2_SRC_INFO_SW_SW_YUV10_ROUND_E (0x1 << 28)
 
-#define s_RGA2_SRC_INFO_SW_SRC_FMT(x) (((x)&0xf) << 0)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_RB_SWAP(x) (((x)&0x1) << 4)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_ALPHA_SWAP(x) (((x)&0x1) << 5)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_UV_SWAP(x) (((x)&0x1) << 6)
-#define s_RGA2_SRC_INFO_SW_SW_CP_ENDAIN(x) (((x)&0x1) << 7)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_CSC_MODE(x) (((x)&0x3) << 8)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_ROT_MODE(x) (((x)&0x3) << 10)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_MIR_MODE(x) (((x)&0x3) << 12)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_HSCL_MODE(x) (((x)&0x3) << 14)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_VSCL_MODE(x) (((x)&0x3) << 16)
+#define s_RGA2_SRC_INFO_SW_SRC_FMT(x) (((x) & 0xf) << 0)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_RB_SWAP(x) (((x) & 0x1) << 4)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_ALPHA_SWAP(x) (((x) & 0x1) << 5)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_UV_SWAP(x) (((x) & 0x1) << 6)
+#define s_RGA2_SRC_INFO_SW_SW_CP_ENDAIN(x) (((x) & 0x1) << 7)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_CSC_MODE(x) (((x) & 0x3) << 8)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_ROT_MODE(x) (((x) & 0x3) << 10)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_MIR_MODE(x) (((x) & 0x3) << 12)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_HSCL_MODE(x) (((x) & 0x3) << 14)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_VSCL_MODE(x) (((x) & 0x3) << 16)
 
-#define s_RGA2_SRC_INFO_SW_SW_SRC_TRANS_MODE(x) (((x)&0x1) << 18)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_TRANS_E(x) (((x)&0xf) << 19)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_DITHER_UP_E(x) (((x)&0x1) << 23)
-#define s_RGA2_SRC_INFO_SW_SW_SRC_SCL_FILTER(x) (((x)&0x3) << 24)
-#define s_RGA2_SRC_INFO_SW_SW_VSP_MODE_SEL(x) (((x)&0x1) << 26)
-#define s_RGA2_SRC_INFO_SW_SW_YUV10_E(x) (((x)&0x1) << 27)
-#define s_RGA2_SRC_INFO_SW_SW_YUV10_ROUND_E(x) (((x)&0x1) << 28)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_TRANS_MODE(x) (((x) & 0x1) << 18)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_TRANS_E(x) (((x) & 0xf) << 19)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_DITHER_UP_E(x) (((x) & 0x1) << 23)
+#define s_RGA2_SRC_INFO_SW_SW_SRC_SCL_FILTER(x) (((x) & 0x3) << 24)
+#define s_RGA2_SRC_INFO_SW_SW_VSP_MODE_SEL(x) (((x) & 0x1) << 26)
+#define s_RGA2_SRC_INFO_SW_SW_YUV10_E(x) (((x) & 0x1) << 27)
+#define s_RGA2_SRC_INFO_SW_SW_YUV10_ROUND_E(x) (((x) & 0x1) << 28)
 
 /* RGA_SRC_VIR_INFO */
 #define m_RGA2_SRC_VIR_INFO_SW_SRC_VIR_STRIDE (0x7fff << 0)  // modify
 #define m_RGA2_SRC_VIR_INFO_SW_MASK_VIR_STRIDE (0x3ff << 16) // modify
 
-#define s_RGA2_SRC_VIR_INFO_SW_SRC_VIR_STRIDE(x) (((x)&0x7fff) << 0)  // modify
-#define s_RGA2_SRC_VIR_INFO_SW_MASK_VIR_STRIDE(x) (((x)&0x3ff) << 16) // modify
+#define s_RGA2_SRC_VIR_INFO_SW_SRC_VIR_STRIDE(x) (((x) & 0x7fff) << 0)  // modify
+#define s_RGA2_SRC_VIR_INFO_SW_MASK_VIR_STRIDE(x) (((x) & 0x3ff) << 16) // modify
 
 /* RGA_SRC_ACT_INFO */
 #define m_RGA2_SRC_ACT_INFO_SW_SRC_ACT_WIDTH (0x1fff << 0)
 #define m_RGA2_SRC_ACT_INFO_SW_SRC_ACT_HEIGHT (0x1fff << 16)
 
-#define s_RGA2_SRC_ACT_INFO_SW_SRC_ACT_WIDTH(x) (((x)&0x1fff) << 0)
-#define s_RGA2_SRC_ACT_INFO_SW_SRC_ACT_HEIGHT(x) (((x)&0x1fff <) < 16)
+#define s_RGA2_SRC_ACT_INFO_SW_SRC_ACT_WIDTH(x) (((x) & 0x1fff) << 0)
+#define s_RGA2_SRC_ACT_INFO_SW_SRC_ACT_HEIGHT(x) (((x) & 0x1fff <) < 16)
 
 /* RGA_DST_INFO */
 #define m_RGA2_DST_INFO_SW_DST_FMT (0xf << 0)
@@ -137,24 +137,24 @@
 #define m_RGA2_DST_INFO_SW_SRC1_CSC_MODE (0x3 << 20) // add
 #define m_RGA2_DST_INFO_SW_SRC1_CSC_CLIP_MODE (0x1 << 22)
 
-#define s_RGA2_DST_INFO_SW_DST_FMT(x) (((x)&0xf) << 0)
-#define s_RGA2_DST_INFO_SW_DST_RB_SWAP(x) (((x)&0x1) << 4)
-#define s_RGA2_DST_INFO_SW_ALPHA_SWAP(x) (((x)&0x1) << 5)
-#define s_RGA2_DST_INFO_SW_DST_UV_SWAP(x) (((x)&0x1) << 6)
-#define s_RGA2_DST_INFO_SW_SRC1_FMT(x) (((x)&0x7) << 7)
-#define s_RGA2_DST_INFO_SW_SRC1_RB_SWP(x) (((x)&0x1) << 10)
-#define s_RGA2_DST_INFO_SW_SRC1_ALPHA_SWP(x) (((x)&0x1) << 11)
-#define s_RGA2_DST_INFO_SW_DITHER_UP_E(x) (((x)&0x1) << 12)
-#define s_RGA2_DST_INFO_SW_DITHER_DOWN_E(x) (((x)&0x1) << 13)
-#define s_RGA2_DST_INFO_SW_DITHER_MODE(x) (((x)&0x3) << 14)
-#define s_RGA2_DST_INFO_SW_DST_CSC_MODE(x) (((x)&0x3) << 16) // add
-#define s_RGA2_DST_INFO_SW_CSC_CLIP_MODE(x) (((x)&0x1) << 18)
-#define s_RGA2_DST_INFO_SW_DST_CSC_MODE_2(x) (((x)&0x1) << 19) // add
-#define s_RGA2_DST_INFO_SW_DST_FMT_YUV400_EN(x) (((x)&0x1) << 24)
-#define s_RGA2_DST_INFO_SW_DST_FMT_Y4_EN(x) (((x)&0x1) << 25)
-#define s_RGA2_DST_INFO_SW_DST_NN_QUANTIZE_EN(x) (((x)&0x1) << 26)
-#define s_RGA2_DST_INFO_SW_SRC1_CSC_MODE(x) (((x)&0x3) << 20) // add
-#define s_RGA2_DST_INFO_SW_SRC1_CSC_CLIP_MODE(x) (((x)&0x1) << 22)
+#define s_RGA2_DST_INFO_SW_DST_FMT(x) (((x) & 0xf) << 0)
+#define s_RGA2_DST_INFO_SW_DST_RB_SWAP(x) (((x) & 0x1) << 4)
+#define s_RGA2_DST_INFO_SW_ALPHA_SWAP(x) (((x) & 0x1) << 5)
+#define s_RGA2_DST_INFO_SW_DST_UV_SWAP(x) (((x) & 0x1) << 6)
+#define s_RGA2_DST_INFO_SW_SRC1_FMT(x) (((x) & 0x7) << 7)
+#define s_RGA2_DST_INFO_SW_SRC1_RB_SWP(x) (((x) & 0x1) << 10)
+#define s_RGA2_DST_INFO_SW_SRC1_ALPHA_SWP(x) (((x) & 0x1) << 11)
+#define s_RGA2_DST_INFO_SW_DITHER_UP_E(x) (((x) & 0x1) << 12)
+#define s_RGA2_DST_INFO_SW_DITHER_DOWN_E(x) (((x) & 0x1) << 13)
+#define s_RGA2_DST_INFO_SW_DITHER_MODE(x) (((x) & 0x3) << 14)
+#define s_RGA2_DST_INFO_SW_DST_CSC_MODE(x) (((x) & 0x3) << 16) // add
+#define s_RGA2_DST_INFO_SW_CSC_CLIP_MODE(x) (((x) & 0x1) << 18)
+#define s_RGA2_DST_INFO_SW_DST_CSC_MODE_2(x) (((x) & 0x1) << 19) // add
+#define s_RGA2_DST_INFO_SW_DST_FMT_YUV400_EN(x) (((x) & 0x1) << 24)
+#define s_RGA2_DST_INFO_SW_DST_FMT_Y4_EN(x) (((x) & 0x1) << 25)
+#define s_RGA2_DST_INFO_SW_DST_NN_QUANTIZE_EN(x) (((x) & 0x1) << 26)
+#define s_RGA2_DST_INFO_SW_SRC1_CSC_MODE(x) (((x) & 0x3) << 20) // add
+#define s_RGA2_DST_INFO_SW_SRC1_CSC_CLIP_MODE(x) (((x) & 0x1) << 22)
 
 /* RGA_ALPHA_CTRL0 */
 #define m_RGA2_ALPHA_CTRL0_SW_ALPHA_ROP_0 (0x1 << 0)

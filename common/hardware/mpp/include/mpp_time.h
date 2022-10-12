@@ -36,7 +36,7 @@ typedef void *MppStopwatch;
 extern "C" {
 #endif
 
-RK_S64 mpp_time();
+RK_S64 mpp_time(void);
 void mpp_time_diff(RK_S64 start, RK_S64 end, RK_S64 limit, const char *fmt);
 MppClock mpp_clock_get(const char *name);
 void mpp_clock_put(MppClock clock);
@@ -63,8 +63,7 @@ RK_S64 mpp_stopwatch_elapsed_time(MppStopwatch stopwatch);
 #endif
 
 #ifdef __cplusplus
-class AutoTiming
-{
+class AutoTiming {
 public:
     AutoTiming(const char *name = __FUNCTION__);
     ~AutoTiming();

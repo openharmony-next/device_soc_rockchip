@@ -147,7 +147,6 @@ void kbase_pm_update_dynamic_cores_onoff(struct kbase_device *kbdev)
     }
 
     shaders_desired = kbdev->pm.backend.pm_current_policy->shaders_needed(kbdev);
-
     if (shaders_desired && kbase_pm_is_l2_desired(kbdev)) {
         kbase_pm_update_state(kbdev);
     }

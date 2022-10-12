@@ -28,16 +28,16 @@
 #define GRF_VI_CON0 (0x0340)
 #define GRF_VI_CON1 (0x0344)
 
-/*RK3588 DPHY GRF REG OFFSET */
+/* RK3588 DPHY GRF REG OFFSET */
 #define GRF_DPHY_CON0 (0x0)
 #define GRF_SOC_CON2 (0x0308)
 
-/*GRF REG BIT DEFINE */
+/* GRF REG BIT DEFINE */
 #define GRF_CSI2PHY_LANE_SEL_SPLIT (0x1)
 #define GRF_CSI2PHY_SEL_SPLIT_0_1 (0x0)
 #define GRF_CSI2PHY_SEL_SPLIT_2_3 BIT(0)
 
-/*RK3588 DCPHY GRF REG OFFSET */
+/* RK3588 DCPHY GRF REG OFFSET */
 #define GRF_DCPHY_CON0 (0x0)
 
 /* PHY REG OFFSET */
@@ -783,7 +783,7 @@ static int csi2_dcphy_hw_stream_on(struct csi2_dphy *dphy, struct v4l2_subdev *s
         reset_control_assert(hw->rsts_bulk);
     }
 
-    /*clk settle fix to 0x301*/
+    /* clk settle fix to 0x301 */
     if (sensor->mbus.type == V4L2_MBUS_CSI2_DPHY) {
         write_csi2_dphy_reg(hw, CSI2PHY_CLK_THS_SETTLE, 0x301);
         write_csi2_dphy_reg(hw, CSI2PHY_S0C_GNR_CON1, 0x1450);
@@ -840,20 +840,20 @@ static int csi2_dcphy_hw_stream_on(struct csi2_dphy *dphy, struct v4l2_subdev *s
         write_csi2_dphy_reg(hw, CSI2PHY_DATA_LANE3_ENABLE, BIT(0));
     }
 
-    /*wait for clk lane ready*/
+    /* wait for clk lane ready */
     if (sensor->mbus.type == V4L2_MBUS_CSI2_DPHY) {
         if (csi_dcphy_wait_lane_prepare(hw, CSI2PHY_CLK_LANE_ENABLE)) {
             goto out_streamon;
         }
     }
 
-    /*wait for data lane ready*/
-    if (sensor->lanes > 0x00) {
+    /* wait for data lane ready */
+    if (sensor->lanes > 0) {
         if (csi_dcphy_wait_lane_prepare(hw, CSI2PHY_DATA_LANE0_ENABLE)) {
             goto out_streamon;
         }
     }
-    if (sensor->lanes > 0x01) {
+    if (sensor->lanes > 1) {
         if (csi_dcphy_wait_lane_prepare(hw, CSI2PHY_DATA_LANE1_ENABLE)) {
             goto out_streamon;
         }
@@ -971,18 +971,16 @@ static const struct dphy_hw_drv_data rk3588_csi2_dcphy_hw_drv_data = {
 };
 
 static const struct of_device_id rockchip_csi2_dphy_hw_match_id[] = {{
-                                                                         .compatible = "rockchip,rk3568-csi2-dphy-hw",
-                                                                         .data = &rk3568_csi2_dphy_hw_drv_data,
-                                                                     },
-                                                                     {
-                                                                         .compatible = "rockchip,rk3588-csi2-dphy-hw",
-                                                                         .data = &rk3588_csi2_dphy_hw_drv_data,
-                                                                     },
-                                                                     {
-                                                                         .compatible = "rockchip,rk3588-csi2-dcphy-hw",
-                                                                         .data = &rk3588_csi2_dcphy_hw_drv_data,
-                                                                     },
-                                                                     {}};
+    .compatible = "rockchip,rk3568-csi2-dphy-hw",
+    .data = &rk3568_csi2_dphy_hw_drv_data,
+}, {
+    .compatible = "rockchip,rk3588-csi2-dphy-hw",
+    .data = &rk3588_csi2_dphy_hw_drv_data,
+}, {
+    .compatible = "rockchip,rk3588-csi2-dcphy-hw",
+    .data = &rk3588_csi2_dcphy_hw_drv_data,
+}, {
+}};
 MODULE_DEVICE_TABLE(of, rockchip_csi2_dphy_hw_match_id);
 
 static int rockchip_csi2_dphy_hw_probe(struct platform_device *pdev)

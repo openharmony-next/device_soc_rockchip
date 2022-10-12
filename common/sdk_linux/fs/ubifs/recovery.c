@@ -558,7 +558,6 @@ static int fix_unclean_leb(struct ubifs_info *c, struct ubifs_scan_leb *sleb, in
             /* Pad to min_io_size */
             if (len > endpt) {
                 int pad_len = len - ALIGN(endpt, RECOVERY_EIGHT);
-
                 if (pad_len > 0) {
                     void *buf = sleb->buf + len - pad_len;
 
@@ -1060,7 +1059,6 @@ static int clean_an_unclean_leb(struct ubifs_info *c, struct ubifs_unclean_leb *
 
         /* Scan quietly until there is an error */
         ret = ubifs_scan_a_node(c, buf, len, lnum, offs, quiet);
-
         if (ret == SCANNED_A_NODE) {
             /* A valid node, and not a padding node */
             struct ubifs_ch *ch = buf;
@@ -1100,7 +1098,6 @@ static int clean_an_unclean_leb(struct ubifs_info *c, struct ubifs_unclean_leb *
     len = ALIGN(ucleb->endpt, c->min_io_size);
     if (len > ucleb->endpt) {
         int pad_len = len - ALIGN(ucleb->endpt, RECOVERY_EIGHT);
-
         if (pad_len > 0) {
             buf = c->sbuf + len - pad_len;
             ubifs_pad(c, buf, pad_len);
@@ -1253,7 +1250,6 @@ int ubifs_rcvry_gc_commit(struct ubifs_info *c)
     err = ubifs_garbage_collect_leb(c, &lp);
     if (err >= 0) {
         int err2 = ubifs_wbuf_sync_nolock(wbuf);
-
         if (err2) {
             err = err2;
         }

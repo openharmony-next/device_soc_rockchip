@@ -293,7 +293,7 @@ struct drm_display_mode *drm_cvt_mode(struct drm_device *dev, int hdisplay, int 
 #define CVT_RB_H_SYNC 32
         /* Fixed number of clocks for horizontal blanking */
 #define CVT_RB_H_BLANK 160
-        /* Fixed number of lines for vertical front porch - default 3*/
+        /* Fixed number of lines for vertical front porch - default 3 */
 #define CVT_RB_VFPORCH 3
         int vbilines;
         int tmp1, tmp2;
@@ -558,7 +558,7 @@ EXPORT_SYMBOL(drm_gtf_mode_complex);
  * I also refer to the function of fb_get_mode in the file of
  * drivers/video/fbmon.c
  *
- * Standard GTF parameters::
+ * Standard GTF parameters:: see below
  *
  *     M = 600
  *     C = 40
@@ -754,7 +754,8 @@ void drm_mode_set_name(struct drm_display_mode *mode)
 {
     bool interlaced = !!(mode->flags & DRM_MODE_FLAG_INTERLACE);
 
-    snprintf(mode->name, DRM_DISPLAY_MODE_LEN, "%dx%d%s", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "");
+    int ret;
+    ret = snprintf(mode->name, DRM_DISPLAY_MODE_LEN, "%dx%d%s", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "");
 }
 EXPORT_SYMBOL(drm_mode_set_name);
 
@@ -993,23 +994,23 @@ bool drm_mode_match(const struct drm_display_mode *mode1, const struct drm_displ
         return false;
     }
 
-    if (match_flags & DRM_MODE_MATCH_TIMINGS && !drm_mode_match_timings(mode1, mode2)) {
+    if ((match_flags & DRM_MODE_MATCH_TIMINGS) && !drm_mode_match_timings(mode1, mode2)) {
         return false;
     }
 
-    if (match_flags & DRM_MODE_MATCH_CLOCK && !drm_mode_match_clock(mode1, mode2)) {
+    if ((match_flags & DRM_MODE_MATCH_CLOCK) && !drm_mode_match_clock(mode1, mode2)) {
         return false;
     }
 
-    if (match_flags & DRM_MODE_MATCH_FLAGS && !drm_mode_match_flags(mode1, mode2)) {
+    if ((match_flags & DRM_MODE_MATCH_FLAGS) && !drm_mode_match_flags(mode1, mode2)) {
         return false;
     }
 
-    if (match_flags & DRM_MODE_MATCH_3D_FLAGS && !drm_mode_match_3d_flags(mode1, mode2)) {
+    if ((match_flags & DRM_MODE_MATCH_3D_FLAGS) && !drm_mode_match_3d_flags(mode1, mode2)) {
         return false;
     }
 
-    if (match_flags & DRM_MODE_MATCH_ASPECT_RATIO && !drm_mode_match_aspect_ratio(mode1, mode2)) {
+    if ((match_flags & DRM_MODE_MATCH_ASPECT_RATIO) && !drm_mode_match_aspect_ratio(mode1, mode2)) {
         return false;
     }
 
@@ -1607,7 +1608,6 @@ static int drm_mode_parse_cmdline_options(const char *str, bool freestanding, co
         delim = strchr(option, '=');
         if (!delim) {
             delim = strchr(option, ',');
-
             if (!delim) {
                 delim = option + strlen(option);
             }

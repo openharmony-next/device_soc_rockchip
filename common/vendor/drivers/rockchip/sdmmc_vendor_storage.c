@@ -238,7 +238,7 @@ static int id_blk_read_data(u32 index, u32 n_sec, u8 *buf)
     u32 i;
     u32 ret = 0;
 
-    if (index + n_sec >= 1024 * 0x5) {
+    if (index + n_sec >= 0x400 * 0x5) {
         return 0;
     }
     index = index + EMMC_IDB_PART_OFFSET;
@@ -398,7 +398,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
                 }
             }
             break;
-        } 
+        }
         case VENDOR_WRITE_IO: {
             if (copy_from_user(page_buf, (void __user *)arg, 0x8)) {
                 ret = -EFAULT;
@@ -417,101 +417,106 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
             break;
 
 #ifdef CONFIG_ROCKCHIP_VENDOR_STORAGE_UPDATE_LOADER
-        case READ_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 0x200)) {
-                ret = -EFAULT;
-                goto exit;
-            }
-
-            size = page_buf[1];
-            if (size <= 0x8) {
-                id_blk_read_data(page_buf[0], size, (u8 *)page_buf);
-                if (copy_to_user((void __user *)arg, page_buf, size * 0x200)) {
+            case READ_SECTOR_IO: {
+                if (copy_from_user(page_buf, (void __user *)arg, 0x200)) {
                     ret = -EFAULT;
                     goto exit;
                 }
-            } else {
-                ret = -EFAULT;
-                goto exit;
-            }
-            ret = 0;
-        } break;
 
-        case WRITE_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 0x1000)) {
-                ret = -EFAULT;
-                goto exit;
+                size = page_buf[1];
+                if (size <= 0x8) {
+                    id_blk_read_data(page_buf[0], size, (u8 *)page_buf);
+                    if (copy_to_user((void __user *)arg, page_buf, size * 0x200)) {
+                        ret = -EFAULT;
+                        goto exit;
+                    }
+                } else {
+                    ret = -EFAULT;
+                    goto exit;
+                }
+                ret = 0;
+                break;
             }
-            if (!g_idb_buffer) {
-                g_idb_buffer = kmalloc(0x1000 + EMMC_BOOT_PART_SIZE * 0x200, GFP_KERNEL);
+
+            case WRITE_SECTOR_IO: {
+                if (copy_from_user(page_buf, (void __user *)arg, 0x1000)) {
+                    ret = -EFAULT;
+                    goto exit;
+                }
                 if (!g_idb_buffer) {
+                    g_idb_buffer = kmalloc(0x1000 + EMMC_BOOT_PART_SIZE * 0x200, GFP_KERNEL);
+                    if (!g_idb_buffer) {
+                        ret = -EFAULT;
+                        goto exit;
+                    }
+                }
+                if (page_buf[1] <= 0xFF8 && page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200 - 0x1000)) {
+                    memcpy(g_idb_buffer + page_buf[0], page_buf + 0x2, page_buf[1]);
+                } else {
                     ret = -EFAULT;
                     goto exit;
                 }
+                ret = 0;
+                break;
             }
-            if (page_buf[1] <= 0xFF8 && page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200 - 0x1000)) {
-                memcpy(g_idb_buffer + page_buf[0], page_buf + 0x2, page_buf[1]);
-            } else {
-                ret = -EFAULT;
-                goto exit;
-            }
-            ret = 0;
-        } break;
 
-        case END_WRITE_SECTOR_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 0x1C)) {
-                ret = -EFAULT;
-                goto exit;
-            }
-            if (page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200)) {
-                if (!g_idb_buffer) {
+            case END_WRITE_SECTOR_IO: {
+                if (copy_from_user(page_buf, (void __user *)arg, 0x1C)) {
                     ret = -EFAULT;
                     goto exit;
                 }
-                if (page_buf[1] != rk_crc_32(g_idb_buffer, page_buf[0])) {
-                    ret = -2;
+                if (page_buf[0] <= (EMMC_BOOT_PART_SIZE * 0x200)) {
+                    if (!g_idb_buffer) {
+                        ret = -EFAULT;
+                        goto exit;
+                    }
+                    if (page_buf[1] != rk_crc_32(g_idb_buffer, page_buf[0])) {
+                        ret = -2;
+                        goto exit;
+                    }
+                    ret = emmc_write_idblock(page_buf[0], (u8 *)g_idb_buffer, &page_buf[2]);
+                    kfree(g_idb_buffer);
+                    g_idb_buffer = NULL;
+                } else {
+                    ret = -EFAULT;
                     goto exit;
                 }
-                ret = emmc_write_idblock(page_buf[0], (u8 *)g_idb_buffer, &page_buf[2]);
-                kfree(g_idb_buffer);
-                g_idb_buffer = NULL;
-            } else {
-                ret = -EFAULT;
-                goto exit;
+                ret = 0;
+                break;
             }
-            ret = 0;
-        } break;
 
-        case GET_BAD_BLOCK_IO: {
-            memset(page_buf, 0, 0x40);
-            if (copy_to_user((void __user *)arg, page_buf, 0x40)) {
-                ret = -EFAULT;
-                goto exit;
+            case GET_BAD_BLOCK_IO: {
+                memset(page_buf, 0, 0x40);
+                if (copy_to_user((void __user *)arg, page_buf, 0x40)) {
+                    ret = -EFAULT;
+                    goto exit;
+                }
+                ret = 0;
+                break;
             }
-            ret = 0;
-        } break;
 
-        case GET_LOCK_FLAG_IO: {
-            page_buf[0] = 0;
-            if (copy_to_user((void __user *)arg, page_buf, 0x4)) {
-                ret = -EFAULT;
-                goto exit;
+            case GET_LOCK_FLAG_IO: {
+                page_buf[0] = 0;
+                if (copy_to_user((void __user *)arg, page_buf, 0x4)) {
+                    ret = -EFAULT;
+                    goto exit;
+                }
+                ret = 0;
+                break;
             }
-            ret = 0;
-        } break;
 
-        case GET_FLASH_INFO_IO: {
-            page_buf[0] = 0x00800000;
-            page_buf[1] = 0x00040400;
-            page_buf[2] = 0x00010028;
-            if (copy_to_user((void __user *)arg, page_buf, 0xB)) {
-                ret = -EFAULT;
-                goto exit;
+            case GET_FLASH_INFO_IO: {
+                page_buf[0] = 0x00800000;
+                page_buf[1] = 0x00040400;
+                page_buf[2] = 0x00010028;
+                if (copy_to_user((void __user *)arg, page_buf, 0xB)) {
+                    ret = -EFAULT;
+                    goto exit;
+                }
+                ret = 0;
+                break;
             }
-            ret = 0;
-        } break;
 #endif
-
         default:
             ret = -EINVAL;
             goto exit;

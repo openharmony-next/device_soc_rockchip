@@ -266,7 +266,6 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
 
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
     irq_delta = irq_time_read(cpu_of(rq)) - rq->prev_irq_time;
-
     /*
      * Since irq_time is only updated on {soft,}irq_exit, we might run into
      * this case when a previous update_rq_clock() happened inside a
@@ -642,7 +641,6 @@ void resched_curr(struct rq *rq)
     }
 
     cpu = cpu_of(rq);
-
     if (cpu == smp_processor_id()) {
         set_tsk_need_resched(curr);
         set_preempt_need_resched();
@@ -723,7 +721,6 @@ int get_nohz_timer_target(void)
 
         /* no active, not-idle, housekpeeing CPU found. */
         default_cpu = cpumask_any(cpu_active_mask);
-
         if (unlikely(default_cpu >= nr_cpu_ids)) {
             goto unlock;
         }
@@ -1593,8 +1590,7 @@ static void __setscheduler_uclamp(struct task_struct *p,
      * On scheduling class change, reset to default clamps for tasks
      * without a task-specific value.
      */
-    for_each_clamp_id(clamp_id)
-    {
+    for_each_clamp_id(clamp_id) {
         struct uclamp_se *uc_se = &p->uclamp_req[clamp_id];
 
         /* Keep using defined clamps across class changes */
@@ -1640,8 +1636,7 @@ static void uclamp_fork(struct task_struct *p)
         return;
     }
 
-    for_each_clamp_id(clamp_id)
-    {
+    for_each_clamp_id(clamp_id) {
         uclamp_se_set(&p->uclamp_req[clamp_id], uclamp_none(clamp_id), false);
     }
 }
@@ -2243,7 +2238,6 @@ static void __migrate_swap_task(struct task_struct *p, int cpu)
 
         rq_unpin_lock(dst_rq, &drf);
         rq_unpin_lock(src_rq, &srf);
-
     } else {
         /*
          * Task isn't running anymore; make it appear like we migrated
@@ -2313,7 +2307,7 @@ int migrate_swap(struct task_struct *cur, struct task_struct *p, int target_cpu,
     struct migration_swap_arg arg;
     int ret = -EINVAL;
 
-    arg = (struct migration_swap_arg){
+    arg = (struct migration_swap_arg) {
         .src_task = cur,
         .src_cpu = curr_cpu,
         .dst_task = p,
@@ -2703,7 +2697,6 @@ static void ttwu_stat(struct task_struct *p, int cpu, int wake_flags)
     }
 
     rq = this_rq();
-
 #ifdef CONFIG_SMP
     if (cpu == rq->cpu) {
         __schedstat_inc(rq->ttwu_local);
@@ -5265,7 +5258,7 @@ asmlinkage __visible void __sched preempt_schedule_irq(void)
 int default_wake_function(wait_queue_entry_t *curr, unsigned mode,
                           int wake_flags, void *key)
 {
-    WARN_ON_ONCE(IS_ENABLED(CONFIG_SCHED_DEBUG) && wake_flags & ~(WF_SYNC));
+    WARN_ON_ONCE(IS_ENABLED(CONFIG_SCHED_DEBUG) && (wake_flags & ~(WF_SYNC)));
     return try_to_wake_up(curr->private, mode, wake_flags);
 }
 EXPORT_SYMBOL(default_wake_function);
@@ -5322,7 +5315,6 @@ void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
 
     /* XXX used to be waiter->prio, not waiter->task->prio */
     prio = __rt_effective_prio(pi_task, p->normal_prio);
-
     /*
      * If nothing changed; bail early.
      */
@@ -5741,7 +5733,6 @@ static int __sched_setscheduler(struct task_struct *p,
 
             if (rt_policy(policy)) {
                 unsigned long rlim_rtprio = task_rlimit(p, RLIMIT_RTPRIO);
-
                 /* Can't set/change the rt policy: */
                 if (policy != p->policy && !rlim_rtprio) {
                     return -EPERM;
@@ -5851,8 +5842,8 @@ static int __sched_setscheduler(struct task_struct *p,
                 goto change;
             }
 #ifdef CONFIG_SCHED_LATENCY_NICE
-            if (attr->sched_flags & SCHED_FLAG_LATENCY_NICE &&
-                attr->sched_latency_nice != LATENCY_TO_NICE(p->latency_prio)) {
+            if ((attr->sched_flags & SCHED_FLAG_LATENCY_NICE) &&
+                (attr->sched_latency_nice != LATENCY_TO_NICE(p->latency_prio))) {
                 goto change;
             }
 #endif
@@ -7247,7 +7238,6 @@ int migrate_task_to(struct task_struct *p, int target_cpu)
 {
     struct migration_arg arg = {p, target_cpu};
     int curr_cpu = task_cpu(p);
-
     if (curr_cpu == target_cpu) {
         return 0;
     }
@@ -7454,8 +7444,7 @@ void migrate_tasks(struct rq *dead_rq, struct rq_flags *rf,
         }
 
         next = __pick_migrate_task(rq);
-
-        if (!migrate_pinned_tasks && next->flags & PF_KTHREAD &&
+        if (!migrate_pinned_tasks && (next->flags & PF_KTHREAD) &&
             !cpumask_intersects(&avail_cpus, &next->cpus_mask)) {
             detach_one_task_core(next, rq, &tasks);
             num_pinned_kthreads += 1;
@@ -8449,8 +8438,7 @@ static inline void alloc_uclamp_sched_group(struct task_group *tg,
 #ifdef CONFIG_UCLAMP_TASK_GROUP
     enum uclamp_id clamp_id;
 
-    for_each_clamp_id(clamp_id)
-    {
+    for_each_clamp_id(clamp_id) {
         uclamp_se_set(&tg->uclamp_req[clamp_id], uclamp_none(clamp_id), false);
         tg->uclamp[clamp_id] = parent->uclamp[clamp_id];
     }
@@ -8577,7 +8565,6 @@ void sched_move_task(struct task_struct *tsk)
 
     running = task_current(rq, tsk);
     queued = task_on_rq_queued(tsk);
-
     if (queued) {
         dequeue_task(rq, tsk, queue_flags);
     }
@@ -8771,8 +8758,7 @@ static void cpu_util_update_eff(struct cgroup_subsys_state *css)
     {
         uc_parent = css_tg(css)->parent ? css_tg(css)->parent->uclamp : NULL;
 
-        for_each_clamp_id(clamp_id)
-        {
+        for_each_clamp_id(clamp_id) {
             /* Assume effective clamps matches requested clamps */
             eff[clamp_id] = css_tg(css)->uclamp_req[clamp_id].value;
             /* Cap effective clamps with parent's effective clamps */
@@ -8786,8 +8772,7 @@ static void cpu_util_update_eff(struct cgroup_subsys_state *css)
         /* Propagate most restrictive effective clamps */
         clamps = 0x0;
         uc_se = css_tg(css)->uclamp;
-        for_each_clamp_id(clamp_id)
-        {
+        for_each_clamp_id(clamp_id) {
             if (eff[clamp_id] == uc_se[clamp_id].value) {
                 continue;
             }
@@ -9575,14 +9560,14 @@ void dump_cpu_task(int cpu)
  * the relative distance between them is ~25%.)
  */
 const int sched_prio_to_weight[40] = {
-    /* -20 */ 88761, 71755, 56483, 46273, 36291,
-    /* -15 */ 29154, 23254, 18705, 14949, 11916,
-    /* -10 */ 9548,  7620,  6100,  4904,  3906,
-    /*  -5 */ 3121,  2501,  1991,  1586,  1277,
-    /*   0 */ 1024,  820,   655,   526,   423,
-    /*   5 */ 335,   272,   215,   172,   137,
-    /*  10 */ 110,   87,    70,    56,    45,
-    /*  15 */ 36,    29,    23,    18,    15,
+    88761, 71755, 56483, 46273, 36291, /* -20 */
+    29154, 23254, 18705, 14949, 11916, /* -15 */
+    9548,  7620,  6100,  4904,  3906,  /* -10 */
+    3121,  2501,  1991,  1586,  1277,  /*  -5 */
+    1024,  820,   655,   526,   423,   /*   0 */
+    335,   272,   215,   172,   137,   /*   5 */
+    110,   87,    70,    56,    45,    /*  10 */
+    36,    29,    23,    18,    15,    /*  15 */
 };
 
 /*
@@ -9593,14 +9578,14 @@ const int sched_prio_to_weight[40] = {
  * into multiplications:
  */
 const u32 sched_prio_to_wmult[40] = {
-    /* -20 */ 48388,     59856,     76040,     92818,     118348,
-    /* -15 */ 147320,    184698,    229616,    287308,    360437,
-    /* -10 */ 449829,    563644,    704093,    875809,    1099582,
-    /*  -5 */ 1376151,   1717300,   2157191,   2708050,   3363326,
-    /*   0 */ 4194304,   5237765,   6557202,   8165337,   10153587,
-    /*   5 */ 12820798,  15790321,  19976592,  24970740,  31350126,
-    /*  10 */ 39045157,  49367440,  61356676,  76695844,  95443717,
-    /*  15 */ 119304647, 148102320, 186737708, 238609294, 286331153,
+    48388,     59856,     76040,     92818,     118348,     /* -20 */
+    147320,    184698,    229616,    287308,    360437,     /* -15 */
+    449829,    563644,    704093,    875809,    1099582,    /* -10 */
+    1376151,   1717300,   2157191,   2708050,   3363326,    /*  -5 */
+    4194304,   5237765,   6557202,   8165337,   10153587,   /*   0 */
+    12820798,  15790321,  19976592,  24970740,  31350126,   /*   5 */
+    39045157,  49367440,  61356676,  76695844,  95443717,   /*  10 */
+    119304647, 148102320, 186737708, 238609294, 286331153,  /*  15 */
 };
 
 #ifdef CONFIG_SCHED_LATENCY_NICE
@@ -9608,14 +9593,14 @@ const u32 sched_prio_to_wmult[40] = {
  * latency weight for wakeup preemption
  */
 const int sched_latency_to_weight[40] = {
-    /* -20 */ 1024, 973,  922,  870,  819,
-    /* -15 */ 768,  717,  666,  614,  563,
-    /* -10 */ 512,  461,  410,  358,  307,
-    /*  -5 */ 256,  205,  154,  102,  51,
-    /*   0 */ 0,    -51,  -102, -154, -205,
-    /*   5 */ -256, -307, -358, -410, -461,
-    /*  10 */ -512, -563, -614, -666, -717,
-    /*  15 */ -768, -819, -870, -922, -973,
+    1024, 973,  922,  870,  819,  /* -20 */
+    768,  717,  666,  614,  563,  /* -15 */
+    512,  461,  410,  358,  307,  /* -10 */
+    256,  205,  154,  102,  51,   /*  -5 */
+    0,    -51,  -102, -154, -205, /*   0 */
+    -256, -307, -358, -410, -461, /*   5 */
+    -512, -563, -614, -666, -717, /*  10 */
+    -768, -819, -870, -922, -973, /*  15 */
 };
 #endif
 

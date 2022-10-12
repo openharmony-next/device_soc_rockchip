@@ -131,7 +131,7 @@ struct dma_fence_ops {
     bool use_64bit_seqno;
 
     /**
-     * @get_driver_name:
+     * @get_driver_name
      *
      * Returns the driver name. This is a callback to allow drivers to
      * compute the name at runtime, without having it to store permanently
@@ -142,7 +142,7 @@ struct dma_fence_ops {
     const char *(*get_driver_name)(struct dma_fence *fence);
 
     /**
-     * @get_timeline_name:
+     * @get_timeline_name
      *
      * Return the name of the context this fence belongs to. This is a
      * callback to allow drivers to compute the name at runtime, without
@@ -154,7 +154,7 @@ struct dma_fence_ops {
     const char *(*get_timeline_name)(struct dma_fence *fence);
 
     /**
-     * @enable_signaling:
+     * @enable_signaling
      *
      * Enable software signaling of fence.
      *
@@ -191,7 +191,7 @@ struct dma_fence_ops {
     bool (*enable_signaling)(struct dma_fence *fence);
 
     /**
-     * @signaled:
+     * @signaled
      *
      * Peek whether the fence is signaled, as a fastpath optimization for
      * e.g. dma_fence_wait() or dma_fence_add_callback(). Note that this
@@ -208,7 +208,7 @@ struct dma_fence_ops {
     bool (*signaled)(struct dma_fence *fence);
 
     /**
-     * @wait:
+     * @wait
      *
      * Custom wait implementation, defaults to dma_fence_default_wait() if
      * not set.
@@ -230,7 +230,7 @@ struct dma_fence_ops {
     signed long (*wait)(struct dma_fence *fence, bool intr, signed long timeout);
 
     /**
-     * @release:
+     * @release
      *
      * Called on destruction of fence to release additional resources.
      * Can be called from irq context.  This callback is optional. If it is
@@ -240,7 +240,7 @@ struct dma_fence_ops {
     void (*release)(struct dma_fence *fence);
 
     /**
-     * @fence_value_str:
+     * @fence_value_str
      *
      * Callback to fill in free-form debug info specific to this fence, like
      * the sequence number.
@@ -250,7 +250,7 @@ struct dma_fence_ops {
     void (*fence_value_str)(struct dma_fence *fence, char *str, int size);
 
     /**
-     * @timeline_value_str:
+     * @timeline_value_str
      *
      * Fills in the current value of the timeline as a string, like the
      * sequence number. Note that the specific fence passed to this function

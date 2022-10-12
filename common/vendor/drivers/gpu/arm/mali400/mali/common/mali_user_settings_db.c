@@ -38,13 +38,13 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
         /* Pre allocate the number of notifications objects we need right now (might change after lock has been taken)
          */
         num_sessions_alloc = mali_session_get_count();
-        if (0 == num_sessions_alloc) {
+        if (num_sessions_alloc == 0) {
             /* No sessions to report to */
             return;
         }
 
         notobjs = (_mali_osk_notification_t **)mali_osk_malloc(sizeof(_mali_osk_notification_t *) * num_sessions_alloc);
-        if (NULL == notobjs) {
+        if (notobjs == NULL) {
             MALI_PRINT_ERROR(("Failed to notify user space session about num PP core change (alloc failure)\n"));
             return;
         }
@@ -52,7 +52,7 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
         for (i = 0; i < num_sessions_alloc; i++) {
             notobjs[i] =
                 _mali_osk_notification_create(MALI_NOTIFICATION_SETTINGS_CHANGED, sizeof(mali_uk_settings_changed_s));
-            if (NULL != notobjs[i]) {
+            if (notobjs[i] != NULL) {
                 mali_uk_settings_changed_s *data;
                 data = notobjs[i]->result_buffer;
 
@@ -67,14 +67,13 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
 
         /* number of sessions will not change while we hold the lock */
         num_sessions_with_lock = mali_session_get_count();
-
         if (num_sessions_alloc >= num_sessions_with_lock) {
             /* We have allocated enough notification objects for all the sessions atm */
             struct mali_session_data *session, *tmp;
             MALI_SESSION_FOREACH(session, tmp, link)
             {
                 MALI_DEBUG_ASSERT(used_notification_objects < num_sessions_alloc);
-                if (NULL != notobjs[used_notification_objects]) {
+                if (notobjs[used_notification_objects] != NULL) {
                     mali_session_send_notification(session, notobjs[used_notification_objects]);
                     notobjs[used_notification_objects] = NULL; /* Don't track this notification object any more */
                 }
@@ -87,7 +86,7 @@ static void mali_user_settings_notify(mali_uk_user_setting_t setting, u32 value)
 
         /* Delete any remaining/unused notification objects */
         for (; used_notification_objects < num_sessions_alloc; used_notification_objects++) {
-            if (NULL != notobjs[used_notification_objects]) {
+            if (notobjs[used_notification_objects] != NULL) {
                 _mali_osk_notification_delete(notobjs[used_notification_objects]);
             }
         }

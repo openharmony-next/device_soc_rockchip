@@ -217,7 +217,7 @@ static void kbase_pm_gpu_poweroff_wait_wq(struct work_struct *data)
 
             /* Turn off clock now that fault have been handled. We
              * dropped locks so poweron_required may have changed -
-             * power back on if this is the case.*/
+             * power back on if this is the case. */
             if (backend->poweron_required) {
                 kbase_pm_clock_on(kbdev, false);
             } else {
@@ -265,7 +265,7 @@ void kbase_pm_do_poweroff(struct kbase_device *kbdev, bool is_suspend)
         kbdev->pm.backend.poweroff_is_suspend = is_suspend;
 
         spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
-        /*Kick off wq here. Callers will have to wait*/
+        /* Kick off wq here. Callers will have to wait */
         queue_work(kbdev->pm.backend.gpu_poweroff_wait_wq, &kbdev->pm.backend.gpu_poweroff_wait_work);
     } else {
         spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
@@ -315,7 +315,7 @@ int kbase_hwaccess_pm_powerup(struct kbase_device *kbdev, unsigned int flags)
     kbasep_pm_init_core_use_bitmaps(kbdev);
 
     kbdev->pm.debug_core_mask_all = kbdev->pm.debug_core_mask[0] = kbdev->pm.debug_core_mask[1] =
-        kbdev->pm.debug_core_mask[2] = kbdev->gpu_props.props.raw_props.shader_present;
+        kbdev->pm.debug_core_mask[0x02] = kbdev->gpu_props.props.raw_props.shader_present;
 
     /* Pretend the GPU is active to prevent a power policy turning the GPU
      * cores off */
@@ -399,7 +399,7 @@ void kbase_pm_set_debug_core_mask(struct kbase_device *kbdev, u64 new_core_mask_
 {
     kbdev->pm.debug_core_mask[0] = new_core_mask_js0;
     kbdev->pm.debug_core_mask[1] = new_core_mask_js1;
-    kbdev->pm.debug_core_mask[2] = new_core_mask_js2;
+    kbdev->pm.debug_core_mask[0x02] = new_core_mask_js2;
     kbdev->pm.debug_core_mask_all = new_core_mask_js0 | new_core_mask_js1 | new_core_mask_js2;
 
     kbase_pm_update_cores_state_nolock(kbdev);

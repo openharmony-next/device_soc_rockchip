@@ -219,16 +219,14 @@ static void ss_wakeup(struct msg_queue *msq, struct wake_q_head *wake_q, bool ki
     {
         if (kill) {
             mss->list.next = NULL;
-        }
-
+        } else if (stop_tsk == mss->tsk) {
         /*
          * Stop at the first task we don't wakeup,
          * we've already iterated the original
          * sender queue.
          */
-        else if (stop_tsk == mss->tsk) {
             break;
-        }
+        } else if (!msg_fits_inqueue(msq, mss->msgsz)) {
         /*
          * We are not in an EIDRM scenario here, therefore
          * verify that we really need to wakeup the task.
@@ -236,7 +234,6 @@ static void ss_wakeup(struct msg_queue *msq, struct wake_q_head *wake_q, bool ki
          * move the sender to the tail on behalf of the
          * blocked task.
          */
-        else if (!msg_fits_inqueue(msq, mss->msgsz)) {
             if (!stop_tsk) {
                 stop_tsk = mss->tsk;
             }
@@ -835,7 +832,6 @@ static inline int pipelined_send(struct msg_queue *msq, struct msg_msg *msg, str
     {
         if (testmsg(msg, msr->r_msgtype, msr->r_mode) &&
             !security_msg_queue_msgrcv(&msq->q_perm, msg, msr->r_tsk, msr->r_msgtype, msr->r_mode)) {
-
             list_del(&msr->r_list);
             if (msr->r_maxsize < msg->m_ts) {
                 wake_q_add(wake_q, msr->r_tsk);

@@ -109,9 +109,9 @@ KBASE_KTRACE_CODE_MAKE_CODE(CORE_CTX_DESTROY),
     KBASE_KTRACE_CODE_MAKE_CODE(PM_RELEASE_CHANGE_TILER_NEEDED),
     KBASE_KTRACE_CODE_MAKE_CODE(PM_REQUEST_CHANGE_SHADER_NEEDED),
     KBASE_KTRACE_CODE_MAKE_CODE(PM_REQUEST_CHANGE_TILER_NEEDED), KBASE_KTRACE_CODE_MAKE_CODE(PM_WAKE_WAITERS),
-    /* info_val == kbdev->pm.active_count*/
+    /* info_val == kbdev->pm.active_count */
     KBASE_KTRACE_CODE_MAKE_CODE(PM_CONTEXT_ACTIVE),
-    /* info_val == kbdev->pm.active_count*/
+    /* info_val == kbdev->pm.active_count */
     KBASE_KTRACE_CODE_MAKE_CODE(PM_CONTEXT_IDLE), KBASE_KTRACE_CODE_MAKE_CODE(PM_GPU_ON),
     KBASE_KTRACE_CODE_MAKE_CODE(PM_GPU_OFF),
     /* info_val == policy number, or -1 for "Already changing" */

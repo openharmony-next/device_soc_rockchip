@@ -404,7 +404,6 @@ EXPORT_SYMBOL(finish_wait);
 __sched int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode, int sync, void *key)
 {
     int ret = default_wake_function(wq_entry, mode, sync, key);
-
     if (ret) {
         list_del_init_careful(&wq_entry->entry);
     }

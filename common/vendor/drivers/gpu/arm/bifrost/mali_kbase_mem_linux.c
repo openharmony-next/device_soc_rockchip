@@ -257,7 +257,6 @@ void *kbase_phy_alloc_mapping_get(struct kbase_context *kctx, u64 gpu_addr,
 
     /* First do a quick lookup in the list of event memory regions */
     reg = kbase_find_event_mem_region(kctx, gpu_addr);
-
     if (!reg) {
         reg =
             kbase_region_tracker_find_region_enclosing_address(kctx, gpu_addr);
@@ -394,7 +393,6 @@ struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx,
     }
 
     reg = kbase_alloc_free_region(rbtree, PFN_DOWN(*gpu_va), va_pages, zone);
-
     if (!reg) {
         dev_err(dev, "Failed to allocate free region");
         goto no_region;
@@ -497,7 +495,7 @@ struct kbase_va_region *kbase_mem_alloc(struct kbase_context *kctx,
         cookie <<= PAGE_SHIFT;
 
         *gpu_va = (u64)cookie;
-    } else /* we control the VA */ {
+    } else { /* we control the VA */
         if (kbase_gpu_mmap(kctx, reg, *gpu_va, va_pages, 1) != 0) {
             dev_warn(dev, "Failed to map memory on GPU");
             kbase_gpu_vm_unlock(kctx);
@@ -683,9 +681,7 @@ out_unlock:
  *
  * Return: Number of pages which can be freed.
  */
-static unsigned long
-kbase_mem_evictable_reclaim_count_objects(struct shrinker *s,
-                                          struct shrink_control *sc)
+static unsigned long kbase_mem_evictable_reclaim_count_objects(struct shrinker *s, struct shrink_control *sc)
 {
     struct kbase_context *kctx;
     struct kbase_mem_phy_alloc *alloc;
@@ -721,9 +717,7 @@ kbase_mem_evictable_reclaim_count_objects(struct shrinker *s,
  * The eviction list itself is guarded by the eviction lock and the MMU updates
  * are protected by their own lock.
  */
-static unsigned long
-kbase_mem_evictable_reclaim_scan_objects(struct shrinker *s,
-                                         struct shrink_control *sc)
+static unsigned long kbase_mem_evictable_reclaim_scan_objects(struct shrinker *s, struct shrink_control *sc)
 {
     struct kbase_context *kctx;
     struct kbase_mem_phy_alloc *alloc;
@@ -906,7 +900,6 @@ bool kbase_mem_evictable_unmake(struct kbase_mem_phy_alloc *gpu_alloc)
         if (gpu_alloc->reg) {
             /* ... allocate replacement backing ... */
             err = kbase_alloc_phy_pages_helper(gpu_alloc, gpu_alloc->evicted);
-
             /*
              * ... and grow the mapping back to its
              * pre-eviction size.
@@ -1646,7 +1639,6 @@ kbase_mem_from_user_buffer(struct kbase_context *kctx, unsigned long address,
     }
 
     reg = kbase_alloc_free_region(rbtree, 0, *va_pages, zone);
-
     if (!reg) {
         goto no_region;
     }
@@ -1892,7 +1884,6 @@ u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride,
 
             aliasing_reg = kbase_region_tracker_find_region_base_address(
                 kctx, (ai[i].handle.basep.handle >> PAGE_SHIFT) << PAGE_SHIFT);
-
             /* validate found region */
             if (kbase_is_region_invalid_or_free(aliasing_reg)) {
                 goto bad_handle; /* Not found/already free */
@@ -1914,7 +1905,7 @@ u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride,
                 goto bad_handle;
             }
             /* Non-coherent memory cannot alias
-               coherent memory, and vice versa.*/
+               coherent memory, and vice versa. */
 
             /* check size against stride */
             if (!ai[i].length) {
@@ -1958,7 +1949,7 @@ u64 kbase_mem_alias(struct kbase_context *kctx, u64 *flags, u64 stride,
         /* relocate to correct base */
         gpu_va += PFN_DOWN(BASE_MEM_COOKIE_BASE);
         gpu_va <<= PAGE_SHIFT;
-    } else /* we control the VA */ {
+    } else { /* we control the VA */
 #else
     if (1) {
 #endif
@@ -2236,7 +2227,7 @@ int kbase_mem_commit(struct kbase_context *kctx, u64 gpu_addr, u64 new_pages)
         goto out_unlock;
     }
 
-    if (0 == (reg->flags & KBASE_REG_GROWABLE)) {
+    if ((reg->flags & KBASE_REG_GROWABLE == 0)) {
         goto out_unlock;
     }
 
@@ -2299,7 +2290,6 @@ int kbase_mem_commit(struct kbase_context *kctx, u64 gpu_addr, u64 new_pages)
 
         /* Update GPU mapping. */
         res = kbase_mem_grow_gpu_mapping(kctx, reg, new_pages, old_pages);
-
         /* On error free the new pages */
         if (res) {
             kbase_free_phy_pages_helper(reg->cpu_alloc, delta);
@@ -2506,7 +2496,6 @@ static vm_fault_t kbase_cpu_vm_fault(struct vm_fault *vmf)
         ret = mgm_dev->ops.mgm_vmf_insert_pfn_prot(
             mgm_dev, map->alloc->group_id, vma, addr << PAGE_SHIFT,
             PFN_DOWN(as_phys_addr_t(pages[i])), vma->vm_page_prot);
-
         if (ret != VM_FAULT_NOPAGE) {
             goto exit;
         }
@@ -2534,7 +2523,6 @@ static int kbase_cpu_mmap(struct kbase_context *kctx,
     int err = 0;
 
     map = kzalloc(sizeof(*map), GFP_KERNEL);
-
     if (!map) {
         WARN_ON(1);
         err = -ENOMEM;
@@ -2659,7 +2647,6 @@ static int kbase_mmu_dump_mmap(struct kbase_context *kctx,
 #endif
 
     kaddr = kbase_mmu_dump(kctx, nr_pages);
-
     if (!kaddr) {
         err = -ENOMEM;
         goto out;
@@ -2747,8 +2734,8 @@ static int kbasep_reg_mmap(struct kbase_context *kctx,
         goto out;
     }
 
-    if ((vma->vm_flags & VM_READ && !(reg->flags & KBASE_REG_CPU_RD)) ||
-        (vma->vm_flags & VM_WRITE && !(reg->flags & KBASE_REG_CPU_WR))) {
+    if (((vma->vm_flags & VM_READ) && !(reg->flags & KBASE_REG_CPU_RD)) ||
+        ((vma->vm_flags & VM_WRITE) && !(reg->flags & KBASE_REG_CPU_WR))) {
         /* VM flags inconsistent with region flags */
         err = -EPERM;
         dev_err(kctx->kbdev->dev, "%s:%d inconsistent VM flags\n", __FILE__,
@@ -2805,7 +2792,7 @@ int kbase_context_mmap(struct kbase_context *const kctx,
         vma->vm_flags &= ~VM_MAYWRITE;
     }
 
-    if (0 == nr_pages) {
+    if (nr_pages == 0) {
         err = -EINVAL;
         goto out;
     }
@@ -2843,7 +2830,7 @@ int kbase_context_mmap(struct kbase_context *const kctx,
         case PFN_DOWN(BASE_MEM_MMU_DUMP_HANDLE):
             /* MMU dump */
             err = kbase_mmu_dump_mmap(kctx, vma, &reg, &kaddr);
-            if (0 != err) {
+            if (err != 0) {
                 goto out_unlock;
             }
             /* free the region on munmap */
@@ -2868,7 +2855,7 @@ int kbase_context_mmap(struct kbase_context *const kctx,
             BASE_MEM_FIRST_FREE_ADDRESS) -
             1: {
             err = kbasep_reg_mmap(kctx, vma, &reg, &nr_pages, &aligned_offset);
-            if (0 != err) {
+            if (err != 0) {
                 goto out_unlock;
             }
             /* free the region on munmap */
@@ -2878,7 +2865,6 @@ int kbase_context_mmap(struct kbase_context *const kctx,
         default: {
             reg = kbase_region_tracker_find_region_enclosing_address(
                 kctx, (u64)vma->vm_pgoff << PAGE_SHIFT);
-
             if (!kbase_is_region_invalid_or_free(reg)) {
                 /* will this mapping overflow the size of the region? */
                 if (nr_pages >
@@ -2887,9 +2873,9 @@ int kbase_context_mmap(struct kbase_context *const kctx,
                     goto out_unlock;
                 }
 
-                if ((vma->vm_flags & VM_READ &&
+                if (((vma->vm_flags & VM_READ) &&
                      !(reg->flags & KBASE_REG_CPU_RD)) ||
-                    (vma->vm_flags & VM_WRITE &&
+                    ((vma->vm_flags & VM_WRITE) &&
                      !(reg->flags & KBASE_REG_CPU_WR))) {
                     /* VM flags inconsistent with region flags */
                     err = -EPERM;
@@ -2899,7 +2885,7 @@ int kbase_context_mmap(struct kbase_context *const kctx,
                 }
 
                 if (KBASE_MEM_TYPE_IMPORTED_UMM == reg->cpu_alloc->type) {
-                    if (0 != (vma->vm_pgoff - reg->start_pfn)) {
+                    if ((vma->vm_pgoff - reg->start_pfn) != 0) {
                         err = -EINVAL;
                         dev_warn(
                             dev,
@@ -3495,7 +3481,6 @@ static vm_fault_t kbase_csf_user_reg_vm_fault(struct vm_fault *vmf)
     struct kbase_device *kbdev = kctx->kbdev;
     unsigned long pfn = PFN_DOWN(kbdev->reg_start + USER_BASE);
     size_t nr_pages = PFN_DOWN(vma->vm_end - vma->vm_start);
-
     /* Few sanity checks up front */
     if (WARN_ON(nr_pages != 1) || WARN_ON(vma != kctx->csf.user_reg_vma) ||
         WARN_ON(vma->vm_pgoff !=

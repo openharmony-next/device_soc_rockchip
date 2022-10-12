@@ -43,7 +43,7 @@ _mali_osk_notification_queue_t *_mali_osk_notification_queue_init(void)
     _mali_osk_notification_queue_t *result;
 
     result = (_mali_osk_notification_queue_t *)kmalloc(sizeof(_mali_osk_notification_queue_t), GFP_KERNEL);
-    if (NULL == result) {
+    if (result == NULL) {
         return NULL;
     }
 
@@ -61,7 +61,7 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size)
 
     notification = (_mali_osk_notification_wrapper_t *)kmalloc(sizeof(_mali_osk_notification_wrapper_t) + size,
                                                                GFP_KERNEL | __GFP_HIGH | __GFP_RETRY_MAYFAIL);
-    if (NULL == notification) {
+    if (notification == NULL) {
         MALI_DEBUG_PRINT(1, ("Failed to create a notification object\n"));
         return NULL;
     }
@@ -69,7 +69,7 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size)
     /* Init the list */
     INIT_LIST_HEAD(&notification->list);
 
-    if (0 != size) {
+    if (size != 0) {
         notification->data.result_buffer = ((u8 *)notification) + sizeof(_mali_osk_notification_wrapper_t);
     } else {
         notification->data.result_buffer = NULL;

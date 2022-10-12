@@ -251,7 +251,7 @@ static inline u32 rk_mk_dte(dma_addr_t pt_dma)
 static inline u32 rk_mk_dte_v2(dma_addr_t pt_dma)
 {
     pt_dma = (pt_dma & PAGE_DESC_LO_MASK) | ((pt_dma & PAGE_DESC_HI_MASK1) >> PAGE_DESC_HI_SHIFT1) |
-             (pt_dma & PAGE_DESC_HI_MASK2) >> PAGE_DESC_HI_SHIFT2;
+             ((pt_dma & PAGE_DESC_HI_MASK2) >> PAGE_DESC_HI_SHIFT2);
 
     return (pt_dma & RK_DTE_PT_ADDRESS_MASK_V2) | RK_DTE_PT_VALID;
 }
@@ -334,7 +334,7 @@ static u32 rk_mk_pte_v2(phys_addr_t page, int prot)
     flags |= (prot & IOMMU_READ) ? RK_PTE_PAGE_READABLE_V2 : 0;
     flags |= (prot & IOMMU_WRITE) ? RK_PTE_PAGE_WRITABLE_V2 : 0;
     page = (page & PAGE_DESC_LO_MASK) | ((page & PAGE_DESC_HI_MASK1) >> PAGE_DESC_HI_SHIFT1) |
-           (page & PAGE_DESC_HI_MASK2) >> PAGE_DESC_HI_SHIFT2;
+           ((page & PAGE_DESC_HI_MASK2) >> PAGE_DESC_HI_SHIFT2);
     page &= RK_PTE_PAGE_ADDRESS_MASK_V2;
 
     return page | flags | RK_PTE_PAGE_VALID;
@@ -1719,15 +1719,17 @@ static const struct rockchip_iommu_data iommu_data_v2 = {
     .version = 0x2,
 };
 
-static const struct of_device_id rk_iommu_dt_ids[] = {{
-    .compatible = "rockchip,iommu",
-    .data = &iommu_data_v1,
-},
-{
-    .compatible = "rockchip,iommu-v2",
-    .data = &iommu_data_v2,
-},
-{}};
+static const struct of_device_id rk_iommu_dt_ids[] = {
+    {
+        .compatible = "rockchip,iommu",
+        .data = &iommu_data_v1,
+    },
+    {
+        .compatible = "rockchip,iommu-v2",
+        .data = &iommu_data_v2,
+    },
+    {}
+};
 
 static int rk_iommu_probe(struct platform_device *pdev)
 {

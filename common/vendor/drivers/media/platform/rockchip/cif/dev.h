@@ -474,7 +474,7 @@ enum rkcif_dma_en_mode {
 };
 
 /*
- * struct rkcif_stream - Stream states TODO
+ * struct rkcif_stream - Stream states
  *
  * @vbq_lock: lock to protect buf_queue
  * @buf_queue: queued buffer list
@@ -505,7 +505,7 @@ struct rkcif_stream {
 
     spinlock_t vbq_lock; /* vfd lock */
     spinlock_t fps_lock;
-    /* TODO: pad for dvp and mipi separately? */
+    /* pad for dvp and mipi separately? */
     struct media_pad pad;
 
     const struct cif_output_fmt *cif_fmt_out;

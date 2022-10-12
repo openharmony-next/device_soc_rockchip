@@ -184,7 +184,6 @@ static void kbasep_hwcnt_backend_jm_cc_disable(struct kbase_hwcnt_backend_jm *ba
     }
 #endif
     if (kbase_hwcnt_clk_enable_map_enabled(clk_enable_map, KBASE_CLOCK_DOMAIN_SHADER_CORES)) {
-
         kbase_clk_rate_trace_manager_unsubscribe(rtm, &backend_jm->rate_listener);
     }
 }
@@ -419,7 +418,6 @@ static int kbasep_hwcnt_backend_jm_dump_alloc(const struct kbase_hwcnt_backend_j
     nr_pages = PFN_UP(info->dump_bytes);
 
     reg = kbase_mem_alloc(kctx, nr_pages, nr_pages, 0, &flags, gpu_dump_va);
-
     if (!reg) {
         return -ENOMEM;
     }
@@ -660,7 +658,6 @@ int kbase_hwcnt_backend_jm_create(struct kbase_device *kbdev, struct kbase_hwcnt
     }
 
     errcode = kbasep_hwcnt_backend_jm_info_create(kbdev, &info);
-
     if (errcode) {
         return errcode;
     }

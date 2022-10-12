@@ -30,7 +30,7 @@ mali_osk_errcode_t mali_session_initialize(void)
     init_waitqueue_head(&pending_queue);
 
     mali_sessions_lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SESSIONS);
-    if (NULL == mali_sessions_lock) {
+    if (mali_sessions_lock == NULL) {
         return MALI_OSK_ERR_NOMEM;
     }
 
@@ -39,7 +39,7 @@ mali_osk_errcode_t mali_session_initialize(void)
 
 void mali_session_terminate(void)
 {
-    if (NULL != mali_sessions_lock) {
+    if (mali_sessions_lock != NULL) {
         _mali_osk_spinlock_irq_term(mali_sessions_lock);
         mali_sessions_lock = NULL;
     }
@@ -71,7 +71,7 @@ mali_bool mali_session_pp_job_is_empty(void *data)
     struct mali_session_data *session = (struct mali_session_data *)data;
     MALI_DEBUG_ASSERT_POINTER(session);
 
-    if (0 == mali_osk_atomic_read(&session->number_of_pp_jobs)) {
+    if (mali_osk_atomic_read(&session->number_of_pp_jobs) == 0) {
         return MALI_TRUE;
     }
     return MALI_FALSE;

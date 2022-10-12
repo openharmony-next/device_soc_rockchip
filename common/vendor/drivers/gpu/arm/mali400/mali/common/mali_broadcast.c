@@ -29,7 +29,7 @@ struct mali_bcast_unit *mali_bcast_unit_create(const _mali_osk_resource_t *resou
     MALI_DEBUG_ASSERT_POINTER(resource);
 
     bcast_unit = mali_osk_malloc(sizeof(struct mali_bcast_unit));
-    if (NULL == bcast_unit) {
+    if (bcast_unit == NULL) {
         MALI_PRINT_ERROR(("Broadcast: Failed to allocate memory for Broadcast unit\n"));
         return NULL;
     }

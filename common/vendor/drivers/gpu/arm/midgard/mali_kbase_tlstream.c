@@ -341,12 +341,8 @@ static atomic_t tlstream_bytes_collected = {0};
 static atomic_t tlstream_bytes_generated = {0};
 #endif /* MALI_UNIT_TEST */
 
-/*****************************************************************************/
-
 /* Indicator of whether the timeline stream file descriptor is used. */
 atomic_t kbase_tlstream_enabled = {0};
-
-/*****************************************************************************/
 
 /**
  * kbasep_tlstream_get_timestamp - return timestamp
@@ -442,7 +438,7 @@ static void kbasep_tlstream_put_bits(u32 *word, u32 value, unsigned int bitpos, 
     const u32 mask = ((1 << bitlen) - 1) << bitpos;
 
     KBASE_DEBUG_ASSERT(word);
-    KBASE_DEBUG_ASSERT((0 != bitlen) && (PACKET_OFFSET >= bitlen));
+    KBASE_DEBUG_ASSERT((bitlen) && (PACKET_OFFSET >= bitlen) != 0);
     KBASE_DEBUG_ASSERT((bitpos + bitlen) <= PACKET_OFFSET);
 
     *word &= ~mask;
@@ -624,7 +620,7 @@ static size_t kbasep_tlstream_msgbuf_submit(struct tl_stream *stream, unsigned i
     wake_up_interruptible(&tl_event_queue);
 
     /* Detect and mark overflow in this stream. */
-    if (PACKET_COUNT == wb_idx_raw - rb_idx_raw) {
+    if (wb_idx_raw - rb_idx_raw == PACKET_COUNT) {
         /* Reader side depends on this increment to correctly handle
          * overflows. The value shall be updated only if it was not
          * modified by the reader. The data holding buffer will not be
@@ -715,8 +711,6 @@ static void kbasep_tlstream_msgbuf_release(enum tl_stream_type stream_type, unsi
     spin_unlock_irqrestore(&stream->lock, flags);
 }
 
-/*****************************************************************************/
-
 /**
  * kbasep_tlstream_flush_stream - flush stream
  * @stype:  type of stream to be flushed
@@ -741,7 +735,6 @@ static void kbasep_tlstream_flush_stream(enum tl_stream_type stype)
     wb_idx_raw = atomic_read(&stream->wbi);
     wb_idx = wb_idx_raw % PACKET_COUNT;
     wb_size = atomic_read(&stream->buffer[wb_idx].size);
-
     if (wb_size > min_size) {
         wb_size = kbasep_tlstream_msgbuf_submit(stream, wb_idx_raw, wb_size);
         wb_idx = (wb_idx_raw + 1) % PACKET_COUNT;
@@ -773,9 +766,8 @@ static void kbasep_tlstream_autoflush_timer_callback(struct timer_list *t)
         size_t min_size = PACKET_HEADER_SIZE;
 
         int af_cnt = atomic_read(&stream->autoflush_counter);
-
         /* Check if stream contain unflushed data. */
-        if (0 > af_cnt) {
+        if (af_cnt < 0) {
             continue;
         }
 
@@ -797,7 +789,6 @@ static void kbasep_tlstream_autoflush_timer_callback(struct timer_list *t)
         wb_idx_raw = atomic_read(&stream->wbi);
         wb_idx = wb_idx_raw % PACKET_COUNT;
         wb_size = atomic_read(&stream->buffer[wb_idx].size);
-
         if (wb_size > min_size) {
             wb_size = kbasep_tlstream_msgbuf_submit(stream, wb_idx_raw, wb_size);
             wb_idx = (wb_idx_raw + 1) % PACKET_COUNT;
@@ -832,7 +823,7 @@ static int kbasep_tlstream_packet_pending(enum tl_stream_type *stype, unsigned i
     KBASE_DEBUG_ASSERT(rb_idx_raw);
 
     for (*stype = 0; (*stype < TL_STREAM_TYPE_COUNT) && !pending; (*stype)++) {
-        if (NULL != tl_stream[*stype]) {
+        if (tl_stream[*stype] != NULL) {
             *rb_idx_raw = atomic_read(&tl_stream[*stype]->rbi);
             /* Read buffer index may be updated by writer in case of
              * overflow. Read and write buffer indexes must be
@@ -1028,8 +1019,6 @@ static void kbasep_tlstream_timeline_header(enum tl_stream_type stream_type, con
     kbasep_tlstream_flush_stream(stream_type);
 }
 
-/*****************************************************************************/
-
 int kbase_tlstream_init(void)
 {
     enum tl_stream_type i;
@@ -1154,7 +1143,6 @@ int kbase_tlstream_acquire(struct kbase_context *kctx, u32 flags)
          * read by client.
          */
         kbase_create_timeline_objects(kctx);
-
     } else {
         ret = -EBUSY;
     }
@@ -1186,8 +1174,6 @@ void kbase_tlstream_stats(u32 *bytes_collected, u32 *bytes_generated)
     *bytes_generated = atomic_read(&tlstream_bytes_generated);
 }
 #endif /* MALI_UNIT_TEST */
-
-/*****************************************************************************/
 
 void __kbase_tlstream_tl_summary_new_ctx(void *context, u32 nr, u32 tgid)
 {
@@ -1312,8 +1298,6 @@ void __kbase_tlstream_tl_summary_lifelink_as_gpu(void *as, void *gpu)
 
     kbasep_tlstream_msgbuf_release(TL_STREAM_TYPE_OBJ_SUMMARY, flags);
 }
-
-/*****************************************************************************/
 
 void __kbase_tlstream_tl_new_ctx(void *context, u32 nr, u32 tgid)
 {
@@ -1857,8 +1841,6 @@ void __kbase_tlstream_jd_gpu_soft_reset(void *gpu)
 
     kbasep_tlstream_msgbuf_release(TL_STREAM_TYPE_OBJ, flags);
 }
-
-/*****************************************************************************/
 
 void __kbase_tlstream_aux_pm_state(u32 core_type, u64 state)
 {

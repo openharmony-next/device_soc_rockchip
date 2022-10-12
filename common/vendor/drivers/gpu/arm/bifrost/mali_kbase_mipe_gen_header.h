@@ -133,8 +133,7 @@
 /**
  * The MIPE tracepoint declaration BLOB.
  */
-const struct
-{
+const struct {
     u32 _mipe_w0;
     u32 _mipe_w1;
     u8  _protocol_version;

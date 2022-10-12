@@ -44,7 +44,7 @@ static void kbase_gpuprops_construct_coherent_groups(struct base_gpu_props *cons
     u64 first_set, first_set_prev;
     u32 num_groups = 0;
 
-    KBASE_DEBUG_ASSERT(NULL != props);
+    KBASE_DEBUG_ASSERT(props != NULL);
 
     props->coherency_info.coherency = props->raw_props.mem_features;
     props->coherency_info.num_core_groups = hweight64(props->raw_props.l2_present);
@@ -120,8 +120,8 @@ static int kbase_gpuprops_get_props(struct base_gpu_props *const gpu_props, stru
     int i;
     int err;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
-    KBASE_DEBUG_ASSERT(NULL != gpu_props);
+    KBASE_DEBUG_ASSERT(kbdev  != NULL);
+    KBASE_DEBUG_ASSERT(gpu_props  != NULL);
 
     /* Dump relevant registers */
     err = kbase_backend_gpuprops_get(kbdev, &regdump);
@@ -273,7 +273,7 @@ void kbase_gpuprops_set(struct kbase_device *kbdev)
     struct kbase_gpu_props *gpu_props;
     struct gpu_raw_gpu_props *raw;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     gpu_props = &kbdev->gpu_props;
     raw = &gpu_props->props.raw_props;
 

@@ -101,7 +101,7 @@ void mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_siz
 
 /** @brief Get Mali PMU switch delay
  *
- *@return pmu switch delay if it is configured
+ * @return pmu switch delay if it is configured
  */
 u32 mali_osk_get_pmu_switch_delay(void);
 

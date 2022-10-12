@@ -130,4 +130,4 @@ int kbase_debugfs_helper_seq_read(struct seq_file *const sfile, size_t const nel
 int kbase_debugfs_helper_seq_write(struct file *const file, const char __user *const ubuf, size_t const count,
                                    size_t const nelems, kbase_debugfs_helper_set_attr_fn const set_attr_fn);
 
-#endif /*_KBASE_DEBUGFS_HELPER_H_ */
+#endif /* _KBASE_DEBUGFS_HELPER_H_ */

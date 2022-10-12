@@ -448,7 +448,6 @@ enum dp_irq_type analogix_dp_get_irq_type(struct analogix_dp_device *dp)
 
     /* Parse hotplug interrupt status register */
     reg = analogix_dp_read(dp, ANALOGIX_DP_COMMON_INT_STA_4);
-
     if (reg & PLUG) {
         return DP_IRQ_TYPE_HP_CABLE_IN;
     }
@@ -798,7 +797,6 @@ int analogix_dp_is_slave_video_stream_clock_on(struct analogix_dp_device *dp)
     analogix_dp_write(dp, ANALOGIX_DP_SYS_CTL_1, reg);
 
     reg = analogix_dp_read(dp, ANALOGIX_DP_SYS_CTL_1);
-
     if (!(reg & DET_STA)) {
         dev_dbg(dp->dev, "Input stream clock not detected.\n");
         return -EINVAL;
@@ -1177,7 +1175,6 @@ ssize_t analogix_dp_transfer(struct analogix_dp_device *dp, struct drm_dp_aux_ms
 
         reg = analogix_dp_read(dp, ANALOGIX_DP_BUFFER_DATA_CTL);
         buf_data_count = BUF_DATA_COUNT(reg);
-
         if (buf_data_count != msg->size) {
             return -EBUSY;
         }

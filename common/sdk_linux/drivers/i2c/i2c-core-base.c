@@ -888,7 +888,7 @@ struct i2c_client *i2c_new_client_device(struct i2c_adapter *adap, struct i2c_bo
     struct i2c_client *client;
     int status;
 
-    client = kzalloc(sizeof *client, GFP_KERNEL);
+    client = kzalloc(sizeof(*client), GFP_KERNEL);
     if (!client) {
         return ERR_PTR(-ENOMEM);
     }
@@ -1999,15 +1999,15 @@ static int i2c_check_for_quirks(struct i2c_adapter *adap, struct i2c_msg *msgs, 
 
         /* special checks for combined messages */
         if (num == I2C_CHECK_MAX_NUM) {
-            if (q->flags & I2C_AQ_COMB_WRITE_FIRST && msgs[0].flags & I2C_M_RD) {
+            if ((q->flags & I2C_AQ_COMB_WRITE_FIRST) && (msgs[0].flags & I2C_M_RD)) {
                 return i2c_quirk_error(adap, &msgs[0], "1st comb msg must be write");
             }
 
-            if (q->flags & I2C_AQ_COMB_READ_SECOND && !(msgs[1].flags & I2C_M_RD)) {
+            if ((q->flags & I2C_AQ_COMB_READ_SECOND) && !(msgs[1].flags & I2C_M_RD)) {
                 return i2c_quirk_error(adap, &msgs[1], "2nd comb msg must be read");
             }
 
-            if (q->flags & I2C_AQ_COMB_SAME_ADDR && msgs[0].addr != msgs[1].addr) {
+            if ((q->flags & I2C_AQ_COMB_SAME_ADDR) && (msgs[0].addr != msgs[1].addr)) {
                 return i2c_quirk_error(adap, &msgs[0], "comb msg only to same addr");
             }
 
@@ -2035,7 +2035,7 @@ static int i2c_check_for_quirks(struct i2c_adapter *adap, struct i2c_msg *msgs, 
                 return i2c_quirk_error(adap, &msgs[i], "msg too long");
             }
 
-            if (q->flags & I2C_AQ_NO_ZERO_LEN_READ && len == 0) {
+            if ((q->flags & I2C_AQ_NO_ZERO_LEN_READ) && len == 0) {
                 return i2c_quirk_error(adap, &msgs[i], "no zero length");
             }
         } else {
@@ -2043,7 +2043,7 @@ static int i2c_check_for_quirks(struct i2c_adapter *adap, struct i2c_msg *msgs, 
                 return i2c_quirk_error(adap, &msgs[i], "msg too long");
             }
 
-            if (q->flags & I2C_AQ_NO_ZERO_LEN_WRITE && len == 0) {
+            if ((q->flags & I2C_AQ_NO_ZERO_LEN_WRITE) && len == 0) {
                 return i2c_quirk_error(adap, &msgs[i], "no zero length");
             }
         }
@@ -2288,7 +2288,7 @@ static int i2c_default_probe(struct i2c_adapter *adap, unsigned short addr)
 #endif
         if (!((addr & ~I2C_ADDR_LOW_THREE_BYTE_BIT_MASK) == I2C_ADDR_DEFAULT_VALUE_ONE ||
               (addr & ~I2C_ADDR_LOW_FOUR_BYTE_BIT_MASK) == I2C_ADDR_DEFAULT_VALUE_TWO) &&
-            i2c_check_functionality(adap, I2C_FUNC_SMBUS_QUICK)){
+            i2c_check_functionality(adap, I2C_FUNC_SMBUS_QUICK)) {
                 err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_WRITE, 0, I2C_SMBUS_QUICK, NULL);
             }
     else if (i2c_check_functionality(adap, I2C_FUNC_SMBUS_READ_BYTE)) {
@@ -2533,7 +2533,7 @@ void i2c_put_dma_safe_msg_buf(u8 *buf, struct i2c_msg *msg, bool xferred)
         return;
     }
 
-    if (xferred && msg->flags & I2C_M_RD) {
+    if (xferred && (msg->flags & I2C_M_RD)) {
         memcpy(msg->buf, buf, msg->len);
     }
 

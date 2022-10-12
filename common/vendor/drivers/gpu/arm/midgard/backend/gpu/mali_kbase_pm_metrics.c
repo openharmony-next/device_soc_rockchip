@@ -194,7 +194,7 @@ void kbase_pm_get_dvfs_utilisation(struct kbase_device *kbdev, unsigned long *to
      * 100ms) */
     if (total >= MALI_UTILIZATION_MAX_PERIOD) {
         kbase_pm_reset_dvfs_utilisation_unlocked(kbdev, now);
-    } else if (total < (MALI_UTILIZATION_MAX_PERIOD / 2)) {
+    } else if (total < (MALI_UTILIZATION_MAX_PERIOD / 0x02)) {
         total += kbdev->pm.backend.metrics.prev_idle + kbdev->pm.backend.metrics.prev_busy;
         busy += kbdev->pm.backend.metrics.prev_busy;
     }
@@ -230,7 +230,7 @@ int kbase_pm_get_dvfs_utilisation_old(struct kbase_device *kbdev, int *util_gl_s
         goto out;
     }
 
-    utilisation = (100 * kbdev->pm.backend.metrics.time_busy) /
+    utilisation = (0x64 * kbdev->pm.backend.metrics.time_busy) /
                   (kbdev->pm.backend.metrics.time_idle + kbdev->pm.backend.metrics.time_busy);
 
     busy =
@@ -238,11 +238,11 @@ int kbase_pm_get_dvfs_utilisation_old(struct kbase_device *kbdev, int *util_gl_s
 
     if (busy != 0) {
         if (util_gl_share) {
-            *util_gl_share = (100 * kbdev->pm.backend.metrics.busy_gl) / busy;
+            *util_gl_share = (0x64 * kbdev->pm.backend.metrics.busy_gl) / busy;
         }
         if (util_cl_share) {
-            util_cl_share[0] = (100 * kbdev->pm.backend.metrics.busy_cl[0]) / busy;
-            util_cl_share[1] = (100 * kbdev->pm.backend.metrics.busy_cl[1]) / busy;
+            util_cl_share[0] = (0x64 * kbdev->pm.backend.metrics.busy_cl[0]) / busy;
+            util_cl_share[1] = (0x64 * kbdev->pm.backend.metrics.busy_cl[1]) / busy;
         }
     } else {
         if (util_gl_share) {
@@ -272,7 +272,6 @@ void kbase_pm_get_dvfs_action(struct kbase_device *kbdev)
     now = ktime_get();
 
     utilisation = kbase_pm_get_dvfs_utilisation_old(kbdev, &util_gl_share, util_cl_share, now);
-
     if (utilisation < 0 || util_gl_share < 0 || util_cl_share[0] < 0 || util_cl_share[1] < 0) {
         utilisation = 0;
         util_gl_share = 0;
@@ -284,7 +283,7 @@ void kbase_pm_get_dvfs_action(struct kbase_device *kbdev)
 out:
 #ifdef CONFIG_MALI_MIDGARD_DVFS
     kbase_platform_dvfs_event(kbdev, utilisation, util_gl_share, util_cl_share);
-#endif /*CONFIG_MALI_MIDGARD_DVFS */
+#endif /* CONFIG_MALI_MIDGARD_DVFS */
 
     kbase_pm_reset_dvfs_utilisation_unlocked(kbdev, now);
 
@@ -339,13 +338,13 @@ static void kbase_pm_metrics_active_calc(struct kbase_device *kbdev)
         if (katom && katom->gpu_rb_state == KBASE_ATOM_GPU_RB_SUBMITTED) {
             if (katom->core_req & BASE_JD_REQ_ONLY_COMPUTE) {
                 int device_nr = (katom->core_req & BASE_JD_REQ_SPECIFIC_COHERENT_GROUP) ? katom->device_nr : 0;
-                if (!WARN_ON(device_nr >= 2)) {
+                if (!WARN_ON(device_nr >= 0x02)) {
                     kbdev->pm.backend.metrics.active_cl_ctx[device_nr] = 1;
                 }
             } else {
                 /* Slot 2 should not be running non-compute
                  * atoms */
-                if (!WARN_ON(js >= 2)) {
+                if (!WARN_ON(js >= 0x02)) {
                     kbdev->pm.backend.metrics.active_gl_ctx[js] = 1;
                 }
             }

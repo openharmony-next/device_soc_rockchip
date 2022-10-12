@@ -75,4 +75,4 @@ static inline int rockchip_iovmm_invalidate_tlb(struct device *dev)
     return -ENOSYS;
 }
 
-#endif /*__ASM_PLAT_IOVMM_H*/
+#endif /* __ASM_PLAT_IOVMM_H */

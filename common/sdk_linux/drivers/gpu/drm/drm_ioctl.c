@@ -53,7 +53,7 @@
  * In an attempt to warn anyone else who's trying to figure out what's going
  * on here, I'll try to summarize the story. First things first, let's clear up
  * the names, because the kernel internals, libdrm and the ioctls are all named
- * differently:
+ * differently:see below
  *
  *  - GET_UNIQUE ioctl, implemented by drm_getunique is wrapped up in libdrm
  *    through the drmGetBusid function.
@@ -727,7 +727,7 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
  * up.
  *
  * First you need to define the structure for your IOCTL in your driver private
- * UAPI header in ``include/uapi/drm/my_driver_drm.h``::
+ * UAPI header in ``include/uapi/drm/my_driver_drm.h``:: see below
  *
  *     struct my_driver_operation {
  *             u32 some_thing;

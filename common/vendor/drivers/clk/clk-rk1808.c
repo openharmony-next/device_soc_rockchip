@@ -77,7 +77,7 @@ static struct rockchip_pll_rate_table rk1808_pll_rates[] = {
     RK3036_PLL_RATE(200000000, 1, 200, 6, 4, 1, 0),
     RK3036_PLL_RATE(100000000, 1, 150, 6, 6, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),
-    {/* sentinel */},
+    { }, /* sentinel */
 };
 
 #define RK1808_DIV_ACLKM_MASK 0x7
@@ -891,9 +891,9 @@ static int __init clk_rk1808_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id clk_rk1808_match_table[] = {{
-                                                                 .compatible = "rockchip,rk1808-cru",
-                                                             },
-                                                             {}};
+    .compatible = "rockchip,rk1808-cru",
+    },
+    {}};
 MODULE_DEVICE_TABLE(of, clk_rk1808_match_table);
 
 static struct platform_driver clk_rk1808_driver = {

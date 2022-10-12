@@ -45,7 +45,7 @@ static struct mali_internal_sync_fence *mali_timeline_sync_fence_create_and_add_
 
     /* Allocate sync fence tracker. */
     sync_fence_tracker = mali_osk_calloc(1, sizeof(struct mali_timeline_sync_fence_tracker));
-    if (NULL == sync_fence_tracker) {
+    if (sync_fence_tracker == NULL) {
         MALI_PRINT_ERROR(("Mali Timeline: sync_fence_tracker allocation failed\n"));
         return NULL;
     }
@@ -53,7 +53,7 @@ static struct mali_internal_sync_fence *mali_timeline_sync_fence_create_and_add_
     /* Create sync flag. */
     MALI_DEBUG_ASSERT_POINTER(timeline->sync_tl);
     sync_fence_tracker->flag = mali_sync_flag_create(timeline->sync_tl, point);
-    if (NULL == sync_fence_tracker->flag) {
+    if (sync_fence_tracker->flag == NULL) {
         MALI_PRINT_ERROR(("Mali Timeline: sync_flag creation failed\n"));
         _mali_osk_free(sync_fence_tracker);
         return NULL;
@@ -61,7 +61,7 @@ static struct mali_internal_sync_fence *mali_timeline_sync_fence_create_and_add_
 
     /* Create sync fence from sync flag. */
     sync_fence = mali_sync_flag_create_fence(sync_fence_tracker->flag);
-    if (NULL == sync_fence) {
+    if (sync_fence == NULL) {
         MALI_PRINT_ERROR(("Mali Timeline: sync_fence creation failed\n"));
         mali_sync_flag_put(sync_fence_tracker->flag);
         _mali_osk_free(sync_fence_tracker);
@@ -107,14 +107,14 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
         MALI_DEBUG_ASSERT_POINTER(timeline);
 
         sync_fence = mali_timeline_sync_fence_create_and_add_tracker(timeline, fence->points[i]);
-        if (NULL == sync_fence) {
+        if (sync_fence == NULL) {
             goto error;
         }
 
-        if (NULL != sync_fence_acc) {
+        if (sync_fence_acc != NULL) {
             /* Merge sync fences. */
             sync_fence_acc = mali_sync_fence_merge(sync_fence_acc, sync_fence);
-            if (NULL == sync_fence_acc) {
+            if (sync_fence_acc == NULL) {
                 goto error;
             }
         } else {
@@ -131,14 +131,13 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
         struct mali_internal_sync_fence *sync_fence;
         sync_fence = mali_internal_sync_fence_fdget(fence->sync_fd);
 #endif
-
-        if (NULL == sync_fence) {
+        if (sync_fence == NULL) {
             goto error;
         }
 
-        if (NULL != sync_fence_acc) {
+        if (sync_fence_acc != NULL) {
             sync_fence_acc = mali_sync_fence_merge(sync_fence_acc, sync_fence);
-            if (NULL == sync_fence_acc) {
+            if (sync_fence_acc == NULL) {
                 goto error;
             }
         } else {
@@ -146,13 +145,13 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
         }
     }
 
-    if (NULL == sync_fence_acc) {
+    if (sync_fence_acc == NULL) {
         MALI_DEBUG_ASSERT_POINTER(system->signaled_sync_tl);
 
         /* There was nothing to wait on, so return an already signaled fence. */
 
         sync_fence_acc = mali_sync_timeline_create_signaled_fence(system->signaled_sync_tl);
-        if (NULL == sync_fence_acc) {
+        if (sync_fence_acc == NULL) {
             goto error;
         }
     }
@@ -161,7 +160,7 @@ s32 mali_timeline_sync_fence_create(struct mali_timeline_system *system, struct 
     return mali_sync_fence_fd_alloc(sync_fence_acc);
 
 error:
-    if (NULL != sync_fence_acc) {
+    if (sync_fence_acc != NULL) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
         sync_fence_put(sync_fence_acc);
 #else

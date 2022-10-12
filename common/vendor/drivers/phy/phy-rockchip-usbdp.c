@@ -186,7 +186,7 @@ static int udphy_clk_init(struct rockchip_udphy *udphy, struct device *dev)
 
     /* used for configure phy reference clock frequency */
     for (i = 0; i < udphy->num_clks; i++) {
-        if (!strncmp(udphy->clks[i].id, "refclk", 6)) {
+        if (!strncmp(udphy->clks[i].id, "refclk", 0x6)) {
             udphy->refclk = udphy->clks[i].clk;
             break;
         }
@@ -302,7 +302,7 @@ static void udphy_usb_bvalid_enable(struct rockchip_udphy *udphy, u8 enable)
  *
  * 2 Mapping the lanes in dtsi
  * if all 4 lane assignment for dp function, define rockchip,dp-lane-mux = <x x x x>;
- * sample as follow:
+ * sample as follow
  * ---------------------------------------------------------------------------
  *                        B11-B10       A2-A3       A11-A10       B2-B3
  * rockchip,dp-lane-mux   ln0(tx/rx)    ln1(tx)     ln2(tx/rx)    ln3(tx)
@@ -310,7 +310,7 @@ static void udphy_usb_bvalid_enable(struct rockchip_udphy *udphy, u8 enable)
  * <2 3 0 1>              dpln2         dpln3       dpln0         dpln1
  * ---------------------------------------------------------------------------
  * if 2 lane for dp function, 2 lane for usb function, define rockchip,dp-lane-mux = <x x>;
- * sample as follow:
+ * sample as follow
  * ---------------------------------------------------------------------------
  *                        B11-B10       A2-A3       A11-A10       B2-B3
  * rockchip,dp-lane-mux   ln0(tx/rx)    ln1(tx)     ln2(tx/rx)    ln3(tx)
@@ -1074,7 +1074,8 @@ static int rk3588_udphy_status_check(struct rockchip_udphy *udphy)
     /* LCPLL check */
     if (udphy->mode & UDPHY_MODE_USB) {
         ret = regmap_read_poll_timeout(udphy->pma_regmap, CMN_ANA_LCPLL_DONE_OFFSET, val,
-                                       (val & CMN_ANA_LCPLL_AFC_DONE) && (val & CMN_ANA_LCPLL_LOCK_DONE), 200, 100000);
+                                       (val & CMN_ANA_LCPLL_AFC_DONE) && (val & CMN_ANA_LCPLL_LOCK_DONE),
+                                       0xC8, 0x186A0);
         if (ret) {
             dev_err(udphy->dev, "cmn ana lcpll lock timeout\n");
             return ret;
@@ -1084,13 +1085,13 @@ static int rk3588_udphy_status_check(struct rockchip_udphy *udphy)
     if (udphy->mode & UDPHY_MODE_USB) {
         if (!udphy->flip) {
             ret = regmap_read_poll_timeout(udphy->pma_regmap, TRSV_LN0_MON_RX_CDR_DONE_OFFSET, val,
-                                           val & TRSV_LN0_MON_RX_CDR_LOCK_DONE, 200, 100000);
+                                           val & TRSV_LN0_MON_RX_CDR_LOCK_DONE, 0xC8, 0x186A0);
             if (ret) {
                 dev_err(udphy->dev, "trsv ln0 mon rx cdr lock timeout\n");
             }
         } else {
             ret = regmap_read_poll_timeout(udphy->pma_regmap, TRSV_LN2_MON_RX_CDR_DONE_OFFSET, val,
-                                           val & TRSV_LN2_MON_RX_CDR_LOCK_DONE, 200, 100000);
+                                           val & TRSV_LN2_MON_RX_CDR_LOCK_DONE, 0xC8, 0x186A0);
             if (ret) {
                 dev_err(udphy->dev, "trsv ln2 mon rx cdr lock timeout\n");
             }
@@ -1259,7 +1260,7 @@ static int rk3588_dp_phy_set_rate(struct rockchip_udphy *udphy, struct phy_confi
 
     ret = regmap_read_poll_timeout(udphy->pma_regmap, CMN_ANA_ROPLL_DONE_OFFSET, val,
                                    FIELD_GET(CMN_ANA_ROPLL_LOCK_DONE, val) && FIELD_GET(CMN_ANA_ROPLL_AFC_DONE, val), 0,
-                                   1000);
+                                   0x3E8);
     if (ret) {
         dev_err(udphy->dev, "ROPLL is not lock\n");
         return ret;
@@ -1369,7 +1370,7 @@ static const struct rockchip_udphy_cfg rk3588_udphy_cfgs = {
 };
 
 static const struct of_device_id rockchip_udphy_dt_match[] = {
-    {.compatible = "rockchip,rk3588-usbdp-phy", .data = &rk3588_udphy_cfgs}, {/* sentinel */}};
+    {.compatible = "rockchip,rk3588-usbdp-phy", .data = &rk3588_udphy_cfgs}, {}};
 
 MODULE_DEVICE_TABLE(of, rockchip_udphy_dt_match);
 

@@ -563,7 +563,6 @@ static int mali_seq_internal_state_show(struct seq_file *seq_file, void *v)
     char *buf;
 
     size = seq_get_buf(seq_file, &buf);
-
     if (!size) {
         return -ENOMEM;
     }
@@ -680,7 +679,7 @@ static void *profiling_events_start(struct seq_file *s, loff_t *pos)
     }
 
     spos = kmalloc(sizeof(loff_t), GFP_KERNEL);
-    if (NULL == spos) {
+    if (spos == NULL) {
         return NULL;
     }
 
@@ -748,10 +747,10 @@ static int profiling_events_show_human_readable(struct seq_file *seq_file, void 
 
     /* Retrieve all events */
     if (MALI_OSK_ERR_OK == _mali_internal_profiling_get_event(index, &timestamp, &event_id, data)) {
-        seq_printf(seq_file, "%llu %u %u %u %u %u %u # ", timestamp, event_id, data[0], data[1], data[2], data[3],
-                   data[4]);
+        seq_printf(seq_file, "%llu %u %u %u %u %u %u # ", timestamp, event_id, data[0], data[1], data[0x02], data[0x03],
+                   data[0x04]);
 
-        if (0 == index) {
+        if (index == 0) {
             start_time = timestamp;
         }
 
@@ -1231,10 +1230,10 @@ int mali_sysfs_register(const char *mali_dev_name)
                     struct mali_group *group = mali_group_get_glob_group(i);
 
                     struct mali_gp_core *gp_core = mali_group_get_gp_core(group);
-                    if (NULL != gp_core) {
+                    if (gp_core != NULL) {
                         struct dentry *mali_gp_gpx_dir;
                         mali_gp_gpx_dir = debugfs_create_dir("gp0", mali_gp_dir);
-                        if (NULL != mali_gp_gpx_dir) {
+                        if (mali_gp_gpx_dir != NULL) {
                             debugfs_create_file("base_addr", 0x100, mali_gp_gpx_dir, &gp_core->hw_core,
                                                 &hw_core_base_addr_fops);
                             debugfs_create_file("enabled", 0x180, mali_gp_gpx_dir, group, &group_enabled_fops);
@@ -1258,12 +1257,12 @@ int mali_sysfs_register(const char *mali_dev_name)
                     struct mali_group *group = mali_group_get_glob_group(i);
 
                     struct mali_pp_core *pp_core = mali_group_get_pp_core(group);
-                    if (NULL != pp_core) {
+                    if (pp_core != NULL) {
                         char buf[16];
                         struct dentry *mali_pp_ppx_dir;
                         mali_osk_snprintf(buf, sizeof(buf), "pp%u", mali_pp_core_get_id(pp_core));
                         mali_pp_ppx_dir = debugfs_create_dir(buf, mali_pp_dir);
-                        if (NULL != mali_pp_ppx_dir) {
+                        if (mali_pp_ppx_dir != NULL) {
                             debugfs_create_file("base_addr", 0x100, mali_pp_ppx_dir, &pp_core->hw_core,
                                                 &hw_core_base_addr_fops);
                             if (!mali_group_is_virtual(group)) {
@@ -1288,12 +1287,12 @@ int mali_sysfs_register(const char *mali_dev_name)
 
                 l2_id = 0;
                 l2_cache = mali_l2_cache_core_get_glob_l2_core(l2_id);
-                while (NULL != l2_cache) {
+                while (l2_cache != NULL) {
                     char buf[16];
                     struct dentry *mali_l2_l2x_dir;
                     mali_osk_snprintf(buf, sizeof(buf), "l2%u", l2_id);
                     mali_l2_l2x_dir = debugfs_create_dir(buf, mali_l2_dir);
-                    if (NULL != mali_l2_l2x_dir) {
+                    if (mali_l2_l2x_dir != NULL) {
                         debugfs_create_file("counter_src0", 0x180, mali_l2_l2x_dir, l2_cache,
                                             &l2_l2x_counter_src0_fops);
                         debugfs_create_file("counter_src1", 0x180, mali_l2_l2x_dir, l2_cache,
@@ -1357,7 +1356,7 @@ int mali_sysfs_register(const char *mali_dev_name)
                     struct dentry *mali_profiling_pp_x_dir;
                     mali_osk_snprintf(buf, sizeof(buf), "%u", i);
                     mali_profiling_pp_x_dir = debugfs_create_dir(buf, mali_profiling_pp_dir);
-                    if (NULL != mali_profiling_pp_x_dir) {
+                    if (mali_profiling_pp_x_dir != NULL) {
                         debugfs_create_file("counter_src0", 0x180, mali_profiling_pp_x_dir,
                                             (void *)PRIVATE_DATA_COUNTER_MAKE_PP_SUB_JOB(0, i),
                                             &profiling_counter_src_fops);
@@ -1405,7 +1404,7 @@ int mali_sysfs_register(const char *mali_dev_name)
 
 int mali_sysfs_unregister(void)
 {
-    if (NULL != mali_debugfs_dir) {
+    if (mali_debugfs_dir != NULL) {
         debugfs_remove_recursive(mali_debugfs_dir);
     }
     return 0;

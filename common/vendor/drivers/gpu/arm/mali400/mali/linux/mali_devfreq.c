@@ -154,13 +154,13 @@ static int mali_devfreq_status(struct device *dev, struct devfreq_dev_status *st
     return 0;
 }
 
-/* setup platform specific opp in platform.c*/
+/* setup platform specific opp in platform.c */
 int __weak setup_opps(void)
 {
     return 0;
 }
 
-/* term platform specific opp in platform.c*/
+/* term platform specific opp in platform.c */
 int __weak term_opps(struct device *dev)
 {
     return 0;
@@ -295,7 +295,7 @@ int mali_devfreq_init(struct mali_device *mdev)
     mdev->devfreq->last_status.current_frequency = mdev->current_freq;
 
     if (MALI_OSK_ERR_OK == mali_osk_device_data_get(&data)) {
-        if (NULL != data.gpu_cooling_ops) {
+        if (data.gpu_cooling_ops != NULL) {
             callbacks = data.gpu_cooling_ops;
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali GPU Thermal: Callback handler installed \n"));
         }

@@ -159,7 +159,6 @@ static int mtd_vendor_storage_init(void)
     if (nand_info.version) {
         for (offset = mtd->erasesize - nand_info.ops_size; offset >= 0; offset -= nand_info.ops_size) {
             err = mtd_read(mtd, nand_info.blk_offset + offset, sizeof(*g_vendor), &bytes_read, (u8 *)g_vendor);
-
             /* the page is not programmed */
             if (!err && bytes_read == sizeof(*g_vendor) && g_vendor->tag == 0xFFFFFFFF &&
                 g_vendor->version == 0xFFFFFFFF && g_vendor->version2 == 0xFFFFFFFF) {
@@ -236,7 +235,7 @@ static int mtd_vendor_write(u32 id, void *pbuf, u32 size)
 
     p_data = g_vendor->data;
     item_num = g_vendor->item_num;
-    align_size = ALIGN(size, 0x40); /* align to 64 bytes*/
+    align_size = ALIGN(size, 0x40); /* align to 64 bytes */
     for (i = 0; i < item_num; i++) {
         item = &g_vendor->item[i];
         if (item->id == id) {
@@ -308,7 +307,7 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
     struct rk_vendor_req *v_req;
     u32 *page_buf;
 
-    page_buf = kmalloc(4096, GFP_KERNEL);
+    page_buf = kmalloc(0x1000, GFP_KERNEL);
     if (!page_buf) {
         return -ENOMEM;
     }
@@ -333,8 +332,8 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
                     }
                 }
             }
-        } break;
-
+            break;
+        }
         case VENDOR_WRITE_IO: {
             if (copy_from_user(page_buf, (void __user *)arg, 8)) {
                 ret = -EFAULT;
@@ -347,8 +346,8 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
                 }
                 ret = mtd_vendor_write(v_req->id, v_req->data, v_req->len);
             }
-        } break;
-
+            break;
+        }
         default:
             ret = -EINVAL;
             goto exit;
@@ -412,9 +411,9 @@ static int vendor_storage_remove(struct platform_device *pdev)
 }
 
 static const struct platform_device_id vendor_storage_ids[] = {{
-                                                                   "mtd_vendor_storage",
-                                                               },
-                                                               {}};
+    "mtd_vendor_storage",
+}, {
+}};
 
 static struct platform_driver vendor_storage_driver = {
     .probe = vendor_storage_probe,

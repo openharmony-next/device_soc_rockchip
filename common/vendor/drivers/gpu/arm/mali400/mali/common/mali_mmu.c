@@ -61,16 +61,18 @@ mali_osk_errcode_t mali_mmu_initialize(void)
 {
     /* allocate the helper pages */
     mali_empty_page_directory_phys = mali_allocate_empty_page(&mali_empty_page_directory_virt);
-    if (0 == mali_empty_page_directory_phys) {
+    if (mali_empty_page_directory_phys == 0) {
         MALI_DEBUG_PRINT_ERROR(("Mali MMU: Could not allocate empty page directory.\n"));
         mali_empty_page_directory_phys = MALI_INVALID_PAGE;
         return MALI_OSK_ERR_NOMEM;
     }
 
-    if (MALI_OSK_ERR_OK != mali_create_fault_flush_pages(
-                               &mali_page_fault_flush_page_directory, &mali_page_fault_flush_page_directory_mapping,
-                               &mali_page_fault_flush_page_table, &mali_page_fault_flush_page_table_mapping,
-                               &mali_page_fault_flush_data_page, &mali_page_fault_flush_data_page_mapping)) {
+    if (MALI_OSK_ERR_OK != mali_create_fault_flush_pages(&mali_page_fault_flush_page_directory,
+                                                         &mali_page_fault_flush_page_directory_mapping,
+                                                         &mali_page_fault_flush_page_table,
+                                                         &mali_page_fault_flush_page_table_mapping,
+                                                         &mali_page_fault_flush_data_page,
+                                                         &mali_page_fault_flush_data_page_mapping)) {
         MALI_DEBUG_PRINT_ERROR(("Mali MMU: Could not allocate fault flush pages\n"));
         mali_free_empty_page(mali_empty_page_directory_phys, mali_empty_page_directory_virt);
         mali_empty_page_directory_phys = MALI_INVALID_PAGE;
@@ -105,7 +107,7 @@ struct mali_mmu_core *mali_mmu_create(_mali_osk_resource_t *resource, struct mal
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali MMU: Creating Mali MMU: %s\n", resource->description));
 
     mmu = mali_osk_calloc(1, sizeof(struct mali_mmu_core));
-    if (NULL != mmu) {
+    if (mmu != NULL) {
         if (MALI_OSK_ERR_OK == mali_hw_core_create(&mmu->hw_core, resource, MALI_MMU_REGISTERS_SIZE)) {
             if (MALI_OSK_ERR_OK == mali_group_add_mmu_core(group, mmu)) {
                 if (is_virtual) {
@@ -118,7 +120,7 @@ struct mali_mmu_core *mali_mmu_create(_mali_osk_resource_t *resource, struct mal
                     mmu->irq =
                         _mali_osk_irq_init(resource->irq, mali_group_upper_half_mmu, group, mali_mmu_probe_trigger,
                                            mali_mmu_probe_ack, mmu, resource->description);
-                    if (NULL != mmu->irq) {
+                    if (mmu->irq != NULL) {
                         return mmu;
                     } else {
                         MALI_PRINT_ERROR(
@@ -142,7 +144,7 @@ struct mali_mmu_core *mali_mmu_create(_mali_osk_resource_t *resource, struct mal
 
 void mali_mmu_delete(struct mali_mmu_core *mmu)
 {
-    if (NULL != mmu->irq) {
+    if (mmu->irq != NULL) {
         _mali_osk_irq_term(mmu->irq);
     }
 
@@ -176,8 +178,7 @@ static mali_bool mali_mmu_enable_stall(struct mali_mmu_core *mmu)
 {
     int i;
     u32 mmu_status = mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_STATUS);
-
-    if (0 == (mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED)) {
+    if ((mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED) == 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("MMU stall is implicit when Paging is not enabled.\n"));
         return MALI_TRUE;
     }
@@ -195,10 +196,10 @@ static mali_bool mali_mmu_enable_stall(struct mali_mmu_core *mmu)
             break;
         }
         if ((mmu_status & MALI_MMU_STATUS_BIT_STALL_ACTIVE) &&
-            (0 == (mmu_status & MALI_MMU_STATUS_BIT_STALL_NOT_ACTIVE))) {
+            ((mmu_status & MALI_MMU_STATUS_BIT_STALL_NOT_ACTIVE) == 0)) {
             break;
         }
-        if (0 == (mmu_status & (MALI_MMU_STATUS_BIT_PAGING_ENABLED))) {
+        if ((mmu_status & (MALI_MMU_STATUS_BIT_PAGING_ENABLED)) == 0) {
             break;
         }
     }
@@ -225,8 +226,7 @@ static void mali_mmu_disable_stall(struct mali_mmu_core *mmu)
 {
     int i;
     u32 mmu_status = mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_STATUS);
-
-    if (0 == (mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED)) {
+    if ((mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED) == 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("MMU disable skipped since it was not enabled.\n"));
         return;
     }
@@ -240,13 +240,13 @@ static void mali_mmu_disable_stall(struct mali_mmu_core *mmu)
 
     for (i = 0; i < MALI_REG_POLL_COUNT_FAST; ++i) {
         u32 status = mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_STATUS);
-        if (0 == (status & MALI_MMU_STATUS_BIT_STALL_ACTIVE)) {
+        if ((status & MALI_MMU_STATUS_BIT_STALL_ACTIVE) == 0) {
             break;
         }
         if (status & MALI_MMU_STATUS_BIT_PAGE_FAULT_ACTIVE) {
             break;
         }
-        if (0 == (mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED)) {
+        if ((mmu_status & MALI_MMU_STATUS_BIT_PAGING_ENABLED) == 0) {
             break;
         }
     }
@@ -268,7 +268,7 @@ MALI_STATIC_INLINE mali_osk_errcode_t mali_mmu_raw_reset(struct mali_mmu_core *m
     int i;
 
     mali_hw_core_register_write(&mmu->hw_core, MALI_MMU_REGISTER_DTE_ADDR, 0xCAFEBABE);
-    MALI_DEBUG_ASSERT(0xCAFEB000 == mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_DTE_ADDR));
+    MALI_DEBUG_ASSERT(mali_hw_core_register_read(&mmu->hw_core, MALI_MMU_REGISTER_DTE_ADDR) == 0xCAFEB000);
     mali_hw_core_register_write(&mmu->hw_core, MALI_MMU_REGISTER_COMMAND, MALI_MMU_COMMAND_HARD_RESET);
 
     for (i = 0; i < MALI_REG_POLL_COUNT_FAST; ++i) {

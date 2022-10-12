@@ -270,7 +270,7 @@ extern _mali_osk_atomic_t virt_pp_tracker_count;
  */
 MALI_STATIC_INLINE mali_bool mali_timeline_point_after(mali_timeline_point a, mali_timeline_point b)
 {
-    return 0 > ((s32)b) - ((s32)a);
+    return ((s32)b) - ((s32)a) < 0;
 }
 
 /**
@@ -328,7 +328,7 @@ MALI_STATIC_INLINE mali_bool mali_timeline_is_tracker_released(struct mali_timel
 
     tracker = timeline->tracker_tail;
 
-    while (NULL != tracker) {
+    while (tracker != NULL) {
         if (point == tracker->point) {
             return MALI_FALSE;
         }
@@ -518,17 +518,17 @@ void mali_timeline_terminate(void);
 
 MALI_STATIC_INLINE mali_bool mali_timeline_has_gp_job(void)
 {
-    return 0 < mali_osk_atomic_read(&gp_tracker_count);
+    return mali_osk_atomic_read(&gp_tracker_count) > 0;
 }
 
 MALI_STATIC_INLINE mali_bool mali_timeline_has_physical_pp_job(void)
 {
-    return 0 < mali_osk_atomic_read(&phy_pp_tracker_count);
+    return mali_osk_atomic_read(&phy_pp_tracker_count) > 0;
 }
 
 MALI_STATIC_INLINE mali_bool mali_timeline_has_virtual_pp_job(void)
 {
-    return 0 < mali_osk_atomic_read(&virt_pp_tracker_count);
+    return mali_osk_atomic_read(&virt_pp_tracker_count) > 0;
 }
 
 #if defined(DEBUG)

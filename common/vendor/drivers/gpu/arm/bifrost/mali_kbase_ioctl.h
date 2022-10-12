@@ -583,7 +583,6 @@ union kbase_ioctl_cinstr_gwt_dump {
         __u64 size_buffer;
         __u32 len;
         __u32 padding;
-
     } in;
     struct {
         __u32 no_of_addr_collected;

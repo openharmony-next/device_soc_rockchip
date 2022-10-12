@@ -167,7 +167,7 @@ int drm_atomic_set_crtc_for_plane(struct drm_plane_state *plane_state, struct dr
 {
     struct drm_plane *plane = plane_state->plane;
     struct drm_crtc_state *crtc_state;
-    /* Nothing to do for same crtc*/
+    /* Nothing to do for same crtc */
     if (plane_state->crtc == crtc) {
         return 0;
     }
@@ -513,7 +513,6 @@ static int drm_atomic_plane_set_property(struct drm_plane *plane, struct drm_pla
         if (!state->fence) {
             return -EINVAL;
         }
-
     } else if (property == config->prop_crtc_id) {
         struct drm_crtc *crtc = drm_crtc_find(dev, file_priv, val);
 
@@ -857,7 +856,7 @@ static struct drm_pending_vblank_event *create_vblank_event(struct drm_crtc *crt
 {
     struct drm_pending_vblank_event *e = NULL;
 
-    e = kzalloc(sizeof *e, GFP_KERNEL);
+    e = kzalloc(sizeof(*e), GFP_KERNEL);
     if (!e) {
         return NULL;
     }
@@ -1079,8 +1078,7 @@ static int prepare_signaling(struct drm_device *dev, struct drm_atomic_state *st
         s32 __user *fence_ptr;
 
         fence_ptr = get_out_fence_for_crtc(crtc_state->state, crtc);
-
-        if (arg->flags & DRM_MODE_PAGE_FLIP_EVENT || fence_ptr) {
+        if ((arg->flags & DRM_MODE_PAGE_FLIP_EVENT) || fence_ptr) {
             struct drm_pending_vblank_event *e;
 
             e = create_vblank_event(crtc, arg->user_data);

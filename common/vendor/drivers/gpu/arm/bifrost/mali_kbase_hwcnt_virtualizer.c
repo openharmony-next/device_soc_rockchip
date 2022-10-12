@@ -452,7 +452,6 @@ int kbase_hwcnt_virtualizer_client_set_counters(struct kbase_hwcnt_virtualizer_c
          * accumulations.
          */
         errcode = kbase_hwcnt_accumulator_set_counters(hvirt->accum, enable_map, ts_start_ns, ts_end_ns, dump_buf);
-
         if (!errcode) {
             /* Update the selected client's enable map */
             kbase_hwcnt_enable_map_copy(&hvcli->enable_map, enable_map);
@@ -634,7 +633,6 @@ int kbase_hwcnt_virtualizer_client_dump(struct kbase_hwcnt_virtualizer_client *h
          * accumulations.
          */
         errcode = kbase_hwcnt_accumulator_dump(hvirt->accum, ts_start_ns, ts_end_ns, dump_buf);
-
         if (!errcode) {
             /* Fix up the timestamps */
             *ts_start_ns = hvcli->ts_start_ns;

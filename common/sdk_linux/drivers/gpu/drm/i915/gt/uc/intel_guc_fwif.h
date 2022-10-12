@@ -125,7 +125,7 @@ struct guc_process_desc {
     u32 reserved[30];
 } __packed;
 
-/* engine id and context id is packed into guc_execlist_context.context_id*/
+/* engine id and context id is packed into guc_execlist_context.context_id */
 #define GUC_ELC_CTXID_OFFSET 0
 #define GUC_ELC_ENGINE_OFFSET 29
 
@@ -247,7 +247,7 @@ struct guc_ct_buffer_desc {
     u32 addr;         /* gfx address */
     u64 host_private; /* host private data */
     u32 size;         /* size in bytes */
-    u32 head;         /* offset updated by GuC*/
+    u32 head;         /* offset updated by GuC */
     u32 tail;         /* offset updated by owner */
     u32 is_in_error;  /* error indicator */
     u32 fence;        /* fence updated by GuC */

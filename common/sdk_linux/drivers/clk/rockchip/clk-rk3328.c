@@ -74,7 +74,7 @@ static struct rockchip_pll_rate_table rk3328_pll_rates[] = {
     RK3036_PLL_RATE(312000000, 1, 52, 2, 2, 1, 0),
     RK3036_PLL_RATE(216000000, 1, 72, 4, 2, 1, 0),
     RK3036_PLL_RATE(96000000, 1, 64, 4, 4, 1, 0),
-    {/* sentinel */},
+    {},
 };
 
 static struct rockchip_pll_rate_table rk3328_pll_frac_rates[] = {
@@ -91,7 +91,7 @@ static struct rockchip_pll_rate_table rk3328_pll_frac_rates[] = {
     /* vco = 903168000 */
     RK3036_PLL_RATE(40960000, 12, 409, 4, 5, 0, 10066330),
     /* vco = 819200000 */
-    {/* sentinel */},
+    {},
 };
 
 #define RK3328_DIV_ACLKM_MASK 0x7
@@ -671,10 +671,12 @@ static int __init clk_rk3328_probe(struct platform_device *pdev)
     return 0;
 }
 
-static const struct of_device_id clk_rk3328_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3328-cru",
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3328_match_table[] = {
+    {
+        .compatible = "rockchip,rk3328-cru",
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3328_match_table);
 
 static struct platform_driver clk_rk3328_driver = {

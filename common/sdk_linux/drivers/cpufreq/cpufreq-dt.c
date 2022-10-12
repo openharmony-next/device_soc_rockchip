@@ -6,7 +6,7 @@
  * Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+// #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/clk.h>
 #include <linux/cpu.h>
@@ -83,7 +83,6 @@ static const char *find_supply_name(struct device *dev)
     const char *name = NULL;
 
     np = of_node_get(dev->of_node);
-
     /* This must be valid for sure */
     if (WARN_ON(!np)) {
         return NULL;

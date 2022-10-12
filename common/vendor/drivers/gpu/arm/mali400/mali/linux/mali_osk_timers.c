@@ -28,7 +28,7 @@ typedef void (*timer_timeout_function_t)(unsigned long);
 _mali_osk_timer_t *_mali_osk_timer_init(_mali_osk_timer_callback_t callback)
 {
     _mali_osk_timer_t *t = (_mali_osk_timer_t *)kmalloc(sizeof(_mali_osk_timer_t), GFP_KERNEL);
-    if (NULL != t) {
+    if (t != NULL) {
         timer_setup(&t->timer, (void (*)(struct timer_list *))callback, 0);
     }
     return t;
@@ -62,7 +62,7 @@ void _mali_osk_timer_del_async(_mali_osk_timer_t *tim)
 mali_bool _mali_osk_timer_pending(_mali_osk_timer_t *tim)
 {
     MALI_DEBUG_ASSERT_POINTER(tim);
-    return 1 == timer_pending(&(tim->timer));
+    return timer_pending(&(tim->timer)) == 1;
 }
 
 void _mali_osk_timer_setcallback(_mali_osk_timer_t *tim, _mali_osk_timer_callback_t callback, void *data)

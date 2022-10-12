@@ -103,7 +103,6 @@ void drm_connector_oob_hotplug_event(struct fwnode_handle *connector_fwnode)
     }
 
     sub_dev = rockchip_drm_get_sub_dev(dev_of_node(connector_fwnode->dev));
-
     if (sub_dev && sub_dev->connector && sub_dev->oob_hotplug_event) {
         sub_dev->oob_hotplug_event(sub_dev->connector);
     }
@@ -232,7 +231,6 @@ void rockchip_drm_te_handle(struct drm_crtc *crtc)
 {
     struct rockchip_drm_private *priv = crtc->dev->dev_private;
     int pipe = drm_crtc_index(crtc);
-
     if (priv->crtc_funcs[pipe] && priv->crtc_funcs[pipe]->te_handler) {
         priv->crtc_funcs[pipe]->te_handler(crtc);
     }
@@ -336,7 +334,7 @@ static bool cea_db_is_hdmi_next_hdr_block(const u8 *db)
         return false;
     }
 
-    oui = db[0x3] << 0x10 | db[0x2] << 0x8 | db[1];
+    oui = (db[0x3] << 0x10) | (db[0x2] << 0x8) | db[1];
 
     return oui == HDMI_NEXT_HDR_VSDB_OUI;
 }
@@ -353,7 +351,7 @@ static bool cea_db_is_hdmi_forum_vsdb(const u8 *db)
         return false;
     }
 
-    oui = db[0x3] << 0x10 | db[0x2] << 0x8 | db[1];
+    oui = (db[0x3] << 0x10) | (db[0x2] << 0x8) | db[1];
 
     return oui == HDMI_FORUM_IEEE_OUI;
 }
@@ -677,7 +675,7 @@ static int check_next_hdr_version(const u8 *next_hdr_db)
 {
     u16 ver;
 
-    ver = (next_hdr_db[0x5] & 0xf0) << 0x8 | next_hdr_db[0];
+    ver = ((next_hdr_db[0x5] & 0xf0) << 0x8) | next_hdr_db[0];
 
     switch (ver) {
         case 0x00f9:
@@ -752,7 +750,7 @@ static void parse_ver_12_v1_data(struct ver_12_v1 *hdr, const u8 *data)
     hdr->low_latency = data[0x8] & 0x3;
 
     hdr->unique_rx = (data[0xb] & 0xf8) >> 0x3;
-    hdr->unique_ry = (data[0xb] & 0x7) << 0x2 | (data[0xa] & BIT(0)) << 1 | (data[0x9] & BIT(0));
+    hdr->unique_ry = ((data[0xb] & 0x7) << 0x2) | ((data[0xa] & BIT(0)) << 1) | (data[0x9] & BIT(0));
     hdr->unique_gx = (data[0x9] & 0xfe) >> 1;
     hdr->unique_gy = (data[0xa] & 0xfe) >> 1;
     hdr->unique_bx = (data[0x8] & 0xe0) >> 0x5;
@@ -768,7 +766,7 @@ static void parse_ver_12_v2_data(struct ver_12_v2 *hdr, const u8 *data)
     hdr->dm_version = (data[0x5] & 0x1c) >> 0x2;
     hdr->backlt_min_luma = data[0x6] & 0x3;
     hdr->interface = data[0x7] & 0x3;
-    hdr->yuv444_10b_12b = (data[0x8] & BIT(0)) << 1 | (data[0x9] & BIT(0));
+    hdr->yuv444_10b_12b = ((data[0x8] & BIT(0)) << 1) | (data[0x9] & BIT(0));
 
     hdr->t_min_pq_v2 = (data[0x6] & 0xf8) >> 0x3;
     hdr->t_max_pq_v2 = (data[0x7] & 0xf8) >> 0x3;
@@ -829,8 +827,7 @@ int rockchip_drm_parse_cea_ext(struct rockchip_drm_dsc_cap *dsc_cap, u8 *max_frl
         return -EINVAL;
     }
 
-    for_each_cea_db(edid_ext, i, start, end)
-    {
+    for_each_cea_db(edid_ext, i, start, end) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_forum_vsdb(db)) {
@@ -862,8 +859,7 @@ int rockchip_drm_parse_next_hdr(struct next_hdr_sink_data *sink_data, const stru
         return -EINVAL;
     }
 
-    for_each_cea_db(edid_ext, i, start, end)
-    {
+    for_each_cea_db(edid_ext, i, start, end) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_next_hdr_block(db)) {
@@ -947,7 +943,6 @@ static int rockchip_drm_fault_handler(struct iommu_domain *iommu, struct device 
     drm_for_each_crtc(crtc, drm_dev)
     {
         int pipe = drm_crtc_index(crtc);
-
         if (priv->crtc_funcs[pipe] && priv->crtc_funcs[pipe]->regs_dump) {
             priv->crtc_funcs[pipe]->regs_dump(crtc, NULL);
         }
@@ -1030,7 +1025,6 @@ static int rockchip_drm_summary_show(struct seq_file *s, void *data)
     drm_for_each_crtc(crtc, drm_dev)
     {
         int pipe = drm_crtc_index(crtc);
-
         if (priv->crtc_funcs[pipe] && priv->crtc_funcs[pipe]->debugfs_dump) {
             priv->crtc_funcs[pipe]->debugfs_dump(crtc, s);
         }
@@ -1055,7 +1049,6 @@ static void rockchip_drm_debugfs_init(struct drm_minor *minor)
     drm_for_each_crtc(crtc, dev)
     {
         int pipe = drm_crtc_index(crtc);
-
         if (priv->crtc_funcs[pipe] && priv->crtc_funcs[pipe]->debugfs_init) {
             priv->crtc_funcs[pipe]->debugfs_init(minor, crtc);
         }
@@ -1372,7 +1365,6 @@ static void rockchip_drm_crtc_cancel_pending_vblank(struct drm_crtc *crtc, struc
 {
     struct rockchip_drm_private *priv = crtc->dev->dev_private;
     int pipe = drm_crtc_index(crtc);
-
     if (pipe < ROCKCHIP_MAX_CRTC && priv->crtc_funcs[pipe] && priv->crtc_funcs[pipe]->cancel_pending_vblank) {
         priv->crtc_funcs[pipe]->cancel_pending_vblank(crtc, file_priv);
     }
@@ -1853,7 +1845,7 @@ static const struct of_device_id rockchip_drm_dt_ids[] = {
     {
         .compatible = "rockchip,display-subsystem",
     },
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rockchip_drm_dt_ids);
 

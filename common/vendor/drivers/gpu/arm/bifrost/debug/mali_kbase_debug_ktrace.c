@@ -31,7 +31,6 @@ int kbase_ktrace_init(struct kbase_device *kbdev)
     struct kbase_ktrace_msg *rbuf;
 
     rbuf = kmalloc_array(KBASE_KTRACE_SIZE, sizeof(*rbuf), GFP_KERNEL);
-
     if (!rbuf) {
         return -EINVAL;
     }
@@ -70,13 +69,12 @@ static const char *const kbasep_ktrace_code_string[] = {
 
 static void kbasep_ktrace_format_header(char *buffer, int sz, s32 written)
 {
-    written += MAX(snprintf(buffer + written, MAX(sz - written, 0), "secs,thread_id,cpu,code,kctx,"), 0);
+    written += MAX((int)snprintf(buffer + written, MAX(sz - written, 0), "secs,thread_id,cpu,code,kctx,"), 0);
 
     kbasep_ktrace_backend_format_header(buffer, sz, &written);
 
-    written += MAX(snprintf(buffer + written, MAX(sz - written, 0), ",info_val,ktrace_version=%u.%u",
-                            KBASE_KTRACE_VERSION_MAJOR, KBASE_KTRACE_VERSION_MINOR),
-                   0);
+    written += MAX((int)snprintf(buffer + written, MAX(sz - written, 0), ",info_val,ktrace_version=%u.%u",
+    KBASE_KTRACE_VERSION_MAJOR, KBASE_KTRACE_VERSION_MINOR), 0);
 
     buffer[sz - 1] = 0;
 }
@@ -90,18 +88,18 @@ static void kbasep_ktrace_format_msg(struct kbase_ktrace_msg *trace_msg, char *b
      * secs,thread_id,cpu,code,
      */
     written +=
-        MAX(snprintf(buffer + written, MAX(sz - written, 0), "%d.%.6d,%d,%d,%s,", (int)trace_msg->timestamp.tv_sec,
-                     (int)(trace_msg->timestamp.tv_nsec / MICRO_TO_MILLI_SECOND), trace_msg->thread_id, trace_msg->cpu,
-                     kbasep_ktrace_code_string[trace_msg->backend.code]),
-            0);
+        MAX((int)snprintf(buffer + written, MAX(sz - written, 0), "%d.%.6d,%d,%d,%s,",
+        (int)trace_msg->timestamp.tv_sec, (int)(trace_msg->timestamp.tv_nsec / MICRO_TO_MILLI_SECOND),
+        trace_msg->thread_id, trace_msg->cpu, kbasep_ktrace_code_string[trace_msg->backend.code]), 0);
 
     /* kctx part: */
     if (trace_msg->kctx_tgid) {
         written +=
-            MAX(snprintf(buffer + written, MAX(sz - written, 0), "%d_%u", trace_msg->kctx_tgid, trace_msg->kctx_id), 0);
+            MAX((int)snprintf(buffer + written, MAX(sz - written, 0), "%d_%u",
+            trace_msg->kctx_tgid, trace_msg->kctx_id), 0);
     }
     /* Trailing comma */
-    written += MAX(snprintf(buffer + written, MAX(sz - written, 0), ","), 0);
+    written += MAX((int)snprintf(buffer + written, MAX(sz - written, 0), ","), 0);
 
     /* Backend parts */
     kbasep_ktrace_backend_format_msg(trace_msg, buffer, sz, &written);
@@ -114,7 +112,8 @@ static void kbasep_ktrace_format_msg(struct kbase_ktrace_msg *trace_msg, char *b
      * version in the header
      */
     written +=
-        MAX(snprintf(buffer + written, MAX(sz - written, 0), ",0x%.16llx", (unsigned long long)trace_msg->info_val), 0);
+        MAX((int)snprintf(buffer + written, MAX(sz - written, 0), ",0x%.16llx",
+        (unsigned long long)trace_msg->info_val), 0);
     buffer[sz - 1] = 0;
 }
 

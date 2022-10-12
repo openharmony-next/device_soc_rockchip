@@ -2637,7 +2637,7 @@ static int rkisp_sd_s_rx_buffer(struct v4l2_subdev *sd, void *buf, unsigned int 
         ret = rkisp_rx_buf_pool_init(dev, dbufs);
     }
 
-    /* TODO qbuf/debuf for more buffer */
+    /* qbuf/debuf for more buffer */
 
     return ret;
 }
@@ -3179,12 +3179,12 @@ void rkisp_unregister_isp_subdev(struct rkisp_device *isp_dev)
 }
 
 #define shm_head_poll_timeout(isp_dev, cond, sleep_us, timeout_us)                                                     \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         u64 __timeout_us = (timeout_us);                                                                               \
         unsigned long __sleep_us = (sleep_us);                                                                         \
         ktime_t __timeout = ktime_add_us(ktime_get(), __timeout_us);                                                   \
         might_sleep_if((__sleep_us) != 0);                                                                             \
-        for (;;) {                                                                                                     \
+        for ( ; ; ) {                                                                                                  \
             dma_sync_single_for_cpu((isp_dev)->dev, (isp_dev)->resmem_addr,                                            \
                                     sizeof(struct rkisp_thunderboot_resmem_head), DMA_FROM_DEVICE);                    \
             if (cond)                                                                                                  \

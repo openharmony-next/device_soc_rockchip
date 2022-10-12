@@ -852,7 +852,6 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, sock
     lock_sock(sk);
 
     switch (optname) {
-
         case BT_DEFER_SETUP:
             if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
                 err = -EINVAL;

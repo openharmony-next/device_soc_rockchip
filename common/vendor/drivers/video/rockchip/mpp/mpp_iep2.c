@@ -283,13 +283,16 @@ static int iep2_extract_task_msg(struct iep_task *task, struct mpp_task_msgs *ms
                     mpp_err("copy_from_user params failed\n");
                     return -EIO;
                 }
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_READ: {
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
-            } break;
+                break;
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
-            } break;
+                break;
+            }
             default:
                 break;
         }
@@ -667,7 +670,7 @@ static int iep2_result(struct mpp_dev *mpp, struct mpp_task *mpp_task, struct mp
     struct mpp_request *req;
     struct iep_task *task = to_iep_task(mpp_task);
 
-    /* FIXME may overflow the kernel */
+    /* may overflow the kernel */
     for (i = 0; i < task->r_req_cnt; i++) {
         req = &task->r_reqs[i];
 

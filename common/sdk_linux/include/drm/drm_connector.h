@@ -137,7 +137,6 @@ enum subpixel_order {
     SubPixelVerticalRGB,
     SubPixelVerticalBGR,
     SubPixelNone,
-
 };
 
 /**
@@ -799,7 +798,7 @@ struct drm_connector_state {
  */
 struct drm_connector_funcs {
     /**
-     * @dpms:
+     * @dpms
      *
      * Legacy entry point to set the per-connector DPMS state. Legacy DPMS
      * is exposed as a standard property on the connector, but diverted to
@@ -810,14 +809,14 @@ struct drm_connector_funcs {
      * This hook is not used by atomic drivers, remapping of the legacy DPMS
      * property is entirely handled in the DRM core.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*dpms)(struct drm_connector *connector, int mode);
 
     /**
-     * @reset:
+     * @reset
      *
      * Reset connector hardware and software state to off. This function isn't
      * called by the core directly, only through drm_mode_config_reset().
@@ -829,7 +828,7 @@ struct drm_connector_funcs {
     void (*reset)(struct drm_connector *connector);
 
     /**
-     * @detect:
+     * @detect
      *
      * Check to see if anything is attached to the connector. The parameter
      * force is set to false whilst polling, true when checking the
@@ -839,7 +838,7 @@ struct drm_connector_funcs {
      * This callback is optional, if not implemented the connector will be
      * considered as always being attached.
      *
-     * FIXME:
+     * FIXME
      *
      * Note that this hook is only called by the probe helper. It's not in
      * the helper library vtable purely for historical reasons. The only DRM
@@ -850,21 +849,21 @@ struct drm_connector_funcs {
      * locks to avoid races with concurrent modeset changes need to use
      * &drm_connector_helper_funcs.detect_ctx instead.
      *
-     * RETURNS:
+     * RETURNS
      *
      * drm_connector_status indicating the connector's status.
      */
     enum drm_connector_status (*detect)(struct drm_connector *connector, bool force);
 
     /**
-     * @force:
+     * @force
      *
      * This function is called to update internal encoder state when the
      * connector is forced to a certain state by userspace, either through
      * the sysfs interfaces or on the kernel cmdline. In that case the
      * @detect callback isn't called.
      *
-     * FIXME:
+     * FIXME
      *
      * Note that this hook is only called by the probe helper. It's not in
      * the helper library vtable purely for historical reasons. The only DRM
@@ -873,7 +872,7 @@ struct drm_connector_funcs {
     void (*force)(struct drm_connector *connector);
 
     /**
-     * @fill_modes:
+     * @fill_modes
      *
      * Entry point for output detection and basic mode validation. The
      * driver should reprobe the output if needed (e.g. when hotplug
@@ -891,14 +890,14 @@ struct drm_connector_funcs {
      * drm_helper_probe_single_connector_modes() to implement this
      * function.
      *
-     * RETURNS:
+     * RETURNS
      *
      * The number of modes detected and filled into &drm_connector.modes.
      */
     int (*fill_modes)(struct drm_connector *connector, uint32_t max_width, uint32_t max_height);
 
     /**
-     * @set_property:
+     * @set_property
      *
      * This is the legacy entry point to update a property attached to the
      * connector.
@@ -907,14 +906,14 @@ struct drm_connector_funcs {
      * driver-private properties. For atomic drivers it is not used because
      * property handling is done entirely in the DRM core.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success or a negative error code on failure.
      */
     int (*set_property)(struct drm_connector *connector, struct drm_property *property, uint64_t val);
 
     /**
-     * @late_register:
+     * @late_register
      *
      * This optional hook can be used to register additional userspace
      * interfaces attached to the connector, light backlight control, i2c,
@@ -925,14 +924,14 @@ struct drm_connector_funcs {
      *
      * This is called while holding &drm_connector.mutex.
      *
-     * Returns:
+     * Returns
      *
      * 0 on success, or a negative error code on failure.
      */
     int (*late_register)(struct drm_connector *connector);
 
     /**
-     * @early_unregister:
+     * @early_unregister
      *
      * This optional hook should be used to unregister the additional
      * userspace interfaces attached to the connector from
@@ -945,7 +944,7 @@ struct drm_connector_funcs {
     void (*early_unregister)(struct drm_connector *connector);
 
     /**
-     * @destroy:
+     * @destroy
      *
      * Clean up connector resources. This is called at driver unload time
      * through drm_mode_config_cleanup(). It can also be called at runtime
@@ -955,7 +954,7 @@ struct drm_connector_funcs {
     void (*destroy)(struct drm_connector *connector);
 
     /**
-     * @atomic_duplicate_state:
+     * @atomic_duplicate_state
      *
      * Duplicate the current atomic state for this connector and return it.
      * The core and helpers guarantee that any atomic state duplicated with
@@ -975,20 +974,20 @@ struct drm_connector_funcs {
      * It is an error to call this hook before &drm_connector.state has been
      * initialized correctly.
      *
-     * NOTE:
+     * NOTE
      *
      * If the duplicate state references refcounted resources this hook must
      * acquire a reference for each of them. The driver must release these
      * references again in @atomic_destroy_state.
      *
-     * RETURNS:
+     * RETURNS
      *
      * Duplicated atomic state or NULL when the allocation failed.
      */
     struct drm_connector_state *(*atomic_duplicate_state)(struct drm_connector *connector);
 
     /**
-     * @atomic_destroy_state:
+     * @atomic_destroy_state
      *
      * Destroy a state duplicated with @atomic_duplicate_state and release
      * or unreference all resources it references
@@ -998,7 +997,7 @@ struct drm_connector_funcs {
     void (*atomic_destroy_state)(struct drm_connector *connector, struct drm_connector_state *state);
 
     /**
-     * @atomic_set_property:
+     * @atomic_set_property
      *
      * Decode a driver-private property value and store the decoded value
      * into the passed-in state structure. Since the atomic core decodes all
@@ -1017,7 +1016,7 @@ struct drm_connector_funcs {
      * This callback is optional if the driver does not support any
      * driver-private atomic properties.
      *
-     * NOTE:
+     * NOTE
      *
      * This function is called in the state assembly phase of atomic
      * modesets, which can be aborted for any reason (including on
@@ -1030,7 +1029,7 @@ struct drm_connector_funcs {
      * incomplete and hence likely inconsistent). Instead any such input
      * validation must be done in the various atomic_check callbacks.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 if the property has been found, -EINVAL if the property isn't
      * implemented by the driver (which shouldn't ever happen, the core only
@@ -1043,7 +1042,7 @@ struct drm_connector_funcs {
                                struct drm_property *property, uint64_t val);
 
     /**
-     * @atomic_get_property:
+     * @atomic_get_property
      *
      * Reads out the decoded driver-private property. This is used to
      * implement the GETCONNECTOR IOCTL.
@@ -1054,7 +1053,7 @@ struct drm_connector_funcs {
      * This callback is optional if the driver does not support any
      * driver-private atomic properties.
      *
-     * RETURNS:
+     * RETURNS
      *
      * 0 on success, -EINVAL if the property isn't implemented by the
      * driver (which shouldn't ever happen, the core only asks for
@@ -1064,7 +1063,7 @@ struct drm_connector_funcs {
                                struct drm_property *property, uint64_t *val);
 
     /**
-     * @atomic_print_state:
+     * @atomic_print_state
      *
      * If driver subclasses &struct drm_connector_state, it should implement
      * this optional hook for printing additional driver specific state.

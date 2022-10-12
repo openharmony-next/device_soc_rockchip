@@ -188,14 +188,14 @@ static void sha_padmessage(struct sha_t *sha)
     }
 
     /* Store the message length as the last 8 octets */
-    sha->mblock[56] = sha->mlength[7];
-    sha->mblock[57] = sha->mlength[6];
-    sha->mblock[58] = sha->mlength[5];
-    sha->mblock[59] = sha->mlength[4];
-    sha->mblock[60] = sha->mlength[3];
-    sha->mblock[61] = sha->mlength[2];
-    sha->mblock[62] = sha->mlength[1];
-    sha->mblock[63] = sha->mlength[0];
+    sha->mblock[0x38] = sha->mlength[0x7];
+    sha->mblock[0x39] = sha->mlength[0x6];
+    sha->mblock[0x3A] = sha->mlength[0x5];
+    sha->mblock[0x3B] = sha->mlength[0x4];
+    sha->mblock[0x3C] = sha->mlength[0x3];
+    sha->mblock[0x3D] = sha->mlength[0x2];
+    sha->mblock[0x3E] = sha->mlength[1];
+    sha->mblock[0x3F] = sha->mlength[0];
 
     sha_processblock(sha);
 }
@@ -338,7 +338,6 @@ static int dw_hdmi_hdcp_load_key(struct dw_hdcp *hdcp)
         hdcp->write(hdmi, hdcp_keys->KSV[i], HDMI_HDCPREG_DPK0 + i);
     }
     ret = readx_poll_timeout(readl, reg_rmsts_addr, val, val & DPK_WR_OK_STS, 0x3E8, DPK_WR_OK_TIMEOUT_US);
-
     if (ret) {
         return ret;
     }
@@ -358,7 +357,6 @@ static int dw_hdmi_hdcp_load_key(struct dw_hdcp *hdcp)
             hdcp->write(hdmi, hdcp_keys->devicekey[i + j], HDMI_HDCPREG_DPK0 + j);
         }
         ret = readx_poll_timeout(readl, reg_rmsts_addr, val, val & DPK_WR_OK_STS, 0x3E8, DPK_WR_OK_TIMEOUT_US);
-
         if (ret) {
             return ret;
         }

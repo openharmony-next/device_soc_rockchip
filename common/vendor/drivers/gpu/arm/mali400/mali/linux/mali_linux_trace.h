@@ -111,7 +111,7 @@ TRACE_EVENT(mali_core_active,
 
             TP_STRUCT__entry(__field(pid_t, pid) __field(unsigned int, active) __field(unsigned int, core_type)
                                  __field(unsigned int, core_id) __field(unsigned int, frame_builder_id)
-                                     __field(unsigned int, flush_id)),
+                                 __field(unsigned int, flush_id)),
 
             TP_fast_assign(__entry->pid = pid; __entry->active = active; __entry->core_type = core_type;
                            __entry->core_id = core_id; __entry->frame_builder_id = frame_builder_id;

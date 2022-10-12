@@ -28,7 +28,6 @@ static int rkisp_stream_config_dcrop(struct rkisp_stream *stream, bool async)
 
     /* dual-crop unit get data from isp */
     input_win = rkisp_get_isp_sd_win(&dev->isp_sdev);
-
     if (dcrop->width == input_win->width && dcrop->height == input_win->height && dcrop->left == 0 && dcrop->top == 0) {
         rkisp_disable_dcrop(stream, async);
         v4l2_dbg(1, rkisp_debug, &dev->v4l2_dev, "stream %d crop disabled\n", stream->id);
@@ -70,7 +69,7 @@ static int rkisp_stream_config_rsz(struct rkisp_stream *stream, bool async)
         return -EINVAL;
     }
 
-    if (xsubs_in == 0 || ysubs_in == 0){
+    if (xsubs_in == 0 || ysubs_in == 0) {
         return -1;
     }
     in_c.width = in_y.width / xsubs_in;
@@ -79,7 +78,7 @@ static int rkisp_stream_config_rsz(struct rkisp_stream *stream, bool async)
     if (output_isp_fmt->fmt_type == FMT_YUV) {
         rkisp_fcc_xysubs(output_isp_fmt->fourcc, &xsubs_out, &ysubs_out);
 
-        if (xsubs_out == 0 || ysubs_out == 0){
+        if (xsubs_out == 0 || ysubs_out == 0) {
             return -1;
         }
         out_c.width = out_y.width / xsubs_out;
@@ -338,7 +337,8 @@ static void update_mi(struct rkisp_stream *stream)
     mi_set_y_offset(stream, 0);
     mi_set_cb_offset(stream, 0);
     mi_set_cr_offset(stream, 0);
-    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev, "%s stream:%d Y:0x%x CB:0x%x CR:0x%x\n", __func__, stream->id,
+    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev,
+             "%s stream:%d Y:0x%x CB:0x%x CR:0x%x\n", __func__, stream->id,
              readl(base + stream->config->mi.y_base_ad_init), readl(base + stream->config->mi.cb_base_ad_init),
              readl(base + stream->config->mi.cr_base_ad_init));
 }
@@ -570,7 +570,8 @@ static void rkisp_buf_queue(struct vb2_buffer *vb)
         }
     }
 
-    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev, "stream:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
+    v4l2_dbg(0x02, rkisp_debug, &stream->ispdev->v4l2_dev,
+             "stream:%d queue buf:0x%x\n", stream->id, ispbuf->buff_addr[0]);
 
     spin_lock_irqsave(&stream->vbq_lock, lock_flags);
     list_add_tail(&ispbuf->queue, &stream->buf_queue);
@@ -697,7 +698,7 @@ static int rkisp_start_streaming(struct vb2_queue *queue, unsigned int count)
         goto buffer_done;
     }
 
-    if (atomic_read(&dev->cap_dev.refcnt) == 1 && (dev->isp_inp & INP_CSI || dev->isp_inp & INP_DVP)) {
+    if (atomic_read(&dev->cap_dev.refcnt) == 1 && ((dev->isp_inp & INP_CSI) || (dev->isp_inp & INP_DVP))) {
         /* update sensor info when first streaming */
         ret = rkisp_update_sensor_info(dev);
         if (ret < 0) {

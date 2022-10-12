@@ -23,7 +23,7 @@ MALI_STATIC_INLINE void mali_soft_job_system_lock(struct mali_soft_job_system *s
     MALI_DEBUG_ASSERT_POINTER(system);
     mali_osk_spinlock_irq_lock(system->lock);
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA, ("Mali Soft Job: soft system %p lock taken\n", system));
-    MALI_DEBUG_ASSERT(0 == system->lock_owner);
+    MALI_DEBUG_ASSERT(system->lock_owner == 0);
     MALI_DEBUG_CODE(system->lock_owner = mali_osk_get_tid());
 }
 
@@ -54,14 +54,14 @@ struct mali_soft_job_system *mali_soft_job_system_create(struct mali_session_dat
     MALI_DEBUG_ASSERT_POINTER(session);
 
     system = (struct mali_soft_job_system *)mali_osk_calloc(1, sizeof(struct mali_soft_job_system));
-    if (NULL == system) {
+    if (system == NULL) {
         return NULL;
     }
 
     system->session = session;
 
     system->lock = mali_osk_spinlock_irq_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_SCHEDULER);
-    if (NULL == system->lock) {
+    if (system->lock == NULL) {
         mali_soft_job_system_destroy(system);
         return NULL;
     }
@@ -80,8 +80,8 @@ void mali_soft_job_system_destroy(struct mali_soft_job_system *system)
     /* All jobs should be free at this point. */
     MALI_DEBUG_ASSERT(_mali_osk_list_empty(&(system->jobs_used)));
 
-    if (NULL != system) {
-        if (NULL != system->lock) {
+    if (system != NULL) {
+        if (system->lock != NULL) {
             _mali_osk_spinlock_irq_term(system->lock);
         }
         _mali_osk_free(system);
@@ -130,14 +130,14 @@ void mali_soft_job_destroy(struct mali_soft_job *job)
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_CODE, ("Mali Soft Job: destroying soft job %u (0x%08X)\n", job->id, job));
 
-    if (NULL != job) {
+    if (job != NULL) {
         if (0 < mali_osk_atomic_dec_return(&job->refcount)) {
             return;
         }
 
         mali_osk_atomic_term(&job->refcount);
 
-        if (NULL != job->activated_notification) {
+        if (job->activated_notification != NULL) {
             _mali_osk_notification_delete(job->activated_notification);
             job->activated_notification = NULL;
         }
@@ -156,13 +156,13 @@ struct mali_soft_job *mali_soft_job_create(struct mali_soft_job_system *system, 
 
     notification =
         _mali_osk_notification_create(MALI_NOTIFICATION_SOFT_ACTIVATED, sizeof(mali_uk_soft_job_activated_s));
-    if (unlikely(NULL == notification)) {
+    if (unlikely(notification == NULL)) {
         MALI_PRINT_ERROR(("Mali Soft Job: failed to allocate notification"));
         return NULL;
     }
 
     job = mali_osk_malloc(sizeof(struct mali_soft_job));
-    if (unlikely(NULL == job)) {
+    if (unlikely(job == NULL)) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali Soft Job: system alloc job failed. \n"));
         return NULL;
     }
@@ -242,8 +242,7 @@ mali_osk_errcode_t mali_soft_job_system_signal_job(struct mali_soft_job_system *
     mali_soft_job_system_lock(system);
 
     job = mali_soft_job_system_lookup_job(system, job_id);
-
-    if ((NULL == job) || (MALI_SOFT_JOB_TYPE_USER_SIGNALED != job->type) ||
+    if ((job == NULL) || (MALI_SOFT_JOB_TYPE_USER_SIGNALED != job->type) ||
         !(MALI_SOFT_JOB_STATE_STARTED == job->state || MALI_SOFT_JOB_STATE_TIMED_OUT == job->state)) {
         mali_soft_job_system_unlock(system);
         MALI_PRINT_ERROR(("Mali Soft Job: invalid soft job id %u", job_id));
@@ -287,7 +286,7 @@ mali_osk_errcode_t mali_soft_job_system_signal_job(struct mali_soft_job_system *
 
 static void mali_soft_job_send_activated_notification(struct mali_soft_job *job)
 {
-    if (NULL != job->activated_notification) {
+    if (job->activated_notification != NULL) {
         mali_uk_soft_job_activated_s *res = job->activated_notification->result_buffer;
         res->user_job = job->user_job;
         mali_session_send_notification(job->system->session, job->activated_notification);

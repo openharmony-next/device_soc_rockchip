@@ -213,7 +213,7 @@ struct kbase_gator_hwcnt_handles *kbase_gator_hwcnt_init(struct kbase_gator_hwcn
 
             in_out_info->hwc_layout[i++] = RESERVED_BLOCK;
 
-            if (0 == cg) {
+            if (cg == 0) {
                 in_out_info->hwc_layout[i++] = JM_BLOCK;
             } else {
                 in_out_info->hwc_layout[i++] = RESERVED_BLOCK;
@@ -262,8 +262,8 @@ struct kbase_gator_hwcnt_handles *kbase_gator_hwcnt_init(struct kbase_gator_hwcn
 
     setup.jm_bm = in_out_info->bitmask[0];
     setup.tiler_bm = in_out_info->bitmask[1];
-    setup.shader_bm = in_out_info->bitmask[2];
-    setup.mmu_l2_bm = in_out_info->bitmask[3];
+    setup.shader_bm = in_out_info->bitmask[0x2];
+    setup.mmu_l2_bm = in_out_info->bitmask[0x3];
     hand->vinstr_cli = kbase_vinstr_hwcnt_kernel_setup(hand->kbdev->vinstr_ctx, &setup, hand->vinstr_buffer);
     if (!hand->vinstr_cli) {
         dev_err(hand->kbdev->dev, "Failed to register gator with vinstr core");
@@ -321,7 +321,6 @@ static void dump_worker(struct work_struct *work)
 uint32_t kbase_gator_instr_hwcnt_dump_complete(struct kbase_gator_hwcnt_handles *opaque_handles,
                                                uint32_t *const success)
 {
-
     if (opaque_handles && success) {
         *success = opaque_handles->dump_complete;
         opaque_handles->dump_complete = 0;

@@ -2141,8 +2141,7 @@ static void report_features(struct hid_device *hid)
     int i, j;
 
     rep_enum = &hid->report_enum[HID_FEATURE_REPORT];
-    list_for_each_entry(rep, &rep_enum->report_list, list)
-    {
+    list_for_each_entry(rep, &rep_enum->report_list, list) {
         for (i = 0; i < rep->maxfield; i++) {
             /* Ignore if report count is out of bounds. */
             if (rep->field[i]->report_count < 1) {
@@ -2161,8 +2160,8 @@ static void report_features(struct hid_device *hid)
                     drv->feature_mapping(hid, rep->field[i], usage);
                 }
             }
-        }    
-    } 
+        }
+    }
 }
 
 static struct hid_input *hidinput_allocate(struct hid_device *hid, unsigned int application)
@@ -2309,7 +2308,7 @@ static void hidinput_cleanup_hidinput(struct hid_device *hid, struct hid_input *
     kfree(hidinput->name);
 
     for (k = HID_INPUT_REPORT; k <= HID_OUTPUT_REPORT; k++) {
-        if (k == HID_OUTPUT_REPORT && hid->quirks & HID_QUIRK_SKIP_OUTPUT_REPORTS) {
+        if ((k == HID_OUTPUT_REPORT) && (hid->quirks & HID_QUIRK_SKIP_OUTPUT_REPORTS)) {
             continue;
         }
 
@@ -2404,7 +2403,7 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
     report_features(hid);
 
     for (k = HID_INPUT_REPORT; k <= HID_OUTPUT_REPORT; k++) {
-        if (k == HID_OUTPUT_REPORT && hid->quirks & HID_QUIRK_SKIP_OUTPUT_REPORTS) {
+        if ((k == HID_OUTPUT_REPORT) && (hid->quirks & HID_QUIRK_SKIP_OUTPUT_REPORTS)) {
             continue;
         }
 

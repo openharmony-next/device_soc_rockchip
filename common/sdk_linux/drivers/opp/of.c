@@ -515,7 +515,6 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev, struct
         /* Search for "opp-microvolt" */
         sprintf(name, "opp-microvolt");
         prop = of_find_property(opp->np, name, NULL);
-
         /* Missing property isn't a problem, but an invalid entry is */
         if (!prop) {
             if (unlikely(supplies == -1)) {
@@ -743,7 +742,7 @@ static int _read_opp_key(struct dev_pm_opp *new_opp, struct opp_table *table, st
  * opp can be controlled using dev_pm_opp_enable/disable functions and may be
  * removed by dev_pm_opp_remove.
  *
- * Return:
+ * Return
  * Valid OPP pointer:
  *        On success
  * NULL:

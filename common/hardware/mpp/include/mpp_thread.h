@@ -65,8 +65,7 @@ class Condition;
 /*
  * for shorter type name and function name
  */
-class Mutex
-{
+class Mutex {
 public:
     Mutex();
     ~Mutex();
@@ -75,8 +74,7 @@ public:
     void unlock();
     int trylock();
 
-    class Autolock
-    {
+    class Autolock {
     public:
         inline Autolock(Mutex *mutex, unsigned int enable = 1) : mEnabled(enable), mLock(*mutex)
         {
@@ -135,8 +133,7 @@ typedef Mutex::Autolock AutoMutex;
 /*
  * for shorter type name and function name
  */
-class Condition
-{
+class Condition {
 public:
     Condition();
     Condition(int type);
@@ -195,11 +192,10 @@ inline signed int Condition::broadcast()
     return pthread_cond_broadcast(&mCond);
 }
 
-class MppMutexCond
-{
+class MppMutexCond {
 public:
-    MppMutexCond(){};
-    ~MppMutexCond(){};
+    MppMutexCond() {};
+    ~MppMutexCond() {};
 
     void lock()
     {
@@ -251,11 +247,10 @@ typedef enum MppThreadSignal_e {
 #define THREAD_NORMAL 0
 #define THRE 0
 
-class MppThread
-{
+class MppThread {
 public:
     MppThread(MppThreadFunc func, void *ctx, const char *name = NULL);
-    ~MppThread(){};
+    ~MppThread() {};
 
     MppThreadStatus get_status(MppThreadSignal id = THREAD_WORK);
     void set_status(MppThreadStatus status, MppThreadSignal id = THREAD_WORK);

@@ -198,7 +198,6 @@ int kbase_dummy_job_wa_execute(struct kbase_device *kbdev, u64 cores)
             }
             runs++;
         }
-
     } else {
         if (run_job(kbdev, as, slot, cores, jc)) {
             failed++;
@@ -281,7 +280,6 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
 
     /* load the wa */
     err = request_firmware(&firmware, wa_name, kbdev->dev);
-
     if (err) {
         dev_err(kbdev->dev, "WA blob missing. Please refer to the Arm Mali DDK Valhall Release Notes, "
                             "Part number DC-06002 or contact support-mali@arm.com - driver probe will be failed");
@@ -289,7 +287,6 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
     }
 
     kctx = kbase_create_context(kbdev, true, BASE_CONTEXT_CREATE_FLAG_NONE, 0, NULL);
-
     if (!kctx) {
         dev_err(kbdev->dev, "Failed to create WA context\n");
         goto no_ctx;
@@ -362,7 +359,6 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
         flags = blob->map_flags | BASE_MEM_FLAG_MAP_FIXED;
 
         va_region = kbase_mem_alloc(kctx, nr_pages, nr_pages, 0, &flags, &gpu_va);
-
         if (!va_region) {
             dev_err(kbdev->dev, "Failed to allocate for blob\n");
         } else {
@@ -374,7 +370,6 @@ int kbase_dummy_job_wa_load(struct kbase_device *kbdev)
             payload = fw + blob->payload_offset;
 
             dst = kbase_vmap(kctx, va_region->start_pfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT, &vmap);
-
             if (dst) {
                 memcpy(dst, payload, blob->size);
                 kbase_vunmap(kctx, &vmap);

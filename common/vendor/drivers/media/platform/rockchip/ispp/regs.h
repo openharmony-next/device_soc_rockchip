@@ -467,7 +467,7 @@
 #define SW_UVNR_STEP1_ON BIT(1)
 #define SW_NR_EN BIT(0)
 
-/* SHP CTRL*/
+/* SHP CTRL */
 #define SW_SHP_WR_FORMAT_MASK GENMASK(3, 0)
 #define SW_SHP_WR_ROT_MODE(a) (((a)&0x3) << 5)
 #define SW_SHP_WR_YUV_LIMIT BIT(4)
@@ -496,7 +496,7 @@
 #define SW_SCL_BYPASS BIT(1)
 #define SW_SCL_ENABLE BIT(0)
 
-/* FEC_CTRL*/
+/* FEC_CTRL */
 #define SW_FEC_WR_YUV_LIMIT BIT(8)
 #define SW_FEC_WR_YUYV_YC_SWAP BIT(7)
 #define SW_FEC_WR_YUYV_FORMAT BIT(6)

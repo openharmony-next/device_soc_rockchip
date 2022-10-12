@@ -458,7 +458,6 @@ static enum drm_mode_status rk3066_hdmi_connector_mode_valid(struct drm_connecto
                                                              struct drm_display_mode *mode)
 {
     u32 vic = drm_match_cea_mode(mode);
-
     if (vic > 1) {
         return MODE_OK;
     } else {
@@ -580,7 +579,7 @@ static int rk3066_hdmi_i2c_read(struct rk3066_hdmi *hdmi, struct i2c_msg *msgs)
     int ret;
 
     ret = wait_for_completion_timeout(&hdmi->i2c->cmpltn, HZ / 0xa);
-    if (!ret || hdmi->i2c->stat & HDMI_INTR_EDID_ERR) {
+    if (!ret || (hdmi->i2c->stat & HDMI_INTR_EDID_ERR)) {
         return -EAGAIN;
     }
 
@@ -828,7 +827,7 @@ static int rk3066_hdmi_remove(struct platform_device *pdev)
 
 static const struct of_device_id rk3066_hdmi_dt_ids[] = {
     {.compatible = "rockchip,rk3066-hdmi"},
-    {/* sentinel */},
+    {},
 };
 MODULE_DEVICE_TABLE(of, rk3066_hdmi_dt_ids);
 

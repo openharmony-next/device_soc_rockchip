@@ -522,7 +522,6 @@ static void rk817_charge_otg_disable(struct rk817_charger *charge)
     int ret;
 
     ret = regulator_disable(charge->otg5v_rdev);
-
     if (ret) {
         DBG("disable otg5v failed:%d\n", ret);
         return;
@@ -536,7 +535,6 @@ static void rk817_charge_otg_enable(struct rk817_charger *charge)
     int ret;
 
     ret = regulator_enable(charge->otg5v_rdev);
-
     if (ret) {
         DBG("enable otg5v failed:%d\n", ret);
         return;
@@ -862,7 +860,6 @@ static void rk817_charge_set_otg_state(struct rk817_charger *charge, int state)
             if (charge->otg_in) {
                 DBG("otg5v is on yet, ignore..\n");
             } else {
-
                 if (!rk817_charge_get_otg_state(charge)) {
                     rk817_charge_otg_enable(charge);
                     if (!rk817_charge_get_otg_state(charge)) {
@@ -880,7 +877,6 @@ static void rk817_charge_set_otg_state(struct rk817_charger *charge, int state)
             if (!charge->otg_in) {
                 DBG("otg5v is off yet, ignore..\n");
             } else {
-
                 if (rk817_charge_get_otg_state(charge)) {
                     rk817_charge_otg_disable(charge);
                     if (rk817_charge_get_otg_state(charge)) {
@@ -1352,11 +1348,9 @@ static int rk817_charge_parse_dt(struct rk817_charger *charge)
     }
 
     ret = of_property_read_u32(np, "chrg_finish_cur", &pdata->chrg_finish_cur);
-
     if (ret < 0) {
         dev_WARN(dev, "chrg_term_mode missing!\n");
     }
-
     ret = of_property_read_u32(np, "chrg_term_mode", &pdata->chrg_term_mode);
     if (ret < 0) {
         dev_WARN(dev, "chrg_term_mode missing!\n");

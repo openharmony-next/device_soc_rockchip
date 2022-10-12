@@ -79,129 +79,112 @@
 /*
  * Here we define the default xmit fifo size used for each type of UART.
  */
-static const struct serial8250_config uart_config[] =
-{
-    [PORT_UNKNOWN] =
-        {
-            .name = "unknown",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_8250] =
-        {
-            .name = "8250",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_16450] =
-        {
-            .name = "16450",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_16550] =
-        {
-            .name = "16550",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_16550A] =
-        {
-            .name = "16550A",
-            .fifo_size = PORT_SIXTEEN,
-            .tx_loadsz = PORT_SIXTEEN,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-            .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
-            .flags = UART_CAP_FIFO,
-        },
-    [PORT_CIRRUS] =
-        {
-            .name = "Cirrus",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_16650] =
-        {
-            .name = "ST16650",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-        },
-    [PORT_16650V2] =
-        {
-            .name = "ST16650V2",
-            .fifo_size = PORT_THIRTYTWO,
-            .tx_loadsz = PORT_SIXTEEN,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_00,
-            .rxtrig_bytes = {8, PORT_SIXTEEN, PORT_TWENTYFOUR, PORT_TWENTYEIGHT},
-            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-        },
-    [PORT_16750] =
-        {
-            .name = "TI16750",
-            .fifo_size = PORT_SIXTYFOUR,
-            .tx_loadsz = PORT_SIXTYFOUR,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
-            .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_FIFTYSIX},
-            .flags = UART_CAP_FIFO | UART_CAP_SLEEP | UART_CAP_AFE,
-        },
-    [PORT_STARTECH] =
-        {
-            .name = "Startech",
-            .fifo_size = PORT_ONE,
-            .tx_loadsz = PORT_ONE,
-        },
-    [PORT_16C950] =
-        {
-            .name = "16C950/954",
-            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01,
-            .rxtrig_bytes = {PORT_SIXTEEN, PORT_THIRTYTWO, PORT_ONEHUNDREDTWELVE, PORT_ONEHUNDREDTWENTY},
-            /* UART_CAP_EFR breaks billionon CF bluetooth card. */
-            .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
-        },
-    [PORT_16654] =
-        {
-            .name = "ST16654",
-            .fifo_size = PORT_SIXTYFOUR,
-            .tx_loadsz = PORT_THIRTYTWO,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_10,
-            .rxtrig_bytes = {PORT_EIGHT, PORT_SIXTEEN, PORT_FIFTYSIX, PORT_SIXTY},
-            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-        },
-    [PORT_16850] =
-        {
-            .name = "XR16850",
-            .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
-            .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-            .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
-        },
-    [PORT_RSA] =
-        {
-            .name = "RSA",
-            .fifo_size = 2048,
-            .tx_loadsz = 2048,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11,
-            .flags = UART_CAP_FIFO,
-        },
-    [PORT_NS16550A] =
-        {
-            .name = "NS16550A",
-            .fifo_size = PORT_SIXTEEN,
-            .tx_loadsz = PORT_SIXTEEN,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-            .flags = UART_CAP_FIFO | UART_NATSEMI,
-        },
-    [PORT_XSCALE] =
-        {
-            .name = "XScale",
-            .fifo_size = PORT_THIRTYTWO,
-            .tx_loadsz = PORT_THIRTYTWO,
-            .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-            .flags = UART_CAP_FIFO | UART_CAP_UUE | UART_CAP_RTOIE,
-        },
+static const struct serial8250_config uart_config[] = {
+    [PORT_UNKNOWN] = {
+        .name = "unknown",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_8250] = {
+        .name = "8250",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_16450] = {
+        .name = "16450",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_16550] = {
+        .name = "16550",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_16550A] = {
+        .name = "16550A",
+        .fifo_size = PORT_SIXTEEN,
+        .tx_loadsz = PORT_SIXTEEN,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+        .rxtrig_bytes = {PORT_ONE, PORT_FOUR, PORT_EIGHT, PORT_FOURTEEN},
+        .flags = UART_CAP_FIFO,
+    },
+    [PORT_CIRRUS] = {
+        .name = "Cirrus",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_16650] = {
+        .name = "ST16650",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+        .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+    },
+    [PORT_16650V2] = {
+        .name = "ST16650V2",
+        .fifo_size = PORT_THIRTYTWO,
+        .tx_loadsz = PORT_SIXTEEN,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_00,
+        .rxtrig_bytes = {8, PORT_SIXTEEN, PORT_TWENTYFOUR, PORT_TWENTYEIGHT},
+        .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+    },
+    [PORT_16750] = {
+        .name = "TI16750",
+        .fifo_size = PORT_SIXTYFOUR,
+        .tx_loadsz = PORT_SIXTYFOUR,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10 | UART_FCR7_64BYTE,
+        .rxtrig_bytes = {PORT_ONE, PORT_SIXTEEN, PORT_THIRTYTWO, PORT_FIFTYSIX},
+        .flags = UART_CAP_FIFO | UART_CAP_SLEEP | UART_CAP_AFE,
+    },
+    [PORT_STARTECH] = {
+        .name = "Startech",
+        .fifo_size = PORT_ONE,
+        .tx_loadsz = PORT_ONE,
+    },
+    [PORT_16C950] = {
+        .name = "16C950/954",
+        .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+        .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01,
+        .rxtrig_bytes = {PORT_SIXTEEN, PORT_THIRTYTWO, PORT_ONEHUNDREDTWELVE, PORT_ONEHUNDREDTWENTY},
+        /* UART_CAP_EFR breaks billionon CF bluetooth card. */
+        .flags = UART_CAP_FIFO | UART_CAP_SLEEP,
+    },
+    [PORT_16654] = {
+        .name = "ST16654",
+        .fifo_size = PORT_SIXTYFOUR,
+        .tx_loadsz = PORT_THIRTYTWO,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_01 | UART_FCR_T_TRIG_10,
+        .rxtrig_bytes = {PORT_EIGHT, PORT_SIXTEEN, PORT_FIFTYSIX, PORT_SIXTY},
+        .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+    },
+    [PORT_16850] = {
+        .name = "XR16850",
+        .fifo_size = PORT_ONEHUNDREDTWENTYEIGHT,
+        .tx_loadsz = PORT_ONEHUNDREDTWENTYEIGHT,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+        .flags = UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+    },
+    [PORT_RSA] = {
+        .name = "RSA",
+        .fifo_size = 2048,
+        .tx_loadsz = 2048,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_11,
+        .flags = UART_CAP_FIFO,
+    },
+    [PORT_NS16550A] = {
+        .name = "NS16550A",
+        .fifo_size = PORT_SIXTEEN,
+        .tx_loadsz = PORT_SIXTEEN,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+        .flags = UART_CAP_FIFO | UART_NATSEMI,
+    },
+    [PORT_XSCALE] = {
+        .name = "XScale",
+        .fifo_size = PORT_THIRTYTWO,
+        .tx_loadsz = PORT_THIRTYTWO,
+        .fcr = UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+        .flags = UART_CAP_FIFO | UART_CAP_UUE | UART_CAP_RTOIE,
+    },
     [PORT_OCTEON] =
         {
             .name = "OCTEON",
@@ -360,14 +343,14 @@ static int default_serial_dl_read(struct uart_8250_port *up)
     unsigned char dll = serial_in(up, UART_DLL);
     unsigned char dlm = serial_in(up, UART_DLM);
 
-    return dll | dlm << PORT_EIGHT;
+    return dll | (dlm << PORT_EIGHT);
 }
 
 /* Uart divisor latch write */
 static void default_serial_dl_write(struct uart_8250_port *up, int value)
 {
     serial_out(up, UART_DLL, value & 0xff);
-    serial_out(up, UART_DLM, value >> PORT_EIGHT & 0xff);
+    serial_out(up, UART_DLM, value >> (PORT_EIGHT & 0xff));
 }
 
 #ifdef CONFIG_SERIAL_8250_RT288X
@@ -1381,7 +1364,7 @@ static void autoconfig(struct uart_8250_port *up)
     /*
      * Only probe for RSA ports if we got the region.
      */
-    if (port->type == PORT_16550A && up->probe & UART_PROBE_RSA && __enable_rsa(up)) {
+    if ((port->type == PORT_16550A) && (up->probe & UART_PROBE_RSA) && __enable_rsa(up)) {
         port->type = PORT_RSA;
     }
 #endif
@@ -1655,7 +1638,7 @@ static inline void __start_tx(struct uart_port *port)
     /*
      * Re-enable the transmitter if we disabled it.
      */
-    if (port->type == PORT_16C950 && up->acr & UART_ACR_TXDIS) {
+    if ((port->type == PORT_16C950) && (up->acr & UART_ACR_TXDIS)) {
         up->acr &= ~UART_ACR_TXDIS;
         serial_icr_write(up, UART_ACR, up->acr);
     }
@@ -1953,7 +1936,7 @@ unsigned int serial8250_modem_status(struct uart_8250_port *up)
 
     status |= up->msr_saved_flags;
     up->msr_saved_flags = 0;
-    if (status & UART_MSR_ANY_DELTA && up->ier & UART_IER_MSI && port->state != NULL) {
+    if ((status & UART_MSR_ANY_DELTA) && (up->ier & UART_IER_MSI) && (port->state != NULL)) {
         if (status & UART_MSR_TERI) {
             port->icount.rng++;
         }
@@ -2038,7 +2021,7 @@ int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
         skip_rx = true;
     }
 
-    if (status & (UART_LSR_DR | UART_LSR_BI) && !skip_rx) {
+    if ((status & (UART_LSR_DR | UART_LSR_BI)) && !skip_rx) {
         if (!up->dma || handle_rx_dma(up, iir)) {
             status = serial8250_rx_chars(up, status);
         }
@@ -2468,7 +2451,7 @@ int serial8250_do_startup(struct uart_port *port)
          * don't trust the iir, setup a timer to kick the UART
          * on a regular basis.
          */
-        if ((!(iir1 & UART_IIR_NO_INT) && (iir & UART_IIR_NO_INT)) || up->port.flags & UPF_BUG_THRE) {
+        if ((!(iir1 & UART_IIR_NO_INT) && (iir & UART_IIR_NO_INT)) || (up->port.flags & UPF_BUG_THRE)) {
             up->bugs |= UART_BUG_THRE;
         }
     }
@@ -2522,7 +2505,7 @@ int serial8250_do_startup(struct uart_port *port)
     iir = serial_port_in(port, UART_IIR);
     serial_port_out(port, UART_IER, 0);
 
-    if (lsr & UART_LSR_TEMT && iir & UART_IIR_NO_INT) {
+    if ((lsr & UART_LSR_TEMT) && (iir & UART_IIR_NO_INT)) {
         if (!(up->bugs & UART_BUG_TXEN)) {
             up->bugs |= UART_BUG_TXEN;
             dev_dbg(port->dev, "enabling bad tx status workarounds\n");
@@ -2693,7 +2676,7 @@ static unsigned int serial8250_do_get_divisor(struct uart_port *port, unsigned i
     /*
      * Oxford Semi 952 rev B workaround
      */
-    if (up->bugs & UART_BUG_QUOT && (quot & 0xff) == 0) {
+    if ((up->bugs & UART_BUG_QUOT) && ((quot & 0xff) == 0)) {
         quot++;
     }
 
@@ -2816,10 +2799,10 @@ static unsigned int serial8250_get_baud_rate(struct uart_port *port, struct kter
      * disable divisor values beyond 32767, which are unavailable.
      */
     if (port->flags & UPF_MAGIC_MULTIPLIER) {
-        min = port->uartclk / PORT_SIXTEEN / UART_DIV_MAX >> 1;
+        min = ((port->uartclk / PORT_SIXTEEN) / UART_DIV_MAX) >> 1;
         max = (port->uartclk + tolerance) / 0x4;
     } else {
-        min = port->uartclk / PORT_SIXTEEN / UART_DIV_MAX;
+        min = (port->uartclk / PORT_SIXTEEN) / UART_DIV_MAX;
         max = (port->uartclk + tolerance) / PORT_SIXTEEN;
     }
 
@@ -2917,7 +2900,7 @@ void serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
 
     up->lcr = cval; /* Save computed LCR */
 
-    if (up->capabilities & UART_CAP_FIFO && port->fifosize > 1) {
+    if ((up->capabilities & UART_CAP_FIFO) && (port->fifosize > 1)) {
         /* NOTE: If fifo_bug is not set, a user can set RX_trigger. */
         if ((baud < 0x960 && !up->dma) || up->fifo_bug) {
             up->fcr &= ~UART_FCR_TRIGGER_MASK;
@@ -3404,7 +3387,7 @@ static void serial8250_config_port(struct uart_port *port, int flags)
         up->bugs |= UART_BUG_NOMSR;
     }
 
-    if (port->type != PORT_UNKNOWN && flags & UART_CONFIG_IRQ) {
+    if ((port->type != PORT_UNKNOWN) && (flags & UART_CONFIG_IRQ)) {
         autoconfig_irq(up);
     }
 

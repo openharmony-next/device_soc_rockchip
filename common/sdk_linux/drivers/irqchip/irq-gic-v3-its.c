@@ -1694,7 +1694,7 @@ static int its_irq_retrigger(struct irq_data *d)
 }
 
 /*
- * Two favourable cases:
+ * Two favourable cases
  *
  * (a) Either we have a GICv4.1, and all vPEs have to be mapped at all times
  *     for vSGI delivery
@@ -2252,7 +2252,7 @@ static void its_write_baser(struct its_node *its, struct its_baser *baser, u64 v
 {
     u32 idx = baser - its->tables;
 
-    gits_write_baser(val, its->base + GITS_BASER + (idx << 3));
+    gits_write_baser(val, its->base + GITS_BASER + (idx << 0x03));
     baser->val = its_read_baser(its, baser);
 }
 

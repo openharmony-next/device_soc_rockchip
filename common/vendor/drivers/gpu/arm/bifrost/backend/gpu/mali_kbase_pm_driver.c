@@ -664,7 +664,6 @@ static int kbase_pm_mcu_update_state(struct kbase_device *kbdev)
             dev_dbg(kbdev->dev, "MCU state transition: %s to %s\n", kbase_mcu_state_to_string(prev_state),
                     kbase_mcu_state_to_string(backend->mcu_state));
         }
-
     } while (backend->mcu_state != prev_state);
 
     return 0;
@@ -1634,7 +1633,6 @@ void kbase_pm_wait_for_l2_powered(struct kbase_device *kbdev)
     /* Wait for cores */
     err = wait_event_killable(kbdev->pm.backend.gpu_in_desired_state_wait,
                               kbase_pm_is_in_desired_state_with_l2_powered(kbdev));
-
     if (err < 0 && time_after(jiffies, timeout)) {
         kbase_pm_timed_out(kbdev);
     }
@@ -1664,7 +1662,6 @@ int kbase_pm_wait_for_desired_state(struct kbase_device *kbdev)
     remaining =
         wait_event_timeout(kbdev->pm.backend.gpu_in_desired_state_wait, kbase_pm_is_in_desired_state(kbdev), timeout);
 #endif
-
     if (!remaining) {
         kbase_pm_timed_out(kbdev);
         err = -ETIMEDOUT;
@@ -1681,7 +1678,7 @@ void kbase_pm_enable_interrupts(struct kbase_device *kbdev)
 {
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     /*
      * Clear all interrupts,
      * and unmask them all.
@@ -1707,7 +1704,7 @@ KBASE_EXPORT_TEST_API(kbase_pm_enable_interrupts);
 
 void kbase_pm_disable_interrupts_nolock(struct kbase_device *kbdev)
 {
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     /*
      * Mask all interrupts,
      * and clear them all.
@@ -1745,7 +1742,7 @@ void kbase_pm_clock_on(struct kbase_device *kbdev, bool is_resume)
     bool reset_required = is_resume;
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
 #if !MALI_USE_CSF
     lockdep_assert_held(&kbdev->js_data.runpool_mutex);
 #endif /* !MALI_USE_CSF */
@@ -1831,7 +1828,7 @@ bool kbase_pm_clock_off(struct kbase_device *kbdev)
 {
     unsigned long flags;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&kbdev->pm.lock);
 
     /* ASSERT that the cores should now be unavailable. No lock needed. */
@@ -1944,7 +1941,6 @@ static int kbase_set_jm_quirks(struct kbase_device *kbdev, const u32 prod_id)
         u32 coherency_features;
 
         coherency_features = kbase_reg_read(kbdev, GPU_CONTROL_REG(COHERENCY_FEATURES));
-
         /* (COHERENCY_ACE_LITE | COHERENCY_ACE) was incorrectly
          * documented for tMIx so force correct value here.
          */
@@ -2238,7 +2234,7 @@ int kbase_pm_init_hw(struct kbase_device *kbdev, unsigned int flags)
     unsigned long irq_flags;
     int err = 0;
 
-    KBASE_DEBUG_ASSERT(NULL != kbdev);
+    KBASE_DEBUG_ASSERT(kbdev != NULL);
     lockdep_assert_held(&kbdev->pm.lock);
 
     /* Ensure the clock is on before attempting to access the hardware */
@@ -2345,7 +2341,7 @@ static void kbase_pm_request_gpu_cycle_counter_do_request(struct kbase_device *k
 
     ++kbdev->pm.backend.gpu_cycle_counter_requests;
 
-    if (1 == kbdev->pm.backend.gpu_cycle_counter_requests) {
+    if (kbdev->pm.backend.gpu_cycle_counter_requests == 1) {
         kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CYCLE_COUNT_START);
     }
 
@@ -2392,7 +2388,7 @@ void kbase_pm_release_gpu_cycle_counter_nolock(struct kbase_device *kbdev)
 
     --kbdev->pm.backend.gpu_cycle_counter_requests;
 
-    if (0 == kbdev->pm.backend.gpu_cycle_counter_requests) {
+    if (kbdev->pm.backend.gpu_cycle_counter_requests == 0) {
         kbase_reg_write(kbdev, GPU_CONTROL_REG(GPU_COMMAND), GPU_COMMAND_CYCLE_COUNT_STOP);
     }
 
@@ -2409,5 +2405,4 @@ void kbase_pm_release_gpu_cycle_counter(struct kbase_device *kbdev)
 
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 }
-
 KBASE_EXPORT_TEST_API(kbase_pm_release_gpu_cycle_counter);

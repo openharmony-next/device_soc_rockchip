@@ -43,7 +43,7 @@ static int clock_step = -1;
 static int cur_clk_step = -1;
 static struct mali_gpu_clock *gpu_clk = NULL;
 
-/*Function prototype */
+/* Function prototype */
 static int (*mali_gpu_set_freq)(int) = NULL;
 static int (*mali_gpu_get_freq)(void) = NULL;
 
@@ -98,7 +98,7 @@ static bool mali_pickup_closest_avail_clock(int target_clock_mhz, mali_bool pick
         }
     }
 
-    /* If the target clock greater than the maximum clock just pick the maximum one*/
+    /* If the target clock greater than the maximum clock just pick the maximum one */
     if (i == gpu_clk->num_of_steps) {
         i = gpu_clk->num_of_steps - 1;
     } else {
@@ -130,7 +130,7 @@ void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_p
 #endif
     u32 window_render_fps;
 
-    if (NULL == gpu_clk) {
+    if (gpu_clk == NULL) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Enable DVFS but patform doesn't Support freq change. \n"));
         return;
     }
@@ -165,7 +165,7 @@ void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_p
     cur_clk_step = mali_gpu_get_freq();
 
     /* Consider offscreen */
-    if (0 == current_fps) {
+    if (current_fps == 0) {
         /* GP or PP under perform, need to give full power */
         if (current_gpu_util > over_perform_boundary_value) {
             if (cur_clk_step != gpu_clk->num_of_steps - 1) {
@@ -175,7 +175,7 @@ void mali_dvfs_policy_realize(struct mali_gpu_utilization_data *data, u64 time_p
         }
 
         /* If GPU is idle, use lowest power */
-        if (0 == current_gpu_util) {
+        if (current_gpu_util == 0) {
             if (cur_clk_step != 0) {
                 clock_changed = true;
                 clock_step = 0;
@@ -230,7 +230,7 @@ mali_osk_errcode_t mali_dvfs_policy_init(void)
     mali_osk_errcode_t err = MALI_OSK_ERR_OK;
 
     if (MALI_OSK_ERR_OK == mali_osk_device_data_get(&data)) {
-        if ((NULL != data.get_clock_info) && (NULL != data.set_freq) && (NULL != data.get_freq)) {
+        if ((data.get_clock_info != NULL) && (data.set_freq != NULL) && (data.get_freq != NULL)) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Mali DVFS init: using arm dvfs policy \n"));
 
             mali_fps_step1 = mali_max_system_fps / MALI_FPS_STEP_ONE;
@@ -254,8 +254,8 @@ mali_osk_errcode_t mali_dvfs_policy_init(void)
             mali_gpu_get_freq = data.get_freq;
             mali_gpu_set_freq = data.set_freq;
 
-            if ((NULL != gpu_clk) && (gpu_clk->num_of_steps > 0) && (NULL != mali_gpu_get_freq) &&
-                (NULL != mali_gpu_set_freq)) {
+            if ((gpu_clk != NULL) && (gpu_clk->num_of_steps > 0) && (mali_gpu_get_freq != NULL) &&
+                (mali_gpu_set_freq != NULL)) {
                 mali_dvfs_enabled = MALI_TRUE;
             }
         } else {
@@ -280,7 +280,6 @@ void mali_dvfs_policy_new_period(void)
     unsigned int cur_clk_step2 = 0;
 
     cur_clk_step2 = mali_gpu_get_freq();
-
     if (cur_clk_step2 != (gpu_clk->num_of_steps - 1)) {
         mali_gpu_set_freq(gpu_clk->num_of_steps - 1);
 
@@ -300,12 +299,10 @@ mali_bool mali_dvfs_policy_enabled(void)
 void mali_get_current_gpu_clk_item(struct mali_gpu_clk_item *clk_item)
 {
     if (mali_platform_device != NULL) {
-
         struct mali_gpu_device_data *device_data = NULL;
         device_data = (struct mali_gpu_device_data *)mali_platform_device->dev.platform_data;
 
-        if ((NULL != device_data->get_clock_info) && (NULL != device_data->get_freq)) {
-
+        if ((device_data->get_clock_info != NULL) && (device_data->get_freq != NULL)) {
             int cur_clk_step2 = device_data->get_freq();
             struct mali_gpu_clock *mali_gpu_clk = NULL;
 

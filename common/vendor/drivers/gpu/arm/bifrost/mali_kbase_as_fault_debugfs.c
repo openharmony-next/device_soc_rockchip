@@ -44,7 +44,6 @@ static int kbase_as_fault_read(struct seq_file *sfile, void *data)
         kbdev = list_entry(entry, struct kbase_device, entry);
 
         if (kbdev->debugfs_as_read_bitmap & (1ULL << as_no)) {
-
             /* don't show this one again until another fault occors */
             kbdev->debugfs_as_read_bitmap &= ~(1ULL << as_no);
 
@@ -91,7 +90,6 @@ void kbase_as_fault_debugfs_init(struct kbase_device *kbdev)
     KBASE_DEBUG_ASSERT(sizeof(kbdev->as[0].pf_data.addr) == sizeof(u64));
 
     debugfs_directory = debugfs_create_dir("address_spaces", kbdev->mali_debugfs_directory);
-
     if (debugfs_directory) {
         for (i = 0; i < kbdev->nr_hw_address_spaces; i++) {
             snprintf(as_name, ARRAY_SIZE(as_name), "as%u", i);

@@ -200,13 +200,13 @@ void kbase_job_hw_submit(struct kbase_device *kbdev, struct kbase_jd_atom *katom
         cfg |= JS_CONFIG_ENABLE_FLUSH_REDUCTION;
     }
 
-    if (0 != (katom->core_req & BASE_JD_REQ_SKIP_CACHE_START)) {
+    if ((katom->core_req & BASE_JD_REQ_SKIP_CACHE_START) != 0) {
         cfg |= JS_CONFIG_START_FLUSH_NO_ACTION;
     } else {
         cfg |= JS_CONFIG_START_FLUSH_CLEAN_INVALIDATE;
     }
 
-    if (0 != (katom->core_req & BASE_JD_REQ_SKIP_CACHE_END) && !(kbdev->serialize_jobs & KBASE_SERIALIZE_RESET)) {
+    if ((katom->core_req & BASE_JD_REQ_SKIP_CACHE_END) && !(kbdev->serialize_jobs & KBASE_SERIALIZE_RESET) != 0) {
         cfg |= JS_CONFIG_END_FLUSH_NO_ACTION;
     } else if (kbase_hw_has_feature(kbdev, BASE_HW_FEATURE_CLEAN_ONLY_SAFE)) {
         cfg |= JS_CONFIG_END_FLUSH_CLEAN;
@@ -338,7 +338,7 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
 
         /* Note: This is inherently unfair, as we always check
          * for lower numbered interrupts before the higher
-         * numbered ones.*/
+         * numbered ones. */
         i = ffs(finished) - 1;
         KBASE_DEBUG_ASSERT(i >= 0);
 
@@ -352,7 +352,6 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
                 /* read out the job slot status code if the job
                  * slot reported failure */
                 completion_code = kbase_reg_read(kbdev, JOB_SLOT_REG(i, JS_STATUS));
-
                 if (completion_code == BASE_JD_EVENT_STOPPED) {
                     KBASE_TLSTREAM_AUX_EVENT_JOB_SLOT(kbdev, NULL, i, 0, TL_JS_EVENT_SOFT_STOP);
 
@@ -388,7 +387,6 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
             kbase_reg_write(kbdev, JOB_CONTROL_REG(JOB_IRQ_CLEAR),
                             done & ((1 << i) | (1 << (i + KBASE_BASE_MEM_PROTECTED))));
             active = kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_JS_STATE));
-
             if (((active >> i) & 1) == 0 &&
                 (((done >> (i + KBASE_BASE_MEM_PROTECTED)) & KBASE_RESET_GPU_PREPARED) == 0)) {
                 /* There is a potential race we must work
@@ -432,7 +430,6 @@ void kbase_job_done(struct kbase_device *kbdev, u32 done)
                  * execution.
                  */
                 u32 rawstat = kbase_reg_read(kbdev, JOB_CONTROL_REG(JOB_IRQ_RAWSTAT));
-
                 if ((rawstat >> (i + KBASE_BASE_MEM_PROTECTED)) & KBASE_RESET_GPU_PREPARED) {
                     /* There is a failed job that we've
                      * missed - add it back to active */
@@ -701,7 +698,6 @@ static int softstop_start_rp_nolock(struct kbase_context *kctx, struct kbase_va_
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
     katom = kbase_gpu_inspect(kbdev, 1, 0);
-
     if (!katom) {
         dev_dbg(kctx->kbdev->dev, "No atom on job slot\n");
         return -ESRCH;
@@ -757,7 +753,6 @@ void kbase_jm_wait_for_zero_jobs(struct kbase_context *kctx)
     unsigned long timeout = msecs_to_jiffies(ZAP_TIMEOUT);
 
     timeout = wait_event_timeout(kctx->jctx.zero_jobs_wait, kctx->jctx.job_nr == 0, timeout);
-
     if (timeout != 0) {
         timeout = wait_event_timeout(kctx->jctx.sched_info.ctx.is_scheduled_wait, !kbase_ctx_flag(kctx, KCTX_SCHEDULED),
                                      timeout);
@@ -908,7 +903,7 @@ void kbase_job_check_enter_disjoint(struct kbase_device *kbdev, u32 action, base
      * causing disjoint.
      */
     if (hw_action == JS_COMMAND_SOFT_STOP &&
-        (kbase_jd_katom_is_protected(target_katom) || (0 == (action & JS_COMMAND_SW_CAUSES_DISJOINT)))) {
+        (kbase_jd_katom_is_protected(target_katom) || ((action & JS_COMMAND_SW_CAUSES_DISJOINT) == 0))) {
         return;
     }
 

@@ -98,7 +98,7 @@ struct drm_pending_event {
     struct completion *completion;
 
     /**
-     * @completion_release:
+     * @completion_release
      *
      * Optional callback currently only used by the atomic modeset helpers
      * to clean up the reference count for the structure @completion is

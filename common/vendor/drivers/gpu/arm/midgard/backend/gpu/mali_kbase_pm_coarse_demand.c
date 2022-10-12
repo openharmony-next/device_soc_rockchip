@@ -31,7 +31,7 @@ static u64 coarse_demand_get_core_mask(struct kbase_device *kbdev)
 
 static bool coarse_demand_get_core_active(struct kbase_device *kbdev)
 {
-    if (0 == kbdev->pm.active_count && !(kbdev->shader_needed_bitmap | kbdev->shader_inuse_bitmap) &&
+    if (kbdev->pm.active_count == 0 && !(kbdev->shader_needed_bitmap | kbdev->shader_inuse_bitmap) &&
         !kbdev->tiler_needed_cnt && !kbdev->tiler_inuse_cnt) {
         return false;
     }

@@ -247,7 +247,6 @@ static const enum base_hw_issue *kbase_hw_get_issues_for_new_id(struct kbase_dev
 
         /* Stop when we reach the end of the map. */
         for (v = 0; product->map[v].version != U32_MAX; ++v) {
-
             if (version == product->map[v].version) {
                 /* Exact match so stop. */
                 issues = product->map[v].issues;

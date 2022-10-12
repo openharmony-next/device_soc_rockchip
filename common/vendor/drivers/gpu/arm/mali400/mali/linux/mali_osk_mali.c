@@ -208,7 +208,7 @@ static int mali_osk_get_compatible_name(const char **out_string)
 {
     struct device_node *node = mali_platform_device->dev.of_node;
 
-    MALI_DEBUG_ASSERT(NULL != node);
+    MALI_DEBUG_ASSERT(node != NULL);
 
     return of_property_read_string(node, "compatible", out_string);
 }
@@ -220,11 +220,11 @@ mali_osk_errcode_t mali_osk_resource_initialize(void)
     struct resource *res;
     const char *compatible_name = NULL;
 
-    if (0 == mali_osk_get_compatible_name(&compatible_name)) {
-        if (0 == strncmp(compatible_name, "arm,mali-450", strlen("arm,mali-450"))) {
+    if (mali_osk_get_compatible_name(&compatible_name) == 0) {
+        if (strncmp(compatible_name, "arm,mali-450", strlen("arm,mali-450")) == 0) {
             mali_is_450 = MALI_TRUE;
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali-450 device tree detected."));
-        } else if (0 == strncmp(compatible_name, "arm,mali-470", strlen("arm,mali-470"))) {
+        } else if (strncmp(compatible_name, "arm,mali-470", strlen("arm,mali-470")) == 0) {
             mali_is_470 = MALI_TRUE;
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("mali-470 device tree detected."));
         }
@@ -240,13 +240,13 @@ mali_osk_errcode_t mali_osk_resource_initialize(void)
     }
 
     for (i = MALI_OSK_RESOURCE_PP_LOCATION_START; i <= MALI_OSK_RESOURCE_PP_LOCATION_END; i++) {
-        if (MALI_OSK_INVALID_RESOURCE_ADDRESS != mali_osk_resource_bank[i].base) {
+        if (mali_osk_resource_bank[i].base != MALI_OSK_INVALID_RESOURCE_ADDRESS) {
             pp_core_num++;
         }
     }
 
     /* We have to divide by 2, because we caculate twice for only one pp(pp_core and pp_mmu_core). */
-    if (0 != pp_core_num % MALI_OSK_RESOURCE_PP_LOCATION_START) {
+    if (pp_core_num % MALI_OSK_RESOURCE_PP_LOCATION_START != 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("The value of pp core number isn't normal."));
         return MALI_OSK_ERR_FAULT;
     }
@@ -288,14 +288,14 @@ mali_osk_errcode_t mali_osk_resource_find(u32 addr, _mali_osk_resource_t *res)
 {
     int i;
 
-    if (NULL == mali_platform_device) {
+    if (mali_platform_device == NULL) {
         return MALI_OSK_ERR_ITEM_NOT_FOUND;
     }
 
     /* Traverse all of resources in resources bank to find the matching one. */
     for (i = 0; i < MALI_OSK_MAX_RESOURCE_NUMBER; i++) {
         if (mali_osk_resource_bank[i].base == addr) {
-            if (NULL != res) {
+            if (res != NULL) {
                 res->base = addr + mali_osk_resource_base_address();
                 res->description = mali_osk_resource_bank[i].description;
                 res->irq = mali_osk_resource_bank[i].irq;
@@ -313,8 +313,7 @@ uintptr_t mali_osk_resource_base_address(void)
     uintptr_t ret = 0;
 
     reg_res = platform_get_resource(mali_platform_device, IORESOURCE_MEM, 0);
-
-    if (NULL != reg_res) {
+    if (reg_res != NULL) {
         ret = reg_res->start;
     }
 
@@ -331,7 +330,7 @@ void mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_siz
 
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Get pmu config from device tree configuration.\n"));
 
-    MALI_DEBUG_ASSERT(NULL != node);
+    MALI_DEBUG_ASSERT(node != NULL);
 
     if (!of_get_property(node, "pmu_domain_config", &length)) {
         return;
@@ -356,9 +355,9 @@ u32 mali_osk_get_pmu_switch_delay(void)
     struct device_node *node = mali_platform_device->dev.of_node;
     u32 switch_delay;
 
-    MALI_DEBUG_ASSERT(NULL != node);
+    MALI_DEBUG_ASSERT(node != NULL);
 
-    if (0 == of_property_read_u32(node, "pmu_switch_delay", &switch_delay)) {
+    if (of_property_read_u32(node, "pmu_switch_delay", &switch_delay) == 0) {
         return switch_delay;
     } else {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
@@ -375,7 +374,7 @@ mali_osk_errcode_t mali_osk_resource_find(u32 addr, _mali_osk_resource_t *res)
     int i;
     uintptr_t phys_addr;
 
-    if (NULL == mali_platform_device) {
+    if (mali_platform_device == NULL) {
         /* Not connected to a device */
         return MALI_OSK_ERR_ITEM_NOT_FOUND;
     }
@@ -445,7 +444,6 @@ u32 mali_osk_get_pmu_switch_delay(void)
     };
 
     err = mali_osk_device_data_get(&data);
-
     if (MALI_OSK_ERR_OK == err) {
         return data.pmu_switch_delay;
     }
@@ -458,11 +456,11 @@ mali_osk_errcode_t mali_osk_device_data_get(mali_osk_device_data *data)
 {
     MALI_DEBUG_ASSERT_POINTER(data);
 
-    if (NULL != mali_platform_device) {
+    if (mali_platform_device != NULL) {
         struct mali_gpu_device_data *os_data = NULL;
 
         os_data = (struct mali_gpu_device_data *)mali_platform_device->dev.platform_data;
-        if (NULL != os_data) {
+        if (os_data != NULL) {
             /* Copy data from OS dependant struct to Mali neutral struct (identical!) */
             BUILD_BUG_ON(sizeof(*os_data) != sizeof(*data));
             mali_osk_memcpy(data, os_data, sizeof(*os_data));
@@ -496,7 +494,7 @@ mali_bool mali_osk_shared_interrupts(void)
     u32 i, j, irq, num_irqs_found = 0;
 
     MALI_DEBUG_ASSERT_POINTER(mali_platform_device);
-    MALI_DEBUG_ASSERT(0X80 >= mali_platform_device->num_resources);
+    MALI_DEBUG_ASSERT(mali_platform_device->num_resources <= 0X80);
 
     for (i = 0; i < mali_platform_device->num_resources; i++) {
         if (IORESOURCE_IRQ & mali_platform_device->resource[i].flags) {
@@ -522,8 +520,8 @@ mali_osk_errcode_t mali_osk_gpu_secure_mode_init(void)
     };
 
     if (MALI_OSK_ERR_OK == mali_osk_device_data_get(&data)) {
-        if ((NULL != data.secure_mode_init) && (NULL != data.secure_mode_deinit) &&
-            (NULL != data.gpu_reset_and_secure_mode_enable) && (NULL != data.gpu_reset_and_secure_mode_disable)) {
+        if ((data.secure_mode_init != NULL) && (data.secure_mode_deinit !=NULL) &&
+            (data.gpu_reset_and_secure_mode_enable != NULL) && (data.gpu_reset_and_secure_mode_disable != NULL)) {
             int err = data.secure_mode_init();
             if (err) {
                 MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Failed to init gpu secure mode.\n"));
@@ -545,7 +543,7 @@ mali_osk_errcode_t mali_osk_gpu_secure_mode_init(void)
 
 mali_osk_errcode_t mali_osk_gpu_secure_mode_deinit(void)
 {
-    if (NULL != mali_secure_mode_deinit) {
+    if (mali_secure_mode_deinit != NULL) {
         mali_secure_mode_deinit();
         mali_secure_mode_enabled = MALI_FALSE;
         mali_secure_mode_supported = MALI_FALSE;
@@ -561,7 +559,7 @@ mali_osk_errcode_t mali_osk_gpu_reset_and_secure_mode_enable(void)
 
     MALI_DEBUG_ASSERT(MALI_FALSE == mali_secure_mode_enabled);
 
-    if (NULL != mali_gpu_reset_and_secure_mode_enable) {
+    if (mali_gpu_reset_and_secure_mode_enable != NULL) {
         if (mali_gpu_reset_and_secure_mode_enable()) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Failed to reset GPU or enable gpu secure mode.\n"));
             return MALI_OSK_ERR_FAULT;
@@ -579,7 +577,7 @@ mali_osk_errcode_t mali_osk_gpu_reset_and_secure_mode_disable(void)
 
     MALI_DEBUG_ASSERT(MALI_TRUE == mali_secure_mode_enabled);
 
-    if (NULL != mali_gpu_reset_and_secure_mode_disable) {
+    if (mali_gpu_reset_and_secure_mode_disable != NULL) {
         if (mali_gpu_reset_and_secure_mode_disable()) {
             MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_WRANING, ("Failed to reset GPU or disable gpu secure mode.\n"));
             return MALI_OSK_ERR_FAULT;

@@ -132,7 +132,6 @@ static int rockchip_drm_bandwidth_atomic_check(struct drm_device *dev, struct dr
     for_each_old_crtc_in_state(state, crtc, old_crtc_state, i)
     {
         funcs = priv->crtc_funcs[drm_crtc_index(crtc)];
-
         if (funcs && funcs->bandwidth) {
             funcs->bandwidth(crtc, old_crtc_state, vop_bw_info);
         }

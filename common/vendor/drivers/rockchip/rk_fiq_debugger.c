@@ -162,7 +162,6 @@ static int debug_getc(struct platform_device *pdev)
      */
     rk_fiq_read(t, UART_USR);
     lsr = rk_fiq_read_lsr(t);
-
     if (lsr & UART_LSR_DR) {
         temp = rk_fiq_read(t, UART_RX);
         buf[n & 0x1f] = temp;
@@ -527,7 +526,6 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
     int ret, cpu, i;
 
     ret = sip_fiq_debugger_sdei_get_event_id(&rk_fiq_sdei.event_id, &rk_fiq_sdei.cpu_sw_event_id, NULL);
-
     if (ret) {
         pr_err("%s: get event id error!\n", __func__);
         return ret;
@@ -546,7 +544,6 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
     }
 
     ret = sdei_event_register(rk_fiq_sdei.event_id, fiq_sdei_event_callback, NULL);
-
     if (ret) {
         pr_err("%s: sdei_event_register error!\n", __func__);
         unregister_pm_notifier(&fiq_dbg_sdei_pm_nb);
@@ -556,7 +553,6 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
     rk_fiq_sdei.cur_cpu = 0;
 
     ret = sdei_event_routing_set(rk_fiq_sdei.event_id, SDEI_EVENT_REGISTER_RM_PE, cpu_logical_map(rk_fiq_sdei.cur_cpu));
-
     if (ret) {
         pr_err("%s: sdei_event_routing_set error!\n", __func__);
         goto err;
@@ -576,7 +572,6 @@ static int fiq_debugger_sdei_enable(struct rk_fiq_debugger *t)
         }
         ret =
             sdei_event_routing_set(rk_fiq_sdei.cpu_sw_event_id + cpu, SDEI_EVENT_REGISTER_RM_PE, cpu_logical_map(cpu));
-
         if (ret) {
             pr_err("%s:cpu %d fiq_sdei_event_routing_set error!\n", __func__, cpu);
             goto cpu_sw_err;

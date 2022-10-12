@@ -537,8 +537,11 @@ static int dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_m
         mpclk = DIV_ROUND_UP(mode->clock, MSEC_PER_SEC);
         if (mpclk) {
             /* take 1 / 0.9, since mbps must big than bandwidth of RGB */
+            if (lanes == 0) {
+                return -EPERM;
+            }
             tmp = mpclk * (bpp / lanes) * 0xa / 0x9;
-            if (tmp < max_mbps) {
+            if (tmp < (unsigned long)max_mbps) {
                 target_mbps = tmp;
             } else {
                 DRM_DEV_ERROR(dsi->dev, "DPHY clock frequency is out of range\n");
@@ -1207,7 +1210,7 @@ static const struct rockchip_dw_dsi_chip_data px30_chip_data[] = {
         .max_bit_rate_per_lane = 1000000000UL,
         .soc_type = PX30,
     },
-    {/* sentinel */}};
+    {}};
 
 static const struct rockchip_dw_dsi_chip_data rk3288_chip_data[] = {
     {
@@ -1230,7 +1233,7 @@ static const struct rockchip_dw_dsi_chip_data rk3288_chip_data[] = {
         .max_bit_rate_per_lane = 1500000000UL,
         .soc_type = RK3288,
     },
-    {/* sentinel */}};
+    {}};
 
 static const struct rockchip_dw_dsi_chip_data rk3399_chip_data[] = {
     {
@@ -1270,7 +1273,7 @@ static const struct rockchip_dw_dsi_chip_data rk3399_chip_data[] = {
         .max_bit_rate_per_lane = 1500000000UL,
         .soc_type = RK3399,
     },
-    {/* sentinel */}};
+    {}};
 
 static const struct rockchip_dw_dsi_chip_data rk3568_chip_data[] = {
     {
@@ -1295,25 +1298,28 @@ static const struct rockchip_dw_dsi_chip_data rk3568_chip_data[] = {
         .max_bit_rate_per_lane = 1200000000UL,
         .soc_type = RK3568,
     },
-    {/* sentinel */}};
+    {}};
 
-static const struct of_device_id dw_mipi_dsi_rockchip_dt_ids[] = {{
-                                                                      .compatible = "rockchip,px30-mipi-dsi",
-                                                                      .data = &px30_chip_data,
-                                                                  },
-                                                                  {
-                                                                      .compatible = "rockchip,rk3288-mipi-dsi",
-                                                                      .data = &rk3288_chip_data,
-                                                                  },
-                                                                  {
-                                                                      .compatible = "rockchip,rk3399-mipi-dsi",
-                                                                      .data = &rk3399_chip_data,
-                                                                  },
-                                                                  {
-                                                                      .compatible = "rockchip,rk3568-mipi-dsi",
-                                                                      .data = &rk3568_chip_data,
-                                                                  },
-                                                                  {/* sentinel */}};
+static const struct of_device_id dw_mipi_dsi_rockchip_dt_ids[] = {
+    {
+        .compatible = "rockchip,px30-mipi-dsi",
+        .data = &px30_chip_data,
+    },
+    {
+        .compatible = "rockchip,rk3288-mipi-dsi",
+        .data = &rk3288_chip_data,
+    },
+    {
+        .compatible = "rockchip,rk3399-mipi-dsi",
+        .data = &rk3399_chip_data,
+    },
+    {
+        .compatible = "rockchip,rk3568-mipi-dsi",
+        .data = &rk3568_chip_data,
+    },
+    {}
+};
+
 MODULE_DEVICE_TABLE(of, dw_mipi_dsi_rockchip_dt_ids);
 
 struct platform_driver dw_mipi_dsi_rockchip_driver = {

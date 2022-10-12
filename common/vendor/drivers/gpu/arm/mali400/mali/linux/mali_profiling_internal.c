@@ -52,7 +52,7 @@ mali_osk_errcode_t _mali_internal_profiling_init(mali_bool auto_start)
     mali_osk_atomic_init(&profile_insert_index, 0);
 
     lock = _mali_osk_mutex_init(_MALI_OSK_LOCKFLAG_ORDERED, _MALI_OSK_LOCK_ORDER_PROFILING);
-    if (NULL == lock) {
+    if (lock == NULL) {
         return MALI_OSK_ERR_FAULT;
     }
 
@@ -79,12 +79,12 @@ void _mali_internal_profiling_term(void)
 
     prof_state = MALI_PROFILING_STATE_UNINITIALIZED;
 
-    if (NULL != profile_entries) {
+    if (profile_entries != NULL) {
         _mali_osk_vfree(profile_entries);
         profile_entries = NULL;
     }
 
-    if (NULL != lock) {
+    if (lock != NULL) {
         _mali_osk_mutex_term(lock);
         lock = NULL;
     }
@@ -103,8 +103,7 @@ mali_osk_errcode_t _mali_internal_profiling_start(u32 *limit)
     }
 
     new_profile_entries = _mali_osk_valloc(*limit * sizeof(mali_profiling_entry));
-
-    if (NULL == new_profile_entries) {
+    if (new_profile_entries == NULL) {
         mali_osk_mutex_signal(lock);
         _mali_osk_vfree(new_profile_entries);
         return MALI_OSK_ERR_NOMEM;
@@ -133,7 +132,6 @@ mali_osk_errcode_t _mali_internal_profiling_start(u32 *limit)
     profile_entries = new_profile_entries;
 
     ret = _mali_timestamp_reset();
-
     if (MALI_OSK_ERR_OK == ret) {
         prof_state = MALI_PROFILING_STATE_RUNNING;
     } else {
@@ -236,9 +234,9 @@ mali_osk_errcode_t _mali_internal_profiling_get_event(u32 index, u64 *timestamp,
         *event_id = profile_entries[index].event_id;
         data[0] = profile_entries[index].data[0];
         data[1] = profile_entries[index].data[1];
-        data[2] = profile_entries[index].data[MAIL_EVENT_TO];
-        data[3] = profile_entries[index].data[MAIL_EVENT_TH];
-        data[4] = profile_entries[index].data[MAIL_EVENT_FO];
+        data[0x02] = profile_entries[index].data[MAIL_EVENT_TO];
+        data[0x03] = profile_entries[index].data[MAIL_EVENT_TH];
+        data[0x04] = profile_entries[index].data[MAIL_EVENT_FO];
     } else {
         mali_osk_mutex_signal(lock);
         return MALI_OSK_ERR_FAULT;
@@ -261,7 +259,7 @@ mali_osk_errcode_t _mali_internal_profiling_clear(void)
     profile_mask = 0;
     mali_osk_atomic_init(&profile_insert_index, 0);
 
-    if (NULL != profile_entries) {
+    if (new_profile_entries != NULL) {
         _mali_osk_vfree(profile_entries);
         profile_entries = NULL;
     }

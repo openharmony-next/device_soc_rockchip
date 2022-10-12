@@ -111,16 +111,15 @@ static mali_bool mali_timeline_fence_wait_check_status(struct mali_timeline_syst
 #else
         sync_fence = mali_internal_sync_fence_fdget(fence->sync_fd);
 #endif
-        if (likely(NULL != sync_fence)) {
+        if (likely(sync_fence != NULL)) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
             if (0 == sync_fence->status) {
 #elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
             if (0 < atomic_read(&sync_fence->status)) {
 #else
-            if (0 == sync_fence->fence->ops->signaled(sync_fence->fence)) {
+            if (sync_fence->fence->ops->signaled(sync_fence->fence) == 0) {
 #endif
                 ret = MALI_FALSE;
-
             } else {
                 ret = MALI_TRUE;
             }
@@ -162,7 +161,7 @@ mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct m
     }
 
     wait = mali_timeline_fence_wait_tracker_alloc();
-    if (unlikely(NULL == wait)) {
+    if (unlikely(wait == NULL)) {
         MALI_PRINT_ERROR(("Mali Timeline: failed to allocate data for fence wait\n"));
         return MALI_FALSE;
     }
@@ -192,7 +191,7 @@ mali_bool mali_timeline_fence_wait(struct mali_timeline_system *system, struct m
 
     ret = wait->activated;
 
-    if (0 == mali_osk_atomic_dec_return(&wait->refcount)) {
+    if (mali_osk_atomic_dec_return(&wait->refcount) == 0) {
         mali_timeline_fence_wait_tracker_free(wait);
     }
 
@@ -218,7 +217,7 @@ void mali_timeline_fence_wait_activate(struct mali_timeline_fence_wait_tracker *
     MALI_DEBUG_ASSERT(MALI_SCHEDULER_MASK_EMPTY == schedule_mask);
     MALI_IGNORE(schedule_mask);
 
-    if (0 == mali_osk_atomic_dec_return(&wait->refcount)) {
+    if (mali_osk_atomic_dec_return(&wait->refcount) == 0) {
         mali_timeline_fence_wait_tracker_free(wait);
     }
 }

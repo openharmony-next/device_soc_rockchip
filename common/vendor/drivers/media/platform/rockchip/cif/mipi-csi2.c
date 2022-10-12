@@ -740,26 +740,22 @@ static const struct csi2_match_data rk3588_csi2_match_data = {
 };
 
 static const struct of_device_id csi2_dt_ids[] = {{
-                                                      .compatible = "rockchip,rk1808-mipi-csi2",
-                                                      .data = &rk1808_csi2_match_data,
-                                                  },
-                                                  {
-                                                      .compatible = "rockchip,rk3288-mipi-csi2",
-                                                      .data = &rk3288_csi2_match_data,
-                                                  },
-                                                  {
-                                                      .compatible = "rockchip,rk3568-mipi-csi2",
-                                                      .data = &rk3568_csi2_match_data,
-                                                  },
-                                                  {
-                                                      .compatible = "rockchip,rv1126-mipi-csi2",
-                                                      .data = &rv1126_csi2_match_data,
-                                                  },
-                                                  {
-                                                      .compatible = "rockchip,rk3588-mipi-csi2",
-                                                      .data = &rk3588_csi2_match_data,
-                                                  },
-                                                  {/* sentinel */}};
+    .compatible = "rockchip,rk1808-mipi-csi2",
+    .data = &rk1808_csi2_match_data,
+}, {
+    .compatible = "rockchip,rk3288-mipi-csi2",
+    .data = &rk3288_csi2_match_data,
+}, {
+    .compatible = "rockchip,rk3568-mipi-csi2",
+    .data = &rk3568_csi2_match_data,
+}, {
+    .compatible = "rockchip,rv1126-mipi-csi2",
+    .data = &rv1126_csi2_match_data,
+}, {
+    .compatible = "rockchip,rk3588-mipi-csi2",
+    .data = &rk3588_csi2_match_data,
+}, {
+}};
 MODULE_DEVICE_TABLE(of, csi2_dt_ids);
 
 static int csi2_probe(struct platform_device *pdev)

@@ -1057,27 +1057,27 @@ static int rk3328_u3phy_tuning(struct rockchip_u3phy *u3phy, struct rockchip_u3p
 }
 
 static const struct rockchip_u3phy_cfg rk3328_u3phy_cfgs[] = {{
-                                                                  .reg = 0xff470000,
-                                                                  .grfcfg =
-                                                                      {
-                                                                          .um_suspend = {0x0004, 15, 0, 0x1452, 0x15d1},
-                                                                          .u2_only_ctrl = {0x0020, 15, 15, 0, 1},
-                                                                          .um_ls = {0x0030, 5, 4, 0, 1},
-                                                                          .um_hstdct = {0x0030, 7, 7, 0, 1},
-                                                                          .ls_det_en = {0x0040, 0, 0, 0, 1},
-                                                                          .ls_det_st = {0x0044, 0, 0, 0, 1},
-                                                                          .pp_pwr_st = {0x0034, 14, 13, 0, 0},
-                                                                          .pp_pwr_en = {{0x0020, 14, 0, 0x0014, 0x0005},
-                                                                                        {0x0020, 14, 0, 0x0014, 0x000d},
-                                                                                        {0x0020, 14, 0, 0x0014, 0x0015},
-                                                                                        {0x0020, 14, 0, 0x0014,
-                                                                                         0x001d}},
-                                                                          .u3_disable = {0x04c4, 15, 0, 0x1100, 0x101},
-                                                                      },
-                                                                  .phy_pipe_power = rk3328_u3phy_pipe_power,
-                                                                  .phy_tuning = rk3328_u3phy_tuning,
-                                                              },
-                                                              {/* sentinel */}};
+    .reg = 0xff470000,
+    .grfcfg =
+        {
+            .um_suspend = {0x0004, 15, 0, 0x1452, 0x15d1},
+            .u2_only_ctrl = {0x0020, 15, 15, 0, 1},
+            .um_ls = {0x0030, 5, 4, 0, 1},
+            .um_hstdct = {0x0030, 7, 7, 0, 1},
+            .ls_det_en = {0x0040, 0, 0, 0, 1},
+            .ls_det_st = {0x0044, 0, 0, 0, 1},
+            .pp_pwr_st = {0x0034, 14, 13, 0, 0},
+            .pp_pwr_en = {
+                {0x0020, 14, 0, 0x0014, 0x0005},
+                {0x0020, 14, 0, 0x0014, 0x000d},
+                {0x0020, 14, 0, 0x0014, 0x0015},
+                {0x0020, 14, 0, 0x0014, 0x001d}},
+            .u3_disable = {0x04c4, 15, 0, 0x1100, 0x101},
+        },
+    .phy_pipe_power = rk3328_u3phy_pipe_power,
+    .phy_tuning = rk3328_u3phy_tuning,
+}, {
+}};
 
 static const struct of_device_id rockchip_u3phy_dt_match[] = {
     {.compatible = "rockchip,rk3328-u3phy", .data = &rk3328_u3phy_cfgs}, {}};

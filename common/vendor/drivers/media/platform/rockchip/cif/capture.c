@@ -370,7 +370,7 @@ static const struct cif_output_fmt out_fmts[] = {
         .fmt_type = CIF_FMT_TYPE_RAW,
     }
 
-    /* TODO: We can support NV12M/NV21M/NV16M/NV61M too */
+    /* We can support NV12M/NV21M/NV16M/NV61M too */
 };
 
 static const struct cif_input_fmt in_fmts[] = {
@@ -3079,8 +3079,8 @@ static void rkcif_stop_streaming(struct vb2_queue *queue)
  *    PAL,
  *    NTSC,
  *    RAW, if the input format is raw bayer
- *    JPEG, TODO
- *    MIPI, TODO
+ *    JPEG,
+ *    MIPI,
  */
 static u32 rkcif_determine_input_mode(struct rkcif_stream *stream)
 {
@@ -3877,7 +3877,7 @@ int rkcif_do_start_stream(struct rkcif_stream *stream, enum rkcif_stream_mode mo
 
         ret = v4l2_subdev_call(terminal_sensor->sd, video, g_frame_interval, &terminal_sensor->fi);
         if (ret) {
-            terminal_sensor->fi.interval = (struct v4l2_fract){1, 30};
+            terminal_sensor->fi.interval = (struct v4l2_fract) {1, 30};
         }
 
         ret = v4l2_subdev_call(terminal_sensor->sd, core, ioctl, RKMODULE_GET_START_STREAM_SEQ, &rkmodule_stream_seq);
@@ -4436,7 +4436,7 @@ static int rkcif_enum_frameintervals(struct file *file, void *fh, struct v4l2_fr
     }
 
     if (!sensor || !sensor->sd) {
-        /* TODO: active_sensor is NULL if using DMARX path */
+        /* active_sensor is NULL if using DMARX path */
         v4l2_err(&dev->v4l2_dev, "%s Not active sensor\n", __func__);
         return -ENODEV;
     }
@@ -5324,7 +5324,7 @@ static void rkcif_vb_done_oneframe(struct rkcif_stream *stream, struct vb2_v4l2_
 
 void rkcif_irq_oneframe(struct rkcif_device *cif_dev)
 {
-    /* TODO: xuhf-debug: add stream type */
+    /* xuhf-debug: add stream type */
     struct rkcif_stream *stream;
     u32 lastline, lastpix, ctl, cif_frmst, intstat, frmid;
     int ret = 0;

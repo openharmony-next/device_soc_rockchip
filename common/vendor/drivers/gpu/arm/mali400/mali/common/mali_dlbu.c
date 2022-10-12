@@ -44,7 +44,7 @@ typedef enum mali_dlbu_register {
     MALI_DLBU_REGISTER_TLLIST_VBASEADDR =
         0x0008, /**< Tile list virtual base address;
                        31:12 Virtual address to the tile list. This address is
-                   used when        calculating the call address sent to PP.*/
+                   used when        calculating the call address sent to PP. */
     MALI_DLBU_REGISTER_FB_DIM =
         0x000C, /**< Framebuffer dimension;
                      23:16 Number of tiles in Y direction-1
@@ -108,7 +108,7 @@ void mali_dlbu_terminate(void)
 {
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_MESSAGE, ("Mali DLBU: terminating\n"));
 
-    if (0 != mali_dlbu_phys_addr && 0 != mali_dlbu_cpu_addr) {
+    if (mali_dlbu_phys_addr != 0 && mali_dlbu_cpu_addr != 0) {
         mali_mmu_release_table_page(mali_dlbu_phys_addr, mali_dlbu_cpu_addr);
         mali_dlbu_phys_addr = 0;
         mali_dlbu_cpu_addr = 0;
@@ -125,7 +125,7 @@ struct mali_dlbu_core *mali_dlbu_create(const _mali_osk_resource_t *resource)
          resource->description));
 
     core = mali_osk_malloc(sizeof(struct mali_dlbu_core));
-    if (NULL != core) {
+    if (core != NULL) {
         if (MALI_OSK_ERR_OK ==
             mali_hw_core_create(&core->hw_core, resource, MALI_DLBU_SIZE)) {
             core->pp_cores_mask = 0;
@@ -175,7 +175,7 @@ mali_osk_errcode_t mali_dlbu_reset(struct mali_dlbu_core *dlbu)
     /* write reset values to core registers */
     mali_hw_core_register_write_array_relaxed(
         &dlbu->hw_core, MALI_DLBU_REGISTER_MASTER_TLLIST_PHYS_ADDR,
-        dlbu_registers, 7);
+        dlbu_registers, 0x7);
 
     err = MALI_OSK_ERR_OK;
 
@@ -240,5 +240,5 @@ void mali_dlbu_config_job(struct mali_dlbu_core *dlbu, struct mali_pp_job *job)
      * / reset) and the PP_ENABLE_MASK register
      */
     mali_hw_core_register_write_array_relaxed(
-        &dlbu->hw_core, MALI_DLBU_REGISTER_TLLIST_VBASEADDR, registers, 4);
+        &dlbu->hw_core, MALI_DLBU_REGISTER_TLLIST_VBASEADDR, registers, 0x4);
 }

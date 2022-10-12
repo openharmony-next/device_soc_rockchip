@@ -419,7 +419,7 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
  * It looks up the correct DRM device and instantiates all the per-file
  * resources for it. It also calls the &drm_driver.open driver callback.
  *
- * RETURNS:
+ * RETURNS: int
  *
  * 0 on success or negative errno value on falure.
  */
@@ -501,7 +501,7 @@ void drm_lastclose(struct drm_device *dev)
  * &drm_driver.postclose driver callback. If this is the last open file for the
  * DRM device also proceeds to call the &drm_driver.lastclose driver callback.
  *
- * RETURNS:
+ * RETURNS:int
  *
  * Always succeeds and returns 0.
  */
@@ -544,7 +544,7 @@ EXPORT_SYMBOL(drm_release);
  * callback. If this is the last open file for the DRM device also proceeds to
  * call the &drm_driver.lastclose driver callback.
  *
- * RETURNS:
+ * RETURNS:int
  *
  * Always succeeds and returns 0.
  */
@@ -680,7 +680,7 @@ EXPORT_SYMBOL(drm_read);
  *
  * See also drm_read().
  *
- * RETURNS:
+ * RETURNS:int
  *
  * Mask of POLL flags indicating the current status of the file.
  */
@@ -719,7 +719,7 @@ EXPORT_SYMBOL(drm_poll);
  * This is the locked version of drm_event_reserve_init() for callers which
  * already hold &drm_device.event_lock.
  *
- * RETURNS:
+ * RETURNS:int
  *
  * 0 on success or a negative error code on failure.
  */
@@ -760,7 +760,7 @@ EXPORT_SYMBOL(drm_event_reserve_init_locked);
  * Callers which already hold &drm_device.event_lock should use
  * drm_event_reserve_init_locked() instead.
  *
- * RETURNS:
+ * RETURNS:int
  *
  * 0 on success or a negative error code on failure.
  */

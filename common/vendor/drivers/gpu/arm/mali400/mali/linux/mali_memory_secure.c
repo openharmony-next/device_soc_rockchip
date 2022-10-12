@@ -37,7 +37,7 @@ mali_osk_errcode_t mali_mem_secure_attach_dma_buf(mali_mem_secure *secure_mem, u
 
     secure_mem->buf = buf;
     secure_mem->attachment = dma_buf_attach(secure_mem->buf, &mali_platform_device->dev);
-    if (NULL == secure_mem->attachment) {
+    if (secure_mem->attachment == NULL) {
         MALI_DEBUG_PRINT_ERROR(("Failed to get dma buf attachment!\n"));
         goto failed_dma_attach;
     }
@@ -81,8 +81,8 @@ mali_osk_errcode_t mali_mem_secure_mali_map(mali_mem_secure *secure_mem, struct 
         dma_addr_t phys = sg_dma_address(sg);
 
         /* sg must be page aligned. */
-        MALI_DEBUG_ASSERT(0 == size % MALI_MMU_PAGE_SIZE);
-        MALI_DEBUG_ASSERT(0 == (phys & ~(uintptr_t)0xFFFFFFFF));
+        MALI_DEBUG_ASSERT(size % MALI_MMU_PAGE_SIZE == 0);
+        MALI_DEBUG_ASSERT((phys & ~(uintptr_t)0xFFFFFFFF) == 0);
 
         mali_mmu_pagedir_update(pagedir, virt, phys, size, prop);
 
@@ -129,12 +129,11 @@ int mali_mem_secure_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *
         phys = page_to_phys(pfn_to_page(dma_to_pfn(&mali_platform_device->dev, dev_addr)));
 #endif
         size = sg_dma_len(sg);
-        MALI_DEBUG_ASSERT(0 == size % MALI_OSK_MALI_PAGE_SIZE);
+        MALI_DEBUG_ASSERT(size % MALI_OSK_MALI_PAGE_SIZE == 0);
 
         for (j = 0; j < size / MALI_OSK_MALI_PAGE_SIZE; j++) {
             ret = vmf_insert_pfn(vma, addr, PFN_DOWN(phys));
-
-            if (unlikely(0 != ret)) {
+            if (unlikely(ret != 0)) {
                 return -EFAULT;
             }
             addr += MALI_OSK_MALI_PAGE_SIZE;

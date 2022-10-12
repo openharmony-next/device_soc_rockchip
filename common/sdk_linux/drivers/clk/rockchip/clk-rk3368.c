@@ -95,7 +95,7 @@ static struct rockchip_pll_rate_table rk3368_pll_rates[] = {
     RK3066_PLL_RATE(216000000, 1, 72, 8),
     RK3066_PLL_RATE(126000000, 2, 84, 8),
     RK3066_PLL_RATE(48000000, 2, 32, 8),
-    {/* sentinel */},
+    {},
 };
 
 static struct rockchip_pll_rate_table rk3368_npll_rates[] = {
@@ -159,7 +159,7 @@ static struct clk_div_table div_ddrphy_t[] = {
     {.val = 0, .div = 1},
     {.val = 1, .div = 2},
     {.val = 3, .div = 4},
-    {/* sentinel */},
+    {},
 };
 
 #define MFLAGS CLK_MUX_HIWORD_MASK
@@ -785,10 +785,12 @@ static int __init clk_rk3368_probe(struct platform_device *pdev)
     return 0;
 }
 
-static const struct of_device_id clk_rk3368_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3368-cru",
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3368_match_table[] = {
+    {
+    .compatible = "rockchip,rk3368-cru",
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3368_match_table);
 
 static struct platform_driver clk_rk3368_driver = {

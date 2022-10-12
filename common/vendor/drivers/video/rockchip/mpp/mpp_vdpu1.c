@@ -310,11 +310,11 @@ static int vdpu_extract_task_msg(struct vdpu_task *task, struct mpp_task_msgs *m
                 }
                 memcpy(&task->r_reqs[task->r_req_cnt++], req, sizeof(*req));
                 break;
-            } 
+            }
             case MPP_CMD_SET_REG_ADDR_OFFSET: {
                 mpp_extract_reg_offset_info(&task->off_inf, req);
                 break;
-            } 
+            }
             default:
                 break;
         }

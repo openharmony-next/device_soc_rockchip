@@ -108,7 +108,7 @@ typedef enum {
      MALI400GP_REG_VAL_IRQ_PLB_INVALID_CMD | MALI400GP_REG_VAL_IRQ_SEMAPHORE_UNDERFLOW |                               \
      MALI400GP_REG_VAL_IRQ_SEMAPHORE_OVERFLOW | MALI400GP_REG_VAL_IRQ_PTR_ARRAY_OUT_OF_BOUNDS)
 
-/* Mask defining non IRQs on MaliGP2*/
+/* Mask defining non IRQs on MaliGP2 */
 #define MALIGP2_REG_VAL_IRQ_MASK_NONE 0
 
 /** }@ defgroup MALIGP2_IRQ*/
@@ -129,7 +129,7 @@ typedef enum {
 
 #define MALIGP2_REG_VAL_STATUS_MASK_ERROR (MALIGP2_REG_VAL_STATUS_BUS_ERROR | MALIGP2_REG_VAL_STATUS_WRITE_BOUND_ERR)
 
-/* This should be in the top 16 bit of the version register of gp.*/
+/* This should be in the top 16 bit of the version register of gp. */
 #define MALI200_GP_PRODUCT_ID 0xA07
 #define MALI300_GP_PRODUCT_ID 0xC07
 #define MALI400_GP_PRODUCT_ID 0xB07

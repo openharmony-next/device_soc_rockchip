@@ -29,7 +29,7 @@ typedef struct _mali_osk_irq_t_struct {
 } mali_osk_irq_object_t;
 
 typedef irqreturn_t (*irq_handler_func_t)(int, void *, struct pt_regs *);
-static irqreturn_t irq_handler_upper_half(int port_name, void *dev_id); /* , struct pt_regs *regs*/
+static irqreturn_t irq_handler_upper_half(int port_name, void *dev_id); /* , struct pt_regs *regs */
 
 #if defined(DEBUG)
 
@@ -68,7 +68,7 @@ static mali_osk_errcode_t test_interrupt(u32 irqnum, _mali_osk_irq_trigger_t tri
     irq_flags |= IRQF_SHARED;
 #endif /* defined(CONFIG_MALI_SHARED_INTERRUPTS) */
 
-    if (0 != request_irq(irqnum, test_interrupt_upper_half, irq_flags, description, &data)) {
+    if (request_irq(irqnum, test_interrupt_upper_half, irq_flags, description, &data) != 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN,
                          ("Unable to install test IRQ handler for core '%s'\n", description));
         return MALI_OSK_ERR_FAULT;
@@ -104,13 +104,13 @@ _mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandle
 #endif /* defined(CONFIG_MALI_SHARED_INTERRUPTS) */
 
     irq_object = kmalloc(sizeof(mali_osk_irq_object_t), GFP_KERNEL);
-    if (NULL == irq_object) {
+    if (irq_object == NULL) {
         return NULL;
     }
 
     if (-1 == irqnum) {
         /* Probe for IRQ */
-        if ((NULL != trigger_func) && (NULL != ack_func)) {
+        if ((trigger_func != NULL) && (ack_func != NULL)) {
             unsigned long probe_count = 0x3;
             mali_osk_errcode_t err;
             int irq;
@@ -166,7 +166,7 @@ _mali_osk_irq_t *_mali_osk_irq_init(u32 irqnum, _mali_osk_irq_uhandler_t uhandle
     }
 #endif
 
-    if (0 != request_irq(irqnum, irq_handler_upper_half, irq_flags, description, irq_object)) {
+    if (request_irq(irqnum, irq_handler_upper_half, irq_flags, description, irq_object) != 0) {
         MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_INFORMATOIN, ("Unable to install IRQ handler for core '%s'\n", description));
         kfree(irq_object);
         return NULL;
@@ -193,7 +193,7 @@ void _mali_osk_irq_term(_mali_osk_irq_t *irq)
  * Then we schedule the mali_core_irq_handler_bottom_half to run as high priority
  * work queue job.
  */
-static irqreturn_t irq_handler_upper_half(int port_name, void *dev_id) /* , struct pt_regs *regs*/
+static irqreturn_t irq_handler_upper_half(int port_name, void *dev_id) /* , struct pt_regs *regs */
 {
     irqreturn_t ret = IRQ_NONE;
     mali_osk_irq_object_t *irq_object = (mali_osk_irq_object_t *)dev_id;

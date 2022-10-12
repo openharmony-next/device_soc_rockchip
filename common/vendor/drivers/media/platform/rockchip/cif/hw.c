@@ -878,7 +878,6 @@ int rkcif_enable_sys_clk(struct rkcif_hw *cif_hw)
 
     for (i = 0; i < cif_hw->clk_size; i++) {
         ret = clk_prepare_enable(cif_hw->clks[i]);
-
         if (ret < 0) {
             goto err;
         }

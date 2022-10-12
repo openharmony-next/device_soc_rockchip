@@ -513,7 +513,6 @@ static inline struct kbase_jd_atom *kbase_jd_atom_from_id(struct kbase_context *
  * The disjoint event count and state are both set to zero.
  *
  * Disjoint functions usage:
- *
  * The disjoint event count should be incremented whenever a disjoint event occurs.
  *
  * There are several cases which are regarded as disjoint behavior. Rather than just increment

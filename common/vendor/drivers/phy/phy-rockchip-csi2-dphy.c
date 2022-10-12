@@ -536,14 +536,13 @@ static struct dphy_drv_data r3588_dcphy_drv_data = {
 };
 
 static const struct of_device_id rockchip_csi2_dphy_match_id[] = {{
-                                                                      .compatible = "rockchip,rk3568-csi2-dphy",
-                                                                      .data = &r3568_dphy_drv_data,
-                                                                  },
-                                                                  {
-                                                                      .compatible = "rockchip,rk3588-csi2-dcphy",
-                                                                      .data = &r3588_dcphy_drv_data,
-                                                                  },
-                                                                  {}};
+    .compatible = "rockchip,rk3568-csi2-dphy",
+    .data = &r3568_dphy_drv_data,
+}, {
+    .compatible = "rockchip,rk3588-csi2-dcphy",
+    .data = &r3588_dcphy_drv_data,
+}, {
+}};
 MODULE_DEVICE_TABLE(of, rockchip_csi2_dphy_match_id);
 
 static int rockchip_csi2_dphy_probe(struct platform_device *pdev)

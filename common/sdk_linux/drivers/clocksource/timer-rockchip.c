@@ -319,7 +319,7 @@ static int __init rk_timer_driver_probe(struct platform_device *pdev)
 static const struct of_device_id rk_timer_match_table[] = {
     {.compatible = "rockchip,rk3288-timer"},
     {.compatible = "rockchip,rk3399-timer"},
-    {/* sentinel */},
+    {},
 };
 
 static struct platform_driver rk_timer_driver = {

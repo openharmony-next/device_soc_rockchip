@@ -22,7 +22,7 @@
  * restart index is out of bounds and the rerun causes a tile range fault. If this happens
  * we try to clamp the restart index to a correct value and rerun the job.
  */
-/* Mask of X and Y coordinates for the coordinates words in the descriptors*/
+/* Mask of X and Y coordinates for the coordinates words in the descriptors */
 #define X_COORDINATE_MASK 0x00000FFF
 #define Y_COORDINATE_MASK 0x0FFF0000
 /* Max number of words needed from the fragment shader job descriptor */
@@ -125,7 +125,7 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
              job_header[JOB_DESC_STATUS_WORD], job_header[JOB_DESC_RESTART_INDEX_WORD],
              job_header[JOB_DESC_FAULT_ADDR_LOW_WORD], minX, minY, maxX, maxY);
 
-    /* Set the restart index to the one which generated the fault*/
+    /* Set the restart index to the one which generated the fault */
     job_header[JOB_DESC_RESTART_INDEX_WORD] = job_header[JOB_DESC_FAULT_ADDR_LOW_WORD];
 
     if (restartX < minX) {
@@ -164,7 +164,7 @@ int kbasep_10969_workaround_clamp_coordinates(struct kbase_jd_atom *katom)
                  job_header[JOB_DESC_STATUS_WORD], job_header[JOB_DESC_RESTART_INDEX_WORD],
                  job_header[JOB_DESC_FAULT_ADDR_LOW_WORD], minX, minY, maxX, maxY);
 
-        /* Flush CPU cache to update memory for future GPU reads*/
+        /* Flush CPU cache to update memory for future GPU reads */
         memcpy(page_1, dst, copy_size);
         p = pfn_to_page(PFN_DOWN(page_array[page_index]));
 

@@ -578,7 +578,7 @@ static int dw_dp_link_power_down(struct dw_dp *dp)
 
 static bool dw_dp_has_sink_count(const u8 dpcd[DP_RECEIVER_CAP_SIZE], const struct drm_dp_desc *desc)
 {
-    return dpcd[DP_DPCD_REV] >= DP_DPCD_REV_11 && dpcd[DP_DOWNSTREAMPORT_PRESENT] & DP_DWN_STRM_PORT_PRESENT &&
+    return (dpcd[DP_DPCD_REV] >= DP_DPCD_REV_11) && (dpcd[DP_DOWNSTREAMPORT_PRESENT] & DP_DWN_STRM_PORT_PRESENT) &&
            !drm_dp_has_quirk(desc, 0, DP_DPCD_QUIRK_NO_SINK_COUNT);
 }
 
@@ -1679,7 +1679,6 @@ static ssize_t dw_dp_aux_transfer(struct drm_dp_aux *aux, struct drm_dp_aux_msg 
     if (msg->size > 0 && msg->reply == DP_AUX_NATIVE_REPLY_ACK) {
         if (msg->request & DP_AUX_I2C_READ) {
             size_t count = FIELD_GET(AUX_BYTES_READ, value) - 1;
-
             if (count != msg->size) {
                 return -EBUSY;
             }
@@ -1702,7 +1701,7 @@ static int dw_dp_bridge_mode_valid(struct drm_bridge *bridge, const struct drm_d
     struct drm_display_mode m;
     u32 min_bpp;
 
-    if (info->color_formats & DRM_COLOR_FORMAT_YCRCB420 && link->vsc_sdp_extension_for_colorimetry_supported) {
+    if ((info->color_formats & DRM_COLOR_FORMAT_YCRCB420) && link->vsc_sdp_extension_for_colorimetry_supported) {
         min_bpp = 0xc;
     } else if (info->color_formats & DRM_COLOR_FORMAT_YCRCB422) {
         min_bpp = 0x10;
@@ -2497,10 +2496,12 @@ static int __maybe_unused dw_dp_runtime_resume(struct device *dev)
 
 static const struct dev_pm_ops dw_dp_pm_ops = {SET_RUNTIME_PM_OPS(dw_dp_runtime_suspend, dw_dp_runtime_resume, NULL)};
 
-static const struct of_device_id dw_dp_of_match[] = {{
-                                                         .compatible = "rockchip,rk3588-dp",
-                                                     },
-                                                     {}};
+static const struct of_device_id dw_dp_of_match[] = {
+    {
+        .compatible = "rockchip,rk3588-dp",
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, dw_dp_of_match);
 
 struct platform_driver dw_dp_driver = {

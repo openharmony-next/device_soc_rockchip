@@ -1379,7 +1379,6 @@ static int try_to_run_init_process(const char *init_filename)
     int ret;
 
     ret = run_init_process(init_filename);
-
     if (ret && ret != -ENOENT) {
         pr_err("Starting init: %s exists but couldn't execute it (error %d)\n", init_filename, ret);
     }

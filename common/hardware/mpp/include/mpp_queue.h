@@ -18,8 +18,7 @@
 
 #include "mpp_list.h"
 
-class MppQueue : public mpp_list
-{
+class MppQueue : public mpp_list {
 public:
     MppQueue(node_destructor func);
     ~MppQueue();

@@ -117,7 +117,7 @@ static struct device_node *get_model_dt_node(struct kbase_ipa_model *model, bool
     struct device_node *model_dt_node;
     char compat_string[64];
 
-    snprintf(compat_string, sizeof(compat_string), "arm,%s", model->ops->name);
+    (void)snprintf(compat_string, sizeof(compat_string), "arm,%s", model->ops->name);
 
     /* of_find_compatible_node() will call of_node_put() on the root node,
      * so take a reference on it first.
@@ -153,7 +153,7 @@ int kbase_ipa_model_add_param_s32(struct kbase_ipa_model *model, const char *nam
         origin = "zero";
     } else if (err && !dt_required) {
         origin = "default";
-    } else /* !err */ {
+    } else { /* !err */
         origin = "DT";
     }
 
@@ -200,7 +200,7 @@ int kbase_ipa_model_add_param_string(struct kbase_ipa_model *model, const char *
         origin = "zero";
     } else if (err && !dt_required) {
         origin = "default";
-    } else /* !err */ {
+    } else { /* !err */
         strncpy(addr, string_prop_value, size - 1);
         origin = "DT";
     }
@@ -284,7 +284,6 @@ static void kbase_ipa_term_locked(struct kbase_device *kbdev)
 
 int kbase_ipa_init(struct kbase_device *kbdev)
 {
-
     const char *model_name;
     const struct kbase_ipa_model_ops *ops;
     struct kbase_ipa_model *default_model = NULL;
@@ -297,7 +296,7 @@ int kbase_ipa_init(struct kbase_device *kbdev)
      */
     mutex_lock(&kbdev->ipa.lock);
 
-    /* The simple IPA model must *always* be present.*/
+    /* The simple IPA model must *always* be present. */
     ops = kbase_ipa_model_ops_find(kbdev, KBASE_IPA_FALLBACK_MODEL_NAME);
 
     default_model = kbase_ipa_init_model(kbdev, ops);
@@ -538,7 +537,6 @@ static unsigned long kbase_get_dynamic_power(unsigned long freq, unsigned long v
     model = kbdev->ipa.fallback_model;
 
     err = model->ops->get_dynamic_coeff(model, &power_coeff);
-
     if (!err) {
         power = kbase_scale_dynamic_power(power_coeff, freq, voltage);
     } else {
@@ -569,7 +567,6 @@ int kbase_get_real_power_locked(struct kbase_device *kbdev, u32 *power, unsigned
     model = get_current_model(kbdev);
 
     err = model->ops->get_dynamic_coeff(model, &power_coeff);
-
     /* If the counter model returns an error (e.g. switching back to
      * protected mode and failing to read counters, or a counter sample
      * with too few cycles), revert to the fallback model.

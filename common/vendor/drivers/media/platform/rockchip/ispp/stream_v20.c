@@ -97,7 +97,7 @@ static int config_fec(struct rkispp_device *dev)
     rkispp_set_bits(dev, RKISPP_FEC_CTRL, FMT_RD_MASK, fmt);
 
     rkispp_write(dev, RKISPP_FEC_RD_VIR_STRIDE, ALIGN(in_width * mult, ISPP_VALUE_SI) >> ISPP_VALUE_TW);
-    rkispp_write(dev, RKISPP_FEC_SRC_SIZE, in_height << ISPP_VALUE_SI | in_width);
+    rkispp_write(dev, RKISPP_FEC_SRC_SIZE, (in_height << ISPP_VALUE_SI) | in_width);
 
     fec_data = (struct rkispp_fec_head *)dev->params_vdev.buf_fec[0].vaddr;
     if (fec_data) {
@@ -315,7 +315,6 @@ restart_unlock:
 
 static void rkispp_module_work_event(struct rkispp_device *dev, void *buf_rd, void *buf_wr, u32 module, bool is_isr)
 {
-
     if (dev->hw_dev->is_shutdown) {
         return;
     }

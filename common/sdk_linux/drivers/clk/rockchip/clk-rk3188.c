@@ -101,7 +101,7 @@ static struct rockchip_pll_rate_table rk3188_pll_rates[] = {
     RK3066_PLL_RATE(148500000, 2, 99, 8),
     RK3066_PLL_RATE(126000000, 1, 84, 16),
     RK3066_PLL_RATE(48000000, 1, 64, 32),
-    {/* sentinel */},
+    { },
 };
 
 #define RK3066_DIV_CORE_PERIPH_MASK 0x3
@@ -233,7 +233,7 @@ static struct rockchip_pll_clock rk3188_pll_clks[] __initdata = {
 
 /* 2 ^ (val + 1) */
 static struct clk_div_table div_core_peri_t[] = {
-    {.val = 0, .div = 2}, {.val = 1, .div = 4}, {.val = 2, .div = 8}, {.val = 3, .div = 16}, {/* sentinel */},
+    {.val = 0, .div = 2}, {.val = 1, .div = 4}, {.val = 2, .div = 8}, {.val = 3, .div = 16}, {},
 };
 
 static struct rockchip_clk_branch common_hsadc_out_fracmux __initdata =
@@ -465,7 +465,7 @@ PNAME(mux_sclk_i2s2_p) = {"i2s2_pre", "i2s2_frac", "xin12m"};
 
 static struct clk_div_table div_aclk_cpu_t[] = {
     {.val = 0, .div = 1}, {.val = 1, .div = 2}, {.val = 2, .div = 3},
-    {.val = 3, .div = 4}, {.val = 4, .div = 8}, {/* sentinel */},
+    {.val = 3, .div = 4}, {.val = 4, .div = 8}, {},
 };
 
 static struct rockchip_clk_branch rk3066a_i2s0_fracmux __initdata =
@@ -545,7 +545,7 @@ static struct rockchip_clk_branch rk3066a_clk_branches[] __initdata = {
 
 static struct clk_div_table div_rk3188_aclk_core_t[] = {
     {.val = 0, .div = 1}, {.val = 1, .div = 2}, {.val = 2, .div = 3},
-    {.val = 3, .div = 4}, {.val = 4, .div = 8}, {/* sentinel */},
+    {.val = 3, .div = 4}, {.val = 4, .div = 8}, {},
 };
 
 PNAME(mux_hsicphy_p) = {"sclk_otgphy0_480m", "sclk_otgphy1_480m", "gpll", "cpll"};
@@ -729,19 +729,21 @@ static const struct clk_rk3188_inits clk_rk3188_init = {
     .inits = rk3188_clk_init,
 };
 
-static const struct of_device_id clk_rk3188_match_table[] = {{
-                                                                 .compatible = "rockchip,rk3066a-cru",
-                                                                 .data = &clk_rk3066a_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3188a-cru",
-                                                                 .data = &clk_rk3188a_init,
-                                                             },
-                                                             {
-                                                                 .compatible = "rockchip,rk3188-cru",
-                                                                 .data = &rk3188_clk_init,
-                                                             },
-                                                             {}};
+static const struct of_device_id clk_rk3188_match_table[] = {
+    {
+        .compatible = "rockchip,rk3066a-cru",
+        .data = &clk_rk3066a_init,
+    },
+    {
+        .compatible = "rockchip,rk3188a-cru",
+        .data = &clk_rk3188a_init,
+    },
+    {
+        .compatible = "rockchip,rk3188-cru",
+        .data = &rk3188_clk_init,
+    },
+    {}
+};
 MODULE_DEVICE_TABLE(of, clk_rk3188_match_table);
 
 static int __init clk_rk3188_probe(struct platform_device *pdev)

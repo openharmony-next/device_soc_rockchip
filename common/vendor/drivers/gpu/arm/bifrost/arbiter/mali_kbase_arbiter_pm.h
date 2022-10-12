@@ -18,7 +18,7 @@
  *
  * SPDX-License-Identifier: GPL-2.0
  *
- *//* SPDX-License-Identifier: GPL-2.0 */
+ * //* SPDX-License-Identifier: GPL-2.0 */
 
 /*
  *
@@ -154,4 +154,4 @@ int kbase_arbiter_pm_ctx_active_handle_suspend(struct kbase_device *kbdev,
  */
 void kbase_arbiter_pm_vm_stopped(struct kbase_device *kbdev);
 
-#endif /*_MALI_KBASE_ARBITER_PM_H_ */
+#endif /* _MALI_KBASE_ARBITER_PM_H_ */

@@ -416,7 +416,7 @@ static int ipcget_public(struct ipc_namespace *ns, struct ipc_ids *ids, const st
     } else {
         /* ipc object has been locked by ipc_findkey() */
 
-        if (flg & IPC_CREAT && flg & IPC_EXCL) {
+        if ((flg & IPC_CREAT) && (flg & IPC_EXCL)) {
             err = -EEXIST;
         } else {
             err = 0;
@@ -534,7 +534,7 @@ int ipcperms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, short flag)
         granted_mode >>= 0x3;
     }
     /* is there some bit set in requested_mode but not in granted_mode? */
-    if ((requested_mode & ~granted_mode & 0007) && !ns_capable(ns->user_ns, CAP_IPC_OWNER)) {
+    if ((requested_mode & ~granted_mode & 0x7) && !ns_capable(ns->user_ns, CAP_IPC_OWNER)) {
         return -1;
     }
 

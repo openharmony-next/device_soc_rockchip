@@ -47,7 +47,7 @@ struct mali_pp_core *mali_pp_create(const _mali_osk_resource_t *resource, struct
     }
 
     core = mali_osk_calloc(1, sizeof(struct mali_pp_core));
-    if (NULL != core) {
+    if (core != NULL) {
         core->core_id = mali_global_num_pp_cores;
         core->bcast_id = bcast_id;
 
@@ -69,7 +69,7 @@ struct mali_pp_core *mali_pp_create(const _mali_osk_resource_t *resource, struct
                     core->irq =
                         _mali_osk_irq_init(resource->irq, mali_group_upper_half_pp, group, mali_pp_irq_probe_trigger,
                                            mali_pp_irq_probe_ack, core, resource->description);
-                    if (NULL != core->irq) {
+                    if (core->irq != NULL) {
                         mali_global_pp_cores[mali_global_num_pp_cores] = core;
                         mali_global_num_pp_cores++;
 

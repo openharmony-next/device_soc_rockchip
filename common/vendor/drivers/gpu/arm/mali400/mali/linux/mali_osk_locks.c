@@ -129,7 +129,7 @@ static mali_bool add_lock_to_log_and_check(struct _mali_osk_lock_debug_s *lock, 
     len = tracking_list_length();
 
     l = lock_lookup_list;
-    if (NULL == l) { /* This is the first lock taken by this thread -- record and return true */
+    if (l == NULL) { /* This is the first lock taken by this thread -- record and return true */
         lock_lookup_list = lock;
         spin_unlock_irqrestore(&lock_tracking_lock, local_lock_flag);
         return MALI_TRUE;
@@ -144,7 +144,7 @@ static mali_bool add_lock_to_log_and_check(struct _mali_osk_lock_debug_s *lock, 
                 highest_order_lock = l;
             }
 
-            if (NULL != l->next) {
+            if (l->next != NULL) {
                 l = l->next;
             } else {
                 break;
@@ -188,7 +188,7 @@ static void remove_lock_from_log(struct _mali_osk_lock_debug_s *lock, uint32_t t
     len = tracking_list_length();
     curr = lock_lookup_list;
 
-    if (NULL == curr) {
+    if (curr == NULL) {
         printk(KERN_ERR "Error: Lock tracking list was empty on call to remove_lock_from_log\n");
         dump_lock_tracking_list();
     }
@@ -203,7 +203,7 @@ static void remove_lock_from_log(struct _mali_osk_lock_debug_s *lock, uint32_t t
         MALI_DEBUG_ASSERT(n++ < 0X64);
     }
 
-    if (NULL == prev) {
+    if (prev == NULL) {
         lock_lookup_list = curr->next;
     } else {
         MALI_DEBUG_ASSERT_POINTER(curr);

@@ -72,8 +72,7 @@ static const struct {
     struct usb_os_desc_header os_header;
     struct usb_ext_compat_desc os_desc;
 
-} __attribute__((__packed__)) descriptors =
-    {
+} __attribute__((__packed__)) descriptors = {
         .header =
             {
                 .magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC_V2),
@@ -325,15 +324,15 @@ int main(int argc, char *argv[])
         printf("ffs directory not specified!\n");
         return 1;
     }
-
-    ep_path = malloc(strlen(argv[1]) + 0x4 /* "/ep#" */ + 1 /* '\0' */);
+                                    /* "/ep#" */ /* '\0' */
+    ep_path = malloc(strlen(argv[1]) + 0x4 + 1);
     if (!ep_path) {
         perror("malloc");
         return 1;
     }
 
     /* open endpoint files */
-    sprintf(ep_path, "%s/ep0", argv[1]);
+    (void)sprintf(ep_path, "%s/ep0", argv[1]);
     ep0 = open(ep_path, O_RDWR);
     if (ep0 < 0) {
         perror("unable to open ep0");
@@ -347,7 +346,7 @@ int main(int argc, char *argv[])
         perror("unable to write strings");
         return 1;
     }
-    sprintf(ep_path, "%s/ep1", argv[1]);
+    (void)sprintf(ep_path, "%s/ep1", argv[1]);
     ep1 = open(ep_path, O_RDWR);
     if (ep1 < 0) {
         perror("unable to open ep1");

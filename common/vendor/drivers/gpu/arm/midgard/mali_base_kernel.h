@@ -1004,7 +1004,7 @@ static inline void base_external_resource_init(struct base_external_resource *re
     address = handle.basep.handle;
 
     LOCAL_ASSERT(res != NULL);
-    LOCAL_ASSERT(0 == (address & LOCAL_PAGE_LSB));
+    LOCAL_ASSERT((address & LOCAL_PAGE_LSB) == 0);
     LOCAL_ASSERT(access == BASE_EXT_RES_ACCESS_SHARED || access == BASE_EXT_RES_ACCESS_EXCLUSIVE);
 
     res->ext_resource = address | (access & LOCAL_PAGE_LSB);
@@ -1810,7 +1810,6 @@ typedef struct base_jd_replay_jc {
      * Pointer to the job chain.
      */
     u64 jc;
-
 } base_jd_replay_jc;
 
 /* Maximum number of jobs allowed in a fragment chain in the payload of a

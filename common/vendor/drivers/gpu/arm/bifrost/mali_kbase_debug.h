@@ -72,7 +72,7 @@ struct kbasep_debug_assert_cb {
  * @param ... Format string followed by format arguments.
  * @note function parameter cannot be concatenated with other strings
  */
-/* Select the correct system output function*/
+/* Select the correct system output function */
 #ifdef CONFIG_MALI_BIFROST_DEBUG
 #define KBASEP_DEBUG_ASSERT_OUT(trace, function, ...)                                                                  \
     do {                                                                                                               \

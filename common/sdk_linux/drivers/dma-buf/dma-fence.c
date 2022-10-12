@@ -68,7 +68,7 @@ static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(1);
  * DOC: fence cross-driver contract
  *
  * Since &dma_fence provide a cross driver contract, all drivers must follow the
- * same rules:
+ * same rules
  *
  * * Fences must complete in a reasonable time. Fences which represent kernels
  *   and shaders submitted by userspace, which could run forever, must be backed
@@ -322,7 +322,7 @@ static struct lockdep_map dma_fence_lockdep_map = {.name = "dma_fence_map"};
  * The end of these critical sections are annotated with
  * dma_fence_end_signalling().
  *
- * Returns:
+ * Returns
  *
  * Opaque cookie needed by the implementation, which needs to be passed to
  * dma_fence_end_signalling().
@@ -830,10 +830,8 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count
 
     if (timeout == 0) {
         for (i = 0; i < count; ++i) {
-            if (dma_fence_is_signaled(fences[i])) {
-                if (idx) {
+            if (dma_fence_is_signaled(fences[i]) && idx) {
                     *idx = i;
-                }
                 return 1;
             }
         }
@@ -872,7 +870,6 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count
         }
 
         ret = schedule_timeout(ret);
-
         if (ret > 0 && intr && signal_pending(current)) {
             ret = -ERESTARTSYS;
         }

@@ -182,7 +182,6 @@ int kbase_gpu_gwt_dump(struct kbase_context *kctx, union kbase_ioctl_cinstr_gwt_
     }
 
     if (list_empty(&kctx->gwt_snapshot_list) && !list_empty(&kctx->gwt_current_list)) {
-
         list_replace_init(&kctx->gwt_current_list, &kctx->gwt_snapshot_list);
 
         /* We have collected all write faults so far
@@ -192,7 +191,7 @@ int kbase_gpu_gwt_dump(struct kbase_context *kctx, union kbase_ioctl_cinstr_gwt_
          */
         kbase_gpu_gwt_setup_pages(kctx, ~KBASE_REG_GPU_WR);
 
-        /* Sort and combine consecutive pages in the dump list*/
+        /* Sort and combine consecutive pages in the dump list */
         kbase_gpu_gwt_collate(kctx, &kctx->gwt_snapshot_list);
     }
 

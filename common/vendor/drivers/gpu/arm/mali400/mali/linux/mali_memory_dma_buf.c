@@ -65,8 +65,7 @@ static int mali_dma_buf_map(mali_mem_backend *mem_backend)
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
                      ("Mali DMA-buf: map attachment %p, new map_ref = %d\n", mem, mem->map_ref));
 
-    if (1 == mem->map_ref) {
-
+    if (mem->map_ref == 1) {
         /* First reference taken, so we need to map the dma buf */
         MALI_DEBUG_ASSERT(!mem->is_mapped);
 
@@ -95,8 +94,8 @@ static int mali_dma_buf_map(mali_mem_backend *mem_backend)
             dma_addr_t phys = sg_dma_address(sg);
 
             /* sg must be page aligned. */
-            MALI_DEBUG_ASSERT(0 == size % MALI_MMU_PAGE_SIZE);
-            MALI_DEBUG_ASSERT(0 == (phys & ~(uintptr_t)0xFFFFFFFF));
+            MALI_DEBUG_ASSERT(size % MALI_MMU_PAGE_SIZE == 0);
+            MALI_DEBUG_ASSERT((phys & ~(uintptr_t)0xFFFFFFFF) == 0);
 
             mali_mmu_pagedir_update(pagedir, virt, phys, size, MALI_MMU_FLAGS_DEFAULT);
 
@@ -137,7 +136,7 @@ static void mali_dma_buf_unmap(mali_mem_allocation *alloc, struct mali_dma_buf_a
     MALI_DEBUG_PRINT(MALI_KERNEL_LEVEL_DATA,
                      ("Mali DMA-buf: unmap attachment %p, new map_ref = %d\n", mem, mem->map_ref));
 
-    if (0 == mem->map_ref) {
+    if (mem->map_ref == 0) {
         dma_buf_unmap_attachment(mem->attachment, mem->sgt, DMA_BIDIRECTIONAL);
         if (MALI_TRUE == mem->is_mapped) {
             mali_mem_mali_map_free(alloc->session, alloc->psize, alloc->mali_vma_node.vm_node.start, alloc->flags);
@@ -173,9 +172,9 @@ int mali_dma_buf_map_job(struct mali_pp_job *job)
     for (i = 0; i < num_memory_cookies; i++) {
         u32 mali_addr = mali_pp_job_get_memory_cookie(job, i);
         mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_addr, 0);
-        MALI_DEBUG_ASSERT(NULL != mali_vma_node);
+        MALI_DEBUG_ASSERT(mali_vma_node != NULL);
         mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
-        MALI_DEBUG_ASSERT(NULL != mali_alloc);
+        MALI_DEBUG_ASSERT(mali_alloc != NULL);
         if (MALI_MEM_DMA_BUF != mali_alloc->type) {
             continue;
         }
@@ -184,7 +183,7 @@ int mali_dma_buf_map_job(struct mali_pp_job *job)
         mutex_lock(&mali_idr_mutex);
         mem_bkend = idr_find(&mali_backend_idr, mali_alloc->backend_handle);
         mutex_unlock(&mali_idr_mutex);
-        MALI_DEBUG_ASSERT(NULL != mem_bkend);
+        MALI_DEBUG_ASSERT(mem_bkend != NULL);
 
         mem = mem_bkend->dma_buf.attachment;
 
@@ -192,7 +191,7 @@ int mali_dma_buf_map_job(struct mali_pp_job *job)
         MALI_DEBUG_ASSERT(mem->session == mali_pp_job_get_session(job));
 
         err = mali_dma_buf_map(mem_bkend);
-        if (0 != err) {
+        if (err != 0) {
             MALI_DEBUG_PRINT_ERROR(("Mali DMA-buf: Failed to map dma-buf for mali address %x\n", mali_addr));
             ret = -EFAULT;
             continue;
@@ -222,9 +221,9 @@ void mali_dma_buf_unmap_job(struct mali_pp_job *job)
     for (i = 0; i < num_memory_cookies; i++) {
         u32 mali_addr = mali_pp_job_get_memory_cookie(job, i);
         mali_vma_node = mali_vma_offset_search(&session->allocation_mgr, mali_addr, 0);
-        MALI_DEBUG_ASSERT(NULL != mali_vma_node);
+        MALI_DEBUG_ASSERT(mali_vma_node != NULL);
         mali_alloc = container_of(mali_vma_node, struct mali_mem_allocation, mali_vma_node);
-        MALI_DEBUG_ASSERT(NULL != mali_alloc);
+        MALI_DEBUG_ASSERT(mali_alloc != NULL);
         if (MALI_MEM_DMA_BUF != mali_alloc->type) {
             continue;
         }
@@ -233,7 +232,7 @@ void mali_dma_buf_unmap_job(struct mali_pp_job *job)
         mutex_lock(&mali_idr_mutex);
         mem_bkend = idr_find(&mali_backend_idr, mali_alloc->backend_handle);
         mutex_unlock(&mali_idr_mutex);
-        MALI_DEBUG_ASSERT(NULL != mem_bkend);
+        MALI_DEBUG_ASSERT(mem_bkend != NULL);
 
         mem = mem_bkend->dma_buf.attachment;
 
@@ -296,7 +295,7 @@ mali_osk_errcode_t mali_mem_bind_dma_buf(mali_mem_allocation *alloc, mali_mem_ba
     }
 
     dma_mem = mali_osk_calloc(1, sizeof(struct mali_dma_buf_attachment));
-    if (NULL == dma_mem) {
+    if (dma_mem == NULL) {
         goto failed_alloc_mem;
     }
 
@@ -306,7 +305,7 @@ mali_osk_errcode_t mali_mem_bind_dma_buf(mali_mem_allocation *alloc, mali_mem_ba
     init_waitqueue_head(&dma_mem->wait_queue);
 
     dma_mem->attachment = dma_buf_attach(dma_mem->buf, &mali_platform_device->dev);
-    if (NULL == dma_mem->attachment) {
+    if (dma_mem->attachment == NULL) {
         goto failed_dma_attach;
     }
 
@@ -319,7 +318,7 @@ mali_osk_errcode_t mali_mem_bind_dma_buf(mali_mem_allocation *alloc, mali_mem_ba
 
 #if defined(CONFIG_MALI_DMA_BUF_MAP_ON_ATTACH)
     /* Map memory into session's Mali virtual address space. */
-    if (0 != mali_dma_buf_map(mem_backend)) {
+    if (mali_dma_buf_map(mem_backend) != 0) {
         goto Failed_dma_map;
     }
 #endif

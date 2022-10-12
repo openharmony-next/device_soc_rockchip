@@ -201,7 +201,7 @@ static void kbase_report_gpu_fault(struct kbase_device *kbdev, int multiple)
     u64 address;
 
     status = kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTSTATUS), NULL);
-    address = (u64)kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTADDRESS_HI), NULL) << 32;
+    address = (u64)kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTADDRESS_HI), NULL) << 0x20;
     address |= kbase_reg_read(kbdev, GPU_CONTROL_REG(GPU_FAULTADDRESS_LO), NULL);
 
     dev_warn(kbdev->dev, "GPU Fault 0x%08x (%s) at 0x%016llx", status & 0xFF, kbase_exception_name(kbdev, status),
