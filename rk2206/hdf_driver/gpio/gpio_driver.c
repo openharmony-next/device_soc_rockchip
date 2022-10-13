@@ -24,7 +24,7 @@
 #include "lz_hardware.h"
 
 #define PRINT_ERR(fmt, args...)     do { \
-    printf("%s, %d, error: "fmt, __func__, __LINE__, ##args); \
+    if (1) printf("%s, %d, error: "fmt, __func__, __LINE__, ##args); \
 } while (0)
 
 #define PRINT_WARR(fmt, args...)    do { \
@@ -35,7 +35,10 @@
     if (1) printf("%s, %d, log: "fmt, __func__, __LINE__, ##args); \
 } while (0)
 
+#define RK2206_GPIO_NAME            "rk2206_gpio"
+
 static struct GpioCntlr m_gpioCntlr;
+static struct GpioInfo *m_gpioInfo = NULL;
 static int32_t m_groupNum = 0;
 static int32_t m_bitNum = 0;
 #define GPIO_MAXSIZE            256
@@ -242,14 +245,24 @@ static int32_t iodrv_init(struct HdfDeviceObject *device)
         m_gpio_init_flag[i] = 0;
     }
 
+    m_gpioInfo = (struct GpioInfo *)OsalMemAlloc(sizeof(struct GpioInfo));
+    if (m_gpioInfo == NULL) {
+        PRINT_ERR("m_gpioInfo OsalMemAlloc failed!\n");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    
+    memset_s(m_gpioInfo->name, GPIO_NAME_LEN, 0, GPIO_NAME_LEN - 1);
+    memcpy_s(m_gpioInfo->name, GPIO_NAME_LEN, RK2206_GPIO_NAME, strlen(RK2206_GPIO_NAME));
+
     cntlr->start = 0;
     cntlr->count = m_groupNum * m_bitNum;
     cntlr->ops = &m_gpio_method;
+    cntlr->ginfos = &m_gpioInfo;
     cntlr->priv = (void *)device->property;
-    PlatformDeviceBind(&cntlr->device, device);
+
     ret = GpioCntlrAdd(cntlr);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: err add controller %d", __func__, ret);
+        PRINT_ERR("GpioCntlrAdd failed(%d)\n", ret);
         return ret;
     }
 
@@ -268,7 +281,7 @@ static void iodrv_release(struct HdfDeviceObject *device)
 
     cntlr = GpioCntlrFromHdfDev(device);
     if (cntlr == NULL) {
-        PRINT_ERR("%s: no service binded!", __func__);
+        PRINT_ERR("%s: no service binded!\n", __func__);
         return;
     }
 

@@ -105,7 +105,6 @@ extern "C" {
 ============================================================================= */
 #define LOSCFG_KERNEL_PRINTF                                1
 #define LOSCFG_BASE_CORE_SCHED_SLEEP                        1
-#define LOSCFG_BACKTRACE_TYPE                               1
 #define LOSCFG_BASE_CORE_TSK_MONITOR                        1
 #define LOSCFG_BASE_CORE_CPUP                               1
 #define LOSCFG_BASE_CORE_EXC_TSK_SWITCH                     1

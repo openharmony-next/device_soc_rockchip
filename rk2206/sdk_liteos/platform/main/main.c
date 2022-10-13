@@ -48,7 +48,7 @@ static void IotProcess(void *arg)
 {
     static const unsigned int SLEEP_MAX_SECOND = 5;
     static const unsigned int SECOND_TO_MSECOND = 1000;
-    
+
     while (1) {
         printf("%s: sleep %d sec!\n", __func__, SLEEP_MAX_SECOND);
         
