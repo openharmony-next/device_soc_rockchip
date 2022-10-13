@@ -19,6 +19,7 @@ ohos_shared_library("libcodec_oem_interface") {
     "include",
     "//drivers/peripheral/codec/interfaces/include",
     "//device/soc/rockchip/rk3568/hardware/mpp/include",
+    "//device/soc/rockchip/rk3568/hardware/rga/include",
   ]
   sources = [
     "src/hdi_mpp.c",
@@ -26,7 +27,10 @@ ohos_shared_library("libcodec_oem_interface") {
     "src/hdi_mpp_mpi.c",
   ]
 
-  deps = [ "$hdf_uhdf_path/utils:libhdf_utils" ]
+  deps = [
+    "$hdf_uhdf_path/utils:libhdf_utils",
+    "//device/soc/rockchip/rk3568/hardware/rga:librga",
+  ]
 
   cflags_c = [
     "-Wno-format",

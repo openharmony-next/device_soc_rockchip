@@ -88,8 +88,7 @@ typedef MPP_RET (*hdiMppBufferGroupGet)(MppBufferGroup *, MppBufferType,
 typedef MPP_RET (*hdiMppBufferGroupPut)(MppBufferGroup);
 typedef MPP_RET (*hdiMppBufferGroupClear)(MppBufferGroup);
 typedef MPP_RET (*hdiMppBufferGroupLimitConfig)(MppBufferGroup, size_t, RK_S32);
-typedef MPP_RET (*hdiMppBufferGetFdWithCaller)(MppBufferGroup *, MppBufferType,
-    MppBufferMode, const char *, const char *);
+typedef MPP_RET (*hdiMppBufferGetFdWithCaller)(MppBufferGroup *, const char *);
 typedef MPP_RET (*hdiMppBufferGetWithTag)(MppBufferGroup, MppBuffer *, size_t, const char *, const char *);
 typedef void* (*hdiMppBufferGetPtrWithCaller)(MppBuffer, const char *);
 typedef size_t (*hdiMppBufferGroupUsage)(MppBufferGroup);
