@@ -240,6 +240,7 @@ unsigned int IoTPwmStart(unsigned int port, unsigned short duty, unsigned int fr
 #define DUTY_MIN        1
 #define DUTY_MAX        99
 #define SEC_TO_NSEC     (1000000000UL)
+#define DUTY_TO_CYCLE   100
     unsigned int duty_ns;
     unsigned int cycle_ns;
     
@@ -247,7 +248,11 @@ unsigned int IoTPwmStart(unsigned int port, unsigned short duty, unsigned int fr
         PRINT_ERR("port(%d) >= EPWMDEV_MAX(%d)\n", port, EPWMDEV_MAX);
         return IOT_FAILURE;
     }
-    if ((duty < DUTY_MIN) || (DUTY_MAX < duty)) {
+    if (duty < DUTY_MIN) {
+        PRINT_ERR("duty(%d) out of the range(%d ~ %d)\n", duty, DUTY_MIN, DUTY_MAX);
+        return IOT_FAILURE;
+    }
+    if (DUTY_MAX < duty)) {
         PRINT_ERR("duty(%d) out of the range(%d ~ %d)\n", duty, DUTY_MIN, DUTY_MAX);
         return IOT_FAILURE;
     }
@@ -261,7 +266,7 @@ unsigned int IoTPwmStart(unsigned int port, unsigned short duty, unsigned int fr
     }
 
     cycle_ns = SEC_TO_NSEC / freq;
-    duty_ns = cycle_ns * duty / 100;
+    duty_ns = cycle_ns * duty / DUTY_TO_CYCLE;
 
     LzPwmStart(m_pwm_bus_info[port].port, duty_ns, cycle_ns);
 
