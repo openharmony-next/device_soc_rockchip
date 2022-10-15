@@ -1,209 +1,59 @@
 # device_rockchip
 
-## 介绍
+## 公司介绍
 
-### 小凌派-RK2206开发板
+瑞芯微电子股份有限公司（“瑞芯微”，股票代码：603893）成立于 2001 年，总部位于福州，在深圳、上海、北京、杭州、香港设有分/子公司，专注于集成电路设计与研发，目前已发展为领先的物联网（IoT）及人工智能物联网（AIoT）处理器芯片企业。瑞芯微拥有一支以系统级芯片、模拟电路芯片设计和算法研究为特长的研发团队，在处理器和数模混合芯片设计、多媒体处理、影像算法、人工智能、系统软件开发上具有丰富的经验和技术储备。瑞芯微主要产品除各类型处理器芯片外，还包括电源管理芯片、数模混合芯片、光电产品及开发板产品。
 
-小凌派-RK2206开发板主控器为瑞芯微高性能、高性价比的RK2206芯片，搭载OpenHarmony操作系统，内置WiFi/AP功能、NFC功能、液晶显示接口以及E53接口，E53接口兼容各类传感器模块，便于多样化的IoT物联网应用；目前小凌派-RK2006开发板已经拥有20+个成熟的应用案例，以及完善的教学课程，可广泛的应用于智慧城市、智能家居、智慧教学、智慧车载以及智慧医疗等多种场景。
-
-参考[小凌派-RK2206开发板简介](https://gitee.com/openharmony-sig/vendor-lockzhiner/tree/master/lingpi)
-
-## rockchip目录
+## 目录简介
 
 ```
 device/soc/rockchip
-├── rk2206                                # RK2206芯片
-├── rk3399                                # RK3399芯片
+├── common				# 公共库
+├── rk2206             	# RK2206芯片
+├── rk3399             	# RK3399芯片
+├── rk3568			   	# RK3568芯片			
+├── ......
 ```
 
-仓库包含编译构建脚本和打包镜像工具。
+## 芯片简介
 
-系统要求： Ubuntu 20.04.3 LTS 64位系统版本。
+### RK2206芯片
 
-编译环境搭建包含如下几步：
+#### 芯片简介
 
-1. 获取源码
-2. 安装的库和工具
-3. 安装python3
-4. 安装hb
-5. 安装arm-none-eabi-gcc
-6. 编译流程
-7. 烧录打印
+RK2206是一款低功耗、高集成度、基于单片机的无线局域网处理器，可应用于诸如物联网、可穿戴设备、智慧家居、云连接等应用领域。RK2206拥有如下特性：
 
-## 获取源码
+| 硬件特性     | 技术能力                                              |
+| ------------ | ----------------------------------------------------- |
+| 处理器       | RK2206                                                |
+| 架构         | ARM                                                   |
+| CPU          | Cortex-M4F，主频高达200MHz                            |
+| DSP          | Tensilica HiFi3 DSP，主频高达300MHz                   |
+| WLAN         | 支持IEEE 802.11b/g/n制式，支持AP模式                  |
+| 内存以及存储 | RAM 256KB、DTCM 192KB 、ROM16KB、PSRAM 8MB、Flash 8MB |
+| 外部存储接口 | 支持SD3.0与MMC ver4.51                                |
+| USB接口      | 1个USB OTG 2.0，1个USB转串口用于调试                  |
+| GPIO         | 32个复用GPIO引脚                                      |
+| SPI          | 2组                                                   |
+| I2C          | 3组                                                   |
+| I2S          | 2组                                                   |
+| UART         | 3组                                                   |
+| PWM          | 12组                                                  |
+| ADC          | 8组                                                   |
+| 主板供电     | USB 5V供电                                            |
 
-```shell
-# 创建openharmony目录
-mkdir -p openharmony
-cd openharmony
-# 下载openharmony最新源代码
-repo init -u https://gitee.com/openharmony/manifest --no-repo-verify
-repo sync -c
-repo forall -c 'git lfs pull'
-```
+#### 相关仓
 
-## 安装的库和工具
+* #### 小凌派-RK2206开发板
 
-> - 通常系统默认安装samba、vim等常用软件。
+  小凌派-RK2206开发板主控器为瑞芯微高性能、高性价比的RK2206芯片，搭载OpenHarmony操作系统，内置WiFi/AP功能、NFC功能、液晶显示接口以及E53接口，E53接口兼容各类传感器模块，便于多样化的IoT物联网应用；目前小凌派-RK2006开发板已经拥有20+个成熟的应用案例，以及完善的教学课程，可广泛的应用于智慧城市、智能家居、智慧教学、智慧车载以及智慧医疗等多种场景。
 
-> - 使用如下apt-get命令安装下面的库和工具：
+  参考[小凌派-RK2206开发板简介](https://gitee.com/openharmony-sig/vendor-lockzhiner/tree/master/lingpi)
 
-```
-sudo apt-get install build-essential gcc g++ make zlib* libffi-dev e2fsprogs pkg-config flex bison perl bc openssl libssl-dev libelf-dev libc6-dev-amd64 binutils binutils-dev libdwarf-dev u-boot-tools mtd-utils gcc-arm-linux-gnueabi
-```
+  * [device/board/lockzhiner](https://gitee.com/openharmony-sig/device_board_lockzhiner)
+  * [vendor/lockzhiner](https://gitee.com/openharmony-sig/vendor-lockzhiner)
 
-## 安装Python3
+### rk3399芯片
 
-1. 打开Linux编译服务器终端。
-2. 输入如下命令，查看python版本号：
-   
-   ```
-   python3 --version
-   ```
-   
-   （1）运行如下命令，查看Ubuntu版本：
-   
-   ```
-   cat /etc/issue
-   ```
-   
-   （2）ubuntu 20安装python。
-   
-   ```
-   sudo apt-get install python3
-   ```
-3. 设置python和python3软链接为python3。
-   
-   ```
-   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
-   ```
-4. 安装并升级Python包管理工具（pip3），任选如下一种方式。
-   
-   ***（1)命令行方式***
-   
-   ```
-   sudo apt-get install python3-setuptools python3-pip -y
-   sudo pip3 install --upgrade pip
-   ```
-   
-   ***（2）安装包方式***
-   
-   ```
-   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-   python get-pip.py
-   ```
 
-## 安装hb
-
-### 安装方法
-
-1. 运行如下命令安装hb
-   
-   ```
-   pip3 uninstall ohos-build # 如果安装了hb,先卸载
-   pip3 install build/lite
-   ```
-2. 设置环境变量
-   
-   ```
-   vim ~/.bashrc
-   ```
-   
-   将以下命令拷贝到.bashrc文件的最后一行，保存并退出。
-   
-   ```
-   export PATH=~/.local/bin:$PATH
-   ```
-   
-   执行如下命令更新环境变量。
-   
-   ```
-   source ~/.bashrc
-   ```
-3. 执行"hb -h"，有打印以下信息即表示安装成功：
-   
-   ```
-   usage: hb
-   
-   OHOS build system
-   
-   positional arguments:
-     {build,set,env,clean}
-       build               Build source code
-       set                 OHOS build settings
-       env                 Show OHOS build env
-       clean               Clean output
-   
-   optional arguments:
-     -h, --help            show this help message and exit
-   ```
-
-## 安装arm-none-eabi-gcc
-
-1. Ubuntu自动安装arm-none-eabi-gcc
-   
-   ```shell
-   sudo apt-get install gcc-arm-none-eabi
-   ```
-2. 手动安装arm-none-eabi-gcc
-   
-   下载[arm-none-eabi-gcc 编译工具下载](https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2)。
-   
-   解压 [gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2](https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2) 安装包至\~/toolchain/路径下。
-   
-   ```shell
-   mkdir -p ~/toolchain/
-   tar -jxvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C ~/toolchain/
-   ```
-   
-   设置环境变量。
-   
-   ```
-   vim ~/.bashrc
-   ```
-   
-   将以下命令拷贝到.bashrc文件的最后一行，保存并退出。
-   
-   ```
-   export PATH=~/toolchain/gcc-arm-none-eabi-10.3-2021.10/bin:$PATH
-   ```
-   
-   生效环境变量。
-   
-   ```
-   source ~/.bashrc
-   ```
-
-## 编译流程
-
-编译步骤如下所示：
-
-```shell
-hb set -root .
-hb set
-lockzhiner
-   lingpi
-
-选择lingpi
-
-hb build -f
-```
-
-## 烧录打印
-
-1. 进入DriverAssitant目录，点击 DriverInstall.exe，安装驱动文件。
-2. 进入RKDevTool目录，点击 RKDevTool.exe
-3. 进入烧写工具主界面，选择“下载镜像”界面
-4. 使用USB线，连接开发板的USB烧写口
-5. 在开发板上，长按MaskRom按键（详见板子的按钮），点击ReSet按键（详见板子的按钮），烧写工具出现：“发现一个MASKROM设备”
-6. 点击“执行”按钮，下载烧写
-7. 使用USB串口线，连接USB_UART口，打开串口工具(波特率:115200)，reset（详见板子的按钮） 启动板子，查看log。
-
-# 相关仓
-
-## 小凌派-RK2206开发板
-
-* [device/board/lockzhiner](https://gitee.com/openharmony-sig/device_board_lockzhiner)
-* [vendor/lockzhiner](https://gitee.com/openharmony-sig/vendor-lockzhiner)
 
