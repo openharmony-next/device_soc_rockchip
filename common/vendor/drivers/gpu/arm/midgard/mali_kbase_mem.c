@@ -2331,13 +2331,16 @@ static void add_kds_resource(struct kds_resource *kds_res, struct kds_resource *
 }
 #endif
 
-struct kbase_mem_phy_alloc *kbase_map_external_resource(struct kbase_context *kctx, struct kbase_va_region *reg,
-                                                        struct mm_struct *locked_mm
 #ifdef CONFIG_KDS
-                                                        ,u32 *kds_res_count, struct kds_resource **kds_resources,
-                                                        unsigned long *kds_access_bitmap, bool exclusive
+struct kbase_mem_phy_alloc *kbase_map_external_resource(struct kbase_context *kctx, struct kbase_va_region *reg,
+                                                        struct mm_struct *locked_mm, u32 *kds_res_count,
+                                                        struct kds_resource **kds_resources,
+                                                        unsigned long *kds_access_bitmap, bool exclusive)
+#else
+struct kbase_mem_phy_alloc *kbase_map_external_resource(struct kbase_context *kctx, struct kbase_va_region *reg,
+                                                        struct mm_struct *locked_mm)
 #endif
-)
+
 {
     int err;
 

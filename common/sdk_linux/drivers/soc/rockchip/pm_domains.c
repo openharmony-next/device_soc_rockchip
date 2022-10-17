@@ -4,7 +4,6 @@
  *
  * Copyright (c) 2015 ROCKCHIP, Co. Ltd.
  */
-
 #include <linux/module.h>
 #include <linux/io.h>
 #include <linux/iopoll.h>

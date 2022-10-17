@@ -433,8 +433,8 @@ static int kbase_legacy_dispatch(struct kbase_context *kctx, void *const args, u
                 ukh->ret = MALI_ERROR_FUNCTION_FAILED;
                 goto no_alias;
             }
-        no_alias:
-        copy_failed:
+            no_alias:
+            copy_failed:
             vfree(ai);
             break;
         }
@@ -2417,7 +2417,7 @@ static ssize_t set_core_mask(struct device *dev, struct device_attribute *attr, 
         u64 group0_core_mask = kbdev->gpu_props.props.coherency_info.group[0].core_mask;
         if ((new_core_mask[0] & shader_present) != new_core_mask[0] || !(new_core_mask[0] & group0_core_mask) ||
             (new_core_mask[1] & shader_present) != new_core_mask[1] || !(new_core_mask[1] & group0_core_mask) ||
-            (new_core_mask[2] & shader_present) != new_core_mask[0x2] || !(new_core_mask[2] & group0_core_mask)) {
+            (new_core_mask[0x2] & shader_present) != new_core_mask[0x2] || !(new_core_mask[0x2] & group0_core_mask)) {
             dev_err(dev, "power_policy: invalid core specification\n");
             return -EINVAL;
         }

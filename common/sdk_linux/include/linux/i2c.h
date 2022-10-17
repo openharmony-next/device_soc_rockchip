@@ -792,7 +792,7 @@ static inline void i2c_mark_adapter_resumed(struct i2c_adapter *adap)
 #define I2C_CLIENT_END 0xfffeU
 
 /* Construct an I2C_CLIENT_END-terminated array of i2c addresses */
-#define I2C_ADDRS(addr, addrs...) ((const unsigned short[]){addr, ##addrs, I2C_CLIENT_END})
+#define I2C_ADDRS(addr, addrs...) ((const unsigned short[]) {addr, ##addrs, I2C_CLIENT_END})
 
 /* ----- functions exported by i2c.o */
 

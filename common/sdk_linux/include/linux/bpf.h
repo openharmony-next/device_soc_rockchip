@@ -171,7 +171,7 @@ static inline void check_and_init_map_lock(struct bpf_map *map, void *dst)
     if (likely(!map_value_has_spin_lock(map))) {
         return;
     }
-    *(struct bpf_spin_lock *)(dst + map->spin_lock_off) = (struct bpf_spin_lock){};
+    *(struct bpf_spin_lock *)(dst + map->spin_lock_off) = (struct bpf_spin_lock) {};
 }
 
 /* copy everything but bpf_spin_lock */
@@ -1069,7 +1069,7 @@ struct bpf_cg_run_ctx {
 };
 
 #define I_BPF_PROG_RUN_ARRAY(array, ctx, func, check_non_null, set_cg_storage)                                         \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         struct bpf_prog_array_item *_item;                                                                             \
         struct bpf_prog *_prog;                                                                                        \
         struct bpf_prog_array *_array;                                                                                 \
@@ -1118,7 +1118,7 @@ struct bpf_cg_run_ctx {
  *   3: -EPERM            skb should be dropped
  */
 #define BPF_PROG_CGROUP_INET_EGRESS_RUN_ARRAY(array, ctx, func)                                                        \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         struct bpf_prog_array_item *_item;                                                                             \
         struct bpf_prog *_prog;                                                                                        \
         struct bpf_prog_array *_array;                                                                                 \

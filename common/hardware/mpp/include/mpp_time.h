@@ -63,18 +63,18 @@ RK_S64 mpp_stopwatch_elapsed_time(MppStopwatch stopwatch);
 #endif
 
 #ifdef __cplusplus
-class AutoTiming {
+class MppTime {
 public:
-    AutoTiming(const char *name = __FUNCTION__);
-    ~AutoTiming();
+    MppTime(const char *name = __FUNCTION__);
+    ~MppTime();
 
 private:
     const char *mName;
     RK_S64 mStart;
     RK_S64 mEnd;
 
-    AutoTiming(const AutoTiming &);
-    AutoTiming &operator=(const AutoTiming &);
+    MppTime(const MppTime &);
+    MppTime &operator=(const MppTime &);
 };
 
 #endif
@@ -82,6 +82,6 @@ private:
 #define AUTO_TIMER_STRING(name, cnt) name##cnt
 #define AUTO_TIMER_NAME_STRING(name, cnt) AUTO_TIMER_STRING(name, cnt)
 #define AUTO_TIMER_NAME(name) AUTO_TIMER_NAME_STRING(name, __COUNTER__)
-#define AUTO_TIMING() AutoTiming AUTO_TIMER_NAME(auto_timing)(__FUNCTION__)
+#define AUTO_TIMING() MppTime AUTO_TIMER_NAME(auto_timing)(__FUNCTION__)
 
 #endif

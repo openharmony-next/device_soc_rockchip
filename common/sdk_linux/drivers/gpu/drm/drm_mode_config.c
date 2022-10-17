@@ -476,7 +476,7 @@ EXPORT_SYMBOL(drmm_mode_config_init);
  * teardown time, no locking is required. It's the driver's job to ensure that
  * this guarantee actually holds true.
  *
- * FIXME: With the managed drmm_mode_config_init() it is no longer necessary for
+ * With the managed drmm_mode_config_init() it is no longer necessary for
  * drivers to explicitly call this function.
  */
 void drm_mode_config_cleanup(struct drm_device *dev)

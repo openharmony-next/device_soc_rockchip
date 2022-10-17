@@ -3273,7 +3273,7 @@ static u8 *drm_find_cea_extension(const struct edid *edid)
     int ext_index;
 
     /* Look for a top level CEA extension block */
-    /* FIXME: make callers iterate through multiple CEA ext blocks? */
+    /* make callers iterate through multiple CEA ext blocks? */
     ext_index = 0;
     cea = drm_find_edid_extension(edid, CEA_EXT, &ext_index);
     if (cea) {
@@ -4075,7 +4075,7 @@ static int cea_db_tag(const u8 *db)
 static int cea_revision(const u8 *cea)
 {
     /*
-     * FIXME is this correct for the DispID variant?
+     * this correct for the DispID variant?
      * The DispID spec doesn't really specify whether
      * this is the revision of the CEA extension or
      * the DispID CEA data block. And the only value
@@ -4214,7 +4214,7 @@ static bool cea_db_is_y420vdb(const u8 *db)
 
 #define for_each_cea_db(cea, i, start, end)                                           \
     for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
-         (i) += cea_db_payload_len(&(cea)[(i)]) + 1)
+        (i) += cea_db_payload_len(&(cea)[(i)]) + 1)
 
 static void drm_parse_y420cmdb_bitmap(struct drm_connector *connector, const u8 *db)
 {
@@ -4272,7 +4272,8 @@ static int add_cea_modes(struct drm_connector *connector, struct edid *edid)
             return 0;
         }
 
-        for_each_cea_db(cea, i, start, end) {
+        for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
+            (i) += cea_db_payload_len(&(cea)[(i)]) + 1) {
             db = &cea[i];
             dbl = cea_db_payload_len(db);
 
@@ -4540,8 +4541,9 @@ static void drm_edid_to_eld(struct drm_connector *connector, struct edid *edid)
             end = 0;
         }
 
-        for_each_cea_db(cea, i, start, end) {
-            db = &cea[i];
+        for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
+            (i) += cea_db_payload_len(&(cea)[(i)]) + 1) {
+            db = &cea[i] ;
             dbl = cea_db_payload_len(db);
 
             switch (cea_db_tag(db)) {
@@ -4617,9 +4619,9 @@ int drm_edid_to_sad(struct edid *edid, struct cea_sad **sads)
         return -EPROTO;
     }
 
-    for_each_cea_db(cea, i, start, end) {
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
+        (i) += cea_db_payload_len(&(cea)[(i)]) + 1) {
         u8 *db = &cea[i];
-
         if (cea_db_tag(db) == AUDIO_BLOCK) {
             int j;
 
@@ -4680,7 +4682,8 @@ int drm_edid_to_speaker_allocation(struct edid *edid, u8 **sadb)
         return -EPROTO;
     }
 
-    for_each_cea_db(cea, i, start, end) {
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(cea)[(i)]) < (end); \
+        (i) += cea_db_payload_len(&(cea)[(i)]) + 1) {
         const u8 *db = &cea[i];
 
         if (cea_db_tag(db) == SPEAKER_BLOCK) {
@@ -4776,7 +4779,8 @@ bool drm_detect_hdmi_monitor(struct edid *edid)
      * Because HDMI identifier is in Vendor Specific Block,
      * search it from all data blocks of CEA extension.
      */
-    for_each_cea_db(edid_ext, i, start_offset, end_offset) {
+    for ((i) = (start_offset); (i) < (end_offset) && (i) + cea_db_payload_len(&(edid_ext)[(i)]) < (end_offset); \
+        (i) += cea_db_payload_len(&(edid_ext)[(i)]) + 1) {
         if (cea_db_is_hdmi_vsdb(&edid_ext[i])) {
             return true;
         }
@@ -4821,7 +4825,8 @@ bool drm_detect_monitor_audio(struct edid *edid)
         goto end;
     }
 
-    for_each_cea_db(edid_ext, i, start_offset, end_offset) {
+    for ((i) = (start_offset); (i) < (end_offset) && (i) + cea_db_payload_len(&(edid_ext)[(i)]) < (end_offset); \
+        (i) += cea_db_payload_len(&(edid_ext)[(i)]) + 1) {
         if (cea_db_tag(&edid_ext[i]) == AUDIO_BLOCK) {
             has_audio = true;
             for (j = 1; j < cea_db_payload_len(&edid_ext[i]) + 1; j += 0x3) {
@@ -5129,7 +5134,8 @@ static void drm_parse_cea_ext(struct drm_connector *connector, const struct edid
         return;
     }
 
-    for_each_cea_db(edid_ext, i, start, end) {
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(edid_ext)[(i)]) < (end);
+        (i) += cea_db_payload_len(&(edid_ext)[(i)]) + 1) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_vsdb(db)) {
@@ -5613,7 +5619,7 @@ EXPORT_SYMBOL(drm_set_preferred_mode);
 static bool is_hdmi2_sink(const struct drm_connector *connector)
 {
     /*
-     * FIXME: sil-sii8620 doesn't have a connector around when
+     * sil-sii8620 doesn't have a connector around when
      * we need one, so we have to be prepared for a NULL connector.
      */
     if (!connector) {
@@ -5875,7 +5881,7 @@ void drm_hdmi_avi_infoframe_colorspace(struct hdmi_avi_infoframe *frame, const s
 
     frame->colorimetry = colorimetry_val & NORMAL_COLORIMETRY_MASK;
     /*
-     * ToDo: Extend it for ACE formats as well. Modify the infoframe
+     * Extend it for ACE formats as well. Modify the infoframe
      * structure and extend it in drivers/video/hdmi
      */
     frame->extended_colorimetry = (colorimetry_val >> 0x2) & EXTENDED_COLORIMETRY_MASK;
@@ -5992,7 +5998,7 @@ int drm_hdmi_vendor_infoframe_from_display_mode(struct hdmi_vendor_infoframe *fr
                                                 const struct drm_display_mode *mode)
 {
     /*
-     * FIXME: sil-sii8620 doesn't have a connector around when
+     * sil-sii8620 doesn't have a connector around when
      * we need one, so we have to be prepared for a NULL connector.
      */
     bool has_hdmi_infoframe = connector ? connector->display_info.has_hdmi_infoframe : false;

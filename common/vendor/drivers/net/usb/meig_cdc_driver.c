@@ -1281,7 +1281,7 @@ static void rx_complete(struct urb *urb)
                     devdbg(dev, "rx throttle %d", urb_status);
                 }
             }
-        block:
+            block:
             entry->state = rx_cleanup;
             entry->urb = urb;
             urb = NULL;
@@ -3290,11 +3290,14 @@ op_error:
 #define HUAWEI_NDIS_INTERFACE                                                                                          \
     .bInterfaceClass = USB_CLASS_COMM, .bInterfaceSubClass = USB_CDC_SUBCLASS_ETHERNET, .bInterfaceProtocol = 0xff
 
-#define HUAWEI_NCM_INTERFACE .bInterfaceClass = USB_CLASS_COMM, .bInterfaceSubClass = 0x0d, .bInterfaceProtocol = 0xff
+#define HUAWEI_NCM_INTERFACE                                                                                           \
+    .bInterfaceClass = USB_CLASS_COMM, .bInterfaceSubClass = 0x0d, .bInterfaceProtocol = 0xff
 
-#define HUAWEI_NCM_INTERFACE2 .bInterfaceClass = USB_CLASS_COMM, .bInterfaceSubClass = 0x0d, .bInterfaceProtocol = 0x00
+#define HUAWEI_NCM_INTERFACE2                                                                                          \
+    .bInterfaceClass = USB_CLASS_COMM, .bInterfaceSubClass = 0x0d, .bInterfaceProtocol = 0x00
 
-#define HUAWEI_NDIS_OPTIMIZED_INTERFACE .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x09
+#define HUAWEI_NDIS_OPTIMIZED_INTERFACE                                                                                \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x09
 
 #define HUAWEI_NDIS_OPTIMIZED_INTERFACE_JUNGO                                                                          \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x09
@@ -3305,17 +3308,20 @@ op_error:
 #define HUAWEI_NDIS_OPTIMIZED_INTERFACE_VDF_JUNGO                                                                      \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x39
 
-#define HUAWEI_NDIS_SINGLE_INTERFACE .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x07
+#define HUAWEI_NDIS_SINGLE_INTERFACE                                                                                   \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x07
 
 #define HUAWEI_NDIS_SINGLE_INTERFACE_JUNGO                                                                             \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x07
 
-#define HUAWEI_NDIS_SINGLE_INTERFACE_VDF .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x37
+#define HUAWEI_NDIS_SINGLE_INTERFACE_VDF                                                                               \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x37
 
 #define HUAWEI_NDIS_SINGLE_INTERFACE_VDF_JUNGO                                                                         \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x37
 
-#define HUAWEI_NCM_OPTIMIZED_INTERFACE .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x16
+#define HUAWEI_NCM_OPTIMIZED_INTERFACE                                                                                 \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x16
 
 #define HUAWEI_NCM_OPTIMIZED_INTERFACE_JUNGO                                                                           \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x16
@@ -3341,12 +3347,14 @@ op_error:
 #define HUAWEI_INTERFACE_NDIS_NCM_QUALCOMM                                                                             \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x01, .bInterfaceProtocol = 0x76
 
-#define HUAWEI_INTERFACE_NDIS_HW_JUNGO .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x67
+#define HUAWEI_INTERFACE_NDIS_HW_JUNGO                                                                                 \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x67
 
 #define HUAWEI_INTERFACE_NDIS_CONTROL_JUNGO                                                                            \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x69
 
-#define HUAWEI_INTERFACE_NDIS_NCM_JUNGO .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x76
+#define HUAWEI_INTERFACE_NDIS_NCM_JUNGO                                                                                \
+    .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x02, .bInterfaceProtocol = 0x76
 
 #define HUAWEI_NDIS_OPTIMIZED_INTERFACE_JUNGO_HW                                                                       \
     .bInterfaceClass = 0xFF, .bInterfaceSubClass = 0x03, .bInterfaceProtocol = 0x09

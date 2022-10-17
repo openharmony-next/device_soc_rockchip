@@ -46,7 +46,7 @@ DECLARE_EVENT_CLASS(
     TP_ARGS(kbdev, group, queue, info_val),
     TP_STRUCT__entry(__field(u64, info_val) __field(pid_t, kctx_tgid) __field(u32, kctx_id) __field(u8, group_handle)
                          __field(s8, csg_nr) __field(u8, slot_prio) __field(s8, csi_index)),
-    TP_fast_assign({
+    TP_fast_assign(
         struct kbase_context *kctx = NULL;
 
         __entry->info_val = info_val;
@@ -79,9 +79,8 @@ DECLARE_EVENT_CLASS(
         }
         __entry->kctx_id = (kctx) ? kctx->id : 0u;
         __entry->kctx_tgid = (kctx) ? kctx->tgid : 0;
-    }
-
-                   ),
+    // }
+    ),
     TP_printk("kctx=%d_%u group=%u slot=%d prio=%u csi=%d info=0x%llx", __entry->kctx_tgid, __entry->kctx_id,
               __entry->group_handle, __entry->csg_nr, __entry->slot_prio, __entry->csi_index, __entry->info_val));
 

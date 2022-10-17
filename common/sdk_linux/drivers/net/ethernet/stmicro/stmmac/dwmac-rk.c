@@ -112,7 +112,7 @@ struct rk_priv_data {
 #define VR_MII_CTRL_QSGMII_AN_EN (PCS_QSGMII_MODE | MII_AN_INTR_EN)
 
 #define SR_MII_OFFSET(_x)                                                                                              \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         typeof(_x)(x) = (_x);                                                                                          \
         (((x) == 0) ? SR_MII_BASE : (SR_MII1_BASE + ((x)-1) * 0x10000));                                               \
     })

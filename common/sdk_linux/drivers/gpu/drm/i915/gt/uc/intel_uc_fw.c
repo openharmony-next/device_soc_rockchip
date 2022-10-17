@@ -3,9 +3,10 @@
  * Copyright © 2016-2019 Intel Corporation
  */
 
+#include <drm/drm_print.h>
+
 #include <linux/bitfield.h>
 #include <linux/firmware.h>
-#include <drm/drm_print.h>
 
 #include "intel_uc_fw.h"
 #include "intel_uc_fw_abi.h"
@@ -73,7 +74,6 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw, enum intel_uc_fw_statu
         MODULE_FIRMWARE(guc_);                                                                                         \
         MODULE_FIRMWARE(huc_);                                                                                         \
         while (0)                                                                                                      \
-            ;
 
 INTEL_UC_FIRMWARE_DEFS(INTEL_UC_MODULE_FW, MAKE_GUC_FW_PATH, MAKE_HUC_FW_PATH)
 

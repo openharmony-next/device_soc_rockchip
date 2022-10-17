@@ -132,7 +132,7 @@
 #define EPPI_BASE_INTID 1056
 
 #define GICR_TYPER_NR_PPIS(r)                                                                                          \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned int __ppinum = ((r) >> 27) & 0x1f;                                                                    \
         unsigned int __nr_ppis = 16;                                                                                   \
         if (__ppinum == 1 || __ppinum == 2)                                                                            \

@@ -367,7 +367,7 @@ static void dw_mipi_message_config(struct dw_mipi_dsi *dsi, const struct mipi_ds
     u32 val = 0;
 
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * largest packet sizes during hfp or during vsa/vpb/vfp
      * should be computed according to byte lane, lane number and only
      * if sending lp cmds in high speed is enable (PHY_TXREQUESTCLKHS)
@@ -534,7 +534,7 @@ static void dw_mipi_dsi_video_mode_config(struct dw_mipi_dsi *dsi)
     u32 val;
 
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * enabling low power is panel-dependent, we should use the
      * panel configuration here...
      */
@@ -629,7 +629,7 @@ static void dw_mipi_dsi_init(struct dw_mipi_dsi *dsi)
     dsi_write(dsi, DSI_PWR_UP, RESET);
 
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * timeout clock division should be computed with the
      * high speed transmission counter timeout and byte lane...
      */
@@ -675,7 +675,7 @@ static void dw_mipi_dsi_packet_handler_config(struct dw_mipi_dsi *dsi)
 static void dw_mipi_dsi_video_packet_config(struct dw_mipi_dsi *dsi, const struct drm_display_mode *mode)
 {
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * only burst mode is supported here. For non-burst video modes,
      * we should compute DSI_VID_PKT_SIZE, DSI_VCCR.NUMC &
      * DSI_VNPCR.NPSIZE... especially because this driver supports
@@ -689,13 +689,13 @@ static void dw_mipi_dsi_video_packet_config(struct dw_mipi_dsi *dsi, const struc
 static void dw_mipi_dsi_command_mode_config(struct dw_mipi_dsi *dsi)
 {
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * compute high speed transmission counter timeout according
      * to the timeout clock division (TO_CLK_DIVISION) and byte lane...
      */
     dsi_write(dsi, DSI_TO_CNT_CFG, HSTX_TO_CNT(0x3e8) | LPRX_TO_CNT(0x3e8));
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * the Bus-Turn-Around Timeout Counter should be computed
      * according to byte lane...
      */
@@ -727,7 +727,7 @@ static void dw_mipi_dsi_line_timer_config(struct dw_mipi_dsi *dsi, const struct 
     hbp = mode->htotal - mode->hsync_end;
 
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * computations below may be improved...
      */
     lbcc = dw_mipi_dsi_get_hcomponent_lbcc(dsi, mode, htotal);
@@ -768,7 +768,7 @@ static void dw_mipi_dsi_dphy_timing_config(struct dw_mipi_dsi *dsi)
     }
 
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * data & clock lane timers should be computed according to panel
      * blankings and to the automatic clock lane control mode...
      * note: DSI_PHY_TMR_CFG.MAX_RD_TIME should be in line with
@@ -791,7 +791,7 @@ static void dw_mipi_dsi_dphy_timing_config(struct dw_mipi_dsi *dsi)
 static void dw_mipi_dsi_dphy_interface_config(struct dw_mipi_dsi *dsi)
 {
     /*
-     * TODO dw drv improvements
+     * dw drv improvements
      * stop wait time should be the maximum between host dsi
      * and panel stop wait times
      */
@@ -850,7 +850,7 @@ static void dw_mipi_dsi_bridge_post_disable(struct drm_bridge *bridge)
     }
 
     /*
-     * TODO Only way found to call panel-bridge post_disable &
+     * Only way found to call panel-bridge post_disable &
      * panel unprepare before the dsi "final" disable...
      * This needs to be fixed in the drm_bridge framework and the API
      * needs to be updated to manage our own call chains...
@@ -1160,7 +1160,7 @@ static struct dw_mipi_dsi *_dw_mipi_dsi_probe(struct platform_device *pdev,
     return dsi;
 }
 
-static void __dw_mipi_dsi_remove(struct dw_mipi_dsi *dsi)
+static void dw_mipi_dsi_remove_func(struct dw_mipi_dsi *dsi)
 {
     mipi_dsi_host_unregister(&dsi->dsi_host);
 
@@ -1193,7 +1193,7 @@ EXPORT_SYMBOL_GPL(dw_mipi_dsi_probe);
 
 void dw_mipi_dsi_remove(struct dw_mipi_dsi *dsi)
 {
-    __dw_mipi_dsi_remove(dsi);
+    dw_mipi_dsi_remove_func(dsi);
 }
 EXPORT_SYMBOL_GPL(dw_mipi_dsi_remove);
 

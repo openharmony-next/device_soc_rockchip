@@ -6,8 +6,6 @@
  * Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-// #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-
 #include <linux/clk.h>
 #include <linux/cpu.h>
 #include <linux/cpufreq.h>

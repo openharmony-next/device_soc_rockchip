@@ -276,7 +276,7 @@ int mali_mem_block_mali_map(mali_mem_block_mem *block_mem, struct mali_session_d
         /* Verify that the "physical" address is 32-bit and
          * usable for Mali, when on a system with bus addresses
          * wider than 32-bit. */
-        MALI_DEBUG_ASSERT(0 == (phys >> 0x20));
+        MALI_DEBUG_ASSERT((phys >> 0x20) == 0);
 #endif
         mali_mmu_pagedir_update(pagedir, virt, (mali_dma_addr)phys, MALI_MMU_PAGE_SIZE, prop);
         virt += MALI_MMU_PAGE_SIZE;
@@ -309,7 +309,7 @@ int mali_mem_block_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *v
     {
         MALI_DEBUG_ASSERT(m_page->type == MALI_PAGE_NODE_BLOCK);
         ret = vmf_insert_pfn(vma, addr, _mali_page_node_get_pfn(m_page));
-        if (unlikely(0 != ret)) {
+        if (unlikely(ret != 0)) {
             return -EFAULT;
         }
         addr += MALI_OSK_MALI_PAGE_SIZE;

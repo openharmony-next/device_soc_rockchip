@@ -162,7 +162,7 @@ struct dma_buf_ops {
      */
     void (*unmap_dma_buf)(struct dma_buf_attachment *, struct sg_table *, enum dma_data_direction);
 
-    /* TODO: Add try_map_dma_buf version, to return immed with -EBUSY
+    /* Add try_map_dma_buf version, to return immed with -EBUSY
      * if the call would block.
      */
 
@@ -189,7 +189,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * FIXME: This is both called through the DMA_BUF_IOCTL_SYNC command
+     * This is both called through the DMA_BUF_IOCTL_SYNC command
      * from userspace (where storage shouldn't be pinned to avoid handing
      * de-factor mlock rights to userspace) and for the kernel-internal
      * users of the various kmap interfaces, where the backing storage must
@@ -222,7 +222,7 @@ struct dma_buf_ops {
      *
      * This callback is optional.
      *
-     * FIXME: This is both called through the DMA_BUF_IOCTL_SYNC command
+     * This is both called through the DMA_BUF_IOCTL_SYNC command
      * from userspace (where storage shouldn't be pinned to avoid handing
      * de-factor mlock rights to userspace) and for the kernel-internal
      * users of the various kmap interfaces, where the backing storage must

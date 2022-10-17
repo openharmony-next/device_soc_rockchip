@@ -59,8 +59,8 @@ typedef enum {
 
 #include "mpp_log.h"
 
-class Mutex;
-class Condition;
+// class Mutex;
+// class Condition;
 
 /*
  * for shorter type name and function name

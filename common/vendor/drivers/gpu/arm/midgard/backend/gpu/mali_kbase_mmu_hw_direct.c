@@ -13,7 +13,7 @@
  *
  */
 
-/* #define ENABLE_DEBUG_LOG */
+
 #include "../../platform/rk/custom_log.h"
 
 #include <linux/bitops.h>

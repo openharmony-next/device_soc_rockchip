@@ -55,7 +55,6 @@ void _mali_osk_locks_debug_add(struct _mali_osk_lock_debug_s *checker)
 
 void _mali_osk_locks_debug_remove(struct _mali_osk_lock_debug_s *checker)
 {
-
 #ifdef LOCK_ORDER_CHECKING
     if (!(checker->orig_flags & _MALI_OSK_LOCKFLAG_UNORDERED)) {
         remove_lock_from_log(checker, mali_osk_get_tid());

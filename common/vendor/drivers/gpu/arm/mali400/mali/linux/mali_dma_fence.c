@@ -304,13 +304,13 @@ mali_osk_errcode_t mali_dma_fence_context_add_waiters(struct mali_dma_fence_cont
 
 ended:
 
-    if (exclusive_fence)
+    if (exclusive_fence) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
         dma_fence_put(exclusive_fence);
 #else
         fence_put(exclusive_fence);
 #endif
-
+    }
     if (shared_fences) {
         for (i = 0; i < shared_count; i++) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)

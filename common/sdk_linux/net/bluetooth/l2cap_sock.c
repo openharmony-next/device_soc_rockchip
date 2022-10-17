@@ -886,7 +886,7 @@ static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
             mode = L2CAP_MODE_LE_FLOWCTL;
             break;
         case BT_MODE_EXT_FLOWCTL:
-            /* TODO: Add support for ECRED PDUs to BR/EDR */
+            /* Add support for ECRED PDUs to BR/EDR */
             if (!bdaddr_type_is_le(chan->src_type)) {
                 return -EINVAL;
             }

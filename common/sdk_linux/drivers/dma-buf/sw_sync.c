@@ -161,14 +161,15 @@ static bool timeline_fence_enable_signaling(struct dma_fence *fence)
 
 static void timeline_fence_value_str(struct dma_fence *fence, char *str, int size)
 {
-    snprintf(str, size, "%lld", fence->seqno);
+    int ret = 0;
+    ret = snprintf(str, size, "%lld", fence->seqno);
 }
 
 static void timeline_fence_timeline_value_str(struct dma_fence *fence, char *str, int size)
 {
     struct sync_timeline *parent = dma_fence_parent(fence);
-
-    snprintf(str, size, "%d", parent->value);
+    int ret = 0;
+    ret = snprintf(str, size, "%d", parent->value);
 }
 
 static const struct dma_fence_ops timeline_fence_ops = {

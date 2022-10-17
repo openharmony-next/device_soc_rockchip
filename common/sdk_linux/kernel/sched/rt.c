@@ -537,13 +537,13 @@ static inline struct task_group *next_task_group(struct task_group *tg)
     return tg;
 }
 
-#define for_each_rt_rq(rt_rq, iter, rq)                                                                                \
+#define cycle_each_rt_rq(rt_rq, iter, rq)                                                                              \
     do {                                                                                                               \
         for (iter = container_of(&task_groups, typeof(*iter), list);                                                   \
              (iter = next_task_group(iter)) && (rt_rq = iter->rt_rq[cpu_of(rq)]);)                                     \
     } while (0)
 
-#define for_each_sched_rt_entity(rt_se) for (; rt_se; rt_se = rt_se->parent)
+#define cycle_each_sched_rt_entity(rt_se) for (; rt_se; rt_se = rt_se->parent)
 
 static inline struct rt_rq *group_rt_rq(struct sched_rt_entity *rt_se)
 {
@@ -646,9 +646,9 @@ static inline u64 sched_rt_period(struct rt_rq *rt_rq)
 
 typedef struct rt_rq *rt_rq_iter_t;
 
-#define for_each_rt_rq(rt_rq, iter, rq) for ((void)(iter), (rt_rq) = &(rq)->rt; (rt_rq); (rt_rq) = NULL)
+#define cycle_each_rt_rq(rt_rq, iter, rq) for ((void)(iter), (rt_rq) = &(rq)->rt; (rt_rq); (rt_rq) = NULL)
 
-#define for_each_sched_rt_entity(rt_se) for (; rt_se; rt_se = NULL)
+#define cycle_each_sched_rt_entity(rt_se) for (; rt_se; rt_se = NULL)
 
 static inline struct rt_rq *group_rt_rq(struct sched_rt_entity *rt_se)
 {
@@ -771,7 +771,7 @@ static void __disable_runtime(struct rq *rq)
         return;
     }
 
-    for_each_rt_rq(rt_rq, iter, rq) {
+    cycle_each_rt_rq(rt_rq, iter, rq) {
         struct rt_bandwidth *rt_b = sched_rt_bandwidth(rt_rq);
         s64 want;
         int i;
@@ -859,7 +859,7 @@ static void __enable_runtime(struct rq *rq)
     /*
      * Reset each runqueue's bandwidth settings
      */
-    for_each_rt_rq(rt_rq, iter, rq) {
+    cycle_each_rt_rq(rt_rq, iter, rq) {
         struct rt_bandwidth *rt_b = sched_rt_bandwidth(rt_rq);
 
         raw_spin_lock(&rt_b->rt_runtime_lock);
@@ -1085,7 +1085,7 @@ static void update_curr_rt(struct rq *rq)
         return;
     }
 
-    for_each_sched_rt_entity(rt_se) {
+    cycle_each_sched_rt_entity(rt_se) {
         struct rt_rq *rt_rq = rt_rq_of_se(rt_se);
         int exceeded;
 
@@ -1404,7 +1404,7 @@ static void dequeue_rt_stack(struct sched_rt_entity *rt_se, unsigned int flags)
 {
     struct sched_rt_entity *back = NULL;
 
-    for_each_sched_rt_entity(rt_se) {
+    cycle_each_sched_rt_entity(rt_se) {
         rt_se->back = back;
         back = rt_se;
     }
@@ -1423,7 +1423,7 @@ static void enqueue_rt_entity(struct sched_rt_entity *rt_se, unsigned int flags)
     struct rq *rq = rq_of_rt_se(rt_se);
 
     dequeue_rt_stack(rt_se, flags);
-    for_each_sched_rt_entity(rt_se) __enqueue_rt_entity(rt_se, flags);
+    cycle_each_sched_rt_entity(rt_se) __enqueue_rt_entity(rt_se, flags);
     enqueue_top_rt_rq(&rq->rt);
 }
 
@@ -1433,7 +1433,7 @@ static void dequeue_rt_entity(struct sched_rt_entity *rt_se, unsigned int flags)
 
     dequeue_rt_stack(rt_se, flags);
 
-    for_each_sched_rt_entity(rt_se) {
+    cycle_each_sched_rt_entity(rt_se) {
         struct rt_rq *rt_rq = group_rt_rq(rt_se);
 
         if (rt_rq && rt_rq->rt_nr_running) {
@@ -1514,7 +1514,7 @@ static void requeue_task_rt(struct rq *rq, struct task_struct *p, int head)
     struct sched_rt_entity *rt_se = &p->rt;
     struct rt_rq *rt_rq;
 
-    for_each_sched_rt_entity(rt_se) {
+    cycle_each_sched_rt_entity(rt_se) {
         rt_rq = rt_rq_of_se(rt_se);
         requeue_rt_entity(rt_rq, rt_se, head);
     }
@@ -2723,7 +2723,7 @@ static void task_tick_rt(struct rq *rq, struct task_struct *p, int queued)
      * Requeue to the end of queue if we (and all of our ancestors) are not
      * the only element on the queue
      */
-    for_each_sched_rt_entity(rt_se) {
+    cycle_each_sched_rt_entity(rt_se) {
         if (rt_se->run_list.prev != rt_se->run_list.next) {
             requeue_task_rt(rq, p, 0);
             resched_curr(rq);
@@ -3213,7 +3213,7 @@ void print_rt_stats(struct seq_file *m, int cpu)
     struct rt_rq *rt_rq;
 
     rcu_read_lock();
-    for_each_rt_rq(rt_rq, iter, cpu_rq(cpu)) print_rt_rq(m, cpu, rt_rq);
+    cycle_each_rt_rq(rt_rq, iter, cpu_rq(cpu)) print_rt_rq(m, cpu, rt_rq);
     rcu_read_unlock();
 }
 #endif /* CONFIG_SCHED_DEBUG */

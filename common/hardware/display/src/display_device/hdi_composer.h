@@ -50,7 +50,7 @@ namespace OHOS {
             class HdiComposer {
             public:
                 HdiComposer(std::unique_ptr<HdiComposition> pre, std::unique_ptr<HdiComposition> post);
-                virtual ~HdiComposer(){};
+                virtual ~HdiComposer() {};
                 int32_t Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);
                 int32_t Commit(bool modeSet);
                 HdiComposition *GetPreCompostion()

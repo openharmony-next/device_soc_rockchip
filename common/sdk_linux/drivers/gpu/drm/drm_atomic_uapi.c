@@ -467,13 +467,11 @@ static int drm_atomic_crtc_get_property(struct drm_crtc *crtc, const struct drm_
         *val = (state->ctm) ? state->ctm->base.id : 0;
     } else if (property == config->gamma_lut_property) {
         *val = (state->gamma_lut) ? state->gamma_lut->base.id : 0;
-    }
 #if defined(CONFIG_ROCKCHIP_DRM_CUBIC_LUT)
-    else if (property == config->cubic_lut_property) {
+    } else if (property == config->cubic_lut_property) {
         *val = (state->cubic_lut) ? state->cubic_lut->base.id : 0;
-    }
 #endif
-    else if (property == config->prop_out_fence_ptr) {
+    } else if (property == config->prop_out_fence_ptr) {
         *val = 0;
     } else if (crtc->funcs->atomic_get_property) {
         return crtc->funcs->atomic_get_property(crtc, state, property, val);

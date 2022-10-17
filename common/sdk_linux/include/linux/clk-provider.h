@@ -1078,19 +1078,19 @@ struct clk_hw_onecell_data {
     OF_DECLARE_1(clk, name, compat, name##_of_clk_init_driver)
 
 #define CLK_HW_INIT(_name, _parent, _ops, _flags)                                                                      \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
-        .parent_names = (const char *[]){_parent},                                                                     \
+        .parent_names = (const char *[]) {_parent},                                                                    \
         .num_parents = 1,                                                                                              \
         .ops = (_ops),                                                                                                 \
     })
 
 #define CLK_HW_INIT_HW(_name, _parent, _ops, _flags)                                                                   \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
-        .parent_hws = (const struct clk_hw *[]){_parent},                                                              \
+        .parent_hws = (const struct clk_hw *[]) {_parent},                                                             \
         .num_parents = 1,                                                                                              \
         .ops = (_ops),                                                                                                 \
     })
@@ -1101,7 +1101,7 @@ struct clk_hw_onecell_data {
  * when using CLK_HW_INIT_HW. It does NOT support multiple parents.
  */
 #define CLK_HW_INIT_HWS(_name, _parent, _ops, _flags)                                                                  \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_hws = (_parent),                                                                                       \
@@ -1110,11 +1110,11 @@ struct clk_hw_onecell_data {
     })
 
 #define CLK_HW_INIT_FW_NAME(_name, _parent, _ops, _flags)                                                              \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_data =                                                                                                 \
-            (const struct clk_parent_data[]){                                                                          \
+            (const struct clk_parent_data[]) {                                                                         \
                 {.fw_name = _parent},                                                                                  \
             },                                                                                                         \
         .num_parents = 1,                                                                                              \
@@ -1122,7 +1122,7 @@ struct clk_hw_onecell_data {
     })
 
 #define CLK_HW_INIT_PARENTS(_name, _parents, _ops, _flags)                                                             \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_names = (_parents),                                                                                    \
@@ -1131,7 +1131,7 @@ struct clk_hw_onecell_data {
     })
 
 #define CLK_HW_INIT_PARENTS_HW(_name, _parents, _ops, _flags)                                                          \
-    (&(struct clk_init_data){                                                                                          \
+    (&(struct clk_init_data) {                                                                                         \
         .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_hws = (_parents),                                                                                      \
@@ -1140,8 +1140,8 @@ struct clk_hw_onecell_data {
     })
 
 #define CLK_HW_INIT_PARENTS_DATA(_name, _parents, _ops, _flags)                                                        \
-    (&(struct clk_init_data){                                                                                          \
-        .flags = （_flags）,                                                                                           \
+    (&(struct clk_init_data) {                                                                                         \
+        .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_data = (_parents),                                                                                     \
         .num_parents = ARRAY_SIZE(_parents),                                                                           \
@@ -1149,8 +1149,8 @@ struct clk_hw_onecell_data {
     })
 
 #define CLK_HW_INIT_NO_PARENT(_name, _ops, _flags)                                                                     \
-    (&(struct clk_init_data){                                                                                          \
-        .flags = （_flags）,                                                                                           \
+    (&(struct clk_init_data) {                                                                                         \
+        .flags = (_flags),                                                                                             \
         .name = (_name),                                                                                               \
         .parent_names = NULL,                                                                                          \
         .num_parents = 0,                                                                                              \

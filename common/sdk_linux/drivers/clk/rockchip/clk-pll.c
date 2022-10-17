@@ -197,7 +197,7 @@ static struct rockchip_pll_rate_table *rockchip_pll_clk_set_by_auto(struct rockc
                                                                     unsigned long fout_hz)
 {
     struct rockchip_pll_rate_table *rate_table = rk_pll_rate_table_get();
-    /* FIXME set postdiv1/2 always 1 */
+    /* set postdiv1/2 always 1 */
     u32 foutvco = fout_hz;
     u64 fin_64, frac_64;
     u32 f_frac, postdiv1, postdiv2;

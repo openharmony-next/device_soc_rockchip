@@ -1,11 +1,11 @@
 /*
  * Copyright (C) 2013-2017 ARM Limited. All rights reserved.
- * 
+ *
  * This program is free software and is provided to you
  * under the terms of the GNU General Public License version 2
  * as published by the Free Software Foundation, and any
  * use by you of this program is subject to the terms of such GNU licence.
- * 
+ *
  * A copy of the licence is included with
  * the program, and can also be obtained from Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor,
@@ -527,7 +527,7 @@ int mali_mem_cow_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *vma
         ret = vm_insert_page(vma, addr, page);
         */
         ret = vmf_insert_pfn(vma, addr, _mali_page_node_get_pfn(m_page));
-        if (unlikely(0 != ret)) {
+        if (unlikely(ret != 0)) {
             return ret;
         }
         addr += MALI_OSK_MALI_PAGE_SIZE;
@@ -562,7 +562,7 @@ mali_osk_errcode_t mali_mem_cow_cpu_map_pages_locked(mali_mem_backend *mem_bkend
     {
         if ((count >= offset) && (count < offset + num)) {
             ret = vmf_insert_pfn(vma, vaddr, _mali_page_node_get_pfn(m_page));
-            if (unlikely(0 != ret)) {
+            if (unlikely(ret != 0)) {
                 if (count == offset) {
                     return MALI_OSK_ERR_FAULT;
                 } else {

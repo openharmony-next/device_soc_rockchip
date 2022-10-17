@@ -34,6 +34,8 @@
 #include <linux/usb/phy.h>
 #include <linux/uaccess.h>
 
+#define FILE_RIGHT_644 0644
+
 #define U3PHY_PORT_NUM 2
 #define U3PHY_MAX_CLKS 4
 #define BIT_WRITEABLE_SHIFT 16
@@ -296,7 +298,7 @@ int rockchip_u3phy_debugfs_init(struct rockchip_u3phy *u3phy)
 
     u3phy->root = root;
 
-    file = debugfs_create_file("u3phy_mode", 0644, root, u3phy, &rockchip_u3phy_usb2_only_fops);
+    file = debugfs_create_file("u3phy_mode", FILE_RIGHT_644, root, u3phy, &rockchip_u3phy_usb2_only_fops);
     if (!file) {
         ret = -ENOMEM;
         goto err1;

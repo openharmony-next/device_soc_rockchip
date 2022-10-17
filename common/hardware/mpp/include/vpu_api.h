@@ -426,12 +426,12 @@ signed int vpu_close_context(struct VpuCodecContext **ctx);
     signed int (*get_unused_num)(vpu_display_mem_pool * p);                                                            \
     signed int buff_size;                                                                                              \
     float version;                                                                                                     \
-    signed int res[18];
+    signed int res[18]
 
 typedef struct vpu_display_mem_pool vpu_display_mem_pool;
 
 struct vpu_display_mem_pool {
-    vpu_display_mem_pool_FIELDS
+    vpu_display_mem_pool_FIELDS;
 };
 
 #ifdef __cplusplus

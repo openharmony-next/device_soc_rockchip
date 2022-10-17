@@ -109,7 +109,7 @@ struct guc_wq_item {
     u32 context_desc;
     u32 submit_element_info;
     u32 fence_id;
-} __packed;
+};
 
 struct guc_process_desc {
     u32 stage_id;
@@ -123,7 +123,7 @@ struct guc_process_desc {
     u32 engine_presence;
     u32 priority;
     u32 reserved[30];
-} __packed;
+};
 
 /* engine id and context id is packed into guc_execlist_context.context_id */
 #define GUC_ELC_CTXID_OFFSET 0
@@ -143,7 +143,7 @@ struct guc_execlist_context {
     u8 engine_state_wait_value;
     u16 pagefault_count;
     u16 engine_submit_queue_count;
-} __packed;
+};
 
 /*
  * This structure describes a stage set arranged for a particular communication
@@ -185,7 +185,7 @@ struct guc_stage_desc {
     u64 reserved1[1];
 
     u64 desc_private;
-} __packed;
+};
 
 /**
  * DOC: CTB based communication
@@ -255,7 +255,7 @@ struct guc_ct_buffer_desc {
     u32 owner;        /* id of the channel owner */
     u32 owner_sub_id; /* owner-defined field for extra tracking */
     u32 reserved[5];
-} __packed;
+};
 
 /* Type of command transport buffer */
 #define INTEL_GUC_CT_BUFFER_TYPE_SEND 0x0u
@@ -315,7 +315,7 @@ struct guc_policy {
     u32 fault_time;
     u32 policy_flags;
     u32 reserved[8];
-} __packed;
+};
 
 struct guc_policies {
     struct guc_policy policy[GUC_CLIENT_PRIORITY_NUM][GUC_MAX_ENGINE_CLASSES];
@@ -333,7 +333,7 @@ struct guc_policies {
     u32 max_num_work_items;
 
     u32 reserved[4];
-} __packed;
+};
 
 /* GuC MMIO reg state struct */
 
@@ -345,19 +345,19 @@ struct guc_mmio_reg {
     u32 value;
     u32 flags;
 #define GUC_REGSET_MASKED (1 << 0)
-} __packed;
+};
 
 struct guc_mmio_regset {
     struct guc_mmio_reg registers[GUC_REGSET_MAX_REGISTERS];
     u32 values_valid;
     u32 number_of_registers;
-} __packed;
+};
 
 /* GuC register sets */
 struct guc_mmio_reg_state {
     struct guc_mmio_regset engine_reg[GUC_MAX_ENGINE_CLASSES][GUC_MAX_INSTANCES_PER_CLASS];
     u32 reserved[98];
-} __packed;
+};
 
 /* HW info */
 struct guc_gt_system_info {
@@ -369,13 +369,13 @@ struct guc_gt_system_info {
     u32 vdbox_sfc_support_mask;
     u32 vebox_enable_mask;
     u32 reserved[9];
-} __packed;
+};
 
 /* Clients info */
 struct guc_ct_pool_entry {
     struct guc_ct_buffer_desc desc;
     u32 reserved[7];
-} __packed;
+};
 
 #define GUC_CT_POOL_SIZE 2
 
@@ -385,7 +385,7 @@ struct guc_clients_info {
     u32 ct_pool_addr;
     u32 ct_pool_count;
     u32 reserved[4];
-} __packed;
+};
 
 /* GuC Additional Data Struct */
 struct guc_ads {
@@ -398,7 +398,7 @@ struct guc_ads {
     u32 golden_context_lrca[GUC_MAX_ENGINE_CLASSES];
     u32 eng_state_size[GUC_MAX_ENGINE_CLASSES];
     u32 reserved[16];
-} __packed;
+};
 
 /* GuC logging structures */
 
@@ -440,14 +440,14 @@ struct guc_log_buffer_state {
         u32 flags;
     };
     u32 version;
-} __packed;
+};
 
 struct guc_ctx_report {
     u32 report_return_status;
     u32 reserved1[64];
     u32 affected_count;
     u32 reserved2[2];
-} __packed;
+};
 
 /* GuC Shared Context Data Struct */
 struct guc_shared_ctx_data {
@@ -466,7 +466,7 @@ struct guc_shared_ctx_data {
     u64 execlist_ctx;
     u32 reserved2[66];
     struct guc_ctx_report preempt_ctx_report[GUC_MAX_ENGINES_NUM];
-} __packed;
+};
 
 /**
  * DOC: MMIO based communication

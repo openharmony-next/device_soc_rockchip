@@ -193,10 +193,11 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id, struct dentry *root)
 {
     struct drm_device *dev = minor->dev;
     char name[64];
+    int ret = 0;
 
     INIT_LIST_HEAD(&minor->debugfs_list);
     mutex_init(&minor->debugfs_lock);
-    sprintf(name, "%d", minor_id);
+    ret = sprintf(name, "%d", minor_id);
     minor->debugfs_root = debugfs_create_dir(name, root);
 
     drm_debugfs_create_files(drm_debugfs_list, DRM_DEBUGFS_ENTRIES, minor->debugfs_root, minor);

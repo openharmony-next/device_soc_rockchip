@@ -23,6 +23,9 @@
 #include <linux/irqreturn.h>
 #include <linux/poll.h>
 
+#define FILE_RIGHT_644 0644
+#define FILE_RIGHT_444 0444
+
 #define MHZ (1000 * 1000)
 
 #define MPP_MAX_MSG_NUM (16)

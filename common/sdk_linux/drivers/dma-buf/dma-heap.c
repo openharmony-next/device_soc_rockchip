@@ -6,6 +6,7 @@
  * Copyright (C) 2019 Linaro Ltd.
  */
 
+#include <linux/dma-heap.h>
 #include <linux/cdev.h>
 #include <linux/debugfs.h>
 #include <linux/device.h>
@@ -16,7 +17,7 @@
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/syscalls.h>
-#include <linux/dma-heap.h>
+
 #include <uapi/linux/dma-heap.h>
 
 #define DEVNAME "dma_heap"

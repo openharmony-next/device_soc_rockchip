@@ -243,7 +243,7 @@ struct ver_26_v0 {
     u16 by;
     u16 wx;
     u16 wy;
-} __packed;
+};
 
 struct ver_15_v1 {
     u8 yuv422_12bit;
@@ -259,7 +259,7 @@ struct ver_15_v1 {
     u8 gy;
     u8 bx;
     u8 by;
-} __packed;
+};
 
 struct ver_12_v1 {
     u8 yuv422_12bit;
@@ -276,7 +276,7 @@ struct ver_12_v1 {
     u8 unique_gy;
     u8 unique_bx;
     u8 unique_by;
-} __packed;
+};
 
 struct ver_12_v2 {
     u8 yuv422_12bit;
@@ -294,7 +294,7 @@ struct ver_12_v2 {
     u8 unique_gy;
     u8 unique_bx;
     u8 unique_by;
-} __packed;
+};
 
 struct next_hdr_sink_data {
     u8 version;
@@ -302,7 +302,7 @@ struct next_hdr_sink_data {
     struct ver_15_v1 ver_15_v1;
     struct ver_12_v1 ver_12_v1;
     struct ver_12_v2 ver_12_v2;
-} __packed;
+};
 
 /*
  * Rockchip drm private crtc funcs.

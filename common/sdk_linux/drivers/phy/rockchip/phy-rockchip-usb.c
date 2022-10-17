@@ -862,7 +862,7 @@ err_clk:
 }
 
 static const struct rockchip_usb_phy_pdata rk3066a_pdata = {
-    .phys = (struct rockchip_usb_phys[]){
+    .phys = (struct rockchip_usb_phys[]) {
         {.reg = 0x17c, .pll_name = "sclk_otgphy0_480m"},
         {.reg = 0x188, .pll_name = "sclk_otgphy1_480m"},
         {}},
@@ -933,7 +933,7 @@ static int __init rk3188_init_usb_uart(struct regmap *grf, const struct rockchip
 }
 
 static const struct rockchip_usb_phy_pdata rk3188_pdata = {
-    .phys = (struct rockchip_usb_phys[]){
+    .phys = (struct rockchip_usb_phys[]) {
         {.reg = 0x10c, .pll_name = "sclk_otgphy0_480m"},
         {.reg = 0x11c, .pll_name = "sclk_otgphy1_480m"},
         {}},
@@ -977,7 +977,7 @@ static int __init rk3288_init_usb_uart(struct regmap *grf, const struct rockchip
 }
 
 static const struct rockchip_usb_phy_pdata rk3288_pdata = {
-    .phys = (struct rockchip_usb_phys[]){
+    .phys = (struct rockchip_usb_phys[]) {
         {.reg = 0x320, .pll_name = "sclk_otgphy0_480m"},
         {.reg = 0x334, .pll_name = "sclk_otgphy1_480m"},
         {.reg = 0x348, .pll_name = "sclk_otgphy2_480m"},

@@ -702,8 +702,6 @@ struct rga2_service_info {
     bool enable;
     uint32_t dev_mode;
 
-    // struct rga_req      req[10];
-
     struct mutex mutex; // mutex
 };
 

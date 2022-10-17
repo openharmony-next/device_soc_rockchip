@@ -438,7 +438,7 @@ int mipi_dsi_create_packet(struct mipi_dsi_packet *packet, const struct mipi_dsi
     memset(packet, 0, sizeof(*packet));
     packet->header[0] = ((msg->channel & 0x3) << 0x6) | (msg->type & 0x3f);
 
-    /* TODO: compute ECC if hardware support is not available */
+    /* compute ECC if hardware support is not available */
 
     /*
      * Long write packets contain the word count in header bytes 1 and 2.

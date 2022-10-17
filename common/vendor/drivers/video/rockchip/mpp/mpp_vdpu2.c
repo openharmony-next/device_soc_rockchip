@@ -438,8 +438,8 @@ static int vdpu_procfs_init(struct mpp_dev *mpp)
         dec->procfs = NULL;
         return -EIO;
     }
-    mpp_procfs_create_u32("aclk", 0644, dec->procfs, &dec->aclk_info.debug_rate_hz);
-    mpp_procfs_create_u32("session_buffers", 0644, dec->procfs, &mpp->session_max_buffers);
+    mpp_procfs_create_u32("aclk", FILE_RIGHT_644, dec->procfs, &dec->aclk_info.debug_rate_hz);
+    mpp_procfs_create_u32("session_buffers", FILE_RIGHT_644, dec->procfs, &mpp->session_max_buffers);
 
     return 0;
 }

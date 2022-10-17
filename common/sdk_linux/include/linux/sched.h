@@ -1599,7 +1599,7 @@ static inline pid_t task_ppid_nr(const struct task_struct *tsk)
     return task_ppid_nr_ns(tsk, &init_pid_ns);
 }
 
-/* Obsolete, do not use: */
+/* Obsolete, do not use */
 static inline pid_t task_pgrp_nr(struct task_struct *tsk)
 {
     return task_pgrp_nr_ns(tsk, &init_pid_ns);
@@ -1923,7 +1923,7 @@ static inline void set_task_comm(struct task_struct *tsk, const char *from)
 
 extern char *__get_task_comm(char *to, size_t len, struct task_struct *tsk);
 #define get_task_comm(buf, tsk)                                                                                        \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         BUILD_BUG_ON(sizeof(buf) != TASK_COMM_LEN);                                                                    \
         __get_task_comm(buf, sizeof(buf), tsk);                                                                        \
     })
@@ -2014,7 +2014,7 @@ static inline int _cond_resched(void)
 #endif
 
 #define cond_resched()                                                                                                 \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         ___might_sleep(__FILE__, __LINE__, 0);                                                                         \
         _cond_resched();                                                                                               \
     })
@@ -2022,7 +2022,7 @@ static inline int _cond_resched(void)
 extern int __cond_resched_lock(spinlock_t *lock);
 
 #define cond_resched_lock(lock)                                                                                        \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         ___might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);                                                       \
         __cond_resched_lock(lock);                                                                                     \
     })

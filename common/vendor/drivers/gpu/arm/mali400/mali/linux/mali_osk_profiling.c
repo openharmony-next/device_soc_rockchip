@@ -464,8 +464,9 @@ static void _mali_profiling_sampling_core_activity_switch(int counter_id, int co
                 }
 
                 if (mali_core_activity_stream == NULL) {
-                    if (MALI_OSK_ERR_OK == _mali_profiling_global_stream_list_dequeue(
-                                           &global_mali_stream_list->free_list, &mali_core_activity_stream)) {
+                    if (MALI_OSK_ERR_OK == \
+                        _mali_profiling_global_stream_list_dequeue(&global_mali_stream_list->free_list,
+                        &mali_core_activity_stream)) {
                         mali_core_activity_stream_dequeue_time = current_time;
                     } else {
                         MALI_DEBUG_PRINT(1, ("Not enough mali profiling stream buffer!\n"));
@@ -538,7 +539,8 @@ static mali_bool _mali_profiling_global_counters_init(void)
 
         for (counter_number = 0; counter_number < 0x02; counter_number++) {
             counter_index++;
-            global_mali_profiling_counters[counter_index].counter_id = COUNTER_VP_0_C0 + (0x02 * core_id) + counter_number;
+            global_mali_profiling_counters[counter_index].counter_id = \
+                COUNTER_VP_0_C0 + (0x02 * core_id) + counter_number;
             mali_osk_snprintf(global_mali_profiling_counters[counter_index].counter_name,
                               sizeof(global_mali_profiling_counters[counter_index].counter_name),
                               "ARM_Mali-%s_VP_%d_cnt%d", mali_name, core_id, counter_number);
@@ -555,7 +557,8 @@ static mali_bool _mali_profiling_global_counters_init(void)
 
         for (counter_number = 0; counter_number < 0x02; counter_number++) {
             counter_index++;
-            global_mali_profiling_counters[counter_index].counter_id = COUNTER_FP_0_C0 + (0x02 * core_id) + counter_number;
+            global_mali_profiling_counters[counter_index].counter_id = \
+                COUNTER_FP_0_C0 + (0x02 * core_id) + counter_number;
             mali_osk_snprintf(global_mali_profiling_counters[counter_index].counter_name,
                               sizeof(global_mali_profiling_counters[counter_index].counter_name),
                               "ARM_Mali-%s_FP_%d_cnt%d", mali_name, core_id, counter_number);
@@ -566,7 +569,8 @@ static mali_bool _mali_profiling_global_counters_init(void)
     for (core_id = 0; core_id < num_l2_cache_cores; core_id++) {
         for (counter_number = 0; counter_number < 0x02; counter_number++) {
             counter_index++;
-            global_mali_profiling_counters[counter_index].counter_id = COUNTER_L2_0_C0 + (0x02 * core_id) + counter_number;
+            global_mali_profiling_counters[counter_index].counter_id = \
+                COUNTER_L2_0_C0 + (0x02 * core_id) + counter_number;
             mali_osk_snprintf(global_mali_profiling_counters[counter_index].counter_name,
                               sizeof(global_mali_profiling_counters[counter_index].counter_name),
                               "ARM_Mali-%s_L2_%d_cnt%d", mali_name, core_id, counter_number);
@@ -826,8 +830,8 @@ void _mali_osk_profiling_record_global_counters(int counter_id, u32 value)
 mali_osk_errcode_t _mali_ukk_profiling_add_event(mali_uk_profiling_add_event_s *args)
 {
     /* Always add process and thread identificator in the first two data elements for events from user space */
-    _mali_osk_profiling_add_event(args->event_id, _mali_osk_get_pid(), mali_osk_get_tid(), args->data[0x02], args->data[0x03],
-                                  args->data[0x04]);
+    _mali_osk_profiling_add_event(args->event_id, _mali_osk_get_pid(), mali_osk_get_tid(), args->data[0x02],
+                                  args->data[0x03], args->data[0x04]);
 
     return MALI_OSK_ERR_OK;
 }

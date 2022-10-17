@@ -83,7 +83,7 @@ class Condition;
  * The mutex must be unlocked by the thread that locked it.  They are not
  * recursive, i.e. the same thread can't lock it multiple times.
  */
-class CAPABILITY("mutex") Mutex {
+class CAPABILITY("mutex") RgaMutex {
 public:
     enum { PRIVATE = 0, SHARED = 1 };
 

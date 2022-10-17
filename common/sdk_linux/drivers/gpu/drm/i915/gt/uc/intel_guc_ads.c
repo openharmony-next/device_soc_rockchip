@@ -89,7 +89,7 @@ static void _guc_ads_init(struct intel_guc *guc)
             continue;
         }
         /*
-         * TODO: Set context pointer to default state to allow
+         * Set context pointer to default state to allow
          * GuC to re-init guilty contexts after internal reset.
          */
         blob->ads.golden_context_lrca[engine_class] = 0;

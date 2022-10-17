@@ -3432,7 +3432,7 @@ static int kbase_csf_cpu_mmap_user_io_pages(struct kbase_context *kctx,
 #else
     vma->vm_flags |= VM_DONTCOPY | VM_DONTEXPAND | VM_RESERVED | VM_IO;
 #endif
-    /* TODO use VM_MIXEDMAP, since it is more appropriate as both types of
+    /* use VM_MIXEDMAP, since it is more appropriate as both types of
      * memory with and without "struct page" backing are being inserted here.
      * Hw Doorbell pages comes from the device register area so kernel does
      * not use "struct page" for them.
@@ -3488,7 +3488,7 @@ static vm_fault_t kbase_csf_user_reg_vm_fault(struct vm_fault *vmf)
         return VM_FAULT_SIGBUS;
     }
 
-    /* TODO: check PM state here and don't map in the actual register page
+    /* check PM state here and don't map in the actual register page
      * if GPU is powered down or is about to be powered down.
      */
 

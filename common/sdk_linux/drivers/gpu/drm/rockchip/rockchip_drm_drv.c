@@ -30,11 +30,11 @@
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_vblank.h>
 
-#include "rockchip_drm_drv.h"
 #include "rockchip_drm_fb.h"
 #include "rockchip_drm_fbdev.h"
 #include "rockchip_drm_gem.h"
 #include "rockchip_drm_logo.h"
+#include "rockchip_drm_drv.h"
 
 #include "../drm_crtc_internal.h"
 
@@ -487,7 +487,7 @@ static u8 *find_cea_extension(const struct edid *edid)
     int ext_index;
 
     /* Look for a top level CEA extension block */
-    /* FIXME: make callers iterate through multiple CEA ext blocks? */
+    /* make callers iterate through multiple CEA ext blocks? */
     ext_index = 0;
     cea = find_edid_extension(edid, 0x02, &ext_index);
     if (cea) {
@@ -827,7 +827,8 @@ int rockchip_drm_parse_cea_ext(struct rockchip_drm_dsc_cap *dsc_cap, u8 *max_frl
         return -EINVAL;
     }
 
-    for_each_cea_db(edid_ext, i, start, end) {
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(edid_ext)[(i)]) < (end);
+         (i) += cea_db_payload_len(&(edid_ext)[(i)]) + 1) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_forum_vsdb(db)) {
@@ -859,7 +860,8 @@ int rockchip_drm_parse_next_hdr(struct next_hdr_sink_data *sink_data, const stru
         return -EINVAL;
     }
 
-    for_each_cea_db(edid_ext, i, start, end) {
+    for ((i) = (start); (i) < (end) && (i) + cea_db_payload_len(&(edid_ext)[(i)]) < (end);
+         (i) += cea_db_payload_len(&(edid_ext)[(i)]) + 1) {
         const u8 *db = &edid_ext[i];
 
         if (cea_db_is_hdmi_next_hdr_block(db)) {

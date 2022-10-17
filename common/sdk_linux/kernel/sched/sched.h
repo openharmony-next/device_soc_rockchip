@@ -4,8 +4,8 @@
  */
 #ifndef COMMON_SDK_LINUX_KERNEL_SCHED_SCHED_H
 #define COMMON_SDK_LINUX_KERNEL_SCHED_SCHED_H
-#include <linux/sched.h>
 
+#include <linux/sched.h>
 #include <linux/sched/autogroup.h>
 #include <linux/sched/clock.h>
 #include <linux/sched/coredump.h>
@@ -81,9 +81,10 @@
 #include <trace/events/sched.h>
 
 #ifdef CONFIG_SCHED_DEBUG
-#define SCHED_WARN_ON(x) WARN_ONCE(x, #x)
+#define SCHED_WARN_ON(x) (WARN_ONCE(x, #x))
 #else
-#define SCHED_WARN_ON(x) ({ (void)(x), 0; })
+#define SCHED_WARN_ON(x) ( {               \
+    (void)(x), 0; })
 #endif
 
 struct rq;
@@ -175,7 +176,7 @@ extern void call_trace_sched_update_nr_running(struct rq *rq, int count);
 #define NICE_0_LOAD_SHIFT (SCHED_FIXEDPOINT_SHIFT + SCHED_FIXEDPOINT_SHIFT)
 #define scale_load(w) ((w) << SCHED_FIXEDPOINT_SHIFT)
 #define scale_load_down(w)                                                                                             \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         unsigned long __w = (w);                                                                                       \
         if (__w)                                                                                                       \
             __w = max(2UL, __w >> SCHED_FIXEDPOINT_SHIFT);                                                             \
@@ -1504,7 +1505,7 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 {
     struct sched_domain *sd, *hsd = NULL;
 
-    for_each_domain(cpu, sd) {
+    for (sd = rcu_dereference_check_sched_domain(cpu_rq(cpu)->sd); sd; sd = sd->parent) {
         if (!(sd->flags & flag)) {
             break;
         }
@@ -1518,7 +1519,7 @@ static inline struct sched_domain *lowest_flag_domain(int cpu, int flag)
 {
     struct sched_domain *sd;
 
-    for_each_domain(cpu, sd) {
+    for (sd = rcu_dereference_check_sched_domain(cpu_rq(cpu)->sd); sd; sd = sd->parent) {
         if (sd->flags & flag) {
             break;
         }

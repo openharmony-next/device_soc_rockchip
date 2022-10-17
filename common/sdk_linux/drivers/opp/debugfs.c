@@ -53,10 +53,10 @@ static void opp_debug_create_bw(struct dev_pm_opp *opp, struct opp_table *opp_ta
 {
     struct dentry *d;
     char name[11];
-    int i;
+    int i, ret;
 
     for (i = 0; i < opp_table->path_count; i++) {
-        snprintf(name, sizeof(name), "icc-path-%.1d", i);
+        ret = snprintf(name, sizeof(name), "icc-path-%.1d", i);
 
         /* Create per-path directory */
         d = debugfs_create_dir(name, pdentry);
@@ -70,12 +70,12 @@ static void opp_debug_create_bw(struct dev_pm_opp *opp, struct opp_table *opp_ta
 static void opp_debug_create_supplies(struct dev_pm_opp *opp, struct opp_table *opp_table, struct dentry *pdentry)
 {
     struct dentry *d;
-    int i;
+    int i, ret;
 
     for (i = 0; i < opp_table->regulator_count; i++) {
         char name[15];
 
-        snprintf(name, sizeof(name), "supply-%d", i);
+        ret = snprintf(name, sizeof(name), "supply-%d", i);
 
         /* Create per-opp directory */
         d = debugfs_create_dir(name, pdentry);
@@ -96,7 +96,7 @@ void opp_debug_create_one(struct dev_pm_opp *opp, struct opp_table *opp_table)
     struct dentry *d;
     unsigned long id;
     char name[25]; /* 20 chars for 64 bit value + 5 (opp:\0) */
-
+    int ret;
     /*
      * Get directory name for OPP.
      *
@@ -109,7 +109,7 @@ void opp_debug_create_one(struct dev_pm_opp *opp, struct opp_table *opp_table)
         id = _get_opp_count(opp_table);
     }
 
-    snprintf(name, sizeof(name), "opp:%lu", id);
+    ret = snprintf(name, sizeof(name), "opp:%lu", id);
 
     /* Create per-opp directory */
     d = debugfs_create_dir(name, pdentry);

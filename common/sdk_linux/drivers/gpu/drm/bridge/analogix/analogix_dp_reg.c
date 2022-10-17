@@ -1154,7 +1154,7 @@ ssize_t analogix_dp_transfer(struct analogix_dp_device *dp, struct drm_dp_aux_ms
         goto aux_error;
     }
 
-    /* TODO: Wait for an interrupt instead of looping? */
+    /* Wait for an interrupt instead of looping? */
     /* Is AUX CH command reply received? */
     ret = readx_poll_timeout(readl, dp->reg_base + ANALOGIX_DP_INT_STA, reg, reg & RPLY_RECEIV, 0xa, 0x4e20);
     if (ret) {

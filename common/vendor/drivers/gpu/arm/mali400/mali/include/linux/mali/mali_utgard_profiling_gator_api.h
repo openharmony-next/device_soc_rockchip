@@ -25,7 +25,7 @@ extern "C" {
 #define MALI_SPCIAL_COUNTER_DESCRIPTIONS                                                                               \
     {                                                                                                                  \
         "Filmstrip_cnt0", "Frequency", "Voltage", "vertex", "fragment", "Total_alloc_pages",                           \
-    };
+    }
 
 #define MALI_MEM_COUTNER_DESCRIPTIONS                                                                                  \
     {                                                                                                                  \
@@ -39,7 +39,7 @@ extern "C" {
         "stream_buffer",     "fragment_stack",                                                                         \
         "uniform",           "untyped_frame_pool",                                                                     \
         "untyped_surface",                                                                                             \
-    };
+    }
 
 /** The list of events supported by the Mali DDK. */
 typedef enum {

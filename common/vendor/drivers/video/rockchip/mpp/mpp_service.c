@@ -265,13 +265,13 @@ static int mpp_procfs_init(struct mpp_service *srv)
         return -EIO;
     }
     /* show version */
-    proc_create_single("version", 0444, srv->procfs, mpp_show_version);
+    proc_create_single("version", FILE_RIGHT_444, srv->procfs, mpp_show_version);
     /* for show session info */
-    proc_create_single_data("sessions-summary", 0444, srv->procfs, mpp_show_session_summary, srv);
+    proc_create_single_data("sessions-summary", FILE_RIGHT_444, srv->procfs, mpp_show_session_summary, srv);
     /* show support dev cmd */
-    proc_create_single("supports-cmd", 0444, srv->procfs, mpp_show_support_cmd);
+    proc_create_single("supports-cmd", FILE_RIGHT_444, srv->procfs, mpp_show_support_cmd);
     /* show support devices */
-    proc_create_single_data("supports-device", 0444, srv->procfs, mpp_show_support_device, srv);
+    proc_create_single_data("supports-device", FILE_RIGHT_444, srv->procfs, mpp_show_support_device, srv);
 
     return 0;
 }

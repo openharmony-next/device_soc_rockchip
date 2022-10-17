@@ -234,7 +234,7 @@
 #define GPU_FAULTSTATUS_ACCESS_TYPE_WRITE 0x3
 /* End of GPU_FAULTSTATUS_ACCESS_TYPE values */
 
-/* TODO: Remove once 10.x.6 headers became available */
+/* Remove once 10.x.6 headers became available */
 #define GPU_EXCEPTION_TYPE_SW_FAULT_0 ((u8)0x70)
 #define GPU_EXCEPTION_TYPE_SW_FAULT_1 ((u8)0x71)
 

@@ -1603,7 +1603,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
             break;
 
         default:
-        unknown:
+            unknown:
             if (field->report_size == 1) {
                 if (field->report->type == HID_OUTPUT_REPORT) {
                     map_led(LED_MISC);

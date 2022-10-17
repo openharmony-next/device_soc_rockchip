@@ -59,7 +59,7 @@
 #define PRIVATE_DATA_COUNTER_GET_SUB_JOB(a) (((a) >> 8) & 0xFF)
 
 #define POWER_BUFFER_SIZE 3
-
+#define FILE_RIGHT  0600
 static struct dentry *mali_debugfs_dir = NULL;
 
 typedef enum {
@@ -1331,9 +1331,9 @@ int mali_sysfs_register(const char *mali_dev_name)
                  */
                 mali_profiling_gp_dir = debugfs_create_dir("gp", mali_profiling_dir);
                 if (mali_profiling_gp_dir != NULL) {
-                    debugfs_create_file("counter_src0", 0600, mali_profiling_gp_dir,
+                    debugfs_create_file("counter_src0", FILE_RIGHT, mali_profiling_gp_dir,
                                         (void *)PRIVATE_DATA_COUNTER_MAKE_GP(0), &profiling_counter_src_fops);
-                    debugfs_create_file("counter_src1", 0600, mali_profiling_gp_dir,
+                    debugfs_create_file("counter_src1", FILE_RIGHT, mali_profiling_gp_dir,
                                         (void *)PRIVATE_DATA_COUNTER_MAKE_GP(1), &profiling_counter_src_fops);
                 }
 

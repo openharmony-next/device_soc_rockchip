@@ -44,7 +44,7 @@ extern "C" {
  * not use ctx, because it is usually a NULL.
  */
 #define RgaInit(ctx)                                                                                                   \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         int ret = 0;                                                                                                   \
         ret = c_RkRgaInit();                                                                                           \
         c_RkRgaGetContext(ctx);                                                                                        \

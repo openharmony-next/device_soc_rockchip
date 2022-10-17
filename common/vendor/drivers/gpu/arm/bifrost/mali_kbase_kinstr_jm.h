@@ -60,7 +60,9 @@
  * a user space reader gets created. This means that there is negligible cost
  * inserting the tracepoints into code when there are no readers.
  */
-
+#ifndef COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_DEBUG_BACKEND_MALI_KBASE_DEBUG_LINUX_KTRACE_JM_H
+#define COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_DEBUG_BACKEND_MALI_KBASE_DEBUG_LINUX_KTRACE_JM_H
+#endif
 #ifndef KBASE_KINSTR_JM_H_
 #define KBASE_KINSTR_JM_H_
 

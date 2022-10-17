@@ -266,7 +266,7 @@ static inline int freezable_schedule_hrtimeout_range(ktime_t *expires, u64 delta
 
 /* DO NOT ADD ANY NEW CALLERS OF THIS FUNCTION */
 #define wait_event_freezekillable_unsafe(wq, condition)                                                                \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         int __retval;                                                                                                  \
         freezer_do_not_count();                                                                                        \
         __retval = wait_event_killable(wq, (condition));                                                               \

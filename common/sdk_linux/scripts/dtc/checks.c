@@ -266,9 +266,10 @@ static void check_duplicate_node_names(struct check *c, struct dt_info *dti, str
 
     for_each_child(node, child) {
         for (child2 = child->next_sibling; child2;
-                                     child2 = child2->next_sibling)
+                                     child2 = child2->next_sibling) {
             if (streq(child->name, child2->name))
                 FAIL(c, dti, child2, "Duplicate node name");
+        }
     }
 }
 ERROR(duplicate_node_names, check_duplicate_node_names, NULL);

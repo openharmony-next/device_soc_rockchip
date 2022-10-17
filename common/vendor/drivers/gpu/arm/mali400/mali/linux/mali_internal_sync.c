@@ -514,13 +514,13 @@ mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
         mali_internal_add_fence_array(fences, &real_num_fences, fences2[j]);
     }
 
-    if (real_num_fences == 0)
+    if (real_num_fences == 0) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
         fences[real_num_fences++] = fence_get(fences1[0]);
 #else
         fences[real_num_fences++] = dma_fence_get(fences1[0]);
 #endif
-
+    }
     if (num_fences > real_num_fences) {
         nfences =
             krealloc(fences, real_num_fences * sizeof(*fences), GFP_KERNEL);
@@ -556,12 +556,13 @@ mali_internal_sync_fence_merge(struct mali_internal_sync_fence *sync_fence1,
 sync_fence_set_failed:
     fput(sync_fence->file);
 sync_fence_alloc_failed:
-    for (i = 0; i < real_num_fences; i++)
+    for (i = 0; i < real_num_fences; i++) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
         fence_put(fences[i]);
 #else
         dma_fence_put(fences[i]);
 #endif
+    }
 nfences_alloc_failed:
     kfree(fences);
 fences_alloc_failed:

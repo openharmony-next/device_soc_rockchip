@@ -55,7 +55,7 @@ static int of_gpio_spi_cs_get_count(struct device *dev, const char *con_id)
 /*
  * This is used by external users of of_gpio_count() from <linux/of_gpio.h>
  *
- * FIXME: get rid of those external users by converting them to GPIO
+ * get rid of those external users by converting them to GPIO
  * descriptors and let them all use gpiod_count()
  */
 int of_gpio_get_count(struct device *dev, const char *con_id)

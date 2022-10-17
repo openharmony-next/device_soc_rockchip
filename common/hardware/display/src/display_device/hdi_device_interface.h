@@ -30,7 +30,7 @@ namespace OHOS {
                 virtual bool HandleHotplug(uint32_t dispId, bool plugIn) = 0;
                 virtual int32_t Init() = 0;
                 virtual void DeInit() = 0;
-                virtual ~HdiDeviceInterface(){};
+                virtual ~HdiDeviceInterface() {};
             };
         } // namespace OHOS
     }     // namespace HDI

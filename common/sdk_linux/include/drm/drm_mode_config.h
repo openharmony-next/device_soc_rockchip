@@ -100,7 +100,6 @@ struct drm_mode_config_funcs {
      * drm_fb_helper_hotplug_changed from this hook to inform the fbdev
      * helper of output changes.
      *
-     * FIXME
      *
      * Except that there's no vtable for device-level helper callbacks
      * there's no reason this is a core function.
@@ -873,7 +872,7 @@ struct drm_mode_config {
      * When set to true memcpy_toio() is used when copying the framebuffer in
      * drm_fb_helper.drm_fb_helper_dirty_blit_real().
      *
-     * FIXME: This should be replaced with a per-mapping is_iomem
+     * This should be replaced with a per-mapping is_iomem
      * flag (like ttm does), and then used everywhere in fbdev code.
      */
     bool fbdev_use_iomem;
@@ -951,7 +950,7 @@ int __must_check drmm_mode_config_init(struct drm_device *dev);
  * This is the unmanaged version of drmm_mode_config_init() for drivers which
  * still explicitly call drm_mode_config_cleanup().
  *
- * FIXME: This function is deprecated and drivers should be converted over to
+ * This function is deprecated and drivers should be converted over to
  * drmm_mode_config_init().
  */
 static inline int drm_mode_config_init(struct drm_device *dev)

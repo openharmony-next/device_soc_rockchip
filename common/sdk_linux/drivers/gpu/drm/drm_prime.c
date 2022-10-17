@@ -547,7 +547,7 @@ int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data, struct drm_
  * storage is fully coherent and either permanently pinned, or it is safe to pin
  * it indefinitely.
  *
- * FIXME: The underlying helper functions are named rather inconsistently.
+ * The underlying helper functions are named rather inconsistently.
  *
  * Exporting buffers
  * ~~~~~~~~~~~~~~~~~
@@ -761,7 +761,7 @@ EXPORT_SYMBOL(drm_gem_prime_mmap);
  * &dma_buf_ops.mmap callback. It just forwards to &drm_driver.gem_prime_mmap,
  * which should be set to drm_gem_prime_mmap().
  *
- * FIXME: There's really no point to this wrapper, drivers which need anything
+ * There's really no point to this wrapper, drivers which need anything
  * else but drm_gem_prime_mmap can roll their own &dma_buf_ops.mmap callback.
  *
  * Returns 0 on success or a negative error code on failure.

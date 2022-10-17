@@ -494,9 +494,8 @@ static void fiq_debugger_irq_exec(struct fiq_debugger_state *state, char *cmd)
         fiq_debugger_do_kgdb(state);
     }
 #endif
-    if (!strncmp(cmd, "reboot", 0x6)) {
+    if (!strncmp(cmd, "reboot", 0x6))
         fiq_debugger_schedule_work(state, cmd);
-    }
 #ifdef CONFIG_ARCH_ROCKCHIP
     else {
         invalid_cmd = 1;
@@ -593,9 +592,8 @@ static void fiq_debugger_switch_cpu(struct fiq_debugger_state *state, int cpu)
         return;
     }
 
-    if (!fiq_debugger_have_fiq(state)) {
+    if (!fiq_debugger_have_fiq(state))
         smp_call_function_single(cpu, fiq_debugger_take_affinity, state, false);
-    }
 #ifdef CONFIG_ARCH_ROCKCHIP
     else {
 #ifdef CONFIG_FIQ_DEBUGGER_TRUST_ZONE

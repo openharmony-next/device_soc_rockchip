@@ -24,7 +24,9 @@
  * NOTE: This must **only** be included through mali_linux_trace.h,
  * otherwise it will fail to setup tracepoints correctly
  */
-
+#ifndef COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_DEBUG_MALI_KBASE_DEBUG_LINUX_KTRACE_H
+#define COMMON_VENDOR_DRIVERS_GPU_ARM_BIFROST_DEBUG_MALI_KBASE_DEBUG_LINUX_KTRACE_H
+#endif
 #if !defined(KBASE_DEBUG_LINUX_KTRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define KBASE_DEBUG_LINUX_KTRACE_H
 

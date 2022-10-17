@@ -832,7 +832,7 @@ int group_balance_cpu(struct sched_group *sg)
  * In order to minimize this overlap, we only build enough groups to cover the
  * domain. For instance Node-0 NUMA-2 would only get groups: 0-1,3 and 1-3.
  *
- * Because:
+ * Because
  *
  *  - the first group of each domain is its child domain; this
  *    gets us the first 0-1,3
@@ -854,7 +854,7 @@ int group_balance_cpu(struct sched_group *sg)
  * used for sched_group_capacity links.
  *
  *
- * Another 'interesting' topology is:
+ * Another 'interesting' topology is
  *
  *   node   0   1   2   3
  *     0:  10  20  20  30
@@ -862,7 +862,7 @@ int group_balance_cpu(struct sched_group *sg)
  *     2:  20  20  10  20
  *     3:  30  20  20  10
  *
- * Which looks a little like:
+ * Which looks a little like
  *
  *   0 ----- 1
  *   |     / |
@@ -1797,17 +1797,18 @@ void sched_init_numa(void)
     /*
      * Add the NUMA identity distance, aka single NODE.
      */
-    tl[i++] = (struct sched_domain_topology_level){.mask = sd_numa_mask, .numa_level = 0, SD_INIT_NAME(NODE)};
+    tl[i++] = (struct sched_domain_topology_level) {.mask = sd_numa_mask, .numa_level = 0, SD_INIT_NAME(NODE)};
 
     /*
      * .. and append 'j' levels of NUMA goodness.
      */
     for (j = 1; j < nr_levels; i++, j++) {
-        tl[i] = (struct sched_domain_topology_level){.mask = sd_numa_mask,
-                                                     .sd_flags = cpu_numa_flags,
-                                                     .flags = SDTL_OVERLAP,
-                                                     .numa_level = j,
-                                                     SD_INIT_NAME(NUMA)};
+        tl[i] = (struct sched_domain_topology_level) {
+            .mask = sd_numa_mask,
+            .sd_flags = cpu_numa_flags,
+            .flags = SDTL_OVERLAP,
+            .numa_level = j,
+            SD_INIT_NAME(NUMA)};
     }
 
     sched_domain_topology = tl;
@@ -1871,7 +1872,7 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
     struct sched_domain_topology_level *tl;
     int j;
 
-    for_each_sd_topology(tl) {
+    for (tl = sched_domain_topology; (tl)->mask; (tl)++) {
         struct sd_data *sdd = &tl->data;
 
         sdd->sd = alloc_percpu(struct sched_domain *);
@@ -1945,7 +1946,7 @@ static void __sdt_free(const struct cpumask *cpu_map)
     struct sched_domain_topology_level *tl;
     int j;
 
-    for_each_sd_topology(tl) {
+    for (tl = sched_domain_topology; (tl)->mask; (tl)++) {
         struct sd_data *sdd = &tl->data;
 
         for_each_cpu(j, cpu_map) {
@@ -2079,7 +2080,7 @@ static struct sched_domain_topology_level *asym_cpu_capacity_level(const struct 
         unsigned long max_capacity = arch_scale_cpu_capacity(i);
         int tl_id = 0;
 
-        for_each_sd_topology(tl) {
+        for (tl = sched_domain_topology; (tl)->mask; (tl)++) {
             if (tl_id < asym_level) {
                 goto next_level;
             }
@@ -2136,7 +2137,7 @@ static int build_sched_domains(const struct cpumask *cpu_map, struct sched_domai
         int dflags = 0;
 
         sd = NULL;
-        for_each_sd_topology(tl) {
+        for (tl = sched_domain_topology; (tl)->mask; (tl)++) {
             if (tl == tl_asym) {
                 dflags |= SD_ASYM_CPUCAPACITY;
                 has_asym = true;

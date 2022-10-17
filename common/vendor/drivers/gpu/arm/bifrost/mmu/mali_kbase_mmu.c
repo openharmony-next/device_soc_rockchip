@@ -101,7 +101,7 @@ static void kbase_mmu_sync_pgd(struct kbase_device *kbdev, dma_addr_t handle, si
 }
 
 /*
- * Definitions:
+ * Definitions
  * - PGD: Page Directory.
  * - PTE: Page Table Entry. A 64bit value pointing to the next
  *        level of translation

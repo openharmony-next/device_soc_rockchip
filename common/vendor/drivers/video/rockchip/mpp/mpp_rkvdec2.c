@@ -18,6 +18,8 @@
 #include "hack/mpp_rkvdec2_hack_rk3568.c"
 
 #define MPP_PROCFS_FILE 0644
+#define SINGLE_FILE_RIGHT 0444
+
 /*
  * hardware information
  */
@@ -609,7 +611,7 @@ static int rkvdec2_procfs_init(struct mpp_dev *mpp)
     mpp_procfs_create_u32("clk_cabac", MPP_PROCFS_FILE, dec->procfs, &dec->cabac_clk_info.debug_rate_hz);
     mpp_procfs_create_u32("clk_hevc_cabac", MPP_PROCFS_FILE, dec->procfs, &dec->hevc_cabac_clk_info.debug_rate_hz);
     mpp_procfs_create_u32("session_buffers", MPP_PROCFS_FILE, dec->procfs, &mpp->session_max_buffers);
-    proc_create_single("perf_sel_offset", 0444, dec->procfs, rkvdec2_show_pref_sel_offset);
+    proc_create_single("perf_sel_offset", SINGLE_FILE_RIGHT, dec->procfs, rkvdec2_show_pref_sel_offset);
     mpp_procfs_create_u32("task_count", MPP_PROCFS_FILE, dec->procfs, &mpp->task_index);
     mpp_procfs_create_u32("disable_work", MPP_PROCFS_FILE, dec->procfs, &dec->disable_work);
 

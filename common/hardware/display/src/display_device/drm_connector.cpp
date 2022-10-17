@@ -64,7 +64,7 @@ namespace OHOS {
                         DISPLAY_DEBUGLOG("set it to prefernce id %{public}d", i);
                         mPreferenceId = i;
                     }
-                    mModes.emplace(i, DrmMode{*mode, i});
+                    mModes.emplace(i, DrmMode {*mode, i});
                 }
                 DISPLAY_DEBUGLOG("mode count %{public}zd", mModes.size());
             }

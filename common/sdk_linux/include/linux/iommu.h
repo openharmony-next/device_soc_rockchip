@@ -373,8 +373,8 @@ struct iommu_fault_param {
  * @iommu_dev:     IOMMU device this device is linked to
  * @priv:     IOMMU Driver private data
  *
- * TODO: migrate other per device data pointers under iommu_dev_data, e.g.
- *    struct iommu_group    *iommu_group;
+ * migrate other per device data pointers under iommu_dev_data, e.g.
+ * struct iommu_group    *iommu_group;
  */
 struct dev_iommu {
     struct mutex lock;

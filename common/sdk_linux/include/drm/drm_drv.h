@@ -447,7 +447,7 @@ struct drm_driver {
      * mmap hook for GEM drivers, used to implement dma-buf mmap in the
      * PRIME helpers.
      *
-     * FIXME: There's way too much duplication going on here, and also moved
+     * There's way too much duplication going on here, and also moved
      * to &drm_gem_object_funcs.
      */
     int (*gem_prime_mmap)(struct drm_gem_object *obj, struct vm_area_struct *vma);

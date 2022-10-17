@@ -550,13 +550,13 @@ static inline int mmc_card_wake_sdio_irq(struct mmc_host *host)
     return host->pm_flags & MMC_PM_WAKE_SDIO_IRQ;
 }
 
-/* TODO: Move to private header */
+/* Move to private header */
 static inline int mmc_card_hs(struct mmc_card *card)
 {
     return card->host->ios.timing == MMC_TIMING_SD_HS || card->host->ios.timing == MMC_TIMING_MMC_HS;
 }
 
-/* TODO: Move to private header */
+/* Move to private header */
 static inline int mmc_card_uhs(struct mmc_card *card)
 {
     return card->host->ios.timing >= MMC_TIMING_UHS_SDR12 && card->host->ios.timing <= MMC_TIMING_UHS_DDR50;

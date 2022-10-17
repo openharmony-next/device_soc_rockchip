@@ -309,7 +309,7 @@ static __always_inline void ___update_load_avg(struct sched_avg *sa, unsigned lo
 }
 
 /*
- * sched_entity:
+ * sched_entity
  *
  *   task:
  *     se_weight()   = se->load.weight
@@ -325,7 +325,7 @@ static __always_inline void ___update_load_avg(struct sched_avg *sa, unsigned lo
  *   load_sum := runnable
  *   load_avg = se_weight(se) * load_sum
  *
- * cfq_rq:
+ * cfq_rq
  *
  *   runnable_sum = \Sum se->avg.runnable_sum
  *   runnable_avg = \Sum se->avg.runnable_avg
@@ -370,7 +370,7 @@ int __update_load_avg_cfs_rq(u64 now, struct cfs_rq *cfs_rq)
 }
 
 /*
- * rt_rq:
+ * rt_rq
  *
  *   util_sum = \Sum se->avg.util_sum but se->avg.util_sum is not tracked
  *   util_sum = cpu_scale * load_sum
@@ -392,7 +392,7 @@ int update_rt_rq_load_avg(u64 now, struct rq *rq, int running)
 }
 
 /*
- * dl_rq:
+ * dl_rq
  *
  *   util_sum = \Sum se->avg.util_sum but se->avg.util_sum is not tracked
  *   util_sum = cpu_scale * load_sum
@@ -415,7 +415,7 @@ int update_dl_rq_load_avg(u64 now, struct rq *rq, int running)
 
 #ifdef CONFIG_SCHED_THERMAL_PRESSURE
 /*
- * thermal:
+ * thermal
  *
  *   load_sum = \Sum se->avg.load_sum but se->avg.load_sum is not tracked
  *
@@ -443,7 +443,7 @@ int update_thermal_load_avg(u64 now, struct rq *rq, u64 capacity)
 
 #ifdef CONFIG_HAVE_SCHED_AVG_IRQ
 /*
- * irq:
+ * irq
  *
  *   util_sum = \Sum se->avg.util_sum but se->avg.util_sum is not tracked
  *   util_sum = cpu_scale * load_sum

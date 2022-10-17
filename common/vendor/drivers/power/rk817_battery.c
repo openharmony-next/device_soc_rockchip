@@ -2367,7 +2367,6 @@ static void rk817_bat_update_info(struct rk817_battery_device *battery)
     /* smooth charge */
     if (battery->remain_cap / 0x3E8 > battery->fcc) {
         /* battery->sm_remain_cap -= */
-        /* (battery->remain_cap - battery->fcc * 0x3E8); */
         battery->sm_remain_cap = battery->fcc * 0x3E8;
         DBG("<%s>. cap: remain=%d, sm_remain=%d\n", __func__, battery->remain_cap, battery->sm_remain_cap);
         DBG("fcc: %d\n", battery->fcc);

@@ -93,9 +93,9 @@ __read_mostly int scheduler_running;
 int sysctl_sched_rt_runtime = 950000;
 
 /*
- * Serialization rules:
+ * Serialization rules
  *
- * Lock order:
+ * Lock order
  *
  *   p->pi_lock
  *     rq->lock
@@ -104,7 +104,7 @@ int sysctl_sched_rt_runtime = 950000;
  *  rq1->lock
  *    rq2->lock  where: rq1 < rq2
  *
- * Regular state:
+ * Regular state
  *
  * Normal scheduling state is serialized by rq->lock. __schedule() takes the
  * local CPU's rq->lock, it optionally removes the task from the runqueue and
@@ -119,11 +119,11 @@ int sysctl_sched_rt_runtime = 950000;
  * Task wakeup, specifically wakeups that involve migration, are horribly
  * complicated to avoid having to take two rq->locks.
  *
- * Special state:
+ * Special state
  *
  * System-calls and anything external will use task_rq_lock() which acquires
  * both p->pi_lock and rq->lock. As a consequence the state they change is
- * stable while holding either lock:
+ * stable while holding either lock
  *
  *  - sched_setaffinity()/
  *    set_cpus_allowed_ptr():    p->cpus_ptr, p->nr_cpus_allowed
@@ -136,7 +136,7 @@ int sysctl_sched_rt_runtime = 950000;
  *    cpu_cgroup_fork():    p->sched_task_group
  *  - uclamp_update_active()    p->uclamp*
  *
- * p->state <- TASK_*:
+ * p->state <- TASK_*
  *
  *   is changed locklessly using set_current_state(), __set_current_state() or
  *   set_special_state(), see their respective comments, or by
@@ -150,7 +150,7 @@ int sysctl_sched_rt_runtime = 950000;
  *   ON_RQ_MIGRATING state is used for migration without holding both
  *   rq->locks. It indicates task_cpu() is not stable, see task_rq_lock().
  *
- * p->on_cpu <- { 0, 1 }:
+ * p->on_cpu <- { 0, 1 }
  *
  *   is set by prepare_task() and cleared by finish_task() such that it will be
  *   set before p is scheduled-in and cleared after p is scheduled-out, both
@@ -176,7 +176,7 @@ int sysctl_sched_rt_runtime = 950000;
  *    o move_queued_task()
  *    o detach_task()
  *
- *  - for migration called under double_rq_lock():
+ *  - for migration called under double_rq_lock()
  *
  *    o __migrate_swap_task()
  *    o push_rt_task() / pull_rt_task()
@@ -253,7 +253,7 @@ struct rq *task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 }
 
 /*
- * RQ-clock updating methods:
+ * RQ-clock updating methods
  */
 
 static void update_rq_clock_task(struct rq *rq, s64 delta)
@@ -464,12 +464,12 @@ static inline void hrtick_rq_init(struct rq *rq)
  * cmpxchg based fetch_or, macro so it works for different integer types
  */
 #define fetch_or(ptr, mask)                                                    \
-    ({                                                                         \
+    ( {                                                                        \
         typeof(ptr) _ptr = (ptr);                                              \
         typeof(mask) _mask = (mask);                                           \
         typeof(*_ptr) _old, _val = *_ptr;                                      \
                                                                                \
-        for (;;) {                                                             \
+        for ( ; ; ) {                                                             \
             _old = cmpxchg(_ptr, _val, _val | _mask);                          \
             if (_old == _val)                                                  \
                 break;                                                         \
@@ -1651,8 +1651,7 @@ static void __init init_uclamp_rq(struct rq *rq)
     enum uclamp_id clamp_id;
     struct uclamp_rq *uc_rq = rq->uclamp;
 
-    for_each_clamp_id(clamp_id)
-    {
+    for_each_clamp_id(clamp_id) {
         uc_rq[clamp_id] = (struct uclamp_rq){.value = uclamp_none(clamp_id)};
     }
 
@@ -1883,7 +1882,7 @@ static inline bool is_cpu_allowed(struct task_struct *p, int cpu)
 }
 
 /*
- * This is how migration works:
+ * This is how migration works
  *
  * 1) we invoke migration_cpu_stop() on the target CPU using
  *    stop_one_cpu().
@@ -2580,7 +2579,6 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
                 state = bug;
                 break;
 #else
-                /* fall through; */
 #endif
 
             case bug:
@@ -3110,7 +3108,7 @@ static inline void walt_try_to_wake_up(struct task_struct *p)
  * @state: the mask of task states that can be woken
  * @wake_flags: wake modifier flags (WF_*)
  *
- * Conceptually does:
+ * Conceptually does
  *
  *   If (@state & @p->state) @p->state = TASK_RUNNING.
  *
@@ -3581,7 +3579,7 @@ static inline void init_schedstats(void)
 #endif /* CONFIG_SCHEDSTATS */
 
 /*
- * fork()/clone()-time setup:
+ * fork()/clone()-time setup
  */
 int sched_fork(unsigned long clone_flags, struct task_struct *p)
 {
@@ -4187,7 +4185,7 @@ static __always_inline struct rq *context_switch(struct rq *rq,
 }
 
 /*
- * nr_running and nr_context_switches:
+ * nr_running and nr_context_switches
  *
  * externally visible scheduler statistics: current number of runnable
  * threads, total number of context switches performed since bootup.
@@ -7246,7 +7244,7 @@ int migrate_task_to(struct task_struct *p, int target_cpu)
         return -EINVAL;
     }
 
-    /* TODO: This is not properly updating schedstats */
+    /* This is not properly updating schedstats */
 
     trace_sched_move_numa(p, curr_cpu, target_cpu);
     return stop_one_cpu(curr_cpu, migration_cpu_stop, &arg);

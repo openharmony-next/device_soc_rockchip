@@ -48,7 +48,6 @@
 #include <linux/uaccess.h>
 
 #include "queue.h"
-#include "block.h"
 #include "core.h"
 #include "card.h"
 #include "host.h"
@@ -56,6 +55,7 @@
 #include "mmc_ops.h"
 #include "quirks.h"
 #include "sd_ops.h"
+#include "block.h"
 
 MODULE_ALIAS("mmc:block");
 #ifdef MODULE_PARAM_PREFIX
@@ -283,7 +283,7 @@ static ssize_t power_ro_lock_store(struct device *dev, struct device_attribute *
         pr_info("%s: Locking boot partition ro until next power on\n", md->disk->disk_name);
         set_disk_ro(md->disk, 1);
 
-        list_for_each_entry(part_md, &md->part, part){
+        list_for_each_entry(part_md, &md->part, part) {
             if (part_md->area_type == MMC_BLK_DATA_AREA_BOOT) {
                 pr_info("%s: Locking boot partition ro until next power on\n", part_md->disk->disk_name);
                 set_disk_ro(part_md->disk, 1);
@@ -2382,7 +2382,8 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card, struct devi
      * messages to tell when the card is present.
      */
 
-    snprintf(md->disk->disk_name, sizeof(md->disk->disk_name), "mmcblk%u%s", card->host->index, subname ? subname : "");
+    ret = snprintf(md->disk->disk_name, sizeof(md->disk->disk_name), \
+                   "mmcblk%u%s", card->host->index, subname ? subname : "");
 
     set_capacity(md->disk, size);
 
@@ -2546,7 +2547,7 @@ static int mmc_blk_alloc_rpmb_part(struct mmc_card *card, struct mmc_blk_data *m
         return -ENOMEM;
     }
 
-    snprintf(rpmb_name, sizeof(rpmb_name), "mmcblk%u%s", card->host->index, subname ? subname : "");
+    ret = snprintf(rpmb_name, sizeof(rpmb_name), "mmcblk%u%s", card->host->index, subname ? subname : "");
 
     rpmb->id = devidx;
     rpmb->part_index = part_index;

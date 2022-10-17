@@ -6,6 +6,8 @@
  *            Daniel Kurtz <djkurtz@chromium.org>
  */
 
+#include <soc/rockchip/rockchip_iommu.h>
+
 #include <linux/clk.h>
 #include <linux/compiler.h>
 #include <linux/delay.h>
@@ -28,7 +30,6 @@
 #include <linux/pm_runtime.h>
 #include <linux/slab.h>
 #include <linux/spinlock.h>
-#include <soc/rockchip/rockchip_iommu.h>
 
 /** MMU register offsets */
 #define RK_MMU_DTE_ADDR 0x00 /* Directory table address */
@@ -584,23 +585,25 @@ static int rk_iommu_disable_paging(struct rk_iommu *iommu)
     }
 
 read_wa:
-    rk_iommu_command(iommu, RK_MMU_CMD_DISABLE_PAGING);
-    if (iommu->skip_read) {
-        return 0;
-    }
-
-    ret =
-        readx_poll_timeout(rk_iommu_is_paging_enabled, iommu, val, !val, RK_MMU_POLL_PERIOD_US, RK_MMU_POLL_TIMEOUT_US);
-    if (ret) {
-        for (i = 0; i < iommu->num_mmu; i++) {
-            dev_err(iommu->dev, "Disable paging request timed out, retry_count = %d, status: %#08x\n", retry_count,
-                    rk_iommu_read(iommu->bases[i], RK_MMU_STATUS));
+    while(1) {
+        rk_iommu_command(iommu, RK_MMU_CMD_DISABLE_PAGING);
+        if (iommu->skip_read) {
+            return 0;
         }
-        if (iommu->cmd_retry && (retry_count++ < CMD_RETRY_COUNT)) {
-            goto read_wa;
-        }
-    }
 
+        ret =
+            readx_poll_timeout(rk_iommu_is_paging_enabled, iommu, val, !val, RK_MMU_POLL_PERIOD_US, RK_MMU_POLL_TIMEOUT_US);
+        if (ret) {
+            for (i = 0; i < iommu->num_mmu; i++) {
+                dev_err(iommu->dev, "Disable paging request timed out, retry_count = %d, status: %#08x\n", retry_count,
+                        rk_iommu_read(iommu->bases[i], RK_MMU_STATUS));
+            }
+            if (iommu->cmd_retry && (retry_count++ < CMD_RETRY_COUNT)) {
+                continue;
+            }
+        }
+        break;
+    }
     return ret;
 }
 

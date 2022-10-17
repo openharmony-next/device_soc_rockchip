@@ -441,7 +441,7 @@ static inline struct usb_composite_driver *to_cdriver(struct usb_gadget_driver *
  *
  * One notion for how to handle Wireless USB devices involves:
  *
- * (a) a second gadget here, discovery mechanism TBD, but likely
+ * (a) a second gadget here, discovery mechanism, but likely
  *     needing separate "register/unregister WUSB gadget" calls;
  * (b) updates to usb_gadget to include flags "is it wireless",
  *     "is it wired", plus (presumably in a wrapper structure)

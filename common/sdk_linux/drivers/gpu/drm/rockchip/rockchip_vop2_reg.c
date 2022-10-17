@@ -4,11 +4,12 @@
  * Author: Andy Yan <andy.yan@rock-chips.com>
  */
 
+#include <dt-bindings/display/rockchip_vop.h>
+
 #include <linux/kernel.h>
 #include <linux/component.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
-#include <dt-bindings/display/rockchip_vop.h>
 
 #include <drm/drm_fourcc.h>
 #include <drm/drm_print.h>
@@ -16,14 +17,14 @@
 #include "rockchip_vop_reg.h"
 #include "rockchip_drm_drv.h"
 
-#define _VOP_REG(off, _mask, _shift, _write_mask)                                                                      \
+#define D_VOP_REG(off, _mask, _shift, _write_mask)                                                                     \
     {                                                                                                                  \
         .offset = (off), .mask = (_mask), .shift = (_shift), .write_mask = (_write_mask),                              \
     }
 
-#define VOP_REG(off, _mask, _shift) _VOP_REG(off, _mask, _shift, false)
+#define VOP_REG(off, _mask, _shift) D_VOP_REG(off, _mask, _shift, false)
 
-#define VOP_REG_MASK(off, _mask, s) _VOP_REG(off, _mask, s, true)
+#define VOP_REG_MASK(off, _mask, s) D_VOP_REG(off, _mask, s, true)
 
 static const uint32_t formats_for_cluster[] = {
     DRM_FORMAT_XRGB2101010,  DRM_FORMAT_ARGB2101010, DRM_FORMAT_XBGR2101010, DRM_FORMAT_ABGR2101010,
@@ -45,7 +46,7 @@ static const uint32_t formats_for_cluster[] = {
 
 static const uint32_t formats_for_esmart[] = {
     DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB8888, DRM_FORMAT_XBGR8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_RGB888,
-    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   
+    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,
     DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV21, /* yvu420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV16, /* yuv422_8bit linear mode, 2 plane */
@@ -66,7 +67,7 @@ static const uint32_t formats_for_esmart[] = {
 /* RK356x can't support uv swap for YUYV and UYVY */
 static const uint32_t formats_for_rk356x_esmart[] = {
     DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB8888, DRM_FORMAT_XBGR8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_RGB888,
-    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,   
+    DRM_FORMAT_BGR888,   DRM_FORMAT_RGB565,   DRM_FORMAT_BGR565,
     DRM_FORMAT_NV12, /* yuv420_8bit linear mode, 2 plane */
     DRM_FORMAT_NV16, /* yuv422_8bit linear mode, 2 plane */
     DRM_FORMAT_NV24, /* yuv444_8bit linear mode, 2 plane */

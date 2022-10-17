@@ -742,7 +742,7 @@ static const struct drm_bus_format_enum_list drm_bus_format_enum_list_ex[] = {
 
 static DRM_ENUM_NAME_FN(drm_get_bus_format_name, drm_bus_format_enum_list_ex)
 
-    static inline struct vop2_video_port *to_vop2_video_port(struct drm_crtc *crtc)
+static inline struct vop2_video_port *to_vop2_video_port(struct drm_crtc *crtc)
 {
     struct rockchip_crtc *rockchip_crtc;
 
@@ -1785,8 +1785,6 @@ static bool vop2_win_dither_up(uint32_t format)
 static bool vop2_output_uv_swap(uint32_t bus_format, uint32_t output_mode)
 {
     /*
-     * FIXME:
-     *
      * There is no media type for YUV444 output,
      * so when out_mode is AAAA or P888, assume output is YUV444 on
      * yuv format.
@@ -4562,7 +4560,7 @@ static void vop2_crtc_cancel_pending_vblank(struct drm_crtc *crtc, struct drm_fi
     if (e && e->base.file_priv == file_priv) {
         vp->event = NULL;
 
-        // e->base.destroy(&e->base);//todo
+        // e->base.destroy(&e->base);
         file_priv->event_space += sizeof(e->event);
     }
     spin_unlock_irqrestore(&drm->event_lock, flags);

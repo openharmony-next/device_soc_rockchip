@@ -52,9 +52,9 @@ static void sha1_starts(sha1_context *ctx)
 
     ctx->state[0] = 0x67452301;
     ctx->state[1] = 0xEFCDAB89;
-    ctx->state[2] = 0x98BADCFE;
-    ctx->state[3] = 0x10325476;
-    ctx->state[4] = 0xC3D2E1F0;
+    ctx->state[0x02] = 0x98BADCFE;
+    ctx->state[0x03] = 0x10325476;
+    ctx->state[0x04] = 0xC3D2E1F0;
 }
 
 static void sha1_process(sha1_context *ctx, const unsigned char data[64])
@@ -229,7 +229,7 @@ static void sha1_update(sha1_context *ctx, const unsigned char *input, unsigned 
     }
 
     left = ctx->total[0] & 0x3F;
-    fill = 64 - left;
+    fill = 0x40 - left;
 
     ctx->total[0] += ilen;
     ctx->total[0] &= 0xFFFFFFFF;
@@ -853,7 +853,7 @@ static bool get_entry(const char *file_path, index_tbl_entry *entry)
     /* test on pc, switch for be. */
     fix_header(&header);
 
-    /* TODO: support header_size & tbl_entry_size */
+    /* support header_size & tbl_entry_size */
     if (header.resource_ptn_version != RESOURCE_PTN_VERSION || header.header_size != RESOURCE_PTN_HDR_SIZE ||
         header.index_tbl_version != INDEX_TBL_VERSION || header.tbl_entry_size != INDEX_TBL_ENTR_SIZE) {
         LOGE("Not supported in this version!");
@@ -862,7 +862,7 @@ static bool get_entry(const char *file_path, index_tbl_entry *entry)
 
     int i;
     for (i = 0; i < header.tbl_entry_num; i++) {
-        /* TODO: support tbl_entry_size */
+        /* support tbl_entry_size */
         if (!StorageReadLba(get_ptn_offset() + header.header_size + i * header.tbl_entry_size, buf, 1)) {
             LOGE("Failed to read index entry:%d!", i);
             goto end;
@@ -1048,7 +1048,7 @@ static int test_charge(int argc, char **argv)
             delay = atoi(arg + strlen(OPT_CHARGE_ANIM_DELAY));
             LOGD("Found delay:%d", delay);
         } else if (!memcmp(arg, OPT_CHARGE_ANIM_LOOP_CUR, strlen(OPT_CHARGE_ANIM_LOOP_CUR))) {
-            only_current_level = !memcmp(arg + strlen(OPT_CHARGE_ANIM_LOOP_CUR), "true", 4);
+            only_current_level = !memcmp(arg + strlen(OPT_CHARGE_ANIM_LOOP_CUR), "true", 0x04);
             LOGD("Found only_current_level:%d", only_current_level);
         } else if (!memcmp(arg, OPT_CHARGE_ANIM_LEVELS, strlen(OPT_CHARGE_ANIM_LEVELS))) {
             if (level_conf_num) {
@@ -1332,7 +1332,7 @@ static int unpack_image(const char *dir)
     printf("index tbl:\n\toffset:%d\tentry size:%d\tentry num:%d\n", header.tbl_offset, header.tbl_entry_size,
            header.tbl_entry_num);
 
-    /* TODO: support header_size & tbl_entry_size */
+    /* support header_size & tbl_entry_size */
     if (header.resource_ptn_version != RESOURCE_PTN_VERSION || header.header_size != RESOURCE_PTN_HDR_SIZE ||
         header.index_tbl_version != INDEX_TBL_VERSION || header.tbl_entry_size != INDEX_TBL_ENTR_SIZE) {
         LOGE("Not supported in this version!");
@@ -1343,7 +1343,7 @@ static int unpack_image(const char *dir)
     index_tbl_entry entry;
     int i;
     for (i = 0; i < header.tbl_entry_num; i++) {
-        /* TODO: support tbl_entry_size */
+        /* support tbl_entry_size */
         if (!fread(buf, BLOCK_SIZE, 1, image_file)) {
             LOGE("Failed to read index entry:%d!", i);
             goto end;

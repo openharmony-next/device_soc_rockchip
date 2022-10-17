@@ -39,14 +39,14 @@ enum vop_clk_branch_type {
 
 #define FACTOR(cname, pname, f)                                                                                        \
     {                                                                                                                  \
-        .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[]){pname}, .num_parents = 1,      \
-        .flags = (f),                                                                                                  \
+        .branch_type = branch_factor, .name = (cname), .parent_names = (const char *[128]) {pname},                    \
+        .num_parents = 1, .flags = (f),                                                                                \
     }
 
 #define DIV(cname, pname, f, w)                                                                                        \
     {                                                                                                                  \
-        .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[]){pname}, .num_parents = 1,     \
-        .flags = (f), .div_width = (w),                                                                                \
+        .branch_type = branch_divider, .name = (cname), .parent_names = (const char *[128]) {pname},                   \
+        .num_parents = 1, .flags = (f), .div_width = (w),                                                              \
     }
 
 struct vop2_clk_branch {

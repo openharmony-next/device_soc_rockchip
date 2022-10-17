@@ -158,7 +158,7 @@ static DEFINE_PER_CPU(bool, has_rss);
 
 enum gic_intid_range { SGI_RANGE, PPI_RANGE, SPI_RANGE, EPPI_RANGE, ESPI_RANGE, LPI_RANGE, __INVALID_RANGE__ };
 
-static enum gic_intid_range __get_intid_range(irq_hw_number_t hwirq)
+static enum gic_intid_range get_intid_range_func(irq_hw_number_t hwirq)
 {
     switch (hwirq) {
         case 0 ... 0xf:
@@ -180,7 +180,7 @@ static enum gic_intid_range __get_intid_range(irq_hw_number_t hwirq)
 
 static enum gic_intid_range get_intid_range(struct irq_data *d)
 {
-    return __get_intid_range(d->hwirq);
+    return get_intid_range_func(d->hwirq);
 }
 
 static inline unsigned int gic_irq(struct irq_data *d)
@@ -1415,7 +1415,7 @@ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq, irq_hw_num
         chip = &gic_eoimode1_chip;
     }
 
-    switch (__get_intid_range(hw)) {
+    switch (get_intid_range_func(hw)) {
         case SGI_RANGE:
             irq_set_percpu_devid(irq);
             irq_domain_set_info(d, irq, hw, chip, d->host_data, handle_percpu_devid_fasteoi_ipi, NULL, NULL);

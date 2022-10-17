@@ -2269,7 +2269,7 @@ static void cpuset_attach(struct cgroup_taskset *tset)
         }
         /*
          * can_attach beforehand should guarantee that this doesn't
-         * fail.  TODO: have a better way to handle failure here
+         * fail. have a better way to handle failure here
          */
         WARN_ON_ONCE(update_cpus_allowed(cs, task, cpus_attach));
 

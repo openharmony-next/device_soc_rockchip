@@ -838,7 +838,6 @@ struct drm_connector_funcs {
      * This callback is optional, if not implemented the connector will be
      * considered as always being attached.
      *
-     * FIXME
      *
      * Note that this hook is only called by the probe helper. It's not in
      * the helper library vtable purely for historical reasons. The only DRM
@@ -863,7 +862,6 @@ struct drm_connector_funcs {
      * the sysfs interfaces or on the kernel cmdline. In that case the
      * @detect callback isn't called.
      *
-     * FIXME
      *
      * Note that this hook is only called by the probe helper. It's not in
      * the helper library vtable purely for historical reasons. The only DRM
@@ -1503,7 +1501,7 @@ struct drm_connector {
      */
     struct drm_connector_state *state;
 
-    /* DisplayID bits. FIXME: Extract into a substruct? */
+    /* DisplayID bits. Extract into a substruct? */
 
     /**
      * @tile_blob_ptr:

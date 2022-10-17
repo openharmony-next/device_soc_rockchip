@@ -31,7 +31,6 @@
 #ifndef H_GPU_ARM_BIFROST_MALI_KBASE_GATOR_H
 #define H_GPU_ARM_BIFROST_MALI_KBASE_GATOR_H
 
-// #include <linux/types.h>
 
 #define GATOR_JOB_SLOT_START 1
 #define GATOR_JOB_SLOT_STOP 2

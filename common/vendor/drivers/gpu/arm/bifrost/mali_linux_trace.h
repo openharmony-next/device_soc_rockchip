@@ -120,7 +120,7 @@ TRACE_EVENT(mali_total_alloc_pages_change, TP_PROTO(u32 gpu_id, s64 event_id), T
 
 #define KBASE_MMU_FAULT_STATUS_ACCESS(status) ((status)&AS_FAULTSTATUS_ACCESS_TYPE_MASK)
 #define KBASE_MMU_FAULT_ACCESS_SYMBOLIC_STRINGS                                                                        \
-    _ENSURE_PARENTHESIS({AS_FAULTSTATUS_ACCESS_TYPE_ATOMIC, "ATOMIC"}, {AS_FAULTSTATUS_ACCESS_TYPE_EX, "EXECUTE"},     \
+    _ENSURE_PARENTHESIS( {AS_FAULTSTATUS_ACCESS_TYPE_ATOMIC, "ATOMIC"}, {AS_FAULTSTATUS_ACCESS_TYPE_EX, "EXECUTE"},    \
                         {AS_FAULTSTATUS_ACCESS_TYPE_READ, "READ"}, {AS_FAULTSTATUS_ACCESS_TYPE_WRITE, "WRITE"})
 #define KBASE_MMU_FAULT_STATUS_ACCESS_PRINT(status)                                                                    \
     __print_symbolic(KBASE_MMU_FAULT_STATUS_ACCESS(status), KBASE_MMU_FAULT_ACCESS_SYMBOLIC_STRINGS)
@@ -131,7 +131,7 @@ TRACE_EVENT(mali_total_alloc_pages_change, TP_PROTO(u32 gpu_id, s64 event_id), T
      (!((code) >= 0xCC && (code) <= 0xD8)) && (!((code) >= 0xDC && (code) <= 0xDF)) &&                                 \
      (!((code) >= 0xE1 && (code) <= 0xE3)))
 #define KBASE_MMU_FAULT_CODE_SYMBOLIC_STRINGS                                                                          \
-    _ENSURE_PARENTHESIS({0xC0, "TRANSLATION_FAULT_"}, {0xC4, "TRANSLATION_FAULT_"}, {0xC8, "PERMISSION_FAULT_"},       \
+    _ENSURE_PARENTHESIS( {0xC0, "TRANSLATION_FAULT_"}, {0xC4, "TRANSLATION_FAULT_"}, {0xC8, "PERMISSION_FAULT_"},      \
                         {0xD0, "TRANSTAB_BUS_FAULT_"}, {0xD8, "ACCESS_FLAG_"}, {0xE0, "ADDRESS_SIZE_FAULT_IN"},        \
                         {0xE4, "ADDRESS_SIZE_FAULT_OUT"}, {0xE8, "MEMORY_ATTRIBUTES_FAULT_"})
 #else /* MALI_USE_CSF */
@@ -140,7 +140,7 @@ TRACE_EVENT(mali_total_alloc_pages_change, TP_PROTO(u32 gpu_id, s64 event_id), T
      (!((code) >= 0xCC && (code) <= 0xCF)) && (!((code) >= 0xD4 && (code) <= 0xD7)) &&                                 \
      (!((code) >= 0xDC && (code) <= 0xDF)))
 #define KBASE_MMU_FAULT_CODE_SYMBOLIC_STRINGS                                                                          \
-    _ENSURE_PARENTHESIS({0xC0, "TRANSLATION_FAULT_"}, {0xC4, "TRANSLATION_FAULT(_7==_IDENTITY)_"},                     \
+    _ENSURE_PARENTHESIS( {0xC0, "TRANSLATION_FAULT_"}, {0xC4, "TRANSLATION_FAULT(_7==_IDENTITY)_"},                    \
                         {0xC8, "PERMISSION_FAULT_"}, {0xD0, "TRANSTAB_BUS_FAULT_"}, {0xD8, "ACCESS_FLAG_"},            \
                         {0xE0, "ADDRESS_SIZE_FAULT_IN"}, {0xE4, "ADDRESS_SIZE_FAULT_OUT"},                             \
                         {0xE8, "MEMORY_ATTRIBUTES_FAULT_"}, {0xEC, "MEMORY_ATTRIBUTES_NONCACHEABLE_"})

@@ -38,7 +38,7 @@ namespace OHOS {
                 explicit DrmPropertyEnum(drm_mode_property_enum *e) : value(e->value), name(e->name)
                 {
                 }
-                ~DrmPropertyEnum(){};
+                ~DrmPropertyEnum() {};
 
                 uint64_t value;
                 std::string name;

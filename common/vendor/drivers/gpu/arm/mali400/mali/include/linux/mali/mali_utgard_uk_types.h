@@ -546,7 +546,7 @@ extern const char *mali_uk_user_setting_descriptions[];
         "buffer_capture_window",      "buffer_capture_other",                                                          \
         "buffer_capture_n_frames",    "buffer_capture_resize_factor",                                                  \
         "sw_counters_enable",                                                                                          \
-    };
+    }
 
 /** @brief struct to hold the value to a particular setting as seen in the kernel space
  */

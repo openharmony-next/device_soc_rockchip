@@ -36,11 +36,11 @@ namespace OHOS {
 
             class DrmMode {
             public:
-                DrmMode(){};
+                DrmMode() {};
                 DrmMode(drmModeModeInfo &modeInfo, uint32_t id) : mModeInfo(modeInfo), mId(id)
                 {
                 }
-                virtual ~DrmMode(){};
+                virtual ~DrmMode() {};
                 drmModeModeInfoPtr GetModeInfoPtr()
                 {
                     return &mModeInfo;
@@ -69,7 +69,7 @@ namespace OHOS {
             class DrmConnector {
             public:
                 DrmConnector(drmModeConnector c, FdPtr &fd);
-                virtual ~DrmConnector(){};
+                virtual ~DrmConnector() {};
                 uint32_t GetId() const
                 {
                     return mId;

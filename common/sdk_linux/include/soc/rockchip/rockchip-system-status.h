@@ -25,9 +25,9 @@ static inline int rockchip_unregister_system_status_notifier(struct notifier_blo
     return -ENOTSUPP;
 };
 
-static inline void rockchip_set_system_status(unsigned long status){};
+static inline void rockchip_set_system_status(unsigned long status) {};
 
-static inline void rockchip_clear_system_status(unsigned long status){};
+static inline void rockchip_clear_system_status(unsigned long status) {};
 
 static inline unsigned long rockchip_get_system_status(void)
 {
@@ -39,7 +39,7 @@ static inline int rockchip_add_system_status_interface(struct device *dev)
     return -ENOTSUPP;
 };
 
-static inline void rockchip_update_system_status(const char *buf){};
+static inline void rockchip_update_system_status(const char *buf) {};
 #endif /* CONFIG_ROCKCHIP_SYSTEM_MONITOR */
 
 #endif

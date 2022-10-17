@@ -127,7 +127,7 @@ struct its_node {
 
 /* The maximum number of VPEID bits supported by VLPI commands */
 #define ITS_MAX_VPEID_BITS                                                                                             \
-    ({                                                                                                                 \
+    ( {                                                                                                                \
         int nvpeid = 16;                                                                                               \
         if (gic_rdists->has_rvpeid && gic_rdists->gicd_typer2 & GICD_TYPER2_VIL)                                       \
             nvpeid = 1 + (gic_rdists->gicd_typer2 & GICD_TYPER2_VID);                                                  \
@@ -1049,8 +1049,7 @@ static int its_wait_for_range_completion(struct its_node *its, u64 prev_idx, str
 
 /* Warning, macro hell follows */
 #define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)                                                      \
-    void name(struct its_node *its, buildtype builder, struct its_cmd_desc *desc)                                      \
-    {                                                                                                                  \
+    void name(struct its_node *its, buildtype builder, struct its_cmd_desc *desc) {                                    \
         struct its_cmd_block *cmd, *sync_cmd, *next_cmd;                                                               \
         synctype *sync_obj;                                                                                            \
         unsigned long flags;                                                                                           \
@@ -1094,7 +1093,7 @@ static void its_build_sync_cmd(struct its_node *its, struct its_cmd_block *sync_
 
 static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t, struct its_collection, its_build_sync_cmd)
 
-    static void its_build_vsync_cmd(struct its_node *its, struct its_cmd_block *sync_cmd, struct its_vpe *sync_vpe)
+static void its_build_vsync_cmd(struct its_node *its, struct its_cmd_block *sync_cmd, struct its_vpe *sync_vpe)
 {
     its_encode_cmd(sync_cmd, GITS_CMD_VSYNC);
     its_encode_vpeid(sync_cmd, sync_vpe->vpe_id);
@@ -1104,7 +1103,7 @@ static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t, struct 
 
 static BUILD_SINGLE_CMD_FUNC(its_send_single_vcommand, its_cmd_vbuilder_t, struct its_vpe, its_build_vsync_cmd)
 
-    static void its_send_int(struct its_device *dev, u32 event_id)
+static void its_send_int(struct its_device *dev, u32 event_id)
 {
     struct its_cmd_desc desc;
 

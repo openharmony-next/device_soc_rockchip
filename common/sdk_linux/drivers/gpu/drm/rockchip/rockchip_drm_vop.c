@@ -311,7 +311,7 @@ static const struct drm_bus_format_enum_list drm_bus_format_enum_list_ex[] = {
 
 static DRM_ENUM_NAME_FN(drm_get_bus_format_name, drm_bus_format_enum_list_ex)
 
-    static inline struct vop *to_vop(struct drm_crtc *crtc)
+static inline struct vop *to_vop(struct drm_crtc *crtc)
 {
     struct rockchip_crtc *rockchip_crtc;
 
@@ -597,8 +597,6 @@ static enum vop_data_format vop_convert_format(uint32_t format)
 static bool is_uv_swap(uint32_t bus_format, uint32_t output_mode)
 {
     /*
-     * FIXME:
-     *
      * There is no media type for YUV444 output,
      * so when out_mode is AAAA or P888, assume output is YUV444 on
      * yuv format.
@@ -1397,7 +1395,7 @@ static void vop_crtc_load_lut(struct drm_crtc *crtc)
 
     if (VOP_CTRL_SUPPORT(vop, update_gamma_lut)) {
         readx_poll_timeout(CTRL_GET, lut_buffer_index, dle, dle != lut_idx, 0x5, 0x8235);
-        /* FIXME:
+        /*
          * update_gamma value auto clean to 0 by HW, should not
          * bakeup it.
          */
@@ -2304,7 +2302,7 @@ static void vop_crtc_cancel_pending_vblank(struct drm_crtc *crtc, struct drm_fil
     if (e && e->base.file_priv == file_priv) {
         vop->event = NULL;
 
-        /* e->base.destroy(&e->base);//todo */
+        /* e->base.destroy(&e->base); */
         file_priv->event_space += sizeof(e->event);
     }
     spin_unlock_irqrestore(&drm->event_lock, flags);
@@ -4105,22 +4103,22 @@ static irqreturn_t vop_isr(int irq, void *data)
         ret = IRQ_HANDLED;
     }
 
-#define ERROR_HANDLER(x)                                                                                               \
+#define ERROR_HANDLER(x, val)                                                                                          \
     do {                                                                                                               \
         if (active_irqs & x##_INTR) {                                                                                  \
-            DRM_DEV_ERROR_RATELIMITED((vop)->dev, #x " irq err\n");                                                    \
+            DRM_DEV_ERROR_RATELIMITED(val, #x " irq err\n");                                                           \
             active_irqs &= ~x##_INTR;                                                                                  \
             ret = IRQ_HANDLED;                                                                                         \
         }                                                                                                              \
     } while (0)
 
-    ERROR_HANDLER(BUS_ERROR);
-    ERROR_HANDLER(WIN0_EMPTY);
-    ERROR_HANDLER(WIN1_EMPTY);
-    ERROR_HANDLER(WIN2_EMPTY);
-    ERROR_HANDLER(WIN3_EMPTY);
-    ERROR_HANDLER(HWC_EMPTY);
-    ERROR_HANDLER(POST_BUF_EMPTY);
+    ERROR_HANDLER(BUS_ERROR, vop->dev);
+    ERROR_HANDLER(WIN0_EMPTY, vop->dev);
+    ERROR_HANDLER(WIN1_EMPTY, vop->dev);
+    ERROR_HANDLER(WIN2_EMPTY, vop->dev);
+    ERROR_HANDLER(WIN3_EMPTY, vop->dev);
+    ERROR_HANDLER(HWC_EMPTY, vop->dev);
+    ERROR_HANDLER(POST_BUF_EMPTY, vop->dev);
 
     /* Unhandled irqs are spurious. */
     if (active_irqs) {

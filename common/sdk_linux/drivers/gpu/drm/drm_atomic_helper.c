@@ -1648,7 +1648,7 @@ int drm_atomic_helper_async_check(struct drm_device *dev, struct drm_atomic_stat
 
     for_each_oldnew_plane_in_state(state, plane, old_plane_state, new_plane_state, i) n_planes++;
 
-    /* FIXME: we support only single plane updates for now */
+    /* we support only single plane updates for now */
     if (n_planes != 1) {
         return -EINVAL;
     }
@@ -1747,7 +1747,7 @@ EXPORT_SYMBOL(drm_atomic_helper_check);
  * the states like normal sync commits, but just do in-place changes on the
  * current state.
  *
- * TODO: Implement full swap instead of doing in-place changes.
+ * Implement full swap instead of doing in-place changes.
  */
 void drm_atomic_helper_async_commit(struct drm_device *dev, struct drm_atomic_state *state)
 {

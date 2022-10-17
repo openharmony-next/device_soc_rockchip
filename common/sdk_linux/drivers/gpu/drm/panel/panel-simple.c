@@ -46,7 +46,7 @@ struct panel_cmd_header {
     u8 data_type;
     u8 delay;
     u8 payload_length;
-} __packed;
+};
 
 struct panel_cmd_desc {
     struct panel_cmd_header header;

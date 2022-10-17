@@ -418,7 +418,7 @@ static mali_scheduler_mask mali_timeline_update_oldest_point(struct mali_timelin
 
     MALI_DEBUG_ASSERT_POINTER(timeline);
 
-    MALI_DEBUG_CODE({
+    MALI_DEBUG_CODE( {
         struct mali_timeline_system *system = timeline->system;
         MALI_DEBUG_ASSERT_POINTER(system);
 
@@ -476,7 +476,7 @@ static mali_scheduler_mask mali_timeline_release_with_depended_point(struct mali
     MALI_DEBUG_ASSERT_POINTER(timeline);
     MALI_DEBUG_ASSERT(MALI_TIMELINE_SOFT == timeline->id);
 
-    MALI_DEBUG_CODE({
+    MALI_DEBUG_CODE( {
         struct mali_timeline_system *system = timeline->system;
         MALI_DEBUG_ASSERT_POINTER(system);
 
@@ -992,7 +992,7 @@ void mali_timeline_system_abort(struct mali_timeline_system *system)
 #endif
 
     /* Should not be any waiters or trackers left at this point. */
-    MALI_DEBUG_CODE({
+    MALI_DEBUG_CODE( {
         u32 i;
         mali_spinlock_reentrant_wait(system->spinlock, tid);
         for (i = 0; i < MALI_TIMELINE_MAX; ++i) {
@@ -1232,7 +1232,7 @@ static void mali_timeline_system_create_waiters_and_unlock(struct mali_timeline_
         MALI_DEBUG_ASSERT(mali_timeline_is_point_on(timeline, point));
 
         /* Get a new zeroed waiter object. */
-        if (likely( waiter_tail != NULL)) {
+        if (likely(waiter_tail != NULL)) {
             waiter = waiter_tail;
             waiter_tail = waiter_tail->tracker_next;
         } else {

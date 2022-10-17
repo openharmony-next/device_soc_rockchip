@@ -108,7 +108,6 @@ void mali_mem_secure_mali_unmap(mali_mem_allocation *alloc)
 
 int mali_mem_secure_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *vma)
 {
-
     int ret = 0;
     struct scatterlist *sg;
     mali_mem_secure *secure_mem = &mem_bkend->secure_mem;

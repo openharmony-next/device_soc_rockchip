@@ -424,7 +424,7 @@ mali_osk_errcode_t mali_mem_os_resize_cpu_map_locked(mali_mem_backend *mem_bkend
         {
             if (count >= offset) {
                 ret = vmf_insert_pfn(vma, vstart, page_to_pfn(m_page->page));
-                if (unlikely(ret != 0)) { 
+                if (unlikely(ret != 0)) {
                     /* will return -EBUSY If the page has already been mapped into table, but it's OK */
                     if (-EBUSY == ret) {
                         break;
@@ -534,7 +534,7 @@ mali_osk_errcode_t mali_mem_os_get_table_page(mali_dma_addr *phys, mali_io_addre
 void mali_mem_os_release_table_page(mali_dma_addr phys, void *virt)
 {
     spin_lock(&mali_mem_page_table_page_pool.lock);
-    if (mali_mem_page_table_page_pool.count < MALI_MEM_OS_PAGE_TABLE_PAGE_POOL_SIZE) { 
+    if (mali_mem_page_table_page_pool.count < MALI_MEM_OS_PAGE_TABLE_PAGE_POOL_SIZE) {
         u32 i = mali_mem_page_table_page_pool.count;
         mali_mem_page_table_page_pool.page[i].phys = phys;
         mali_mem_page_table_page_pool.page[i].mapping = virt;

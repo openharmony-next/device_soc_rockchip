@@ -45,7 +45,7 @@ struct device;
 struct file;
 
 /*
- * FIXME: Not sure we want to have drm_minor here in the end, but to avoid
+ * Not sure we want to have drm_minor here in the end, but to avoid
  * header include loops we need it here for now.
  */
 

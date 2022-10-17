@@ -29,8 +29,8 @@
 #include <drm/drm_print.h>
 #include <drm/drm_probe_helper.h>
 
-#include "analogix_dp_core.h"
 #include "analogix_dp_reg.h"
+#include "analogix_dp_core.h"
 
 #define to_dp(nm) container_of(nm, struct analogix_dp_device, nm)
 

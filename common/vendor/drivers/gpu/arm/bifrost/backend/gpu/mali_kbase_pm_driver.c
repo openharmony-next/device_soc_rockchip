@@ -1780,11 +1780,10 @@ void kbase_pm_clock_on(struct kbase_device *kbdev, bool is_resume)
     kbdev->pm.backend.gpu_powered = true;
     spin_unlock_irqrestore(&kbdev->hwaccess_lock, flags);
 
-    if (reset_required) {
+    if (reset_required)
         /* GPU state was lost, reset GPU to ensure it is in a
          * consistent state */
         kbase_pm_init_hw(kbdev, PM_ENABLE_IRQS);
-    }
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
     else {
         struct kbase_arbiter_vm_state *arb_vm_state = kbdev->pm.arb_vm_state;

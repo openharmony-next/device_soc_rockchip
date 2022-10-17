@@ -767,12 +767,12 @@ void kbase_backend_slot_update(struct kbase_device *kbdev)
     lockdep_assert_held(&kbdev->hwaccess_lock);
 
 #ifdef CONFIG_MALI_ARBITER_SUPPORT
-    if (kbase_reset_gpu_is_active(kbdev) || kbase_is_gpu_removed(kbdev))
+    if (kbase_reset_gpu_is_active(kbdev) || kbase_is_gpu_removed(kbdev)) {
 #else
-    if (kbase_reset_gpu_is_active(kbdev))
+    if (kbase_reset_gpu_is_active(kbdev)) {
 #endif
         return;
-
+    }
     for (js = 0; js < kbdev->gpu_props.num_job_slots; js++) {
         struct kbase_jd_atom *katom[2];
         int idx;

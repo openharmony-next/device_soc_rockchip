@@ -2290,8 +2290,7 @@ static int i2c_default_probe(struct i2c_adapter *adap, unsigned short addr)
               (addr & ~I2C_ADDR_LOW_FOUR_BYTE_BIT_MASK) == I2C_ADDR_DEFAULT_VALUE_TWO) &&
             i2c_check_functionality(adap, I2C_FUNC_SMBUS_QUICK)) {
                 err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_WRITE, 0, I2C_SMBUS_QUICK, NULL);
-            }
-    else if (i2c_check_functionality(adap, I2C_FUNC_SMBUS_READ_BYTE)) {
+    } else if (i2c_check_functionality(adap, I2C_FUNC_SMBUS_READ_BYTE)) {
         err = i2c_smbus_xfer(adap, addr, 0, I2C_SMBUS_READ, 0, I2C_SMBUS_BYTE, &dummy);
     } else {
         dev_warn(&adap->dev, "No suitable probing method supported for address 0x%02X\n", addr);

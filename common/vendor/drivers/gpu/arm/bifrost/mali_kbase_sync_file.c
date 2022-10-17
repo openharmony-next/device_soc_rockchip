@@ -59,7 +59,7 @@ int kbase_sync_fence_stream_create(const char *name, int *const out_fd)
 }
 
 #if !MALI_USE_CSF
-int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int stream_fd)
+int kbase_sync_fence_out_create(struct kbase_jd_atom *katom, int tl_fd)
 {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0))
     struct fence *fence;

@@ -756,7 +756,7 @@ struct usb_gadget_driver {
     void (*resume)(struct usb_gadget *);
     void (*reset)(struct usb_gadget *);
 
-    /* FIXME support safe rmmod */
+    /* support safe rmmod */
     struct device_driver driver;
 
     char *udc_name;

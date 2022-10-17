@@ -24,7 +24,8 @@
 #include <linux/thermal.h>
 
 #define wr_mask_bit(v, off, mask) ((v) << (off) | (mask) << (16 + (off)))
-#define IO_MEM __iomem
+
+#define FILE_RIGHT 0444
 
 #define PVTM(_id, _name, _num_rings, _start, _en, _cal, _done, _freq)                                                  \
     {                                                                                                                  \
@@ -64,7 +65,7 @@ struct rockchip_pvtm {
     struct list_head node;
     struct device *dev;
     struct regmap *grf;
-    void IO_MEM *base;
+    void __iomem *base;
     int num_clks;
     struct clk_bulk_data *clks;
     struct reset_control *rst;
@@ -151,7 +152,7 @@ static int rockchip_pvtm_add_debugfs(struct rockchip_pvtm *pvtm)
         return -ENOMEM;
     }
 
-    d = debugfs_create_file("value", 0444, pvtm->dentry, (void *)pvtm, &pvtm_value_fops);
+    d = debugfs_create_file("value", FILE_RIGHT, pvtm->dentry, (void *)pvtm, &pvtm_value_fops);
     if (!d) {
         dev_err(pvtm->dev, "failed to pvtm %s value node\n", pvtm->info->name);
         debugfs_remove_recursive(pvtm->dentry);
@@ -842,7 +843,7 @@ static int rockchip_pvtm_get_index(const struct rockchip_pvtm_data *data, u32 ch
 
 static struct rockchip_pvtm *rockchip_pvtm_init(struct device *dev, struct device_node *node,
                                                 const struct rockchip_pvtm_data *data, struct regmap *grf,
-                                                void IO_MEM *base)
+                                                void __iomem *base)
 {
     struct rockchip_pvtm *pvtm;
     const char *tz_name;
@@ -924,7 +925,7 @@ static int rockchip_pvtm_probe(struct platform_device *pdev)
     const struct of_device_id *match;
     struct rockchip_pvtm *pvtm;
     struct regmap *grf = NULL;
-    void IO_MEM *base = NULL;
+    void __iomem *base = NULL;
 
     match = of_match_device(dev->driver->of_match_table, dev);
     if (!match || !match->data) {

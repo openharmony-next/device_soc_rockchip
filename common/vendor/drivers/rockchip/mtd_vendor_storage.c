@@ -316,41 +316,33 @@ static long vendor_storage_ioctl(struct file *file, unsigned int cmd, unsigned l
 
     v_req = (struct rk_vendor_req *)page_buf;
 
-    switch (cmd) {
-        case VENDOR_READ_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 8)) {
+    if (copy_from_user(page_buf, (void __user *)arg, 0x08)) {
+        ret = -EFAULT;
+        goto exit;
+    }
+
+    if (cmd == VENDOR_READ_IO) {
+        if (v_req->tag == VENDOR_REQ_TAG) {
+            size = mtd_vendor_read(v_req->id, v_req->data, v_req->len);
+            if (size != -1) {
+                v_req->len = size;
+                ret = 0;
+            }
+            if (copy_to_user((void __user *)arg, page_buf, v_req->len + 0x08)) {
                 ret = -EFAULT;
-                break;
             }
-            if (v_req->tag == VENDOR_REQ_TAG) {
-                size = mtd_vendor_read(v_req->id, v_req->data, v_req->len);
-                if (size != -1) {
-                    v_req->len = size;
-                    ret = 0;
-                    if (copy_to_user((void __user *)arg, page_buf, v_req->len + 8)) {
-                        ret = -EFAULT;
-                    }
-                }
-            }
-            break;
         }
-        case VENDOR_WRITE_IO: {
-            if (copy_from_user(page_buf, (void __user *)arg, 8)) {
+    } else if (cmd == VENDOR_WRITE_IO) {
+        if (v_req->tag == VENDOR_REQ_TAG && (v_req->len < 0x1000 - 0x08)) {
+            if (copy_from_user(page_buf, (void __user *)arg, v_req->len + 0x08)) {
                 ret = -EFAULT;
-                break;
+                goto exit;
             }
-            if (v_req->tag == VENDOR_REQ_TAG && (v_req->len < 4096 - 8)) {
-                if (copy_from_user(page_buf, (void __user *)arg, v_req->len + 8)) {
-                    ret = -EFAULT;
-                    break;
-                }
-                ret = mtd_vendor_write(v_req->id, v_req->data, v_req->len);
-            }
-            break;
+            ret = mtd_vendor_write(v_req->id, v_req->data, v_req->len);
         }
-        default:
-            ret = -EINVAL;
-            goto exit;
+    } else {
+        ret = -EINVAL;
+        goto exit;
     }
 exit:
     mutex_unlock(&vendor_ops_mutex);

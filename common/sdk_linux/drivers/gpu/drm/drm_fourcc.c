@@ -142,7 +142,8 @@ EXPORT_SYMBOL(drm_driver_legacy_fb_format);
  */
 const char *drm_get_format_name(uint32_t format, struct drm_format_name_buf *buf)
 {
-    snprintf(buf->str, sizeof(buf->str), "%c%c%c%c %s-endian (0x%08x)", printable_char(format & 0xff),
+    int ret = 0;
+    ret = snprintf(buf->str, sizeof(buf->str), "%c%c%c%c %s-endian (0x%08x)", printable_char(format & 0xff),
              printable_char((format >> 0x8) & 0xff), printable_char((format >> 0x10) & 0xff),
              printable_char((format >> 0x18) & 0x7f), format & DRM_FORMAT_BIG_ENDIAN ? "big" : "little", format);
 

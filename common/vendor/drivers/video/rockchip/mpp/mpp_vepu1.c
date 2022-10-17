@@ -530,10 +530,10 @@ static int vepu_procfs_init(struct mpp_dev *mpp)
         enc->procfs = NULL;
         return -EIO;
     }
-    mpp_procfs_create_u32("aclk", 0644, enc->procfs, &enc->aclk_info.debug_rate_hz);
-    mpp_procfs_create_u32("session_buffers", 0644, enc->procfs, &mpp->session_max_buffers);
+    mpp_procfs_create_u32("aclk", FILE_RIGHT_644, enc->procfs, &enc->aclk_info.debug_rate_hz);
+    mpp_procfs_create_u32("session_buffers", FILE_RIGHT_644, enc->procfs, &mpp->session_max_buffers);
     /* for show session info */
-    proc_create_single_data("sessions-info", 0444, enc->procfs, vepu_show_session_info, mpp);
+    proc_create_single_data("sessions-info", FILE_RIGHT_444, enc->procfs, vepu_show_session_info, mpp);
 
     return 0;
 }

@@ -484,7 +484,7 @@ static inline struct task_struct *task_of(struct sched_entity *se)
     return container_of(se, struct task_struct, se);
 }
 
-#define for_each_sched_entity(se) for (; se; se = NULL)
+#define for_each_sched_entity(se) (for (; se; se = NULL))
 
 static inline struct cfs_rq *task_cfs_rq(struct task_struct *p)
 {
@@ -525,7 +525,7 @@ static inline void assert_list_leaf_cfs_rq(struct rq *rq)
 {
 }
 
-#define for_each_leaf_cfs_rq_safe(rq, cfs_rq, pos) for ((cfs_rq) = &(rq)->cfs, (pos) = NULL; (cfs_rq); (cfs_rq) = (pos))
+#define for_each_leaf_cfs_rq_safe(rq, cfs, pos) (for ((cfs) = &(rq)->cfs, (pos) = NULL; (cfs); (cfs) = (pos)))
 
 static inline struct sched_entity *parent_entity(struct sched_entity *se)
 {
@@ -675,7 +675,7 @@ struct sched_entity *__pick_last_entity(struct cfs_rq *cfs_rq)
 }
 
 /**************************************************************
- * Scheduling class statistics methods:
+ * Scheduling class statistics methods
  */
 
 int sched_proc_update_handler(struct ctl_table *table, int write, void *buffer, size_t *lenp, loff_t *ppos)
@@ -824,7 +824,7 @@ static void attach_entity_cfs_rq(struct sched_entity *se);
  * where n denotes the nth task and cpu_scale the CPU capacity.
  *
  * For example, for a CPU with 1024 of capacity, a simplest series from
- * the beginning would be like:
+ * the beginning would be like
  *
  *  task  util_avg: 512, 256, 128,  64,  32,   16,    8, ...
  * cfs_rq util_avg: 512, 768, 896, 960, 992, 1008, 1016, ...
@@ -3258,7 +3258,7 @@ void reweight_task(struct task_struct *p, int prio)
  *
  *   grq->load.weight -> grq->avg.load_avg                         (2)
  *
- * which yields the following:
+ * which yields the following
  *
  *                     tg->weight * grq->avg.load_avg
  *   ge->load.weight = ------------------------------              (3)
@@ -3283,7 +3283,7 @@ void reweight_task(struct task_struct *p, int prio)
  * That is, the sum collapses because all other CPUs are idle; the UP scenario.
  *
  * So what we do is modify our approximation (3) to approach (4) in the (near)
- * UP case, like:
+ * UP case, like
  *
  *   ge->load.weight =
  *
@@ -3299,7 +3299,7 @@ void reweight_task(struct task_struct *p, int prio)
  *   ge->load.weight = -----------------------------           (6)
  *                             tg_load_avg'
  *
- * Where:
+ * Where
  *
  *   tg_load_avg' = tg->load_avg - grq->avg.load_avg +
  *                  max(grq->load.weight, grq->avg.load_avg)
@@ -3492,7 +3492,7 @@ void set_task_rq_fair(struct sched_entity *se, struct cfs_rq *prev, struct cfs_r
 /*
  * When on migration a sched_entity joins/leaves the PELT hierarchy, we need to
  * propagate its contribution. The key to this propagation is the invariant
- * that for each group:
+ * that for each group
  *
  *   ge->avg == grq->avg                        (1)
  *
@@ -3512,11 +3512,11 @@ void set_task_rq_fair(struct sched_entity *se, struct cfs_rq *prev, struct cfs_r
  *
  *   grq->avg.load_avg = grq->load.weight * grq->avg.runnable_avg    (3)
  *
- * And per (1) we have:
+ * And per (1) we have
  *
  *   ge->avg.runnable_avg == grq->avg.runnable_avg
  *
- * Which gives:
+ * Which gives
  *
  *                      ge->load.weight * grq->avg.load_avg
  *   ge->avg.load_avg = -----------------------------------        (4)
@@ -3542,7 +3542,7 @@ void set_task_rq_fair(struct sched_entity *se, struct cfs_rq *prev, struct cfs_r
  *
  * So we'll have to approximate.. :/
  *
- * Given the constraint:
+ * Given the constraint
  *
  *   ge->avg.running_sum <= ge->avg.runnable_sum <= LOAD_AVG_MAX
  *
@@ -3705,7 +3705,7 @@ static inline int propagate_entity_load_avg(struct sched_entity *se)
 
 /*
  * Check if we need to update the load and the utilization of a blocked
- * group_entity:
+ * group_entity
  */
 static inline bool skip_blocked_update(struct sched_entity *se)
 {
@@ -4096,7 +4096,7 @@ static inline void util_est_dequeue(struct cfs_rq *cfs_rq, struct task_struct *p
 
 /*
  * Check if a (signed) value is within a specified (unsigned) margin,
- * based on the observation that:
+ * based on the observation that
  *
  *     abs(x) < y := (unsigned)(x + y - 1) < (2 * y - 1)
  *
@@ -5871,7 +5871,7 @@ static void set_next_buddy(struct sched_entity *se);
 /*
  * The dequeue_task method is called before nr_running is
  * decreased. We remove the task from the rbtree and
- * update the fair scheduling stats:
+ * update the fair scheduling stats
  */
 static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 {
@@ -7579,7 +7579,7 @@ static struct task_struct *fair_pick_next_task_fair(struct rq *rq)
 }
 
 /*
- * Account for a descheduled task:
+ * Account for a descheduled task
  */
 static void put_prev_task_fair(struct rq *rq, struct task_struct *prev)
 {
@@ -8740,7 +8740,7 @@ static inline int check_misfit_status(struct rq *rq, struct sched_domain *sd)
  *
  * Imagine a situation of two groups of 4 CPUs each and 4 tasks each with a
  * cpumask covering 1 CPU of the first group and 3 CPUs of the second group.
- * Something like:
+ * Something like
  *
  *    { 0 1 2 3 } { 4 5 6 7 }
  *            *     * * *
