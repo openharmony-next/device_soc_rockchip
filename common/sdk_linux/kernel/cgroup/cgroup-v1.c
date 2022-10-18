@@ -507,7 +507,7 @@ static int cgroup_pidlist_show(struct seq_file *s, void *v)
 }
 
 static ssize_t cgroup1_procs_write_func(struct kernfs_open_file *of, char *buf, size_t nbytes, loff_t off,
-                                     bool threadgroup)
+                                        bool threadgroup)
 {
     struct cgroup *cgrp;
     struct task_struct *task;

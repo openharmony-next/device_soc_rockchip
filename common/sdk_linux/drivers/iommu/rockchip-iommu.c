@@ -585,14 +585,15 @@ static int rk_iommu_disable_paging(struct rk_iommu *iommu)
     }
 
 read_wa:
-    while(1) {
+    while (1) {
         rk_iommu_command(iommu, RK_MMU_CMD_DISABLE_PAGING);
         if (iommu->skip_read) {
             return 0;
         }
 
         ret =
-            readx_poll_timeout(rk_iommu_is_paging_enabled, iommu, val, !val, RK_MMU_POLL_PERIOD_US, RK_MMU_POLL_TIMEOUT_US);
+            readx_poll_timeout(rk_iommu_is_paging_enabled, iommu, val, !val, RK_MMU_POLL_PERIOD_US,
+                RK_MMU_POLL_TIMEOUT_US);
         if (ret) {
             for (i = 0; i < iommu->num_mmu; i++) {
                 dev_err(iommu->dev, "Disable paging request timed out, retry_count = %d, status: %#08x\n", retry_count,

@@ -175,7 +175,7 @@ typedef struct mali_kbase_capability_def {
 /**
  * This must be kept in-sync with mali_kbase_cap
  *
- * TODO: The alternative approach would be to embed the cap enum values
+ * The alternative approach would be to embed the cap enum values
  * in the table. Less efficient but potentially safer.
  */
 static mali_kbase_capability_def kbase_caps_table[MALI_KBASE_NUM_CAPS] = {

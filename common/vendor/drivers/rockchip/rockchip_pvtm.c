@@ -23,7 +23,7 @@
 #include <linux/soc/rockchip/pvtm.h>
 #include <linux/thermal.h>
 
-#define wr_mask_bit(v, off, mask) ((v) << (off) | (mask) << (16 + (off)))
+#define wr_mask_bit(v, off, mask) (((v) << (off)) | ((mask) << (16 + (off))))
 
 #define FILE_RIGHT 0444
 

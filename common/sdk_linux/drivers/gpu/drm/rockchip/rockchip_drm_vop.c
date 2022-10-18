@@ -2301,8 +2301,6 @@ static void vop_crtc_cancel_pending_vblank(struct drm_crtc *crtc, struct drm_fil
     e = vop->event;
     if (e && e->base.file_priv == file_priv) {
         vop->event = NULL;
-
-        /* e->base.destroy(&e->base); */
         file_priv->event_space += sizeof(e->event);
     }
     spin_unlock_irqrestore(&drm->event_lock, flags);

@@ -494,10 +494,11 @@ static void fiq_debugger_irq_exec(struct fiq_debugger_state *state, char *cmd)
         fiq_debugger_do_kgdb(state);
     }
 #endif
-    if (!strncmp(cmd, "reboot", 0x6))
+    if (!strncmp(cmd, "reboot", 0x6)) {
         fiq_debugger_schedule_work(state, cmd);
+    }
 #ifdef CONFIG_ARCH_ROCKCHIP
-    else {
+    if (strncmp(cmd, "reboot", 0x6)) {
         invalid_cmd = 1;
         memset(state->debug_buf, 0, DEBUG_MAX);
     }

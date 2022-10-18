@@ -1040,7 +1040,7 @@ DEFINE_STATIC_KEY_FALSE(sched_uclamp_used);
 #define UCLAMP_BUCKET_DELTA                                                    \
     DIV_ROUND_CLOSEST(SCHED_CAPACITY_SCALE, UCLAMP_BUCKETS)
 
-#define for_each_clamp_id(clamp_id)                                            \
+#define cycle_each_clamp_id(clamp_id)                                            \
     for ((clamp_id) = 0; (clamp_id) < UCLAMP_CNT; (clamp_id)++)
 
 static inline unsigned int uclamp_bucket_id(unsigned int clamp_value)
@@ -1376,7 +1376,7 @@ static inline void uclamp_rq_inc(struct rq *rq, struct task_struct *p)
         return;
     }
 
-    for_each_clamp_id(clamp_id) uclamp_rq_inc_id(rq, p, clamp_id);
+    cycle_each_clamp_id(clamp_id) uclamp_rq_inc_id(rq, p, clamp_id);
 
     /* Reset clamp idle holding when there is one RUNNABLE task */
     if (rq->uclamp_flags & UCLAMP_FLAG_IDLE) {
@@ -1402,7 +1402,7 @@ static inline void uclamp_rq_dec(struct rq *rq, struct task_struct *p)
         return;
     }
 
-    for_each_clamp_id(clamp_id) uclamp_rq_dec_id(rq, p, clamp_id);
+    cycle_each_clamp_id(clamp_id) uclamp_rq_dec_id(rq, p, clamp_id);
 }
 
 static inline void uclamp_rq_reinc_id(struct rq *rq, struct task_struct *p,
@@ -1446,7 +1446,7 @@ static inline void uclamp_update_active(struct task_struct *p)
      * affecting a valid clamp bucket, the next time it's enqueued,
      * it will already see the updated clamp bucket value.
      */
-    for_each_clamp_id(clamp_id) uclamp_rq_reinc_id(rq, p, clamp_id);
+    cycle_each_clamp_id(clamp_id) uclamp_rq_reinc_id(rq, p, clamp_id);
 
     task_rq_unlock(rq, p, &rf);
 }
@@ -1590,7 +1590,7 @@ static void __setscheduler_uclamp(struct task_struct *p,
      * On scheduling class change, reset to default clamps for tasks
      * without a task-specific value.
      */
-    for_each_clamp_id(clamp_id) {
+    cycle_each_clamp_id(clamp_id) {
         struct uclamp_se *uc_se = &p->uclamp_req[clamp_id];
 
         /* Keep using defined clamps across class changes */
@@ -1630,13 +1630,13 @@ static void uclamp_fork(struct task_struct *p)
      * We don't need to hold task_rq_lock() when updating p->uclamp_* here
      * as the task is still at its early fork stages.
      */
-    for_each_clamp_id(clamp_id) p->uclamp[clamp_id].active = false;
+    cycle_each_clamp_id(clamp_id) p->uclamp[clamp_id].active = false;
 
     if (likely(!p->sched_reset_on_fork)) {
         return;
     }
 
-    for_each_clamp_id(clamp_id) {
+    cycle_each_clamp_id(clamp_id) {
         uclamp_se_set(&p->uclamp_req[clamp_id], uclamp_none(clamp_id), false);
     }
 }
@@ -1651,8 +1651,8 @@ static void __init init_uclamp_rq(struct rq *rq)
     enum uclamp_id clamp_id;
     struct uclamp_rq *uc_rq = rq->uclamp;
 
-    for_each_clamp_id(clamp_id) {
-        uc_rq[clamp_id] = (struct uclamp_rq){.value = uclamp_none(clamp_id)};
+    cycle_each_clamp_id(clamp_id) {
+        uc_rq[clamp_id] = (struct uclamp_rq) {.value = uclamp_none(clamp_id)};
     }
 
     rq->uclamp_flags = 0;
@@ -1666,7 +1666,7 @@ static void __init init_uclamp(void)
 
     for_each_possible_cpu(cpu) init_uclamp_rq(cpu_rq(cpu));
 
-    for_each_clamp_id(clamp_id)
+    cycle_each_clamp_id(clamp_id)
     {
         uclamp_se_set(&init_task.uclamp_req[clamp_id], uclamp_none(clamp_id),
                       false);
@@ -1674,7 +1674,7 @@ static void __init init_uclamp(void)
 
     /* System defaults allow max clamp values for both indexes */
     uclamp_se_set(&uc_max, uclamp_none(UCLAMP_MAX), false);
-    for_each_clamp_id(clamp_id)
+    cycle_each_clamp_id(clamp_id)
     {
         uclamp_default[clamp_id] = uc_max;
 #ifdef CONFIG_UCLAMP_TASK_GROUP
@@ -8436,7 +8436,7 @@ static inline void alloc_uclamp_sched_group(struct task_group *tg,
 #ifdef CONFIG_UCLAMP_TASK_GROUP
     enum uclamp_id clamp_id;
 
-    for_each_clamp_id(clamp_id) {
+    cycle_each_clamp_id(clamp_id) {
         uclamp_se_set(&tg->uclamp_req[clamp_id], uclamp_none(clamp_id), false);
         tg->uclamp[clamp_id] = parent->uclamp[clamp_id];
     }
@@ -8756,7 +8756,7 @@ static void cpu_util_update_eff(struct cgroup_subsys_state *css)
     {
         uc_parent = css_tg(css)->parent ? css_tg(css)->parent->uclamp : NULL;
 
-        for_each_clamp_id(clamp_id) {
+        cycle_each_clamp_id(clamp_id) {
             /* Assume effective clamps matches requested clamps */
             eff[clamp_id] = css_tg(css)->uclamp_req[clamp_id].value;
             /* Cap effective clamps with parent's effective clamps */
@@ -8770,7 +8770,7 @@ static void cpu_util_update_eff(struct cgroup_subsys_state *css)
         /* Propagate most restrictive effective clamps */
         clamps = 0x0;
         uc_se = css_tg(css)->uclamp;
-        for_each_clamp_id(clamp_id) {
+        cycle_each_clamp_id(clamp_id) {
             if (eff[clamp_id] == uc_se[clamp_id].value) {
                 continue;
             }

@@ -1248,7 +1248,7 @@ static void mmc_blk_eval_resp_error(struct mmc_blk_request *brq)
         /* If there is no error yet, check R1 response */
 
         val = brq->stop.resp[0] & CMD_ERRORS;
-        oor_with_open_end = val & R1_OUT_OF_RANGE && !brq->mrq.sbc;
+        (oor_with_open_end = val & R1_OUT_OF_RANGE) && !brq->mrq.sbc;
 
         if (val && !oor_with_open_end) {
             brq->stop.error = -EIO;
@@ -1682,7 +1682,7 @@ static void mmc_blk_read_single(struct mmc_queue *mq, struct request *req)
         }
 
         if (mrq->cmd->error || mrq->data->error ||
-            (!mmc_host_is_spi(host) && (mrq->cmd->resp[0] & CMD_ERRORS || status & CMD_ERRORS))) {
+            (!mmc_host_is_spi(host) && ((mrq->cmd->resp[0] & CMD_ERRORS) || (status & CMD_ERRORS)))) {
             error = BLK_STS_IOERR;
         } else {
             error = BLK_STS_OK;
@@ -1726,7 +1726,7 @@ static bool mmc_blk_status_error(struct request *req, u32 status)
 
     stop_err_bits = mmc_blk_stop_err_bits(brq);
 
-    return brq->cmd.resp[0] & CMD_ERRORS || brq->stop.resp[0] & stop_err_bits || status & stop_err_bits ||
+    return (brq->cmd.resp[0] & CMD_ERRORS) || (brq->stop.resp[0] & stop_err_bits) || (status & stop_err_bits) ||
            (rq_data_dir(req) == WRITE && !mmc_ready_for_data(status));
 }
 
@@ -1849,7 +1849,7 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
 {
     mmc_blk_eval_resp_error(brq);
 
-    return brq->sbc.error || brq->cmd.error || brq->stop.error || brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
+    return brq->sbc.error || brq->cmd.error || brq->stop.error || brq->data.error || (brq->cmd.resp[0] & CMD_ERRORS);
 }
 
 static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
@@ -1874,7 +1874,7 @@ static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
     }
 
     /* Copy the exception bit so it will be seen later on */
-    if (mmc_card_mmc(card) && status & R1_EXCEPTION_EVENT) {
+    if (mmc_card_mmc(card) && (status & R1_EXCEPTION_EVENT)) {
         mqrq->brq.cmd.resp[0] |= R1_EXCEPTION_EVENT;
     }
 
@@ -1914,7 +1914,7 @@ static void mmc_blk_mq_complete_rq(struct mmc_queue *mq, struct request *req)
 static bool mmc_blk_urgent_bkops_needed(struct mmc_queue *mq, struct mmc_queue_req *mqrq)
 {
     return mmc_card_mmc(mq->card) && !mmc_host_is_spi(mq->card->host) &&
-           (mqrq->brq.cmd.resp[0] & R1_EXCEPTION_EVENT || mqrq->brq.stop.resp[0] & R1_EXCEPTION_EVENT);
+           ((mqrq->brq.cmd.resp[0] & R1_EXCEPTION_EVENT) || (mqrq->brq.stop.resp[0] & R1_EXCEPTION_EVENT));
 }
 
 static void mmc_blk_urgent_bkops(struct mmc_queue *mq, struct mmc_queue_req *mqrq)
@@ -2388,13 +2388,13 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card, struct devi
     set_capacity(md->disk, size);
 
     if (mmc_host_cmd23(card->host)) {
-        if ((mmc_card_mmc(card) && card->csd.mmca_vsn >= CSD_SPEC_VER_3) ||
-            (mmc_card_sd(card) && card->scr.cmds & SD_SCR_CMD23_SUPPORT)) {
+        if ((mmc_card_mmc(card) && (card->csd.mmca_vsn >= CSD_SPEC_VER_3)) ||
+            (mmc_card_sd(card) && (card->scr.cmds & SD_SCR_CMD23_SUPPORT))) {
             md->flags |= MMC_BLK_CMD23;
         }
     }
 
-    if (mmc_card_mmc(card) && md->flags & MMC_BLK_CMD23 &&
+    if (mmc_card_mmc(card) && (md->flags & MMC_BLK_CMD23) &&
         ((card->ext_csd.rel_param & EXT_CSD_WR_REL_PARAM_EN) || card->ext_csd.rel_sectors)) {
         md->flags |= MMC_BLK_REL_WR;
         blk_queue_write_cache(md->queue.queue, true, true);

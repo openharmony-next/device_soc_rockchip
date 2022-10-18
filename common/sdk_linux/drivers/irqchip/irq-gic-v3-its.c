@@ -1047,42 +1047,6 @@ static int its_wait_for_range_completion(struct its_node *its, u64 prev_idx, str
     return 0;
 }
 
-/* Warning, macro hell follows */
-#define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)                                                      \
-    void name(struct its_node *its, buildtype builder, struct its_cmd_desc *desc) {                                    \
-        struct its_cmd_block *cmd, *sync_cmd, *next_cmd;                                                               \
-        synctype *sync_obj;                                                                                            \
-        unsigned long flags;                                                                                           \
-        u64 rd_idx;                                                                                                    \
-                                                                                                                       \
-        raw_spin_lock_irqsave(&its->lock, flags);                                                                      \
-                                                                                                                       \
-        cmd = its_allocate_entry(its);                                                                                 \
-        if (!cmd) { /* We're soooooo screewed... */                                                                    \
-            raw_spin_unlock_irqrestore(&its->lock, flags);                                                             \
-            return;                                                                                                    \
-        }                                                                                                              \
-        sync_obj = builder(its, cmd, desc);                                                                            \
-        its_flush_cmd(its, cmd);                                                                                       \
-                                                                                                                       \
-        if (sync_obj) {                                                                                                \
-            sync_cmd = its_allocate_entry(its);                                                                        \
-            if (!sync_cmd)                                                                                             \
-                goto post;                                                                                             \
-                                                                                                                       \
-            buildfn(its, sync_cmd, sync_obj);                                                                          \
-            its_flush_cmd(its, sync_cmd);                                                                              \
-        }                                                                                                              \
-                                                                                                                       \
-    post:                                                                                                              \
-        rd_idx = readl_relaxed(its->base + GITS_CREADR);                                                               \
-        next_cmd = its_post_commands(its);                                                                             \
-        raw_spin_unlock_irqrestore(&its->lock, flags);                                                                 \
-                                                                                                                       \
-        if (its_wait_for_range_completion(its, rd_idx, next_cmd))                                                      \
-            pr_err_ratelimited("ITS cmd %ps failed\n", builder);                                                       \
-    }
-
 static void its_build_sync_cmd(struct its_node *its, struct its_cmd_block *sync_cmd, struct its_collection *sync_col)
 {
     its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
@@ -1091,7 +1055,40 @@ static void its_build_sync_cmd(struct its_node *its, struct its_cmd_block *sync_
     its_fixup_cmd(sync_cmd);
 }
 
-static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t, struct its_collection, its_build_sync_cmd)
+void its_send_single_command(struct its_node *its, its_cmd_builder_t builder, struct its_cmd_desc *desc)
+{
+    struct its_cmd_block *cmd, *sync_cmd, *next_cmd;
+    struct its_collection *sync_obj;
+    unsigned long flags;
+    u64 rd_idx;
+
+    raw_spin_lock_irqsave(&its->lock, flags);
+
+    cmd = its_allocate_entry(its);
+    if (!cmd) { /* We're soooooo screewed... */
+        raw_spin_unlock_irqrestore(&its->lock, flags);
+        return;
+    }
+    sync_obj = builder(its, cmd, desc);
+    its_flush_cmd(its, cmd);
+
+    if (sync_obj) {
+        sync_cmd = its_allocate_entry(its);
+        if (!sync_cmd)
+            goto post;
+
+        its_build_sync_cmd(its, sync_cmd, sync_obj);
+        its_flush_cmd(its, sync_cmd);
+    }
+
+post:
+    rd_idx = readl_relaxed(its->base + GITS_CREADR);
+    next_cmd = its_post_commands(its);
+    raw_spin_unlock_irqrestore(&its->lock, flags);
+
+    if (its_wait_for_range_completion(its, rd_idx, next_cmd))
+        pr_err_ratelimited("ITS cmd %ps failed\n", builder);
+}
 
 static void its_build_vsync_cmd(struct its_node *its, struct its_cmd_block *sync_cmd, struct its_vpe *sync_vpe)
 {
@@ -1101,7 +1098,40 @@ static void its_build_vsync_cmd(struct its_node *its, struct its_cmd_block *sync
     its_fixup_cmd(sync_cmd);
 }
 
-static BUILD_SINGLE_CMD_FUNC(its_send_single_vcommand, its_cmd_vbuilder_t, struct its_vpe, its_build_vsync_cmd)
+void its_send_single_vcommand(struct its_node *its,  its_cmd_vbuilder_t builder, struct its_cmd_desc *desc)
+{
+    struct its_cmd_block *cmd, *sync_cmd, *next_cmd;
+    struct its_vpe *sync_obj;
+    unsigned long flags;
+    u64 rd_idx;
+
+    raw_spin_lock_irqsave(&its->lock, flags);
+
+    cmd = its_allocate_entry(its);
+    if (!cmd) { /* We're soooooo screewed... */
+        raw_spin_unlock_irqrestore(&its->lock, flags);
+        return;
+    }
+    sync_obj = builder(its, cmd, desc);
+    its_flush_cmd(its, cmd);
+
+    if (sync_obj) {
+        sync_cmd = its_allocate_entry(its);
+        if (!sync_cmd)
+            goto post;
+
+        its_build_vsync_cmd(its, sync_cmd, sync_obj);
+        its_flush_cmd(its, sync_cmd);
+    }
+
+post:
+    rd_idx = readl_relaxed(its->base + GITS_CREADR);
+    next_cmd = its_post_commands(its);
+    raw_spin_unlock_irqrestore(&its->lock, flags);
+
+    if (its_wait_for_range_completion(its, rd_idx, next_cmd))
+        pr_err_ratelimited("ITS cmd %ps failed\n", builder);
+}
 
 static void its_send_int(struct its_device *dev, u32 event_id)
 {

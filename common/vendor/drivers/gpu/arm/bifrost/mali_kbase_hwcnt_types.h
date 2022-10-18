@@ -386,7 +386,7 @@ void kbase_hwcnt_metadata_destroy(const struct kbase_hwcnt_metadata *metadata);
      kbase_hwcnt_metadata_block_headers_count((metadata), (grp), (blk)))
 
 /**
- * kbase_hwcnt_metadata_for_each_block() - Iterate over each block instance in
+ * kbase_hwcnt_metadata_cycle_each_block() - Iterate over each block instance in
  *                                         the metadata.
  * @md:       Non-NULL pointer to metadata.
  * @grp:      size_t variable used as group iterator.
@@ -396,7 +396,7 @@ void kbase_hwcnt_metadata_destroy(const struct kbase_hwcnt_metadata *metadata);
  * Iteration order is group, then block, then block instance (i.e. linearly
  * through memory).
  */
-#define kbase_hwcnt_metadata_for_each_block(md, grp, blk, blk_inst)                                                    \
+#define kbase_hwcnt_metadata_cycle_each_block(md, grp, blk, blk_inst)                                                  \
     for ((grp) = 0; (grp) < kbase_hwcnt_metadata_group_count((md)); (grp)++)                                           \
         for ((blk) = 0; (blk) < kbase_hwcnt_metadata_block_count((md), (grp)); (blk)++)                                \
             for ((blk_inst) = 0; (blk_inst) < kbase_hwcnt_metadata_block_instance_count((md), (grp), (blk));           \
@@ -554,7 +554,7 @@ static inline void kbase_hwcnt_enable_map_enable_all(struct kbase_hwcnt_enable_m
 {
     size_t grp, blk, blk_inst;
 
-    kbase_hwcnt_metadata_for_each_block(dst->metadata, grp, blk, blk_inst) {
+    kbase_hwcnt_metadata_cycle_each_block(dst->metadata, grp, blk, blk_inst) {
         kbase_hwcnt_enable_map_block_enable_all(dst, grp, blk, blk_inst);
     }
 
@@ -649,7 +649,7 @@ static inline bool kbase_hwcnt_enable_map_any_enabled(const struct kbase_hwcnt_e
         return true;
     }
 
-    kbase_hwcnt_metadata_for_each_block(enable_map->metadata, grp, blk, blk_inst) {
+    kbase_hwcnt_metadata_cycle_each_block(enable_map->metadata, grp, blk, blk_inst) {
         if (kbase_hwcnt_enable_map_block_enabled(enable_map, grp, blk, blk_inst)) {
             return true;
         }

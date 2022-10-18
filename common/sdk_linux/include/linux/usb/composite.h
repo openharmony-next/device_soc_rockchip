@@ -455,7 +455,7 @@ static inline struct usb_composite_driver *to_cdriver(struct usb_gadget_driver *
  *     necessarily requiring a wireless adapter;
  * (g) composite device setup that can create one or more wireless
  *     configs, including appropriate association setup support;
- * (h) more, TBD.
+ * (h) more.
  */
 struct usb_composite_dev {
     struct usb_gadget *gadget;

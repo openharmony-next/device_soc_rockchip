@@ -316,7 +316,7 @@ void kbase_hwcnt_dump_buffer_zero(struct kbase_hwcnt_dump_buffer *dst,
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk;
         size_t val_cnt;
@@ -359,7 +359,7 @@ void kbase_hwcnt_dump_buffer_zero_non_enabled(struct kbase_hwcnt_dump_buffer *ds
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk = kbase_hwcnt_dump_buffer_block_instance(dst, grp, blk, blk_inst);
         const u64 *blk_em = kbase_hwcnt_enable_map_block_instance(dst_enable_map, grp, blk, blk_inst);
@@ -393,7 +393,7 @@ void kbase_hwcnt_dump_buffer_copy(struct kbase_hwcnt_dump_buffer *dst, const str
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk;
         const u32 *src_blk;
@@ -433,7 +433,7 @@ void kbase_hwcnt_dump_buffer_copy_strict(struct kbase_hwcnt_dump_buffer *dst, co
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk = kbase_hwcnt_dump_buffer_block_instance(dst, grp, blk, blk_inst);
         const u32 *src_blk = kbase_hwcnt_dump_buffer_block_instance(src, grp, blk, blk_inst);
@@ -468,7 +468,7 @@ void kbase_hwcnt_dump_buffer_accumulate(struct kbase_hwcnt_dump_buffer *dst, con
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk;
         const u32 *src_blk;
@@ -511,7 +511,7 @@ void kbase_hwcnt_dump_buffer_accumulate_strict(struct kbase_hwcnt_dump_buffer *d
 
     metadata = dst->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         u32 *dst_blk = kbase_hwcnt_dump_buffer_block_instance(dst, grp, blk, blk_inst);
         const u32 *src_blk = kbase_hwcnt_dump_buffer_block_instance(src, grp, blk, blk_inst);

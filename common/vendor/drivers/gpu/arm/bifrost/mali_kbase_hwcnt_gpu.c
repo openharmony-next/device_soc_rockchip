@@ -256,7 +256,7 @@ int kbase_hwcnt_gpu_dump_get(struct kbase_hwcnt_dump_buffer *dst, void *src,
     dump_src = (const u32 *)src;
     src_offset = 0;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         const size_t hdr_cnt = kbase_hwcnt_metadata_block_headers_count(metadata, grp, blk);
         const size_t ctr_cnt = kbase_hwcnt_metadata_block_counters_count(metadata, grp, blk);
@@ -382,7 +382,7 @@ void kbase_hwcnt_gpu_enable_map_to_physical(struct kbase_hwcnt_physical_enable_m
 
     metadata = src->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         const u64 grp_type = kbase_hwcnt_metadata_group_type(metadata, grp);
         const u64 blk_type = kbase_hwcnt_metadata_block_type(metadata, grp, blk);
@@ -444,7 +444,7 @@ void kbase_hwcnt_gpu_enable_map_from_physical(struct kbase_hwcnt_enable_map *dst
     kbasep_hwcnt_backend_gpu_block_map_from_physical(src->tiler_bm, &tiler_bm, &ignored_hi);
     kbasep_hwcnt_backend_gpu_block_map_from_physical(src->mmu_l2_bm, &mmu_l2_bm, &ignored_hi);
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         const u64 grp_type = kbase_hwcnt_metadata_group_type(metadata, grp);
         const u64 blk_type = kbase_hwcnt_metadata_block_type(metadata, grp, blk);
@@ -490,7 +490,7 @@ void kbase_hwcnt_gpu_patch_dump_headers(struct kbase_hwcnt_dump_buffer *buf,
 
     metadata = buf->metadata;
 
-    kbase_hwcnt_metadata_for_each_block(metadata, grp, blk, blk_inst)
+    kbase_hwcnt_metadata_cycle_each_block(metadata, grp, blk, blk_inst)
     {
         const u64 grp_type = kbase_hwcnt_metadata_group_type(metadata, grp);
         u32 *buf_blk = kbase_hwcnt_dump_buffer_block_instance(buf, grp, blk, blk_inst);
