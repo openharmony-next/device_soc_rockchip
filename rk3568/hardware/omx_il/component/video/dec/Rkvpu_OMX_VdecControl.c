@@ -112,16 +112,16 @@ static const CodecProfileLevel kH264ProfileLevelsMax[] = {
 };
 
 static const CodecProfileLevel kH265ProfileLevels[] = {
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel1  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel2  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel21 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel3  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel31 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel4  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel41 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel5  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel51 },
-    { OMX_VIDEO_HEVCProfileMain10, OMX_VIDEO_HEVCMainTierLevel51 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL1  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL2  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL21 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL3  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL31 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL4  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL41 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL5  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL51 },
+    { CODEC_HEVC_PROFILE_MAIN10, CODEC_HEVC_MAIN_TIER_LEVEL51 },
 };
 
 OMX_ERRORTYPE Rkvpu_OMX_UseBuffer(OMX_IN OMX_HANDLETYPE hComponent,
@@ -823,8 +823,8 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         src.height   = mHeight;
         src.format   = RK_FORMAT_YCbCr_420_SP;
         dst.fd = bufferHandle->fd;
-        dst.wstride  = mStride;
-        dst.hstride  = mSliceHeight;
+        dst.wstride  = bufferHandle->width;
+        dst.hstride  = bufferHandle->height;
         dst.width    = mWidth;
         dst.height   = mHeight;
         dst.format   = RK_FORMAT_YCbCr_420_SP;
@@ -949,9 +949,9 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         pOutputBuffer->nFilledLen = mWidth * mHeight * 3 / 2; // 3:byte alignment, 2:byte alignment
 #if AVS100
         if ((pVideoDec->codecProfile == OMX_VIDEO_AVCProfileHigh10 && pVideoDec->codecId == OMX_VIDEO_CodingAVC)
-            || ((pVideoDec->codecProfile == OMX_VIDEO_HEVCProfileMain10 ||
-                pVideoDec->codecProfile == OMX_VIDEO_HEVCProfileMain10HDR10)
-                && pVideoDec->codecId == OMX_VIDEO_CodingHEVC)) {
+            || ((pVideoDec->codecProfile == CODEC_HEVC_PROFILE_MAIN10 ||
+                pVideoDec->codecProfile == CODEC_HEVC_PROFILE_MAIN10_HDR10)
+                && pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC)) {
             OMX_U32 horStride = Get_Video_HorAlign(pVideoDec->codecId, pframe->DisplayWidth,
                 pframe->DisplayHeight, pVideoDec->codecProfile);
             OMX_U32 verStride = Get_Video_VerAlign(pVideoDec->codecId, pframe->DisplayHeight, pVideoDec->codecProfile);
@@ -1548,7 +1548,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
                     portDefinition->format.video.nFrameWidth = portDefinition->format.video.nStride;
                 }
 
-                if (fbcMode && (pVideoDec->codecId == OMX_VIDEO_CodingHEVC
+                if (fbcMode && (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC
                                 || pVideoDec->codecId == OMX_VIDEO_CodingAVC)) {
                     OMX_U32 height = pInputPort->portDefinition.format.video.nFrameHeight;
                     // On FBC case H.264/H.265 decoder will add 4 lines blank on top.
@@ -1581,7 +1581,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_MPEG2_DEC_ROLE);
             } else if (pVideoDec->codecId == OMX_VIDEO_CodingVP8EXT) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_VP8_DEC_ROLE);
-            } else if (pVideoDec->codecId == OMX_VIDEO_CodingHEVC) {
+            } else if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_HEVC_DEC_ROLE);
             } else if (pVideoDec->codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingFLV1) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_FLV_DEC_ROLE);
@@ -1640,7 +1640,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
                 }
                 profileLevel->eProfile = kH264ProfileLevelsMax[index].mProfile;
                 profileLevel->eLevel = kH264ProfileLevelsMax[index].mLevel;
-            } else if (pVideoDec->codecId == OMX_VIDEO_CodingHEVC) {
+            } else if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
                 nProfileLevels =
                     sizeof(kH265ProfileLevels) / sizeof(kH265ProfileLevels[0]);
                 if (index >= nProfileLevels) {
@@ -1969,7 +1969,7 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
             } else if (!Rockchip_OSAL_Strcmp((char*)pComponentRole->cRole, RK_OMX_COMPONENT_HEVC_DEC_ROLE)) {
                 pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX].portDefinition.format.video.eCompressionFormat =
-                    (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+                    (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
             } else if (!Rockchip_OSAL_Strcmp((char*)pComponentRole->cRole, RK_OMX_COMPONENT_FLV_DEC_ROLE)) {
                 pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX].portDefinition.format.video.eCompressionFormat =
                     (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingFLV1;
@@ -2019,8 +2019,8 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
             RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec =
                 (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
             if (pVideoDec != NULL) {
-                if (pVideoDec->codecId == OMX_VIDEO_CodingHEVC) {
-                    if (params->eProfile >= OMX_VIDEO_HEVCProfileMain10) {
+                if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
+                    if (params->eProfile >= CODEC_HEVC_PROFILE_MAIN10) {
                         pVideoDec->bIs10bit = OMX_TRUE;
                     }
                 } else if (pVideoDec->codecId == OMX_VIDEO_CodingAVC) {
@@ -2107,7 +2107,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(OMX_HANDLETYPE hComponent,
             // fbc output buffer offset X/Y
             int32_t depth = (pVideoDec->bIs10bit) ? OMX_DEPTH_BIT_10 : OMX_DEPTH_BIT_8;
             if (Rockchip_OSAL_Check_Use_FBCMode(pVideoDec->codecId, depth, pRockchipPort)) {
-                if (pVideoDec->codecId == OMX_VIDEO_CodingHEVC
+                if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC
                     || pVideoDec->codecId == OMX_VIDEO_CodingAVC) {
                     rectParams->nTop = 4; // 4:value of nTop
                 }
@@ -2570,22 +2570,17 @@ OMX_U32 Rkvpu_GetCompressRatioByCodingtype(
     OMX_VIDEO_CODINGTYPE codingType)
 {
     OMX_U32 nCompressRatio = 1;
-    OMX_VIDEO_CODINGTYPEEXT codingTypeExt = (OMX_VIDEO_CODINGTYPEEXT)codingType;
-    switch (codingType) {
+    OMX_U32 codingTypeWithExt = (OMX_U32)codingType;
+    switch (codingTypeWithExt) {
         case OMX_VIDEO_CodingAVC:
             nCompressRatio = 2; // 2:value of nCompressRatio
             break;
+        case CODEC_OMX_VIDEO_CodingHEVC:
+        case OMX_VIDEO_CodingVP9:
+            nCompressRatio = 4; // 4:value of nCompressRatio
+            break;
         default:
-            switch (codingTypeExt) {
-                case OMX_VIDEO_CodingHEVC:
-                case OMX_VIDEO_CodingVP9:
-                    nCompressRatio = 4; // 4:value of nCompressRatio
-                    break;
-            
-                default:
-                    nCompressRatio = 2; // 2:value of nCompressRatio
-                    break;
-            }
+            nCompressRatio = 2; // 2:value of nCompressRatio
             break;
     }
 
@@ -2626,8 +2621,14 @@ OMX_ERRORTYPE Rkvpu_CheckPortDefinition(
         }
 
         if (pNewPortDefinition->format.video.nFrameWidth > nSupportWidthMax) {
-            if (access("/dev/rkvdec", 06) == 0) { // 06:access para
-                if (pNewPortDefinition->format.video.eCompressionFormat == OMX_VIDEO_CodingHEVC ||
+            if (access("/dev/rkvdec", 06) != 0) { // 06:access para
+                omx_err("decoder width %d big than support width %d return error",
+                        (int)pNewPortDefinition->format.video.nFrameWidth,
+                        (int)nSupportWidthMax);
+                ret = OMX_ErrorBadParameter;
+                goto EXIT;
+            }
+            if (pNewPortDefinition->format.video.eCompressionFormat == CODEC_OMX_VIDEO_CodingHEVC ||
                     pNewPortDefinition->format.video.eCompressionFormat == OMX_VIDEO_CodingAVC ||
                     pNewPortDefinition->format.video.eCompressionFormat == OMX_VIDEO_CodingVP9) {
                     nSupportWidthMax = 4096; // 4096:value of nSupportWidthMax
@@ -2638,13 +2639,6 @@ OMX_ERRORTYPE Rkvpu_CheckPortDefinition(
                     ret = OMX_ErrorBadParameter;
                     goto EXIT;
                 }
-            } else {
-                omx_err("decoder width %d big than support width %d return error",
-                        (int)pNewPortDefinition->format.video.nFrameWidth,
-                        (int)nSupportWidthMax);
-                ret = OMX_ErrorBadParameter;
-                goto EXIT;
-            }
         }
         omx_info("decoder width %d support %d",
                  (int)pNewPortDefinition->format.video.nFrameWidth,

@@ -51,7 +51,6 @@
         (_struct_)->nVersion.s.nRevision = REVISION_NUMBER;         \
         (_struct_)->nVersion.s.nStep = STEP_NUMBER;                 \
     } while (0)
-
 /*
  * Port Specific
  */
