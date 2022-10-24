@@ -28,9 +28,9 @@
 
 template <typename TYPE> class RgaSingleton {
 public:
-    static TYPE &getInstance()
+    static TYPE& getInstance()
     {
-        Mutex::Autolock _l(sLock);
+        RgaMutex::Autolock _l(sLock);
         TYPE *instance = sInstance;
         if (instance == nullptr) {
             instance = new TYPE();
@@ -40,7 +40,7 @@ public:
     }
     static bool hasInstance()
     {
-        Mutex::Autolock _l(sLock);
+        RgaMutex::Autolock _l(sLock);
         return sInstance != nullptr;
     }
 
@@ -55,7 +55,7 @@ protected:
 private:
     RgaSingleton(const RgaSingleton &);
     RgaSingleton &operator=(const RgaSingleton &);
-    static Mutex sLock;
+    static RgaMutex sLock;
     static TYPE *sInstance;
 };
 

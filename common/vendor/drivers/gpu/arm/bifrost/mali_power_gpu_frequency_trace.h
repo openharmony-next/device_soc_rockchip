@@ -24,12 +24,14 @@
 #define TRACE_POWER_GPU_FREQUENCY_MALI
 #endif
 
+#define TMP_NULL
+
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM power
 #undef TRACE_INCLUDE_FILE
 #define TRACE_INCLUDE_FILE mali_power_gpu_frequency_trace
 #undef TRACE_INCLUDE_PATH
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH TMP_NULL.
 
 #if !defined(TRACE_POWER_GPU_FREQUENCY_H) || defined(TRACE_HEADER_MULTI_READ)
 #define TRACE_POWER_GPU_FREQUENCY_H

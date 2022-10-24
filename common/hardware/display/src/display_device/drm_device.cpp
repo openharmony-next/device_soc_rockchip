@@ -39,7 +39,7 @@ namespace OHOS {
                         return nullptr;
                     }
                     DISPLAY_DEBUGLOG("the drm fd is %{public}d", drmFd);
-                    mDrmFd = std::make_shared<HdiFd>(drmFd);
+                    mDrmFd = std::make_shared<HdiSharedFd>(drmFd);
                 }
                 if (mInstance == nullptr) {
                     mInstance = std::make_shared<DrmDevice>();

@@ -113,6 +113,8 @@ struct kbase_ktrace_backend;
 
 #define KBASE_KTRACE_CODE(X) KBASE_KTRACE_CODE_##X
 
+#define TMP_NULL
+
 /* Note: compiletime_assert() about this against kbase_ktrace_code_t is in
  * kbase_ktrace_init()
  */
@@ -125,7 +127,7 @@ enum kbase_ktrace_code {
 #include <debug/mali_kbase_debug_ktrace_codes.h>
 #undef KBASE_KTRACE_CODE_MAKE_CODE
     /* Comma on its own, to extend the list */
-    ,
+    TMP_NULL,
     /* Must be the last in the enum */
     KBASE_KTRACE_CODE_COUNT
 };

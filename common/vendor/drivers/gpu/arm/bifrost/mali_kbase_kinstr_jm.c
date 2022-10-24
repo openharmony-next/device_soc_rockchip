@@ -56,7 +56,7 @@
 #endif
 
 #if KERNEL_VERSION(4, 16, 0) >= LINUX_VERSION_CODE
-typedef unsigned int __poll_t;
+typedef unsigned int (__poll_t);
 #endif
 
 #ifndef ENOTSUP

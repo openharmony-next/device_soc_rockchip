@@ -177,8 +177,10 @@ TRACE_EVENT(mali_timeline_context_active,
 
 #endif /* _MALI_TIMELINE_H */
 
+#define TMP_NULL
+
 #undef TRACE_INCLUDE_PATH
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH TMP_NULL.
 
 /* This part must be outside protection */
 #include <trace/define_trace.h>

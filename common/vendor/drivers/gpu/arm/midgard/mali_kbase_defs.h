@@ -712,6 +712,8 @@ struct kbasep_mem_device {
 
 #define KBASE_TRACE_CODE(X) KBASE_TRACE_CODE_##X
 
+#define TMP_NULL
+
 enum kbase_trace_code {
 /* IMPORTANT: USE OF SPECIAL #INCLUDE OF NON-STANDARD HEADER FILE
  * THIS MUST BE USED AT THE START OF THE ENUM */
@@ -719,7 +721,7 @@ enum kbase_trace_code {
 #include "mali_kbase_trace_defs.h"
 #undef KBASE_TRACE_CODE_MAKE_CODE
     /* Comma on its own, to extend the list */
-    ,
+    TMP_NULL,
     /* Must be the last in the enum */
     KBASE_TRACE_CODE_COUNT
 };

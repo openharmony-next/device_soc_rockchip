@@ -22,8 +22,8 @@
 typedef RK_U64 RK_U64;
 typedef RK_S64 RK_S64;
 #else
-typedef unsigned long long int RK_U64;
-typedef signed long long int RK_S64;
+typedef unsigned long long int (RK_U64);
+typedef signed long long int (RK_S64);
 
 #endif
 #ifndef MODULE_TAG

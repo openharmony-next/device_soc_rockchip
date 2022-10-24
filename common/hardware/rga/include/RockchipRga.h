@@ -35,7 +35,6 @@
 #include "RgaUtils.h"
 #include "rga.h"
 
-//////////////////////////////////////////////////////////////////////////////////
 #include "RgaSingleton.h"
 
 class RockchipRga : public RgaSingleton<RockchipRga> {

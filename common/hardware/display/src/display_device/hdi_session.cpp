@@ -386,7 +386,7 @@ int32_t LayerInitialize(LayerFuncs **funcs)
     DISPLAY_CHK_RETURN((funcs == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the in funcs is nullptr"));
     LayerFuncs *lFuncs = (LayerFuncs *)calloc(1, sizeof(LayerFuncs));
     if (lFuncs == nullptr) {
-        DISPLAY_LOGE("can not calloc errno: %{public}d", errno)
+        DISPLAY_LOGE("can not calloc errno: %{public}d", errno);
         return DISPLAY_FAILURE;
     }
     lFuncs->SetLayerAlpha = SetLayerAlpha;

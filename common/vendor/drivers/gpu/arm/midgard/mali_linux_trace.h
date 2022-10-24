@@ -108,9 +108,11 @@ TRACE_EVENT(mali_total_alloc_pages_change, TP_PROTO(long long int event_id), TP_
 
 #endif /*  _TRACE_MALI_H */
 
+#define TMP_NULL
+
 #undef TRACE_INCLUDE_PATH
 #undef linux
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH TMP_NULL.
 
 /* This part must be outside protection */
 #include <trace/define_trace.h>

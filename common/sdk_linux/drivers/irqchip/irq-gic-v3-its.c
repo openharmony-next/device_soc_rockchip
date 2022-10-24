@@ -1074,8 +1074,9 @@ void its_send_single_command(struct its_node *its, its_cmd_builder_t builder, st
 
     if (sync_obj) {
         sync_cmd = its_allocate_entry(its);
-        if (!sync_cmd)
+        if (!sync_cmd) {
             goto post;
+        }
 
         its_build_sync_cmd(its, sync_cmd, sync_obj);
         its_flush_cmd(its, sync_cmd);
@@ -1117,8 +1118,9 @@ void its_send_single_vcommand(struct its_node *its,  its_cmd_vbuilder_t builder,
 
     if (sync_obj) {
         sync_cmd = its_allocate_entry(its);
-        if (!sync_cmd)
+        if (!sync_cmd) {
             goto post;
+        }
 
         its_build_vsync_cmd(its, sync_cmd, sync_obj);
         its_flush_cmd(its, sync_cmd);

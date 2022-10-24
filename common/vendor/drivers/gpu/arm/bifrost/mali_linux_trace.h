@@ -349,11 +349,13 @@ TRACE_EVENT(mali_jit_trim, TP_PROTO(size_t freed_pages), TP_ARGS(freed_pages),
 
 #endif /* _TRACE_MALI_H */
 
+#define TMP_NULL
+
 #undef TRACE_INCLUDE_PATH
 /* lwn.net/Articles/383362 suggests this should remain as '.', and instead
  * extend CFLAGS
  */
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH TMP_NULL.
 #undef TRACE_INCLUDE_FILE
 #define TRACE_INCLUDE_FILE mali_linux_trace
 

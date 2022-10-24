@@ -39,7 +39,7 @@ extern "C" {
 
 /** @brief Mali Boolean type which uses MALI_TRUE and MALI_FALSE
  */
-typedef unsigned long mali_bool;
+typedef unsigned long (mali_bool);
 
 #ifndef MALI_TRUE
 #define MALI_TRUE ((mali_bool)1)

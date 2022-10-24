@@ -161,9 +161,11 @@ DEFINE_MALI_ADD_EVENT(PM_WAKE_WAITERS);
 
 #endif /* _TRACE_MALI_KBASE_H */
 
+#define TMP_NULL
+
 #undef TRACE_INCLUDE_PATH
 #undef linux
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH TMP_NULL.
 #undef TRACE_INCLUDE_FILE
 #define TRACE_INCLUDE_FILE mali_linux_kbase_trace
 

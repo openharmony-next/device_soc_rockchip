@@ -87,10 +87,10 @@ class CAPABILITY("mutex") RgaMutex {
 public:
     enum { PRIVATE = 0, SHARED = 1 };
 
-    Mutex();
-    explicit Mutex(const char *name);
-    explicit Mutex(int type, const char *name = nullptr);
-    ~Mutex();
+    RgaMutex();
+    explicit RgaMutex(const char *name);
+    explicit RgaMutex(int type, const char *name = nullptr);
+    ~RgaMutex();
 
     // lock or unlock the mutex
     int32_t lock() ACQUIRE();
@@ -105,11 +105,11 @@ public:
     // constructed and released when Autolock goes out of scope.
     class SCOPED_CAPABILITY Autolock {
     public:
-        inline explicit Autolock(Mutex &mutex) ACQUIRE(mutex) : mLock(mutex)
+        inline explicit Autolock(RgaMutex &mutex) ACQUIRE(mutex) : mLock(mutex)
         {
             mLock.lock();
         }
-        inline explicit Autolock(Mutex *mutex) ACQUIRE(mutex) : mLock(*mutex)
+        inline explicit Autolock(RgaMutex *mutex) ACQUIRE(mutex) : mLock(*mutex)
         {
             mLock.lock();
         }
@@ -119,7 +119,7 @@ public:
         }
 
     private:
-        Mutex &mLock;
+        RgaMutex &mLock;
         // Cannot be copied or moved - declarations only
         Autolock(const Autolock &);
         Autolock &operator=(const Autolock &);
@@ -129,22 +129,22 @@ private:
     friend class Condition;
 
     // A mutex cannot be copied
-    Mutex(const Mutex &);
-    Mutex &operator=(const Mutex &);
+    RgaMutex(const RgaMutex &);
+    RgaMutex &operator=(const RgaMutex &);
 
     pthread_mutex_t mMutex;
 };
 
 // ---------------------------------------------------------------------------
-inline Mutex::Mutex()
+inline RgaMutex::RgaMutex()
 {
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(__attribute__((unused)) const char *name)
+inline RgaMutex::RgaMutex(__attribute__((unused)) const char *name)
 {
     pthread_mutex_init(&mMutex, nullptr);
 }
-inline Mutex::Mutex(int type, __attribute__((unused)) const char *name)
+inline RgaMutex::RgaMutex(int type, __attribute__((unused)) const char *name)
 {
     if (type == SHARED) {
         pthread_mutexattr_t attr;
@@ -156,23 +156,23 @@ inline Mutex::Mutex(int type, __attribute__((unused)) const char *name)
         pthread_mutex_init(&mMutex, nullptr);
     }
 }
-inline Mutex::~Mutex()
+inline RgaMutex::~RgaMutex()
 {
     pthread_mutex_destroy(&mMutex);
 }
-inline int32_t Mutex::lock()
+inline int32_t RgaMutex::lock()
 {
     return -pthread_mutex_lock(&mMutex);
 }
-inline void Mutex::unlock()
+inline void RgaMutex::unlock()
 {
     pthread_mutex_unlock(&mMutex);
 }
-inline int32_t Mutex::tryLock()
+inline int32_t RgaMutex::tryLock()
 {
     return -pthread_mutex_trylock(&mMutex);
 }
-inline int32_t Mutex::timedLock(int64_t timeoutNs)
+inline int32_t RgaMutex::timedLock(int64_t timeoutNs)
 {
     timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
@@ -192,5 +192,5 @@ inline int32_t Mutex::timedLock(int64_t timeoutNs)
  * mutex.
  */
 
-typedef Mutex::Autolock AutoMutex;
+typedef RgaMutex::Autolock AutoMutex;
 #endif // _LIBS_RGA_MUTEX_H
