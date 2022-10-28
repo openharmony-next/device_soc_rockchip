@@ -27,15 +27,15 @@
 
 #ifndef Rkvpu_OMX_VIDEO_ENCODER
 #define Rkvpu_OMX_VIDEO_ENCODER
-
+#include <codec_omx_ext.h>
 #include "OMX_Component.h"
+#include "OMX_Video.h"
+#include "OMX_VideoExt.h"
+#include "Rockchip_OMX_Basecomponent.h"
+#include "Rockchip_OMX_Baseport.h"
 #include "Rockchip_OMX_Def.h"
 #include "Rockchip_OSAL_Queue.h"
-#include "Rockchip_OMX_Baseport.h"
-#include "Rockchip_OMX_Basecomponent.h"
-#include "OMX_Video.h"
 #include "VideoExt.h"
-#include "OMX_VideoExt.h"
 #include "vpu_api.h"
 
 #define MAX_VIDEOENC_INPUTBUFFER_NUM           2
@@ -58,7 +58,7 @@ typedef struct _RKVPU_OMX_VIDEOENC_COMPONENT {
 
     OMX_VIDEO_PARAM_AVCTYPE AVCComponent[ALL_PORT_NUM];
 
-    OMX_VIDEO_PARAM_HEVCTYPE HEVCComponent[ALL_PORT_NUM];
+    struct CodecVideoParamHevc HEVCComponent[ALL_PORT_NUM];
 
     /* Buffer Process */
     OMX_BOOL       bExitBufferProcessThread;

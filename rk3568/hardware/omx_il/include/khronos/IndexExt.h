@@ -82,7 +82,6 @@ typedef enum OMX_INDEXEXEXTTYPE {
     OMX_IndexParamAudioAndroidEac3,
     OMX_IndexParamAudioProfileQuerySupported,
     OMX_IndexParamVideoAndroidVp8Encoder = OMX_IndexKhronosExtensions + 0x00600007,
-    OMX_IndexParamVideoHevc,
     OMX_IndexParamSliceSegments,
     OMX_IndexConfigAndroidIntraRefresh,
     OMX_IndexParamAndroidVideoTemporalLayering,

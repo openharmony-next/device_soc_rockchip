@@ -114,15 +114,15 @@ static const CodecProfileLevel kProfileLevels[] = {
 };
 
 static const CodecProfileLevel kH265ProfileLevels[] = {
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel1  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel2  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel21 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel3  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel31 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel4  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel41 },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel5  },
-    { OMX_VIDEO_HEVCProfileMain, OMX_VIDEO_HEVCMainTierLevel51 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL1  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL2  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL21 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL3  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL31 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL4  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL41 },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL5  },
+    { CODEC_HEVC_PROFILE_MAIN, CODEC_HEVC_MAIN_TIER_LEVEL51 },
 };
 
 OMX_ERRORTYPE Rkvpu_OMX_ComponentTunnelRequest(OMX_IN OMX_HANDLETYPE hComp, OMX_IN OMX_U32 nPort,
@@ -1008,7 +1008,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     }
                     case supportFormat_1: {
                         portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                        portFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888;
+                        portFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)CODEC_COLOR_FORMAT_RGBA8888;
                         portFormat->xFramerate         = portDefinition->format.video.xFramerate;
                         break;
                     }
@@ -1219,7 +1219,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_H264_ENC_ROLE);
             } else if (pVideoEnc->codecId == OMX_VIDEO_CodingVP8EXT) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_VP8_ENC_ROLE);
-            } else if (pVideoEnc->codecId == OMX_VIDEO_CodingHEVC) {
+            } else if (pVideoEnc->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_HEVC_ENC_ROLE);
             }
         }
@@ -1245,23 +1245,23 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
         }
         break;
         case OMX_IndexParamVideoHevc: {
-            OMX_VIDEO_PARAM_HEVCTYPE *pDstHEVCComponent = (OMX_VIDEO_PARAM_HEVCTYPE *)ComponentParameterStructure;
-            OMX_VIDEO_PARAM_HEVCTYPE *pSrcHEVCComponent = NULL;
+            struct CodecVideoParamHevc *pDstHEVCComponent = (struct CodecVideoParamHevc *)ComponentParameterStructure;
+            struct CodecVideoParamHevc *pSrcHEVCComponent = NULL;
             RKVPU_OMX_VIDEOENC_COMPONENT *pVideoEnc =
                 (RKVPU_OMX_VIDEOENC_COMPONENT *)pRockchipComponent->hComponentHandle;
 
-            ret = Rockchip_OMX_Check_SizeVersion(pDstHEVCComponent, sizeof(OMX_VIDEO_PARAM_HEVCTYPE));
+            ret = Rockchip_OMX_Check_SizeVersion(pDstHEVCComponent, sizeof(struct CodecVideoParamHevc));
             if (ret != OMX_ErrorNone) {
                 goto EXIT;
             }
 
-            if (pDstHEVCComponent->nPortIndex >= ALL_PORT_NUM) {
+            if (pDstHEVCComponent->portIndex >= ALL_PORT_NUM) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
             }
 
-            pSrcHEVCComponent = &pVideoEnc->HEVCComponent[pDstHEVCComponent->nPortIndex];
-            Rockchip_OSAL_Memcpy(pDstHEVCComponent, pSrcHEVCComponent, sizeof(OMX_VIDEO_PARAM_HEVCTYPE));
+            pSrcHEVCComponent = &pVideoEnc->HEVCComponent[pDstHEVCComponent->portIndex];
+            Rockchip_OSAL_Memcpy(pDstHEVCComponent, pSrcHEVCComponent, sizeof(struct CodecVideoParamHevc));
         }
         break;
         case OMX_IndexParamVideoProfileLevelQuerySupported: {
@@ -1285,7 +1285,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                 }
                 profileLevel->eProfile = kProfileLevels[index].mProfile;
                 profileLevel->eLevel = kProfileLevels[index].mLevel;
-            } else if (pVideoEnc->codecId == OMX_VIDEO_CodingHEVC) {
+            } else if (pVideoEnc->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
                 nProfileLevels = ARRAY_SIZE(kH265ProfileLevels);
                 if (index >= nProfileLevels) {
                     ret = OMX_ErrorNoMore;
@@ -1598,7 +1598,7 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP8EXT;
             } else if (!Rockchip_OSAL_Strcmp((char*)pComponentRole->cRole, RK_OMX_COMPONENT_HEVC_ENC_ROLE)) {
                 pRockchipComponent->pRockchipPort[OUTPUT_PORT_INDEX].portDefinition.format.video.eCompressionFormat =
-                    (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+                    (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
             } else {
                 ret = OMX_ErrorInvalidComponentName;
                 goto EXIT;
@@ -1625,21 +1625,21 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
             break;
         }
         case OMX_IndexParamVideoHevc: {
-            OMX_VIDEO_PARAM_HEVCTYPE *pDstHEVCComponent = NULL;
-            OMX_VIDEO_PARAM_HEVCTYPE *pSrcHEVCComponent = (OMX_VIDEO_PARAM_HEVCTYPE *)ComponentParameterStructure;
+            struct CodecVideoParamHevc *pDstHEVCComponent = NULL;
+            struct CodecVideoParamHevc *pSrcHEVCComponent = (struct CodecVideoParamHevc *)ComponentParameterStructure;
             RKVPU_OMX_VIDEOENC_COMPONENT *pVideoEnc =
                 (RKVPU_OMX_VIDEOENC_COMPONENT *)pRockchipComponent->hComponentHandle;
-            ret = Rockchip_OMX_Check_SizeVersion(pSrcHEVCComponent, sizeof(OMX_VIDEO_PARAM_HEVCTYPE));
+            ret = Rockchip_OMX_Check_SizeVersion(pSrcHEVCComponent, sizeof(struct CodecVideoParamHevc));
             if (ret != OMX_ErrorNone) {
                 goto EXIT;
             }
-            if (pSrcHEVCComponent->nPortIndex >= ALL_PORT_NUM) {
+            if (pSrcHEVCComponent->portIndex >= ALL_PORT_NUM) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
             }
 
-            pDstHEVCComponent = &pVideoEnc->HEVCComponent[pSrcHEVCComponent->nPortIndex];
-            Rockchip_OSAL_Memcpy(pDstHEVCComponent, pSrcHEVCComponent, sizeof(OMX_VIDEO_PARAM_HEVCTYPE));
+            pDstHEVCComponent = &pVideoEnc->HEVCComponent[pSrcHEVCComponent->portIndex];
+            Rockchip_OSAL_Memcpy(pDstHEVCComponent, pSrcHEVCComponent, sizeof(struct CodecVideoParamHevc));
             break;
         }
         case OMX_IndexParamRkEncExtendedVideo: {

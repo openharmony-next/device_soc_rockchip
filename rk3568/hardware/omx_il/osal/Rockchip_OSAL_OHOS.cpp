@@ -62,8 +62,8 @@ extern "C" {
 OMX_U32 Get_Video_HorAlign(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 width, OMX_U32 height, OMX_U32 codecProfile)
 {
     OMX_U32 stride = 0;
-    if (codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC) {
-        if (codecProfile == OMX_VIDEO_HEVCProfileMain10 || codecProfile == OMX_VIDEO_HEVCProfileMain10HDR10) {
+    if (codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC) {
+        if (codecProfile == CODEC_HEVC_PROFILE_MAIN10 || codecProfile == CODEC_HEVC_PROFILE_MAIN10_HDR10) {
             // 10:byte alignment, 8:byte alignment, 255:byte alignment, 256:byte alignment
             stride = (((width * 10 / 8 + 255) & ~(255)) | (256));
         } else
@@ -107,8 +107,8 @@ OMX_U32 Get_Video_HorAlign(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 width, OMX_U32 
 OMX_U32 Get_Video_VerAlign(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 height, OMX_U32 codecProfile)
 {
     OMX_U32 stride = 0;;
-    if (codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC) {
-        if (codecProfile == OMX_VIDEO_HEVCProfileMain10 || codecProfile == OMX_VIDEO_HEVCProfileMain10HDR10)
+    if (codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC) {
+        if (codecProfile == CODEC_HEVC_PROFILE_MAIN10 || codecProfile == CODEC_HEVC_PROFILE_MAIN10_HDR10)
             stride = (height + 15) & (~15); // 15:byte alignment
         else
             stride = (height + 7) & (~7); // 7:byte alignment
@@ -143,7 +143,7 @@ OMX_BOOL Rockchip_OSAL_Check_Use_FBCMode(OMX_VIDEO_CODINGTYPE codecId, int32_t d
     // 10bit force set fbc mode
     if ((depth ==  OMX_DEPTH_BIT_10) || ((width * height > 1920 * 1088) // 1920:Resolution size, 1088:Resolution size
         && (codecId == OMX_VIDEO_CodingAVC
-        || codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC
+        || codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC
         || codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9))) {
             fbcMode = OMX_TRUE;
     }
@@ -258,11 +258,11 @@ EXIT:
 }
 
 #ifdef OHOS_BUFFER_HANDLE
-OMX_U32 CodecOmxExtColor2CodecFormat(enum CodecOmxColorFormatExt codecExtColor)
+OMX_U32 CodecOmxExtColor2CodecFormat(enum CodecColorFormatExt codecExtColor)
 {
     OMX_U32 codecFormat = PIXEL_FMT_BUTT;
     switch (codecExtColor) {
-    case CODEC_OMX_COLOR_FORMAT_RGBA8888:
+    case CODEC_COLOR_FORMAT_RGBA8888:
         codecFormat = PIXEL_FMT_RGBA_8888;
         break;
     default:
@@ -315,7 +315,7 @@ OMX_U32 Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FORMATTYPE omxColorFo
         codecFormat = PIXEL_FMT_VYUY_422_PKG;
         break;
     default:
-        codecFormat = CodecOmxExtColor2CodecFormat((enum CodecOmxColorFormatExt)omxColorFormat);
+        codecFormat = CodecOmxExtColor2CodecFormat((enum CodecColorFormatExt)omxColorFormat);
         break;
     }
     return codecFormat;
@@ -364,7 +364,7 @@ OMX_COLOR_FORMATTYPE Rochip_OSAL_CodecFormat2OmxColorFormat(OMX_U32 codecFormat)
         omxColorFormat = OMX_COLOR_FormatCrYCbY;
         break;
     case PIXEL_FMT_RGBA_8888:
-        omxColorFormat = (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888;
+        omxColorFormat = (OMX_COLOR_FORMATTYPE)CODEC_COLOR_FORMAT_RGBA8888;
         break;
     default:
         omx_err("%s: undefined codecColorFormat[%d]", __func__, omxColorFormat);
@@ -636,7 +636,7 @@ OMX_COLOR_FORMATTYPE Rockchip_OSAL_CheckFormat(
     OMX_COLOR_FORMATTYPE             eColorFormat       = pOutputPort->portDefinition.format.video.eColorFormat;
     VPU_FRAME *pframe = (VPU_FRAME *)pVpuframe;
 
-    if ((pVideoDec->codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC && (pframe->OutputWidth != 0x20))
+    if ((pVideoDec->codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC && (pframe->OutputWidth != 0x20))
         || (pframe->ColorType & VPU_OUTPUT_FORMAT_BIT_MASK) == VPU_OUTPUT_FORMAT_BIT_10) { // 10bit
         OMX_BOOL fbcMode = Rockchip_OSAL_Check_Use_FBCMode(pVideoDec->codecId,
                                                            (int32_t)OMX_DEPTH_BIT_10, pOutputPort);
@@ -861,7 +861,7 @@ OMX_U32 Rockchip_OSAL_CalculateTotalRefFrames(
                 nRefFramesNum = 6; // 6:frame number
             }
         } break;
-        case OMX_VIDEO_CodingHEVC: {
+        case CODEC_OMX_VIDEO_CodingHEVC: {
             /* use 4K refs frame Num to computate others */
             nRefFramesNum = 4096 * 2160 * 6 / (width * height); /* 4096:Resolution size,
                                                                    2160:Resolution size, 6:frame number */
