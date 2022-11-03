@@ -1484,14 +1484,30 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
             }
             ROCKCHIP_OMX_BASEPORT *pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
             OMX_PARAM_PORTDEFINITIONTYPE *portDefinition = &pRockchipPort->portDefinition;
+            OMX_U32 index = videoFormat->codecColorIndex;
             if (portIndex == INPUT_PORT_INDEX) {
+                if (index > supportFormat_0) {
+                    omx_err_f("nomore index supported");
+                    ret = OMX_ErrorNoMore;
+                }
                 videoFormat->codecColorFormat =
                     Rockchip_OSAL_OmxColorFormat2CodecFormat(portDefinition->format.video.eColorFormat);
                 videoFormat->codecCompressFormat = portDefinition->format.video.eCompressionFormat;
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
             } else {
-                videoFormat->codecColorFormat =
-                    Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                switch (index) {
+                    case supportFormat_0: {
+                        videoFormat->codecColorFormat =
+                            Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                        break;
+                    }
+                    default: {
+                        omx_err_f("nomore index supported");
+                        ret = OMX_ErrorNoMore;
+                        goto EXIT;
+                    }
+                }
+
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
                 videoFormat->codecCompressFormat = OMX_VIDEO_CodingUnused;
             }
@@ -1595,7 +1611,7 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_WMV3_DEC_ROLE);
             } else if (pVideoDec->codecId == OMX_VIDEO_CodingRV) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_RMVB_DEC_ROLE);
-            } else if (pVideoDec->codecId == OMX_VIDEO_CodingVP9) {
+            } else if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingVP9) {
                 Rockchip_OSAL_Strcpy((char *)pComponentRole->cRole, RK_OMX_COMPONENT_VP9_DEC_ROLE);
             }
         }
@@ -1966,7 +1982,7 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP8EXT;
             } else if (!Rockchip_OSAL_Strcmp((char*)pComponentRole->cRole, RK_OMX_COMPONENT_VP9_DEC_ROLE)) {
                 pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX].portDefinition.format.video.eCompressionFormat =
-                    (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
+                    (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
             } else if (!Rockchip_OSAL_Strcmp((char*)pComponentRole->cRole, RK_OMX_COMPONENT_HEVC_DEC_ROLE)) {
                 pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX].portDefinition.format.video.eCompressionFormat =
                     (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
@@ -2027,7 +2043,7 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                     if (params->eProfile == OMX_VIDEO_AVCProfileHigh10) {
                         pVideoDec->bIs10bit = OMX_TRUE;
                     }
-                } else if (pVideoDec->codecId == OMX_VIDEO_CodingVP9) {
+                } else if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingVP9) {
                 }
             }
         }
@@ -2576,7 +2592,7 @@ OMX_U32 Rkvpu_GetCompressRatioByCodingtype(
             nCompressRatio = 2; // 2:value of nCompressRatio
             break;
         case CODEC_OMX_VIDEO_CodingHEVC:
-        case OMX_VIDEO_CodingVP9:
+        case CODEC_OMX_VIDEO_CodingVP9:
             nCompressRatio = 4; // 4:value of nCompressRatio
             break;
         default:
@@ -2630,7 +2646,7 @@ OMX_ERRORTYPE Rkvpu_CheckPortDefinition(
             }
             if (pNewPortDefinition->format.video.eCompressionFormat == CODEC_OMX_VIDEO_CodingHEVC ||
                     pNewPortDefinition->format.video.eCompressionFormat == OMX_VIDEO_CodingAVC ||
-                    pNewPortDefinition->format.video.eCompressionFormat == OMX_VIDEO_CodingVP9) {
+                    pNewPortDefinition->format.video.eCompressionFormat == CODEC_OMX_VIDEO_CodingVP9) {
                     nSupportWidthMax = 4096; // 4096:value of nSupportWidthMax
                 } else {
                     omx_err("decoder width %d big than support width %d return error",

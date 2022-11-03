@@ -91,7 +91,6 @@ typedef struct OMX_CONFIG_DESCRIBECOLORASPECTSPARAMS {
 
 typedef enum OMX_VIDEO_CODINGTYPEEXT {
     OMX_VIDEO_CodingVP8EXT = 9,        /**< Google VP8, formerly known as On2 VP8 */
-    OMX_VIDEO_CodingVP9,        /**< Google VP9 */
     OMX_VIDEO_AVCLevel52  = 0x10000,
 }OMX_VIDEO_CODINGTYPEEXT;
 
