@@ -1019,12 +1019,9 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
                         break;
                     }
                     default: {
-                        if (index > supportFormat_0) {
-                            omx_err_f("index is large than supportFormat_0");
-                            ret = OMX_ErrorNoMore;
-                            goto EXIT;
-                        }
-                        break;
+                        omx_err_f("index is large than supportFormat_0");
+                        ret = OMX_ErrorNoMore;
+                        goto EXIT;
                     }
                 }
             } else if (portIndex == OUTPUT_PORT_INDEX) {
@@ -1108,12 +1105,38 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent,
         }
         ROCKCHIP_OMX_BASEPORT *pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
         OMX_PARAM_PORTDEFINITIONTYPE *portDefinition = &pRockchipPort->portDefinition;
+        uint32_t index = videoFormat->codecColorIndex;
         if (portIndex == INPUT_PORT_INDEX) {
-                videoFormat->codecColorFormat =
-                    Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                switch (index) {
+                    case supportFormat_0: {
+                        videoFormat->codecColorFormat =
+                        Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                        break;
+                    }
+                    case supportFormat_1: {
+                        videoFormat->codecColorFormat =
+                        Rockchip_OSAL_OmxColorFormat2CodecFormat((OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888);
+                        break;
+                    }
+                    case supportFormat_2: {
+                        videoFormat->codecColorFormat =
+                        Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_Format32bitBGRA8888);
+                        break;
+                    }
+                    default: {
+                        omx_err_f("index is large than supportFormat_0");
+                        ret = OMX_ErrorNoMore;
+                        goto EXIT;
+                    }
+                }
                 videoFormat->codecCompressFormat = OMX_VIDEO_CodingUnused;
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
             } else {
+                if (index > supportFormat_0) {
+                    omx_err_f("index is too large");
+                    ret = OMX_ErrorNoMore;
+                    goto EXIT;
+                }
                 videoFormat->codecColorFormat =
                     Rockchip_OSAL_OmxColorFormat2CodecFormat(portDefinition->format.video.eColorFormat);
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
