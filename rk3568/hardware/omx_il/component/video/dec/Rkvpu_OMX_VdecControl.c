@@ -823,8 +823,8 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         src.height   = mHeight;
         src.format   = RK_FORMAT_YCbCr_420_SP;
         dst.fd = bufferHandle->fd;
-        dst.wstride  = mStride;
-        dst.hstride  = mSliceHeight;
+        dst.wstride  = bufferHandle->width;
+        dst.hstride  = bufferHandle->height;
         dst.width    = mWidth;
         dst.height   = mHeight;
         dst.format   = RK_FORMAT_YCbCr_420_SP;
@@ -1484,14 +1484,30 @@ OMX_ERRORTYPE Rkvpu_OMX_GetParameter(OMX_IN OMX_HANDLETYPE hComponent, OMX_IN OM
             }
             ROCKCHIP_OMX_BASEPORT *pRockchipPort = &pRockchipComponent->pRockchipPort[portIndex];
             OMX_PARAM_PORTDEFINITIONTYPE *portDefinition = &pRockchipPort->portDefinition;
+            OMX_U32 index = videoFormat->codecColorIndex;
             if (portIndex == INPUT_PORT_INDEX) {
+                if (index > supportFormat_0) {
+                    omx_err_f("nomore index supported");
+                    ret = OMX_ErrorNoMore;
+                }
                 videoFormat->codecColorFormat =
                     Rockchip_OSAL_OmxColorFormat2CodecFormat(portDefinition->format.video.eColorFormat);
                 videoFormat->codecCompressFormat = portDefinition->format.video.eCompressionFormat;
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
             } else {
-                videoFormat->codecColorFormat =
+                switch (index) {
+                case supportFormat_0: {
+                    videoFormat->codecColorFormat =
                     Rockchip_OSAL_OmxColorFormat2CodecFormat(OMX_COLOR_FormatYUV420SemiPlanar);
+                    break;
+                }
+                default: {
+                    omx_err_f("nomore index supported");
+                    ret = OMX_ErrorNoMore;
+                    goto EXIT;
+                }
+                }
+                
                 videoFormat->framerate = portDefinition->format.video.xFramerate;
                 videoFormat->codecCompressFormat = OMX_VIDEO_CodingUnused;
             }
