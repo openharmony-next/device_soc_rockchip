@@ -69,7 +69,7 @@ OMX_U32 Get_Video_HorAlign(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 width, OMX_U32 
         } else
             // 255:byte alignment, 256:byte alignment
             stride = ((width + 255) & (~255)) | (256);
-    } else if (codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9) {
+    } else if (codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9) {
 #ifdef AVS100
         // 255:byte alignment, 256:byte alignment
         stride = ((width + 255) & (~255)) | (256);
@@ -112,7 +112,7 @@ OMX_U32 Get_Video_VerAlign(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 height, OMX_U32
             stride = (height + 15) & (~15); // 15:byte alignment
         else
             stride = (height + 7) & (~7); // 7:byte alignment
-    } else if (codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9) {
+    } else if (codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9) {
         stride = (height + 63) & (~63); // 63:byte alignment
     } else {
         stride = ((height + 15) & (~15)); // 15:byte alignment
@@ -144,7 +144,7 @@ OMX_BOOL Rockchip_OSAL_Check_Use_FBCMode(OMX_VIDEO_CODINGTYPE codecId, int32_t d
     if ((depth ==  OMX_DEPTH_BIT_10) || ((width * height > 1920 * 1088) // 1920:Resolution size, 1088:Resolution size
         && (codecId == OMX_VIDEO_CodingAVC
         || codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC
-        || codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9))) {
+        || codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9))) {
             fbcMode = OMX_TRUE;
     }
 #else
@@ -873,7 +873,7 @@ OMX_U32 Rockchip_OSAL_CalculateTotalRefFrames(
                 nRefFramesNum = 6;
             }
         } break;
-        case OMX_VIDEO_CodingVP9: {
+        case CODEC_OMX_VIDEO_CodingVP9: {
             nRefFramesNum = 4096 * 2176 * 4 / (width * height);/* 4096:Resolution size,
                                                                    2176:Resolution size, 4:frame number */
             if (nRefFramesNum > 8) { // 8:frame number

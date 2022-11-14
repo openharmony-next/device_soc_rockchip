@@ -80,7 +80,7 @@ static const CodeMap kCodeMap[] = {
     {OMX_RK_VIDEO_CodingVP8, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP8EXT},
     {OMX_RK_VIDEO_CodingWMV, OMX_VIDEO_CodingWMV},
     {OMX_RK_VIDEO_CodingHEVC, (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC},
-    {OMX_RK_VIDEO_CodingVP9, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9},
+    {OMX_RK_VIDEO_CodingVP9, (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9},
     /*
      * remove copyright coding type
      *
@@ -1668,17 +1668,17 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentConstructor(OMX_HANDLETYPE hComponent, OMX_S
     } else if (!strcmp(componentName, RK_OMX_COMPONENT_VP9_DEC)) {
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
         Rockchip_OSAL_Strcpy(pRockchipPort->portDefinition.format.video.cMIMEType, "video/x-vnd.on2.vp9");
-        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
-        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
+        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
+        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
     } else if (!strcmp(componentName, RK_OMX_COMPONENT_VP9_DRM_DEC)) {
         omx_err("Rockchip_OMX_ComponentConstructor VP9 secure");
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
         Rockchip_OSAL_Strcpy(pRockchipPort->portDefinition.format.video.cMIMEType, "video/x-vnd.on2.vp9");
-        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
+        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
 #ifdef HAVE_L1_SVP_MODE
         pVideoDec->bDRMPlayerMode = OMX_TRUE;
 #endif
-        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9;
+        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
     } else if (!strcmp(componentName, RK_OMX_COMPONENT_VP8_DRM_DEC)) {
         omx_err("Rockchip_OMX_ComponentConstructor VP8 secure");
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
