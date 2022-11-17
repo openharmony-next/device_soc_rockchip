@@ -20,6 +20,7 @@
 #include <hdf_log.h>
 #include "hdi_mpp_config.h"
 #include "im2d.h"
+#include "mpp_common.h"
 #include "rga.h"
 #include "rk_vdec_cfg.h"
 
@@ -30,6 +31,7 @@
 #define DFAULT_ENC_FPS_NUM              24
 #define DFAULT_ENC_DROP_THD             20
 #define DFAULT_ENC_GOP_OPERATOR         2
+#define FRAME_STRIDE_ALIGNMENT          16
 
 RKHdiBaseComponent *g_pBaseComponent = NULL;
 
@@ -615,8 +617,7 @@ static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
-    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
+    BufferHandle *bufferHandle = (BufferHandle *)outInfo->buffer[0].buf;
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -628,23 +629,27 @@ static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
+    if (bufferHandle == NULL) {
+        HDF_LOGE("%{public}s: bufferHandle invalid", __func__);
+        return IM_STATUS_INVALID_PARAM;
+    }
 
     src.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
+    src.width    = mppApi->HdiMppFrameGetWidth(frame);
+    src.height   = mppApi->HdiMppFrameGetHeight(frame);
     src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    src.width    = width;
-    src.height   = height;
     src.format   = RK_FORMAT_YCbCr_420_SP;
-    dst.fd = ((BufferHandle *)outInfo->buffer[0].buf)->fd;
-    dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
-    dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    dst.width    = width;
-    dst.height   = height;
+    dst.fd = bufferHandle->fd;
+    dst.width    = src.width;
+    dst.height   = bufferHandle->height;
+    dst.wstride  = MPP_ALIGN(dst.width, FRAME_STRIDE_ALIGNMENT);
+    dst.hstride  = bufferHandle->height;
     dst.format   = RK_FORMAT_YCbCr_420_SP;
     rect.x = 0;
     rect.y = 0;
-    rect.width = width;
-    rect.height = height;
+    rect.width = dst.width;
+    rect.height = dst.height;
     return imcrop(src, dst, rect);
 }
 
@@ -817,8 +822,7 @@ static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, Co
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
-    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
+    BufferHandle *bufferHandle = (BufferHandle *)inputInfo->buffer[0].buf;
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -830,23 +834,27 @@ static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, Co
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
+    if (bufferHandle == NULL) {
+        HDF_LOGE("%{public}s: bufferHandle invalid", __func__);
+        return IM_STATUS_INVALID_PARAM;
+    }
 
-    src.fd = ((BufferHandle *)inputInfo->buffer[0].buf)->fd;
-    src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
-    src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    src.width    = width;
-    src.height   = height;
+    src.fd = bufferHandle->fd;
+    src.width    = mppApi->HdiMppFrameGetWidth(frame);
+    src.height   = bufferHandle->height;
+    src.wstride  = MPP_ALIGN(src.width, FRAME_STRIDE_ALIGNMENT);
+    src.hstride  = bufferHandle->height;
     src.format   = RK_FORMAT_YCbCr_420_SP;
     dst.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
     dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    dst.width    = width;
-    dst.height   = height;
+    dst.width    = mppApi->HdiMppFrameGetWidth(frame);
+    dst.height   = mppApi->HdiMppFrameGetHeight(frame);
     dst.format   = RK_FORMAT_YCbCr_420_SP;
     rect.x = 0;
     rect.y = 0;
-    rect.width = width;
-    rect.height = height;
+    rect.width = dst.width;
+    rect.height = dst.height;
     return imcrop(src, dst, rect);
 }
 
