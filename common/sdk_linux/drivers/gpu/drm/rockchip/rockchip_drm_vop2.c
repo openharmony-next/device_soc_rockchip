@@ -4027,7 +4027,7 @@ static void vop2_win_atomic_update(struct vop2_win *win, struct drm_rect *src, s
          * with WIN_VIR_STRIDE.
          */
         if (bpp == 0) {
-            return 0;
+            return;
         }
         stride = (fb->pitches[0] << 0x3) / bpp;
         if ((stride & 0x3f) && (vpstate->xmirror_en || vpstate->rotate_90_en || vpstate->rotate_270_en)) {

@@ -34,13 +34,11 @@ ohos_static_library("higbm") {
     "-DGRALLOC_GBM_SUPPORT",
     "-Wno-macro-redefined",
   ]
-  deps = [
-    "//third_party/libdrm:libdrm",
-   
+  deps = [ "//third_party/libdrm:libdrm" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ,
-   "c_utils:utils",
-   ]
 }
 
 ohos_shared_library("display_gralloc") {
@@ -69,9 +67,10 @@ ohos_shared_library("display_gralloc") {
     "//third_party/libdrm:libdrm",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog",
-  "c_utils:utils",
-   ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   install_enable = true
   install_images = [ chipset_base_dir ]
@@ -99,8 +98,9 @@ ohos_shared_library("display_gfx") {
     "//device/soc/rockchip/common/hardware/rga:librga",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ,
-  "c_utils:utils",
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 
   install_enable = true
@@ -151,9 +151,10 @@ ohos_shared_library("display_device") {
     "-Wno-error=missing-braces",
     "-Wno-error=#warnings",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog",
-  "c_utils:utils",
-   ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   symlink_target_name = [ "libdisplay_layer.z.so" ]
 
