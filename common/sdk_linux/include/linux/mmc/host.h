@@ -474,7 +474,7 @@ int mmc_of_parse(struct mmc_host *host);
 int mmc_of_parse_voltage(struct device_node *np, u32 *mask);
 
 extern struct mmc_host *primary_sdio_host;
-extern int mmc_host_rescan(struct mmc_host *host, int val, int is_cap_sdio_irq);
+int mmc_host_rescan(struct mmc_host *host, int val, int is_cap_sdio_irq);
 
 static inline void *mmc_priv(struct mmc_host *host)
 {

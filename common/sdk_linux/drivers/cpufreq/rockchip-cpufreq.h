@@ -20,7 +20,7 @@ static inline int rockchip_cpufreq_adjust_power_scale(struct device *dev)
     return -EOPNOTSUPP;
 }
 
-static inline int rockchip_cpufreq_opp_set_rate(struct device *dev, unsigned long target_freq);
+static inline int rockchip_cpufreq_opp_set_rate(struct device *dev, unsigned long target_freq)
 {
     return -EOPNOTSUPP;
 }

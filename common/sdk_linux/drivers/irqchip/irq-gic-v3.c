@@ -219,11 +219,11 @@ static inline void __iomem *gic_dist_base(struct irq_data *d)
     }
 }
 
-static void gic_do_wait_for_rwp(void __iomem *base)
+static void gic_do_wait_for_rwp(void __iomem *base, u32 bit)
 {
     u32 count = 0xf4240; /* 1s! */
 
-    while (readl_relaxed(base + GICD_CTLR) & GICD_CTLR_RWP) {
+    while (readl_relaxed(base + GICD_CTLR) & bit) {
         count--;
         if (!count) {
             pr_err_ratelimited("RWP timeout, gone fishing\n");
@@ -237,13 +237,13 @@ static void gic_do_wait_for_rwp(void __iomem *base)
 /* Wait for completion of a distributor change */
 static void gic_dist_wait_for_rwp(void)
 {
-    gic_do_wait_for_rwp(gic_data.dist_base);
+    gic_do_wait_for_rwp(gic_data.dist_base, GICD_CTLR_RWP);
 }
 
 /* Wait for completion of a redistributor change */
 static void gic_redist_wait_for_rwp(void)
 {
-    gic_do_wait_for_rwp(gic_data_rdist_rd_base());
+    gic_do_wait_for_rwp(gic_data_rdist_rd_base(),GICR_CTLR_RWP);
 }
 
 #ifdef CONFIG_ARM64
@@ -948,6 +948,22 @@ static int __gic_update_rdist_properties(struct redist_region *region, void __io
 {
     u64 typer = gic_read_typer(ptr + GICR_TYPER);
 
+    	/* Boot-time cleanip */
+    if ((typer & GICR_TYPER_VLPIS) && (typer & GICR_TYPER_RVPEID)) {
+        u64 val;
+
+		/* Deactivate any present vPE */
+        val = gicr_read_vpendbaser(ptr + SZ_128K + GICR_VPENDBASER);
+        if (val & GICR_VPENDBASER_Valid)
+            gicr_write_vpendbaser(GICR_VPENDBASER_PendingLast,
+					      ptr + SZ_128K + GICR_VPENDBASER);
+
+		/* Mark the VPE table as invalid */
+        val = gicr_read_vpropbaser(ptr + SZ_128K + GICR_VPROPBASER);
+        val &= ~GICR_VPROPBASER_4_1_VALID;
+        gicr_write_vpropbaser(val, ptr + SZ_128K + GICR_VPROPBASER);
+    }
+
     gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
 
     /* RVPEID implies some form of DirectLPI, no matter what the doc says... :-/ */
@@ -1507,6 +1523,12 @@ static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fws
             return -EINVAL;
         }
 
+		if (fwspec->param[0] < 16) {
+			pr_err(FW_BUG "Illegal GSI%d translation request\n",
+			       fwspec->param[0]);
+			return -EINVAL;
+		}
+
         *hwirq = fwspec->param[0];
         *type = fwspec->param[1];
 
@@ -1873,7 +1895,8 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
 
     gic_data.ppi_descs = kcalloc(gic_data.ppi_nr, sizeof(*gic_data.ppi_descs), GFP_KERNEL);
     if (!gic_data.ppi_descs) {
-        return;
+        		goto out_put_node;
+
     }
 
     nr_parts = of_get_child_count(parts_node);
@@ -1913,6 +1936,7 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
 
             cpu_node = of_find_node_by_phandle(cpu_phandle);
             if (WARN_ON(!cpu_node)) {
+               of_node_put(cpu_node);
                 continue;
             }
 
@@ -1924,6 +1948,7 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
             pr_cont("%pOF[%d] ", cpu_node, cpu);
 
             cpumask_set_cpu(cpu, &part->mask);
+			of_node_put(cpu_node);
         }
 
         pr_cont("}\n");

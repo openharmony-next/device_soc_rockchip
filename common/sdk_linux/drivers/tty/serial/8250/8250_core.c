@@ -23,6 +23,7 @@
 #include <linux/sysrq.h>
 #include <linux/delay.h>
 #include <linux/platform_device.h>
+#include <linux/pm_runtime.h>
 #include <linux/tty.h>
 #include <linux/ratelimit.h>
 #include <linux/tty_flip.h>
@@ -595,6 +596,8 @@ static void __init serial8250_register_ports(struct uart_driver *drv, struct dev
         }
 
         up->port.dev = dev;
+		if (uart_console_enabled(&up->port))
+			pm_runtime_get_sync(up->port.dev);
 
         serial8250_apply_quirks(up);
         uart_add_one_port(drv, &up->port);

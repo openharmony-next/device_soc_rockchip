@@ -1226,6 +1226,13 @@ static void hdmi_enable_audio_clk(struct dw_hdmi *hdmi, bool enable)
     hdmi_writeb(hdmi, hdmi->mc_clkdis, HDMI_MC_CLKDIS);
 }
 
+static u8 *hdmi_audio_get_eld(struct dw_hdmi *hdmi)
+{
+    if (!hdmi->curr_conn)
+        return NULL;
+    return hdmi->curr_conn->eld;
+}
+
 static void dw_hdmi_ahb_audio_enable(struct dw_hdmi *hdmi)
 {
     hdmi_set_cts_n(hdmi, hdmi->audio_cts, hdmi->audio_n);
@@ -3394,7 +3401,7 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
     }
 
     /* If dw-hdmi is the only bridge, avoid negociating with ourselves */
-    if (list_is_singular(&bridge->encoder->bridge_chain)) {
+    if (list_is_singular(&bridge->encoder->bridge_chain) || list_is_first(&bridge->chain_node, &bridge->encoder->bridge_chain)) {
         *num_output_fmts = 1;
         output_fmts[0] = MEDIA_BUS_FMT_FIXED;
 

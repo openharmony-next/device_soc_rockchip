@@ -725,7 +725,7 @@ static int load_image_and_restore(void)
     }
 
     error = swsusp_read(&flags);
-    swsusp_close(FMODE_READ);
+    swsusp_close(FMODE_READ | FMODE_EXCL);
     if (!error) {
         error = hibernation_restore(flags & SF_PLATFORM_MODE);
     }
@@ -1034,7 +1034,7 @@ Check_image:
     /* The snapshot device should not be opened while we're running */
     if (!hibernate_acquire()) {
         error = -EBUSY;
-        swsusp_close(FMODE_READ);
+        swsusp_close(FMODE_READ | FMODE_EXCL);
         goto Unlock;
     }
 
@@ -1048,14 +1048,14 @@ Check_image:
     pm_pr_dbg("Preparing processes for hibernation restore.\n");
     error = freeze_processes();
     if (error) {
-        swsusp_close(FMODE_READ);
+        swsusp_close(FMODE_READ | FMODE_EXCL);
         goto Finish;
     }
 
     error = freeze_kernel_threads();
     if (error) {
         thaw_processes();
-        swsusp_close(FMODE_READ);
+        swsusp_close(FMODE_READ | FMODE_EXCL);
         goto Finish;
     }
 
@@ -1371,7 +1371,7 @@ static int __init resumedelay_setup(char *str)
     int rc = kstrtouint(str, 0, &resume_delay);
 
     if (rc) {
-        return rc;
+		pr_warn("resumedelay: bad option string '%s'\n", str);
     }
     return 1;
 }

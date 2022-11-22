@@ -451,9 +451,6 @@ static void inno_mipi_dphy_timing_init(struct inno_dsidphy *inno)
     t_txbyteclkhs = div_u64(PSEC_PER_SEC, txbyteclkhs);
 
     esc_clk_div = DIV_ROUND_UP(txbyteclkhs, TXBYTECLKHS_DIV_ROUND_UP_A);
-    if (esc_clk_div == 0) {
-        return;
-    }
     txclkesc = txbyteclkhs / esc_clk_div;
     t_txclkesc = div_u64(PSEC_PER_SEC, txclkesc);
 

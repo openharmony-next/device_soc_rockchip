@@ -915,6 +915,9 @@ static bool crtc_needs_disable(struct drm_crtc_state *old_state, struct drm_crtc
     if (!new_state) {
         return drm_atomic_crtc_effectively_active(old_state);
     }
+	if (old_state->self_refresh_active &&
+	    old_state->crtc != new_state->crtc)
+		return true;
 
     /*
      * We need to run through the crtc_funcs->disable() function if the CRTC

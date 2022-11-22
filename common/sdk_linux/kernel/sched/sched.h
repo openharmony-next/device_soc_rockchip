@@ -143,7 +143,6 @@ extern __read_mostly int scheduler_running;
 extern unsigned long calc_load_update;
 extern atomic_long_t calc_load_tasks;
 
-extern const u64 max_cfs_quota_period;
 
 extern void calc_global_load_tick(struct rq *this_rq);
 extern long calc_load_fold_active(struct rq *this_rq, long adjust);
@@ -157,6 +156,18 @@ extern void call_trace_sched_update_nr_running(struct rq *rq, int count);
  * Helpers for converting nanosecond timing to jiffy resolution
  */
 #define NS_TO_JIFFIES(TIME) ((unsigned long)(TIME) / (NSEC_PER_SEC / HZ))
+#ifdef CONFIG_SCHED_LATENCY_NICE
+#define MAX_LATENCY_NICE	19
+#define MIN_LATENCY_NICE	-20
+#define LATENCY_NICE_WIDTH	\
+	(MAX_LATENCY_NICE - MIN_LATENCY_NICE + 1)
+#define DEFAULT_LATENCY_NICE	0
+#define DEFAULT_LATENCY_PRIO	(DEFAULT_LATENCY_NICE + LATENCY_NICE_WIDTH/2)
+#define NICE_TO_LATENCY(nice)	((nice) + DEFAULT_LATENCY_PRIO)
+#define LATENCY_TO_NICE(prio)	((prio) - DEFAULT_LATENCY_PRIO)
+#define NICE_LATENCY_SHIFT	(SCHED_FIXEDPOINT_SHIFT)
+#define NICE_LATENCY_WEIGHT_MAX	(1L << NICE_LATENCY_SHIFT)
+#endif /* CONFIG_SCHED_LATENCY_NICE */
 
 /*
  * Increase resolution of nice-level calculations for 64-bit architectures.
@@ -201,7 +212,6 @@ extern void call_trace_sched_update_nr_running(struct rq *rq, int count);
 #define CPU_FREQ_1K 1024
 #define CPU_SAMPLE_ARTE 8
 
-extern struct cpufreq_governor schedutil_gov;
 
 /*
  * Single value that decides SCHED_DEADLINE internal math precision.
@@ -398,7 +408,7 @@ extern bool __checkparam_dl(const struct sched_attr *attr);
 extern bool dl_param_changed(struct task_struct *p, const struct sched_attr *attr);
 extern int dl_task_can_attach(struct task_struct *p, const struct cpumask *cs_cpus_allowed);
 extern int dl_cpuset_cpumask_can_shrink(const struct cpumask *cur, const struct cpumask *trial);
-extern bool dl_cpu_busy(unsigned int cpu);
+extern int  dl_cpu_busy(int cpu, struct task_struct *p);
 
 #ifdef CONFIG_CGROUP_SCHED
 
@@ -659,8 +669,8 @@ struct cfs_rq {
     s64 runtime_remaining;
 
     u64 throttled_clock;
-    u64 throttled_clock_task;
-    u64 throttled_clock_task_time;
+    u64 throttled_clock_pelt;
+    u64 throttled_clock_pelt_time;
     int throttled;
     int throttle_count;
     struct list_head throttled_list;
@@ -1821,6 +1831,9 @@ static inline int task_on_rq_migrating(struct task_struct *p)
 
 extern const int sched_prio_to_weight[40];
 extern const u32 sched_prio_to_wmult[40];
+#ifdef CONFIG_SCHED_LATENCY_NICE
+extern const int		sched_latency_to_weight[40];
+#endif
 
 /*
  * {de,en}queue flags:
