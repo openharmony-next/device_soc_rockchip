@@ -24,6 +24,7 @@ ohos_static_library("RkOMX_Basecomponent") {
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/khronos",
     "//device/soc/rockchip/rk3568/hardware/omx_il/include/rockchip",
     "//device/soc/rockchip/rk3568/hardware/omx_il/osal",
+    "//drivers/peripheral/codec/interfaces/include",
     "//third_party/openmax/api/1.1.2",
   ]
 

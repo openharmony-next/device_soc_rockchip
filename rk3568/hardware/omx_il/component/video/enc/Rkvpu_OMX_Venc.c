@@ -119,7 +119,7 @@ typedef struct {
 static const CodeMap kCodeMap[] = {
     {OMX_RK_VIDEO_CodingAVC,   OMX_VIDEO_CodingAVC},
     {OMX_RK_VIDEO_CodingVP8,   (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP8EXT},
-    {OMX_RK_VIDEO_CodingHEVC,  (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC},
+    {OMX_RK_VIDEO_CodingHEVC,  (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC},
 };
 
 int calc_plane(int width, int height)
@@ -1174,17 +1174,17 @@ static OMX_ERRORTYPE ConvertOmxAvcLevelToAvcSpecLevel(
 }
 
 OMX_ERRORTYPE ConvertOmxHevcProfile2HalHevcProfile(
-    OMX_VIDEO_HEVCPROFILETYPE omxHevcProfile, HEVCEncProfile *halHevcProfile)
+    enum CodecHevcProfile omxHevcProfile, HEVCEncProfile *halHevcProfile)
 {
     HEVCEncProfile hevcProfile = HEVC_MAIN_PROFILE;
     switch (omxHevcProfile) {
-        case OMX_VIDEO_HEVCProfileMain:
+        case CODEC_HEVC_PROFILE_MAIN:
             hevcProfile = HEVC_MAIN_PROFILE;
             break;
-        case OMX_VIDEO_HEVCProfileMain10:
+        case CODEC_HEVC_PROFILE_MAIN10:
             hevcProfile = HEVC_MAIN10_PROFILE;
             break;
-        case OMX_VIDEO_HEVCProfileMain10HDR10:
+        case CODEC_HEVC_PROFILE_MAIN10_HDR10:
             hevcProfile = HEVC_MAIN10HDR10_PROFILE;
             break;
         default:
@@ -1197,11 +1197,11 @@ OMX_ERRORTYPE ConvertOmxHevcProfile2HalHevcProfile(
 }
 
 OMX_ERRORTYPE ConvertOmxHevcLevel2HalHevcLevel(
-    OMX_VIDEO_HEVCLEVELTYPE omxHevcLevel, HEVCLevel *halHevcLevel)
+    enum CodecHevcLevel omxHevcLevel, HEVCLevel *halHevcLevel)
 {
     HEVCLevel hevcLevel = HEVC_LEVEL4_1;
     switch (omxHevcLevel) {
-        case OMX_VIDEO_HEVCMainTierLevel41:
+        case CODEC_HEVC_MAIN_TIER_LEVEL41:
             hevcLevel = HEVC_LEVEL4_1;
             break;
         default:
@@ -1403,7 +1403,7 @@ OMX_ERRORTYPE Rkvpu_Enc_ComponentInit(OMX_COMPONENTTYPE *pOMXComponent)
         pVideoEnc->bLast_config_frame = 0;
         pVideoEnc->bSpsPpsHeaderFlag = OMX_FALSE;
         pVideoEnc->bSpsPpsbuf = NULL;
-        if (pVideoEnc->codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC) {
+        if (pVideoEnc->codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC) {
             pVideoEnc->bSpsPpsbuf = NULL;
             pVideoEnc->bSpsPpsLen = 0;
         } else {
@@ -1508,8 +1508,8 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
                 (*encParams)->rc_mode = Video_RC_Mode_VBR;
                 break;
         }
-        enum CodecOmxColorFormatExt eColorFormatExt =
-            (enum CodecOmxColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
+        enum CodecColorFormatExt eColorFormatExt =
+            (enum CodecColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
         omx_err("inputPort colorformat= %d", eColorFormatExt);
         switch (pRockchipInputPort->portDefinition.format.video.eColorFormat) {
             case OMX_COLOR_FormatYUV420Planar: {
@@ -1527,7 +1527,7 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
             }
             default:
                 switch (eColorFormatExt) {
-                    case CODEC_OMX_COLOR_FORMAT_RGBA8888: {
+                    case CODEC_COLOR_FORMAT_RGBA8888: {
                         (*encParams)->rc_mode = Video_RC_Mode_VBR;
                         (*encParams)->format = VPU_H264ENC_RGB888;
                         break;
@@ -1542,17 +1542,17 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
         void *levelTmp = &((*encParams)->levelIdc);
         AVCLevel *encLevel = (AVCLevel *)levelTmp;
         ConvertOmxAvcLevelToAvcSpecLevel((int32_t)pVideoEnc->AVCComponent[OUTPUT_PORT_INDEX].eLevel, encLevel);
-    } else if (pVideoEnc->codecId == (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC) {
+    } else if (pVideoEnc->codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC) {
         (*encParams)->enableCabac   = 0;
         (*encParams)->cabacInitIdc  = 0;
-        (*encParams)->intraPicRate  = pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].nKeyFrameInterval;
+        (*encParams)->intraPicRate  = pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].keyFrameInterval;
         void *profileTmp = &((*encParams)->profileIdc);
         HEVCEncProfile *encProfile = (HEVCEncProfile *)profileTmp;
         void *levelTmp = &((*encParams)->levelIdc);
         HEVCLevel *encLevel = (HEVCLevel *)levelTmp;
-        ConvertOmxHevcProfile2HalHevcProfile(pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].eProfile,
+        ConvertOmxHevcProfile2HalHevcProfile(pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].profile,
                                              encProfile);
-        ConvertOmxHevcLevel2HalHevcLevel(pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].eLevel,
+        ConvertOmxHevcLevel2HalHevcLevel(pVideoEnc->HEVCComponent[OUTPUT_PORT_INDEX].level,
                                          encLevel);
         switch (pVideoEnc->eControlRate[OUTPUT_PORT_INDEX]) {
             case OMX_Video_ControlRateDisable:
@@ -1570,8 +1570,8 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
                 (*encParams)->rc_mode = Video_RC_Mode_VBR;
                 break;
         }
-        enum CodecOmxColorFormatExt eColorFormatExt =
-            (enum CodecOmxColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
+        enum CodecColorFormatExt eColorFormatExt =
+            (enum CodecColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
         switch (pRockchipInputPort->portDefinition.format.video.eColorFormat) {
             case OMX_COLOR_FormatYUV420Planar: {
                 (*encParams)->format = VPU_H264ENC_YUV420_PLANAR;
@@ -1588,7 +1588,7 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
             }
             default:
                 switch (eColorFormatExt) {
-                    case CODEC_OMX_COLOR_FORMAT_RGBA8888: {
+                    case CODEC_COLOR_FORMAT_RGBA8888: {
                         (*encParams)->rc_mode = Video_RC_Mode_VBR;
                         (*encParams)->format = VPU_H264ENC_RGB888;
                         break;
@@ -1868,14 +1868,19 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentConstructor(OMX_HANDLETYPE hComponent, OMX_S
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
         Rockchip_OSAL_Strcpy(pRockchipPort->portDefinition.format.video.cMIMEType, "video/hevc");
         for (i = 0; i < ALL_PORT_NUM; i++) {
-            INIT_SET_SIZE_VERSION(&pVideoEnc->HEVCComponent[i], OMX_VIDEO_PARAM_HEVCTYPE);
-            pVideoEnc->HEVCComponent[i].nPortIndex = i;
-            pVideoEnc->HEVCComponent[i].eProfile   = OMX_VIDEO_HEVCProfileMain;
-            pVideoEnc->HEVCComponent[i].eLevel     = OMX_VIDEO_HEVCMainTierLevel41;
-            pVideoEnc->HEVCComponent[i].nKeyFrameInterval = 20; // 20:nPFrames
+            pVideoEnc->HEVCComponent[i].size = sizeof(struct CodecVideoParamHevc);
+            pVideoEnc->HEVCComponent[i].version.s.nVersionMajor = VERSIONMAJOR_NUMBER;
+            pVideoEnc->HEVCComponent[i].version.s.nVersionMinor = VERSIONMINOR_NUMBER;
+            pVideoEnc->HEVCComponent[i].version.s.nRevision = REVISION_NUMBER;
+            pVideoEnc->HEVCComponent[i].version.s.nStep = STEP_NUMBER;
+            pVideoEnc->HEVCComponent[i].portIndex = i;
+            pVideoEnc->HEVCComponent[i].profile   = CODEC_HEVC_PROFILE_MAIN;
+            pVideoEnc->HEVCComponent[i].level     = CODEC_HEVC_MAIN_TIER_LEVEL41;
+            pVideoEnc->HEVCComponent[i].keyFrameInterval = 20; // 20:nPFrames
         }
-        pVideoEnc->codecId = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
-        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+        pVideoEnc->codecId = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
+        pRockchipPort->portDefinition.format.video.eCompressionFormat =
+            (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
     } else {
         // IL client specified an invalid component name
         omx_err("VPU Component Invalid Component Name\n");
