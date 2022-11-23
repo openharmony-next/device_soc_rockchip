@@ -1869,7 +1869,7 @@ struct analogix_dp_device *analogix_dp_probe(struct device *dev, struct analogix
 
     if (dp_dev->hpd_gpiod) {
         ret = devm_request_threaded_irq(dev, gpiod_to_irq(dp_dev->hpd_gpiod), NULL, analogix_dp_hpd_irq_handler,
-                                        IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, "analogix-hpd", dp_dev);
+            IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, "analogix-hpd", dp_dev);
         if (ret) {
             dev_err(dev, "failed to request hpd IRQ: %d\n", ret);
             return ERR_PTR(ret);
@@ -1884,8 +1884,8 @@ struct analogix_dp_device *analogix_dp_probe(struct device *dev, struct analogix
     }
 
     irq_set_status_flags(dp_dev->irq, IRQ_NOAUTOEN);
-    ret = devm_request_threaded_irq(&pdevice->dev, dp_dev->irq, analogix_dp_hardirq, analogix_dp_irq_thread, 0, "analogix-dp",
-                                    dp_dev);
+    ret = devm_request_threaded_irq(&pdevice->dev, dp_dev->irq, analogix_dp_hardirq,
+        analogix_dp_irq_thread, 0, "analogix-dp", dp_dev);
     if (ret) {
         dev_err(&pdevice->dev, "failed to request irq\n");
         goto err_disable_clk;
