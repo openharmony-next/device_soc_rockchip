@@ -243,7 +243,7 @@ static void gic_dist_wait_for_rwp(void)
 /* Wait for completion of a redistributor change */
 static void gic_redist_wait_for_rwp(void)
 {
-    gic_do_wait_for_rwp(gic_data_rdist_rd_base(),GICR_CTLR_RWP);
+    gic_do_wait_for_rwp(gic_data_rdist_rd_base(), GICR_CTLR_RWP);
 }
 
 #ifdef CONFIG_ARM64
@@ -948,17 +948,17 @@ static int __gic_update_rdist_properties(struct redist_region *region, void __io
 {
     u64 typer = gic_read_typer(ptr + GICR_TYPER);
 
-    	/* Boot-time cleanip */
+    /* Boot-time cleanip */
     if ((typer & GICR_TYPER_VLPIS) && (typer & GICR_TYPER_RVPEID)) {
         u64 val;
 
-		/* Deactivate any present vPE */
+        /* Deactivate any present vPE */
         val = gicr_read_vpendbaser(ptr + SZ_128K + GICR_VPENDBASER);
         if (val & GICR_VPENDBASER_Valid)
             gicr_write_vpendbaser(GICR_VPENDBASER_PendingLast,
-					      ptr + SZ_128K + GICR_VPENDBASER);
+                          ptr + SZ_128K + GICR_VPENDBASER);
 
-		/* Mark the VPE table as invalid */
+        /* Mark the VPE table as invalid */
         val = gicr_read_vpropbaser(ptr + SZ_128K + GICR_VPROPBASER);
         val &= ~GICR_VPROPBASER_4_1_VALID;
         gicr_write_vpropbaser(val, ptr + SZ_128K + GICR_VPROPBASER);
@@ -1466,8 +1466,7 @@ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq, irq_hw_num
     return 0;
 }
 
-static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fwspec, unsigned long *hwirq,
-                                    unsigned int *type)
+static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fwspec, unsigned long *hwirq, unsigned int *type)
 {
     if (fwspec->param_count == 1 && fwspec->param[0] < GIC_IRQ_PARAMETER_VALUE_SIXTEEN) {
         *hwirq = fwspec->param[0];
@@ -1523,11 +1522,11 @@ static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fws
             return -EINVAL;
         }
 
-		if (fwspec->param[0] < 16) {
-			pr_err(FW_BUG "Illegal GSI%d translation request\n",
-			       fwspec->param[0]);
-			return -EINVAL;
-		}
+        if (fwspec->param[0] < GIC_IRQ_PARAMETER_VALUE_SIXTEEN) {
+            pr_err(FW_BUG "Illegal GSI%d translation request\n",
+                   fwspec->param[0]);
+            return -EINVAL;
+        }
 
         *hwirq = fwspec->param[0];
         *type = fwspec->param[1];
@@ -1887,16 +1886,13 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
     int part_idx = 0, i;
     int nr_parts;
     struct partition_affinity *parts;
-
     parts_node = of_get_child_by_name(gic_node, "ppi-partitions");
     if (!parts_node) {
         return;
     }
-
     gic_data.ppi_descs = kcalloc(gic_data.ppi_nr, sizeof(*gic_data.ppi_descs), GFP_KERNEL);
     if (!gic_data.ppi_descs) {
-        		goto out_put_node;
-
+                goto out_put_node;
     }
 
     nr_parts = of_get_child_count(parts_node);
@@ -1948,7 +1944,7 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
             pr_cont("%pOF[%d] ", cpu_node, cpu);
 
             cpumask_set_cpu(cpu, &part->mask);
-			of_node_put(cpu_node);
+            of_node_put(cpu_node);
         }
 
         pr_cont("}\n");

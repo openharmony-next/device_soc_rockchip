@@ -1324,7 +1324,7 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq, 
          * sectors can be read successfully.
          */
         if (recovery_mode) {
-            brq->data.blocks = queue_physical_block_size(mq->queue) >> 9;
+            brq->data.blocks = queue_physical_block_size(mq->queue) >> MMC_BLK_REQUEST_ARG_SHIFT_VALUE;
         }
 
         /*
@@ -1652,7 +1652,7 @@ static void mmc_blk_read_single(struct mmc_queue *mq, struct request *req)
     struct mmc_card *card = mq->card;
     struct mmc_host *host = card->host;
     blk_status_t error = BLK_STS_OK;
-	size_t bytes_per_read = queue_physical_block_size(mq->queue);
+    size_t bytes_per_read = queue_physical_block_size(mq->queue);
 
     do {
         u32 status;
@@ -1838,8 +1838,8 @@ static void mmc_blk_mq_rw_recovery(struct mmc_queue *mq, struct request *req)
     }
 
     /* Missing single sector read for large sector size */
-    	if (rq_data_dir(req) == READ && brq->data.blocks >
-			queue_physical_block_size(mq->queue) >> 9) {
+        if (rq_data_dir(req) == READ && (brq->data.blocks >
+            (queue_physical_block_size(mq->queue) >> MMC_BLK_REQUEST_ARG_SHIFT_VALUE))) {
         /* Read one sector at a time */
         mmc_blk_read_single(mq, req);
         return;

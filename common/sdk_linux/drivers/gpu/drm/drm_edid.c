@@ -2007,8 +2007,8 @@ struct edid *drm_do_get_edid(struct drm_connector *connector,
             base += EDID_LENGTH;
         }
 
-		new[EDID_LENGTH - 1] += new[0x7e] - valid_extensions;
-		new[0x7e] = valid_extensions;
+        new[EDID_LENGTH - 1] += new[0x7e] - valid_extensions;
+        new[0x7e] = valid_extensions;
 
         kfree(edid);
         edid = new;
@@ -4814,8 +4814,8 @@ bool drm_detect_monitor_audio(struct edid *edid)
         goto end;
     }
 
-	has_audio = (edid_ext[0] == CEA_EXT &&
-		    (edid_ext[3] & EDID_BASIC_AUDIO) != 0);
+    has_audio = (edid_ext[0] == CEA_EXT &&
+            (edid_ext[0x3] & EDID_BASIC_AUDIO) != 0);
 
     if (has_audio) {
         DRM_DEBUG_KMS("Monitor has basic audio support\n");
@@ -5235,7 +5235,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
     if (!(edid->input & DRM_EDID_INPUT_DIGITAL)) {
         return quirks;
     }
-	info->color_formats |= DRM_COLOR_FORMAT_RGB444;
+    info->color_formats |= DRM_COLOR_FORMAT_RGB444;
     drm_parse_cea_ext(connector, edid);
 
     /*
