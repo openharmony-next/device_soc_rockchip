@@ -756,7 +756,8 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
         EncoderOut_t pOutput;
         OMX_U8 *aOut_buf = outputUseBuffer->bufferHeader->pBuffer;
         Rockchip_OSAL_Memset(&pOutput, 0, sizeof(EncoderOut_t));
-        if ((OMX_FALSE == pVideoEnc->bSpsPpsHeaderFlag) && (pVideoEnc->codecId == OMX_VIDEO_CodingAVC)) {
+        if ((OMX_FALSE == pVideoEnc->bSpsPpsHeaderFlag) && ((pVideoEnc->codecId == OMX_VIDEO_CodingAVC)
+         || (pVideoEnc->codecId == CODEC_OMX_VIDEO_CodingHEVC))) {
             if (pVideoEnc->bSpsPpsLen > 0) {
                 Rockchip_OSAL_Memcpy(aOut_buf, pVideoEnc->bSpsPpsbuf, pVideoEnc->bSpsPpsLen);
                 outputUseBuffer->remainDataLen = pVideoEnc->bSpsPpsLen;
@@ -825,6 +826,17 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
                     outputUseBuffer->usedDataLen += 4; // 4:byte alignment
                     outputUseBuffer->usedDataLen += pOutput.size;
                 }
+            } else if (pVideoEnc->codecId == CODEC_OMX_VIDEO_CodingHEVC &&
+                      (pVideoEnc->bPrependSpsPpsToIdr && pOutput.keyFrame)) {
+                    omx_info("IDR outputUseBuffer->remainDataLen  %d spslen %d size %d",
+                        (int)outputUseBuffer->remainDataLen, (int)pVideoEnc->bSpsPpsLen,
+                        (int)outputUseBuffer->allocSize);
+                    // The start code is included in pOutput.data
+                    Rockchip_OSAL_Memcpy(aOut_buf, pVideoEnc->bSpsPpsbuf, pVideoEnc->bSpsPpsLen);
+                    Rockchip_OSAL_Memcpy(aOut_buf + pVideoEnc->bSpsPpsLen, pOutput.data, pOutput.size);
+                    outputUseBuffer->remainDataLen = pVideoEnc->bSpsPpsLen + pOutput.size;
+                    outputUseBuffer->usedDataLen += pVideoEnc->bSpsPpsLen;
+                    outputUseBuffer->usedDataLen += pOutput.size;
             } else {
                 Rockchip_OSAL_Memcpy(aOut_buf, pOutput.data, pOutput.size);
                 outputUseBuffer->remainDataLen = pOutput.size;
@@ -1403,25 +1415,20 @@ OMX_ERRORTYPE Rkvpu_Enc_ComponentInit(OMX_COMPONENTTYPE *pOMXComponent)
         pVideoEnc->bLast_config_frame = 0;
         pVideoEnc->bSpsPpsHeaderFlag = OMX_FALSE;
         pVideoEnc->bSpsPpsbuf = NULL;
-        if (pVideoEnc->codecId == (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC) {
+        if (p_vpu_ctx->extradata == NULL) {
+            omx_err("init get extradata fail!");
             pVideoEnc->bSpsPpsbuf = NULL;
             pVideoEnc->bSpsPpsLen = 0;
+            goto EXIT;
         } else {
-            if (p_vpu_ctx->extradata == NULL) {
-                omx_err("init get extradata fail!");
-                pVideoEnc->bSpsPpsbuf = NULL;
-                pVideoEnc->bSpsPpsLen = 0;
-                goto EXIT;
+            if ((p_vpu_ctx->extradata != NULL) && p_vpu_ctx->extradata_size > 0 &&
+                p_vpu_ctx->extradata_size <= 2048) { // 2048:extradata_size
+                pVideoEnc->bSpsPpsbuf = (OMX_U8 *)Rockchip_OSAL_Malloc(2048); // 2048:extradata_size
+                Rockchip_OSAL_Memcpy(pVideoEnc->bSpsPpsbuf, p_vpu_ctx->extradata, p_vpu_ctx->extradata_size);
+                pVideoEnc->bSpsPpsLen = p_vpu_ctx->extradata_size;
             } else {
-                if ((p_vpu_ctx->extradata != NULL) && p_vpu_ctx->extradata_size > 0 &&
-                    p_vpu_ctx->extradata_size <= 2048) { // 2048:extradata_size
-                    pVideoEnc->bSpsPpsbuf = (OMX_U8 *)Rockchip_OSAL_Malloc(2048); // 2048:extradata_size
-                    Rockchip_OSAL_Memcpy(pVideoEnc->bSpsPpsbuf, p_vpu_ctx->extradata, p_vpu_ctx->extradata_size);
-                    pVideoEnc->bSpsPpsLen = p_vpu_ctx->extradata_size;
-                } else {
-                    omx_err("p_vpu_ctx->extradata = %p,p_vpu_ctx->extradata_size = %d",
-                        p_vpu_ctx->extradata, p_vpu_ctx->extradata_size);
-                }
+                omx_err("p_vpu_ctx->extradata = %p,p_vpu_ctx->extradata_size = %d",
+                    p_vpu_ctx->extradata, p_vpu_ctx->extradata_size);
             }
         }
     }
