@@ -3401,7 +3401,8 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
     }
 
     /* If dw-hdmi is the only bridge, avoid negociating with ourselves */
-    if (list_is_singular(&bridge->encoder->bridge_chain) || list_is_first(&bridge->chain_node, &bridge->encoder->bridge_chain)) {
+    if (list_is_singular(&bridge->encoder->bridge_chain) ||
+        list_is_first(&bridge->chain_node, &bridge->encoder->bridge_chain)) {
         *num_output_fmts = 1;
         output_fmts[0] = MEDIA_BUS_FMT_FIXED;
 

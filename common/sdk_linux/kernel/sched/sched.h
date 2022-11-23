@@ -160,7 +160,7 @@ extern void call_trace_sched_update_nr_running(struct rq *rq, int count);
 #define MAX_LATENCY_NICE	19
 #define MIN_LATENCY_NICE	-20
 #define LATENCY_NICE_WIDTH	\
-	(MAX_LATENCY_NICE - MIN_LATENCY_NICE + 1)
+    (MAX_LATENCY_NICE - MIN_LATENCY_NICE + 1)
 #define DEFAULT_LATENCY_NICE	0
 #define DEFAULT_LATENCY_PRIO	(DEFAULT_LATENCY_NICE + LATENCY_NICE_WIDTH/2)
 #define NICE_TO_LATENCY(nice)	((nice) + DEFAULT_LATENCY_PRIO)

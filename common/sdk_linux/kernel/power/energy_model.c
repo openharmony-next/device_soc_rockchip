@@ -113,7 +113,7 @@ static void em_debug_remove_pd(struct device *dev)
 static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd, int nr_states,
                                 struct em_data_callback *cb)
 {
-	unsigned long power, freq, prev_freq = 0, prev_cost = ULONG_MAX;
+    unsigned long power, freq, prev_freq = 0, prev_cost = ULONG_MAX;
     struct em_perf_state *table;
     int i, ret;
     u64 fmax;
@@ -160,16 +160,16 @@ static int em_create_perf_table(struct device *dev, struct em_perf_domain *pd, i
 
     /* Compute the cost of each performance state. */
     fmax = (u64)table[nr_states - 1].frequency;
-	for (i = nr_states - 1; i >= 0; i--) {
+    for (i = nr_states - 1; i >= 0; i--) {
         unsigned long power_res = em_scale_power(table[i].power);
 
         table[i].cost = div64_u64(fmax * power_res, table[i].frequency);
-		if (table[i].cost >= prev_cost) {
-			dev_dbg(dev, "EM: OPP:%lu is inefficient\n",
-				table[i].frequency);
-		} else {
-			prev_cost = table[i].cost;
-		}
+        if (table[i].cost >= prev_cost) {
+            dev_dbg(dev, "EM: OPP:%lu is inefficient\n",
+                table[i].frequency);
+        } else {
+            prev_cost = table[i].cost;
+        }
     }
 
     pd->table = table;

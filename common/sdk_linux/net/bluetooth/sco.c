@@ -51,8 +51,8 @@ struct sco_conn {
     unsigned int mtu;
 };
 
-#define sco_conn_lock(c) spin_lock(&(c)->lock);
-#define sco_conn_unlock(c) spin_unlock(&(c)->lock);
+#define sco_conn_lock(c) spin_lock(&(c)->lock)
+#define sco_conn_unlock(c) spin_unlock(&(c)->lock)
 
 static void sco_sock_close(struct sock *sk);
 static void sco_sock_kill(struct sock *sk);
@@ -137,7 +137,7 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
     }
 
     spin_lock_init(&conn->lock);
-	INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
+    INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
 
     hcon->sco_data = conn;
     conn->hcon = hcon;
@@ -220,7 +220,6 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *
     sco_pi(sk)->conn = conn;
     conn->sk = sk;
 
-
     if (parent) {
         bt_accept_enqueue(parent, sk, true);
     }
@@ -292,7 +291,7 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
 static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
 {
     struct sco_conn *conn = sco_pi(sk)->conn;
-	int len = skb->len;
+    int len = skb->len;
 
     /* Check outgoing MTU */
     if (len > conn->mtu) {
@@ -300,8 +299,6 @@ static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
     }
 
     BT_DBG("sk %p len %d", sk, len);
-
-
 
     hci_send_sco(conn->hcon, skb);
 
@@ -593,8 +590,8 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
     }
 
     if (sk->sk_type != SOCK_SEQPACKET) {
-       err = -EINVAL;
-       goto done;
+        err = -EINVAL;
+        goto done;
     }
 
     hdev = hci_get_route(&sa->sco_bdaddr, &sco_pi(sk)->src, BDADDR_BREDR);
@@ -738,7 +735,7 @@ static int sco_sock_getname(struct socket *sock, struct sockaddr *addr, int peer
 static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 {
     struct sock *sk = sock->sk;
-	struct sk_buff *skb;
+    struct sk_buff *skb;
     int err;
 
     BT_DBG("sock %p, sk %p", sock, sk);
@@ -751,23 +748,23 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
     if (msg->msg_flags & MSG_OOB) {
         return -EOPNOTSUPP;
     }
-	
-	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
-	if (IS_ERR(skb)) {
-		return PTR_ERR(skb);
-	}
+    
+    skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
+    if (IS_ERR(skb)) {
+        return PTR_ERR(skb);
+    }
 
     lock_sock(sk);
 
     if (sk->sk_state == BT_CONNECTED) {
-		err = sco_send_frame(sk, skb);
+        err = sco_send_frame(sk, skb);
     } else {
         err = -ENOTCONN;
     }
 
     release_sock(sk);
-	if (err < 0)
-		kfree_skb(skb);
+    if (err < 0)
+        kfree_skb(skb);
     return err;
 }
 

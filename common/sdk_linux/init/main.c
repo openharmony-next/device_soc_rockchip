@@ -398,7 +398,7 @@ static char *__init xbc_make_cmdline(const char *key)
     ret = xbc_snprint_cmdline(new_cmdline, len + 1, root);
     if (ret < 0 || ret > len) {
         pr_err("Failed to print extra kernel cmdline.\n");
-		memblock_free(__pa(new_cmdline), len + 1);
+        memblock_free(__pa(new_cmdline), len + 1);
         return NULL;
     }
 
@@ -1391,10 +1391,9 @@ static noinline void __init kernel_init_freeable(void);
 bool rodata_enabled __ro_after_init = true;
 static int __init set_debug_rodata(char *str)
 {
-    	if (strtobool(str, &rodata_enabled))
-		pr_warn("Invalid option string for rodata: '%s'\n", str);
-	return 1;
-
+        if (strtobool(str, &rodata_enabled))
+            pr_warn("Invalid option string for rodata: '%s'\n", str);
+    return 1;
 }
 __setup("rodata=", set_debug_rodata);
 #endif
@@ -1545,7 +1544,7 @@ static noinline void __init kernel_init_freeable(void)
     sched_init_smp();
 
 #ifdef CONFIG_ROCKCHIP_THUNDER_BOOT
-	kthread_run(defer_free_memblock, NULL, "defer_mem");
+    kthread_run(defer_free_memblock, NULL, "defer_mem");
 #endif
     padata_init();
     page_alloc_init_late();

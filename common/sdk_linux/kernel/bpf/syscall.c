@@ -1373,7 +1373,7 @@ int generic_map_update_batch(struct bpf_map *map, const union bpf_attr *attr, un
 
         if (err) {
             break;
-		cond_resched();
+        cond_resched();
         }
     }
 
@@ -1478,7 +1478,7 @@ int generic_map_lookup_batch(struct bpf_map *map, const union bpf_attr *attr, un
         swap(prev_key, key);
         retry = MAP_LOOKUP_RETRIES;
         cp++;
-		cond_resched();
+        cond_resched();
     }
 
     if (err == -EFAULT) {

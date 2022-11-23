@@ -4636,10 +4636,10 @@ static int vop2_crtc_loader_protect(struct drm_crtc *crtc, bool on)
 
 #define DEBUG_PRINT(args...)                                                                                           \
     do {                                                                                                               \
-			if (s) \
+            if (s) \
             seq_printf(s, args);                                                                                       \
-			else \
-				pr_err(args); \
+            else \
+                pr_err(args); \
     } while (0)
 
 static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)

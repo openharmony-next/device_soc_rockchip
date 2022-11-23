@@ -3,7 +3,6 @@
  * (C) Copyright 2008-2015 Fuzhou Rockchip Electronics Co., Ltd
  */
 
-#include <errno.h>
 #include <memory.h>
 #include <stdint.h>
 #include <stdio.h>

@@ -465,7 +465,7 @@ void ipc_rmid(struct ipc_ids *ids, struct kern_ipc_perm *ipcp)
 {
     int idx = ipcid_to_idx(ipcp->id);
 
-	WARN_ON_ONCE(idr_remove(&ids->ipcs_idr, idx) != ipcp);
+    WARN_ON_ONCE(idr_remove(&ids->ipcs_idr, idx) != ipcp);
     ipc_kht_remove(ids, ipcp);
     ids->in_use--;
     ipcp->deleted = true;

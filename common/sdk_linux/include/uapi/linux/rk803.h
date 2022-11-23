@@ -6,7 +6,6 @@
 #ifndef _UAPI_RK803_H
 #define _UAPI_RK803_H
 
-#include <linux/types.h>
 #define RK803_SET_GPIO1 _IOW('p', 1, int)
 #define RK803_SET_GPIO2 _IOW('p', 2, int)
 #define RK803_SET_CURENT1 _IOW('p', 3, int)

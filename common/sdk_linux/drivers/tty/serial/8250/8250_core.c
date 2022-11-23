@@ -596,8 +596,8 @@ static void __init serial8250_register_ports(struct uart_driver *drv, struct dev
         }
 
         up->port.dev = dev;
-		if (uart_console_enabled(&up->port))
-			pm_runtime_get_sync(up->port.dev);
+        if (uart_console_enabled(&up->port))
+            pm_runtime_get_sync(up->port.dev);
 
         serial8250_apply_quirks(up);
         uart_add_one_port(drv, &up->port);

@@ -2647,7 +2647,7 @@ static void xfs_iunpin(struct xfs_inode *ip)
     trace_xfs_inode_unpin_nowait(ip, _RET_IP_);
 
     /* Give the log a push to start the unpinning I/O */
-	xfs_log_force_seq(ip->i_mount, ip->i_itemp->ili_commit_seq, 0, NULL);
+    xfs_log_force_seq(ip->i_mount, ip->i_itemp->ili_commit_seq, 0, NULL);
 }
 
 static void _xfs_iunpin_wait(struct xfs_inode *ip)
@@ -3148,29 +3148,29 @@ int xfs_rename(struct xfs_inode *src_dp, struct xfs_name *src_name, struct xfs_i
         }
     }
 
-	/*
-	 * Lock the AGI buffers we need to handle bumping the nlink of the
-	 * whiteout inode off the unlinked list and to handle dropping the
-	 * nlink of the target inode.  Per locking order rules, do this in
-	 * increasing AG order and before directory block allocation tries to
-	 * grab AGFs because we grab AGIs before AGFs.
-	 *
-	 * The (vfs) caller must ensure that if src is a directory then
-	 * target_ip is either null or an empty directory.
-	 */
-	for (i = 0; i < num_inodes && inodes[i] != NULL; i++) {
-		if (inodes[i] == wip ||
-		    (inodes[i] == target_ip &&
-		     (VFS_I(target_ip)->i_nlink == 1 || src_is_directory))) {
-			struct xfs_buf	*bp;
-			xfs_agnumber_t	agno;
+    /*
+     * Lock the AGI buffers we need to handle bumping the nlink of the
+     * whiteout inode off the unlinked list and to handle dropping the
+     * nlink of the target inode.  Per locking order rules, do this in
+     * increasing AG order and before directory block allocation tries to
+     * grab AGFs because we grab AGIs before AGFs.
+     *
+     * The (vfs) caller must ensure that if src is a directory then
+     * target_ip is either null or an empty directory.
+     */
+    for (i = 0; i < num_inodes && inodes[i] != NULL; i++) {
+        if (inodes[i] == wip ||
+            (inodes[i] == target_ip &&
+             (VFS_I(target_ip)->i_nlink == 1 || src_is_directory))) {
+            struct xfs_buf *bp;
+            xfs_agnumber_t agno;
 
-			agno = XFS_INO_TO_AGNO(mp, inodes[i]->i_ino);
-			error = xfs_read_agi(mp, tp, agno, &bp);
-			if (error)
-				goto out_trans_cancel;
-		}
-	}
+            agno = XFS_INO_TO_AGNO(mp, inodes[i]->i_ino);
+            error = xfs_read_agi(mp, tp, agno, &bp);
+            if (error)
+                goto out_trans_cancel;
+        }
+    }
 
     /*
      * Directory entry creation below may acquire the AGF. Remove

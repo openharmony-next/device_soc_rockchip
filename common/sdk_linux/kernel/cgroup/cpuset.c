@@ -2210,7 +2210,7 @@ static int cpuset_can_attach(struct cgroup_taskset *tset)
 
     cgroup_taskset_for_each(task, css, tset)
     {
-		ret = task_can_attach(task, cs->effective_cpus);
+        ret = task_can_attach(task, cs->effective_cpus);
         if (ret) {
             goto out_unlock;
         }

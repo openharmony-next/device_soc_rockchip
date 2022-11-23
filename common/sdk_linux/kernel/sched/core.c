@@ -907,7 +907,7 @@ int tg_nop(struct task_group *tg, void *data)
 
 static void set_load_weight(struct task_struct *p)
 {
-	bool update_load = !(READ_ONCE(p->state) & TASK_NEW);
+    bool update_load = !(READ_ONCE(p->state) & TASK_NEW);
     int prio = p->static_prio - MAX_RT_PRIO;
     struct load_weight *load = &p->se.load;
 
@@ -3619,7 +3619,7 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
         }
 
         p->prio = p->normal_prio = p->static_prio;
-		set_load_weight(p);
+        set_load_weight(p);
 
 #ifdef CONFIG_SCHED_LATENCY_NICE
         p->latency_prio = NICE_TO_LATENCY(0);
@@ -5466,7 +5466,7 @@ void set_user_nice(struct task_struct *p, long nice)
     }
 
     p->static_prio = NICE_TO_PRIO(nice);
-	set_load_weight(p);
+    set_load_weight(p);
     old_prio = p->prio;
     p->prio = effective_prio(p);
 
@@ -5649,7 +5649,7 @@ static void __setscheduler_params(struct task_struct *p,
      */
     p->rt_priority = attr->sched_priority;
     p->normal_prio = normal_prio(p);
-	set_load_weight(p);
+    set_load_weight(p);
 }
 
 /*
@@ -7213,11 +7213,10 @@ int task_can_attach(struct task_struct *p,
 
     if (dl_task(p) &&
         !cpumask_intersects(task_rq(p)->rd->span, cs_effective_cpus)) {
-		int cpu = cpumask_any_and(cpu_active_mask, cs_effective_cpus);
-
-		if (unlikely(cpu >= nr_cpu_ids))
-			return -EINVAL;
-		ret = dl_cpu_busy(cpu, p);
+        int cpu = cpumask_any_and(cpu_active_mask, cs_effective_cpus);
+        if (unlikely(cpu >= nr_cpu_ids))
+            return -EINVAL;
+        ret = dl_cpu_busy(cpu, p);
     }
 
 out:
@@ -7841,9 +7840,9 @@ static void cpuset_cpu_active(void)
 static int cpuset_cpu_inactive(unsigned int cpu)
 {
     if (!cpuhp_tasks_frozen) {
-		int ret = dl_cpu_busy(cpu, NULL);
-		if (ret) {
-			return ret;
+        int ret = dl_cpu_busy(cpu, NULL);
+        if (ret) {
+            return ret;
         }
         cpuset_update_active_cpus();
     } else {
@@ -8191,8 +8190,7 @@ void __init sched_init(void)
     }
 
     BUG_ON(alloc_related_thread_groups());
-	set_load_weight(&init_task);
-
+    set_load_weight(&init_task);
     /*
      * The boot idle thread does lazy MMU switching as well:
      */

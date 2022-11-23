@@ -309,7 +309,6 @@ void _dma_fence_might_wait(void)
     }
 #endif
 
-
 /**
  * dma_fence_signal_timestamp_locked - signal completion of a fence
  * @fence: the fence to signal
@@ -329,30 +328,30 @@ void _dma_fence_might_wait(void)
  * signalled already.
  */
 int dma_fence_signal_timestamp_locked(struct dma_fence *fence,
-				      ktime_t timestamp)
+                      ktime_t timestamp)
 {
-	struct dma_fence_cb *cur, *tmp;
-	struct list_head cb_list;
+    struct dma_fence_cb *cur, *tmp;
+    struct list_head cb_list;
 
-	lockdep_assert_held(fence->lock);
+    lockdep_assert_held(fence->lock);
 
-	if (unlikely(test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
-				      &fence->flags)))
-		return -EINVAL;
+    if (unlikely(test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
+        &fence->flags)))
+        return -EINVAL;
 
-	/* Stash the cb_list before replacing it with the timestamp */
-	list_replace(&fence->cb_list, &cb_list);
+    /* Stash the cb_list before replacing it with the timestamp */
+    list_replace(&fence->cb_list, &cb_list);
 
-	fence->timestamp = timestamp;
-	set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
-	trace_dma_fence_signaled(fence);
+    fence->timestamp = timestamp;
+    set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
+    trace_dma_fence_signaled(fence);
 
-	list_for_each_entry_safe(cur, tmp, &cb_list, node) {
-		INIT_LIST_HEAD(&cur->node);
-		cur->func(fence, cur);
-	}
+    list_for_each_entry_safe(cur, tmp, &cb_list, node) {
+        INIT_LIST_HEAD(&cur->node);
+        cur->func(fence, cur);
+    }
 
-	return 0;
+    return 0;
 }
 EXPORT_SYMBOL(dma_fence_signal_timestamp_locked);
 
@@ -405,7 +404,7 @@ EXPORT_SYMBOL(dma_fence_signal_timestamp);
  */
 int dma_fence_signal_locked(struct dma_fence *fence)
 {
-	return dma_fence_signal_timestamp_locked(fence, ktime_get());
+    return dma_fence_signal_timestamp_locked(fence, ktime_get());
 }
 EXPORT_SYMBOL(dma_fence_signal_locked);
 

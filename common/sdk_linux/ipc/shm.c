@@ -235,31 +235,31 @@ static void shm_rcu_free(struct rcu_head *head)
  */
 static inline void shm_clist_rm(struct shmid_kernel *shp)
 {
-	struct task_struct *creator;
+    struct task_struct *creator;
 
-	/* ensure that shm_creator does not disappear */
-	rcu_read_lock();
+    /* ensure that shm_creator does not disappear */
+    rcu_read_lock();
 
-	/*
-	 * A concurrent exit_shm may do a list_del_init() as well.
-	 * Just do nothing if exit_shm already did the work
-	 */
-	if (!list_empty(&shp->shm_clist)) {
-		/*
-		 * shp->shm_creator is guaranteed to be valid *only*
-		 * if shp->shm_clist is not empty.
-		 */
-		creator = shp->shm_creator;
+    /*
+     * A concurrent exit_shm may do a list_del_init() as well.
+     * Just do nothing if exit_shm already did the work
+     */
+    if (!list_empty(&shp->shm_clist)) {
+        /*
+         * shp->shm_creator is guaranteed to be valid *only*
+         * if shp->shm_clist is not empty.
+         */
+        creator = shp->shm_creator;
 
-		task_lock(creator);
-		/*
-		 * list_del_init() is a nop if the entry was already removed
-		 * from the list.
-		 */
-		list_del_init(&shp->shm_clist);
-		task_unlock(creator);
-	}
-	rcu_read_unlock();
+        task_lock(creator);
+        /*
+         * list_del_init() is a nop if the entry was already removed
+         * from the list.
+         */
+        list_del_init(&shp->shm_clist);
+        task_unlock(creator);
+    }
+    rcu_read_unlock();
 }
 
 static inline void shm_rmid(struct shmid_kernel *s)
@@ -345,8 +345,8 @@ static void shm_destroy(struct ipc_namespace *ns, struct shmid_kernel *shp)
 static bool shm_may_destroy(struct shmid_kernel *shp)
 {
     return (shp->shm_nattch == 0) &&
-	       (shp->ns->shm_rmid_forced ||
-		(shp->shm_perm.mode & SHM_DEST));
+           (shp->ns->shm_rmid_forced ||
+        (shp->shm_perm.mode & SHM_DEST));
 }
 
 /*
@@ -432,80 +432,80 @@ void exit_shm(struct task_struct *task)
             break;
         }
 
-		shp = list_first_entry(&task->sysvshm.shm_clist, struct shmid_kernel,
-				shm_clist);
+        shp = list_first_entry(&task->sysvshm.shm_clist, struct shmid_kernel,
+                shm_clist);
 
-		/*
-		 * 1) Get pointer to the ipc namespace. It is worth to say
-		 * that this pointer is guaranteed to be valid because
-		 * shp lifetime is always shorter than namespace lifetime
-		 * in which shp lives.
-		 * We taken task_lock it means that shp won't be freed.
-		 */
+        /*
+         * 1) Get pointer to the ipc namespace. It is worth to say
+         * that this pointer is guaranteed to be valid because
+         * shp lifetime is always shorter than namespace lifetime
+         * in which shp lives.
+         * We taken task_lock it means that shp won't be freed.
+         */
         ns = shp->ns;
 
-		/*
-		 * 2) If kernel.shm_rmid_forced is not set then only keep track of
-		 * which shmids are orphaned, so that a later set of the sysctl
-		 * can clean them up.
-		 */
+        /*
+         * 2) If kernel.shm_rmid_forced is not set then only keep track of
+         * which shmids are orphaned, so that a later set of the sysctl
+         * can clean them up.
+         */
         if (!ns->shm_rmid_forced)
             goto unlink_continue;
 
-		/*
-		 * 3) get a reference to the namespace.
-		 *    The refcount could be already 0. If it is 0, then
-		 *    the shm objects will be free by free_ipc_work().
-		 */
+        /*
+         * 3) get a reference to the namespace.
+         *    The refcount could be already 0. If it is 0, then
+         *    the shm objects will be free by free_ipc_work().
+         */
         ns = get_ipc_ns_not_zero(ns);
         if (!ns) {
 unlink_continue:
-			list_del_init(&shp->shm_clist);
+            list_del_init(&shp->shm_clist);
             task_unlock(task);
             continue;
         }
 
-		/*
-		 * 4) get a reference to shp.
-		 *   This cannot fail: shm_clist_rm() is called before
-		 *   ipc_rmid(), thus the refcount cannot be 0.
-		 */
+        /*
+         * 4) get a reference to shp.
+         *   This cannot fail: shm_clist_rm() is called before
+         *   ipc_rmid(), thus the refcount cannot be 0.
+         */
         WARN_ON(!ipc_rcu_getref(&shp->shm_perm));
 
-		/*
-		 * 5) unlink the shm segment from the list of segments
-		 *    created by current.
-		 *    This must be done last. After unlinking,
-		 *    only the refcounts obtained above prevent IPC_RMID
-		 *    from destroying the segment or the namespace.
-		 */
+        /*
+         * 5) unlink the shm segment from the list of segments
+         *    created by current.
+         *    This must be done last. After unlinking,
+         *    only the refcounts obtained above prevent IPC_RMID
+         *    from destroying the segment or the namespace.
+         */
         list_del_init(&shp->shm_clist);
 
         task_unlock(task);
 
-		/*
-		 * 6) we have all references
-		 *    Thus lock & if needed destroy shp.
-		 */
+        /*
+         * 6) we have all references
+         *    Thus lock & if needed destroy shp.
+         */
         down_write(&shm_ids(ns).rwsem);
         shm_lock_by_ptr(shp);
-		/*
-		 * rcu_read_lock was implicitly taken in shm_lock_by_ptr, it's
-		 * safe to call ipc_rcu_putref here
-		 */
+        /*
+         * rcu_read_lock was implicitly taken in shm_lock_by_ptr, it's
+         * safe to call ipc_rcu_putref here
+         */
         ipc_rcu_putref(&shp->shm_perm, shm_rcu_free);
 
         if (ipc_valid_object(&shp->shm_perm)) {
             if (shm_may_destroy(shp))
                 shm_destroy(ns, shp);
             else
-				shm_unlock(shp);
+                shm_unlock(shp);
         } else {
-			/*
-			 * Someone else deleted the shp from namespace
-			 * idr/kht while we have waited.
-			 * Just unlock and continue.
-			 */
+            /*
+             * Someone else deleted the shp from namespace
+             * idr/kht while we have waited.
+             * Just unlock and continue.
+             */
             shm_unlock(shp);
         }
 
@@ -775,11 +775,11 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
     if (error < 0) {
         goto no_id;
     }
-	shp->ns = ns;
+    shp->ns = ns;
 
-	task_lock(current);
-	list_add(&shp->shm_clist, &current->sysvshm.shm_clist);
-	task_unlock(current);
+    task_lock(current);
+    list_add(&shp->shm_clist, &current->sysvshm.shm_clist);
+    task_unlock(current);
 
     /*
      * shmid gets reported as "inode#" in /proc/pid/maps.
