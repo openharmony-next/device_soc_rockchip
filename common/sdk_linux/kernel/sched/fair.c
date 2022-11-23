@@ -5456,7 +5456,6 @@ static enum hrtimer_restart sched_cfs_slack_timer(struct hrtimer *timer)
     return HRTIMER_NORESTART;
 }
 
-extern const u64 max_cfs_quota_period;
 static enum hrtimer_restart sched_cfs_period_timer(struct hrtimer *timer)
 {
     struct cfs_bandwidth *cfs_b = container_of(timer, struct cfs_bandwidth, period_timer);

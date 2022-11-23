@@ -4634,12 +4634,9 @@ static int vop2_crtc_loader_protect(struct drm_crtc *crtc, bool on)
     return 0;
 }
 
-#define DEBUG_PRINT(args...)                                                                                           \
-    do {                                                                                                               \
-            if (s) \
-            seq_printf(s, args);                                                                                       \
-            else \
-                pr_err(args); \
+#define DEBUG_PRINT(args...)           \
+    do {                               \
+        pr_err(args);                  \
     } while (0)
 
 static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
@@ -4656,7 +4653,7 @@ static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
 
     int i;
 
-    DEBUG_PRINT("    %s: %s\n", win->name, pstate->crtc ? "ACTIVE" : "DISABLED");
+    DEBUG_PRINT("%s: %s\n", win->name, pstate->crtc ? "ACTIVE" : "DISABLED");
     if (!fb) {
         return 0;
     }

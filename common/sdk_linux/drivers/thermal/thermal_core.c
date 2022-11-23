@@ -830,8 +830,8 @@ void thermal_zone_device_unbind_exception(struct thermal_zone_device *tz, const 
  *
  * Return: 0 on success, the proper error value otherwise.
  */
-int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, struct thermal_cooling_device *cdev,
-                                     unsigned long upper, unsigned long lower, unsigned int weight)
+int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip,
+    struct thermal_cooling_device *cdev, unsigned long upper, unsigned long lower, unsigned int weight)
 {
     struct thermal_instance *dev, *pos;
     struct thermal_zone_device *pos1;
@@ -843,14 +843,12 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, s
         return -EINVAL;
     }
 
-    list_for_each_entry(pos1, &thermal_tz_list, node)
-    {
+    list_for_each_entry(pos1, &thermal_tz_list, node) {
         if (pos1 == tz) {
             break;
         }
     }
-    list_for_each_entry(pos2, &thermal_cdev_list, node)
-    {
+    list_for_each_entry(pos2, &thermal_cdev_list, node) {
         if (pos2 == cdev) {
             break;
         }
@@ -1101,9 +1099,8 @@ static void bind_cdev(struct thermal_cooling_device *cdev)
  * Return: a pointer to the created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
-static struct thermal_cooling_device *__thermal_cooling_device_register(struct device_node *np, const char *type,
-                                                                        void *devdata,
-                                                                        const struct thermal_cooling_device_ops *ops)
+static struct thermal_cooling_device *__thermal_cooling_device_register(
+    struct device_node *np, const char *type, void *devdata, const struct thermal_cooling_device_ops *ops)
 {
     struct thermal_cooling_device *cdev;
     struct thermal_zone_device *pos = NULL;

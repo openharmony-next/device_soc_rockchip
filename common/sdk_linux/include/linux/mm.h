@@ -2,8 +2,6 @@
 #ifndef _LINUX_MM_H
 #define _LINUX_MM_H
 
-#include <linux/errno.h>
-
 #ifdef __KERNEL__
 
 #include <linux/mmdebug.h>
@@ -174,8 +172,8 @@ extern int mmap_rnd_compat_bits __read_mostly;
  * combine write statments if they are both assignments and can be reordered,
  * this can result in several of the writes here being dropped.
  */
-#define mm_zero_struct_page(pp) __mm_zero_struct_page(pp)
-static inline void __mm_zero_struct_page(struct page *page)
+#define mm_zero_struct_page(pp) _mm_zero_struct_page(pp)
+static inline void _mm_zero_struct_page(struct page *page)
 {
     unsigned long *_pp = (void *)page;
 

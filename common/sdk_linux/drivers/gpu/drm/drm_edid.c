@@ -2026,9 +2026,7 @@ EXPORT_SYMBOL_GPL(drm_do_get_edid);
 
 /**
  * drm_probe_ddc() - probe DDC presence
- * @adapter: I2C adapter to probe
- *
- * Return: True on success, false on failure.
+ * Return: True -> success, false -> failure.
  */
 bool drm_probe_ddc(struct i2c_adapter *adapter)
 {
@@ -2040,9 +2038,6 @@ EXPORT_SYMBOL(drm_probe_ddc);
 
 /**
  * drm_get_edid - get EDID data, if available
- * @connector: connector we're probing
- * @adapter: I2C adapter to use for DDC
- *
  * Poke the given I2C channel to grab EDID data if possible.  If found,
  * attach it to the connector.
  *

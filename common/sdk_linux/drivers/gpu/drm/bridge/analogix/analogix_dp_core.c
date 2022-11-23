@@ -1448,49 +1448,49 @@ static void analogix_dp_bridge_atomic_enable(struct drm_bridge *bridge, struct d
 
 static void analogix_dp_bridge_disable(struct drm_bridge *bridge)
 {
-    struct analogix_dp_device *dp = bridge->driver_private;
+    struct analogix_dp_device *dp_dev = bridge->driver_private;
 
-    if (dp->dpms_mode != DRM_MODE_DPMS_ON) {
+    if (dp_dev->dpms_mode != DRM_MODE_DPMS_ON) {
         return;
     }
 
-    if (dp->plat_data->panel) {
-        if (drm_panel_disable(dp->plat_data->panel)) {
+    if (dp_dev->plat_data->panel) {
+        if (drm_panel_disable(dp_dev->plat_data->panel)) {
             DRM_ERROR("failed to disable the panel\n");
             return;
         }
     }
 
-    disable_irq(dp->irq);
+    disable_irq(dp_dev->irq);
 
-    if (dp->plat_data->power_off) {
-        dp->plat_data->power_off(dp->plat_data);
+    if (dp_dev->plat_data->power_off) {
+        dp_dev->plat_data->power_off(dp_dev->plat_data);
     }
 
-    analogix_dp_reset_aux(dp);
-    analogix_dp_set_analog_power_down(dp, POWER_ALL, 1);
-    analogix_dp_phy_power_off(dp);
+    analogix_dp_reset_aux(dp_dev);
+    analogix_dp_set_analog_power_down(dp_dev, POWER_ALL, 1);
+    analogix_dp_phy_power_off(dp_dev);
 
-    pm_runtime_put_sync(dp->dev);
+    pm_runtime_put_sync(dp_dev->dev);
 
-    if (dp->plat_data->panel) {
-        analogix_dp_panel_unprepare(dp);
+    if (dp_dev->plat_data->panel) {
+        analogix_dp_panel_unprepare(dp_dev);
     }
 
-    dp->fast_train_enable = false;
-    dp->psr_supported = false;
-    dp->dpms_mode = DRM_MODE_DPMS_OFF;
+    dp_dev->fast_train_enable = false;
+    dp_dev->psr_supported = false;
+    dp_dev->dpms_mode = DRM_MODE_DPMS_OFF;
 }
 
 static void analogix_dp_bridge_atomic_disable(struct drm_bridge *bridge, struct drm_bridge_state *old_bridge_state)
 {
     struct drm_atomic_state *old_state = old_bridge_state->base.state;
-    struct analogix_dp_device *dp = bridge->driver_private;
+    struct analogix_dp_device *dp_dev = bridge->driver_private;
     struct drm_crtc *old_crtc, *new_crtc;
     struct drm_crtc_state *old_crtc_state = NULL;
     struct drm_crtc_state *new_crtc_state = NULL;
     int ret;
-    new_crtc = analogix_dp_get_new_crtc(dp, old_state);
+    new_crtc = analogix_dp_get_new_crtc(dp_dev, old_state);
     if (!new_crtc) {
         goto out;
     }
@@ -1503,13 +1503,13 @@ static void analogix_dp_bridge_atomic_disable(struct drm_bridge *bridge, struct 
         return;
     }
 out:
-    old_crtc = analogix_dp_get_old_crtc(dp, old_state);
+    old_crtc = analogix_dp_get_old_crtc(dp_dev, old_state);
     if (old_crtc) {
         old_crtc_state = drm_atomic_get_old_crtc_state(old_state, old_crtc);
         /* When moving from PSR to fully disabled, exit PSR first. */
         if (old_crtc_state && old_crtc_state->self_refresh_active) {
-            ret = analogix_dp_disable_psr(dp);
-            if (ret){
+            ret = analogix_dp_disable_psr(dp_dev);
+            if (ret) {
                 DRM_ERROR("Failed to disable psr (%d)\n", ret);
             }
         }
@@ -1725,7 +1725,7 @@ static ssize_t analogix_dpaux_transfer(struct drm_dp_aux *aux, struct drm_dp_aux
     int ret;
     pm_runtime_get_sync(dp->dev);
     ret = analogix_dp_detect_hpd(dp);
-    if (ret){
+    if (ret) {
         goto out;
     }
     ret = analogix_dp_transfer(dp, msg);
@@ -1794,8 +1794,8 @@ EXPORT_SYMBOL_GPL(analogix_dp_loader_protect);
 
 struct analogix_dp_device *analogix_dp_probe(struct device *dev, struct analogix_dp_plat_data *plat_data)
 {
-    struct platform_device *pdev = to_platform_device(dev);
-    struct analogix_dp_device *dp;
+    struct platform_device *pdevice = to_platform_device(dev);
+    struct analogix_dp_device *dp_dev;
     struct resource *res;
     int ret;
 
@@ -1804,105 +1804,99 @@ struct analogix_dp_device *analogix_dp_probe(struct device *dev, struct analogix
         return ERR_PTR(-EINVAL);
     }
 
-    dp = devm_kzalloc(dev, sizeof(struct analogix_dp_device), GFP_KERNEL);
-    if (!dp) {
+    dp_dev = devm_kzalloc(dev, sizeof(struct analogix_dp_device), GFP_KERNEL);
+    if (!dp_dev) {
         return ERR_PTR(-ENOMEM);
     }
 
-    dp->dev = &pdev->dev;
-    dp->dpms_mode = DRM_MODE_DPMS_OFF;
+    dp_dev->dev = &pdevice->dev;
+    dp_dev->dpms_mode = DRM_MODE_DPMS_OFF;
 
-    mutex_init(&dp->panel_lock);
-    dp->panel_is_prepared = false;
+    mutex_init(&dp_dev->panel_lock);
+    dp_dev->panel_is_prepared = false;
+    dp_dev->plat_data = plat_data;
 
-    /*
-     * platform dp driver need containor_of the plat_data to get
-     * the driver private data, so we need to store the point of
-     * plat_data, not the context of plat_data.
-     */
-    dp->plat_data = plat_data;
-
-    ret = analogix_dp_dt_parse_pdata(dp);
+    ret = analogix_dp_dt_parse_pdata(dp_dev);
     if (ret) {
         return ERR_PTR(ret);
     }
 
-    dp->phy = devm_phy_get(dp->dev, "dp");
-    if (IS_ERR(dp->phy)) {
-        dev_err(dp->dev, "no DP phy configured\n");
-        ret = PTR_ERR(dp->phy);
+    dp_dev->phy = devm_phy_get(dp_dev->dev, "dp");
+    if (IS_ERR(dp_dev->phy)) {
+        dev_err(dp_dev->dev, "no DP phy configured\n");
+        ret = PTR_ERR(dp_dev->phy);
         if (ret) {
             /*
              * phy itself is not enabled, so we can move forward
              * assigning NULL to phy pointer.
              */
             if (ret == -ENOSYS || ret == -ENODEV) {
-                dp->phy = NULL;
+                dp_dev->phy = NULL;
             } else {
                 return ERR_PTR(ret);
             }
         }
     }
 
-    ret = devm_clk_bulk_get_all(dev, &dp->clks);
+    ret = devm_clk_bulk_get_all(dev, &dp_dev->clks);
     if (ret < 0) {
         dev_err(dev, "failed to get clocks %d\n", ret);
         return ERR_PTR(ret);
     }
 
-    dp->nr_clks = ret;
+    dp_dev->nr_clks = ret;
 
-    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+    res = platform_get_resource(pdevice, IORESOURCE_MEM, 0);
 
-    dp->reg_base = devm_ioremap_resource(&pdev->dev, res);
-    if (IS_ERR(dp->reg_base)) {
-        ret = PTR_ERR(dp->reg_base);
+    dp_dev->reg_base = devm_ioremap_resource(&pdevice->dev, res);
+    if (IS_ERR(dp_dev->reg_base)) {
+        ret = PTR_ERR(dp_dev->reg_base);
         goto err_disable_clk;
     }
 
-    dp->force_hpd = of_property_read_bool(dev->of_node, "force-hpd");
+    dp_dev->force_hpd = of_property_read_bool(dev->of_node, "force-hpd");
 
     /* Try two different names */
-    dp->hpd_gpiod = devm_gpiod_get_optional(dev, "hpd", GPIOD_IN);
-    if (!dp->hpd_gpiod) {
-        dp->hpd_gpiod = devm_gpiod_get_optional(dev, "samsung,hpd", GPIOD_IN);
+    dp_dev->hpd_gpiod = devm_gpiod_get_optional(dev, "hpd", GPIOD_IN);
+    if (!dp_dev->hpd_gpiod) {
+        dp_dev->hpd_gpiod = devm_gpiod_get_optional(dev, "samsung,hpd", GPIOD_IN);
     }
-    if (IS_ERR(dp->hpd_gpiod)) {
-        dev_err(dev, "error getting HDP GPIO: %ld\n", PTR_ERR(dp->hpd_gpiod));
-        ret = PTR_ERR(dp->hpd_gpiod);
+    if (IS_ERR(dp_dev->hpd_gpiod)) {
+        dev_err(dev, "error getting HDP GPIO: %ld\n", PTR_ERR(dp_dev->hpd_gpiod));
+        ret = PTR_ERR(dp_dev->hpd_gpiod);
         goto err_disable_clk;
     }
 
-    if (dp->hpd_gpiod) {
-        ret = devm_request_threaded_irq(dev, gpiod_to_irq(dp->hpd_gpiod), NULL, analogix_dp_hpd_irq_handler,
-                                        IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, "analogix-hpd", dp);
+    if (dp_dev->hpd_gpiod) {
+        ret = devm_request_threaded_irq(dev, gpiod_to_irq(dp_dev->hpd_gpiod), NULL, analogix_dp_hpd_irq_handler,
+                                        IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, "analogix-hpd", dp_dev);
         if (ret) {
             dev_err(dev, "failed to request hpd IRQ: %d\n", ret);
             return ERR_PTR(ret);
         }
     }
 
-    dp->irq = platform_get_irq(pdev, 0);
-    if (dp->irq == -ENXIO) {
-        dev_err(&pdev->dev, "failed to get irq\n");
+    dp_dev->irq = platform_get_irq(pdevice, 0);
+    if (dp_dev->irq == -ENXIO) {
+        dev_err(&pdevice->dev, "failed to get irq\n");
         ret = -ENODEV;
         goto err_disable_clk;
     }
 
-    irq_set_status_flags(dp->irq, IRQ_NOAUTOEN);
-    ret = devm_request_threaded_irq(&pdev->dev, dp->irq, analogix_dp_hardirq, analogix_dp_irq_thread, 0, "analogix-dp",
-                                    dp);
+    irq_set_status_flags(dp_dev->irq, IRQ_NOAUTOEN);
+    ret = devm_request_threaded_irq(&pdevice->dev, dp_dev->irq, analogix_dp_hardirq, analogix_dp_irq_thread, 0, "analogix-dp",
+                                    dp_dev);
     if (ret) {
-        dev_err(&pdev->dev, "failed to request irq\n");
+        dev_err(&pdevice->dev, "failed to request irq\n");
         goto err_disable_clk;
     }
 
-    dp->bridge.driver_private = dp;
-    dp->bridge.funcs = &analogix_dp_bridge_funcs;
+    dp_dev->bridge.driver_private = dp_dev;
+    dp_dev->bridge.funcs = &analogix_dp_bridge_funcs;
 
-    return dp;
+    return dp_dev;
 err_disable_clk:
-    clk_bulk_disable_unprepare(dp->nr_clks, dp->clks);
+    clk_bulk_disable_unprepare(dp_dev->nr_clks, dp_dev->clks);
     return ERR_PTR(ret);
 }
 EXPORT_SYMBOL_GPL(analogix_dp_probe);

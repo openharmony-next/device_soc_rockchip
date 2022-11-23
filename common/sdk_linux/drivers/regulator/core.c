@@ -408,7 +408,7 @@ static struct device_node *of_get_regulator(struct device *dev, const char *supp
 
     dev_dbg(dev, "Looking up %s-supply from device tree\n", supply);
 
-    snprintf(prop_name, CORE_SIXTYFOUR, "%s-supply", supply);
+    (void)snprintf(prop_name, CORE_SIXTYFOUR, "%s-supply", supply);
     regnode = of_parse_phandle(dev->of_node, prop_name, 0);
     if (!regnode) {
         regnode = of_get_child_regulator(dev->of_node, prop_name);

@@ -537,9 +537,11 @@ static inline struct task_group *next_task_group(struct task_group *tg)
     return tg;
 }
 
-#define cycle_each_rt_rq(rt_rq, iter, rq)                                                                              \
-        for (iter = container_of(&task_groups, typeof(*iter), list);                                                   \
-             (iter = next_task_group(iter)) && (rt_rq = iter->rt_rq[cpu_of(rq)]);)
+#define cycle_each_rt_rq(rt_rq, iter, rq)
+    do {                                                                                    \
+        for (iter = container_of(&task_groups, typeof(*iter), list);                        \
+             (iter = next_task_group(iter)) && (rt_rq = iter->rt_rq[cpu_of(rq)]);)          \
+    } while (0)
 
 #define cycle_each_sched_rt_entity(rt_se) for (; rt_se; rt_se = rt_se->parent)
 

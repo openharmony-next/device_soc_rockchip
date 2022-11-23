@@ -936,13 +936,13 @@ static void of_gpiochip_init_valid_mask(struct gpio_chip *chip)
 #ifdef CONFIG_PINCTRL
 static int of_gpiochip_add_pin_range(struct gpio_chip *chip)
 {
-    struct device_node *np = chip->of_node;
     struct of_phandle_args pinspec;
     struct pinctrl_dev *pctldev;
+    struct device_node *np = chip->of_node;
     int index = 0, ret;
-    const char *name;
-    static const char group_names_propname[] = "gpio-ranges-group-names";
     struct property *group_names;
+    static const char group_names_propname[] = "gpio-ranges-group-names";
+    const char *name;
 
     if (!np) {
         return 0;

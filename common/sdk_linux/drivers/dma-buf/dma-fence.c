@@ -307,6 +307,7 @@ void _dma_fence_might_wait(void)
     if (tmp) {
         lock_acquire(&dma_fence_lockdep_map, 0, 0, 1, 1, NULL, _THIS_IP_);
     }
+}
 #endif
 
 /**
@@ -327,8 +328,7 @@ void _dma_fence_might_wait(void)
  * Returns 0 on success and a negative error value when @fence has been
  * signalled already.
  */
-int dma_fence_signal_timestamp_locked(struct dma_fence *fence,
-                      ktime_t timestamp)
+int dma_fence_signal_timestamp_locked(struct dma_fence *fence, ktime_t timestamp)
 {
     struct dma_fence_cb *cur, *tmp;
     struct list_head cb_list;
@@ -833,7 +833,6 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count
                 return 1;
             }
         }
-
         return 0;
     }
 
@@ -845,10 +844,8 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count
 
     for (i = 0; i < count; ++i) {
         struct dma_fence *fence = fences[i];
-
         cb[i].task = current;
         if (dma_fence_add_callback(fence, &cb[i].base, dma_fence_default_wait_cb)) {
-            /* This fence is already signaled */
             if (idx) {
                 *idx = i;
             }
@@ -872,14 +869,11 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count
             ret = -ERESTARTSYS;
         }
     }
-
     __set_current_state(TASK_RUNNING);
-
 fence_rm_cb:
     while (i-- > 0) {
         dma_fence_remove_callback(fences[i], &cb[i].base);
     }
-
 err_free_cb:
     kfree(cb);
 

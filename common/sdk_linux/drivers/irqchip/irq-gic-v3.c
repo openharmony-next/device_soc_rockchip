@@ -1012,58 +1012,31 @@ static void gic_cpu_sys_reg_init(void)
     bool group0;
     u32 pribits;
 
-    /*
-     * Need to check that the SRE bit has actually been set. If
-     * not, it means that SRE is disabled at EL2. We're going to
-     * die painfully, and there is nothing we can do about it.
-     *
-     * Kindly inform the luser.
-     */
     if (!gic_enable_sre()) {
         pr_err("GIC: unable to set SRE (disabled at EL2), panic ahead\n");
     }
 
     pribits = gic_get_pribits();
-
     group0 = gic_has_group0();
 
     /* Set priority mask register */
     if (!gic_prio_masking_enabled()) {
         write_gicreg(DEFAULT_PMR_VALUE, ICC_PMR_EL1);
     } else if (gic_supports_nmi()) {
-        /*
-         * Mismatch configuration with boot CPU, the system is likely
-         * to die as interrupt masking will not work properly on all
-         * CPUs
-         *
-         * The boot CPU calls this function before enabling NMI support,
-         * and as a result we'll never see this warning in the boot path
-         * for that CPU.
-         */
         if (static_branch_unlikely(&gic_nonsecure_priorities)) {
             WARN_ON(!group0 || gic_dist_security_disabled());
         } else {
             WARN_ON(group0 && !gic_dist_security_disabled());
         }
     }
-
-    /*
-     * Some firmwares hand over to the kernel with the BPR changed from
-     * its reset value (and with a value large enough to prevent
-     * any pre-emptive interrupts from working at all). Writing a zero
-     * to BPR restores is reset value.
-     */
     gic_write_bpr1(0);
 
     if (static_branch_likely(&supports_deactivate_key)) {
-        /* EOI drops priority only (mode 1) */
         gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop);
     } else {
-        /* EOI deactivates interrupt too (mode 0) */
         gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
     }
 
-    /* Always whack Group0 before Group1 */
     if (group0) {
         switch (pribits) {
             case 0x8:
@@ -1078,7 +1051,6 @@ static void gic_cpu_sys_reg_init(void)
             case 0x4:
                 write_gicreg(0, ICC_AP0R0_EL1);
         }
-
         isb();
     }
 
@@ -1097,18 +1069,10 @@ static void gic_cpu_sys_reg_init(void)
     }
 
     isb();
-
-    /* ... and let's hit the road... */
     gic_write_grpen1(1);
-
-    /* Keep the RSS capability status in per_cpu variable */
     per_cpu(has_rss, cpu) = !!(gic_read_ctlr() & ICC_CTLR_EL1_RSS);
-
-    /* Check all the CPUs have capable of sending SGIs to other CPUs */
-    for_each_online_cpu(i)
-    {
+    for_each_online_cpu(i) {
         bool have_rss = per_cpu(has_rss, i) && per_cpu(has_rss, cpu);
-
         need_rss |= MPIDR_RS(cpu_logical_map(i));
         if (need_rss && (!have_rss)) {
             pr_crit("CPU%d (%lx) can't SGI CPU%d (%lx), no RSS\n", cpu, (unsigned long)mpidr, i,
@@ -1116,13 +1080,6 @@ static void gic_cpu_sys_reg_init(void)
         }
     }
 
-    /**
-     * GIC spec says, when ICC_CTLR_EL1.RSS==1 and GICD_TYPER.RSS==0,
-     * writing ICC_ASGI1R_EL1 register with RS != 0 is a CONSTRAINED
-     * UNPREDICTABLE choice of :
-     *   - The write is ignored.
-     *   - The RS field is treated as 0.
-     */
     if (need_rss && (!gic_data.has_rss)) {
         pr_crit_once("RSS is required but GICD doesn't support it\n");
     }
@@ -1466,7 +1423,8 @@ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq, irq_hw_num
     return 0;
 }
 
-static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fwspec, unsigned long *hwirq, unsigned int *type)
+static int gic_irq_domain_translate(struct irq_domain *d, struct irq_fwspec *fwspec,
+    unsigned long *hwirq, unsigned int *type)
 {
     if (fwspec->param_count == 1 && fwspec->param[0] < GIC_IRQ_PARAMETER_VALUE_SIXTEEN) {
         *hwirq = fwspec->param[0];
@@ -1932,7 +1890,7 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
 
             cpu_node = of_find_node_by_phandle(cpu_phandle);
             if (WARN_ON(!cpu_node)) {
-               of_node_put(cpu_node);
+                of_node_put(cpu_node);
                 continue;
             }
 

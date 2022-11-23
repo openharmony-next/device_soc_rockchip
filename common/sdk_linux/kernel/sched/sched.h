@@ -143,6 +143,7 @@ extern __read_mostly int scheduler_running;
 extern unsigned long calc_load_update;
 extern atomic_long_t calc_load_tasks;
 
+extern const u64 max_cfs_quota_period;
 
 extern void calc_global_load_tick(struct rq *this_rq);
 extern long calc_load_fold_active(struct rq *this_rq, long adjust);
@@ -212,6 +213,7 @@ extern void call_trace_sched_update_nr_running(struct rq *rq, int count);
 #define CPU_FREQ_1K 1024
 #define CPU_SAMPLE_ARTE 8
 
+extern struct cpufreq_governor schedutil_gov;
 
 /*
  * Single value that decides SCHED_DEADLINE internal math precision.

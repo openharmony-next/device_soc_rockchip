@@ -356,8 +356,6 @@ static void sched_energy_set(bool has_eas)
  */
 #define EM_MAX_COMPLEXITY 2048
 
-extern struct cpufreq_governor schedutil_gov;
-
 static bool build_perf_domains(const struct cpumask *cpu_map)
 {
     int i, nr_pd = 0, nr_ps = 0, nr_cpus = cpumask_weight(cpu_map);

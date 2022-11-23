@@ -332,7 +332,7 @@ drop:
 }
 
 /* -------- Socket interface ---------- */
-static struct sock *__sco_get_sock_listen_by_addr(bdaddr_t *ba)
+static struct sock *_sco_get_sock_listen_by_addr(bdaddr_t *ba)
 {
     struct sock *sk;
 
@@ -422,7 +422,7 @@ static void sco_sock_kill(struct sock *sk)
     sock_put(sk);
 }
 
-static void __sco_sock_close(struct sock *sk)
+static void _sco_sock_close(struct sock *sk)
 {
     BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
 
@@ -462,7 +462,7 @@ static void sco_sock_close(struct sock *sk)
 {
     sco_sock_clear_timer(sk);
     lock_sock(sk);
-    __sco_sock_close(sk);
+    _sco_sock_close(sk);
     release_sock(sk);
 }
 
@@ -640,7 +640,7 @@ static int sco_sock_listen(struct socket *sock, int backlog)
 
     write_lock(&sco_sk_list.lock);
 
-    if (__sco_get_sock_listen_by_addr(src)) {
+    if (_sco_get_sock_listen_by_addr(src)) {
         err = -EADDRINUSE;
         goto unlock;
     }
@@ -763,8 +763,9 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
     }
 
     release_sock(sk);
-    if (err < 0)
+    if (err < 0) {
         kfree_skb(skb);
+    }
     return err;
 }
 
@@ -1076,7 +1077,7 @@ static int sco_sock_shutdown(struct socket *sock, int how)
     if (!sk->sk_shutdown) {
         sk->sk_shutdown = SHUTDOWN_MASK;
         sco_sock_clear_timer(sk);
-        __sco_sock_close(sk);
+        _sco_sock_close(sk);
 
         if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime && !(current->flags & PF_EXITING)) {
             err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);

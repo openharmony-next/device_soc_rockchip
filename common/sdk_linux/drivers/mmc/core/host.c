@@ -580,7 +580,7 @@ int mmc_add_host(struct mmc_host *host)
 {
     int err;
     err = mmc_validate_host_caps(host);
-    if (err){
+    if (err) {
         return err;
     }
 
