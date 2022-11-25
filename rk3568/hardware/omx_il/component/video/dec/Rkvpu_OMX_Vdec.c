@@ -79,7 +79,7 @@ static const CodeMap kCodeMap[] = {
     {OMX_RK_VIDEO_CodingFLV1, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingFLV1},
     {OMX_RK_VIDEO_CodingVP8, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP8EXT},
     {OMX_RK_VIDEO_CodingWMV, OMX_VIDEO_CodingWMV},
-    {OMX_RK_VIDEO_CodingHEVC, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC},
+    {OMX_RK_VIDEO_CodingHEVC, (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC},
     {OMX_RK_VIDEO_CodingVP9, (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingVP9},
     /*
      * remove copyright coding type
@@ -215,7 +215,7 @@ OMX_ERRORTYPE Rkvpu_OMX_CheckIsNeedFastmode(
     ROCKCHIP_OMX_BASEPORT         *pInputPort       = &pRockchipComponent->pRockchipPort[INPUT_PORT_INDEX];
     VpuCodecContext_t             *p_vpu_ctx         = pVideoDec->vpu_ctx;
     if (pVideoDec->bFastMode == OMX_FALSE
-        && pVideoDec->codecId == OMX_VIDEO_CodingHEVC
+        && pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC
         && pInputPort->portDefinition.format.video.nFrameWidth > 1920 // 1920:Resolution size
         && pInputPort->portDefinition.format.video.nFrameHeight > 1080) { // 1080:Resolution size
         pVideoDec->bFastMode = OMX_TRUE;
@@ -912,9 +912,9 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                 Rkvpu_Frame2Outbuf(pOMXComponent, outputUseBuffer->bufferHeader, &pframe);
                 if ((pVideoDec->codecProfile == OMX_VIDEO_AVCProfileHigh10 &&
                     pVideoDec->codecId == OMX_VIDEO_CodingAVC)
-                    || ((pVideoDec->codecProfile == OMX_VIDEO_HEVCProfileMain10 ||
-                        pVideoDec->codecProfile == OMX_VIDEO_HEVCProfileMain10HDR10)
-                        && pVideoDec->codecId == OMX_VIDEO_CodingHEVC)) {
+                    || ((pVideoDec->codecProfile == CODEC_HEVC_PROFILE_MAIN10 ||
+                        pVideoDec->codecProfile == CODEC_HEVC_PROFILE_MAIN10_HDR10)
+                        && pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC)) {
                     OMX_U32 horStride = Get_Video_HorAlign(pVideoDec->codecId, pframe.DisplayWidth,
                         pframe.DisplayHeight, pVideoDec->codecProfile);
                     OMX_U32 verStride = Get_Video_VerAlign(pVideoDec->codecId, pframe.DisplayHeight,
@@ -1338,7 +1338,7 @@ OMX_ERRORTYPE Rkvpu_Dec_ComponentInit(OMX_COMPONENTTYPE *pOMXComponent)
         }
     }
 
-    if (pVideoDec->codecId == OMX_VIDEO_CodingHEVC) {
+    if (pVideoDec->codecId == CODEC_OMX_VIDEO_CodingHEVC) {
         pVideoDec->bIsHevc = 1;
     }
     if (p_vpu_ctx->width > 1920 && p_vpu_ctx->height > 1088) { // 1920:width, 1088:height
@@ -1640,21 +1640,23 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentConstructor(OMX_HANDLETYPE hComponent, OMX_S
     } else if (!strcmp(componentName, RK_OMX_COMPONENT_HEVC_DRM_DEC)) {
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
         Rockchip_OSAL_Strcpy(pRockchipPort->portDefinition.format.video.cMIMEType, "video/hevc");
-        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
 #ifdef HAVE_L1_SVP_MODE
         pVideoDec->bDRMPlayerMode = OMX_TRUE;
 #endif
 #ifndef LOW_VRESION
-        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+        pRockchipPort->portDefinition.format.video.eCompressionFormat =
+            (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
 #else
         pRockchipPort->portDefinition.format.video.eCompressionFormat = OMX_VIDEO_OLD_CodingHEVC;
 #endif
     } else if (!strcmp(componentName, RK_OMX_COMPONENT_HEVC_DEC)) {
         Rockchip_OSAL_Memset(pRockchipPort->portDefinition.format.video.cMIMEType, 0, MAX_OMX_MIMETYPE_SIZE);
         Rockchip_OSAL_Strcpy(pRockchipPort->portDefinition.format.video.cMIMEType, "video/hevc");
-        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+        pVideoDec->codecId = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
 #ifndef LOW_VRESION
-        pRockchipPort->portDefinition.format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;
+        pRockchipPort->portDefinition.format.video.eCompressionFormat =
+            (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
 #else
         pRockchipPort->portDefinition.format.video.eCompressionFormat = OMX_VIDEO_OLD_CodingHEVC;
 #endif
