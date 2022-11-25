@@ -31,6 +31,4 @@ source "lib/Kconfig.debug"
 
 source "Documentation/Kconfig"
 
-source "lib/Kconfig.debug"
-
 source "vendor/Kconfig"

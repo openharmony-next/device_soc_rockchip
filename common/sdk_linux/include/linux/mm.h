@@ -123,6 +123,16 @@ extern int mmap_rnd_compat_bits __read_mostly;
 #define lm_alias(x) __va(__pa_symbol(x))
 #endif
 
+/*
+ * With CONFIG_CFI_CLANG, the compiler replaces function addresses in
+ * instrumented C code with jump table addresses. Architectures that
+ * support CFI can define this macro to return the actual function address
+ * when needed.
+ */
+#ifndef function_nocfi
+#define function_nocfi(x) (x)
+#endif
+
 #define MM_ZERO 0
 #define MM_ONE 1
 #define MM_TWO 2
@@ -805,6 +815,7 @@ static inline void *kvcalloc(size_t n, size_t size, gfp_t flags)
     return kvmalloc_array(n, size, flags | __GFP_ZERO);
 }
 
+extern void *kvrealloc(const void *p, size_t oldsize, size_t newsize, gfp_t flags);
 extern void kvfree(const void *addr);
 extern void kvfree_sensitive(const void *addr, size_t len);
 
@@ -2585,6 +2596,7 @@ extern int install_special_mapping(struct mm_struct *mm, unsigned long addr, uns
                                    struct page **pages);
 
 unsigned long randomize_stack_top(unsigned long stack_top);
+unsigned long randomize_page(unsigned long start, unsigned long range);
 
 extern unsigned long get_unmapped_area(struct file *, unsigned long, unsigned long, unsigned long, unsigned long);
 

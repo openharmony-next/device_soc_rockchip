@@ -1220,6 +1220,20 @@ static void verifier_reg_bound_offset(struct bpf_reg_state *reg)
     reg->var_off = tnum_or(tnum_clear_subreg(var64_off), var32_off);
 }
 
+static void reg_bounds_sync(struct bpf_reg_state *reg)
+{
+    /* We might have learned new bounds from the var_off. */
+    verifier_update_reg_bounds(reg);
+    /* We might have learned something about the sign bit. */
+    verifier_reg_deduce_bounds(reg);
+    /* We might have learned some bits from the bounds. */
+    verifier_reg_bound_offset(reg);
+    /* Intersecting with the old var_off might have improved our bounds
+     * slightly, e.g. if umax was 0x7f...f and var_off was (0; 0xf...fc),
+     * then new var_off is (0; 0x7f...fc) which improves our umax.
+     */
+    verifier_update_reg_bounds(reg);
+}
 static bool verifier_reg32_bound_s64(s32 a)
 {
     return a >= 0 && a <= S32_MAX;
@@ -1267,9 +1281,7 @@ static void verifier_reg_combine_32_into_64(struct bpf_reg_state *reg)
      * slightly.  e.g. if umax was 0x7f...f and var_off was (0; 0xf...fc),
      * then new var_off is (0; 0x7f...fc) which improves our umax.
      */
-    verifier_reg_deduce_bounds(reg);
-    verifier_reg_bound_offset(reg);
-    verifier_update_reg_bounds(reg);
+    reg_bounds_sync(reg);
 }
 
 static bool verifier_reg64_bound_s32(s64 a)
@@ -1299,9 +1311,7 @@ static void __reg_combine_64_into_32(struct bpf_reg_state *reg)
      * slightly.  e.g. if umax was 0x7f...f and var_off was (0; 0xf...fc),
      * then new var_off is (0; 0x7f...fc) which improves our umax.
      */
-    verifier_reg_deduce_bounds(reg);
-    verifier_reg_bound_offset(reg);
-    verifier_update_reg_bounds(reg);
+    reg_bounds_sync(reg);
 }
 
 /* Mark a register as having a completely unknown (scalar) value. */
@@ -5206,9 +5216,7 @@ static void do_refine_retval_range(struct bpf_reg_state *regs, int ret_type, int
     ret_reg->s32_max_value = meta->msize_max_value;
     ret_reg->smin_value = -MAX_ERRNO;
     ret_reg->s32_min_value = -MAX_ERRNO;
-    verifier_reg_deduce_bounds(ret_reg);
-    verifier_reg_bound_offset(ret_reg);
-    verifier_update_reg_bounds(ret_reg);
+    reg_bounds_sync(ret_reg);
 }
 
 static int record_func_map(struct bpf_verifier_env *env, struct bpf_call_arg_meta *meta, int func_id, int insn_idx)
@@ -5251,7 +5259,6 @@ static int record_func_key(struct bpf_verifier_env *env, struct bpf_call_arg_met
     struct bpf_insn_aux_data *aux = &env->insn_aux_data[insn_idx];
     struct bpf_reg_state *regs = cur_regs(env), *reg;
     struct bpf_map *map = meta->map_ptr;
-    struct tnum range;
     u64 val;
     int err;
 
@@ -5263,10 +5270,11 @@ static int record_func_key(struct bpf_verifier_env *env, struct bpf_call_arg_met
         return -EINVAL;
     }
 
-    range = tnum_range(0, map->max_entries - 1);
     reg = &regs[BPF_REG_3];
+    val = reg->var_off.value;
+    max = map->max_entries;
 
-    if (!register_is_const(reg) || !tnum_in(range, reg->var_off)) {
+    if (!(register_is_const(reg) && val < max)) {
         bpf_map_key_store(aux, BPF_MAP_KEY_POISON);
         return 0;
     }
@@ -5276,7 +5284,6 @@ static int record_func_key(struct bpf_verifier_env *env, struct bpf_call_arg_met
         return err;
     }
 
-    val = reg->var_off.value;
     if (bpf_map_key_unseen(aux)) {
         bpf_map_key_store(aux, val);
     } else if (!bpf_map_key_poisoned(aux) && bpf_map_key_immediate(aux) != val) {
@@ -6138,9 +6145,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env, struct bpf_insn
         return -EINVAL;
     }
 
-    verifier_update_reg_bounds(dst_reg);
-    verifier_reg_deduce_bounds(dst_reg);
-    verifier_reg_bound_offset(dst_reg);
+    reg_bounds_sync(dst_reg);
 
     if (sanitize_check_bounds(env, insn, dst_reg) < 0) {
         return -EACCES;
@@ -6859,9 +6864,7 @@ static int adjust_scalar_min_max_vals(struct bpf_verifier_env *env, struct bpf_i
         zext_32_to_64(dst_reg);
     }
 
-    verifier_update_reg_bounds(dst_reg);
-    verifier_reg_deduce_bounds(dst_reg);
-    verifier_reg_bound_offset(dst_reg);
+    reg_bounds_sync(dst_reg);
     return 0;
 }
 
@@ -7046,9 +7049,7 @@ static int check_alu_op(struct bpf_verifier_env *env, struct bpf_insn *insn)
                 }
                 zext_32_to_64(dst_reg);
 
-                verifier_update_reg_bounds(dst_reg);
-                verifier_reg_deduce_bounds(dst_reg);
-                verifier_reg_bound_offset(dst_reg);
+                reg_bounds_sync(dst_reg);
             }
         } else {
             /* case: R = imm
@@ -7445,25 +7446,33 @@ static void reg_set_min_max(struct bpf_reg_state *true_reg, struct bpf_reg_state
     }
 
     switch (opcode) {
+    /* JEQ/JNE comparison doesn't change the register equivalence.
+     *
+     * r1 = r2;
+     * if (r1 == 42) goto label;
+     * ...
+     * label: // here both r1 and r2 are known to be 42.
+     *
+     * Hence when marking register as known preserve it's ID.
+     */
         case BPF_JEQ:
-        case BPF_JNE: {
-            struct bpf_reg_state *reg = opcode == BPF_JEQ ? true_reg : false_reg;
-
-            /* JEQ/JNE comparison doesn't change the register equivalence.
-             * r1 = r2;
-             * if (r1 == 42) goto label;
-             * ...
-             * label: // here both r1 and r2 are known to be 42.
-             *
-             * Hence when marking register as known preserve it's ID.
-             */
             if (is_jmp32) {
-                verifier_mark_reg32_known(reg, val32);
+                __mark_reg32_known(true_reg, val32);
+                true_32off = tnum_subreg(true_reg->var_off);
             } else {
-                verifier2_mark_reg_known(reg, val);
+                ___mark_reg_known(true_reg, val);
+                true_64off = true_reg->var_off;
             }
             break;
-        }
+        case BPF_JNE:
+            if (is_jmp32) {
+                __mark_reg32_known(false_reg, val32);
+                false_32off = tnum_subreg(false_reg->var_off);
+            } else {
+                ___mark_reg_known(false_reg, val);
+                false_64off = false_reg->var_off;
+            }
+            break;
         case BPF_JSET:
             if (is_jmp32) {
                 false_32off = tnum_and(false_32off, tnum_const(~val32));
@@ -7600,20 +7609,8 @@ static void __reg_combine_min_max(struct bpf_reg_state *src_reg, struct bpf_reg_
     src_reg->smax_value = dst_reg->smax_value = min(src_reg->smax_value, dst_reg->smax_value);
     src_reg->var_off = dst_reg->var_off = tnum_intersect(src_reg->var_off, dst_reg->var_off);
     /* We might have learned new bounds from the var_off. */
-    verifier_update_reg_bounds(src_reg);
-    verifier_update_reg_bounds(dst_reg);
-    /* We might have learned something about the sign bit. */
-    verifier_reg_deduce_bounds(src_reg);
-    verifier_reg_deduce_bounds(dst_reg);
-    /* We might have learned some bits from the bounds. */
-    verifier_reg_bound_offset(src_reg);
-    verifier_reg_bound_offset(dst_reg);
-    /* Intersecting with the old var_off might have improved our bounds
-     * slightly.  e.g. if umax was 0x7f...f and var_off was (0; 0xf...fc),
-     * then new var_off is (0; 0x7f...fc) which improves our umax.
-     */
-    verifier_update_reg_bounds(src_reg);
-    verifier_update_reg_bounds(dst_reg);
+    reg_bounds_sync(src_reg);
+    reg_bounds_sync(dst_reg);
 }
 
 static void reg_combine_min_max(struct bpf_reg_state *true_src, struct bpf_reg_state *true_dst,
@@ -7631,14 +7628,16 @@ static void reg_combine_min_max(struct bpf_reg_state *true_src, struct bpf_reg_s
 
 static void mark_ptr_or_null_reg(struct bpf_func_state *state, struct bpf_reg_state *reg, u32 id, bool is_null)
 {
-    if (type_may_be_null(reg->type) && reg->id == id && !WARN_ON_ONCE(!reg->id)) {
-        /* Old offset (both fixed and variable parts) should
-         * have been known-zero, because we don't allow pointer
-         * arithmetic on pointers that might be NULL.
-         */
-        if (WARN_ON_ONCE(reg->smin_value || reg->smax_value || !tnum_equals_const(reg->var_off, 0) || reg->off)) {
-            verifier_mark_reg_known_zero(reg);
-            reg->off = 0;
+    if (type_may_be_null(reg->type) && reg->id == id &&
+        !WARN_ON_ONCE(!reg->id)) {
+        if (WARN_ON_ONCE(reg->smin_value || reg->smax_value ||
+            !tnum_equals_const(reg->var_off, 0) || reg->off)) {
+            /* Old offset (both fixed and variable parts) should
+             * have been known-zero, because we don't allow pointer
+             * arithmetic on pointers that might be NULL. If we
+             * see this happening, don't convert the register.
+             */
+            return;
         }
         if (is_null) {
             reg->type = SCALAR_VALUE;

@@ -862,25 +862,20 @@ int of_mm_gpiochip_add_data(struct device_node *np, struct of_mm_gpio_chip *mm_g
 {
     int ret = -ENOMEM;
     struct gpio_chip *gc = &mm_gc->gc;
-
     gc->label = kasprintf(GFP_KERNEL, "%pOF", np);
     if (!gc->label) {
         goto err0;
     }
-
     mm_gc->regs = of_iomap(np, 0);
     if (!mm_gc->regs) {
         goto err1;
     }
-
     gc->base = -1;
-
     if (mm_gc->save_regs) {
         mm_gc->save_regs(mm_gc);
     }
-
-    mm_gc->gc.of_node = np;
-
+        of_node_put(mm_gc->gc.of_node);
+    mm_gc->gc.of_node = of_node_get(np);
     ret = gpiochip_add_data(gc, data);
     if (ret) {
         goto err2;
@@ -888,6 +883,7 @@ int of_mm_gpiochip_add_data(struct device_node *np, struct of_mm_gpio_chip *mm_g
 
     return 0;
 err2:
+    of_node_put(np);
     iounmap(mm_gc->regs);
 err1:
     kfree(gc->label);
@@ -929,7 +925,7 @@ static void of_gpiochip_init_valid_mask(struct gpio_chip *chip)
     for (i = 0; i < len; i += 0x2) {
         of_property_read_u32_index(np, "gpio-reserved-ranges", i, &start);
         of_property_read_u32_index(np, "gpio-reserved-ranges", i + 1, &count);
-        if (start >= chip->ngpio || start + count >= chip->ngpio) {
+        if (start >= chip->ngpio || start + count > chip->ngpio) {
             continue;
         }
 
@@ -940,16 +936,21 @@ static void of_gpiochip_init_valid_mask(struct gpio_chip *chip)
 #ifdef CONFIG_PINCTRL
 static int of_gpiochip_add_pin_range(struct gpio_chip *chip)
 {
-    struct device_node *np = chip->of_node;
     struct of_phandle_args pinspec;
     struct pinctrl_dev *pctldev;
+    struct device_node *np = chip->of_node;
     int index = 0, ret;
-    const char *name;
-    static const char group_names_propname[] = "gpio-ranges-group-names";
     struct property *group_names;
+    static const char group_names_propname[] = "gpio-ranges-group-names";
+    const char *name;
 
     if (!np) {
         return 0;
+    }
+
+    if (!of_property_read_bool(np, "gpio-ranges") &&
+        chip->of_gpio_ranges_fallback) {
+        return chip->of_gpio_ranges_fallback(chip, np);
     }
 
     group_names = of_find_property(np, group_names_propname, NULL);

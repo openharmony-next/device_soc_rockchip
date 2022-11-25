@@ -1990,9 +1990,6 @@ struct edid *drm_do_get_edid(struct drm_connector *connector,
 
         connector_bad_edid(connector, edid, edid[0x7e] + 1);
 
-        edid[EDID_LENGTH - 1] += edid[0x7e] - valid_extensions;
-        edid[0x7e] = valid_extensions;
-
         new = kmalloc_array(valid_extensions + 1, EDID_LENGTH, GFP_KERNEL);
         if (!new) {
             goto out;
@@ -2010,6 +2007,9 @@ struct edid *drm_do_get_edid(struct drm_connector *connector,
             base += EDID_LENGTH;
         }
 
+        new[EDID_LENGTH - 1] += new[0x7e] - valid_extensions;
+        new[0x7e] = valid_extensions;
+
         kfree(edid);
         edid = new;
     }
@@ -2026,9 +2026,7 @@ EXPORT_SYMBOL_GPL(drm_do_get_edid);
 
 /**
  * drm_probe_ddc() - probe DDC presence
- * @adapter: I2C adapter to probe
- *
- * Return: True on success, false on failure.
+ * Return: True -> success, false -> failure.
  */
 bool drm_probe_ddc(struct i2c_adapter *adapter)
 {
@@ -2040,9 +2038,6 @@ EXPORT_SYMBOL(drm_probe_ddc);
 
 /**
  * drm_get_edid - get EDID data, if available
- * @connector: connector we're probing
- * @adapter: I2C adapter to use for DDC
- *
  * Poke the given I2C channel to grab EDID data if possible.  If found,
  * attach it to the connector.
  *
@@ -4814,7 +4809,8 @@ bool drm_detect_monitor_audio(struct edid *edid)
         goto end;
     }
 
-    has_audio = ((edid_ext[0x3] & EDID_BASIC_AUDIO) != 0);
+    has_audio = (edid_ext[0] == CEA_EXT &&
+            (edid_ext[0x3] & EDID_BASIC_AUDIO) != 0);
 
     if (has_audio) {
         DRM_DEBUG_KMS("Monitor has basic audio support\n");
@@ -5065,16 +5061,8 @@ static void drm_parse_hdmi_deep_color_info(struct drm_connector *connector, cons
     DRM_DEBUG("%s: Assigning HDMI sink color depth as %d bpc.\n", connector->name, dc_bpc);
     info->bpc = dc_bpc;
 
-    /*
-     * Deep color support mandates RGB444 support for all video
-     * modes and forbids YCRCB422 support for all video modes per
-     * HDMI 1.3 spec.
-     */
-    info->color_formats = DRM_COLOR_FORMAT_RGB444;
-
     /* YCRCB444 is optional according to spec. */
     if (hdmi[0x6] & DRM_EDID_HDMI_DC_Y444) {
-        info->color_formats |= DRM_COLOR_FORMAT_YCRCB444;
         DRM_DEBUG("%s: HDMI sink does YCRCB444 in deep color.\n", connector->name);
     }
 
@@ -5242,7 +5230,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
     if (!(edid->input & DRM_EDID_INPUT_DIGITAL)) {
         return quirks;
     }
-
+    info->color_formats |= DRM_COLOR_FORMAT_RGB444;
     drm_parse_cea_ext(connector, edid);
 
     /*
@@ -5289,7 +5277,6 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
 
     DRM_DEBUG("%s: Assigning EDID-1.4 digital sink color depth as %d bpc.\n", connector->name, info->bpc);
 
-    info->color_formats |= DRM_COLOR_FORMAT_RGB444;
     if (edid->features & DRM_EDID_FEATURE_RGB_YCRCB444) {
         info->color_formats |= DRM_COLOR_FORMAT_YCRCB444;
     }

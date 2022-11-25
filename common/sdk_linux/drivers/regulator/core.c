@@ -408,7 +408,7 @@ static struct device_node *of_get_regulator(struct device *dev, const char *supp
 
     dev_dbg(dev, "Looking up %s-supply from device tree\n", supply);
 
-    snprintf(prop_name, CORE_SIXTYFOUR, "%s-supply", supply);
+    (void)snprintf(prop_name, CORE_SIXTYFOUR, "%s-supply", supply);
     regnode = of_parse_phandle(dev->of_node, prop_name, 0);
     if (!regnode) {
         regnode = of_get_child_regulator(dev->of_node, prop_name);
@@ -2197,8 +2197,10 @@ struct regulator *_regulator_get(struct device *dev, const char *id, enum regula
         ret = _regulator_is_enabled(rdev);
         if (ret > 0) {
             rdev->use_count = 1;
+            regulator->enable_count = 1;
         } else {
             rdev->use_count = 0;
+            regulator->enable_count = 0;
         }
     }
 
@@ -6127,9 +6129,8 @@ core_initcall(regulator_init);
 static int regulator_late_cleanup(struct device *dev, void *data)
 {
     struct regulator_dev *rdev = dev_to_rdev(dev);
-    const struct regulator_ops *ops = rdev->desc->ops;
     struct regulation_constraints *c = rdev->constraints;
-    int enabled, ret;
+    int ret;
 
     if (c && c->always_on) {
         return 0;
@@ -6145,15 +6146,8 @@ static int regulator_late_cleanup(struct device *dev, void *data)
         goto unlock;
     }
 
-    /* If we can't read the status assume it's always on. */
-    if (ops->is_enabled) {
-        enabled = ops->is_enabled(rdev);
-    } else {
-        enabled = 1;
-    }
-
-    /* But if reading the status failed, assume that it's off. */
-    if (enabled <= 0) {
+ 	/* If reading the status failed, assume that it's off. */
+    if (_regulator_is_enabled(rdev) <= 0) {
         goto unlock;
     }
 

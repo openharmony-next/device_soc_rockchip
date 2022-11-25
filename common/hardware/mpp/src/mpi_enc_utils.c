@@ -25,6 +25,8 @@
 #include "mpp_packet.h"
 #include "mpi_enc_utils.h"
 
+#include "mpp_env.h"
+
 static MPP_RET mpi_enc_gen_ref_cfg(MppEncRefCfg ref, signed int gop_mode)
 {
     MppEncRefLtFrmCfg lt_ref[4];

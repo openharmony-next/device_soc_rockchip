@@ -1222,6 +1222,9 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
                 case 0x0cf:
                     map_key_clear(KEY_VOICECOMMAND);
                     break;
+                case 0x0d8:
+                    map_key_clear(KEY_DICTATE);
+                    break;
 
                 case 0x0d9:
                     map_key_clear(KEY_EMOJI_PICKER);
@@ -1473,11 +1476,11 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
                 case 0x28c:
                     map_key_clear(KEY_SEND);
                     break;
-
                 case 0x29d:
                     map_key_clear(KEY_KBD_LAYOUT_NEXT);
                     break;
-
+                case 0x2a2: map_key_clear(KEY_ALL_APPLICATIONS);
+                    break;
                 case 0x2c7:
                     map_key_clear(KEY_KBDINPUTASSIST_PREV);
                     break;
@@ -1496,11 +1499,9 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
                 case 0x2cc:
                     map_key_clear(KEY_KBDINPUTASSIST_CANCEL);
                     break;
-
                 case 0x29f:
                     map_key_clear(KEY_SCALE);
                     break;
-
                 default:
                     map_key_clear(KEY_UNKNOWN);
             }
@@ -1771,6 +1772,12 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
     }
 
     input = field->hidinput->input;
+
+    if (usage->type == EV_ABS &&
+        (((*quirks & HID_QUIRK_X_INVERT) && usage->code == ABS_X) ||
+         ((*quirks & HID_QUIRK_Y_INVERT) && usage->code == ABS_Y))) {
+        value = field->logical_maximum - value;
+    }
 
     if (usage->hat_min < usage->hat_max || usage->hat_dir) {
         int hat_dir = usage->hat_dir;

@@ -581,36 +581,34 @@ static int rockchip_dp_probe(struct platform_device *pdev)
     if (ret < 0) {
         return ret;
     }
-
     platform_set_drvdata(pdev, dp);
-
     dp->adp = analogix_dp_probe(dev, &dp->plat_data);
     if (IS_ERR(dp->adp)) {
         return PTR_ERR(dp->adp);
     }
-
     if (dp->data->split_mode && device_property_read_bool(dev, "split-mode")) {
         struct rockchip_dp_device *secondary = rockchip_dp_find_by_id(dev->driver, !dp->id);
         if (!secondary) {
             return -EPROBE_DEFER;
         }
-
         dp->plat_data.right = secondary->adp;
         dp->plat_data.split_mode = true;
         secondary->plat_data.left = dp->adp;
         secondary->plat_data.split_mode = true;
     }
-
-    return component_add(dev, &rockchip_dp_component_ops);
+    ret = component_add(dev, &rockchip_dp_component_ops);
+    if (ret) {
+        analogix_dp_remove(dp->adp);
+        return ret;
+    }
+    return 0;
 }
 
 static int rockchip_dp_remove(struct platform_device *pdev)
 {
     struct rockchip_dp_device *dp = platform_get_drvdata(pdev);
-
     component_del(&pdev->dev, &rockchip_dp_component_ops);
     analogix_dp_remove(dp->adp);
-
     return 0;
 }
 

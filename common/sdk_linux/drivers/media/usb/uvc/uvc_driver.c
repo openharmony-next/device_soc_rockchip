@@ -2195,23 +2195,19 @@ int uvc_register_video_device(struct uvc_device *dev, struct uvc_streaming *stre
     switch (type) {
         case V4L2_BUF_TYPE_VIDEO_CAPTURE:
             vdev->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
-            name = "Video Capture";
             break;
         case V4L2_BUF_TYPE_VIDEO_OUTPUT:
             vdev->device_caps = V4L2_CAP_VIDEO_OUTPUT | V4L2_CAP_STREAMING;
-            name = "Video Output";
             break;
         case V4L2_BUF_TYPE_META_CAPTURE:
             vdev->device_caps = V4L2_CAP_META_CAPTURE | V4L2_CAP_STREAMING;
-            name = "Metadata";
             break;
         default:
             vdev->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
-            name = "Video Capture";
             break;
     }
 
-    ret = snprintf(vdev->name, sizeof(vdev->name), "%s %u", name, stream->header.bTerminalLink);
+    strscpy(vdev->name, dev->name, sizeof(vdev->name));
 
     /*
      * Set the driver data before calling video_register_device, otherwise

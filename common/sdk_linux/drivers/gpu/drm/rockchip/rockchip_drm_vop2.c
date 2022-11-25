@@ -1962,11 +1962,6 @@ static uint32_t vop2_afbc_transform_offset(struct vop2_plane_state *vpstate, int
     uint8_t top_crop_line_num = 0;
     uint8_t bottom_crop_line_num = 0;
 
-    if (bpp == 0) {
-        return 0;
-    }
-    vir_width = (fb->pitches[0] << 0x3) / bpp;
-
     act_xoffset += xoffset;
     /* 16 pixel align */
     if (height & 0xf) {
@@ -4032,7 +4027,7 @@ static void vop2_win_atomic_update(struct vop2_win *win, struct drm_rect *src, s
          * with WIN_VIR_STRIDE.
          */
         if (bpp == 0) {
-            return 0;
+            return;
         }
         stride = (fb->pitches[0] << 0x3) / bpp;
         if ((stride & 0x3f) && (vpstate->xmirror_en || vpstate->rotate_90_en || vpstate->rotate_270_en)) {
@@ -4639,14 +4634,9 @@ static int vop2_crtc_loader_protect(struct drm_crtc *crtc, bool on)
     return 0;
 }
 
-#define DEBUG_PRINT(args...)                                                                                           \
-    do {                                                                                                               \
-            pr_err(args);                                                                                              \
-    } while (0)
-
-#define DEBUG_PRINT_S(s, args...)                                                                                      \
-    do {                                                                                                               \
-            seq_printf(s, args);                                                                                       \
+#define DEBUG_PRINT(args...)           \
+    do {                               \
+        pr_err(args);                  \
     } while (0)
 
 static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
@@ -4663,7 +4653,7 @@ static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
 
     int i;
 
-    DEBUG_PRINT_S(s, "    %s: %s\n", win->name, pstate->crtc ? "ACTIVE" : "DISABLED");
+    DEBUG_PRINT("%s: %s\n", win->name, pstate->crtc ? "ACTIVE" : "DISABLED");
     if (!fb) {
         return 0;
     }
@@ -4671,19 +4661,19 @@ static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
     src = &vpstate->src;
     dest = &vpstate->dest;
 
-    DEBUG_PRINT_S(s, "\twin_id: %d\n", win->win_id);
+    DEBUG_PRINT("\twin_id: %d\n", win->win_id);
 
     drm_get_format_name(fb->format->format, &format_name);
-    DEBUG_PRINT_S(s, "\tformat: %s%s%s[%d] color_space[%d] glb_alpha[0x%x]\n", format_name.str,
+    DEBUG_PRINT("\tformat: %s%s%s[%d] color_space[%d] glb_alpha[0x%x]\n", format_name.str,
                 rockchip_afbc(plane, fb->modifier) ? "[AFBC]" : "", vpstate->eotf ? " HDR" : " SDR", vpstate->eotf,
                 vpstate->color_space, vpstate->global_alpha);
-    DEBUG_PRINT_S(s, "\trotate: xmirror: %d ymirror: %d rotate_90: %d rotate_270: %d\n", vpstate->xmirror_en,
+    DEBUG_PRINT("\trotate: xmirror: %d ymirror: %d rotate_90: %d rotate_270: %d\n", vpstate->xmirror_en,
                 vpstate->ymirror_en, vpstate->rotate_90_en, vpstate->rotate_270_en);
-    DEBUG_PRINT_S(s, "\tcsc: y2r[%d] r2y[%d] csc mode[%d]\n", vpstate->y2r_en, vpstate->r2y_en, vpstate->csc_mode);
-    DEBUG_PRINT_S(s, "\tzpos: %d\n", vpstate->zpos);
-    DEBUG_PRINT_S(s, "\tsrc: pos[%d, %d] rect[%d x %d]\n", src->x1 >> 0x10, src->y1 >> 0x10,  \
+    DEBUG_PRINT("\tcsc: y2r[%d] r2y[%d] csc mode[%d]\n", vpstate->y2r_en, vpstate->r2y_en, vpstate->csc_mode);
+    DEBUG_PRINT("\tzpos: %d\n", vpstate->zpos);
+    DEBUG_PRINT("\tsrc: pos[%d, %d] rect[%d x %d]\n", src->x1 >> 0x10, src->y1 >> 0x10,  \
                   drm_rect_width(src) >> 0x10, drm_rect_height(src) >> 0x10);
-    DEBUG_PRINT_S(s, "\tdst: pos[%d, %d] rect[%d x %d]\n", dest->x1, dest->y1, drm_rect_width(dest), \
+    DEBUG_PRINT("\tdst: pos[%d, %d] rect[%d x %d]\n", dest->x1, dest->y1, drm_rect_width(dest), \
                   drm_rect_height(dest));
 
     for (i = 0; i < fb->format->num_planes; i++) {
@@ -4691,7 +4681,7 @@ static int vop2_plane_info_dump(struct seq_file *s, struct drm_plane *plane)
         rk_obj = to_rockchip_obj(obj);
         fb_addr = rk_obj->dma_addr + fb->offsets[0];
 
-        DEBUG_PRINT_S(s, "\tbuf[%d]: addr: %pad pitch: %d offset: %d\n", i, &fb_addr, fb->pitches[i], fb->offsets[i]);
+        DEBUG_PRINT("\tbuf[%d]: addr: %pad pitch: %d offset: %d\n", i, &fb_addr, fb->pitches[i], fb->offsets[i]);
     }
 
     return 0;
@@ -4706,7 +4696,7 @@ static void vop2_dump_connector_on_crtc(struct drm_crtc *crtc, struct seq_file *
     drm_for_each_connector_iter(connector, &conn_iter)
     {
         if (crtc->state->connector_mask & drm_connector_mask(connector)) {
-            DEBUG_PRINT_S(s, "    Connector: %s\n", connector->name);
+            DEBUG_PRINT("    Connector: %s\n", connector->name);
         }
     }
     drm_connector_list_iter_end(&conn_iter);
@@ -4721,22 +4711,22 @@ static int vop2_crtc_debugfs_dump(struct drm_crtc *crtc, struct seq_file *s)
     bool interlaced = !!(mode->flags & DRM_MODE_FLAG_INTERLACE);
     struct drm_plane *plane;
 
-    DEBUG_PRINT_S(s, "Video Port%d: %s\n", vp->id, crtc_state->active ? "ACTIVE" : "DISABLED");
+    DEBUG_PRINT("Video Port%d: %s\n", vp->id, crtc_state->active ? "ACTIVE" : "DISABLED");
 
     if (!crtc_state->active) {
         return 0;
     }
 
     vop2_dump_connector_on_crtc(crtc, s);
-    DEBUG_PRINT_S(s, "\tbus_format[%x]: %s\n", state->bus_format, drm_get_bus_format_name(state->bus_format));
-    DEBUG_PRINT_S(s, "\toverlay_mode[%d] output_mode[%x]", state->yuv_overlay, state->output_mode);
-    DEBUG_PRINT_S(s, " color_space[%d]\n", state->color_space);
-    DEBUG_PRINT_S(s, "    Display mode: %dx%d%s%d\n", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "p",
+    DEBUG_PRINT("\tbus_format[%x]: %s\n", state->bus_format, drm_get_bus_format_name(state->bus_format));
+    DEBUG_PRINT("\toverlay_mode[%d] output_mode[%x]", state->yuv_overlay, state->output_mode);
+    DEBUG_PRINT(" color_space[%d]\n", state->color_space);
+    DEBUG_PRINT("    Display mode: %dx%d%s%d\n", mode->hdisplay, mode->vdisplay, interlaced ? "i" : "p",
                   drm_mode_vrefresh(mode));
-    DEBUG_PRINT_S(s, "\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, \
+    DEBUG_PRINT("\tclk[%d] real_clk[%d] type[%x] flag[%x]\n", mode->clock, mode->crtc_clock, mode->type, \
                   mode->flags);
-    DEBUG_PRINT_S(s, "\tH: %d %d %d %d\n", mode->hdisplay, mode->hsync_start, mode->hsync_end, mode->htotal);
-    DEBUG_PRINT_S(s, "\tV: %d %d %d %d\n", mode->vdisplay, mode->vsync_start, mode->vsync_end, mode->vtotal);
+    DEBUG_PRINT("\tH: %d %d %d %d\n", mode->hdisplay, mode->hsync_start, mode->hsync_end, mode->htotal);
+    DEBUG_PRINT("\tV: %d %d %d %d\n", mode->vdisplay, mode->vsync_start, mode->vsync_end, mode->vtotal);
 
     drm_atomic_crtc_for_each_plane(plane, crtc)
     {
@@ -4801,17 +4791,17 @@ static int vop2_gamma_show(struct seq_file *s, void *data)
         struct vop2_video_port *vp = &vop2->vps[i];
 
         if (!vp->lut || !vp->gamma_lut_active || !vop2->lut_regs || !vp->rockchip_crtc.crtc.state->enable) {
-            DEBUG_PRINT_S(s, "Video port%d gamma disabled\n", vp->id);
+            DEBUG_PRINT("Video port%d gamma disabled\n", vp->id);
             continue;
         }
-        DEBUG_PRINT_S(s, "Video port%d gamma:\n", vp->id);
+        DEBUG_PRINT("Video port%d gamma:\n", vp->id);
         for (j = 0; j < vp->gamma_lut_len; j++) {
             if (j % 0x8 == 0) {
-                DEBUG_PRINT_S(s, "\n");
+                DEBUG_PRINT("\n");
             }
-            DEBUG_PRINT_S(s, "0x%08x ", vp->lut[j]);
+            DEBUG_PRINT("0x%08x ", vp->lut[j]);
         }
-        DEBUG_PRINT_S(s, "\n");
+        DEBUG_PRINT("\n");
     }
 
     return 0;
@@ -4829,22 +4819,21 @@ static int vop2_cubic_lut_show(struct seq_file *s, void *data)
 
         if ((!vp->cubic_lut_gem_obj && !private->cubic_lut[vp->id].enable) || !vp->cubic_lut ||
             !vp->rockchip_crtc.crtc.state->enable) {
-            DEBUG_PRINT_S(s, "Video port%d cubic lut disabled\n", vp->id);
+            DEBUG_PRINT("Video port%d cubic lut disabled\n", vp->id);
             continue;
         }
-        DEBUG_PRINT_S(s, "Video port%d cubic lut:\n", vp->id);
+        DEBUG_PRINT("Video port%d cubic lut:\n", vp->id);
         for (j = 0; j < vp->cubic_lut_len; j++) {
-            DEBUG_PRINT_S(s, "%04d: 0x%04x 0x%04x 0x%04x\n", j, vp->cubic_lut[j].red, vp->cubic_lut[j].green,
+            DEBUG_PRINT("%04d: 0x%04x 0x%04x 0x%04x\n", j, vp->cubic_lut[j].red, vp->cubic_lut[j].green,
                         vp->cubic_lut[j].blue);
         }
-        DEBUG_PRINT_S(s, "\n");
+        DEBUG_PRINT("\n");
     }
 
     return 0;
 }
 
 #undef DEBUG_PRINT
-#undef DEBUG_PRINT_S
 
 static struct drm_info_list vop2_debugfs_files[] = {
     {"gamma_lut", vop2_gamma_show, 0, NULL},
