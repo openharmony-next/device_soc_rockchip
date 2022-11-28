@@ -23,68 +23,37 @@ int32_t AllocMem(const AllocInfo *info, BufferHandle **handle)
 {
     DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("info is null"));
     DISPLAY_CHK_RETURN((handle == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (info->usage & HBM_USE_MEM_DMA) {
-        return GbmAllocMem(info, handle);
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", info->usage);
-    return DISPLAY_NOT_SUPPORT;
+    return GbmAllocMem(info, handle);
 }
 
 void FreeMem(BufferHandle *handle)
 {
     DISPLAY_CHK_RETURN_NOT_VALUE((handle == NULL), DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle->usage & HBM_USE_MEM_DMA) {
-        GbmFreeMem(handle);
-        return;
-    }
-#endif
+    GbmFreeMem(handle);
 }
 
 void *Mmap(BufferHandle *handle)
 {
     DISPLAY_CHK_RETURN((handle == NULL), NULL, DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle->usage & HBM_USE_MEM_DMA) {
-        return GbmMmap(handle);
-    }
-#endif
-    return NULL;
+    return GbmMmap(handle);
 }
 
 int32_t Unmap(BufferHandle *handle)
 {
     DISPLAY_CHK_RETURN((handle == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle->usage & HBM_USE_MEM_DMA) {
-        return GbmUnmap(handle);
-    }
-#endif
-    return DISPLAY_NOT_SUPPORT;
+    return GbmUnmap(handle);
 }
 
 int32_t FlushCache(BufferHandle *handle)
 {
     DISPLAY_CHK_RETURN((handle == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle->usage & HBM_USE_MEM_DMA) {
-        return GbmFlushCache(handle);
-    }
-#endif
-    return DISPLAY_NOT_SUPPORT;
+    return GbmFlushCache(handle);
 }
 
 int32_t InvalidateCache(BufferHandle *handle)
 {
     DISPLAY_CHK_RETURN((handle == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is null"));
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle->usage & HBM_USE_MEM_DMA) {
-        return GbmInvalidateCache(handle);
-    }
-#endif
-    return DISPLAY_NOT_SUPPORT;
+    return GbmInvalidateCache(handle);
 }
 
 int32_t GrallocUninitialize(GrallocFuncs *funcs)

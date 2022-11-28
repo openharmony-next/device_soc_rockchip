@@ -239,6 +239,7 @@ int32_t DrmDisplay::PushFirstFrame()
     HdiDrmComposition *drmComp = static_cast<HdiDrmComposition *>(mComposer->GetPostCompostion());
     drmComp->SetLayers(layers, *mClientLayer);
     drmComp->Apply(true);
+    free(grallocFucs);
     return DISPLAY_SUCCESS;
 }
 
