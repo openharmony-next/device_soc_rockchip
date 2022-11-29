@@ -12194,11 +12194,10 @@ int bpf_check(struct bpf_prog **prog, union bpf_attr *attr, union bpf_attr __use
         log->ubuf = (char __user *)(unsigned long)attr->log_buf;
         log->len_total = attr->log_size;
 
-        ret = -EINVAL;
-        /* log attributes have to be sane */
-        if (log->len_total < VERIFIER_ONEHUNDREDTWENTYEIGHT || log->len_total > UINT_MAX >> 2 || !log->level ||
-            !log->ubuf || log->level & ~BPF_LOG_MASK) {
-            goto err_unlock;
+		/* log attributes have to be sane */
+		if (!bpf_verifier_log_attr_valid(log)) {
+			ret = -EINVAL;
+			goto err_unlock;
         }
     }
 
