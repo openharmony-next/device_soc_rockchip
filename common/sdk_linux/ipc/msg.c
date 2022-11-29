@@ -221,7 +221,7 @@ static void ss_wakeup(struct msg_queue *msq, struct wake_q_head *wake_q, bool ki
             mss->list.next = NULL;
         } else if (stop_tsk == mss->tsk) {
             break;
-		} else if (!msg_fits_inqueue(msq, mss->msgsz)) {
+        } else if (!msg_fits_inqueue(msq, mss->msgsz)) {
             if (!stop_tsk) {
                 stop_tsk = mss->tsk;
             }
