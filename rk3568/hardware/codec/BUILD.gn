@@ -23,6 +23,7 @@ ohos_shared_library("libcodec_oem_interface") {
   ]
   sources = [
     "src/hdi_mpp.c",
+    "src/hdi_mpp_component_manager.cpp",
     "src/hdi_mpp_config.c",
     "src/hdi_mpp_mpi.c",
   ]
