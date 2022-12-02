@@ -252,7 +252,7 @@ unsigned int IoTPwmStart(unsigned int port, unsigned short duty, unsigned int fr
         PRINT_ERR("duty(%d) out of the range(%d ~ %d)\n", duty, DUTY_MIN, DUTY_MAX);
         return IOT_FAILURE;
     }
-    if (DUTY_MAX < duty)) {
+    if (duty > DUTY_MAX) {
         PRINT_ERR("duty(%d) out of the range(%d ~ %d)\n", duty, DUTY_MIN, DUTY_MAX);
         return IOT_FAILURE;
     }
