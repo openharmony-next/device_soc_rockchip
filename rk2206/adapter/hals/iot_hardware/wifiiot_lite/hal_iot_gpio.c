@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "iot_errno.h"
 #include "iot_gpio.h"
 #include "lz_hardware.h"

@@ -13,15 +13,15 @@
 # limitations under the License.
 #
 
-import("//drivers/adapter/khdf/liteos_m/hdf.gni")
+import("//drivers/hdf_core/adapter/khdf/liteos_m/hdf.gni")
 
 module_name = get_path_info(rebase_path("."), "name")
 module_group(module_name) {
   modules = [
-    "gpio",
-
-    #"i2c",
     "spi",
     "fs",
+
+    #"gpio",
+    #"i2c",
   ]
 }

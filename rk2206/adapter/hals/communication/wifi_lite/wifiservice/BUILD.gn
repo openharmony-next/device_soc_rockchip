@@ -30,7 +30,6 @@ static_library("wifiservice") {
     "//foundation/communication/wifi_lite/interfaces/wifiservice",
     "//kernel/liteos_m/kal",
     "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//third_party/musl/porting/liteos_m/kernel/include",
   ]
 }
 if (ohos_kernel_type == "liteos_m") {
