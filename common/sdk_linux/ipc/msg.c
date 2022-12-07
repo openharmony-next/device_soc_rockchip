@@ -220,20 +220,8 @@ static void ss_wakeup(struct msg_queue *msq, struct wake_q_head *wake_q, bool ki
         if (kill) {
             mss->list.next = NULL;
         } else if (stop_tsk == mss->tsk) {
-        /*
-         * Stop at the first task we don't wakeup,
-         * we've already iterated the original
-         * sender queue.
-         */
             break;
         } else if (!msg_fits_inqueue(msq, mss->msgsz)) {
-        /*
-         * We are not in an EIDRM scenario here, therefore
-         * verify that we really need to wakeup the task.
-         * To maintain current semantics and wakeup order,
-         * move the sender to the tail on behalf of the
-         * blocked task.
-         */
             if (!stop_tsk) {
                 stop_tsk = mss->tsk;
             }
