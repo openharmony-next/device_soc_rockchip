@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 OMX_ERRORTYPE Rockchip_OSAL_GetEnvU32(const char *name, OMX_U32 *value, OMX_U32 default_value);
-OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, char *default_value);
+OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, OMX_U32 valueSize, char *default_value);
 OMX_ERRORTYPE Rockchip_OSAL_SetEnvU32(const char *name, OMX_U32 value);
 OMX_ERRORTYPE Rockchip_OSAL_SetEnvStr(const char *name, char *value);
 

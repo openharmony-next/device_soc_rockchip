@@ -47,7 +47,7 @@ OMX_ERRORTYPE Rockchip_OSAL_GetEnvU32(const char *name, OMX_U32 *value, OMX_U32 
     return ret;
 }
 
-OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, char *default_value)
+OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, OMX_U32 valueSize, char *default_value)
 {
     OMX_ERRORTYPE ret = OMX_ErrorNone;
     if (value != NULL) {
@@ -103,9 +103,11 @@ EXIT:
 }
 
 #else
-#define VDEC_DBG_RECORD_MASK                0xff000000
-#define VDEC_DBG_RECORD_IN                  0x01000000
-#define VDEC_DBG_RECORD_OUT                 0x02000000
+
+#include "parameter.h"
+#define VDEC_DBG_RECORD_MASK 0xff000000
+#define VDEC_DBG_RECORD_IN   0x01000000
+#define VDEC_DBG_RECORD_OUT  0x02000000
 
 #define VIDEO_DBG_LOG_MASK                  0x0000ffff
 #define VIDEO_DBG_LOG_PTS                   0x00000001
@@ -119,33 +121,62 @@ EXIT:
 #define VDEC_DBG_VPU_VPUAPI_FIRST           0x00000002
 OMX_ERRORTYPE Rockchip_OSAL_GetEnvU32(const char *name, OMX_U32 *value, OMX_U32 default_value)
 {
+    if ((value == NULL) || (name == NULL)) {
+        return OMX_ErrorUndefined;
+    }
+    omx_info("%s defval: 0x%lx", name, default_value);
     *value = default_value;
-    omx_info("%s value: 0x%lx", name, *value);
+    char bufDef[10] = {0};
+    if (snprintf(bufDef, sizeof(bufDef), "%d", default_value) <= 0) {
+        omx_err("snprintf error");
+        return OMX_ErrorUndefined;
+    }
+    char bufValue[10] = {0};
+    OMX_ERRORTYPE ret = Rockchip_OSAL_GetEnvStr(name, bufValue, sizeof(bufValue), bufDef);
+    if (ret != OMX_ErrorNone) {
+        return ret;
+    }
+    *value = atoi(bufValue);
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, char *default_value)
+OMX_ERRORTYPE Rockchip_OSAL_GetEnvStr(const char *name, char *value, OMX_U32 valueSize, char *default_value)
 {
-    if ((value == NULL) || (default_value == NULL)) {
+    if ((value == NULL) || (default_value == NULL) || (name == NULL)) {
         return OMX_ErrorUndefined;
     }
-
-    int ret;
-    ret = memcpy_s(value, strlen(value), default_value, strlen(default_value));
-    if (ret != EOK) {
-        printf("memcpy_s fail.\n");
+    omx_info("%s def: %s", name, default_value);
+    if (GetParameter(name, default_value, value, valueSize) <= 0) {
+        omx_err("GetParameter error");
+        strcpy_s(value, valueSize > strlen(default_value) ? strlen(default_value) : valueSize, default_value);
+        return OMX_ErrorUndefined;
     }
-    omx_info("%s value: %s", name, value);
     return OMX_ErrorNone;
 }
 
 OMX_ERRORTYPE Rockchip_OSAL_SetEnvU32(const char *name, OMX_U32 value)
 {
-    return OMX_ErrorNone;
+    if (name == NULL) {
+        return OMX_ErrorUndefined;
+    }
+    char buf[10] = {0};
+    if (snprintf(buf, sizeof(buf), "%d", value) <= 0) {
+        omx_err("snprintf error");
+        return OMX_ErrorUndefined;
+    }
+    return Rockchip_OSAL_SetEnvStr(name, buf);
 }
 
 OMX_ERRORTYPE Rockchip_OSAL_SetEnvStr(const char *name, char *value)
 {
+    if ((name == NULL) || (value == NULL)) {
+        return OMX_ErrorUndefined;
+    }
+    if (SetParameter(name, value) <= 0) {
+        omx_err("SetParameter error");
+        return OMX_ErrorUndefined;
+    }
     return OMX_ErrorNone;
 }
 #endif
+
