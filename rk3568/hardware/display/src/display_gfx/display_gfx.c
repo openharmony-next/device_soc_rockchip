@@ -182,7 +182,7 @@ int32_t rkFillRect(ISurface *iSurface, IRect *rect, uint32_t color, GfxOpt *opt)
     dst.width = iSurface->width;
     dst.height = iSurface->height;
     dst.wstride = ALIGN_UP(iSurface->width, 16);
-    dst.hstride = ALIGN_UP(iSurface->height, 16);
+    dst.hstride = ALIGN_UP(iSurface->height, 2);
     dst.format = colorSpaceModeChange(iSurface->enColorFmt, &isYuv);
     dst.color_space_mode = IM_COLOR_SPACE_DEFAULT;
     dst.color = color;
@@ -320,7 +320,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     dstRgaBuffer.width = dstSurface->width;
     dstRgaBuffer.height = dstSurface->height;
     dstRgaBuffer.wstride = ALIGN_UP(dstSurface->width, 16);
-    dstRgaBuffer.hstride = ALIGN_UP(dstSurface->height, 16);
+    dstRgaBuffer.hstride = ALIGN_UP(dstSurface->height, 2);
     dstRgaBuffer.format = colorSpaceModeChange(dstSurface->enColorFmt, &isYuv);
     dstRgaBuffer.phy_addr = 0; // (void *)dstSurface->phyAddr;
     dstRgaBuffer.vir_addr = 0; // dstSurface->virAddr;
@@ -334,7 +334,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     srcRgaBuffer.width = srcSurface->width;
     srcRgaBuffer.height = srcSurface->height;
     srcRgaBuffer.wstride = ALIGN_UP(srcSurface->width, 16);
-    srcRgaBuffer.hstride = ALIGN_UP(srcSurface->height, 16);
+    srcRgaBuffer.hstride = ALIGN_UP(srcSurface->height, 2);
     srcRgaBuffer.phy_addr = 0; // (void *)srcSurface->phyAddr;
     srcRgaBuffer.vir_addr = 0; // srcSurface->virAddr;
     srcRgaBuffer.format = colorSpaceModeChange(srcSurface->enColorFmt, &isYuv);
@@ -348,10 +348,10 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
 
     DISPLAY_DEBUGLOG("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d vir %{public}p",
         (int32_t)srcSurface->phyAddr, srcSurface->width, srcSurface->height, ALIGN_UP(srcSurface->width, 16),
-        ALIGN_UP(srcSurface->height, 16), srcRgaBuffer.vir_addr);
+        ALIGN_UP(srcSurface->height, 2), srcRgaBuffer.vir_addr);
     DISPLAY_DEBUGLOG("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d vir %{public}p",
         (int32_t)dstSurface->phyAddr, dstSurface->width, dstSurface->height, ALIGN_UP(dstSurface->width, 16),
-        ALIGN_UP(dstSurface->height, 16), dstRgaBuffer.vir_addr);
+        ALIGN_UP(dstSurface->height, 2), dstRgaBuffer.vir_addr);
 
     srect.x = srcRect->x;
     srect.x = (srect.x == 1) ? 0 : srect.x;
