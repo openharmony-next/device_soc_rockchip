@@ -126,8 +126,8 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     bo->gbm = gbm;
     bo->format = format;
     // init create_dumb
-    dumb.height = ALIGN_UP(height, HEIGHT_ALIGN);
-    dumb.width = ALIGN_UP(AdjustStrideFromFormat(format, width), WIDTH_ALIGN);
+    dumb.height = ALIGN_UP(AdjustStrideFromFormat(format, height), HEIGHT_ALIGN);
+    dumb.width = ALIGN_UP(width, WIDTH_ALIGN);
     dumb.flags = 0;
     dumb.bpp = fmtInfo->bitsPerPixel;
     ret = drmIoctl(gbm->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
