@@ -2060,5 +2060,6 @@ void process_checks(bool force, struct dt_info *dti)
             fprintf(stderr, "ERROR: Input tree has errors, aborting "
                             "(use -f to force output)\n");
             exit(CHECK_OUTPUT_ABORTING);
+        }
     }
 }
