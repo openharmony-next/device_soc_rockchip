@@ -449,14 +449,14 @@ enum drm_bus_flags {
      *
      * Sync signals are sampled on the rising edge of the pixel clock
      */
-    DRM_BUS_FLAG_SYNC_SAMPLE_POSEDGE = BIT(7),
+    DRM_BUS_FLAG_SYNC_SAMPLE_POSEDGE = DRM_BUS_FLAG_SYNC_DRIVE_NEGEDGE,
 
     /**
      * @DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE:
      *
      * Sync signals are sampled on the falling edge of the pixel clock
      */
-    DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE = BIT(6),
+    DRM_BUS_FLAG_SYNC_SAMPLE_NEGEDGE = DRM_BUS_FLAG_SYNC_DRIVE_POSEDGE,
 
     /**
      * @DRM_BUS_FLAG_SHARP_SIGNALS:

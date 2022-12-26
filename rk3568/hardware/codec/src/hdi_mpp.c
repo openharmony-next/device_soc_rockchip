@@ -18,6 +18,7 @@
 #include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include "hdi_mpp_component_manager.h"
 #include "hdi_mpp_config.h"
 #include "im2d.h"
 #include "mpp_common.h"
@@ -33,9 +34,7 @@
 #define DFAULT_ENC_GOP_OPERATOR         2
 #define FRAME_STRIDE_ALIGNMENT          16
 
-RKHdiBaseComponent *g_pBaseComponent = NULL;
-
-void InitComponentSetup(RKHdiEncodeSetup *setup)
+static void InitComponentSetup(RKHdiEncodeSetup *setup)
 {
     setup->fmt = PIXEL_FORMAT_NONE;
 
@@ -56,68 +55,90 @@ void InitComponentSetup(RKHdiEncodeSetup *setup)
     setup->gop.gop = setup->fps.fpsOutNum * DFAULT_ENC_GOP_OPERATOR;
 }
 
-int32_t CodecInit(void)
+static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType codingType)
 {
-    g_pBaseComponent = (RKHdiBaseComponent *)malloc(sizeof(RKHdiBaseComponent));
-    if (g_pBaseComponent == NULL) {
+    RKHdiBaseComponent* component = (RKHdiBaseComponent *)malloc(sizeof(RKHdiBaseComponent));
+    if (component == NULL) {
         HDF_LOGE("%{public}s: malloc failed!", __func__);
-        return HDF_FAILURE;
+        return NULL;
     }
-    int32_t ret = memset_s(g_pBaseComponent, sizeof(RKHdiBaseComponent), 0, sizeof(RKHdiBaseComponent));
+    int32_t ret = memset_s(component, sizeof(RKHdiBaseComponent), 0, sizeof(RKHdiBaseComponent));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memset failed, error code: %{public}d", __func__, ret);
     }
-    InitComponentSetup(&g_pBaseComponent->setup);
+    InitComponentSetup(&component->setup);
 
-    ret = GetMppApi(&g_pBaseComponent->mppApi);
-    if ((ret != HDF_SUCCESS) || (g_pBaseComponent->mppApi == NULL)) {
+    ret = GetMppApi(&component->mppApi);
+    if ((ret != HDF_SUCCESS) || (component->mppApi == NULL)) {
         HDF_LOGE("%{public}s: GetMppAPI failed!", __func__);
-        ReleaseMppApi(g_pBaseComponent->mppApi);
-        g_pBaseComponent->mppApi = NULL;
-        free(g_pBaseComponent);
-        g_pBaseComponent = NULL;
-        return HDF_FAILURE;
+        component->mppApi = NULL;
+        free(component);
+        return NULL;
     }
 
-    g_pBaseComponent->ctxType = MPP_CTX_BUTT;
-    g_pBaseComponent->codingType = MPP_VIDEO_CodingMax;
-    g_pBaseComponent->frameNum = 0;
-    ret = g_pBaseComponent->mppApi->HdiMppEncCfgInit(&g_pBaseComponent->cfg);
+    component->ctxType = ctxType;
+    component->codingType = codingType;
+    component->frameNum = 0;
+    if (ctxType == MPP_CTX_ENC) {
+        ret = component->mppApi->HdiMppEncCfgInit(&component->cfg);
+    } else if (component->ctxType == MPP_CTX_DEC) {
+        ret = component->mppApi->HdiMppDecCfgInit(&component->cfg);
+    }
     if (ret != 0) {
         HDF_LOGE("%{public}s: config mpp cfg init failed!", __func__);
-        ReleaseMppApi(g_pBaseComponent->mppApi);
-        g_pBaseComponent->mppApi = NULL;
-        free(g_pBaseComponent);
-        g_pBaseComponent = NULL;
-        return HDF_FAILURE;
+        ReleaseMppApi(component->mppApi);
+        component->mppApi = NULL;
+        free(component);
+        return NULL;
     }
+
+    return component;
+}
+
+static void DestroyMppComponent(RKHdiBaseComponent *component)
+{
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+    }
+    if (component->ctxType == MPP_CTX_ENC) {
+        component->mppApi->HdiMppEncCfgDeinit(component->cfg);
+    } else if (component->ctxType == MPP_CTX_DEC) {
+        component->mppApi->HdiMppDecCfgDeinit(component->cfg);
+    }
+    ReleaseMppApi(component->mppApi);
+    component->mppApi = NULL;
+    free(component);
+    component = NULL;
+}
+
+int32_t CodecInit(void)
+{
     return HDF_SUCCESS;
 }
 
 int32_t CodecDeinit(void)
 {
-    ReleaseMppApi(g_pBaseComponent->mppApi);
-    g_pBaseComponent->mppApi = NULL;
-    if (g_pBaseComponent != NULL) {
-        free(g_pBaseComponent);
-        g_pBaseComponent = NULL;
-    }
     return HDF_SUCCESS;
 }
 
 int32_t CodecSetCallback(CODEC_HANDLETYPE handle, CodecCallback *cb, UINTPTR instance)
 {
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
     if (cb == NULL) {
         HDF_LOGE("%{public}s: call back is NULL", __func__);
         return HDF_FAILURE;
     }
 
-    g_pBaseComponent->pCallbacks = cb;
+    component->pCallbacks = cb;
 
     return HDF_SUCCESS;
 }
 
-MppCtxType GetMppCtxType(const char* name)
+static MppCtxType GetMppCtxType(const char* name)
 {
     char *pos = strstr(name, "decoder");
     if (pos != NULL) {
@@ -133,7 +154,7 @@ MppCtxType GetMppCtxType(const char* name)
     return MPP_CTX_BUTT;
 }
 
-MppCodingType GetMppCodingType(const char* name)
+static MppCodingType GetMppCodingType(const char* name)
 {
     char *pos = strstr(name, "avc");
     if (pos != NULL) {
@@ -155,48 +176,76 @@ MppCodingType GetMppCodingType(const char* name)
         return MPP_VIDEO_CodingMPEG2;
     }
 
+    pos = strstr(name, "vp8");
+    if (pos != NULL) {
+        return MPP_VIDEO_CodingVP8;
+    }
+
+    pos = strstr(name, "vp9");
+    if (pos != NULL) {
+        return MPP_VIDEO_CodingVP9;
+    }
+
+    pos = strstr(name, "flv1");
+    if (pos != NULL) {
+        return MPP_VIDEO_CodingFLV1;
+    }
+
+    pos = strstr(name, "mjpeg");
+    if (pos != NULL) {
+        return MPP_VIDEO_CodingMJPEG;
+    }
+
     HDF_LOGE("%{public}s: CodingType unsupported!", __func__);
     return MPP_VIDEO_CodingMax;
 }
 
 int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
 {
+    if (name == NULL || handle == NULL) {
+        HDF_LOGE("%{public}s: invalid params!", __func__);
+        return HDF_FAILURE;
+    }
+    MppCtxType ctxType = GetMppCtxType(name);
+    if (ctxType == MPP_CTX_BUTT) {
+        HDF_LOGE("%{public}s: MppCtxType:%{public}d not support!", __func__, ctxType);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    MppCodingType codingType = GetMppCodingType(name);
+    if (codingType == MPP_VIDEO_CodingMax) {
+        HDF_LOGE("%{public}s: MppCodingType:%{public}d not support!", __func__, codingType);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
     MPP_RET ret = MPP_OK;
     MppCtx ctx = NULL;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
-    if (name == NULL || mppApi == NULL || handle == NULL) {
+    RKHdiBaseComponent* component = CreateMppComponent(ctxType, codingType);
+    if (component == NULL) {
         return HDF_FAILURE;
     }
 
-    MppCtxType ctxType = GetMppCtxType(name);
-    if (ctxType == MPP_CTX_BUTT) {
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    g_pBaseComponent->ctxType = ctxType;
-    MppCodingType codingType = GetMppCodingType(name);
-    if (codingType == MPP_VIDEO_CodingMax) {
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    g_pBaseComponent->codingType = codingType;
-
-    ret = mppApi->HdiMppCreate(&ctx, &(g_pBaseComponent->mpi));
+    ret = component->mppApi->HdiMppCreate(&ctx, &(component->mpi));
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpp create failed", __func__);
         return HDF_FAILURE;
     }
     *handle = ctx;
-    g_pBaseComponent->ctx = ctx;
-    g_pBaseComponent->componentName = name;
-    if (g_pBaseComponent->ctxType == MPP_CTX_ENC) {
+    component->ctx = ctx;
+    component->componentName = name;
+    if (!AddToMppComponentManager(*handle, component)) {
+        HDF_LOGE("%{public}s: AddToMppComponentManager failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (component->ctxType == MPP_CTX_ENC) {
         MppPollType timeout = MPP_POLL_BLOCK;
-        ret = g_pBaseComponent->mpi->control(ctx, MPP_SET_OUTPUT_TIMEOUT, &timeout);
+        ret = component->mpi->control(ctx, MPP_SET_OUTPUT_TIMEOUT, &timeout);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: mpi control set output timeout failed ret %{public}d", __func__, ret);
             return HDF_FAILURE;
         }
     }
 
-    ret = mppApi->HdiMppInit(ctx, ctxType, codingType);
+    ret = component->mppApi->HdiMppInit(ctx, ctxType, codingType);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpp init failed", __func__);
         return HDF_FAILURE;
@@ -209,93 +258,96 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
 
-    if (g_pBaseComponent == NULL) {
-        HDF_LOGE("%{public}s: g_pBaseComponent is NULL", __func__);
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
         return HDF_FAILURE;
     }
 
-    if (g_pBaseComponent->cfg != NULL) {
-        mppApi->HdiMppDecCfgDeinit(g_pBaseComponent->cfg);
-        g_pBaseComponent->cfg = NULL;
+    RKMppApi *mppApi = component->mppApi;
+    if (component->cfg != NULL) {
+        mppApi->HdiMppDecCfgDeinit(component->cfg);
+        component->cfg = NULL;
     }
 
-    if (g_pBaseComponent->packet != NULL) {
-        mppApi->HdiMppPacketDeinit(&g_pBaseComponent->packet);
-        g_pBaseComponent->packet = NULL;
+    if (component->packet != NULL) {
+        mppApi->HdiMppPacketDeinit(&component->packet);
+        component->packet = NULL;
     }
 
-    if (g_pBaseComponent->frame != NULL) {
-        mppApi->HdiMppFrameDeinit(&g_pBaseComponent->frame);
-        g_pBaseComponent->frame = NULL;
+    if (component->frame != NULL) {
+        mppApi->HdiMppFrameDeinit(&component->frame);
+        component->frame = NULL;
     }
 
-    if (g_pBaseComponent->frmBuf != NULL) {
-        mppApi->HdiMppBufferPutWithCaller(g_pBaseComponent->frmBuf, __func__);
-        g_pBaseComponent->frmBuf = NULL;
+    if (component->frmBuf != NULL) {
+        mppApi->HdiMppBufferPutWithCaller(component->frmBuf, __func__);
+        component->frmBuf = NULL;
     }
 
-    if (g_pBaseComponent->pktBuf != NULL) {
-        mppApi->HdiMppBufferPutWithCaller(g_pBaseComponent->pktBuf, __func__);
-        g_pBaseComponent->pktBuf = NULL;
+    if (component->pktBuf != NULL) {
+        mppApi->HdiMppBufferPutWithCaller(component->pktBuf, __func__);
+        component->pktBuf = NULL;
     }
 
-    if (g_pBaseComponent->frmGrp != NULL) {
-        mppApi->HdiMppBufferGroupPut(g_pBaseComponent->frmGrp);
-        g_pBaseComponent->frmGrp = NULL;
+    if (component->frmGrp != NULL) {
+        mppApi->HdiMppBufferGroupPut(component->frmGrp);
+        component->frmGrp = NULL;
+    }
+
+    if (component->ctxType == MPP_CTX_DEC) {
+        HDF_LOGI("%{public}s: dec frame count : %{public}d, error count : %{public}d", __func__,
+            component->frameCount, component->frameErr);
+        HDF_LOGI("%{public}s: dec max memory %{public}.2f MB", __func__,
+            component->maxUsage / (float)BITWISE_LEFT_SHIFT_WITH_ONE);
+    } else if (component->ctxType == MPP_CTX_ENC) {
+        HDF_LOGI("%{public}s: enc frame count : %{public}d", __func__, component->frameCount);
+    } else {
+        HDF_LOGE("%{public}s: CtxType undefined!", __func__);
     }
 
     ret = mppApi->HdiMppDestroy(ctx);
+    RemoveFromMppComponentManager(handle);
+    DestroyMppComponent(component);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpp destroy failed", __func__);
         return HDF_FAILURE;
     }
 
-    if (g_pBaseComponent->ctxType == MPP_CTX_DEC) {
-        HDF_LOGI("%{public}s: dec frame count : %{public}d, error count : %{public}d", __func__,
-            g_pBaseComponent->frameCount, g_pBaseComponent->frameErr);
-        HDF_LOGI("%{public}s: dec max memory %{public}.2f MB", __func__,
-            g_pBaseComponent->maxUsage / (float)BITWISE_LEFT_SHIFT_WITH_ONE);
-    } else if (g_pBaseComponent->ctxType == MPP_CTX_ENC) {
-        HDF_LOGI("%{public}s: enc frame count : %{public}d", __func__, g_pBaseComponent->frameCount);
-    } else {
-        HDF_LOGE("%{public}s: CtxType undefined!", __func__);
-        return HDF_FAILURE;
-    }
     return HDF_SUCCESS;
 }
 
-int32_t SetExtMppParam(Param *param)
+int32_t SetExtMppParam(RKHdiBaseComponent* component, Param *param)
 {
     int32_t ret = HDF_SUCCESS;
     int32_t paramKey = param->key;
 
     switch (paramKey) {
         case KEY_EXT_SPLIT_PARSE_RK:
-            ret = SetParamSplitParse(g_pBaseComponent, param);
+            ret = SetParamSplitParse(component, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set split parse failed", __func__);
             }
             break;
         case KEY_EXT_DEC_FRAME_NUM_RK:
         case KEY_EXT_ENC_FRAME_NUM_RK:
-            ret = SetParamCodecFrameNum(g_pBaseComponent, param);
+            ret = SetParamCodecFrameNum(component, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set frame number failed", __func__);
             }
             break;
         case KEY_EXT_SETUP_DROP_MODE_RK:
-            ret = SetParamDrop(g_pBaseComponent, param);
+            ret = SetParamDrop(component, param);
             break;
         case KEY_EXT_ENC_VALIDATE_SETUP_RK:
-            ret = ValidateEncSetup(g_pBaseComponent, param);
+            ret = ValidateEncSetup(component, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config validata setup failed", __func__);
             }
             break;
         case KEY_EXT_ENC_SETUP_AVC_RK:
-            ret = SetParamEncSetupAVC(g_pBaseComponent, param);
+            ret = SetParamEncSetupAVC(component, param);
             break;
         default:
             HDF_LOGE("%{public}s: param key unsupport, key:%{public}d", __func__, paramKey);
@@ -304,41 +356,41 @@ int32_t SetExtMppParam(Param *param)
     return ret;
 }
 
-int32_t SetMppParam(Param *param)
+int32_t SetMppParam(RKHdiBaseComponent* component, Param *param)
 {
     int32_t ret = HDF_SUCCESS;
     int32_t paramKey = param->key;
 
     switch (paramKey) {
         case KEY_VIDEO_WIDTH:
-            ret = SetParamWidth(g_pBaseComponent, param);
+            ret = SetParamWidth(component, param);
             break;
         case KEY_VIDEO_HEIGHT:
-            ret = SetParamHeight(g_pBaseComponent, param);
+            ret = SetParamHeight(component, param);
             break;
         case KEY_PIXEL_FORMAT:
-            ret = SetParamPixleFmt(g_pBaseComponent, param);
+            ret = SetParamPixleFmt(component, param);
             break;
         case KEY_VIDEO_STRIDE:
-            ret = SetParamStride(g_pBaseComponent, param);
+            ret = SetParamStride(component, param);
             break;
         case KEY_VIDEO_FRAME_RATE:
-            ret = SetParamFps(g_pBaseComponent, param);
+            ret = SetParamFps(component, param);
             break;
         case KEY_VIDEO_RC_MODE:
-            ret = SetParamRateControl(g_pBaseComponent, param);
+            ret = SetParamRateControl(component, param);
             break;
         case KEY_VIDEO_GOP_MODE:
-            ret = SetParamGop(g_pBaseComponent, param);
+            ret = SetParamGop(component, param);
             break;
         case KEY_MIMETYPE:
-            ret = SetParamMimeCodecType(g_pBaseComponent, param);
+            ret = SetParamMimeCodecType(component, param);
             break;
         case KEY_CODEC_TYPE:
-            ret = SetParamCodecType(g_pBaseComponent, param);
+            ret = SetParamCodecType(component, param);
             break;
         default:
-            ret = SetExtMppParam(param);
+            ret = SetExtMppParam(component, param);
     }
     return ret;
 }
@@ -347,13 +399,19 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 {
     MppCtx ctx = handle;
     int32_t ret = HDF_SUCCESS;
-    if (ctx != g_pBaseComponent->ctx) {
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (ctx != component->ctx) {
         HDF_LOGE("%{public}s: ctx not match %{public}d", __func__, ctx);
         return HDF_FAILURE;
     }
 
     for (int32_t i = 0; i < paramCnt; i++) {
-        ret = SetMppParam(params + i);
+        ret = SetMppParam(component, params + i);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: SetMppParam faild, param key:%{public}d", __func__, params[i].key);
             return ret;
@@ -363,33 +421,33 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
     return HDF_SUCCESS;
 }
 
-int32_t GetExtMppParam(Param *param)
+int32_t GetExtMppParam(RKHdiBaseComponent* component, Param *param)
 {
     int32_t ret = HDF_SUCCESS;
     int32_t paramKey = param->key;
 
     switch (paramKey) {
         case KEY_EXT_DEFAULT_CFG_RK:
-            ret = GetDefaultConfig(g_pBaseComponent);
+            ret = GetDefaultConfig(component);
             if (ret != 0) {
                 HDF_LOGE("%{public}s: config get default config failed", __func__);
             }
             break;
         case KEY_EXT_SPLIT_PARSE_RK:
-            ret = GetParamSplitParse(g_pBaseComponent, param);
+            ret = GetParamSplitParse(component, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set split parse failed", __func__);
             }
             break;
         case KEY_EXT_DEC_FRAME_NUM_RK:
         case KEY_EXT_ENC_FRAME_NUM_RK:
-            ret = GetParamCodecFrameNum(g_pBaseComponent, param);
+            ret = GetParamCodecFrameNum(component, param);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: config set frame number failed", __func__);
             }
             break;
         case KEY_EXT_SETUP_DROP_MODE_RK:
-            ret = GetParamDrop(g_pBaseComponent, param);
+            ret = GetParamDrop(component, param);
             break;
         default:
             HDF_LOGE("%{public}s: param key unsupport, key:%{public}d", __func__, paramKey);
@@ -398,44 +456,44 @@ int32_t GetExtMppParam(Param *param)
     return ret;
 }
 
-int32_t GetMppParam(Param *param)
+int32_t GetMppParam(RKHdiBaseComponent* component, Param *param)
 {
     int32_t ret = HDF_SUCCESS;
     int32_t paramKey = param->key;
 
     switch (paramKey) {
         case KEY_BUFFERSIZE:
-            ret = GetParamBufferSize(g_pBaseComponent, param);
+            ret = GetParamBufferSize(component, param);
             break;
         case KEY_VIDEO_WIDTH:
-            ret = GetParamWidth(g_pBaseComponent, param);
+            ret = GetParamWidth(component, param);
             break;
         case KEY_VIDEO_HEIGHT:
-            ret = GetParamHeight(g_pBaseComponent, param);
+            ret = GetParamHeight(component, param);
             break;
         case KEY_PIXEL_FORMAT:
-            ret = GetParamPixleFmt(g_pBaseComponent, param);
+            ret = GetParamPixleFmt(component, param);
             break;
         case KEY_VIDEO_STRIDE:
-            ret = GetParamStride(g_pBaseComponent, param);
+            ret = GetParamStride(component, param);
             break;
         case KEY_VIDEO_FRAME_RATE:
-            ret = GetParamFps(g_pBaseComponent, param);
+            ret = GetParamFps(component, param);
             break;
         case KEY_VIDEO_RC_MODE:
-            ret = GetParamRateControl(g_pBaseComponent, param);
+            ret = GetParamRateControl(component, param);
             break;
         case KEY_VIDEO_GOP_MODE:
-            ret = GetParamGop(g_pBaseComponent, param);
+            ret = GetParamGop(component, param);
             break;
         case KEY_MIMETYPE:
-            ret = GetParamMimeCodecType(g_pBaseComponent, param);
+            ret = GetParamMimeCodecType(component, param);
             break;
         case KEY_CODEC_TYPE:
-            ret = GetParamCodecType(g_pBaseComponent, param);
+            ret = GetParamCodecType(component, param);
             break;
         default:
-            ret = GetExtMppParam(param);
+            ret = GetExtMppParam(component, param);
     }
     return ret;
 }
@@ -444,13 +502,19 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 {
     int32_t ret = HDF_SUCCESS;
     MppCtx ctx = handle;
-    if (ctx != g_pBaseComponent->ctx) {
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (ctx != component->ctx) {
         HDF_LOGE("%{public}s: ctx not match %{public}d", __func__, ctx);
         return HDF_FAILURE;
     }
 
     for (int32_t i = 0; i < paramCnt; i++) {
-        ret = GetMppParam(params + i);
+        ret = GetMppParam(component, params + i);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetMppParam faild, param key:%{public}d", __func__, params[i].key);
             return ret;
@@ -464,7 +528,13 @@ int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    RKMppApi *mppApi = component->mppApi;
 
     ret = mppApi->HdiMppStart(ctx);
     if (ret != MPP_OK) {
@@ -478,7 +548,13 @@ int32_t CodecStop(CODEC_HANDLETYPE handle)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    RKMppApi *mppApi = component->mppApi;
 
     ret = mppApi->HdiMppStop(ctx);
     if (ret != MPP_OK) {
@@ -492,11 +568,16 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
     switch (directType) {
         case INPUT_TYPE:
         case OUTPUT_TYPE:
         case ALL_TYPE:
-            ret = g_pBaseComponent->mpi->reset(ctx);
+            ret = component->mpi->reset(ctx);
             if (ret != 0) {
                 HDF_LOGE("%{public}s: reset failed", __func__);
                 return HDF_FAILURE;
@@ -507,19 +588,19 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
             return HDF_FAILURE;
     }
 
-    UINTPTR userData = NULL;
+    UINTPTR userData = (UINTPTR)component->ctx;
     EventType event = EVENT_FLUSH_COMPLETE;
     uint32_t length = 0;
     int32_t *eventData = NULL;
-    g_pBaseComponent->pCallbacks->OnEvent(userData, event, length, eventData);
+    component->pCallbacks->OnEvent(userData, event, length, eventData);
 
     return HDF_SUCCESS;
 }
 
-int32_t DecodeInitPacket(MppPacket *pPacket, CodecBuffer *inputData, RK_U32 pkt_eos)
+int32_t DecodeInitPacket(RKHdiBaseComponent* component, MppPacket *pPacket, CodecBuffer *inputData, RK_U32 pkt_eos)
 {
     MPP_RET ret = MPP_OK;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
     uint32_t inBufferSize = inputData->buffer[0].length;
 
@@ -540,9 +621,9 @@ int32_t DecodeInitPacket(MppPacket *pPacket, CodecBuffer *inputData, RK_U32 pkt_
     return HDF_SUCCESS;
 }
 
-MPP_RET DecodeGetFrame(MppCtx ctx, MppFrame *frame)
+MPP_RET DecodeGetFrame(RKHdiBaseComponent* component, MppCtx ctx, MppFrame *frame)
 {
-    MppApi *mpi = g_pBaseComponent->mpi;
+    MppApi *mpi = component->mpi;
     MPP_RET ret = MPP_OK;
     RK_S32 retryTimes = 10;
     while (true) {
@@ -561,11 +642,11 @@ MPP_RET DecodeGetFrame(MppCtx ctx, MppFrame *frame)
     return ret;
 }
 
-int32_t HandleDecodeFrameInfoChange(MppFrame frame, MppCtx ctx)
+int32_t HandleDecodeFrameInfoChange(RKHdiBaseComponent* component, MppFrame frame, MppCtx ctx)
 {
     MPP_RET ret = MPP_OK;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
-    MppApi *mpi = g_pBaseComponent->mpi;
+    RKMppApi *mppApi = component->mppApi;
+    MppApi *mpi = component->mpi;
     RK_U32 width = mppApi->HdiMppFrameGetWidth(frame);
     RK_U32 height = mppApi->HdiMppFrameGetHeight(frame);
     RK_U32 hor_stride = mppApi->HdiMppFrameGetHorStride(frame);
@@ -577,27 +658,27 @@ int32_t HandleDecodeFrameInfoChange(MppFrame frame, MppCtx ctx)
     HDF_LOGI("%{public}s: decoder require stride [%{public}d:%{public}d]", __func__, hor_stride, ver_stride);
     HDF_LOGI("%{public}s: decoder require buf_size %{public}d", __func__, buf_size);
 
-    if (g_pBaseComponent->frmGrp == NULL) {
-        ret = mppApi->HdiMppBufferGroupGet(&g_pBaseComponent->frmGrp,
+    if (component->frmGrp == NULL) {
+        ret = mppApi->HdiMppBufferGroupGet(&component->frmGrp,
             MPP_BUFFER_TYPE_DRM, MPP_BUFFER_INTERNAL, NULL, __func__);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: get mpp buffer group failed ret %{public}d", __func__, ret);
             return HDF_FAILURE;
         }
-        ret = mpi->control(ctx, MPP_DEC_SET_EXT_BUF_GROUP, g_pBaseComponent->frmGrp);
+        ret = mpi->control(ctx, MPP_DEC_SET_EXT_BUF_GROUP, component->frmGrp);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: set buffer group failed ret %{public}d", __func__, ret);
             return HDF_FAILURE;
         }
     } else {
-        ret = mppApi->HdiMppBufferGroupClear(g_pBaseComponent->frmGrp);
+        ret = mppApi->HdiMppBufferGroupClear(component->frmGrp);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: clear buffer group failed ret %{public}d", __func__, ret);
             return HDF_FAILURE;
         }
     }
     
-    ret = mppApi->HdiMppBufferGroupLimitConfig(g_pBaseComponent->frmGrp, buf_size, BUFFER_GROUP_LIMIT_NUM);
+    ret = mppApi->HdiMppBufferGroupLimitConfig(component->frmGrp, buf_size, BUFFER_GROUP_LIMIT_NUM);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: limit buffer group failed ret %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -610,14 +691,13 @@ int32_t HandleDecodeFrameInfoChange(MppFrame frame, MppCtx ctx)
     return HDF_SUCCESS;
 }
 
-static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
+static IM_STATUS PutDecodeFrameToOutput(RKHdiBaseComponent* component, MppFrame frame, CodecBuffer *outInfo)
 {
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     MppBuffer mppBuffer = mppApi->HdiMppFrameGetBuffer(frame);
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    BufferHandle *bufferHandle = (BufferHandle *)outInfo->buffer[0].buf;
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -629,8 +709,8 @@ static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
-    if (bufferHandle == NULL) {
-        HDF_LOGE("%{public}s: bufferHandle invalid", __func__);
+    if (outInfo->buffer[0].buf == 0) {
+        HDF_LOGE("%{public}s: output buf invalid", __func__);
         return IM_STATUS_INVALID_PARAM;
     }
 
@@ -640,12 +720,19 @@ static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
     src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
     src.format   = RK_FORMAT_YCbCr_420_SP;
-    dst.fd = bufferHandle->fd;
+
+    if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)outInfo->buffer[0].buf;
+        dst.fd = bufferHandle->fd;
+    } else {
+        dst.vir_addr = (void *)outInfo->buffer[0].buf;
+    }
     dst.width    = src.width;
-    dst.height   = bufferHandle->height;
+    dst.height   = src.height;
     dst.wstride  = MPP_ALIGN(dst.width, FRAME_STRIDE_ALIGNMENT);
-    dst.hstride  = bufferHandle->height;
+    dst.hstride  = dst.height;
     dst.format   = RK_FORMAT_YCbCr_420_SP;
+
     rect.x = 0;
     rect.y = 0;
     rect.width = dst.width;
@@ -653,15 +740,15 @@ static IM_STATUS PutDecodeFrameToOutput(MppFrame frame, CodecBuffer *outInfo)
     return imcrop(src, dst, rect);
 }
 
-void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outInfo)
+void HandleDecodeFrameOutput(RKHdiBaseComponent* component, MppFrame frame, int32_t frm_eos, CodecBuffer *outInfo)
 {
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     RK_U32 err_info = mppApi->HdiMppFrameGetErrinfo(frame);
     RK_U32 discard = mppApi->HdiMppFrameGetDiscard(frame);
-    g_pBaseComponent->frameCount++;
+    component->frameCount++;
     
     if ((err_info | discard) != 0) {
-        g_pBaseComponent->frameErr++;
+        component->frameErr++;
         HDF_LOGE("%{public}s: bad output data, err_info: %{public}d", __func__, err_info);
         return;
     }
@@ -670,76 +757,57 @@ void HandleDecodeFrameOutput(MppFrame frame, int32_t frm_eos, CodecBuffer *outIn
         return;
     }
     // have output data
-    if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
-        IM_STATUS ret = PutDecodeFrameToOutput(frame, outInfo);
-        if (ret != IM_STATUS_SUCCESS) {
-            HDF_LOGE("%{public}s: copy decode output data failed, error code: %{public}d", __func__, ret);
-        }
-    } else {
-        MppBuffer buffer = mppApi->HdiMppFrameGetBuffer(frame);
-        RK_U8 *base = (RK_U8 *)mppApi->HdiMppBufferGetPtrWithCaller(buffer, __func__);
-        RK_U32 bufferSize = mppApi->HdiMppFrameGetBufferSize(frame);
-        uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
-        uint32_t outBufferSize = outInfo->buffer[0].capacity;
-        if (outBuffer != NULL && outBufferSize != 0 && base != NULL && bufferSize != 0) {
-            int32_t ret = memcpy_s(outBuffer, outBufferSize, base, outBufferSize);
-            if (ret == EOK) {
-                outInfo->buffer[0].length = bufferSize;
-            } else {
-                HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
-                HDF_LOGE("%{public}s: dst bufferSize:%{public}d, src data len: %{public}d", __func__,
-                    outBufferSize, bufferSize);
-            }
-        } else {
-            if (frm_eos == 0) {
-                HDF_LOGE("%{public}s: output data not copy, buffer incorrect!", __func__);
-            }
-        }
+    IM_STATUS ret = PutDecodeFrameToOutput(component, frame, outInfo);
+    if (ret != IM_STATUS_SUCCESS) {
+        HDF_LOGE("%{public}s: copy decode output data failed, error code: %{public}d", __func__, ret);
     }
 
     if (frm_eos != 0) {
         outInfo->flag |= STREAM_FLAG_EOS;
         HDF_LOGI("%{public}s: dec reach STREAM_FLAG_EOS, frame count : %{public}d, error count : %{public}d",
-            __func__, g_pBaseComponent->frameCount, g_pBaseComponent->frameErr);
+            __func__, component->frameCount, component->frameErr);
     }
+    UINTPTR userData = (UINTPTR)component->ctx;
     int32_t acquireFd = 1;
-    g_pBaseComponent->pCallbacks->OutputBufferAvailable((UINTPTR)NULL, outInfo, &acquireFd);
+    component->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
 }
 
-int32_t HandleDecodedFrame(MppFrame frame, MppCtx ctx, int32_t frm_eos, CodecBuffer *outInfo)
+int32_t HandleDecodedFrame(RKHdiBaseComponent* component, MppFrame frame, MppCtx ctx,
+    int32_t frm_eos, CodecBuffer *outInfo)
 {
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     if (frame) {
         if (mppApi->HdiMppFrameGetInfoChange(frame)) {
-            if (HandleDecodeFrameInfoChange(frame, ctx) != HDF_SUCCESS) {
+            if (HandleDecodeFrameInfoChange(component, frame, ctx) != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: func failed!", __func__);
                 return HDF_FAILURE;
             }
         } else {
-            HandleDecodeFrameOutput(frame, frm_eos, outInfo);
+            HandleDecodeFrameOutput(component, frame, frm_eos, outInfo);
         }
         mppApi->HdiMppFrameDeinit(&frame);
     }
 
     // try get runtime frame memory usage
-    if (g_pBaseComponent->frmGrp) {
-        size_t usage = mppApi->HdiMppBufferGroupUsage(g_pBaseComponent->frmGrp);
-        if (usage > g_pBaseComponent->maxUsage)
-            g_pBaseComponent->maxUsage = usage;
+    if (component->frmGrp) {
+        size_t usage = mppApi->HdiMppBufferGroupUsage(component->frmGrp);
+        if (usage > component->maxUsage)
+            component->maxUsage = usage;
     }
     return HDF_SUCCESS;
 }
 
-RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, CodecBuffer *outInfo)
+RK_U32 CodecDecodeGetFrameLoop(RKHdiBaseComponent* component, MppCtx ctx, RK_U32 pkt_done,
+    RK_U32 pkt_eos, CodecBuffer *outInfo)
 {
     MPP_RET ret = MPP_OK;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     RK_U32 frm_eos = 0;
     MppFrame frame = NULL;
 
     do {
         RK_S32 get_frm = 0;
-        ret = DecodeGetFrame(ctx, &frame);
+        ret = DecodeGetFrame(component, ctx, &frame);
         if (ret != MPP_OK) {
             HDF_LOGE("%{public}s: decode_get_frame failed, ret:%{public}d", __func__, ret);
             break;
@@ -747,7 +815,7 @@ RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, Code
         if (frame) {
             frm_eos = mppApi->HdiMppFrameGetEos(frame);
             get_frm = 1;
-            if (HandleDecodedFrame(frame, ctx, frm_eos, outInfo) != HDF_SUCCESS) {
+            if (HandleDecodedFrame(component, frame, ctx, frm_eos, outInfo) != HDF_SUCCESS) {
                 break;
             }
         }
@@ -759,8 +827,8 @@ RK_U32 CodecDecodeGetFrameLoop(MppCtx ctx, RK_U32 pkt_done, RK_U32 pkt_eos, Code
             break;
         }
 
-        if ((g_pBaseComponent->frameNum > 0 && (g_pBaseComponent->frameCount >= g_pBaseComponent->frameNum)) ||
-            ((g_pBaseComponent->frameNum == 0) && frm_eos != 0)) {
+        if ((component->frameNum > 0 && (component->frameCount >= component->frameNum)) ||
+            ((component->frameNum == 0) && frm_eos != 0)) {
             break;
         }
         if (get_frm) {
@@ -776,14 +844,20 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
-    MppApi *mpi = g_pBaseComponent->mpi;
-    MppPacket packet = g_pBaseComponent->packet;
     RK_U32 loop_end = 0;
     RK_U32 frm_eos;
     RK_U32 pkt_done = 0;
     RK_U32 pkt_eos = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
 
-    if (DecodeInitPacket(&packet, inputData, pkt_eos) != HDF_SUCCESS) {
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    MppApi *mpi = component->mpi;
+    MppPacket packet = component->packet;
+
+    if (DecodeInitPacket(component, &packet, inputData, pkt_eos) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Init packet failed!", __func__);
         return HDF_FAILURE;
     }
@@ -796,9 +870,9 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
             }
         }
 
-        frm_eos = CodecDecodeGetFrameLoop(ctx, pkt_done, pkt_eos, outInfo);
-        if ((g_pBaseComponent->frameNum > 0 && (g_pBaseComponent->frameCount >= g_pBaseComponent->frameNum)) ||
-            ((g_pBaseComponent->frameNum == 0) && frm_eos != 0)) {
+        frm_eos = CodecDecodeGetFrameLoop(component, ctx, pkt_done, pkt_eos, outInfo);
+        if ((component->frameNum > 0 && (component->frameCount >= component->frameNum)) ||
+            ((component->frameNum == 0) && frm_eos != 0)) {
             loop_end = 1;
             break;
         }
@@ -807,8 +881,9 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
         }
         usleep(SLEEP_INTERVAL_MICROSECONDS);
     } while (1);
+    UINTPTR userData = (UINTPTR)component->ctx;
     int32_t acquireFd = 1;
-    g_pBaseComponent->pCallbacks->InputBufferAvailable((UINTPTR)NULL, inputData, &acquireFd);
+    component->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
 
     if (loop_end != 1) {
         return HDF_FAILURE;
@@ -816,13 +891,13 @@ int32_t CodecDecode(CODEC_HANDLETYPE handle, CodecBuffer* inputData, CodecBuffer
     return HDF_SUCCESS;
 }
 
-static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, CodecBuffer *inputInfo)
+static IM_STATUS GetEncodeFrameFromInput(RKHdiBaseComponent* component, MppFrame frame,
+    MppBuffer mppBuffer, CodecBuffer *inputInfo)
 {
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    BufferHandle *bufferHandle = (BufferHandle *)inputInfo->buffer[0].buf;
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -834,23 +909,30 @@ static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, Co
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
-    if (bufferHandle == NULL) {
-        HDF_LOGE("%{public}s: bufferHandle invalid", __func__);
+    if (inputInfo->buffer[0].buf == 0) {
+        HDF_LOGE("%{public}s: output buf invalid", __func__);
         return IM_STATUS_INVALID_PARAM;
     }
 
-    src.fd = bufferHandle->fd;
-    src.width    = mppApi->HdiMppFrameGetWidth(frame);
-    src.height   = bufferHandle->height;
-    src.wstride  = MPP_ALIGN(src.width, FRAME_STRIDE_ALIGNMENT);
-    src.hstride  = bufferHandle->height;
-    src.format   = RK_FORMAT_YCbCr_420_SP;
     dst.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
     dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
     dst.width    = mppApi->HdiMppFrameGetWidth(frame);
     dst.height   = mppApi->HdiMppFrameGetHeight(frame);
     dst.format   = RK_FORMAT_YCbCr_420_SP;
+
+    if (inputInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)inputInfo->buffer[0].buf;
+        src.fd = bufferHandle->fd;
+    } else {
+        src.vir_addr = (void *)inputInfo->buffer[0].buf;
+    }
+    src.width    = dst.width;
+    src.height   = dst.height;
+    src.wstride  = MPP_ALIGN(src.width, FRAME_STRIDE_ALIGNMENT);
+    src.hstride  = src.height;
+    src.format   = RK_FORMAT_YCbCr_420_SP;
+
     rect.x = 0;
     rect.y = 0;
     rect.width = dst.width;
@@ -858,10 +940,10 @@ static IM_STATUS GetEncodeFrameFromInput(MppFrame frame, MppBuffer mppBuffer, Co
     return imcrop(src, dst, rect);
 }
 
-int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData)
+int32_t EncodeInitFrame(RKHdiBaseComponent* component, MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData)
 {
     MPP_RET ret = MPP_OK;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
 
     if (frm_eos != 0) {
         HDF_LOGI("%{public}s: receive eos frame", __func__);
@@ -871,58 +953,34 @@ int32_t EncodeInitFrame(MppFrame *pFrame, RK_U32 frm_eos, CodecBuffer *inputData
         HDF_LOGE("%{public}s: mpp_frame_init failed", __func__);
         return HDF_FAILURE;
     }
-    mppApi->HdiMppFrameSetWidth(*pFrame, g_pBaseComponent->setup.width);
-    mppApi->HdiMppFrameSetHeight(*pFrame, g_pBaseComponent->setup.height);
-    mppApi->HdiMppFrameSetHorStride(*pFrame, g_pBaseComponent->setup.stride.horStride);
-    mppApi->HdiMppFrameSetVerStride(*pFrame, g_pBaseComponent->setup.stride.verStride);
-    mppApi->HdiMppFrameSetFormat(*pFrame, g_pBaseComponent->fmt);
+    mppApi->HdiMppFrameSetWidth(*pFrame, component->setup.width);
+    mppApi->HdiMppFrameSetHeight(*pFrame, component->setup.height);
+    mppApi->HdiMppFrameSetHorStride(*pFrame, component->setup.stride.horStride);
+    mppApi->HdiMppFrameSetVerStride(*pFrame, component->setup.stride.verStride);
+    mppApi->HdiMppFrameSetFormat(*pFrame, component->fmt);
     mppApi->HdiMppFrameSetEos(*pFrame, frm_eos);
 
-    if (inputData->buffer[0].type == BUFFER_TYPE_HANDLE) {
-        IM_STATUS status = GetEncodeFrameFromInput(*pFrame, g_pBaseComponent->frmBuf, inputData);
-        if (status == IM_STATUS_SUCCESS) {
-            mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
-        } else {
-            mppApi->HdiMppFrameDeinit(&pFrame);
-            HDF_LOGE("%{public}s: copy encode input data failed, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
+    IM_STATUS status = GetEncodeFrameFromInput(component, *pFrame, component->frmBuf, inputData);
+    if (status == IM_STATUS_SUCCESS) {
+        mppApi->HdiMppFrameSetBuffer(*pFrame, component->frmBuf);
     } else {
-        uint8_t *buf = NULL;
-        if ((uint8_t *)inputData->buffer[0].buf != NULL && inputData->buffer[0].length > 0) {
-            buf = (uint8_t *)mppApi->HdiMppBufferGetPtrWithCaller(g_pBaseComponent->frmBuf, __func__);
-            if (buf == NULL) {
-                HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
-                mppApi->HdiMppFrameDeinit(&pFrame);
-                return HDF_FAILURE;
-            }
-            uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
-            uint32_t inBufferSize = inputData->buffer[0].length;
-            int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
-            if (ret != EOK) {
-                HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
-                mppApi->HdiMppFrameDeinit(&pFrame);
-                return HDF_FAILURE;
-            }
-            mppApi->HdiMppFrameSetBuffer(*pFrame, g_pBaseComponent->frmBuf);
-        } else {
-            mppApi->HdiMppFrameSetBuffer(*pFrame, NULL);
-            HDF_LOGI("%{public}s: receive empty frame", __func__);
-        }
+        mppApi->HdiMppFrameDeinit(&pFrame);
+        HDF_LOGE("%{public}s: copy encode input data failed, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
 }
 
-int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, CodecBuffer *outInfo)
+int32_t HandleEncodedPacket(RKHdiBaseComponent* component, MppPacket packet, RK_U32 pkt_eos, CodecBuffer *outInfo)
 {
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
+    RKMppApi *mppApi = component->mppApi;
     void *ptr   = mppApi->HdiMppPacketGetPos(packet);
     size_t len  = mppApi->HdiMppPacketGetLength(packet);
     pkt_eos = mppApi->HdiMppPacketGetEos(packet);
 
     // call back have out data
-    UINTPTR userData = NULL;
+    UINTPTR userData = (UINTPTR)component->ctx;
     int32_t acquireFd = 1;
     uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
     uint32_t outBufferSize = outInfo->buffer[0].capacity;
@@ -940,19 +998,19 @@ int32_t HandleEncodedPacket(MppPacket packet, RK_U32 pkt_eos, CodecBuffer *outIn
     if (pkt_eos != 0) {
         outInfo->flag |= STREAM_FLAG_EOS;
         HDF_LOGI("%{public}s: enc reach STREAM_FLAG_EOS, frame count : %{public}d",
-            __func__, g_pBaseComponent->frameCount);
+            __func__, component->frameCount);
     }
-    g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
+    component->pCallbacks->OutputBufferAvailable(userData, outInfo, &acquireFd);
 
     return HDF_SUCCESS;
 }
 
-RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, CodecBuffer *outInfo)
+RK_U32 CodecEncodeGetPacketLoop(RKHdiBaseComponent* component, MppCtx ctx, CodecBuffer *outInfo)
 {
     MPP_RET ret = MPP_OK;
-    MppApi *mpi = g_pBaseComponent->mpi;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
-    MppPacket packet = g_pBaseComponent->packet;
+    MppApi *mpi = component->mpi;
+    RKMppApi *mppApi = component->mppApi;
+    MppPacket packet = component->packet;
     RK_U32 eoi = 1;
     RK_U32 pkt_eos = 0;
 
@@ -965,7 +1023,7 @@ RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, CodecBuffer *outInfo)
 
         if (packet) {
             pkt_eos = mppApi->HdiMppPacketGetEos(packet);
-            HandleEncodedPacket(packet, pkt_eos, outInfo);
+            HandleEncodedPacket(component, packet, pkt_eos, outInfo);
 
             /* for low delay partition encoding */
             if (mppApi->HdiMppPacketIsPartition(packet)) {
@@ -973,7 +1031,7 @@ RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, CodecBuffer *outInfo)
             }
 
             mppApi->HdiMppPacketDeinit(&packet);
-            g_pBaseComponent->frameCount += eoi;
+            component->frameCount += eoi;
 
             if (pkt_eos != 0) {
                 HDF_LOGI("%{public}s: find eos packet", __func__);
@@ -988,8 +1046,6 @@ RK_U32 CodecEncodeGetPacketLoop(MppCtx ctx, CodecBuffer *outInfo)
 int32_t CodecEncode(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer *outInfo, uint32_t timeoutMs)
 {
     MPP_RET ret = MPP_OK;
-    MppApi *mpi = g_pBaseComponent->mpi;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
     MppFrame frame = NULL;
     MppCtx ctx = handle;
     RK_U32 pkt_eos = 0;
@@ -1004,7 +1060,15 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer
     }
     frm_eos = (inputData->flag == STREAM_FLAG_EOS) ? 1 : 0;
 
-    if (EncodeInitFrame(&frame, frm_eos, inputData) != HDF_SUCCESS) {
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    MppApi *mpi = component->mpi;
+    RKMppApi *mppApi = component->mppApi;
+
+    if (EncodeInitFrame(component, &frame, frm_eos, inputData) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
 
@@ -1015,10 +1079,11 @@ int32_t CodecEncode(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer
         return HDF_FAILURE;
     }
     mppApi->HdiMppFrameDeinit(&frame);
-    pkt_eos = CodecEncodeGetPacketLoop(ctx, outInfo);
+    pkt_eos = CodecEncodeGetPacketLoop(component, ctx, outInfo);
 
-    g_pBaseComponent->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
-    if (g_pBaseComponent->frameNum > 0 && g_pBaseComponent->frameCount >= g_pBaseComponent->frameNum) {
+    userData = (UINTPTR)component->ctx;
+    component->pCallbacks->InputBufferAvailable(userData, inputData, &acquireFd);
+    if (component->frameNum > 0 && component->frameCount >= component->frameNum) {
         loop_end = 1;
     }
 
@@ -1036,15 +1101,20 @@ int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t
 {
     MPP_RET ret = MPP_OK;
     MppCtx ctx = handle;
-    RKMppApi *mppApi = g_pBaseComponent->mppApi;
-
     MppPacket packet = NULL;
 
-    mppApi->HdiMppPacketInitWithBuffer(&packet, g_pBaseComponent->pktBuf);
+    RKHdiBaseComponent* component = FindInMppComponentManager(handle);
+    if (component == NULL) {
+        HDF_LOGE("%{public}s: component is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    RKMppApi *mppApi = component->mppApi;
+
+    mppApi->HdiMppPacketInitWithBuffer(&packet, component->pktBuf);
     // NOTE: It is important to clear output packet length!!
     mppApi->HdiMppPacketSetLength(packet, 0);
 
-    ret = g_pBaseComponent->mpi->control(ctx, MPP_ENC_GET_HDR_SYNC, packet);
+    ret = component->mpi->control(ctx, MPP_ENC_GET_HDR_SYNC, packet);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: mpi control enc get extra info failed", __func__);
         return HDF_FAILURE;
@@ -1053,7 +1123,7 @@ int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t
         size_t len  = mppApi->HdiMppPacketGetLength(packet);
 
         // call back have out data
-        UINTPTR userData = NULL;
+        UINTPTR userData = (UINTPTR)component->ctx;
         int32_t acquireFd = 1;
         uint8_t *outBuffer = (uint8_t *)outInfo.buffer[0].buf;
         uint32_t outBufferSize = outInfo.buffer[0].capacity;
@@ -1064,7 +1134,7 @@ int32_t CodecEncodeHeader(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t
                 HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
             }
         }
-        g_pBaseComponent->pCallbacks->OutputBufferAvailable(userData, &outInfo, &acquireFd);
+        component->pCallbacks->OutputBufferAvailable(userData, &outInfo, &acquireFd);
     }
 
     mppApi->HdiMppPacketDeinit(&packet);

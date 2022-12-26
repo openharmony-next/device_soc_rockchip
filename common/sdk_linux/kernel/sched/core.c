@@ -18,7 +18,6 @@
 #include <linux/scs.h>
 #include <linux/irq.h>
 #include <linux/delay.h>
-#include <linux/wgcm.h>
 
 #include <asm/switch_to.h>
 #include <asm/tlb.h>
@@ -31,7 +30,6 @@
 #include "smp.h"
 #include "walt.h"
 #include "rtg/rtg.h"
-#include "rtg/rtg_qos.h"
 
 /*
  * Export tracepoints that act as a bare tracehook (ie: have no trace event
@@ -42,6 +40,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(pelt_rt_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(pelt_dl_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(pelt_irq_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(pelt_se_tp);
+EXPORT_TRACEPOINT_SYMBOL_GPL(pelt_thermal_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(sched_cpu_capacity_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(sched_overutilized_tp);
 EXPORT_TRACEPOINT_SYMBOL_GPL(sched_util_est_cfs_tp);
@@ -906,8 +905,9 @@ int tg_nop(struct task_group *tg, void *data)
 }
 #endif
 
-static void set_load_weight(struct task_struct *p, bool update_load)
+static void set_load_weight(struct task_struct *p)
 {
+    bool update_load = !(READ_ONCE(p->state) & TASK_NEW);
     int prio = p->static_prio - MAX_RT_PRIO;
     struct load_weight *load = &p->se.load;
 
@@ -1655,7 +1655,7 @@ static void __init init_uclamp_rq(struct rq *rq)
         uc_rq[clamp_id] = (struct uclamp_rq) {.value = uclamp_none(clamp_id)};
     }
 
-    rq->uclamp_flags = 0;
+    rq->uclamp_flags = UCLAMP_FLAG_IDLE;
 }
 
 static void __init init_uclamp(void)
@@ -1745,15 +1745,11 @@ void activate_task(struct rq *rq, struct task_struct *p, int flags)
 {
     enqueue_task(rq, p, flags);
 
-    wgcm_activate_task(p);
-
     p->on_rq = TASK_ON_RQ_QUEUED;
 }
 
 void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
 {
-    wgcm_deactivate_task(p, flags);
-
     p->on_rq = (flags & DEQUEUE_SLEEP) ? 0 : TASK_ON_RQ_MIGRATING;
 
     dequeue_task(rq, p, flags);
@@ -3449,8 +3445,6 @@ static void __sched_fork(unsigned long clone_flags, struct task_struct *p)
 #ifdef CONFIG_SCHED_RTG
     p->rtg_depth = 0;
 #endif
-
-    wgcm_clear_child(p);
 }
 
 DEFINE_STATIC_KEY_FALSE(sched_numa_balancing);
@@ -3625,7 +3619,7 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
         }
 
         p->prio = p->normal_prio = p->static_prio;
-        set_load_weight(p, false);
+        set_load_weight(p);
 
 #ifdef CONFIG_SCHED_LATENCY_NICE
         p->latency_prio = NICE_TO_LATENCY(0);
@@ -5472,7 +5466,7 @@ void set_user_nice(struct task_struct *p, long nice)
     }
 
     p->static_prio = NICE_TO_PRIO(nice);
-    set_load_weight(p, true);
+    set_load_weight(p);
     old_prio = p->prio;
     p->prio = effective_prio(p);
 
@@ -5655,7 +5649,7 @@ static void __setscheduler_params(struct task_struct *p,
      */
     p->rt_priority = attr->sched_priority;
     p->normal_prio = normal_prio(p);
-    set_load_weight(p, true);
+    set_load_weight(p);
 }
 
 /*
@@ -7135,8 +7129,6 @@ void __init init_idle(struct task_struct *idle, int cpu)
     idle->se.exec_start = sched_clock();
     idle->flags |= PF_IDLE;
 
-    scs_task_reset(idle);
-    kasan_unpoison_task_stack(idle);
 
 #ifdef CONFIG_SMP
     /*
@@ -7201,7 +7193,7 @@ int cpuset_cpumask_can_shrink(const struct cpumask *cur,
 }
 
 int task_can_attach(struct task_struct *p,
-                    const struct cpumask *cs_cpus_allowed)
+                    const struct cpumask *cs_effective_cpus)
 {
     int ret = 0;
 
@@ -7220,8 +7212,11 @@ int task_can_attach(struct task_struct *p,
     }
 
     if (dl_task(p) &&
-        !cpumask_intersects(task_rq(p)->rd->span, cs_cpus_allowed)) {
-        ret = dl_task_can_attach(p, cs_cpus_allowed);
+        !cpumask_intersects(task_rq(p)->rd->span, cs_effective_cpus)) {
+        int cpu = cpumask_any_and(cpu_active_mask, cs_effective_cpus);
+        if (unlikely(cpu >= nr_cpu_ids))
+            return -EINVAL;
+        ret = dl_cpu_busy(cpu, p);
     }
 
 out:
@@ -7300,7 +7295,6 @@ void idle_task_exit(void)
         finish_arch_post_lock_switch();
     }
 
-    scs_task_reset(current);
     /* finish_cpu(), as ran on the BP, will clean up the active_mm state */
 }
 
@@ -7846,8 +7840,9 @@ static void cpuset_cpu_active(void)
 static int cpuset_cpu_inactive(unsigned int cpu)
 {
     if (!cpuhp_tasks_frozen) {
-        if (dl_cpu_busy(cpu)) {
-            return -EBUSY;
+        int ret = dl_cpu_busy(cpu, NULL);
+        if (ret) {
+            return ret;
         }
         cpuset_update_active_cpus();
     } else {
@@ -8195,8 +8190,7 @@ void __init sched_init(void)
     }
 
     BUG_ON(alloc_related_thread_groups());
-    set_load_weight(&init_task, false);
-
+    set_load_weight(&init_task);
     /*
      * The boot idle thread does lazy MMU switching as well:
      */
@@ -9628,10 +9622,6 @@ void sched_exit(struct task_struct *p)
 
 #ifdef CONFIG_SCHED_RTG
     sched_set_group_id(p, 0);
-#endif
-
-#ifdef CONFIG_SCHED_RTG_QOS
-    sched_exit_qos_list(p);
 #endif
 
     rq = task_rq_lock(p, &rf);

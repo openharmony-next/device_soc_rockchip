@@ -311,9 +311,12 @@ int32_t SetParamPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
     RKMppApi *mppApi = pBaseComponent->mppApi;
     RK_S32 *pixFmt = (RK_S32 *)param->val;
     MppFrameFormat rkPixFmt = ConvertHdiFormat2RKFormat(*pixFmt);
+    if (rkPixFmt == MPP_FMT_BUTT) {
+        return HDF_FAILURE;
+    }
     ret = mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:format", rkPixFmt);
     if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: config mpp set pixFmt failed!", __func__);
+        HDF_LOGE("%{public}s: config mpp set pixFmt failed! ret: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
     pBaseComponent->setup.fmt = *pixFmt;
@@ -398,7 +401,7 @@ int32_t SetParamGop(RKHdiBaseComponent *pBaseComponent, Param *param)
 
     ret = mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "rc:gop", gopSet->gop);
     if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: config mpp set gop failed!", __func__);
+        HDF_LOGE("%{public}s: config mpp set gop failed! ret: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 

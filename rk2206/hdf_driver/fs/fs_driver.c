@@ -19,7 +19,8 @@
 #include "hdf_device_desc.h"
 #include "device_resource_if.h"
 #include "osal_mem.h"
-#include "lfs_api.h"
+#include "lfs.h"
+#include "lfs_adapter.h"
 
 #include "lz_hardware.h"
 
@@ -441,19 +442,13 @@ static int32_t fsdrv_init(struct HdfDeviceObject *device)
         m_fs_cfg[i].lfs_cfg.file_max = LFS_FILE_MAX;
         m_fs_cfg[i].lfs_cfg.name_max = LFS_NAME_MAX;
 
-        result = SetDefaultMountPath(i, m_fs_cfg[i].mount_point);
-        if (result != VFS_OK) {
-            PRINT_ERR("SetDefaultMountPath(%d, %d) failed(%d)\n", i, m_fs_cfg[i].mount_point, result);
-            continue;
-        }
-
         result = mount(NULL, m_fs_cfg[i].mount_point, "littlefs", 0, &m_fs_cfg[i].lfs_cfg);
         printf("%s: mount fs on '%s' %s\n", __func__, m_fs_cfg[i].mount_point, (result == 0) ? "succeed" : "failed");
-        if (CheckPathIsMounted(m_fs_cfg[i].mount_point, &file_op_info) == TRUE) {
-            int lfs_ret = lfs_mkdir(&file_op_info->lfsInfo, m_fs_cfg[i].mount_point);
-            if (lfs_ret == LFS_ERR_OK) {
+        if (ret == 0) {
+            ret = mkdir(m_fs_cfg[i].mount_point, S_IRWXU | S_IRWXG | S_IRWXO);
+            if (ret == 0) {
                 PRINT_LOG("create root dir(%s) success.\n", m_fs_cfg[i].mount_point);
-            } else if (lfs_ret == LFS_ERR_EXIST) {
+            } else if (errno == EEXIST) {
                 PRINT_LOG("root dir(%s) exist.\n", m_fs_cfg[i].mount_point);
             } else {
                 PRINT_LOG("create root dir(%s) failed.", m_fs_cfg[i].mount_point);

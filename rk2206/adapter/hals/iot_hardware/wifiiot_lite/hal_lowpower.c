@@ -12,17 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "iot_errno.h"
 #include "lowpower.h"
 #include "lz_hardware.h"
 
 unsigned int LpcInit(void)
 {
-    return LZ_HARDWARE_SUCCESS;
+    return IOT_SUCCESS;
 }
 
 unsigned int LpcSetType(LpcType type)
 {
-    return LZ_HARDWARE_SUCCESS;
+    return IOT_SUCCESS;
 }

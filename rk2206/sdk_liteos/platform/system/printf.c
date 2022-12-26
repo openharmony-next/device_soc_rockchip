@@ -1019,6 +1019,14 @@ int __wrap_printf(const char* format, ...)
     return ret;
 }
 
+int __wrap_snprintf(char* buffer, size_t count, const char* format, ...)
+{
+    va_list va;
+    va_start(va, format);
+    const int ret = vsnprintf_s(_out_buffer, buffer, count, format, va);
+    va_end(va);
+    return ret;
+}
 
 int __wrap_vsnprintf(char* buffer, size_t count, const char* format, va_list va)
 {

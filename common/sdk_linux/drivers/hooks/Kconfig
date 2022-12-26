@@ -26,5 +26,6 @@ config VENDOR_DTC_HOOKS
         default y
         help
 	  Enable dtc driver vendor hooks
-
+config OHOS_VENDOR
+	def_bool $(success,$(srctree)/scripts/ohos-check-dir.sh $(srctree)/vendor)
 endmenu

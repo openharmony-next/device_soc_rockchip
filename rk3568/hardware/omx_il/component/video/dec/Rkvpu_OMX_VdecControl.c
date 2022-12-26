@@ -74,7 +74,9 @@
 #include "IndexExt.h"
 
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-
+#define WIDTH_720P  1080
+#define HEIGHT_720P  720
+static const OMX_U32 SIZE_720P = WIDTH_720P * HEIGHT_720P;
 typedef struct {
     OMX_U32 mProfile;
     OMX_U32 mLevel;
@@ -960,7 +962,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
             omx_trace("debug 10bit mWidth = %d mHeight = %d horStride = %d,verStride %d",
                 (int)mWidth, (int)mHeight, (int)horStride, (int)verStride);
         } else {
-            OMX_BOOL useRga = OMX_FALSE;
+            OMX_BOOL useRga = mWidth * mHeight >= SIZE_720P ? OMX_TRUE : OMX_FALSE;
             if (useRga) {
                 rga_buffer_t dstRgaBuffer, srcRgaBuffer, bRgbBuffer;
                 im_rect srect, drect, prect;
@@ -970,30 +972,30 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
                 dstRgaBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
                 dstRgaBuffer.wstride = pOutputPort->portDefinition.format.video.nFrameWidth;
                 dstRgaBuffer.hstride = pOutputPort->portDefinition.format.video.nFrameHeight;
-                dstRgaBuffer.format = pOutputPort->portDefinition.format.video.eColorFormat;
-                dstRgaBuffer.phy_addr = 0; // (void *)dstSurface->phyAddr;
-                dstRgaBuffer.vir_addr = pOutputBuffer->pBuffer; // dstSurface->virAddr;
+                dstRgaBuffer.format = RK_FORMAT_YCbCr_420_SP;
+                dstRgaBuffer.phy_addr = 0;
+                dstRgaBuffer.vir_addr = pOutputBuffer->pBuffer;
                 dstRgaBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
                 dstRgaBuffer.fd = -1;
 
                 srcRgaBuffer.width = pOutputPort->portDefinition.format.video.nFrameWidth;
                 srcRgaBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
-                srcRgaBuffer.wstride = ALIGN_UP(pOutputPort->portDefinition.format.video.nFrameWidth, 16);
-                srcRgaBuffer.hstride = ALIGN_UP(pOutputPort->portDefinition.format.video.nFrameHeight, 16);
+                srcRgaBuffer.wstride = mStride;
+                srcRgaBuffer.hstride = mSliceHeight;
                 
-                srcRgaBuffer.format = pOutputPort->portDefinition.format.video.eColorFormat;
-                srcRgaBuffer.phy_addr = 0; // (void *)dstSurface->phyAddr;
-                srcRgaBuffer.vir_addr = buff_vir; // dstSurface->virAddr;
+                srcRgaBuffer.format = RK_FORMAT_YCbCr_420_SP;
+                srcRgaBuffer.phy_addr = 0;
+                srcRgaBuffer.vir_addr = buff_vir;
                 srcRgaBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
                 srcRgaBuffer.fd = -1;
 
                 bRgbBuffer.width = pOutputPort->portDefinition.format.video.nFrameWidth;
                 bRgbBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
-                bRgbBuffer.wstride = ALIGN_UP(pOutputPort->portDefinition.format.video.nFrameWidth, 16);
-                bRgbBuffer.hstride = ALIGN_UP(pOutputPort->portDefinition.format.video.nFrameHeight, 16);
-                bRgbBuffer.format = pOutputPort->portDefinition.format.video.eColorFormat;
-                bRgbBuffer.phy_addr = 0; // (void *)dstSurface->phyAddr;
-                bRgbBuffer.vir_addr = 0; // dstSurface->virAddr;
+                bRgbBuffer.wstride = mStride;
+                bRgbBuffer.hstride = mSliceHeight;
+                bRgbBuffer.format = RK_FORMAT_YCbCr_420_SP;
+                bRgbBuffer.phy_addr = 0;
+                bRgbBuffer.vir_addr = 0;
                 bRgbBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
                 bRgbBuffer.fd = -1;
 

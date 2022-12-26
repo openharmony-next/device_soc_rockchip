@@ -18,23 +18,22 @@
 #include <stdio.h>
 
 #include "cmsis_os.h"
-#include "common.h"
 #include "ohos_init.h"
 
 #include "wifi_hotspot_config.h"
 #include "lz_hardware.h"
 
-#define LOG_TAG "WIFI_DEVICE_UTIL"
+#define LOG_TAG                         "WIFI_DEVICE_UTIL"
 
-#define WIFI_WAIT_FOREVER 0xFFFFFFFF
-#define CHANNEL_80211B_ONLY 14
-#define FREQ_OF_CHANNEL_1 2412
-#define FREQ_OF_CHANNEL_80211B_ONLY 2484
-#define WIFI_MIN_CHANNEL 1
-#define WIFI_FREQ_INTERVAL 5
+#define WIFI_WAIT_FOREVER               0xFFFFFFFF
+#define CHANNEL_80211B_ONLY             14
+#define FREQ_OF_CHANNEL_1               2412
+#define FREQ_OF_CHANNEL_80211B_ONLY     2484
+#define WIFI_MIN_CHANNEL                1
+#define WIFI_FREQ_INTERVAL              5
 
-static MutexId g_wifiGlobalLock = NULL;
-static MutexId g_wifiEventLock = NULL;
+static osMutexId_t g_wifiGlobalLock = NULL;
+static osMutexId_t g_wifiEventLock = NULL;
 
 static void InitWifiGlobalLock(void)
 {

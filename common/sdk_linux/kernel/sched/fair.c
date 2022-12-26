@@ -218,7 +218,10 @@ static unsigned int get_update_sysctl_factor(void)
 
 static void update_sysctl(void)
 {
-#define SET_SYSCTL(name) (sysctl_##name = (get_update_sysctl_factor()) * normalized_sysctl_##name)
+    unsigned int factor = get_update_sysctl_factor();
+
+#define SET_SYSCTL(name) \
+    (sysctl_##name = (factor) * normalized_sysctl_##name)
     SET_SYSCTL(sched_min_granularity);
     SET_SYSCTL(sched_latency);
     SET_SYSCTL(sched_wakeup_granularity);
@@ -3791,7 +3794,19 @@ static inline int update_cfs_rq_load_avg(u64 now, struct cfs_rq *cfs_rq)
 
         r = removed_util;
         sub_positive(&sa->util_avg, r);
-        sa->util_sum = sa->util_avg * divider;
+        sub_positive(&sa->util_sum, r * divider);
+        /*
+         * Because of rounding, se->util_sum might ends up being +1 more than
+         * cfs->util_sum. Although this is not a problem by itself, detaching
+         * a lot of tasks with the rounding problem between 2 updates of
+         * util_avg (~1ms) can make cfs->util_sum becoming null whereas
+         * cfs_util_avg is not.
+         * Check that util_sum is still above its lower bound for the new
+         * util_avg. Given that period_contrib might have moved since the last
+         * sync, we are only sure that util_sum must be above or equal to
+         *    util_avg * minimum possible divider
+         */
+        sa->util_sum = max_t(u32, sa->util_sum, sa->util_avg * PELT_MIN_DIVIDER);
 
         r = removed_runnable;
         sub_positive(&sa->runnable_avg, r);
@@ -3852,10 +3867,11 @@ static void attach_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *s
 
     se->avg.runnable_sum = se->avg.runnable_avg * divider;
 
-    se->avg.load_sum = divider;
-    if (se_weight(se)) {
-        se->avg.load_sum = div_u64(se->avg.load_avg * se->avg.load_sum, se_weight(se));
-    }
+    se->avg.load_sum = se->avg.load_avg * divider;
+    if (se_weight(se) < se->avg.load_sum)
+        se->avg.load_sum = div_u64(se->avg.load_sum, se_weight(se));
+    else
+        se->avg.load_sum = 1;
 
     enqueue_load_avg(cfs_rq, se);
     cfs_rq->avg.util_avg += se->avg.util_avg;
@@ -4937,7 +4953,7 @@ static int tg_unthrottle_up(struct task_group *tg, void *data)
 
     cfs_rq->throttle_count--;
     if (!cfs_rq->throttle_count) {
-        cfs_rq->throttled_clock_task_time += rq_clock_task(rq) - cfs_rq->throttled_clock_task;
+        cfs_rq->throttled_clock_pelt_time += rq_clock_task(rq) - cfs_rq->throttled_clock_pelt;
 
         /* Add cfs_rq with already running entity in the list */
         if (cfs_rq->nr_running >= 1) {
@@ -4955,7 +4971,7 @@ static int tg_throttle_down(struct task_group *tg, void *data)
 
     /* group is entering throttled state, stop time */
     if (!cfs_rq->throttle_count) {
-        cfs_rq->throttled_clock_task = rq_clock_task(rq);
+        cfs_rq->throttled_clock_pelt = rq_clock_task(rq);
         list_del_leaf_cfs_rq(cfs_rq);
     }
     cfs_rq->throttle_count++;
@@ -5406,7 +5422,7 @@ static void sync_throttle(struct task_group *tg, int cpu)
     pcfs_rq = tg->parent->cfs_rq[cpu];
 
     cfs_rq->throttle_count = pcfs_rq->throttle_count;
-    cfs_rq->throttled_clock_task = rq_clock_task(cpu_rq(cpu));
+    cfs_rq->throttled_clock_pelt = rq_clock_task(cpu_rq(cpu));
 }
 
 /* conditionally throttle active cfs_rq's from put_prev_entity() */
@@ -5751,6 +5767,23 @@ static int sched_idle_cpu(int cpu)
 }
 #endif
 
+static void set_next_buddy(struct sched_entity *se);
+#ifdef CONFIG_SCHED_LATENCY_NICE
+static void check_preempt_from_idle(struct cfs_rq *cfs, struct sched_entity *se)
+{
+    struct sched_entity *next;
+    if (se->latency_weight <= 0)
+        return;
+    if (cfs->nr_running <= 1)
+        return;
+    if (cfs->next)
+        next = cfs->next;
+    else
+        next = __pick_first_entity(cfs);
+    if (next && wakeup_preempt_entity(next, se) == 1)
+        set_next_buddy(se);
+}
+#endif
 /*
  * The enqueue_task method is called before nr_running is
  * increased. Here we update the fair scheduling stats and
@@ -5844,6 +5877,10 @@ static void enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
     if (!task_new) {
         update_overutilized_status(rq);
     }
+#ifdef CONFIG_SCHED_LATENCY_NICE
+    if (rq->curr == rq->idle)
+        check_preempt_from_idle(cfs_rq_of(&p->se), &p->se);
+#endif
 
 enqueue_throttle:
     if (cfs_bandwidth_used()) {
@@ -5866,7 +5903,6 @@ enqueue_throttle:
     hrtick_update(rq);
 }
 
-static void set_next_buddy(struct sched_entity *se);
 
 /*
  * The dequeue_task method is called before nr_running is
@@ -6586,15 +6622,11 @@ static int select_idle_sibling(struct task_struct *p, int prev, int target)
         return prev;
     }
 
-    /*
-     * Allow a per-cpu kthread to stack with the wakee if the
-     * kworker thread and the tasks previous CPUs are the same.
-     * The assumption is that the wakee queued work for the
-     * per-cpu kthread that is now complete and the wakeup is
-     * essentially a sync wakeup. An obvious example of this
-     * pattern is IO completions.
-     */
-    if (is_per_cpu_kthread(current) && prev == smp_processor_id() && this_rq()->nr_running <= 1) {
+    if (is_per_cpu_kthread(current) &&
+        in_task() &&
+        prev == smp_processor_id() &&
+        this_rq()->nr_running <= 1 &&
+        asym_fits_capacity(task_util, prev)) {
         return prev;
     }
 
@@ -6603,28 +6635,12 @@ static int select_idle_sibling(struct task_struct *p, int prev, int target)
     if (recent_used_cpu != prev && recent_used_cpu != target && cpus_share_cache(recent_used_cpu, target) &&
         (available_idle_cpu(recent_used_cpu) || sched_idle_cpu(recent_used_cpu)) &&
         cpumask_test_cpu(p->recent_used_cpu, p->cpus_ptr) && asym_fits_capacity(task_util, recent_used_cpu)) {
-        /*
-         * Replace recent_used_cpu with prev as it is a potential
-         * candidate for the next wake:
-         */
         p->recent_used_cpu = prev;
         return recent_used_cpu;
     }
 
-    /*
-     * For asymmetric CPU capacity systems, our domain of interest is
-     * sd_asym_cpucapacity rather than sd_llc.
-     */
     if (static_branch_unlikely(&sched_asym_cpucapacity)) {
         sd = rcu_dereference(per_cpu(sd_asym_cpucapacity, target));
-        /*
-         * On an asymmetric CPU capacity system where an exclusive
-         * cpuset defines a symmetric island (i.e. one unique
-         * capacity_orig value through the cpuset), the key will be set
-         * but the CPUs within that cpuset will not have a domain with
-         * SD_ASYM_CPUCAPACITY. These should follow the usual symmetric
-         * capacity path.
-         */
         if (sd) {
             i = select_idle_capacity(p, sd, target);
             return ((unsigned)i < nr_cpumask_bits) ? i : target;
@@ -7239,8 +7255,25 @@ static int balance_fair(struct rq *rq, struct task_struct *prev, struct rq_flags
     if (rq->nr_running) {
         return 1;
     }
-
     return newidle_balance(rq, rf) != 0;
+}
+#endif /* CONFIG_SMP */
+
+#ifdef CONFIG_SCHED_LATENCY_NICE
+static long wakeup_latency_gran(struct sched_entity *curr, struct sched_entity *se)
+{
+    int latency_weight = se->latency_weight;
+    long thresh = sysctl_sched_latency;
+    if ((se->latency_weight > 0) || (curr->latency_weight > 0))
+        latency_weight -= curr->latency_weight;
+    if (!latency_weight)
+        return 0;
+    if (sched_feat(GENTLE_FAIR_SLEEPERS))
+        thresh >>= 1;
+    latency_weight = clamp_t(long, latency_weight,
+                -1 * NICE_LATENCY_WEIGHT_MAX,
+                NICE_LATENCY_WEIGHT_MAX);
+    return (thresh * latency_weight) >> NICE_LATENCY_SHIFT;
 }
 #endif /* CONFIG_SMP */
 
@@ -7282,6 +7315,9 @@ static int wakeup_preempt_entity(struct sched_entity *curr, struct sched_entity 
 {
     s64 gran, vdiff = curr->vruntime - se->vruntime;
 
+#ifdef CONFIG_SCHED_LATENCY_NICE
+    vdiff += wakeup_latency_gran(curr, se);
+#endif
     if (vdiff <= 0) {
         return -1;
     }

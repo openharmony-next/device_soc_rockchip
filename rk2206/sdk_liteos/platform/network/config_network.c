@@ -211,7 +211,7 @@ WifiErrorCode SetWifiModeOff(void)
     WifiErrorCode error;
     // check wifi stat
     int ret = IsWifiActive();
-    if (ret == WIFI_STATE_AVALIABLE) {
+    if (ret == WIFI_STATE_AVAILABLE) {
         LZ_HARDWARE_LOGD(LOG_TAG, "rknetwork wifi is active, disable now...\n");
         error = DisableWifi();
         if (error == WIFI_SUCCESS) {

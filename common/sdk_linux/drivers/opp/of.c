@@ -349,33 +349,27 @@ static int _bandwidth_supported(struct device *dev, struct opp_table *opp_table)
         if (!np) {
             return -ENODEV;
         }
-
         opp_np = _opp_of_get_opp_desc_node(np, 0);
         of_node_put(np);
     } else {
         opp_np = of_node_get(opp_table->np);
     }
-
     /* Lets not fail in case we are parsing opp-v1 bindings */
     if (!opp_np) {
         return 0;
     }
-
     /* Checking only first OPP is sufficient */
     np = of_get_next_available_child(opp_np, NULL);
+    of_node_put(opp_np);
     if (!np) {
         dev_err(dev, "OPP table empty\n");
         return -EINVAL;
     }
-    of_node_put(opp_np);
-
     prop = of_find_property(np, "opp-peak-kBps", NULL);
     of_node_put(np);
-
     if (!prop || !prop->length) {
         return 0;
     }
-
     return 1;
 }
 
@@ -848,7 +842,7 @@ free_required_opps:
 free_opp:
     _opp_free(new_opp);
 
-    return ERR_PTR(ret);
+    return ret ? ERR_PTR(ret) : NULL;
 }
 
 /* Initializes OPP tables based on new bindings */

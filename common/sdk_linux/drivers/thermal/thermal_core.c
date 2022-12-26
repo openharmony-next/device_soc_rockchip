@@ -478,6 +478,8 @@ static void thermal_zone_device_init(struct thermal_zone_device *tz)
 {
     struct thermal_instance *pos;
     tz->temperature = THERMAL_TEMP_INVALID;
+    tz->prev_low_trip = -INT_MAX;
+    tz->prev_high_trip = INT_MAX;
     list_for_each_entry(pos, &tz->thermal_instances, tz_node) pos->initialized = false;
 }
 
@@ -828,11 +830,10 @@ void thermal_zone_device_unbind_exception(struct thermal_zone_device *tz, const 
  *
  * Return: 0 on success, the proper error value otherwise.
  */
-int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, struct thermal_cooling_device *cdev,
-                                     unsigned long upper, unsigned long lower, unsigned int weight)
+int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip,
+    struct thermal_cooling_device *cdev, unsigned long upper, unsigned long lower, unsigned int weight)
 {
-    struct thermal_instance *dev;
-    struct thermal_instance *pos;
+    struct thermal_instance *dev, *pos;
     struct thermal_zone_device *pos1;
     struct thermal_cooling_device *pos2;
     unsigned long max_state;
@@ -842,14 +843,12 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz, int trip, s
         return -EINVAL;
     }
 
-    list_for_each_entry(pos1, &thermal_tz_list, node)
-    {
+    list_for_each_entry(pos1, &thermal_tz_list, node) {
         if (pos1 == tz) {
             break;
         }
     }
-    list_for_each_entry(pos2, &thermal_cdev_list, node)
-    {
+    list_for_each_entry(pos2, &thermal_cdev_list, node) {
         if (pos2 == cdev) {
             break;
         }
@@ -1100,17 +1099,12 @@ static void bind_cdev(struct thermal_cooling_device *cdev)
  * Return: a pointer to the created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
-static struct thermal_cooling_device *__thermal_cooling_device_register(struct device_node *np, const char *type,
-                                                                        void *devdata,
-                                                                        const struct thermal_cooling_device_ops *ops)
+static struct thermal_cooling_device *__thermal_cooling_device_register(
+    struct device_node *np, const char *type, void *devdata, const struct thermal_cooling_device_ops *ops)
 {
     struct thermal_cooling_device *cdev;
     struct thermal_zone_device *pos = NULL;
-    int result;
-
-    if (type && strlen(type) >= THERMAL_NAME_LENGTH) {
-        return ERR_PTR(-EINVAL);
-    }
+    int id, ret;
 
     if (!ops || !ops->get_max_state || !ops->get_cur_state || !ops->set_cur_state) {
         return ERR_PTR(-EINVAL);
@@ -1121,14 +1115,19 @@ static struct thermal_cooling_device *__thermal_cooling_device_register(struct d
         return ERR_PTR(-ENOMEM);
     }
 
-    result = ida_simple_get(&thermal_cdev_ida, 0, 0, GFP_KERNEL);
-    if (result < 0) {
-        kfree(cdev);
-        return ERR_PTR(result);
+    ret = ida_simple_get(&thermal_cdev_ida, 0, 0, GFP_KERNEL);
+    if (ret < 0) {
+        goto out_kfree_cdev;
+    }
+    cdev->id = ret;
+    id = ret;
+
+    cdev->type = kstrdup(type ? type : "", GFP_KERNEL);
+    if (!cdev->type) {
+        ret = -ENOMEM;
+        goto out_ida_remove;
     }
 
-    cdev->id = result;
-    strlcpy(cdev->type, type ?: "", sizeof(cdev->type));
     mutex_init(&cdev->lock);
     INIT_LIST_HEAD(&cdev->thermal_instances);
     cdev->np = np;
@@ -1138,27 +1137,32 @@ static struct thermal_cooling_device *__thermal_cooling_device_register(struct d
     cdev->devdata = devdata;
     thermal_cooling_device_setup_sysfs(cdev);
     dev_set_name(&cdev->device, "cooling_device%d", cdev->id);
-    result = device_register(&cdev->device);
-    if (result) {
-        ida_simple_remove(&thermal_cdev_ida, cdev->id);
-        put_device(&cdev->device);
-        return ERR_PTR(result);
+    ret = device_register(&cdev->device);
+    if (ret) {
+        goto out_kfree_type;
     }
 
-    /* Add 'this' new cdev to the global cdev list */
     mutex_lock(&thermal_list_lock);
     list_add(&cdev->node, &thermal_cdev_list);
     mutex_unlock(&thermal_list_lock);
-
-    /* Update binding information for 'this' new cdev */
     bind_cdev(cdev);
 
     mutex_lock(&thermal_list_lock);
     list_for_each_entry(pos, &thermal_tz_list, node) if (atomic_cmpxchg(&pos->need_update, 1, 0))
         thermal_zone_device_update(pos, THERMAL_EVENT_UNSPECIFIED);
     mutex_unlock(&thermal_list_lock);
-
     return cdev;
+
+out_kfree_type:
+    thermal_cooling_device_destroy_sysfs(cdev);
+    kfree(cdev->type);
+    put_device(&cdev->device);
+    cdev = NULL;
+out_ida_remove:
+    ida_simple_remove(&thermal_cdev_ida, id);
+out_kfree_cdev:
+    kfree(cdev);
+    return ERR_PTR(ret);
 }
 
 /**
@@ -1314,6 +1318,7 @@ void thermal_cooling_device_unregister(struct thermal_cooling_device *cdev)
     ida_simple_remove(&thermal_cdev_ida, cdev->id);
     device_del(&cdev->device);
     thermal_cooling_device_destroy_sysfs(cdev);
+    kfree(cdev->type);
     put_device(&cdev->device);
 }
 EXPORT_SYMBOL_GPL(thermal_cooling_device_unregister);
