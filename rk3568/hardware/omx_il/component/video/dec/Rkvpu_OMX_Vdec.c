@@ -817,7 +817,14 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                 }
                 Rkvpu_OutputBufferReturn(pOMXComponent, outputUseBuffer);
             }
-
+            // error in outframe
+            if (pframe.ErrorInfo) {
+                if (pframe.vpumem.phy_addr > 0) {
+                    VPUMemLink(&pframe.vpumem);
+                    VPUFreeLinear(&pframe.vpumem);
+                }
+                goto EXIT;
+            }
             /*
              * when decode frame (width > 8192 || Height > 4096), mpp not to check it.
              * do not check here, ACodec will alloc large 4K size memory.
