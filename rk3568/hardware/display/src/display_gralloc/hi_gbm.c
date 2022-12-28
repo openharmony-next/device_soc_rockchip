@@ -174,6 +174,12 @@ uint32_t hdi_gbm_bo_get_height(struct gbm_bo *bo)
     return bo->height;
 }
 
+uint32_t hdi_gbm_bo_get_size(struct gbm_bo *bo)
+{
+    DISPLAY_CHK_RETURN((bo == NULL), 0, DISPLAY_LOGE("the bo is null"));
+    return bo->size;
+}
+
 void hdi_gbm_bo_destroy(struct gbm_bo *bo)
 {
     int ret;
