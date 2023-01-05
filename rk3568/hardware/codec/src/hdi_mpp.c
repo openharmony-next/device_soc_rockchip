@@ -21,6 +21,7 @@
 #include "hdi_mpp_component_manager.h"
 #include "hdi_mpp_config.h"
 #include "im2d.h"
+#include "mpp_common.h"
 #include "rga.h"
 #include "rk_vdec_cfg.h"
 
@@ -31,6 +32,7 @@
 #define DFAULT_ENC_FPS_NUM              24
 #define DFAULT_ENC_DROP_THD             20
 #define DFAULT_ENC_GOP_OPERATOR         2
+#define FRAME_STRIDE_ALIGNMENT          16
 
 static void InitComponentSetup(RKHdiEncodeSetup *setup)
 {
@@ -696,8 +698,6 @@ static IM_STATUS PutDecodeFrameToOutput(RKHdiBaseComponent* component, MppFrame 
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
-    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -709,23 +709,34 @@ static IM_STATUS PutDecodeFrameToOutput(RKHdiBaseComponent* component, MppFrame 
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
+    if (outInfo->buffer[0].buf == 0) {
+        HDF_LOGE("%{public}s: output buf invalid", __func__);
+        return IM_STATUS_INVALID_PARAM;
+    }
 
     src.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
+    src.width    = mppApi->HdiMppFrameGetWidth(frame);
+    src.height   = mppApi->HdiMppFrameGetHeight(frame);
     src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    src.width    = width;
-    src.height   = height;
     src.format   = RK_FORMAT_YCbCr_420_SP;
-    dst.fd = ((BufferHandle *)outInfo->buffer[0].buf)->fd;
-    dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
-    dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    dst.width    = width;
-    dst.height   = height;
+
+    if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)outInfo->buffer[0].buf;
+        dst.fd = bufferHandle->fd;
+    } else {
+        dst.vir_addr = (void *)outInfo->buffer[0].buf;
+    }
+    dst.width    = src.width;
+    dst.height   = src.height;
+    dst.wstride  = MPP_ALIGN(dst.width, FRAME_STRIDE_ALIGNMENT);
+    dst.hstride  = dst.height;
     dst.format   = RK_FORMAT_YCbCr_420_SP;
+
     rect.x = 0;
     rect.y = 0;
-    rect.width = width;
-    rect.height = height;
+    rect.width = dst.width;
+    rect.height = dst.height;
     return imcrop(src, dst, rect);
 }
 
@@ -746,31 +757,9 @@ void HandleDecodeFrameOutput(RKHdiBaseComponent* component, MppFrame frame, int3
         return;
     }
     // have output data
-    if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
-        IM_STATUS ret = PutDecodeFrameToOutput(component, frame, outInfo);
-        if (ret != IM_STATUS_SUCCESS) {
-            HDF_LOGE("%{public}s: copy decode output data failed, error code: %{public}d", __func__, ret);
-        }
-    } else {
-        MppBuffer buffer = mppApi->HdiMppFrameGetBuffer(frame);
-        RK_U8 *base = (RK_U8 *)mppApi->HdiMppBufferGetPtrWithCaller(buffer, __func__);
-        RK_U32 bufferSize = mppApi->HdiMppFrameGetBufferSize(frame);
-        uint8_t *outBuffer = (uint8_t *)outInfo->buffer[0].buf;
-        uint32_t outBufferSize = outInfo->buffer[0].capacity;
-        if (outBuffer != NULL && outBufferSize != 0 && base != NULL && bufferSize != 0) {
-            int32_t ret = memcpy_s(outBuffer, outBufferSize, base, outBufferSize);
-            if (ret == EOK) {
-                outInfo->buffer[0].length = bufferSize;
-            } else {
-                HDF_LOGE("%{public}s: copy output data failed, error code: %{public}d", __func__, ret);
-                HDF_LOGE("%{public}s: dst bufferSize:%{public}d, src data len: %{public}d", __func__,
-                    outBufferSize, bufferSize);
-            }
-        } else {
-            if (frm_eos == 0) {
-                HDF_LOGE("%{public}s: output data not copy, buffer incorrect!", __func__);
-            }
-        }
+    IM_STATUS ret = PutDecodeFrameToOutput(component, frame, outInfo);
+    if (ret != IM_STATUS_SUCCESS) {
+        HDF_LOGE("%{public}s: copy decode output data failed, error code: %{public}d", __func__, ret);
     }
 
     if (frm_eos != 0) {
@@ -909,8 +898,6 @@ static IM_STATUS GetEncodeFrameFromInput(RKHdiBaseComponent* component, MppFrame
     rga_buffer_t src;
     rga_buffer_t dst;
     im_rect rect;
-    int32_t width = mppApi->HdiMppFrameGetWidth(frame);
-    int32_t height = mppApi->HdiMppFrameGetHeight(frame);
     
     int32_t err = memset_s(&src, sizeof(src), 0, sizeof(src));
     if (err != EOK) {
@@ -922,23 +909,34 @@ static IM_STATUS GetEncodeFrameFromInput(RKHdiBaseComponent* component, MppFrame
         HDF_LOGE("%{public}s: memset_s dst failed, error code: %{public}d", __func__, err);
         return IM_STATUS_FAILED;
     }
+    if (inputInfo->buffer[0].buf == 0) {
+        HDF_LOGE("%{public}s: output buf invalid", __func__);
+        return IM_STATUS_INVALID_PARAM;
+    }
 
-    src.fd = ((BufferHandle *)inputInfo->buffer[0].buf)->fd;
-    src.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
-    src.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    src.width    = width;
-    src.height   = height;
-    src.format   = RK_FORMAT_YCbCr_420_SP;
     dst.fd = mppApi->HdiMppBufferGetFdWithCaller(mppBuffer, __func__);
     dst.wstride  = mppApi->HdiMppFrameGetHorStride(frame);
     dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
-    dst.width    = width;
-    dst.height   = height;
+    dst.width    = mppApi->HdiMppFrameGetWidth(frame);
+    dst.height   = mppApi->HdiMppFrameGetHeight(frame);
     dst.format   = RK_FORMAT_YCbCr_420_SP;
+
+    if (inputInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)inputInfo->buffer[0].buf;
+        src.fd = bufferHandle->fd;
+    } else {
+        src.vir_addr = (void *)inputInfo->buffer[0].buf;
+    }
+    src.width    = dst.width;
+    src.height   = dst.height;
+    src.wstride  = MPP_ALIGN(src.width, FRAME_STRIDE_ALIGNMENT);
+    src.hstride  = src.height;
+    src.format   = RK_FORMAT_YCbCr_420_SP;
+
     rect.x = 0;
     rect.y = 0;
-    rect.width = width;
-    rect.height = height;
+    rect.width = dst.width;
+    rect.height = dst.height;
     return imcrop(src, dst, rect);
 }
 
@@ -962,37 +960,13 @@ int32_t EncodeInitFrame(RKHdiBaseComponent* component, MppFrame *pFrame, RK_U32 
     mppApi->HdiMppFrameSetFormat(*pFrame, component->fmt);
     mppApi->HdiMppFrameSetEos(*pFrame, frm_eos);
 
-    if (inputData->buffer[0].type == BUFFER_TYPE_HANDLE) {
-        IM_STATUS status = GetEncodeFrameFromInput(component, *pFrame, component->frmBuf, inputData);
-        if (status == IM_STATUS_SUCCESS) {
-            mppApi->HdiMppFrameSetBuffer(*pFrame, component->frmBuf);
-        } else {
-            mppApi->HdiMppFrameDeinit(&pFrame);
-            HDF_LOGE("%{public}s: copy encode input data failed, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
+    IM_STATUS status = GetEncodeFrameFromInput(component, *pFrame, component->frmBuf, inputData);
+    if (status == IM_STATUS_SUCCESS) {
+        mppApi->HdiMppFrameSetBuffer(*pFrame, component->frmBuf);
     } else {
-        uint8_t *buf = NULL;
-        if ((uint8_t *)inputData->buffer[0].buf != NULL && inputData->buffer[0].length > 0) {
-            buf = (uint8_t *)mppApi->HdiMppBufferGetPtrWithCaller(component->frmBuf, __func__);
-            if (buf == NULL) {
-                HDF_LOGE("%{public}s: mpp buffer get ptr with caller failed", __func__);
-                mppApi->HdiMppFrameDeinit(&pFrame);
-                return HDF_FAILURE;
-            }
-            uint8_t *inBuffer = (uint8_t *)inputData->buffer[0].buf;
-            uint32_t inBufferSize = inputData->buffer[0].length;
-            int32_t ret = memcpy_s(buf, inBufferSize, inBuffer, inBufferSize);
-            if (ret != EOK) {
-                HDF_LOGE("%{public}s: copy input data failed, error code: %{public}d", __func__, ret);
-                mppApi->HdiMppFrameDeinit(&pFrame);
-                return HDF_FAILURE;
-            }
-            mppApi->HdiMppFrameSetBuffer(*pFrame, component->frmBuf);
-        } else {
-            mppApi->HdiMppFrameSetBuffer(*pFrame, NULL);
-            HDF_LOGI("%{public}s: receive empty frame", __func__);
-        }
+        mppApi->HdiMppFrameDeinit(&pFrame);
+        HDF_LOGE("%{public}s: copy encode input data failed, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
