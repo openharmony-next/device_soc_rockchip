@@ -281,7 +281,7 @@ OMX_ERRORTYPE Rkvpu_OMX_DebugSwitchfromPropget(
         pVideoDec->bPrintBufferPosition = OMX_TRUE;
     }
     Rockchip_OSAL_Memset(pValue,  0, 128 + 1); // 128:array length
-    if (!Rockchip_OSAL_GetEnvStr("cts_gts.media.gts", pValue, NULL) && !strcasecmp(pValue, "true")) {
+    if (!Rockchip_OSAL_GetEnvStr("cts_gts.media.gts", pValue, sizeof(pValue), NULL) && !strcasecmp(pValue, "true")) {
         omx_info("This is gts media test. pValue: %s", pValue);
         pVideoDec->bGtsMediaTest = OMX_TRUE;
     }
@@ -933,7 +933,7 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                         pframe.DisplayHeight * pframe.DisplayWidth * 3 / 2; // 3:byte alignment, 2:byte alignment
                 outputUseBuffer->timeStamp = pOutput.timeUs;
                 omx_trace("outputUseBuffer->remainDataLen = %d", (int)outputUseBuffer->remainDataLen);
-                if (pVideoDec->fp_out != NULL) {
+                if (pVideoDec->fp_out != NULL && (pVideoDec->bOhosBufferHandle == OMX_FALSE)) {
                     fwrite(outputUseBuffer->bufferHeader->pBuffer, 1,
                         outputUseBuffer->remainDataLen, pVideoDec->fp_out);
                     fflush(pVideoDec->fp_out);

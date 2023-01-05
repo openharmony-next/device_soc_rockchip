@@ -92,5 +92,8 @@ ohos_static_library("RkOMX_OSAL") {
   deps =
       [ "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy:librockchip_vpu" ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
+  ]
 }
