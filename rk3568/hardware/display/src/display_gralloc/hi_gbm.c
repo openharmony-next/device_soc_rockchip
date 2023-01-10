@@ -126,8 +126,8 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     bo->gbm = gbm;
     bo->format = format;
     // init create_dumb
-    dumb.height = ALIGN_UP(height, HEIGHT_ALIGN);
-    dumb.width = ALIGN_UP(AdjustStrideFromFormat(format, width), WIDTH_ALIGN);
+    dumb.height = ALIGN_UP(AdjustStrideFromFormat(format, height), HEIGHT_ALIGN);
+    dumb.width = ALIGN_UP(width, WIDTH_ALIGN);
     dumb.flags = 0;
     dumb.bpp = fmtInfo->bitsPerPixel;
     ret = drmIoctl(gbm->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
@@ -172,6 +172,12 @@ uint32_t hdi_gbm_bo_get_height(struct gbm_bo *bo)
 {
     DISPLAY_CHK_RETURN((bo == NULL), 0, DISPLAY_LOGE("the bo is null"));
     return bo->height;
+}
+
+uint32_t hdi_gbm_bo_get_size(struct gbm_bo *bo)
+{
+    DISPLAY_CHK_RETURN((bo == NULL), 0, DISPLAY_LOGE("the bo is null"));
+    return bo->size;
 }
 
 void hdi_gbm_bo_destroy(struct gbm_bo *bo)
