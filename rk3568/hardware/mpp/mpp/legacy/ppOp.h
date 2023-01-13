@@ -22,7 +22,7 @@
 
 typedef RK_S32     status_t;
 
-namespace android {
+namespace ppOp {
 #define PP_IN_FORMAT_YUV422INTERLAVE                0
 #define PP_IN_FORMAT_YUV420SEMI                     1
 #define PP_IN_FORMAT_YUV420PLANAR                   2

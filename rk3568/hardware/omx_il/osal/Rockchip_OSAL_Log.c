@@ -32,50 +32,6 @@
 #include <string.h>
 #include "Rockchip_OSAL_Env.h"
 
-#ifndef OHOS
-#include <android/log.h>
-#include <utils/Log.h>
-
-void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *tag, const char *msg, ...)
-{
-    OMX_U32 value = 0;
-
-    va_list argptr;
-
-    va_start(argptr, msg);
-
-    switch (logLevel) {
-        case ROCKCHIP_LOG_TRACE: {
-            Rockchip_OSAL_GetEnvU32("vendor.dump.omx.log", &value, 0);
-            if (value) {
-                __android_log_vprint(ANDROID_LOG_DEBUG, tag, msg, argptr);
-            }
-            break;
-        }
-        case ROCKCHIP_LOG_DEBUG: {
-            Rockchip_OSAL_GetEnvU32("vendor.omx.log.debug", &value, 0);
-            if (value & flag) {
-                __android_log_vprint(ANDROID_LOG_DEBUG, tag, msg, argptr);
-            }
-            break;
-        }
-        case ROCKCHIP_LOG_INFO:
-            __android_log_vprint(ANDROID_LOG_INFO, tag, msg, argptr);
-            break;
-        case ROCKCHIP_LOG_WARNING:
-            __android_log_vprint(ANDROID_LOG_WARN, tag, msg, argptr);
-            break;
-        case ROCKCHIP_LOG_ERROR:
-            __android_log_vprint(ANDROID_LOG_ERROR, tag, msg, argptr);
-            break;
-        default:
-            __android_log_vprint(ANDROID_LOG_VERBOSE, tag, msg, argptr);
-    }
-
-    va_end(argptr);
-}
-
-#else
 #include <hdf_log.h>
 #define MPP_LOG_MAX_LEN 256
 void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *tag, const char *msg, ...)
@@ -152,4 +108,3 @@ void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *t
             break;
     }
 }
-#endif
