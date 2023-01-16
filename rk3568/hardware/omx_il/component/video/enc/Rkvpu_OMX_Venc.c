@@ -580,10 +580,7 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
                     p_vpu_ctx->control(p_vpu_ctx, VPU_API_ENC_SETFORMAT, (void *)&encType);
                 }
             }
-            /*
-             * Improve encode quality for CtsTestCases input.
-             * - android.media.cts.DecodeEditEncodeTest#testVideoEditQCIF
-             */
+
             if (Rockchip_OSAL_OMX2HalPixelFormat(omx_format) != HAL_PIXEL_FORMAT_RGBA_8888) {
                 if (p_vpu_ctx->width <= 176 && p_vpu_ctx->height <= 144) { // 176:width, 144:height
                     p_vpu_ctx->control(p_vpu_ctx, VPU_API_ENC_GETCFG, (void*)&vpug);

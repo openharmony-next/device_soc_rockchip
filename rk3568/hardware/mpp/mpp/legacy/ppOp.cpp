@@ -21,7 +21,7 @@
 #include "vpu.h"
 #include "securec.h"
 
-namespace android {
+namespace ppOp {
 status_t ppOpInit(PP_OP_HANDLE *hnd, PP_OPERATION *init)
 {
     (void)hnd;
@@ -83,7 +83,7 @@ int main()
 
     ALOGI("ppOp test start\n");
     VPUMemLinear_t src, dst;
-    android::PP_OP_HANDLE hnd;
+    ppOp::PP_OP_HANDLE hnd;
     int vpuFd = VPUClientInit(VPU_PP);
     ret |= VPUMallocLinear(&src, src_vir_width * src_vir_height * 2); // SRC_SIZE) 2;
     ret |= VPUMallocLinear(&dst, dst_vir_width * dst_vir_height * 2); // DST_SIZE) 2;
@@ -133,7 +133,7 @@ int main()
         wid_alig16 = ((SRC_WIDTH + 15) & (~0xf)); // wid_alig16 15
         hei_alig16 = ((SRC_HEIGHT + 15) & (~0xf)); // hei_alig16 15
 
-        android::PP_OPERATION opt;
+        ppOp::PP_OPERATION opt;
         memset_s(&opt, sizeof(opt), 0, sizeof(opt));
         opt.srcAddr     = src.phy_addr;
         opt.srcFormat   = PP_IN_FORMAT_YUV420SEMI;
@@ -165,21 +165,21 @@ int main()
         opt.rotation    = PP_ROTATION_RIGHT_90; // PP_ROTATION_RIGHT_90
 
         opt.vpuFd       = vpuFd;
-        ret |= android::ppOpInit(&hnd, &opt);
+        ret |= ppOp::ppOpInit(&hnd, &opt);
         if (ret) {
             HDF_LOGE("ppOpInit failed");
             hnd = nullptr;
             goto end;
         }
-        ret = android::ppOpPerform(hnd);
+        ret = ppOp::ppOpPerform(hnd);
         if (ret) {
             HDF_LOGE("ppOpPerform failed");
         }
-        ret = android::ppOpSync(hnd);
+        ret = ppOp::ppOpSync(hnd);
         if (ret) {
             HDF_LOGE("ppOpSync failed");
         }
-        ret = android::ppOpRelease(hnd);
+        ret = ppOp::ppOpRelease(hnd);
         if (ret) {
             HDF_LOGE("ppOpPerform failed");
         }
