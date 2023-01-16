@@ -35,8 +35,8 @@
 #include "Rockchip_OSAL_Mutex.h"
 #include "Rockchip_OSAL_Log.h"
 
-#define MAX_RESOURCE_VIDEO_DEC 6 /* for Android */
-#define MAX_RESOURCE_VIDEO_ENC 4 /* for Android */
+#define MAX_RESOURCE_VIDEO_DEC 6
+#define MAX_RESOURCE_VIDEO_ENC 4
 
 /* Max allowable video scheduler component instance */
 static ROCKCHIP_OMX_RM_COMPONENT_LIST *gpVideoDecRMComponentList = NULL;

@@ -58,8 +58,6 @@
 #include "drm_mode.h"
 #include "VideoExt.h"
 
-#define ANDROID_OREO 27
-
 #define int64_t long long int
 
 static int64_t lastPts = 0;
@@ -1265,11 +1263,6 @@ OMX_ERRORTYPE Rkvpu_Dec_ComponentInit(OMX_COMPONENTTYPE *pOMXComponent)
     if (pVideoDec->bDRMPlayerMode == OMX_TRUE) {
         omx_info("drm player mode is true, force to mpp");
         Rockchip_OSAL_GetEnvU32("ro.build.version.sdk", &version_sdk, 0);
-        if (version_sdk > ANDROID_OREO) {
-            Rockchip_OSAL_SetEnvU32("vendor.use_mpp_mode", 1);
-        } else {
-            Rockchip_OSAL_SetEnvU32("use_mpp_mode", 1);
-        }
     }
     Rockchip_OSAL_Memset((void*)p_vpu_ctx, 0, sizeof(VpuCodecContext_t));
     if (omx_open_vpudec_context(pVideoDec)) {
@@ -1799,11 +1792,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentDeInit(OMX_HANDLETYPE hComponent)
     if (pVideoDec->bDRMPlayerMode == OMX_TRUE) {
         omx_info("drm player mode is true, force to mpp");
         Rockchip_OSAL_GetEnvU32("ro.build.version.sdk", &version_sdk, 0);
-        if (version_sdk > ANDROID_OREO) {
-            Rockchip_OSAL_SetEnvU32("vendor.use_mpp_mode", 0);
-        } else {
-            Rockchip_OSAL_SetEnvU32("use_mpp_mode", 0);
-        }
     }
 
     Rockchip_OSAL_Free(pVideoDec);
