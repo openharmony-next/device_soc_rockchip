@@ -123,7 +123,6 @@ typedef enum _ROCKCHIP_OMX_TRANS_STATETYPE {
 typedef enum _ROCKCHIP_OMX_COLOR_FORMATTYPE {
     /* to copy a encoded data for drm component using gsc or fimc */
     OMX_SEC_COLOR_FormatEncodedData                 = OMX_COLOR_FormatYCbYCr,
-    /* for Android SurfaceMediaSource */
     OMX_COLOR_FormatYUV420Flexible                  = 0x7F420888
 } ROCKCHIP_OMX_COLOR_FORMATTYPE;
 

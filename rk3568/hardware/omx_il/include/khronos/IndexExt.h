@@ -23,25 +23,25 @@
 #define ROCKCHIP_INDEX_CONFIG_VIDEO_INTRAPERIOD \
     "OMX.SEC.index.VideoIntraPeriod"
 #define ROCKCHIP_INDEX_PARAM_ENABLE_ANB    \
-    "OMX.google.android.index.enableAndroidNativeBuffers"
+    "OMX.rockchip.index.enableAndroidNativeBuffers"
 #define ROCKCHIP_INDEX_PARAM_GET_ANB_Usage  \
-    "OMX.google.android.index.getAndroidNativeBufferUsage"
+    "OMX.rockchip.index.getAndroidNativeBufferUsage"
 #define ROCKCHIP_INDEX_PARAM_USE_ANB      \
-    "OMX.google.android.index.useAndroidNativeBuffer2"
+    "OMX.rockchip.index.useAndroidNativeBuffer2"
 #define ROCKCHIP_INDEX_PARAM_STORE_METADATA_BUFFER  \
-    "OMX.google.android.index.storeMetaDataInBuffers"
+    "OMX.rockchip.index.storeMetaDataInBuffers"
 #define ROCKCHIP_INDEX_PARAM_STORE_ANW_BUFFER   \
-    "OMX.google.android.index.storeANWBufferInMetadata"
+    "OMX.rockchip.index.storeANWBufferInMetadata"
 #define ROCKCHIP_INDEX_PARAM_PREPEND_SPSPPS_TO_IDR  \
-    "OMX.google.android.index.prependSPSPPSToIDRFrames"
+    "OMX.rockchip.index.prependSPSPPSToIDRFrames"
 #define ROCKCHIP_INDEX_PARAM_RKWFD  \
     "OMX.rk.index.encoder.wifidisplay"
 #define ROCKCHIP_INDEX_PARAM_THUMBNAIL_CODECPROFILE \
     "OMX.rk.index.decoder.thumbnail.codecprofile"
 #define ROCKCHIP_INDEX_PREPARE_ADAPTIVE_PLAYBACK \
-    "OMX.google.android.index.prepareForAdaptivePlayback"
+    "OMX.rockchip.index.prepareForAdaptivePlayback"
 #define ROCKCHIP_INDEX_DESCRIBE_COLORFORMAT \
-    "OMX.google.android.index.describeColorFormat"
+    "OMX.rockchip.index.describeColorFormat"
 #define ROCKCHIP_INDEX_PARAM_ROCKCHIP_DEC_EXTENSION_DIV3  \
     "OMX.rk.index.decoder.extension.div3"
 #define ROCKCHIP_INDEX_PARAM_ROCKCHIP_DEC_EXTENSION_USE_DTS \
@@ -51,9 +51,9 @@
 #define ROCKCHIP_INDEX_PARAM_EXTENDED_VIDEO \
     "OMX.Topaz.index.param.extended_video"
 #define ROCKCHIP_INDEX_PARAM_DSECRIBECOLORASPECTS \
-    "OMX.google.android.index.describeColorAspects"
+    "OMX.rockchip.index.describeColorAspects"
 #define ROCKCHIP_INDEX_PARAM_ALLOCATENATIVEHANDLE \
-    "OMX.google.android.index.allocateNativeHandle"
+    "OMX.rockchip.index.allocateNativeHandle"
 
 typedef enum OMX_INDEXEXEXTTYPE {
     OMX_IndexRockchipExtensions = 0x70000000,
