@@ -49,7 +49,7 @@ ohos_shared_library("libcodec_oem_interface") {
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
