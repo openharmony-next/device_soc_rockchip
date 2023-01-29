@@ -48,18 +48,18 @@ int32_t GetDefaultConfig(RKHdiBaseComponent *pBaseComponent)
     return HDF_SUCCESS;
 }
 
-CodecPixelFormat ConvertRKFormat2HdiFormat(MppFrameFormat fmtRK)
+PixelFormat ConvertRKFormat2HdiFormat(MppFrameFormat fmtRK)
 {
     if (fmtRK == MPP_FMT_YUV420SP) {
-        return PIXEL_FORMAT_YCBCR_420_SP;
+        return PIXEL_FMT_YCBCR_420_SP;
     } else {
-        return PIXEL_FORMAT_NONE;
+        return PIXEL_FMT_BUTT;
     }
 }
 
-MppFrameFormat ConvertHdiFormat2RKFormat(CodecPixelFormat fmtHDI)
+MppFrameFormat ConvertHdiFormat2RKFormat(PixelFormat fmtHDI)
 {
-    if (fmtHDI == PIXEL_FORMAT_YCBCR_420_SP) {
+    if (fmtHDI == PIXEL_FMT_YCBCR_420_SP) {
         return MPP_FMT_YUV420SP;
     } else {
         HDF_LOGE("%{public}s: do not support type %{public}d", __func__, fmtHDI);
@@ -177,7 +177,7 @@ int32_t GetStrideByWidth(int32_t width, MppFrameFormat fmt)
     return stride;
 }
 
-int32_t GetDefaultHorStride(int32_t width, CodecPixelFormat fmtHDI)
+int32_t GetDefaultHorStride(int32_t width, PixelFormat fmtHDI)
 {
     MppFrameFormat fmt = ConvertHdiFormat2RKFormat(fmtHDI);
     return GetStrideByWidth(width, fmt);
@@ -276,7 +276,7 @@ int32_t SetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param)
         return HDF_FAILURE;
     }
     pBaseComponent->setup.width = *width;
-    if (pBaseComponent->setup.stride.horStride == 0 && pBaseComponent->setup.fmt != PIXEL_FORMAT_NONE) {
+    if (pBaseComponent->setup.stride.horStride == 0 && pBaseComponent->setup.fmt != PIXEL_FMT_BUTT) {
         pBaseComponent->setup.stride.horStride = GetDefaultHorStride(*width, pBaseComponent->setup.fmt);
         mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:hor_stride", pBaseComponent->setup.stride.horStride);
     }
@@ -645,19 +645,19 @@ int32_t GetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param)
 int32_t GetParamDecOutputPixelFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     if (param->val == NULL) {
-        param->size = sizeof(CodecPixelFormat);
+        param->size = sizeof(PixelFormat);
         param->val = malloc(param->size);
     }
 
     RKMppApi *mppApi = pBaseComponent->mppApi;
     MppFrameFormat fmtRK  = MPP_FMT_YUV420SP;
-    CodecPixelFormat format = PIXEL_FORMAT_YCBCR_420_SP;
+    PixelFormat format = PIXEL_FMT_YCBCR_420_SP;
     if (pBaseComponent->frame) {
         fmtRK = mppApi->HdiMppFrameGetFormat(pBaseComponent->frame);
         format = ConvertRKFormat2HdiFormat(fmtRK);
     }
     // Rk mpp Only NV12 is supported
-    int32_t ret = memcpy_s(param->val, param->size, &format, sizeof(CodecPixelFormat));
+    int32_t ret = memcpy_s(param->val, param->size, &format, sizeof(PixelFormat));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -668,10 +668,10 @@ int32_t GetParamDecOutputPixelFmt(RKHdiBaseComponent *pBaseComponent, Param *par
 int32_t GetParamEncInputPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     if (param->val == NULL) {
-        param->size = sizeof(RK_S32);
+        param->size = sizeof(PixelFormat);
         param->val = malloc(param->size);
     }
-    int32_t ret = memcpy_s(param->val, param->size, &pBaseComponent->setup.fmt, sizeof(RK_S32));
+    int32_t ret = memcpy_s(param->val, param->size, &pBaseComponent->setup.fmt, sizeof(PixelFormat));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;

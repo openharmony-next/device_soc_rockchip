@@ -85,7 +85,7 @@ typedef struct {
     int32_t codecType;
     uint32_t split;
     RKHdiStrideSetup stride;
-    CodecPixelFormat fmt;
+    PixelFormat fmt;
     RKHdiFpsSetup fps;
     RKHdiDropSetup drop;
     RKHdiRcSetup rc;
