@@ -235,39 +235,34 @@ int32_t blendTypeChange(BlendType blendType)
 
 int32_t TransformTypeChange(TransformType type)
 {
-    int32_t rkRotateType;
+    int32_t rkTransformType;
     switch (type) {
         case ROTATE_90:            /**< Rotation by 90 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_90;
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90;
             break;
-        case ROTATE_180:             /**< Rotation by 180 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_180;
+        case ROTATE_180:           /**< Rotation by 180 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_180;
             break;
-        case ROTATE_270:             /**< Rotation by 270 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_270;
+        case ROTATE_270:           /**< Rotation by 270 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_270;
             break;
-        default:
-            rkRotateType = 0;        /**< No rotation */
+        case MIRROR_H:             /**< Mirror transform horizontally */
+            rkTransformType = IM_HAL_TRANSFORM_FLIP_H;
             break;
-    }
-    return rkRotateType;
-}
-
-int32_t mirrorTypeChange(MirrorType type)
-{
-    int32_t rkMirrorType;
-    switch (type) {
-        case MIRROR_LR:            /**< Left and right mirrors */
-            rkMirrorType = IM_HAL_TRANSFORM_FLIP_H;
+        case MIRROR_V:             /**< Mirror transform vertically */
+            rkTransformType = IM_HAL_TRANSFORM_FLIP_V;
             break;
-        case MIRROR_TB:            /**< Top and bottom mirrors */
-            rkMirrorType = IM_HAL_TRANSFORM_FLIP_V;
+        case MIRROR_H_ROTATE_90:   /**< Mirror transform horizontally, rotation by 90 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90 | IM_HAL_TRANSFORM_FLIP_V;
+            break;
+        case MIRROR_V_ROTATE_90:   /**< Mirror transform vertically, rotation by 90 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90 | IM_HAL_TRANSFORM_FLIP_H;
             break;
         default:
-            rkMirrorType = 0;
+            rkTransformType = 0;   /**< No rotation */
             break;
     }
-    return rkMirrorType;
+    return rkTransformType;
 }
 
 int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect *dstRect, GfxOpt *opt)
@@ -280,8 +275,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     im_rect drect;
     im_rect prect;
     int32_t rkBlendType = 0;
-    int32_t rkRotateType = 0;
-    int32_t rkMirrorType = 0;
+    int32_t rkTransformType = 0;
 
     errno_t eok = memset_s(&dstRgaBuffer, sizeof(dstRgaBuffer), 0, sizeof(dstRgaBuffer));
     if (eok != EOK) {
@@ -377,14 +371,9 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         }
     }
     if (opt->rotateType) {
-        rkRotateType = TransformTypeChange(opt->rotateType);
-        if (rkRotateType != 0)
-            usage |= rkRotateType;
-    }
-    if (opt->mirrorType == MIRROR_LR || opt->mirrorType == MIRROR_TB) {
-        rkMirrorType = mirrorTypeChange(opt->mirrorType);
-        if (rkMirrorType != 0)
-            usage |= rkMirrorType;
+        rkTransformType = TransformTypeChange(opt->rotateType);
+        if (rkTransformType != 0)
+            usage |= rkTransformType;
     }
     if (opt->enableScale) {
         DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", \
@@ -413,7 +402,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                 drect.width = srcRgaBuffer.width;
                 drect.height = srcRgaBuffer.height;
             }
-            usage = rkRotateType | rkMirrorType | IM_SYNC;
+            usage = rkTransformType | IM_SYNC;
             ret = improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
             if (ret != IM_STATUS_SUCCESS) {
                 DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
