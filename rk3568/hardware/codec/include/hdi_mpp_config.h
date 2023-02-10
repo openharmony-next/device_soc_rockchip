@@ -23,7 +23,7 @@
 #include "hdi_mpp.h"
 
 int32_t GetDefaultConfig(RKHdiBaseComponent *pBaseComponent);
-int32_t GetDefaultHorStride(int32_t width, CodecPixelFormat fmtHDI);
+int32_t GetDefaultHorStride(int32_t width, PixelFormat fmtHDI);
 int32_t InitConfig(RKHdiBaseComponent *pBaseComponent);
 int32_t SetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);

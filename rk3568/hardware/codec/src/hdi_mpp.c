@@ -36,7 +36,7 @@
 
 static void InitComponentSetup(RKHdiEncodeSetup *setup)
 {
-    setup->fmt = PIXEL_FORMAT_NONE;
+    setup->fmt = PIXEL_FMT_BUTT;
 
     setup->fps.fpsInNum = DFAULT_ENC_FPS_NUM;
     setup->fps.fpsInDen = 1;
@@ -196,7 +196,7 @@ static MppCodingType GetMppCodingType(const char* name)
         return MPP_VIDEO_CodingMJPEG;
     }
 
-    HDF_LOGE("%{public}s: CodingType unsupported!", __func__);
+    HDF_LOGE("%{public}s: CodingType unsupported! name:%{public}s", __func__, name);
     return MPP_VIDEO_CodingMax;
 }
 
@@ -780,6 +780,7 @@ int32_t HandleDecodedFrame(RKHdiBaseComponent* component, MppFrame frame, MppCtx
         if (mppApi->HdiMppFrameGetInfoChange(frame)) {
             if (HandleDecodeFrameInfoChange(component, frame, ctx) != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: func failed!", __func__);
+                mppApi->HdiMppFrameDeinit(&frame);
                 return HDF_FAILURE;
             }
         } else {
