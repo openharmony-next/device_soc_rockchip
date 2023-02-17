@@ -28,14 +28,23 @@
                 <policyitem type="copyright" name="Rockchip Electronics Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
                 <policyitem type="copyright" name="Rockchip Electronics S.LSI Co. LTD" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
                 <policyitem type="copyright" name="Rockchip Electronics Co., LTD." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
+                <policyitem type="copyright" name="Rockchip Electronics Co. LTD" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
+                <policyitem type="copyright" name="Rockchip Electronics Co., Ltd" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
+                <policyitem type="copyright" name="Rockchip Electronics Co., Ltd */" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
+                <policyitem type="copyright" name="RockChip Limited." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Rockchip"/>
+                <policyitem type="copyright" name="STMicroelectronics Ltd" path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By STM"/>
+                <policyitem type="copyright" name="Realtek Semiconductor Corp. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Realtek"/>
+                <policyitem type="COPYRIGHT" name="ARM Limited. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By ARM"/>
+                <policyitem type="copyright" name="Synopsys, Inc. and/or its affiliates." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Synopsys"/>
                 <policyitem type="copyright" name="HiHope Open Source Organization ." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Hihope"/>
                 <policyitem type="copyright" name="Institute of Software, CAS." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By ISCAS"/>           
-                <policyitem type="copyright" name="Shenzhen Kaihong DID Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>           
+                <policyitem type="copyright" name="Shenzhen Kaihong DID Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
 		<policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
                 <policyitem type="license" name="MIT" path=".*" desc="Intel code"/>
+                <policyitem type="license" name="EndUserLicenseAgreement" path=".*" desc="Intel code"/>
                 <policyitem type="copyright" name="Intel Corporation" path=".*" desc="Intel code"/>
-                <policyitem type="copyright" name="iSoftStone Information Technology (Group) Co.,Ltd. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/> 
+                <policyitem type="copyright" name="iSoftStone Information Technology (Group) Co.,Ltd. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Shenzhen Kaihong DID"/>
 		<policyitem type="copyright" name="FuZhou Lockzhiner Electronic Co., Ltd. All rights reserved." path=".*" desc=""/>
                 <policyitem type="copyright" name="Lockzhiner Electronics Co., Ltd." path=".*" desc=""/>
 		<policyitem type="copyright" name="Shenzhen Kaihong Digital Industry Development Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Kaihong"/>
@@ -44,16 +53,24 @@
         </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filepath" name="rk3568/hardware/isp/bin/*" desc="isp bin file"/>
-                <filteritem type="filepath" name="rk3568/hardware/isp/bin64/*" desc="isp bin file"/>
-                <filteritem type="filepath" name="rk3568/hardware/isp/lib/*" desc="isp lib file"/>
-                <filteritem type="filepath" name="rk3568/hardware/isp/lib64/*" desc="isp lib file"/>
-                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/*" desc="mirror image file"/>
-                <filteritem type="filepath" name="rk3568/hardware/rga/lib64/*" desc="so file"/>
-                <filteritem type="filepath" name="rk3568/hardware/rga/lib/*" desc="so file"/>
-                <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
-                <filteritem type="filepath" name="rk3568/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/isp/bin64/*" desc="isp bin file"/>
+                <filteritem type="filepath" name="rk3588/hardware/isp/lib64/*" desc="isp lib file"/>
+                <filteritem type="filepath" name="rk3588/hardware/wifi/ap6xxx/*" desc="mirror image file"/>
+                <filteritem type="filepath" name="rk3588/hardware/rga/lib64/*" desc="so file"/>
+                <filteritem type="filepath" name="rk3588/hardware/rga/lib/*" desc="so file"/>
+                <filteritem type="filepath" name="rk3588/hardware/wifi/*" desc="wifi lib and bin files"/>
+                <filteritem type="filepath" name="rk3588/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gra/lib/*" desc="gra 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/wifi/proc/sys/net/ipv4/ping_group_range/*" desc="project configuration file"/>
+                <filteritem type="filepath" name="rk3588/NOTICE" desc="rk3588 NOTICE file"/>
+                <filteritem type="filepath" name="rk3588/hardware/End User License Agreement.md" desc="RK3588 hard EULA file"/>
+                <filteritem type="filepath" name="common/kernel/NOTICE" desc="common kernel NOTICE file"/>
+                <filteritem type="filepath" name="common/kernel/.*" desc="thirdparty file"/>
+                <filteritem type="filepath" name="rk3588/kernel/.*" desc="thirdparty file"/>
                 <filteritem type="filepath" name="rk3568/hardware/display/lib/*" desc="display 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/display/lib64/*" desc="display 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/omx_il/lib/*" desc="omx 32bit libs file"/>
@@ -157,17 +174,17 @@
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
-                <filteritem type="filepath" name="rk3568/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/isp/*" desc="isp lib and bin files"/>
-                <filteritem type="filepath" name="rk3568/hardware/mpp/lib/*" desc="mpp 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/display/lib/*" desc="display 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/display/lib64/*" desc="display 64bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/omx_il/lib/*" desc="omx 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/omx_il/lib64/*" desc="omx 64bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/gra/lib/*" desc="gra 32bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/isp/*" desc="isp lib and bin files"/>
+                <filteritem type="filepath" name="rk3588/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/display/lib/*" desc="display 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/display/lib64/*" desc="display 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/omx_il/lib/*" desc="omx 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/omx_il/lib64/*" desc="omx 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gra/lib/*" desc="gra 32bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
+                <filteritem type="filepath" name="rk3588/hardware/wifi/*" desc="wifi lib and bin files"/>
+                <filteritem type="filepath" name="rk3588/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
                 <filteritem type="filepath" name="rk3568/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>              
                 <filteritem type="filepath" name="rk3399/hardware/mpp/lib/librockchip_mpp.z.so" desc="lib files"/>

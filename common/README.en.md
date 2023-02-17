@@ -4,7 +4,7 @@
 Merge the same parts of rockchip soc 
 ## Constraints
 
-Currently,the same parts rk3566 and rk3568 are supported.
+Currently,the same parts rk3566 rk3588 and rk3568 are supported.
 ## Repositories Involved
 1.  device_soc_rockchip/common/hardware/display
 
@@ -37,3 +37,14 @@ Currently,the same parts rk3566 and rk3568 are supported.
 
 - implement codec interfaces
 
+8.  device_soc_rockchip/common/sdk_linux
+
+- Kernel part of the modified files
+
+9.  device_soc_rockchip/common/vendor
+
+- Kernel part of the new files
+
+10.  device_soc_rockchip/common/kernel
+
+- Kernel part of the new files
