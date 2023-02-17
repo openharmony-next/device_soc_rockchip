@@ -1,0 +1,87 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+
+import("//build/lite/config/component/lite_component.gni")
+
+config("algos_camgroup_ae_config") {
+  include_dirs = [
+    ".",
+    "..",
+    "../../",
+    "../../iq_parser",
+    "../../iq_parser_v2",
+    "../../include/algos",
+    "../../include",
+    "../../include/xcore/base",
+    "../../include/xcore",
+    "../../include/iq_parser",
+    "../../include/iq_parser_v2",
+    "../../include/iq_parser_v2/j2s",
+    "../../include/common",
+    "../../uAPI",
+    "../../uAPI/include",
+    "../../include/uAPI2",    
+    "../../common",
+    "../../xcore/base",
+    "../../xcore",
+    "../../aiq_core",      
+    "../../algo_handlers",
+    "../../algos",
+    "../../algos_camgroup",
+    "../../include/ipc_server",
+    ]
+    
+    cflags_cc = [
+      "-DISP_HW_V30",
+      "-DRKAIQ_ENABLE_PARSER_V1",
+      "-DRKAIQ_ENABLE_CAMGROUP",
+      "-ffast-math",
+      "-funroll-loops",
+      "-Os",
+      "-g",
+      "-Wno-error",
+      "-Wno-unused-value",
+      "-Wno-unused-variable",
+      "-Wno-unused-private-field",
+      "-Wno-unused-function",
+      "-Wno-implicit-fallthrough",
+      "-Wno-address-of-packed-member",
+      "-Wno-ignored-qualifiers",
+      "-Wno-unused-label",
+      "-fno-strict-aliasing",
+      "-Wno-reorder",
+      "-Wno-overloaded-virtual",
+      "-Wno-unused-parameter",
+      "-Wno-extern-c-compat",
+      "-Wno-missing-braces",
+      "-Wno-missing-field-initializers",
+      "-Wno-c99-designator",
+      "-Wno-macro-redefined",
+      "-Wno-header-hygiene",
+      "-Wno-misleading-indentation",
+      "-frtti",
+      "-fno-function-sections",
+      "-fno-data-sections",
+    ]
+    ldflags = [
+      "-fno-function-sections",
+      "-fno-data-sections",
+    ]
+    defines = [
+      "ISP_HW_V30",
+    ]
+}
+
+static_library("rkaiq_camgroup_ae_static") {
+  sources = [
+      "rk_aiq_algo_camgroup_ae_itf.cpp",
+      "rk_aiq_group_ae_algo.cpp",
+  ]
+ 
+  output_name = "rkaiq_camgroup_ae"
+  public_configs = [ ":algos_camgroup_ae_config" ]
+  include_dirs = [
+    "../../include/algos/ae",
+    "../../algos_camgroup",
+  ]
+}
+

@@ -1,0 +1,49 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+
+import("//build/lite/config/component/lite_component.gni")
+
+config("j2s_config") {
+  include_dirs = [
+      "../include/common",
+      "../include/algos",
+      "../include/iq_parser_v2",
+      "../include/iq_parser_v2/j2s",
+      "../include/uAPI",
+      "../include/uAPI2",
+    ]
+    
+    cflags_cc = [
+      "-Wno-unused-value",
+      "-Wno-unused-variable",
+      "-Wno-unused-private-field",
+      "-Wno-unused-function",
+      "-Wno-unused-label",
+      "-Wno-implicit-fallthrough",
+      "-Wno-ignored-qualifiers",
+      "-Wno-reorder",
+      "-Wno-address-of-packed-member",
+      "-Wno-unused-parameter",
+      "-Wno-overloaded-virtual",
+      "-Wno-extern-c-compat",
+      "-Wno-unused-variable",
+      "-fno-strict-aliasing",
+      "-frtti",
+    ]
+
+    defines = [
+      "GENMESH_ONLINE",
+      "ISP_HW_V30",
+    ]
+}
+
+static_library("iq_parser_v2_static") {
+  sources = [
+    "j2s/cJSON.c",
+    "j2s/cJSON_Utils.c",
+    "j2s/j2s.c",
+    "j2s/j2s_utils.c",
+  ]
+ 
+  output_name = "iq_parser_v2"
+  public_configs = [ ":j2s_config" ]
+}

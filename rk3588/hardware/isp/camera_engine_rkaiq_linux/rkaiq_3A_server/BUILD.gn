@@ -1,0 +1,67 @@
+#Copyright (c) 2021 Huawei Device Co., Ltd.
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos/ndk/ndk.gni")
+
+config("ispserver_config") {
+  include_dirs = [
+    ".",
+    "../include/",
+    "../include/uAPI/",
+    "../include/uAPI2/",
+    "../include/algos",
+    "../include/common",
+    "../include/xcore",
+    "../include/iq_parser",
+    "../include/iq_parser_v2",
+  ]
+
+  cflags = [
+    "-DISP_HW_V30",
+    "-Wno-incompatible-pointer-types",
+    "-Werror",
+    "-Wimplicit-function-declaration",
+    "-Wno-error=unused-variable",
+    "-Wno-implicit-fallthrough",
+    "-Wno-sign-compare",
+    "-Wno-unused-variable",
+    "-Wno-int-conversion",
+    "-Wno-unused-function",
+    "-Wno-return-type",
+    "-Wno-pragma-pack",
+    "-Wno-reorder",
+    "-fpermissive",
+    "-Wno-implicit-function-declaration",
+  ]
+}
+
+ohos_executable("rkaiq_3A_server") {                                                                                                                                                   
+  install_enable = true
+
+  sources = [
+    "rkaiq_3A_server.cpp",
+  ]
+
+  configs = [ ":ispserver_config" ]
+  deps = [
+    "//device/soc/rockchip/rk3588/hardware/isp/camera_engine_rkaiq_linux:rkaiq",
+  ]
+
+  part_name = "init"
+  install_images = [
+    "system",
+    "updater",
+  ]
+  install_enable = true
+}

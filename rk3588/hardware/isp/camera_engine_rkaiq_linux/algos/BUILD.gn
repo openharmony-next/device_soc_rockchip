@@ -1,0 +1,734 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+
+import("//build/lite/config/component/lite_component.gni")
+
+config("algos_config") {
+  include_dirs = [
+    ".",
+    "../",
+    "../iq_parser",
+    "../iq_parser_v2",
+    "../include/algos",
+    "../include",
+    "../include/xcore/base",
+    "../include/xcore",
+    "../include/iq_parser",
+    "../include/iq_parser_v2",
+    "../include/iq_parser_v2/j2s",
+    "../include/common",
+    "../uAPI",
+    "../uAPI/include",
+    "../include/uAPI2",    
+    "../common",
+    "../xcore/base",
+    "../xcore",
+    "../aiq_core",      
+    "../algo_handlers",
+    "../algos_camgroup",
+    "../include/ipc_server",
+    ]
+    
+    cflags_cc = [
+      "-ffast-math",
+      "-funroll-loops",
+      "-Os",
+      "-g",
+      "-Wno-error",
+      "-Wno-unused-value",
+      "-Wno-unused-variable",
+      "-Wno-unused-private-field",
+      "-Wno-unused-function",
+      "-Wno-implicit-fallthrough",
+      "-Wno-address-of-packed-member",
+      "-Wno-ignored-qualifiers",
+      "-Wno-unused-label",
+      "-fno-strict-aliasing",
+      "-Wno-reorder",
+      "-Wno-overloaded-virtual",
+      "-Wno-unused-parameter",
+      "-Wno-extern-c-compat",
+      "-Wno-missing-braces",
+      "-Wno-missing-field-initializers",
+      "-Wno-c99-designator",
+      "-Wno-macro-redefined",
+      "-Wno-header-hygiene",
+      "-Wno-misleading-indentation",
+      "-frtti",
+      "-fno-function-sections",
+      "-fno-data-sections",
+    ]
+    ldflags = [
+      "-fno-function-sections",
+      "-fno-data-sections",
+    ]
+    defines = [
+#"GENMESH_ONLINE",
+      "ISP_HW_V30",
+    ]
+}
+
+static_library("rkaiq_ae_static") {
+  sources = [
+    "ae/rk_aiq_algo_ae_itf.cpp",
+    "ae/rk_aiq_ae_algo.cpp",
+    "ae/rk_aiq_ae_algo_hdrecm.cpp",
+    "ae/rk_aiq_ae_algo_ecm.cpp",
+    "ae/rk_aiq_ae_algo_clm.cpp",
+    "ae/rk_aiq_ae_algo_ldm.cpp",
+    "ae/rk_aiq_ae_algo_pid.cpp",
+    "ae/rk_aiq_uapi_ae_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_ae"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/ae",
+  ]
+}
+
+static_library("rkaiq_awb_static") {
+  sources = [
+    "awb/color_space_convert.cpp",
+    "awb/fixfloat.cpp",
+    "awb/rk_aiq_algo_awb_itf.cpp",
+    "awb/rk_aiq_awb_algo_caga.cpp",
+    "awb/rk_aiq_awb_algo_com1.cpp",
+    "awb/rk_aiq_awb_algo_com2.cpp",
+    "awb/rk_aiq_awb_algo_sgc.cpp",
+    "awb/rk_aiq_awb_algo_v200.cpp",
+    "awb/rk_aiq_awb_algo_v201.cpp",
+    "awb/rk_aiq_uapi_awb_int.cpp",
+    "awb/rk_aiq_uapiv2_awb_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_awb"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/ablc",
+    "../include/algos/ae",
+    "../include/algos/awb",
+  ]
+}
+
+static_library("rkaiq_af_static") {
+  sources = [
+    "af/pdafLib.cpp",
+    "af/rk_aiq_algo_af_itf.cpp",
+    "af/af.cpp",
+    "af/af_search.cpp",
+    "af/af_trigger.cpp",
+    "af/af_utils.cpp",
+    "af/rk_aiq_uapi_af_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_af"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/af",
+  ]
+}
+
+static_library("rkaiq_asd_static") {
+  sources = [
+    "asd/rk_aiq_algo_asd_itf.cpp",
+    "asd/scene_detector.cpp",
+    "asd/rk_aiq_uapi_asd_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_asd"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/asd",
+  ]
+}
+
+static_library("rkaiq_amerge_static") {
+  sources = [
+    "amerge/rk_aiq_algo_amerge_itf.cpp",
+    "amerge/rk_aiq_amerge_algo.cpp",
+    "amerge/rk_aiq_uapi_amerge_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_amerge"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/amerge",
+  ]
+}
+
+static_library("rkaiq_atmo_static") {
+  sources = [
+    "atmo/rk_aiq_algo_atmo_itf.cpp",
+    "atmo/rk_aiq_atmo_algo.cpp",
+    "atmo/rk_aiq_uapi_atmo_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_atmo"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/atmo",
+  ]
+}
+
+static_library("rkaiq_acsm_static") {
+  sources = [
+    "acsm/rk_aiq_algo_acsm_itf.cpp",
+    "acsm/rk_aiq_uapi_acsm.cpp",
+  ]
+ 
+  output_name = "rkaiq_acsm"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acsm",
+  ]
+}
+
+static_library("rkaiq_a3dlut_static") {
+  sources = [
+    "a3dlut/rk_aiq_algo_a3dlut_itf.cpp",
+    "a3dlut/rk_aiq_a3dlut_algo.cpp",
+    "a3dlut/rk_aiq_uapi_a3dlut_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_a3dlut"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/a3dlut",
+  ]
+}
+
+static_library("rkaiq_ablc_static") {
+  sources = [
+    "ablc/rk_aiq_algo_ablc_itf.cpp",
+    "ablc/rk_aiq_ablc_algo.cpp",
+    "ablc/rk_aiq_uapi_ablc_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_ablc"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/ablc",
+  ]
+}
+
+static_library("rkaiq_accm_static") {
+  sources = [
+    "accm/rk_aiq_algo_accm_itf.cpp",
+    "accm/rk_aiq_accm_algo.cpp",
+    "accm/rk_aiq_uapi_accm_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_accm"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/accm",
+  ]
+}
+
+static_library("rkaiq_adebayer_static") {
+  sources = [
+    "adebayer/rk_aiq_algo_adebayer_itf.cpp",
+    "adebayer/rk_aiq_algo_adebayer.cpp",
+    "adebayer/rk_aiq_uapi_adebayer_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_adebayer"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/adebayer",
+  ]
+}
+
+static_library("rkaiq_adpcc_static") {
+  sources = [
+    "adpcc/rk_aiq_algo_adpcc_itf.cpp",
+    "adpcc/rk_aiq_adpcc_algo.cpp",
+    "adpcc/rk_aiq_uapi_adpcc_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_adpcc"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/adpcc",
+  ]
+}
+
+static_library("rkaiq_afec_static") {
+  sources = [
+    "afec/rk_aiq_algo_afec_itf.cpp",
+    "afec/rk_aiq_uapi_afec_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_afec"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/afec",
+  ]
+}
+
+static_library("rkaiq_agamma_static") {
+  sources = [
+    "agamma/rk_aiq_algo_agamma_itf.cpp",
+    "agamma/rk_aiq_agamma_algo.cpp",
+    "agamma/rk_aiq_uapi_agamma_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_agamma"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/agamma",
+  ]
+}
+
+static_library("rkaiq_adegamma_static") {
+  sources = [
+    "adegamma/rk_aiq_algo_adegamma_itf.cpp",
+    "adegamma/rk_aiq_adegamma_algo.cpp",
+    "adegamma/rk_aiq_uapi_adegamma_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_adegamma"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/adegamma",
+  ]
+}
+
+static_library("rkaiq_agic_static") {
+  sources = [
+    "agic/rk_aiq_algo_agic_itf.cpp",
+    "agic/rk_aiq_algo_agic.cpp",
+    "agic/rk_aiq_uapi_agic_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_agic"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/agic",
+  ]
+}
+
+static_library("rkaiq_aldch_static") {
+  sources = [
+    "aldch/rk_aiq_algo_aldch_itf.cpp",
+    "aldch/rk_aiq_uapi_aldch_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_aldch"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aldch",
+  ]
+}
+
+static_library("rkaiq_alsc_static") {
+  sources = [
+    "alsc/rk_aiq_algo_alsc_itf.cpp",
+    "alsc/rk_aiq_alsc_algo.cpp",
+    "alsc/rk_aiq_uapi_alsc_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_alsc"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/alsc",
+  ]
+}
+
+static_library("rkaiq_aorb_static") {
+  sources = [
+    "aorb/rk_aiq_algo_aorb_itf.cpp",
+    "aorb/orb_algos.cpp",
+    "aorb/orb_algos_opencv.cpp",
+  ]
+ 
+  output_name = "rkaiq_aorb"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aorb",
+  ]
+}
+
+static_library("rkaiq_awdr_static") {
+  sources = [
+    "awdr/rk_aiq_algo_awdr_itf.cpp",
+  ]
+ 
+  output_name = "rkaiq_awdr"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/awdr",
+  ]
+}
+
+static_library("rkaiq_adrc_static") {
+  sources = [
+    "adrc/rk_aiq_algo_adrc_itf.cpp",
+    "adrc/rk_aiq_adrc_algo.cpp",
+    "adrc/rk_aiq_uapi_adrc_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_adrc"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/adrc",
+  ]
+}
+
+static_library("rkaiq_anr_static") {
+  sources = [
+    "anr/rk_aiq_algo_anr_itf.cpp",
+    "anr/rk_aiq_anr_algo.cpp",
+    "anr/rk_aiq_anr_algo_bayernr.cpp",
+    "anr/rk_aiq_anr_algo_mfnr.cpp",
+    "anr/rk_aiq_anr_algo_uvnr.cpp",
+    "anr/rk_aiq_anr_algo_ynr.cpp",
+    "anr/rk_aiq_uapi_anr_int.cpp",
+    "anr/rk_aiq_anr_algo_gain.cpp",
+  ]
+ 
+  output_name = "rkaiq_anr"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/anr",
+  ]
+}
+
+static_library("rkaiq_asharp_static") {
+  sources = [
+    "asharp/rk_aiq_algo_asharp_itf.cpp",
+    "asharp/rk_aiq_asharp_algo.cpp",
+    "asharp/rk_aiq_asharp_algo_edgefilter.cpp",
+    "asharp/rk_aiq_asharp_algo_sharp.cpp",
+    "asharp/rk_aiq_uapi_asharp_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_asharp"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/asharp",
+  ]
+}
+
+static_library("rkaiq_acp_static") {
+  sources = [
+    "acp/rk_aiq_algo_acp_itf.cpp",
+    "acp/rk_aiq_uapi_acp_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_acp"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acp",
+  ]
+}
+
+static_library("rkaiq_aie_static") {
+  sources = [
+    "aie/rk_aiq_algo_aie_itf.cpp",
+    "aie/rk_aiq_algo_aie_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_aie"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aie",
+  ]
+}
+
+static_library("rkaiq_adhaz_static") {
+  sources = [
+    "adehaze/rk_aiq_algo_adhaz_itf.cpp",
+    "adehaze/rk_aiq_adehaze_algo.cpp",
+    "adehaze/rk_aiq_uapi_adehaze_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_adhaz"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/adehaze",
+  ]
+}
+
+static_library("rkaiq_acgc_static") {
+  sources = [
+    "acgc/rk_aiq_algo_acgc_itf.cpp",
+  ]
+ 
+  output_name = "rkaiq_acgc"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acgc",
+  ]
+}
+
+static_library("rkaiq_asharp_v3_static") {
+  sources = [
+    "asharp3/rk_aiq_asharp_algo_itf_v3.cpp",
+    "asharp3/rk_aiq_asharp_algo_sharp_v3.cpp",
+    "asharp3/rk_aiq_asharp_algo_v3.cpp",
+    "asharp3/rk_aiq_uapi_asharp_int_v3.cpp",
+  ]
+ 
+  output_name = "rkaiq_asharp_v3"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/asharp3",
+  ]
+}
+
+static_library("rkaiq_asharp_v4_static") {
+  sources = [
+      "asharp4/rk_aiq_asharp_algo_itf_v4.cpp",
+      "asharp4/rk_aiq_asharp_algo_sharp_v4.cpp",
+      "asharp4/rk_aiq_asharp_algo_v4.cpp",
+      "asharp4/rk_aiq_uapi_asharp_int_v4.cpp",
+  ]
+ 
+  output_name = "rkaiq_asharp_v4"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/asharp4",
+  ]
+}
+
+static_library("rkaiq_again_v1_static") {
+  sources = [
+    "again/rk_aiq_again_algo_itf.cpp",
+    "again/rk_aiq_again_algo_gain.cpp",
+    "again/rk_aiq_again_algo.cpp",
+#"again/rk_aiq_uapi_again_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_again_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/again",
+  ]
+}
+
+static_library("rkaiq_again_v2_static") {
+  sources = [
+     "again2/rk_aiq_again_algo_itf_v2.cpp",
+     "again2/rk_aiq_again_algo_gain_v2.cpp",
+     "again2/rk_aiq_again_algo_v2.cpp",
+     "again2/rk_aiq_uapi_again_int_v2.cpp",
+  ]
+ 
+  output_name = "rkaiq_again_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/again2",
+  ]
+}
+
+static_library("rkaiq_mfnr_v1_static") {
+  sources = [
+    "amfnr/rk_aiq_amfnr_algo_itf_v1.cpp",
+    "amfnr/rk_aiq_amfnr_algo_mfnr_v1.cpp",
+    "amfnr/rk_aiq_amfnr_algo_v1.cpp",
+    "amfnr/rk_aiq_uapi_amfnr_int_v1.cpp",
+  ]
+ 
+  output_name = "rkaiq_mfnr_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/amfnr",
+  ]
+}
+
+static_library("rkaiq_aynr_v1_static") {
+  sources = [
+    "aynr/rk_aiq_aynr_algo_itf_v1.cpp",
+    "aynr/rk_aiq_aynr_algo_ynr_v1.cpp",
+    "aynr/rk_aiq_aynr_algo_v1.cpp",
+    "aynr/rk_aiq_uapi_aynr_int_v1.cpp",
+  ]
+ 
+  output_name = "rkaiq_aynr_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aynr",
+  ]
+}
+
+static_library("rkaiq_aynr_v2_static") {
+  sources = [
+    "aynr2/rk_aiq_aynr_algo_itf_v2.cpp",
+    "aynr2/rk_aiq_aynr_algo_ynr_v2.cpp",
+    "aynr2/rk_aiq_aynr_algo_v2.cpp",
+    "aynr2/rk_aiq_uapi_aynr_int_v2.cpp",
+  ]
+ 
+  output_name = "rkaiq_aynr_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aynr2",
+  ]
+}
+
+static_library("rkaiq_aynr_v3_static") {
+  sources = [
+      "aynr3/rk_aiq_aynr_algo_itf_v3.cpp",
+      "aynr3/rk_aiq_aynr_algo_ynr_v3.cpp",
+      "aynr3/rk_aiq_aynr_algo_v3.cpp",
+      "aynr3/rk_aiq_uapi_aynr_int_v3.cpp",
+  ]
+ 
+  output_name = "rkaiq_aynr_v3"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aynr3",
+  ]
+}
+
+
+static_library("rkaiq_uvnr_v1_static") {
+  sources = [
+    "auvnr/rk_aiq_auvnr_algo_itf_v1.cpp",
+    "auvnr/rk_aiq_auvnr_algo_uvnr_v1.cpp",
+    "auvnr/rk_aiq_auvnr_algo_v1.cpp",
+    "auvnr/rk_aiq_uapi_auvnr_int_v1.cpp",
+  ]
+ 
+  output_name = "rkaiq_uvnr_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/auvnr",
+  ]
+}
+
+static_library("rkaiq_acnr_v1_static") {
+  sources = [
+    "acnr/rk_aiq_acnr_algo_itf_v1.cpp",
+    "acnr/rk_aiq_acnr_algo_cnr_v1.cpp",
+    "acnr/rk_aiq_acnr_algo_v1.cpp",
+    "acnr/rk_aiq_uapi_acnr_int_v1.cpp",
+  ]
+ 
+  output_name = "rkaiq_acnr_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acnr",
+  ]
+}
+
+static_library("rkaiq_acnr_v2_static") {
+  sources = [
+    "acnr2/rk_aiq_acnr_algo_itf_v2.cpp",
+    "acnr2/rk_aiq_acnr_algo_cnr_v2.cpp",
+    "acnr2/rk_aiq_acnr_algo_v2.cpp",
+    "acnr2/rk_aiq_uapi_acnr_int_v2.cpp",
+  ]
+ 
+  output_name = "rkaiq_acnr_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acnr2",
+  ]
+}
+
+static_library("rkaiq_arawnr_v1_static") {
+  sources = [
+    "arawnr/rk_aiq_abayernr_algo_itf_v1.cpp",
+    "arawnr/rk_aiq_abayernr_algo_bayernr_v1.cpp",
+    "arawnr/rk_aiq_abayernr_algo_v1.cpp",
+    "arawnr/rk_aiq_uapi_abayernr_int_v1.cpp",
+  ]
+ 
+  output_name = "rkaiq_arawnr_v1"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/arawnr",
+  ]
+}
+
+static_library("rkaiq_arawnr_v2_static") {
+  sources = [
+    "arawnr2/rk_aiq_abayernr_algo_itf_v2.cpp",
+    "arawnr2/rk_aiq_abayernr_algo_bayernr_v2.cpp",
+    "arawnr2/rk_aiq_abayernr_algo_v2.cpp",
+    "arawnr2/rk_aiq_uapi_abayernr_int_v2.cpp",
+  ]
+ 
+  output_name = "rkaiq_arawnr_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/arawnr2",
+  ]
+}
+
+static_library("rkaiq_abayer2dnr_v2_static") {
+  sources = [
+      "abayer2dnr2/rk_aiq_abayer2dnr_algo_itf_v2.cpp",
+      "abayer2dnr2/rk_aiq_abayer2dnr_algo_bayernr_v2.cpp",
+      "abayer2dnr2/rk_aiq_abayer2dnr_algo_v2.cpp",
+      "abayer2dnr2/rk_aiq_uapi_abayer2dnr_int_v2.cpp",
+  ]
+ 
+  output_name = "rk_aiq_abayer2dnr_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/abayer2dnr2",
+  ]
+}
+
+static_library("rkaiq_abayertnr_v2_static") {
+  sources = [
+      "abayertnr2/rk_aiq_abayertnr_algo_itf_v2.cpp",
+      "abayertnr2/rk_aiq_abayertnr_algo_bayertnr_v2.cpp",
+      "abayertnr2/rk_aiq_abayertnr_algo_v2.cpp",
+      "abayertnr2/rk_aiq_uapi_abayertnr_int_v2.cpp",
+  ]
+ 
+  output_name = "rk_aiq_abayertnr_v2"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/abayertnr2",
+  ]
+}
+
+static_library("rkaiq_amd_static") {
+  sources = [
+    "amd/rk_aiq_algo_amd_itf.cpp",
+  ]
+ 
+  output_name = "rkaiq_amd"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/amd",
+  ]
+}
+
+static_library("rkaiq_aeis_static") {
+  sources = [
+    "aeis/eis_loader.cpp",
+    "aeis/remap_backend.cpp",
+    "aeis/imu_service.cpp",
+    "aeis/eis_algo_service.cpp",
+    "aeis/rk_aiq_uapi_aeis_int.cpp",
+    "aeis/rk_aiq_algo_aeis_itf.cpp",
+  ]
+ 
+  output_name = "rkaiq_aeis"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/aeis",
+    "../hwi",
+    "../hwi/isp20",
+  ]
+}
+
+static_library("rkaiq_acac_static") {
+  sources = [
+      "acac/cac_adaptor.cpp",
+      "acac/rk_aiq_algo_acac_itf.cpp",
+      "acac/rk_aiq_uapi_acac_int.cpp",
+  ]
+ 
+  output_name = "rkaiq_acac"
+  public_configs = [ ":algos_config" ]
+  include_dirs = [
+    "../include/algos/acac",
+  ]
+}
