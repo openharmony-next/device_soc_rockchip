@@ -46,9 +46,9 @@ ohos_prebuilt_executable("ispserver") {
 
 group("isp") {
   deps = [
-    ":ov13855_CMK-OT2016-FV1_default.json",
     ":iqfil",
     ":ispserver",
     ":librkaiq",
+    ":ov13855_CMK-OT2016-FV1_default.json",
   ]
 }
