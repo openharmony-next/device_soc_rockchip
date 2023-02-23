@@ -67,6 +67,10 @@
                 <filteritem type="filepath" name="rk3588/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
                 <filteritem type="filepath" name="rk3588/hardware/wifi/proc/sys/net/ipv4/ping_group_range/*" desc="project configuration file"/>
                 <filteritem type="filepath" name="rk3588/NOTICE" desc="rk3588 NOTICE file"/>
+                <filteritem type="filepath" name="LICENSE-Apache" desc="license file"/>
+                <filteritem type="filepath" name="LICENSE-BSD-3-Clause" desc="license file"/>
+                <filteritem type="filepath" name="LICENSE-GPL-2.0" desc="license file"/>
+                <filteritem type="filepath" name="LICENSE-MIT" desc="license file"/>
                 <filteritem type="filepath" name="rk3588/hardware/End User License Agreement.md" desc="RK3588 hard EULA file"/>
                 <filteritem type="filepath" name="common/kernel/NOTICE" desc="common kernel NOTICE file"/>
                 <filteritem type="filepath" name="common/kernel/.*" desc="thirdparty file"/>
