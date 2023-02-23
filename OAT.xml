@@ -84,7 +84,6 @@
                 <filteritem type="filepath" name="rk3568/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/gpu/lib/*" desc="gpb 32bit libs file"/>
                 <filteritem type="filepath" name="rk3568/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
-                <filteritem type="filepath" name="rk3568/hardware/gpu/firmware/mali_csffw.bin" desc="gpu firmware"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/proc/sys/net/ipv4/ping_group_range/*" desc="project configuration file"/>
                 <filteritem type="filepath" name="rk2206/hardware/End User License Agreement.md" desc=""/>
                 <filteritem type="filepath" name="rk2206/sdk_liteos/loader/End User License Agreement.md" desc=""/>
@@ -179,6 +178,7 @@
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
+                <filteritem type="filepath" name="rk3588/hardware/gpu/firmware/mali_csffw.bin" desc="gpu firmware"/>
                 <filteritem type="filepath" name="rk3588/hardware/gpu/lib64/*" desc="gpb 64bit libs file"/>
                 <filteritem type="filepath" name="rk3588/hardware/isp/*" desc="isp lib and bin files"/>
                 <filteritem type="filepath" name="rk3588/hardware/mpp/lib64/*" desc="mpp 64bit libs file"/>
