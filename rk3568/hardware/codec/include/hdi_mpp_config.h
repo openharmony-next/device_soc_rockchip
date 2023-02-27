@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 HiHope Open Source Organization .
+ * Copyright (c) 2022-2023 HiHope Open Source Organization .
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,9 +22,14 @@
 #include "rk_venc_cfg.h"
 #include "hdi_mpp.h"
 
-int32_t GetDefaultConfig(RKHdiBaseComponent *pBaseComponent);
+int32_t InitMppConfig(RKHdiBaseComponent *pBaseComponent);
+int32_t DeinitMppConfig(RKHdiBaseComponent *pBaseComponent);
+void SetDefaultFps(RKHdiEncodeSetup *setup);
+void SetDefaultDropMode(RKHdiEncodeSetup *setup);
+void SetDefaultGopMode(RKHdiEncodeSetup *setup);
+int32_t SetEncCfg(RKHdiBaseComponent *pBaseComponent);
+int32_t SetDecCfg(RKHdiBaseComponent *pBaseComponent);
 int32_t GetDefaultHorStride(int32_t width, PixelFormat fmtHDI);
-int32_t InitConfig(RKHdiBaseComponent *pBaseComponent);
 int32_t SetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param);
@@ -38,8 +43,6 @@ int32_t SetParamMimeCodecType(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamCodecType(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamCodecFrameNum(RKHdiBaseComponent *pBaseComponent, Param *param);
-int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param);
-int32_t SetParamEncSetupAVC(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamBufferSize(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);

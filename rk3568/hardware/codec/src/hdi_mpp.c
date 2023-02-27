@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,30 +29,15 @@
 #define BITWISE_LEFT_SHIFT_WITH_ONE     (1 << 20)
 #define SLEEP_INTERVAL_MICROSECONDS     1000
 #define BUFFER_GROUP_LIMIT_NUM          24
-#define DFAULT_ENC_FPS_NUM              24
-#define DFAULT_ENC_DROP_THD             20
-#define DFAULT_ENC_GOP_OPERATOR         2
 #define FRAME_STRIDE_ALIGNMENT          16
 
 static void InitComponentSetup(RKHdiEncodeSetup *setup)
 {
     setup->fmt = PIXEL_FMT_BUTT;
-
-    setup->fps.fpsInNum = DFAULT_ENC_FPS_NUM;
-    setup->fps.fpsInDen = 1;
-    setup->fps.fpsOutNum = DFAULT_ENC_FPS_NUM;
-    setup->fps.fpsOutDen = 1;
-
-    setup->drop.dropMode = MPP_ENC_RC_DROP_FRM_DISABLED;
-    setup->drop.dropThd = DFAULT_ENC_DROP_THD;
-    setup->drop.dropGap = 1;
-
-    setup->rc.rcMode = MPP_ENC_RC_MODE_BUTT;
-
-    setup->gop.gopMode = VID_CODEC_GOPMODE_NORMALP;
-    setup->gop.gopLen = 0;
-    setup->gop.viLen = 0;
-    setup->gop.gop = setup->fps.fpsOutNum * DFAULT_ENC_GOP_OPERATOR;
+    SetDefaultFps(setup);
+    SetDefaultDropMode(setup);
+    setup->rc.rcMode = MPP_ENC_RC_MODE_VBR;
+    SetDefaultGopMode(setup);
 }
 
 static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType codingType)
@@ -79,11 +64,7 @@ static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType 
     component->ctxType = ctxType;
     component->codingType = codingType;
     component->frameNum = 0;
-    if (ctxType == MPP_CTX_ENC) {
-        ret = component->mppApi->HdiMppEncCfgInit(&component->cfg);
-    } else if (component->ctxType == MPP_CTX_DEC) {
-        ret = component->mppApi->HdiMppDecCfgInit(&component->cfg);
-    }
+    ret = InitMppConfig(component);
     if (ret != 0) {
         HDF_LOGE("%{public}s: config mpp cfg init failed!", __func__);
         ReleaseMppApi(component->mppApi);
@@ -100,11 +81,7 @@ static void DestroyMppComponent(RKHdiBaseComponent *component)
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
     }
-    if (component->ctxType == MPP_CTX_ENC) {
-        component->mppApi->HdiMppEncCfgDeinit(component->cfg);
-    } else if (component->ctxType == MPP_CTX_DEC) {
-        component->mppApi->HdiMppDecCfgDeinit(component->cfg);
-    }
+    DeinitMppConfig(component);
     ReleaseMppApi(component->mppApi);
     component->mppApi = NULL;
     free(component);
@@ -266,11 +243,6 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
     }
 
     RKMppApi *mppApi = component->mppApi;
-    if (component->cfg != NULL) {
-        mppApi->HdiMppDecCfgDeinit(component->cfg);
-        component->cfg = NULL;
-    }
-
     if (component->packet != NULL) {
         mppApi->HdiMppPacketDeinit(&component->packet);
         component->packet = NULL;
@@ -339,15 +311,6 @@ int32_t SetExtMppParam(RKHdiBaseComponent* component, Param *param)
             break;
         case KEY_EXT_SETUP_DROP_MODE_RK:
             ret = SetParamDrop(component, param);
-            break;
-        case KEY_EXT_ENC_VALIDATE_SETUP_RK:
-            ret = ValidateEncSetup(component, param);
-            if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s: config validata setup failed", __func__);
-            }
-            break;
-        case KEY_EXT_ENC_SETUP_AVC_RK:
-            ret = SetParamEncSetupAVC(component, param);
             break;
         default:
             HDF_LOGE("%{public}s: param key unsupport, key:%{public}d", __func__, paramKey);
@@ -427,12 +390,6 @@ int32_t GetExtMppParam(RKHdiBaseComponent* component, Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
-        case KEY_EXT_DEFAULT_CFG_RK:
-            ret = GetDefaultConfig(component);
-            if (ret != 0) {
-                HDF_LOGE("%{public}s: config get default config failed", __func__);
-            }
-            break;
         case KEY_EXT_SPLIT_PARSE_RK:
             ret = GetParamSplitParse(component, param);
             if (ret != HDF_SUCCESS) {
@@ -526,39 +483,26 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
-    MPP_RET ret = MPP_OK;
-    MppCtx ctx = handle;
     RKHdiBaseComponent* component = FindInMppComponentManager(handle);
 
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
         return HDF_FAILURE;
     }
-    RKMppApi *mppApi = component->mppApi;
-
-    ret = mppApi->HdiMppStart(ctx);
-    if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: mpp start failed", __func__);
-        return HDF_FAILURE;
+    if (component->ctxType == MPP_CTX_ENC) {
+        SetEncCfg(component);
+    } else if (component->ctxType == MPP_CTX_DEC) {
+        SetDecCfg(component);
     }
     return HDF_SUCCESS;
 }
 
 int32_t CodecStop(CODEC_HANDLETYPE handle)
 {
-    MPP_RET ret = MPP_OK;
-    MppCtx ctx = handle;
     RKHdiBaseComponent* component = FindInMppComponentManager(handle);
 
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
-        return HDF_FAILURE;
-    }
-    RKMppApi *mppApi = component->mppApi;
-
-    ret = mppApi->HdiMppStop(ctx);
-    if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: mpp stop failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
