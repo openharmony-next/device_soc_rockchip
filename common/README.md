@@ -3,7 +3,7 @@
 #### 简介
 合并rockchip soc公共部分
 #### 约束
-目前支持rk3566 and rk3568公共部分
+目前支持rk3566 rk3588 和 rk3568公共部分
 #### 对应仓库
 
 1. device_soc_rockchip/common/hardware/display
@@ -35,4 +35,12 @@
 7.  device_soc_rockchip/common/hardware/codec
 
 - 实现codec接口
+8.  device_soc_rockchip/common/sdk_linux
 
+- kernel部分修改文件
+
+9.  device_soc_rockchip/common/vendor
+- kernel部分新增文件
+
+10.  device_soc_rockchip/common/kernel
+- kernel部分新增文件
