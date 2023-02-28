@@ -1627,7 +1627,7 @@ OMX_ERRORTYPE Rockchip_OMX_BaseComponent_Destructor(
     Rockchip_OSAL_QueueTerminate(&pRockchipComponent->messageQ);
 
     Rockchip_OSAL_Free(pRockchipComponent);
-    pRockchipComponent = NULL;
+    pOMXComponent->pComponentPrivate = pRockchipComponent = NULL;
 
     ret = OMX_ErrorNone;
 EXIT:
