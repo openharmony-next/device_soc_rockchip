@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,10 @@
 #include "display_common.h"
 #include "display_device.h"
 #include "display_layer.h"
+#include "hdf_trace.h"
 #include "hdi_netlink_monitor.h"
+
+#define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
 
 namespace OHOS {
 namespace HDI {
@@ -168,6 +171,7 @@ static int32_t SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value)
 static int32_t PrepareDisplayLayers(uint32_t devId, bool *needFlushFb)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     DISPLAY_CHK_RETURN((needFlushFb == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("needFlushFb is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::PrepareDisplayLayers, needFlushFb);
 }
@@ -175,6 +179,7 @@ static int32_t PrepareDisplayLayers(uint32_t devId, bool *needFlushFb)
 static int32_t GetDisplayCompChange(uint32_t devId, uint32_t *num, uint32_t *layers, int32_t *type)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     DISPLAY_CHK_RETURN((num == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("num is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayCompChange, num, layers, type);
 }
@@ -222,6 +227,7 @@ static int32_t RegDisplayVBlankCallback(uint32_t devId, VBlankCallback callback,
 static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *layers, int32_t *fences)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayReleaseFence, num, layers,
         fences);
 }
@@ -229,6 +235,7 @@ static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *l
 static int32_t Commit(uint32_t devId, int32_t *fence)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     DISPLAY_CHK_RETURN((fence == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("fence is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::Commit, fence);
 }
@@ -254,6 +261,7 @@ static int32_t SetVirtualDisplayBuffer(uint32_t devId, BufferHandle *buffer, int
 static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     DISPLAY_CHK_RETURN((layerId == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("layerId is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::CreateLayer, layerInfo, layerId);
 }
@@ -261,6 +269,7 @@ static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t 
 static int32_t CloseLayer(uint32_t devId, uint32_t layerId)
 {
     DISPLAY_DEBUGLOG();
+    DISPLAY_TRACE;
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::CloseLayer, layerId);
 }
 
