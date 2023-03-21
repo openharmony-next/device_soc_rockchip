@@ -348,11 +348,13 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         ALIGN_UP(dstSurface->height, 2), dstRgaBuffer.vir_addr);
 
     srect.x = srcRect->x;
-    srect.x = (srect.x == 1) ? 0 : srect.x;
+    srect.x = (srect.x % 2 == 1) ? (srect.x + 1) : srect.x;
     srect.y = srcRect->y;
-    srect.y = (srect.y == 1) ? 0 : srect.y;
+    srect.y = (srect.y % 2 == 1) ? (srect.y + 1) : srect.y;
     srect.height = srcRect->h;
+    srect.height = (srect.height % 2 == 1) ? (srect.height + 1) : srect.height;
     srect.width = srcRect->w;
+    srect.width = (srect.width % 2 == 1) ? (srect.width + 1) : srect.width;
     drect.x = dstRect->x;
     drect.x = (drect.x == 1) ? 0 : drect.x;
     drect.y = dstRect->y;
