@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,6 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/types.h>
-#include "display_common.h"
-#include "display_device.h"
-#include "display_layer.h"
 #include "hdi_session.h"
 
 namespace OHOS {
@@ -30,12 +27,12 @@ namespace HDI {
 namespace DISPLAY {
 HdiNetLinkMonitor::HdiNetLinkMonitor()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
 }
 
 int HdiNetLinkMonitor::Init()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     mThread = std::make_unique<std::thread>(std::bind(&HdiNetLinkMonitor::MonitorThread, this));
     mThread->detach();
     mRunning = true;
@@ -44,7 +41,7 @@ int HdiNetLinkMonitor::Init()
 
 HdiNetLinkMonitor::~HdiNetLinkMonitor()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mScoketFd >= 0) {
         close(mScoketFd);
     }

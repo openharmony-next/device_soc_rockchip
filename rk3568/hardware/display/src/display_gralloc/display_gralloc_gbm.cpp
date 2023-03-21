@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include <limits.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
 #include <xf86drm.h>
 #include <securec.h>
 #include <linux/dma-buf.h>
@@ -31,7 +32,15 @@
 #include "hi_gbm.h"
 #include "hdf_dlist.h"
 #include "display_gralloc_private.h"
-#include "display_common.h"
+#include "display_log.h"
+#include "v1_0/display_composer_type.h"
+
+namespace OHOS {
+namespace HDI {
+namespace DISPLAY {
+
+using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_0;
 
 const char *g_drmFileNode = "/dev/dri/renderD128";
 static GrallocManager *g_grallocManager = NULL;
@@ -160,7 +169,7 @@ static uint32_t ConvertFormatToDrm(PixelFormat fmtIn)
             fmtOut = convertTable[i].drmFormat;
         }
     }
-    DISPLAY_DEBUGLOG("fmtIn %{public}d : %{public}s, outFmt %{public}d : %{public}s", fmtIn,
+    DISPLAY_LOGD("fmtIn %{public}d : %{public}s, outFmt %{public}d : %{public}s", fmtIn,
         GetPixelFmtStr(fmtIn), fmtOut, GetDrmFmtStr(fmtOut));
     return fmtOut;
 }
@@ -174,23 +183,23 @@ static uint64_t ConvertUsageToGbm(uint64_t inUsage)
     if (inUsage & HBM_USE_CPU_WRITE) {
         outUsage |= GBM_BO_USE_SW_WRITE_OFTEN;
     }
-    DISPLAY_DEBUGLOG("outUsage 0x%{public}" PRIx64 "", outUsage);
+    DISPLAY_LOGD("outUsage 0x%{public}" PRIx64 "", outUsage);
     return outUsage;
 }
 
 static int32_t InitGbmDevice(const char *drmFile, GrallocManager *grallocManager)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (grallocManager->gbmDevice == NULL) {
 	    char path[PATH_MAX] = {0};
         if (realpath(drmFile, path) == NULL) {
             DISPLAY_LOGE(" drm File : %{public}s is not a realpath, errno: %{public}s", drmFile, strerror(errno));
-            return DISPLAY_PARAM_ERR;
+            return HDF_ERR_INVALID_PARAM;
         }
         int drmFd = open(path, O_RDWR);
         if (drmFd < 0) {
             DISPLAY_LOGE("drm file:%{public}s open failed %{public}s", drmFile, strerror(errno));
-            return DISPLAY_FD_ERR;
+            return HDF_ERR_BAD_FD;
         }
         drmDropMaster(drmFd);
         struct gbm_device *gbmDevice = hdi_gbm_create_device(drmFd);
@@ -199,18 +208,18 @@ static int32_t InitGbmDevice(const char *drmFile, GrallocManager *grallocManager
             close(drmFd);
             grallocManager->drmFd = -1;
             DISPLAY_LOGE("gbm device create failed");
-            return DISPLAY_FAILURE;
+            return HDF_FAILURE;
         }
         grallocManager->gbmDevice = gbmDevice;
         grallocManager->drmFd = drmFd;
         DListHeadInit(&grallocManager->gbmBoHead);
     }
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 static void DeInitGbmDevice(GrallocManager *grallocManager)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     hdi_gbm_device_destroy(grallocManager->gbmDevice);
     if (grallocManager->drmFd > 0) {
         close(grallocManager->drmFd);
@@ -221,10 +230,10 @@ static void DeInitGbmDevice(GrallocManager *grallocManager)
 
 static int32_t DmaBufferSync(const BufferHandle *handle, bool start)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     struct dma_buf_sync syncPrm;
     errno_t eok = memset_s(&syncPrm, sizeof(syncPrm), 0, sizeof(syncPrm));
-    DISPLAY_CHK_RETURN((eok != EOK), DISPLAY_PARAM_ERR, DISPLAY_LOGE("dma buffer sync memset_s failed"));
+    DISPLAY_CHK_RETURN((eok != EOK), HDF_ERR_INVALID_PARAM, DISPLAY_LOGE("dma buffer sync memset_s failed"));
 
     if (handle->usage & HBM_USE_CPU_WRITE) {
         syncPrm.flags |= DMA_BUF_SYNC_WRITE;
@@ -247,9 +256,9 @@ static int32_t DmaBufferSync(const BufferHandle *handle, bool start)
 
     if (ret < 0) {
         DISPLAY_LOGE("sync failed");
-        return DISPLAY_SYS_BUSY;
+        return HDF_ERR_DEVICE_BUSY;
     }
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 static void InitBufferHandle(struct gbm_bo *bo, int fd, const AllocInfo *info, PriBufferHandle *buffer)
@@ -269,36 +278,40 @@ static void InitBufferHandle(struct gbm_bo *bo, int fd, const AllocInfo *info, P
 
 int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer)
 {
-    DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("info is null"));
-    DISPLAY_CHK_RETURN((buffer == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("buffer is null"));
+    DISPLAY_CHK_RETURN((info == NULL), HDF_FAILURE, DISPLAY_LOGE("info is null"));
+    DISPLAY_CHK_RETURN((buffer == NULL), HDF_FAILURE, DISPLAY_LOGE("buffer is null"));
     PriBufferHandle *priBuffer = NULL;
-    uint32_t drmFmt = ConvertFormatToDrm(info->format);
-    DISPLAY_CHK_RETURN((drmFmt == INVALID_PIXEL_FMT), DISPLAY_NOT_SUPPORT,
+    uint32_t drmFmt = ConvertFormatToDrm(static_cast<PixelFormat>(info->format));
+    DISPLAY_CHK_RETURN((drmFmt == INVALID_PIXEL_FMT), HDF_ERR_NOT_SUPPORT,
         DISPLAY_LOGE("format %{public}d can not support", info->format));
-    DISPLAY_DEBUGLOG("requeset width %{public}d, heigt %{public}d, format %{public}d",
+    DISPLAY_LOGD("requeset width %{public}d, heigt %{public}d, format %{public}d",
         info->width, info->height, drmFmt);
 
         GRALLOC_LOCK();
     GrallocManager *grallocManager = GetGrallocManager();
-    DISPLAY_CHK_RETURN((grallocManager == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("gralloc manager failed");
+    DISPLAY_CHK_RETURN((grallocManager == NULL), HDF_ERR_INVALID_PARAM, DISPLAY_LOGE("gralloc manager failed");
         GRALLOC_UNLOCK());
     struct gbm_bo *bo =
         hdi_gbm_bo_create(grallocManager->gbmDevice, info->width, info->height, drmFmt, ConvertUsageToGbm(info->usage));
-    DISPLAY_CHK_RETURN((bo == NULL), DISPLAY_NOMEM, DISPLAY_LOGE("gbm create bo failed"); \
+    DISPLAY_CHK_RETURN((bo == NULL), HDF_DEV_ERR_NO_MEMORY, DISPLAY_LOGE("gbm create bo failed"); \
         GRALLOC_UNLOCK());
 
     int fd = hdi_gbm_bo_get_fd(bo);
-    DISPLAY_CHK_RETURN((fd < 0), DISPLAY_FD_ERR, DISPLAY_LOGE("gbm can not get fd"); \
+    DISPLAY_CHK_RETURN((fd < 0), HDF_ERR_BAD_FD, DISPLAY_LOGE("gbm can not get fd"); \
         hdi_gbm_bo_destroy(bo); \
         GRALLOC_UNLOCK());
 
+    errno_t eok = EOK;
     priBuffer = (PriBufferHandle *)malloc(sizeof(PriBufferHandle));
-    DISPLAY_CHK_RETURN((priBuffer == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("bufferhandle malloc failed"); \
-        goto error);
+    if (priBuffer == NULL) {
+        DISPLAY_LOGE("bufferhandle malloc failed");
+        goto error;
+    }
 
-    errno_t eok = memset_s(priBuffer, sizeof(PriBufferHandle), 0, sizeof(PriBufferHandle));
+    eok = memset_s(priBuffer, sizeof(PriBufferHandle), 0, sizeof(PriBufferHandle));
     if (eok != EOK) {
         DISPLAY_LOGE("memset_s failed");
+        goto error;
     }
     DISPLAY_CHK_RETURN((eok != EOK), DISPLAY_PARAM_ERR, DISPLAY_LOGE("memset_s failed"); \
         goto error);
@@ -307,7 +320,7 @@ int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer)
     *buffer = &priBuffer->hdl;
     hdi_gbm_bo_destroy(bo);
     GRALLOC_UNLOCK();
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 error:
     close(fd);
     hdi_gbm_bo_destroy(bo);
@@ -315,7 +328,7 @@ error:
         free(priBuffer);
     }
     GRALLOC_UNLOCK();
-    return DISPLAY_FAILURE;
+    return HDF_FAILURE;
 }
 
 static void CloseBufferHandle(BufferHandle *handle)
@@ -336,9 +349,9 @@ static void CloseBufferHandle(BufferHandle *handle)
 
 void GbmFreeMem(BufferHandle *buffer)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((buffer == NULL), DISPLAY_LOGE("buffer is null"));
-    if ((buffer->virAddr != NULL) && (GbmUnmap(buffer) != DISPLAY_SUCCESS)) {
+    if ((buffer->virAddr != NULL) && (GbmUnmap(buffer) != HDF_SUCCESS)) {
         DISPLAY_LOGE("freeMem unmap buffer failed");
     }
     CloseBufferHandle(buffer);
@@ -348,13 +361,13 @@ void GbmFreeMem(BufferHandle *buffer)
 void *GbmMmap(BufferHandle *buffer)
 {
     void *virAddr = NULL;
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (buffer == NULL) {
         DISPLAY_LOGE("gbmmap the buffer handle is NULL");
         return NULL;
     }
     if (buffer->virAddr != NULL) {
-        DISPLAY_DEBUGLOG("the buffer has virtual addr");
+        DISPLAY_LOGD("the buffer has virtual addr");
         return buffer->virAddr;
     }
     virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->fd, 0);
@@ -367,43 +380,43 @@ void *GbmMmap(BufferHandle *buffer)
 
 int32_t GbmUnmap(BufferHandle *buffer)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (buffer == NULL) {
         DISPLAY_LOGE("gbmumap the buffer handle is null");
-        return DISPLAY_NULL_PTR;
+        return HDF_FAILURE;
     }
 
     if (buffer->virAddr == NULL) {
         DISPLAY_LOGE("virAddr is NULL , has not map the buffer");
-        return DISPLAY_PARAM_ERR;
+        return HDF_ERR_INVALID_PARAM;
     }
     int ret = munmap(buffer->virAddr, buffer->size);
     if (ret != 0) {
         DISPLAY_LOGE("munmap failed err: %{public}s", strerror(errno));
-        return DISPLAY_FAILURE;
+        return HDF_FAILURE;
     }
     buffer->virAddr = NULL;
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 int32_t GbmInvalidateCache(BufferHandle *buffer)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     return DmaBufferSync(buffer, true);
 }
 
 int32_t GbmFlushCache(BufferHandle *buffer)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     return DmaBufferSync(buffer, false);
 }
 
 int32_t GbmGrallocUninitialize(void)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     GRALLOC_LOCK();
     GrallocManager *grallocManager = GetGrallocManager();
-    DISPLAY_CHK_RETURN((grallocManager == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("gralloc manager failed"); \
+    DISPLAY_CHK_RETURN((grallocManager == NULL), HDF_ERR_INVALID_PARAM, DISPLAY_LOGE("gralloc manager failed"); \
         GRALLOC_UNLOCK());
     grallocManager->referCount--;
     if (grallocManager->referCount < 0) {
@@ -412,20 +425,24 @@ int32_t GbmGrallocUninitialize(void)
         g_grallocManager = NULL;
     }
     GRALLOC_UNLOCK();
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 int32_t GbmGrallocInitialize(void)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     GRALLOC_LOCK();
     GrallocManager *grallocManager = GetGrallocManager();
-    DISPLAY_CHK_RETURN((grallocManager == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("gralloc manager failed"); \
+    DISPLAY_CHK_RETURN((grallocManager == NULL), HDF_ERR_INVALID_PARAM, DISPLAY_LOGE("gralloc manager failed"); \
         GRALLOC_UNLOCK());
     int ret = InitGbmDevice(g_drmFileNode, grallocManager);
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), ret, DISPLAY_LOGE("gralloc manager failed"); \
+    DISPLAY_CHK_RETURN((ret != HDF_SUCCESS), ret, DISPLAY_LOGE("gralloc manager failed"); \
         GRALLOC_UNLOCK());
     grallocManager->referCount++;
     GRALLOC_UNLOCK();
-    return DISPLAY_SUCCESS;
+    return HDF_SUCCESS;
 }
+
+} // namespace DISPLAY
+} // namespace HDI
+} // namespace OHOS

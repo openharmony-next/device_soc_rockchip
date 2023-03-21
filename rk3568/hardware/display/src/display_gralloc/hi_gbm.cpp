@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,13 @@
 #include <xf86drmMode.h>
 #include <drm_fourcc.h>
 #include <securec.h>
-#include "display_common.h"
+#include "display_log.h"
 #include "hi_gbm_internal.h"
+
+namespace OHOS {
+namespace HDI {
+namespace DISPLAY {
+
 #ifdef ROCKCHIP_CMA
 #define ROCKCHIP_BO_CONTIG (1 << 0)
 #endif
@@ -104,7 +109,7 @@ static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t height)
         if (sum > 0) {
             tmpHeight = DIV_ROUND_UP((height * sum), fmtInfo->planes->radio[0]);
         }
-        DISPLAY_DEBUGLOG("height adjust to : %{public}d", tmpHeight);
+        DISPLAY_LOGD("height adjust to : %{public}d", tmpHeight);
     }
     return tmpHeight;
 }
@@ -131,12 +136,12 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     dumb.flags = 0;
     dumb.bpp = fmtInfo->bitsPerPixel;
     ret = drmIoctl(gbm->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dumb);
-    DISPLAY_DEBUGLOG("fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d bpp: %{public}u pitch"
+    DISPLAY_LOGD("fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d bpp: %{public}u pitch"
         "%{public}d size %{public}llu",
         format, dumb.width, dumb.height, dumb.bpp, dumb.pitch, dumb.size);
     DISPLAY_CHK_RETURN((ret != 0), NULL, DISPLAY_LOGE("DRM_IOCTL_MODE_CREATE_DUMB failed errno %{public}d", errno));
     InitGbmBo(bo, &dumb);
-    DISPLAY_DEBUGLOG(
+    DISPLAY_LOGD(
         "fmt 0x%{public}x create dumb width: %{public}d  height: %{public}d  stride %{public}d size %{public}u", format,
         bo->width, bo->height, bo->stride, bo->size);
     return bo;
@@ -199,3 +204,7 @@ int hdi_gbm_bo_get_fd(struct gbm_bo *bo)
         DISPLAY_LOGE("drmPrimeHandleToFD  failed ret: %{public}d  errno: %{public}d", ret, errno));
     return fd;
 }
+
+} // namespace DISPLAY
+} // namespace HDI
+} // namespace OHOS

@@ -22,14 +22,15 @@
 #include <string>
 #include <sys/time.h>
 #include <unistd.h>
-#include "display_gralloc.h"
+#include "display_buffer_vdi_impl.h"
+#include "v1_0/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
 uint32_t HdiLayer::mIdleId = 0;
 std::unordered_set<uint32_t> HdiLayer::mIdSets;
-static GrallocFuncs *g_grallocFuncs = nullptr;
+std::shared_ptr<IDisplayBufferVdi> g_buffer;
 constexpr int TIME_BUFFER_MAX_LEN = 15;
 constexpr int FILE_NAME_MAX_LEN = 80;
 const std::string PATH_PREFIX = "/data/local/traces/";
@@ -37,7 +38,7 @@ const std::string PATH_PREFIX = "/data/local/traces/";
 HdiLayerBuffer::HdiLayerBuffer(const BufferHandle &hdl)
     : mPhyAddr(hdl.phyAddr), mHeight(hdl.height), mWidth(hdl.width), mStride(hdl.stride), mFormat(hdl.format)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     mFd = dup(hdl.fd);
     mHandle = hdl;
     if (mFd < 0) {
@@ -47,7 +48,7 @@ HdiLayerBuffer::HdiLayerBuffer(const BufferHandle &hdl)
 
 HdiLayerBuffer::~HdiLayerBuffer()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mFd >= 0) {
         close(mFd);
     }
@@ -55,7 +56,7 @@ HdiLayerBuffer::~HdiLayerBuffer()
 
 HdiLayerBuffer &HdiLayerBuffer::operator = (const BufferHandle &right)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mFd >= 0) {
         close(mFd);
     }
@@ -84,23 +85,23 @@ uint32_t HdiLayer::GetIdleId()
     } while (oldIdleId != mIdleId);
     mIdSets.emplace(id);
     mIdleId++;
-    DISPLAY_DEBUGLOG("id %{public}d mIdleId %{public}d", id, mIdleId);
+    DISPLAY_LOGD("id %{public}d mIdleId %{public}d", id, mIdleId);
     return id;
 }
 
 int32_t HdiLayer::Init()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     uint32_t id = GetIdleId();
     DISPLAY_CHK_RETURN((id == INVALIDE_LAYER_ID), DISPLAY_FAILURE, DISPLAY_LOGE("have no id to used"));
     mId = id;
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiLayer::SetLayerSize(IRect *rect)
+int32_t HdiLayer::SetLayerRegion(IRect *rect)
 {
     DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in rect is nullptr"));
-    DISPLAY_DEBUGLOG(" displayRect x: %{public}d y : %{public}d w : %{public}d h : %{public}d", rect->x, rect->y,
+    DISPLAY_LOGD(" displayRect x: %{public}d y : %{public}d w : %{public}d h : %{public}d", rect->x, rect->y,
         rect->w, rect->h);
     mDisplayRect = *rect;
     return DISPLAY_SUCCESS;
@@ -109,7 +110,7 @@ int32_t HdiLayer::SetLayerSize(IRect *rect)
 int32_t HdiLayer::SetLayerCrop(IRect *rect)
 {
     DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in rect is nullptr"));
-    DISPLAY_DEBUGLOG("id : %{public}d crop x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
+    DISPLAY_LOGD("id : %{public}d crop x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
         rect->x, rect->y, rect->w, rect->h);
     mCrop = *rect;
     return DISPLAY_SUCCESS;
@@ -117,13 +118,13 @@ int32_t HdiLayer::SetLayerCrop(IRect *rect)
 
 void HdiLayer::SetLayerZorder(uint32_t zorder)
 {
-    DISPLAY_DEBUGLOG("id : %{public}d zorder : %{public}d ", mId, zorder);
+    DISPLAY_LOGD("id : %{public}d zorder : %{public}d ", mId, zorder);
     mZorder = zorder;
 }
 
 int32_t HdiLayer::SetLayerPreMulti(bool preMul)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     mPreMul = preMul;
     return DISPLAY_SUCCESS;
 }
@@ -131,14 +132,14 @@ int32_t HdiLayer::SetLayerPreMulti(bool preMul)
 int32_t HdiLayer::SetLayerAlpha(LayerAlpha *alpha)
 {
     DISPLAY_CHK_RETURN((alpha == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in alpha is nullptr"));
-    DISPLAY_DEBUGLOG("enable alpha %{public}d galpha 0x%{public}x", alpha->enGlobalAlpha, alpha->gAlpha);
+    DISPLAY_LOGD("enable alpha %{public}d galpha 0x%{public}x", alpha->enGlobalAlpha, alpha->gAlpha);
     mAlpha = *alpha;
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiLayer::SetTransformMode(TransformType type)
+int32_t HdiLayer::SetLayerTransformMode(TransformType type)
 {
-    DISPLAY_DEBUGLOG("TransformType %{public}d", type);
+    DISPLAY_LOGD("TransformType %{public}d", type);
     mTransformType = type;
     return DISPLAY_SUCCESS;
 }
@@ -146,14 +147,14 @@ int32_t HdiLayer::SetTransformMode(TransformType type)
 int32_t HdiLayer::SetLayerDirtyRegion(IRect *region)
 {
     DISPLAY_CHK_RETURN((region == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("the in rect is null"));
-    DISPLAY_DEBUGLOG("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
+    DISPLAY_LOGD("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
         region->x, region->y, region->w, region->h);
     return DISPLAY_SUCCESS;
 }
 
 int32_t HdiLayer::SetLayerVisibleRegion(uint32_t num, IRect *rect)
 {
-    DISPLAY_DEBUGLOG("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
+    DISPLAY_LOGD("id : %{public}d DirtyRegion x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId,
         rect->x, rect->y, rect->w, rect->h);
     return DISPLAY_SUCCESS;
 }
@@ -179,9 +180,10 @@ static int32_t DumpLayerBuffer(BufferHandle *buffer)
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, DISPLAY_NULL_PTR);
 
     int32_t ret = 0;
-    if (g_grallocFuncs == nullptr) {
-        ret = GrallocInitialize(&g_grallocFuncs);
-        DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("Gralloc init failed"));
+    if (g_buffer== NULL) {
+        IDisplayBufferVdi* dispBuf = new DisplayBufferVdiImpl();
+        DISPLAY_CHK_RETURN((dispBuf == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("dispBuf init failed"));
+        g_buffer.reset(dispBuf);
     }
 
     char fileName[FILE_NAME_MAX_LEN] = {0};
@@ -195,20 +197,20 @@ static int32_t DumpLayerBuffer(BufferHandle *buffer)
     DISPLAY_CHK_RETURN((!rawDataFile.good()), DISPLAY_FAILURE, DISPLAY_LOGE("open file failed, %{public}s",
         std::strerror(errno)));
 
-    void *buffAddr = g_grallocFuncs->Mmap(buffer);
+    void *buffAddr = g_buffer->Mmap(*buffer);
     DISPLAY_CHK_RETURN((buffAddr == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("Mmap buffer failed"));
 
     rawDataFile.write(static_cast<const char *>(buffAddr), buffer->size);
     rawDataFile.close();
 
-    ret = g_grallocFuncs->Unmap(buffer);
+    ret = g_buffer->Unmap(*buffer);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("Unmap buffer failed"));
     return DISPLAY_SUCCESS;
 }
 
 int32_t HdiLayer::SetLayerBuffer(const BufferHandle *buffer, int32_t fence)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((buffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("buffer is nullptr"));
     std::unique_ptr<HdiLayerBuffer> layerbuffer = std::make_unique<HdiLayerBuffer>(*buffer);
     mHdiBuffer = std::move(layerbuffer);
@@ -223,14 +225,14 @@ int32_t HdiLayer::SetLayerBuffer(const BufferHandle *buffer, int32_t fence)
 
 int32_t HdiLayer::SetLayerCompositionType(CompositionType type)
 {
-    DISPLAY_DEBUGLOG("CompositionType type %{public}d", type);
+    DISPLAY_LOGD("CompositionType type %{public}d", type);
     mCompositionType = type;
     return DISPLAY_SUCCESS;
 }
 
 int32_t HdiLayer::SetLayerBlendType(BlendType type)
 {
-    DISPLAY_DEBUGLOG("BlendType type %{public}d", type);
+    DISPLAY_LOGD("BlendType type %{public}d", type);
     mBlendType = type;
     return DISPLAY_SUCCESS;
 }
@@ -255,7 +257,7 @@ void HdiLayer::SetPixel(const BufferHandle &handle, int x, int y, uint32_t color
 
 void HdiLayer::ClearColor(uint32_t color)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     BufferHandle &handle = mHdiBuffer->mHandle;
     for (int32_t x = 0; x < handle.width; x++) {
         for (int32_t y = 0; y < handle.height; y++) {
@@ -268,7 +270,7 @@ void HdiLayer::WaitAcquireFence()
 {
     int fd = GetAcquireFenceFd();
     if (fd < 0) {
-        DISPLAY_DEBUGLOG("fd is invalid");
+        DISPLAY_LOGE("fd is invalid");
         return;
     }
     sync_wait(fd, mFenceTimeOut);

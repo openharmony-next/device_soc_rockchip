@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "drm_crtc.h"
-#include "display_common.h"
+#include "display_log.h"
 #include "drm_device.h"
 
 namespace OHOS {
@@ -36,7 +36,7 @@ DrmCrtc::DrmCrtc(drmModeCrtcPtr c, uint32_t pipe) : mId(c->crtc_id), mPipe(pipe)
 
 int32_t DrmCrtc::Init(DrmDevice &drmDevice)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     int32_t ret;
     DrmProperty prop;
     ret = drmDevice.GetCrtcProperty(*this, PROP_MODEID, prop);
@@ -82,7 +82,7 @@ int32_t DrmCrtc::BindToDisplay(uint32_t id)
 
 void DrmCrtc::UnBindDisplay(uint32_t id)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mDisplayId == id) {
         mDisplayId = INVALIDE_DISPLAY_ID;
     } else {
@@ -97,7 +97,8 @@ bool DrmCrtc::CanBind()
 
 int32_t DrmCrtc::SetActivieMode(int32_t id)
 {
-    DISPLAY_DEBUGLOG("set activie modeid to %{public}d", id);
+    DISPLAY_LOGD("set activie modeid to %{public}d", id);
+    DISPLAY_CHK_RETURN((id > 0), DISPLAY_PARAM_ERR, DISPLAY_LOGE("id %{public}d is invalid ", id));
     if (mActiveModeId != id) {
         mNeedModeSet = true;
     }
