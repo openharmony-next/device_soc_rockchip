@@ -89,7 +89,7 @@ RKMppApi *GetConfigApi(RKMppApi *pMppApi)
     pMppApi->HdiMppEncCfgInit = (hdiMppEncCfgInit)dlsym(mLibHandle, "mpp_enc_cfg_init");
     pMppApi->HdiMppEncCfgDeinit = (hdiMppEncCfgDeinit)dlsym(mLibHandle, "mpp_enc_cfg_deinit");
     pMppApi->HdiMppEncCfgSetS32 = (hdiMppEncCfgSetS32)dlsym(mLibHandle, "mpp_enc_cfg_set_s32");
-    pMppApi->HdiMppEncCfgSetU32 = (hdiMppEncCfgSetS32)dlsym(mLibHandle, "mpp_enc_cfg_set_u32");
+    pMppApi->HdiMppEncCfgSetU32 = (hdiMppEncCfgSetU32)dlsym(mLibHandle, "mpp_enc_cfg_set_u32");
     pMppApi->HdiMppEncRefCfgInit = (hdiMppEncRefCfgInit)dlsym(mLibHandle, "mpp_enc_ref_cfg_init");
     pMppApi->HdiMppEncRefCfgDeinit = (hdiMppEncRefCfgDeinit)dlsym(mLibHandle, "mpp_enc_ref_cfg_deinit");
     pMppApi->HdiMppEncGenRefCfg = (hdiMppEncGenRefCfg)dlsym(mLibHandle, "mpi_enc_gen_ref_cfg");

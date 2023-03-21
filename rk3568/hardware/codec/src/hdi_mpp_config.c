@@ -14,9 +14,9 @@
  */
 
 #include "hdi_mpp_config.h"
-#include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <securec.h>
 #include "mpp_common.h"
 
 #define HDF_LOG_TAG codec_hdi_mpp_config
@@ -32,32 +32,43 @@
 #define MPP_ALIGN_DIVISOR_WITH_SIXTEEN      16
 #define GOP_MODE_THRESHOLD_VALUE            4
 
-#define BPS_BASE		            16
-#define BPS_MAX			            17
-#define BPS_MEDIUM			        15
-#define BPS_MIN            			1
-#define BPS_TARGET         			2
-#define FIXQP_INIT_VALUE            20
-#define FIXQP_MAX_VALUE             20
-#define FIXQP_MIN_VALUE             20
-#define FIXQP_MAX_I_VALUE           20
-#define FIXQP_MIN_I_VALUE           20
-#define FIXQP_IP_VALUE              2
-#define OTHER_QP_INIT_VALUE         26
-#define OTHER_QP_MAX_VALUE          51
-#define OTHER_QP_MIN_VALUE          10
-#define OTHER_QP_MAX_I_VALUE        51
-#define OTHER_QP_MIN_I_VALUE        10
-#define OTHER_QP_IP_VALUE           2
-#define AVC_SETUP_LEVEL_DEFAULT     40
-#define AVC_SETUP_CABAC_EN_DEFAULT  1
-#define AVC_SETUP_CABAC_IDC_DEFAULT 0
-#define AVC_SETUP_TRANS_DEFAULT     1
-#define AVC_SETUP_PROFILE_DEFAULT   100
-#define FPS_SETUP_DEFAULT           24
-#define DFAULT_ENC_DROP_THD         20
-#define DFAULT_ENC_GOP_OPERATOR     2
-#define DFAULT_BUF_SIZE_OPERATOR    2
+#define BPS_BASE                            16
+#define BPS_MAX                             17
+#define BPS_MEDIUM                          15
+#define BPS_MIN                             1
+#define BPS_TARGET                          2
+#define FIXQP_INIT_VALUE                    20
+#define FIXQP_MAX_VALUE                     20
+#define FIXQP_MIN_VALUE                     20
+#define FIXQP_MAX_I_VALUE                   20
+#define FIXQP_MIN_I_VALUE                   20
+#define FIXQP_IP_VALUE                      2
+#define OTHER_QP_INIT_VALUE                 26
+#define OTHER_QP_MAX_VALUE                  51
+#define OTHER_QP_MIN_VALUE                  10
+#define OTHER_QP_MAX_I_VALUE                51
+#define OTHER_QP_MIN_I_VALUE                10
+#define OTHER_QP_IP_VALUE                   2
+#define AVC_SETUP_LEVEL_DEFAULT             40
+#define AVC_SETUP_CABAC_EN_DEFAULT          1
+#define AVC_SETUP_CABAC_IDC_DEFAULT         0
+#define AVC_SETUP_TRANS_DEFAULT             1
+#define AVC_SETUP_PROFILE_DEFAULT           100
+#define FPS_SETUP_DEFAULT                   24
+#define DFAULT_ENC_DROP_THD                 20
+#define DFAULT_ENC_GOP_OPERATOR             2
+#define DFAULT_BUF_SIZE_OPERATOR            2
+#define FOUR_BYTE_PIX_BUF_SIZE_OPERATOR     4
+#define PACKET_SIZE_MULTI                   3
+#define PACKET_SIZE_OPERATOR                2
+#define DEFAULT_RESOLUTION_SIZE             (1920 * 1088)
+
+static const CodecPixelFormatConvertTbl pixelFormatSupportted[] = {
+    {PIXEL_FMT_RGBA_8888, MPP_FMT_RGBA8888, RK_FORMAT_RGBA_8888},
+    {PIXEL_FMT_BGRA_8888, MPP_FMT_BGRA8888, RK_FORMAT_BGRA_8888},
+    {PIXEL_FMT_YCBCR_420_SP, MPP_FMT_YUV420SP, RK_FORMAT_YCbCr_420_SP },
+    {PIXEL_FMT_YCBCR_420_P, MPP_FMT_YUV420P, RK_FORMAT_YCbCr_420_P},
+};
 
 int32_t InitMppConfig(RKHdiBaseComponent *pBaseComponent)
 {
@@ -142,14 +153,52 @@ static PixelFormat ConvertRKFormat2HdiFormat(MppFrameFormat fmtRK)
     }
 }
 
-static MppFrameFormat ConvertHdiFormat2RKFormat(PixelFormat fmtHDI)
+MppFrameFormat ConvertHdiFormat2RKFormat(PixelFormat fmtHDI)
 {
-    if (fmtHDI == PIXEL_FMT_YCBCR_420_SP) {
-        return MPP_FMT_YUV420SP;
-    } else {
-        HDF_LOGE("%{public}s: do not support type %{public}d", __func__, fmtHDI);
-        return MPP_FMT_BUTT;
+    MppFrameFormat mppFmt = MPP_FMT_BUTT;
+    int32_t count = sizeof(pixelFormatSupportted) / sizeof(CodecPixelFormatConvertTbl);
+    for (int i = 0; i < count; i++) {
+        if (pixelFormatSupportted[i].pixFormat == fmtHDI) {
+            mppFmt = pixelFormatSupportted[i].mppFormat;
+            break;
+        }
     }
+    if (mppFmt == MPP_FMT_BUTT) {
+        HDF_LOGE("%{public}s: do not support type %{public}d", __func__, fmtHDI);
+    }
+    return mppFmt;
+}
+
+RgaSURF_FORMAT ConvertHdiFormat2RgaFormat(PixelFormat fmtHDI)
+{
+    RgaSURF_FORMAT rgaFmt = RK_FORMAT_UNKNOWN;
+    int32_t count = sizeof(pixelFormatSupportted) / sizeof(CodecPixelFormatConvertTbl);
+    for (int i = 0; i < count; i++) {
+        if (pixelFormatSupportted[i].pixFormat == fmtHDI) {
+            rgaFmt = pixelFormatSupportted[i].rgaFormat;
+            break;
+        }
+    }
+    if (rgaFmt == RK_FORMAT_UNKNOWN) {
+        HDF_LOGE("%{public}s: do not support type %{public}d", __func__, fmtHDI);
+    }
+    return rgaFmt;
+}
+
+RgaSURF_FORMAT ConvertMppFormat2RgaFormat(MppFrameFormat mppFmt)
+{
+    RgaSURF_FORMAT rgaFmt = RK_FORMAT_UNKNOWN;
+    int32_t count = sizeof(pixelFormatSupportted) / sizeof(CodecPixelFormatConvertTbl);
+    for (int i = 0; i < count; i++) {
+        if (pixelFormatSupportted[i].mppFormat == mppFmt) {
+            rgaFmt = pixelFormatSupportted[i].rgaFormat;
+            break;
+        }
+    }
+    if (rgaFmt == RK_FORMAT_UNKNOWN) {
+        HDF_LOGE("%{public}s: do not support type %{public}d", __func__, mppFmt);
+    }
+    return rgaFmt;
 }
 
 static MppEncRcMode ConvertHdiRcMode2RKRcMode(VideoCodecRcMode hdiRcMode)
@@ -205,6 +254,9 @@ static MppCodingType ConvertHdiMimeCodecType2RKCodecType(AvCodecMime mime)
             break;
         default:
             break;
+    }
+    if (type == MPP_VIDEO_CodingMax) {
+        HDF_LOGE("%{public}s: do not support type %{public}d", __func__, type);
     }
     return type;
 }
@@ -268,14 +320,14 @@ int32_t GetDefaultHorStride(int32_t width, PixelFormat fmtHDI)
     return GetStrideByWidth(width, fmt);
 }
 
-static uint32_t GetFrameBufferSize(RKHdiBaseComponent *pBaseComponent)
+static uint32_t GetMppFrameBufferSize(RKHdiBaseComponent *pBaseComponent)
 {
     uint32_t frameSize = 0;
     switch (pBaseComponent->fmt) {
         case MPP_FMT_YUV420SP:
         case MPP_FMT_YUV420P:
-            frameSize = MPP_ALIGN(pBaseComponent->setup.stride.horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
-                * MPP_ALIGN(pBaseComponent->setup.stride.verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+            frameSize = MPP_ALIGN(pBaseComponent->horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+                * MPP_ALIGN(pBaseComponent->verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
                 * MPP_ALIGN_MULTIPLE_WITH_THREE / MPP_ALIGN_DIVISOR_WITH_TWO;
             break;
 
@@ -291,21 +343,21 @@ static uint32_t GetFrameBufferSize(RKHdiBaseComponent *pBaseComponent)
         case MPP_FMT_BGR555:
         case MPP_FMT_RGB565:
         case MPP_FMT_BGR565:
-            frameSize = MPP_ALIGN(pBaseComponent->setup.stride.horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
-                * MPP_ALIGN(pBaseComponent->setup.stride.verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+            frameSize = MPP_ALIGN(pBaseComponent->horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+                * MPP_ALIGN(pBaseComponent->verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
                 * MPP_ALIGN_MULTIPLE_WITH_TWO;
             break;
 
         default:
-            frameSize = MPP_ALIGN(pBaseComponent->setup.stride.horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
-                * MPP_ALIGN(pBaseComponent->setup.stride.verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+            frameSize = MPP_ALIGN(pBaseComponent->horStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
+                * MPP_ALIGN(pBaseComponent->verStride, MPP_ALIGN_STRIDE_WITH_SIXTY_FOUR)
                 * MPP_ALIGN_MULTIPLE_WITH_FOUR;
             break;
     }
     return frameSize;
 }
 
-static uint32_t GetFrameHeaderSize(RKHdiBaseComponent *pBaseComponent)
+static uint32_t GetMppFrameHeaderSize(RKHdiBaseComponent *pBaseComponent)
 {
     uint32_t headerSize = 0;
     if (MPP_FRAME_FMT_IS_FBC(pBaseComponent->fmt)) {
@@ -408,10 +460,44 @@ static void CalcBpsValue(RKHdiBaseComponent *pBaseComponent, MppEncRcMode mppRcM
         }
     }
     /* setup qp for different codec and rc_mode */
-    switch (encSetup->codecMime.mimeCodecType) {
+    switch (pBaseComponent->codingType) {
         case MPP_VIDEO_CodingAVC:
         case MPP_VIDEO_CodingHEVC: {
             SetQpValue(encSetup, mppRcMode);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+static void SetMimeSettings(RKHdiCodecMimeSetup *codecMimeSet, MppCodingType codingType)
+{
+    switch (codingType) {
+        case MPP_VIDEO_CodingAVC: {
+            /*
+            * H.264 profile_idc parameter
+            * 66  - Baseline profile
+            * 77  - Main profile
+            * 100 - High profile
+            */
+            codecMimeSet->avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
+            /*
+            * H.264 level_idc parameter
+            * 10 / 11 / 12 / 13    - qcif@15fps / cif@7.5fps / cif@15fps / cif@30fps
+            * 20 / 21 / 22         - cif@30fps / half-D1@@25fps / D1@12.5fps
+            * 30 / 31 / 32         - D1@25fps / 720p@30fps / 720p@60fps
+            * 40 / 41 / 42         - 1080p@30fps / 1080p@30fps / 1080p@60fps
+            * 50 / 51 / 52         - 4K@30fps
+            */
+            codecMimeSet->avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
+            codecMimeSet->avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
+            codecMimeSet->avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
+            codecMimeSet->avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
+            break;
+        }
+        case MPP_VIDEO_CodingHEVC: {
             break;
         }
         default: {
@@ -466,14 +552,14 @@ int32_t SetEncCfg(RKHdiBaseComponent *pBaseComponent)
     
     mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:format", pBaseComponent->fmt);
 
-    if (setup->stride.horStride == 0) {
-        setup->stride.horStride = GetDefaultHorStride(setup->width, setup->fmt);
+    pBaseComponent->horStride = GetStrideByWidth(setup->width, pBaseComponent->fmt);
+    pBaseComponent->verStride = setup->height;
+    if (pBaseComponent->horStride == 0 || pBaseComponent->verStride == 0) {
+        HDF_LOGE("%{public}s: size or stride incorrect!", __func__);
+        return HDF_FAILURE;
     }
-    if (setup->stride.verStride == 0) {
-        setup->stride.verStride = setup->height;
-    }
-    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:hor_stride", setup->stride.horStride);
-    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:ver_stride", setup->stride.verStride);
+    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:hor_stride", pBaseComponent->horStride);
+    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:ver_stride", pBaseComponent->verStride);
     
     mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "rc:fps_in_flex", setup->fps.fpsInFlex);
     mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "rc:fps_in_num", setup->fps.fpsInNum);
@@ -503,6 +589,7 @@ int32_t SetEncCfg(RKHdiBaseComponent *pBaseComponent)
     mppApi->HdiMppEncCfgSetU32(pBaseComponent->cfg, "rc:drop_gap", setup->drop.dropGap);
     
     mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "codec:type", pBaseComponent->codingType);
+    SetMimeSettings(&setup->codecMime, pBaseComponent->codingType);
     if (pBaseComponent->codingType == MPP_VIDEO_CodingAVC) {
         mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "h264:profile", setup->codecMime.avcSetup.profile);
         mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "h264:level", setup->codecMime.avcSetup.level);
@@ -522,8 +609,6 @@ int32_t SetDecCfg(RKHdiBaseComponent *pBaseComponent)
     MppCtx ctx = pBaseComponent->ctx;
 
     GetDefaultConfig(pBaseComponent);
-    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:format", pBaseComponent->setup.fmt);
-    mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:hor_stride", pBaseComponent->setup.stride.horStride);
     mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "codec:type", pBaseComponent->codingType);
     mppApi->HdiMppDecCfgSetU32(pBaseComponent->cfg, "base:split_parse", pBaseComponent->setup.split);
     ret = pBaseComponent->mpi->control(ctx, MPP_DEC_SET_CFG, pBaseComponent->cfg);
@@ -543,24 +628,33 @@ int32_t SetDecCfg(RKHdiBaseComponent *pBaseComponent)
 int32_t SetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.width = *(RK_S32 *)param->val;
+    if (pBaseComponent->setup.width <= 0) {
+        HDF_LOGE("%{public}s: invalid width value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t SetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.height = *(RK_S32 *)param->val;
+    if (pBaseComponent->setup.height <= 0) {
+        HDF_LOGE("%{public}s: invalid height value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
-int32_t SetParamPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
+int32_t SetParamPixelFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
-    RK_S32 *pixFmt = (RK_S32 *)param->val;
-    MppFrameFormat rkPixFmt = ConvertHdiFormat2RKFormat(*pixFmt);
-    if (rkPixFmt == MPP_FMT_BUTT) {
+    RK_S32 *hdiPixFmt = (RK_S32 *)param->val;
+    MppFrameFormat mppPixFmt = ConvertHdiFormat2RKFormat(*hdiPixFmt);
+    if (mppPixFmt == MPP_FMT_BUTT) {
+        HDF_LOGE("%{public}s: invalid pixel format value!", __func__);
         return HDF_FAILURE;
     }
-    pBaseComponent->setup.fmt = *pixFmt;
-    pBaseComponent->fmt = rkPixFmt;
+    pBaseComponent->setup.fmt = *hdiPixFmt;
+    pBaseComponent->fmt = MPP_FMT_YUV420SP;
     return HDF_SUCCESS;
 }
 
@@ -578,77 +672,67 @@ int32_t SetParamFps(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.fps.fpsInNum = *(RK_S32 *)param->val;
     pBaseComponent->setup.fps.fpsOutNum = *(RK_S32 *)param->val;
+    if (pBaseComponent->setup.fps.fpsInNum <= 0) {
+        HDF_LOGE("%{public}s: invalid fps value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t SetParamDrop(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.drop.dropMode = *(RK_U32 *)param->val;
+    if (pBaseComponent->setup.drop.dropMode < 0 || pBaseComponent->setup.drop.dropMode >= MPP_ENC_RC_DROP_FRM_BUTT) {
+        HDF_LOGE("%{public}s: drop stride value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t SetParamRateControl(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.rc.rcMode = *(RK_S32 *)param->val;
+    if (pBaseComponent->setup.rc.rcMode < 0) {
+        HDF_LOGE("%{public}s: invalid rcMode value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t SetParamGop(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.gop.gopMode = *(VideoCodecGopMode *)param->val;
-    return HDF_SUCCESS;
-}
-
-static void SetParamMimeCodecTypeExt(RKHdiCodecMimeSetup *codecMimeSet)
-{
-    switch (codecMimeSet->mimeCodecType) {
-        case MEDIA_MIMETYPE_VIDEO_AVC: {
-            /*
-            * H.264 profile_idc parameter
-            * 66  - Baseline profile
-            * 77  - Main profile
-            * 100 - High profile
-            */
-            codecMimeSet->avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
-            /*
-            * H.264 level_idc parameter
-            * 10 / 11 / 12 / 13    - qcif@15fps / cif@7.5fps / cif@15fps / cif@30fps
-            * 20 / 21 / 22         - cif@30fps / half-D1@@25fps / D1@12.5fps
-            * 30 / 31 / 32         - D1@25fps / 720p@30fps / 720p@60fps
-            * 40 / 41 / 42         - 1080p@30fps / 1080p@30fps / 1080p@60fps
-            * 50 / 51 / 52         - 4K@30fps
-            */
-            codecMimeSet->avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
-            codecMimeSet->avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
-            codecMimeSet->avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
-            codecMimeSet->avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
-            break;
-        }
-        case MEDIA_MIMETYPE_VIDEO_HEVC: {
-            break;
-        }
-        default: {
-            break;
-        }
+    if (pBaseComponent->setup.gop.gopMode < 0 || pBaseComponent->setup.gop.gopMode >= VID_CODEC_GOPMODE_INVALID) {
+        HDF_LOGE("%{public}s: invalid gop value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
+    return HDF_SUCCESS;
 }
 
 int32_t SetParamMimeCodecType(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     RKHdiCodecMimeSetup *mimeCodecTypeSet = &pBaseComponent->setup.codecMime;
-
     mimeCodecTypeSet->mimeCodecType = *(RK_S32 *)param->val;
-    MppCodingType codingType = ConvertHdiMimeCodecType2RKCodecType(mimeCodecTypeSet->mimeCodecType);
-    if (codingType != MPP_VIDEO_CodingMax) {
-        pBaseComponent->codingType = codingType;
+    if (mimeCodecTypeSet->mimeCodecType < 0 || mimeCodecTypeSet->mimeCodecType >= MEDIA_MIMETYPE_INVALID) {
+        HDF_LOGE("%{public}s: invalid mime type value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
-    SetParamMimeCodecTypeExt(mimeCodecTypeSet);
+
+    MppCodingType codingType = ConvertHdiMimeCodecType2RKCodecType(mimeCodecTypeSet->mimeCodecType);
+    if (codingType == MPP_VIDEO_CodingMax) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    pBaseComponent->codingType = codingType;
     return HDF_SUCCESS;
 }
 
 int32_t SetParamCodecType(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->setup.codecType = *(RK_S32 *)param->val;
+    if (pBaseComponent->setup.codecType < 0 || pBaseComponent->setup.codecType >= INVALID_TYPE) {
+        HDF_LOGE("%{public}s: invalid codec type value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
@@ -661,24 +745,24 @@ int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param)
 int32_t SetParamCodecFrameNum(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     pBaseComponent->frameNum = *(RK_S32 *)param->val;
+    if (pBaseComponent->frameNum < 0) {
+        HDF_LOGE("%{public}s: invalid frame num value!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HDF_SUCCESS;
 }
 
-int32_t CheckSetup(RKHdiBaseComponent *pBaseComponent)
+int32_t CheckSetupStride(RKHdiBaseComponent *pBaseComponent)
 {
-    RKMppApi *mppApi = pBaseComponent->mppApi;
     if (pBaseComponent->setup.width <= 0 || pBaseComponent->setup.height <= 0) {
-        HDF_LOGE("%{public}s: width or height invalid %{public}d", __func__);
+        HDF_LOGE("%{public}s: width or height invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (pBaseComponent->setup.stride.horStride == 0) {
         pBaseComponent->setup.stride.horStride = MPP_ALIGN(pBaseComponent->setup.width, MPP_ALIGN_STRIDE_WITH_SIXTEEN);
-        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:hor_stride", pBaseComponent->setup.stride.horStride);
     }
-    if (pBaseComponent->setup.stride.horStride == 0) {
-        pBaseComponent->setup.stride.verStride = MPP_ALIGN(pBaseComponent->setup.height,
-            MPP_ALIGN_STRIDE_WITH_SIXTEEN);
-        mppApi->HdiMppEncCfgSetS32(pBaseComponent->cfg, "prep:ver_stride", pBaseComponent->setup.stride.verStride);
+    if (pBaseComponent->setup.stride.verStride == 0) {
+        pBaseComponent->setup.stride.verStride = pBaseComponent->setup.height;
     }
     return HDF_SUCCESS;
 }
@@ -690,9 +774,9 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
     RK_U32 splitMode = 0;
     RK_U32 splitArg = 0;
 
-    int32_t checkResult = CheckSetup(pBaseComponent);
+    int32_t checkResult = CheckSetupStride(pBaseComponent);
     if (checkResult != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CheckSetup failed!", __func__);
+        HDF_LOGE("%{public}s: CheckSetupStride failed!", __func__);
         return checkResult;
     }
 
@@ -728,8 +812,8 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
         }
     }
 
-    pBaseComponent->frameSize = GetFrameBufferSize(pBaseComponent);
-    pBaseComponent->headerSize = GetFrameHeaderSize(pBaseComponent);
+    pBaseComponent->frameSize = GetMppFrameBufferSize(pBaseComponent);
+    pBaseComponent->headerSize = GetMppFrameHeaderSize(pBaseComponent);
     ret = GetMppBuffers(pBaseComponent);
     if (ret != MPP_OK) {
         HDF_LOGE("%{public}s: GetMppBuffers failed ret %{public}d", __func__, ret);
@@ -746,8 +830,24 @@ int32_t GetParamBufferSize(RKHdiBaseComponent *pBaseComponent, Param *param)
         param->val = malloc(param->size);
     }
 
-    RK_U32 bufSize = pBaseComponent->setup.width * pBaseComponent->setup.height * DFAULT_BUF_SIZE_OPERATOR;
-    int32_t ret = memcpy_s(param->val, param->size, &bufSize, sizeof(RK_U32));
+    PixelFormat format = pBaseComponent->setup.fmt;
+    if (format == PIXEL_FMT_BUTT) {
+        HDF_LOGE("%{public}s: pixel format not set!", __func__);
+        return HDF_FAILURE;
+    }
+    
+    RK_U32 bufferSize = pBaseComponent->setup.width * pBaseComponent->setup.height;
+    if (bufferSize == 0) {
+        bufferSize = DEFAULT_RESOLUTION_SIZE;
+    }
+    if (format == PIXEL_FMT_YCBCR_420_SP || format == PIXEL_FMT_YCBCR_420_P) {
+        bufferSize = (bufferSize * PACKET_SIZE_MULTI) / PACKET_SIZE_OPERATOR;
+    } else if (format == PIXEL_FMT_BGRA_8888 || format == PIXEL_FMT_RGBA_8888) {
+        bufferSize = bufferSize * FOUR_BYTE_PIX_BUF_SIZE_OPERATOR;
+    } else {
+        bufferSize = bufferSize * DFAULT_BUF_SIZE_OPERATOR;
+    }
+    int32_t ret = memcpy_s(param->val, param->size, &bufferSize, sizeof(RK_U32));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -790,14 +890,13 @@ int32_t GetParamDecOutputPixelFmt(RKHdiBaseComponent *pBaseComponent, Param *par
         param->val = malloc(param->size);
     }
 
-    RKMppApi *mppApi = pBaseComponent->mppApi;
-    MppFrameFormat fmtRK  = MPP_FMT_YUV420SP;
-    PixelFormat format = PIXEL_FMT_YCBCR_420_SP;
-    if (pBaseComponent->frame) {
-        fmtRK = mppApi->HdiMppFrameGetFormat(pBaseComponent->frame);
-        format = ConvertRKFormat2HdiFormat(fmtRK);
+    PixelFormat format = pBaseComponent->setup.fmt;
+    if (format == PIXEL_FMT_BUTT) {
+        // Rk mpp only support NV12 output (rga can be used for other formats)
+        format = PIXEL_FMT_YCBCR_420_SP;
+        pBaseComponent->setup.fmt = PIXEL_FMT_YCBCR_420_SP;
+        pBaseComponent->fmt = MPP_FMT_YUV420SP;
     }
-    // Rk mpp Only NV12 is supported
     int32_t ret = memcpy_s(param->val, param->size, &format, sizeof(PixelFormat));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
@@ -823,10 +922,8 @@ int32_t GetParamEncInputPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *para
 int32_t GetParamPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param)
 {
     if (pBaseComponent->setup.codecType == VIDEO_DECODER) {
-        HDF_LOGI("%{public}s: codec type VIDEO_DECODER!", __func__);
         return GetParamDecOutputPixelFmt(pBaseComponent, param);
     } else if (pBaseComponent->setup.codecType == VIDEO_ENCODER) {
-        HDF_LOGI("%{public}s: codec type VIDEO_ENCODER!", __func__);
         return GetParamEncInputPixleFmt(pBaseComponent, param);
     } else {
         HDF_LOGE("%{public}s: codec type invalid!", __func__);

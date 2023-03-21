@@ -17,9 +17,9 @@
 #define HDI_MPP_H
 
 #include "codec_type.h"
-#include "rk_mpi.h"
 #include "hdi_mpp_ext_param_keys.h"
 #include "hdi_mpp_mpi.h"
+#include "rk_mpi.h"
 
 typedef struct {
     int32_t profile;
@@ -99,6 +99,10 @@ typedef struct {
     char *componentName;
     MppCtxType ctxType;
     MppCodingType codingType;
+    MppFrameFormat fmt;
+    RK_S32 horStride;
+    RK_S32 verStride;
+
     CodecCallback *pCallbacks;
     void *cfg;
     RKHdiEncodeSetup setup;
@@ -117,8 +121,7 @@ typedef struct {
     size_t headerSize;
     size_t frameSize;
     MppBuffer pktBuf;
-
-    MppFrameFormat fmt;
 } RKHdiBaseComponent;
 
 #endif // HDI_MPP_H
+
