@@ -348,17 +348,21 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         ALIGN_UP(dstSurface->height, 2), dstRgaBuffer.vir_addr);
 
     srect.x = srcRect->x;
-    srect.x = (srect.x == 1) ? 0 : srect.x;
+    srect.x = (srect.x % 2 == 1) ? (srect.x - 1) : srect.x; // 2: Is it odd?
     srect.y = srcRect->y;
-    srect.y = (srect.y == 1) ? 0 : srect.y;
+    srect.y = (srect.y % 2 == 1) ? (srect.y - 1) : srect.y; // 2: Is it odd?
     srect.height = srcRect->h;
+    srect.height = (srect.height % 2 == 1) ? (srect.height + 1) : srect.height; // 2: Is it odd?
     srect.width = srcRect->w;
+    srect.width = (srect.width % 2 == 1) ? (srect.width + 1) : srect.width; // 2: Is it odd?
     drect.x = dstRect->x;
-    drect.x = (drect.x == 1) ? 0 : drect.x;
+    drect.x = (drect.x % 2 == 1) ? (drect.x - 1) : drect.x; // 2: Is it odd?
     drect.y = dstRect->y;
-    drect.y = (drect.y == 1) ? 0 : drect.y;
+    drect.y = (drect.y % 2 == 1) ? (drect.y - 1) : drect.y; // 2: Is it odd?
     drect.height = dstRect->h;
+    drect.height = (drect.height % 2 == 1) ? (drect.height + 1) : drect.height; // 2: Is it odd?
     drect.width = dstRect->w;
+    drect.width = (drect.width % 2 == 1) ? (drect.width + 1) : drect.width; // 2: Is it odd?
 
     if (opt->blendType) {
         rkBlendType = blendTypeChange(opt->blendType);
