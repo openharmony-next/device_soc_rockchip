@@ -15,12 +15,11 @@
 
 #ifndef HI_GBM_H
 #define HI_GBM_H
-#include <stdint.h>
+#include <cstdint>
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-
 struct gbm_device;
 struct gbm_bo;
 
@@ -95,7 +94,6 @@ uint32_t hdi_gbm_bo_get_height(struct gbm_bo *bo);
 uint32_t hdi_gbm_bo_get_size(struct gbm_bo *bo);
 void hdi_gbm_bo_destroy(struct gbm_bo *bo);
 int hdi_gbm_bo_get_fd(struct gbm_bo *bo);
-
 } // namespace DISPLAY
 } // namespace HDI
 } // namespace OHOS

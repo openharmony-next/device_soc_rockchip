@@ -23,21 +23,20 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 
-typedef struct {
+using GrallocManager = struct {
     struct gbm_device *gbmDevice;
     int drmFd;
     struct DListHead gbmBoHead;
     int32_t referCount;
-} GrallocManager;
+};
 
-typedef struct {
+using GbmBoList = struct {
     struct DListHead entry;
     struct gbm_bo *bo;
     int fd;
-} GbmBoList;
+};
 
 int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer);
 void GbmFreeMem(BufferHandle *buffer);
@@ -71,9 +70,7 @@ int32_t GbmGrallocInitialize(void);
         pthread_mutex_unlock(&g_lock); \
     } while (0)
 #endif
-
 } // namespace DISPLAY
 } // namespace HDI
 } // namespace OHOS
-
 #endif // DISPLAY_GRALLOC_GBM_H

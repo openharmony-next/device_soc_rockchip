@@ -125,7 +125,6 @@ extern "C" void DestroyDisplayBufferVdi(IDisplayBufferVdi* vdi)
 {
     delete vdi;
 }
-
 } // namespace DISPLAY
 } // namespace HDI
 } // namespace OHOS

@@ -15,11 +15,9 @@
 
 #include "hdi_netlink_monitor.h"
 #include <arpa/inet.h>
-#include <cerrno>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
-#include <linux/types.h>
 #include "hdi_session.h"
 
 namespace OHOS {
@@ -64,13 +62,13 @@ static int ThreadInit()
     if (ret == -1) {
         DISPLAY_LOGE("setsockopt fail");
         close(fd);
-        return DISPLAY_FAILURE;
+        return -1;
     }
-    ret = bind(fd, (struct sockaddr *)&snl, sizeof(struct sockaddr_nl));
+    ret = bind(fd, reinterpret_cast<struct sockaddr *>(&snl), sizeof(struct sockaddr_nl));
     if (ret < 0) {
         DISPLAY_LOGE("bind fail");
         close(fd);
-        return DISPLAY_FAILURE;
+        return -1;
     }
     return fd;
 }

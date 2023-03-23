@@ -24,7 +24,7 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 /**
  * @brief Defines pointers to the hardware acceleration driver functions.
  */
-typedef struct {
+using GfxFuncs = struct {
     /**
      * @brief Initializes hardware acceleration.
      *
@@ -119,7 +119,7 @@ typedef struct {
      * otherwise.
      */
     int32_t (*Sync)(int32_t timeOut);
-} GfxFuncs;
+};
 
 /**
  * @brief Initializes the hardware acceleration module to obtain the pointer to functions for hardware acceleration
@@ -144,7 +144,6 @@ int32_t GfxInitialize(GfxFuncs **funcs);
  * otherwise.
  */
 int32_t GfxUninitialize(GfxFuncs *funcs);
-
 } // DISPLAY
 }  // HDI
 }  // OHOS

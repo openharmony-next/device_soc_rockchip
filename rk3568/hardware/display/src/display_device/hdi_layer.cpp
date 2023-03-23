@@ -180,7 +180,7 @@ static int32_t DumpLayerBuffer(BufferHandle *buffer)
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, DISPLAY_NULL_PTR);
 
     int32_t ret = 0;
-    if (g_buffer== NULL) {
+    if (g_buffer== nullptr) {
         IDisplayBufferVdi* dispBuf = new DisplayBufferVdiImpl();
         DISPLAY_CHK_RETURN((dispBuf == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("dispBuf init failed"));
         g_buffer.reset(dispBuf);

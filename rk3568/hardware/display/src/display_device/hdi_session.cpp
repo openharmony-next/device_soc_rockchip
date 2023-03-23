@@ -185,14 +185,14 @@ static int32_t GetDisplayCompChange(uint32_t devId, uint32_t *num, uint32_t *lay
 static int32_t SetDisplayClientCrop(uint32_t devId, IRect *rect)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return DISPLAY_NOT_SUPPORT;
 }
 
 static int32_t SetDisplayClientDestRect(uint32_t devId, IRect *rect)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return DISPLAY_NOT_SUPPORT;
 }
 
@@ -206,7 +206,7 @@ static int32_t SetDisplayClientDamage(uint32_t devId, uint32_t num, IRect *rect)
 {
     DISPLAY_LOGD();
     (void)num;
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return DISPLAY_NOT_SUPPORT;
 }
 
@@ -232,7 +232,7 @@ static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *l
 static int32_t Commit(uint32_t devId, int32_t *fence)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((fence == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("fence is nullptr"));
+    DISPLAY_CHK_RETURN((fence == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("fence is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::Commit, fence);
 }
 
@@ -257,7 +257,7 @@ static int32_t SetVirtualDisplayBuffer(uint32_t devId, BufferHandle *buffer, int
 static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((layerId == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("layerId is nullptr"));
+    DISPLAY_CHK_RETURN((layerId == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("layerId is nullptr"));
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::CreateLayer, layerInfo, layerId);
 }
 
@@ -269,7 +269,7 @@ static int32_t DestroyLayer(uint32_t devId, uint32_t layerId)
 
 static int32_t SetLayerRegion(uint32_t devId, uint32_t layerId, IRect *rect)
 {
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     DISPLAY_LOGD();
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerRegion, rect);
 }
@@ -277,7 +277,7 @@ static int32_t SetLayerRegion(uint32_t devId, uint32_t layerId, IRect *rect)
 static int32_t SetLayerCrop(uint32_t devId, uint32_t layerId, IRect *rect)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerCrop, rect);
 }
 
@@ -296,7 +296,7 @@ static int32_t SetLayerPreMulti(uint32_t devId, uint32_t layerId, bool preMul)
 static int32_t SetLayerAlpha(uint32_t devId, uint32_t layerId, LayerAlpha *alpha)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((alpha == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("alpha is nullptr"));
+    DISPLAY_CHK_RETURN((alpha == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("alpha is nullptr"));
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerAlpha, alpha);
 }
 
@@ -309,14 +309,14 @@ static int32_t SetLayerTransformMode(uint32_t devId, uint32_t layerId, Transform
 static int32_t SetLayerDirtyRegion(uint32_t devId, uint32_t layerId, IRect *region)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((region == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("region is nullptr"));
+    DISPLAY_CHK_RETURN((region == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("region is nullptr"));
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerDirtyRegion, region);
 }
 
 static int32_t SetLayerVisibleRegion(uint32_t devId, uint32_t layerId, uint32_t num, IRect *rect)
 {
     DISPLAY_LOGD();
-    DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerVisibleRegion, num, rect);
 }
 

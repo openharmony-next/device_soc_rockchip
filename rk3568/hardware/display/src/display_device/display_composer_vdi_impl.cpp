@@ -14,14 +14,13 @@
  */
 
 #include "display_composer_vdi_impl.h"
-#include "display_log.h"
 #include <hdf_base.h>
+#include "display_log.h"
 #include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-
 DisplayComposerVdiImpl::DisplayComposerVdiImpl()
 {
     composerModel_.reset(&HdiSession::GetInstance());
@@ -349,7 +348,6 @@ extern "C" void DestroyComposerVdi(IDisplayComposerVdi* vdi)
 {
     delete vdi;
 }
-
 } // DISPLAY
 } // HDI
 } // OHOS

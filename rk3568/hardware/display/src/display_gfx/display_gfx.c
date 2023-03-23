@@ -22,7 +22,6 @@
 #include "display_gfx.h"
 
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-#define DISPLAY_GFX_INVILID_FD -1;
 int32_t rkInitGfx()
 {
     DISPLAY_LOGE("%s\n", querystring(RGA_ALL));
@@ -419,7 +418,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             bRgbBuffer.phy_addr = 0; // (void *) buffer->phyAddr;
             bRgbBuffer.vir_addr = 0; // buffer->virAddr;
             bRgbBuffer.color_space_mode = dstRgaBuffer.color_space_mode;
-            bRgbBuffer.fd = DISPLAY_GFX_INVILID_FD;
+            bRgbBuffer.fd = -1;
             int ret = memcpy_s(&prect, sizeof(drect), &drect, sizeof(drect));
             if (!ret) {
                 printf("memcpy_s failed!\n");

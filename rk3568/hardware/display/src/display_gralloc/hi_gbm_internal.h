@@ -19,13 +19,12 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-#define HEIGHT_ALIGN 2U
-#define WIDTH_ALIGN 8U
+const uint32_t HEIGHT_ALIGN = 2U;
+const uint32_t WIDTH_ALIGN = 8U;
 
-#define MAX_PLANES 3
+const uint32_t MAX_PLANES = 3U;
 
 struct gbm_device {
     int fd;
@@ -40,7 +39,6 @@ struct gbm_bo {
     uint32_t stride;
     uint32_t size;
 };
-
 } // namespace DISPLAY
 } // namespace HDI
 } // namespace OHOS
