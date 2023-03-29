@@ -16,6 +16,7 @@
 #include "hdi_drm_composition.h"
 #include <cerrno>
 #include "hdi_drm_layer.h"
+#include <libsync.h>
 
 namespace OHOS {
 namespace HDI {
@@ -308,6 +309,7 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE,
         DISPLAY_LOGE("drmModeAtomicCommit failed %{public}d errno %{public}d", ret, errno));
     // set the release fence
+    sync_wait(crtcOutFence, 3000);  // 3000: wait time
     for (auto layer : mCompLayers) {
         layer->SetReleaseFence(static_cast<int>(crtcOutFence));
     }
