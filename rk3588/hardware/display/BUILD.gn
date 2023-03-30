@@ -69,6 +69,7 @@ ohos_shared_library("display_gralloc") {
 
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
 
@@ -100,6 +101,7 @@ ohos_shared_library("display_gfx") {
 
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
 
@@ -153,6 +155,8 @@ ohos_shared_library("display_device") {
   ]
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
   ]
 
