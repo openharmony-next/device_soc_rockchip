@@ -62,6 +62,20 @@
 #define PACKET_SIZE_MULTI                   3
 #define PACKET_SIZE_OPERATOR                2
 #define DEFAULT_RESOLUTION_SIZE             (1920 * 1088)
+#define DEFAULT_PACKET_BUFFER_NUM           4
+#define DEFAULT_FRAME_BUFFER_NUM            2
+
+#define DEFAULT_REF_FRAME_NUM               8
+#define LEVEL_5P1_MAX_DPB_MBS               184320
+#define REF_FRAME_DIVISOR                   16
+#define MAX_REF_FRAME_NUM                   16
+#define MIN_REF_FRAME_NUM                   6
+#define WIDTH_OF_4K_VIDEO                   4096
+#define HEIGHT_OF_4K_HEVC                   2160
+#define HEIGHT_OF_4K_VP9                    2176
+#define MAX_REF_FRAME_NUM_VP9               8
+#define MIN_REF_FRAME_NUM_VP9               4
+#define BASIC_DEC_FRAME_BUFFER_NUM          5
 
 static const CodecPixelFormatConvertTbl pixelFormatSupportted[] = {
     {PIXEL_FMT_RGBA_8888, MPP_FMT_RGBA8888, RK_FORMAT_RGBA_8888},
@@ -820,6 +834,101 @@ int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param)
         return HDF_FAILURE;
     }
 
+    return HDF_SUCCESS;
+}
+
+uint32_t CalculateTotalDecRefFrames(RKHdiBaseComponent *pBaseComponent)
+{
+    uint32_t refFramesNum = DEFAULT_REF_FRAME_NUM;
+    int32_t width = pBaseComponent->setup.width;
+    int32_t height = pBaseComponent->setup.height;
+
+    if (width == 0 || height == 0 || pBaseComponent->codingType < 0 ||
+        pBaseComponent->codingType >= MPP_VIDEO_CodingMax) {
+        HDF_LOGE("%{public}s: invalid parameters", __func__);
+        return refFramesNum;
+    }
+    switch (pBaseComponent->codingType) {
+        case MPP_VIDEO_CodingAVC:
+            /* used level 5.1 MaxDpbMbs to compute ref num */
+            refFramesNum = LEVEL_5P1_MAX_DPB_MBS / ((width / REF_FRAME_DIVISOR) * (height / REF_FRAME_DIVISOR));
+            if (refFramesNum > MAX_REF_FRAME_NUM) {
+                /* max ref frame number is 16 */
+                refFramesNum = MAX_REF_FRAME_NUM;
+            } else if (refFramesNum < MIN_REF_FRAME_NUM) {
+                /* min ref frame number is 6 */
+                refFramesNum = MIN_REF_FRAME_NUM;
+            }
+            break;
+        case MPP_VIDEO_CodingHEVC:
+            /* use 4K resolution to compute ref num */
+            refFramesNum = WIDTH_OF_4K_VIDEO * HEIGHT_OF_4K_HEVC * MIN_REF_FRAME_NUM / (width * height);
+            if (refFramesNum > MAX_REF_FRAME_NUM) {
+                /* max ref frame number is 16 */
+                refFramesNum = MAX_REF_FRAME_NUM;
+            } else if (refFramesNum < MIN_REF_FRAME_NUM) {
+                /* min ref frame number is 6 */
+                refFramesNum = MIN_REF_FRAME_NUM;
+            }
+            break;
+        case MPP_VIDEO_CodingVP9:
+            refFramesNum = WIDTH_OF_4K_VIDEO * HEIGHT_OF_4K_VP9 * MIN_REF_FRAME_NUM_VP9 / (width * height);
+            if (refFramesNum > MAX_REF_FRAME_NUM_VP9) {
+                /* max ref frame number is 8 */
+                refFramesNum = MAX_REF_FRAME_NUM_VP9;
+            } else if (refFramesNum < MIN_REF_FRAME_NUM_VP9) {
+                /* min ref frame number is 4 */
+                refFramesNum = MIN_REF_FRAME_NUM_VP9;
+            }
+            break;
+        default:
+            refFramesNum = DEFAULT_REF_FRAME_NUM;
+            break;
+    }
+
+    return refFramesNum;
+}
+
+int32_t GetParamInputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param)
+{
+    if (param->val == NULL) {
+        param->size = sizeof(RK_U32);
+        param->val = malloc(param->size);
+    }
+
+    RK_U32 inputBufferCount = 0;
+    if (pBaseComponent->ctxType == MPP_CTX_ENC) {
+        inputBufferCount = DEFAULT_FRAME_BUFFER_NUM;
+    } else {
+        inputBufferCount = DEFAULT_PACKET_BUFFER_NUM;
+    }
+    int32_t ret = memcpy_s(param->val, param->size, &inputBufferCount, sizeof(RK_U32));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t GetParamOutputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param)
+{
+    if (param->val == NULL) {
+        param->size = sizeof(RK_U32);
+        param->val = malloc(param->size);
+    }
+
+    RK_U32 outputBufferCount = 0;
+    if (pBaseComponent->ctxType == MPP_CTX_ENC) {
+        outputBufferCount = DEFAULT_PACKET_BUFFER_NUM;
+    } else {
+        RK_U32 refFramesNum = CalculateTotalDecRefFrames(pBaseComponent);
+        outputBufferCount = refFramesNum + BASIC_DEC_FRAME_BUFFER_NUM;
+    }
+    int32_t ret = memcpy_s(param->val, param->size, &outputBufferCount, sizeof(RK_U32));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: copy data failed, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 

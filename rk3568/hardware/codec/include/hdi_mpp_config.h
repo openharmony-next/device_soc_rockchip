@@ -54,6 +54,8 @@ int32_t SetParamCodecType(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamCodecFrameNum(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t CheckSetupStride(RKHdiBaseComponent *pBaseComponent);
+int32_t GetParamInputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param);
+int32_t GetParamOutputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamBufferSize(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);
