@@ -368,8 +368,6 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         rkBlendType = blendTypeChange(opt->blendType);
         if (rkBlendType > 0) {
             usage |= rkBlendType;
-            if (rkBlendType == IM_ALPHA_BLEND_DST_OVER || rkBlendType == IM_ALPHA_BLEND_SRC_OVER)
-                usage |= IM_ALPHA_BLEND_PRE_MUL;
         } else if (rkBlendType == IM_STATUS_NOT_SUPPORTED) {
             return DISPLAY_NOT_SUPPORT;
         }
