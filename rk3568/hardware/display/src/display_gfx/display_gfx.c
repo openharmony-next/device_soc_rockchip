@@ -406,6 +406,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                 drect.width = srcRgaBuffer.width;
                 drect.height = srcRgaBuffer.height;
             }
+            srcRgaBuffer.wstride = srcSurface->stride;
             usage = rkTransformType | IM_SYNC;
             ret = improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
             if (ret != IM_STATUS_SUCCESS) {
