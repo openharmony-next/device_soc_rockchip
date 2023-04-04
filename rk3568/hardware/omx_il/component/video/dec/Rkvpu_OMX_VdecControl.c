@@ -825,10 +825,10 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         src.height   = mHeight;
         src.format   = RK_FORMAT_YCbCr_420_SP;
         dst.fd = bufferHandle->fd;
-        dst.wstride  = bufferHandle->width;
+        dst.wstride  = bufferHandle->stride;
         dst.hstride  = bufferHandle->height;
-        dst.width    = mWidth;
-        dst.height   = mHeight;
+        dst.width    = bufferHandle->width;
+        dst.height   = bufferHandle->height;
         dst.format   = RK_FORMAT_YCbCr_420_SP;
         rect.x = 0;
         rect.y = 0;
