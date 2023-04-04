@@ -76,7 +76,7 @@
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
 #define WIDTH_720P  1080
 #define HEIGHT_720P  720
-static const OMX_U32 SIZE_720P = WIDTH_720P * HEIGHT_720P;
+
 typedef struct {
     OMX_U32 mProfile;
     OMX_U32 mLevel;
@@ -810,7 +810,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
             omx_err("bufferhandle format is %d", bufferHandle->format);
         }
 
-        pOutputBuffer->nFilledLen = bufferHandle->stride * bufferHandle->height;
+        pOutputBuffer->nFilledLen = bufferHandle->size;
         VPUMemLink(&pframe->vpumem);
         VPUMemInvalidate(&pframe->vpumem);
         rga_buffer_t src;
@@ -821,15 +821,23 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         src.fd = pframe->vpumem.phy_addr;
         src.wstride  = pframe->FrameWidth;
         src.hstride  = pframe->FrameHeight;
-        src.width    = mWidth;
-        src.height   = mHeight;
+        src.width    = pframe->DisplayWidth;
+        src.height   = pframe->DisplayHeight;
         src.format   = RK_FORMAT_YCbCr_420_SP;
         dst.fd = bufferHandle->fd;
         dst.wstride  = bufferHandle->stride;
         dst.hstride  = bufferHandle->height;
         dst.width    = bufferHandle->width;
         dst.height   = bufferHandle->height;
-        dst.format   = RK_FORMAT_YCbCr_420_SP;
+        if (bufferHandle->format == PIXEL_FMT_RGBA_8888) {
+            dst.format = RK_FORMAT_RGBA_8888;
+            dst.wstride  = bufferHandle->stride/4; // 4 : rgba alignment
+        } else if (bufferHandle->format == PIXEL_FMT_BGRA_8888) {
+            dst.format = RK_FORMAT_BGRA_8888;
+            dst.wstride  = bufferHandle->stride/4; // 4: bgra alignment
+        } else {
+            dst.format   = RK_FORMAT_YCbCr_420_SP;
+        }
         rect.x = 0;
         rect.y = 0;
         rect.width = mWidth;
@@ -937,18 +945,11 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
     {
         // csy@rock-chips.com
         OMX_U8 *buff_vir = (OMX_U8 *)pframe->vpumem.vir_addr;
-        OMX_U32 uv_offset = mStride * mSliceHeight;
-        OMX_U32 y_size = mWidth * mHeight;
-        OMX_U8 *dst_uv = (OMX_U8 *)(pOutputBuffer->pBuffer + y_size);
-        OMX_U8 *src_uv =  (OMX_U8 *)(buff_vir + uv_offset);
-        OMX_U32 i = 0;
 #if AVS100
         OMX_U32 srcFormat, dstFormat;
         srcFormat = dstFormat = HAL_PIXEL_FORMAT_YCrCb_NV12;
 #endif
-        omx_trace("mWidth = %ld mHeight = %ld mStride = %ld,mSlicHeight %ld",
-            mWidth, mHeight, mStride, mSliceHeight);
-        pOutputBuffer->nFilledLen = mWidth * mHeight * 3 / 2; // 3:byte alignment, 2:byte alignment
+        pOutputBuffer->nFilledLen = GetDataSize(mWidth, mHeight, pOutputPort->portDefinition.format.video.eColorFormat);
 #if AVS100
         if ((pVideoDec->codecProfile == OMX_VIDEO_AVCProfileHigh10 && pVideoDec->codecId == OMX_VIDEO_CodingAVC)
             || ((pVideoDec->codecProfile == CODEC_HEVC_PROFILE_MAIN10 ||
@@ -962,68 +963,35 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
             omx_trace("debug 10bit mWidth = %d mHeight = %d horStride = %d,verStride %d",
                 (int)mWidth, (int)mHeight, (int)horStride, (int)verStride);
         } else {
-            OMX_BOOL useRga = mWidth * mHeight >= SIZE_720P ? OMX_TRUE : OMX_FALSE;
-            if (useRga) {
-                rga_buffer_t dstRgaBuffer, srcRgaBuffer, bRgbBuffer;
-                im_rect srect, drect, prect;
-                int32_t usage = 0;
-
-                dstRgaBuffer.width = pOutputPort->portDefinition.format.video.nFrameWidth;
-                dstRgaBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
-                dstRgaBuffer.wstride = pOutputPort->portDefinition.format.video.nFrameWidth;
-                dstRgaBuffer.hstride = pOutputPort->portDefinition.format.video.nFrameHeight;
-                dstRgaBuffer.format = RK_FORMAT_YCbCr_420_SP;
-                dstRgaBuffer.phy_addr = 0;
-                dstRgaBuffer.vir_addr = pOutputBuffer->pBuffer;
-                dstRgaBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
-                dstRgaBuffer.fd = -1;
-
-                srcRgaBuffer.width = pOutputPort->portDefinition.format.video.nFrameWidth;
-                srcRgaBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
-                srcRgaBuffer.wstride = mStride;
-                srcRgaBuffer.hstride = mSliceHeight;
-                
-                srcRgaBuffer.format = RK_FORMAT_YCbCr_420_SP;
-                srcRgaBuffer.phy_addr = 0;
-                srcRgaBuffer.vir_addr = buff_vir;
-                srcRgaBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
-                srcRgaBuffer.fd = -1;
-
-                bRgbBuffer.width = pOutputPort->portDefinition.format.video.nFrameWidth;
-                bRgbBuffer.height = pOutputPort->portDefinition.format.video.nFrameHeight;
-                bRgbBuffer.wstride = mStride;
-                bRgbBuffer.hstride = mSliceHeight;
-                bRgbBuffer.format = RK_FORMAT_YCbCr_420_SP;
-                bRgbBuffer.phy_addr = 0;
-                bRgbBuffer.vir_addr = 0;
-                bRgbBuffer.color_space_mode = IM_COLOR_SPACE_DEFAULT;
-                bRgbBuffer.fd = -1;
-
-                srect.x = 0;
-                srect.y = 0;
-                srect.height = dstRgaBuffer.height;
-                srect.width = dstRgaBuffer.width;
-                drect.x = 0;
-                drect.y = 0;
-                drect.height = srcRgaBuffer.height;
-                drect.width = srcRgaBuffer.width;
-                prect.x = 0;
-                prect.y = 0;
-                prect.height =  0;
-                prect.width =  0;
-                usage =  IM_SYNC;
-                improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
+            rga_buffer_t src;
+            rga_buffer_t dst;
+            im_rect rect;
+            Rockchip_OSAL_Memset(&src, 0, sizeof(src));
+            Rockchip_OSAL_Memset(&dst, 0, sizeof(dst));
+            src.fd = pframe->vpumem.phy_addr;
+            src.wstride  = pframe->FrameWidth;
+            src.hstride  = pframe->FrameHeight;
+            src.width    = pframe->DisplayWidth;
+            src.height   = pframe->DisplayHeight;
+            src.format   = RK_FORMAT_YCbCr_420_SP;
+            dst.fd = -1;
+            dst.width    = pOutputPort->portDefinition.format.video.nFrameWidth;
+            dst.height   = pOutputPort->portDefinition.format.video.nFrameHeight;
+            dst.wstride  = dst.width;
+            dst.hstride  = dst.height;
+            dst.vir_addr = pOutputBuffer->pBuffer;
+            if (pOutputPort->portDefinition.format.video.eColorFormat == CODEC_COLOR_FORMAT_RGBA8888) {
+                dst.format = RK_FORMAT_RGBA_8888;
+            } else if (pOutputPort->portDefinition.format.video.eColorFormat == OMX_COLOR_Format32bitBGRA8888) {
+                dst.format = RK_FORMAT_BGRA_8888;
             } else {
-                for (i = 0; i < mHeight; i++) {
-                    Rockchip_OSAL_Memcpy((char*)pOutputBuffer->pBuffer + i * mWidth, buff_vir + i * mStride, mWidth);
-                }
-
-                for (i = 0; i < mHeight / 2; i++) { // 2:byte alignment
-                    Rockchip_OSAL_Memcpy((OMX_U8*)dst_uv, (OMX_U8*)src_uv, mWidth);
-                    dst_uv += mWidth;
-                    src_uv += mStride;
-                }
+                dst.format = RK_FORMAT_YCbCr_420_SP;
             }
+            rect.x = 0;
+            rect.y = 0;
+            rect.width = mWidth;
+            rect.height = mHeight;
+            imcrop(src, dst, rect);
         }
 #else
         for (i = 0; i < mHeight; i++) {
@@ -2524,6 +2492,14 @@ OMX_ERRORTYPE Rkvpu_UpdatePortDefinition(
                         nStride * nSliceHeight * 3 / 2; // 3:byte alignment, 2:byte alignment
                     omx_trace("%s nStride = %ld,nSliceHeight = %lu", __func__, nStride, nSliceHeight);
                     break;
+#ifdef OHOS_BUFFER_HANDLE
+                case CODEC_COLOR_FORMAT_RGBA8888:
+                case OMX_COLOR_Format32bitBGRA8888: {
+                    omx_trace("%s rgba/bgra nStride = %ld,nSliceHeight = %lu", __func__, nStride, nSliceHeight);
+                    pRockchipOutputPort->portDefinition.nBufferSize = nStride * nSliceHeight * 4; // 4:byte alignment
+                    break;
+                }
+#endif
 #ifdef USE_STOREMETADATA
                     /*
                     * this case used RGBA buffer size
@@ -2551,7 +2527,12 @@ OMX_ERRORTYPE Rkvpu_UpdatePortDefinition(
         int32_t depth = (pVideoDec->bIs10bit) ? OMX_DEPTH_BIT_10 : OMX_DEPTH_BIT_8;
         OMX_BOOL fbcMode = Rockchip_OSAL_Check_Use_FBCMode(pVideoDec->codecId, depth, pRockchipPort);
         OMX_COLOR_FORMATTYPE format = pRockchipPort->portDefinition.format.video.eColorFormat;
-
+#ifdef OHOS_BUFFER_HANDLE
+        if (format == CODEC_COLOR_FORMAT_RGBA8888 || format == OMX_COLOR_Format32bitBGRA8888) {
+            omx_trace("%s rgba/bgra nStride = %ld,nSliceHeight = %lu", __func__, nStride, nSliceHeight);
+            pRockchipPort->portDefinition.nBufferSize = nStride * nSliceHeight * 4; // 4: byte alignment
+        }
+#endif
         if (fbcMode) {
             // fbc stride default 64 align
             nStride = (nFrameWidth + 63) & (~63); // 63:byte alignment

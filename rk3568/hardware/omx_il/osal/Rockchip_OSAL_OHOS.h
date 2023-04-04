@@ -113,14 +113,10 @@ OMX_ERRORTYPE Rockchip_OSAL_PowerControl(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCo
                                          int32_t frameRate,
                                          OMX_BOOL mFlag,
                                          int bitDepth);
-OMX_ERRORTYPE Rkvpu_ComputeDecBufferCount(
-    OMX_HANDLETYPE hComponent);
-
-OMX_U32 Rockchip_OSAL_CalculateTotalRefFrames(
-    OMX_VIDEO_CODINGTYPE codecId,
-    OMX_U32 width,
-    OMX_U32 height,
-    OMX_BOOL isSecure);
+OMX_U32 GetDataSize(OMX_U32 width, OMX_U32 height, OMX_COLOR_FORMATTYPE);
+OMX_ERRORTYPE Rkvpu_ComputeDecBufferCount(OMX_HANDLETYPE hComponent);
+OMX_U32 Rockchip_OSAL_CalculateTotalRefFrames(OMX_VIDEO_CODINGTYPE codecId, OMX_U32 width,
+                                              OMX_U32 height, OMX_BOOL isSecure);
 
 #ifdef AVS80
 #endif

@@ -701,6 +701,15 @@ OMX_U32 Rockchip_OSAL_GetVideoGrallocMetaSize()
     return sizeof(VideoGrallocMetadata);
 }
 #endif
+OMX_U32 GetDataSize(OMX_U32 width, OMX_U32 height, OMX_COLOR_FORMATTYPE format)
+{
+    if (format == OMX_COLOR_FormatYUV420SemiPlanar || format == OMX_COLOR_FormatYUV420Planar)
+    {
+        return width * height * 3 / 2; // 3: byte alignment, 2: byte alignment
+    } else {
+        return width * height * 4; // 4: byte alignment
+    }
+}
 
 OMX_ERRORTYPE Rkvpu_ComputeDecBufferCount(
     OMX_HANDLETYPE hComponent)
