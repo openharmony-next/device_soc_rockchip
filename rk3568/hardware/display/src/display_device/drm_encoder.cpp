@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ DrmEncoder::DrmEncoder(drmModeEncoder e)
 int32_t DrmEncoder::PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
 {
     // find the crtc id;
-    DISPLAY_DEBUGLOG("crtcs szie %{public}zu", crtcs.size());
+    DISPLAY_LOGD("crtcs szie %{public}zu", crtcs.size());
     std::shared_ptr<DrmCrtc> crtc;
     auto crtcIter = crtcs.find(mCrtcId);
     if (crtcIter == crtcs.end()) {
@@ -36,7 +36,7 @@ int32_t DrmEncoder::PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
         for (crtcIter = crtcs.begin(); crtcIter != crtcs.end(); ++crtcIter) {
             auto &posCrts = crtcIter->second;
             if (mPossibleCrtcs == (1<<posCrts->GetPipe())) {
-                DISPLAY_DEBUGLOG("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
+                DISPLAY_LOGD("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
                 break;
             }
         }
@@ -50,7 +50,7 @@ int32_t DrmEncoder::PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
         crtc = nullptr;
         for (const auto &posCrtcPair : crtcs) {
             auto &posCrts = posCrtcPair.second;
-            DISPLAY_DEBUGLOG("try crtc id : %{public}d", posCrts->GetId());
+            DISPLAY_LOGD("try crtc id : %{public}d", posCrts->GetId());
             if (posCrts->CanBind() && ((1 << posCrts->GetPipe()) & mPossibleCrtcs)) {
                 crtc = posCrts;
             }

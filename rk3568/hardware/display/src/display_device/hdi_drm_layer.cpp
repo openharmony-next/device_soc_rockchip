@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "hdi_drm_layer.h"
 #include <cinttypes>
 #include <cerrno>
+#include "display_log.h"
 #include "drm_device.h"
 
 namespace OHOS {
@@ -23,7 +24,7 @@ namespace HDI {
 namespace DISPLAY {
 DrmGemBuffer::DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl) : mDrmFd(drmFd)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     Init(mDrmFd, hdl);
 }
 
@@ -34,7 +35,7 @@ void DrmGemBuffer::Init(int drmFd, HdiLayerBuffer &hdl)
     uint32_t pitches[MAX_COUNT] = {0};
     uint32_t gemHandles[MAX_COUNT] = {0};
     uint32_t offsets[MAX_COUNT] = {0};
-    DISPLAY_DEBUGLOG("hdl %{public}" PRIx64 "", hdl.GetPhysicalAddr());
+    DISPLAY_LOGD("hdl %{public}" PRIx64 "", hdl.GetPhysicalAddr());
     DISPLAY_CHK_RETURN_NOT_VALUE((drmFd < 0), DISPLAY_LOGE("can not init drmfd %{public}d", drmFd));
     mDrmFormat = DrmDevice::ConvertToDrmFormat(static_cast<PixelFormat>(hdl.GetFormat()));
     ret = drmPrimeFDToHandle(drmFd, hdl.GetFb(), &mGemHandle);
@@ -44,8 +45,8 @@ void DrmGemBuffer::Init(int drmFd, HdiLayerBuffer &hdl)
     gemHandles[0] = mGemHandle;
     offsets[0] = 0;
     ret = drmModeAddFB2(drmFd, hdl.GetWight(), hdl.GetHeight(), mDrmFormat, gemHandles, pitches, offsets, &mFdId, 0);
-    DISPLAY_DEBUGLOG("mGemHandle %{public}d  mFdId %{public}d", mGemHandle, mFdId);
-    DISPLAY_DEBUGLOG("w: %{public}d  h: %{public}d mDrmFormat : %{public}d gemHandles: %{public}d pitches: %{public}d "
+    DISPLAY_LOGD("mGemHandle %{public}d  mFdId %{public}d", mGemHandle, mFdId);
+    DISPLAY_LOGD("w: %{public}d  h: %{public}d mDrmFormat : %{public}d gemHandles: %{public}d pitches: %{public}d "
         "offsets: %{public}d",
         hdl.GetWight(), hdl.GetHeight(), mDrmFormat, gemHandles[0], pitches[0], offsets[0]);
     DISPLAY_CHK_RETURN_NOT_VALUE((ret != 0), DISPLAY_LOGE("can not add fb errno %{public}d", errno));
@@ -53,7 +54,7 @@ void DrmGemBuffer::Init(int drmFd, HdiLayerBuffer &hdl)
 
 DrmGemBuffer::~DrmGemBuffer()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mFdId) {
         if (drmModeRmFB(mDrmFd, mFdId)) {
             DISPLAY_LOGE("can not free fdid %{public}d errno %{public}d", mFdId, errno);
@@ -64,20 +65,20 @@ DrmGemBuffer::~DrmGemBuffer()
         struct drm_gem_close gemClose = { 0 };
         gemClose.handle = mGemHandle;
         if (drmIoctl(mDrmFd, DRM_IOCTL_GEM_CLOSE, &gemClose)) {
-            DISPLAY_DEBUGLOG("can not free gem handle %{public}d errno : %{public}d", mGemHandle, errno);
+            DISPLAY_LOGD("can not free gem handle %{public}d errno : %{public}d", mGemHandle, errno);
         }
     }
 }
 
 bool DrmGemBuffer::IsValid()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     return (mGemHandle != INVALID_DRM_ID) && (mFdId != INVALID_DRM_ID);
 }
 
 DrmGemBuffer *HdiDrmLayer::GetGemBuffer()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     std::unique_ptr<DrmGemBuffer> ptr = std::make_unique<DrmGemBuffer>(DrmDevice::GetDrmFd(), *GetCurrentBuffer());
     mLastBuffer = std::move(mCurrentBuffer);
     mCurrentBuffer = std::move(ptr);

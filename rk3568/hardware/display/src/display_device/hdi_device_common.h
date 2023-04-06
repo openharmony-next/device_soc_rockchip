@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 #define HDI_DEVICE_COMMON_H
 #include <memory>
 #include <unordered_map>
-#include "display_type.h"
+#include "common/include/display_common.h"
 
 namespace OHOS {
 namespace HDI {

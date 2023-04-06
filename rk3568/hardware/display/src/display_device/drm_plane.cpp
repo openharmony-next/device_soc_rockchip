@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,7 +55,7 @@ DrmPlane::DrmPlane(drmModePlane &p)
 
 DrmPlane::~DrmPlane()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
 }
 
 int DrmPlane::GetCrtcProp(DrmDevice &drmDevice)
@@ -124,7 +124,7 @@ int  DrmPlane::GetSrcProp(DrmDevice &drmDevice)
 
 int32_t DrmPlane::Init(DrmDevice &drmDevice)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     int32_t ret;
     uint32_t find_name = 0;
     DrmProperty prop;

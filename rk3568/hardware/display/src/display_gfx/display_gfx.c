@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2021-2023 Rockchip Electronics Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +17,11 @@
 #include <string.h>
 #include "im2d.h"
 #include "rga.h"
-#include "display_common.h"
-#include "display_gralloc.h"
+#include "display_log.h"
 #include "securec.h"
 #include "display_gfx.h"
 
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-GrallocFuncs *grallocFucs = NULL;
 int32_t rkInitGfx()
 {
     DISPLAY_LOGE("%s\n", querystring(RGA_ALL));
@@ -178,7 +176,7 @@ int32_t rkFillRect(ISurface *iSurface, IRect *rect, uint32_t color, GfxOpt *opt)
         DISPLAY_LOGE("source fd is invalid");
         return DISPLAY_PARAM_ERR;
     }
-    DISPLAY_DEBUGLOG("fd %{public}d", dst.fd);
+    DISPLAY_LOGD("fd %{public}d", dst.fd);
     dst.width = iSurface->width;
     dst.height = iSurface->height;
     dst.wstride = ALIGN_UP(iSurface->width, 16);
@@ -340,12 +338,12 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         return DISPLAY_PARAM_ERR;
     }
 
-    DISPLAY_DEBUGLOG("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d vir %{public}p",
+    DISPLAY_LOGD("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d",
         (int32_t)srcSurface->phyAddr, srcSurface->width, srcSurface->height, ALIGN_UP(srcSurface->width, 16),
-        ALIGN_UP(srcSurface->height, 2), srcRgaBuffer.vir_addr);
-    DISPLAY_DEBUGLOG("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d vir %{public}p",
+        ALIGN_UP(srcSurface->height, 2));
+    DISPLAY_LOGD("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d",
         (int32_t)dstSurface->phyAddr, dstSurface->width, dstSurface->height, ALIGN_UP(dstSurface->width, 16),
-        ALIGN_UP(dstSurface->height, 2), dstRgaBuffer.vir_addr);
+        ALIGN_UP(dstSurface->height, 2));
 
     srect.x = srcRect->x;
     srect.x = (srect.x % 2 == 1) ? (srect.x - 1) : srect.x; // 2: Is it odd?
@@ -411,21 +409,6 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                 DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
             }
         } else if (rkBlendType == IM_ALPHA_BLEND_DST_OVER) {
-            if (grallocFucs == NULL) {
-                ret = GrallocInitialize(&grallocFucs);
-                DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("Gralloc init failed"));
-            }
-            AllocInfo info = {
-                .width = dstRgaBuffer.width,
-                .height = dstRgaBuffer.height,
-                .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
-                .format = PIXEL_FMT_RGBA_8888, // srcSurface->enColorFmt,
-            };
-            BufferHandle *buffer = NULL;
-
-            ret = grallocFucs->AllocMem(&info, &buffer);
-            DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not alloc memory"));
-
             bRgbBuffer.width = dstRgaBuffer.width;
             bRgbBuffer.height = dstRgaBuffer.height;
             bRgbBuffer.wstride = dstRgaBuffer.wstride;
@@ -434,7 +417,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             bRgbBuffer.phy_addr = 0; // (void *) buffer->phyAddr;
             bRgbBuffer.vir_addr = 0; // buffer->virAddr;
             bRgbBuffer.color_space_mode = dstRgaBuffer.color_space_mode;
-            bRgbBuffer.fd = (int32_t)buffer->phyAddr;
+            bRgbBuffer.fd = -1;
             int ret = memcpy_s(&prect, sizeof(drect), &drect, sizeof(drect));
             if (!ret) {
                 printf("memcpy_s failed!\n");
@@ -448,7 +431,6 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                     DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
                 }
             }
-            grallocFucs->FreeMem(buffer);
         }
     } else {
         ret = improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
@@ -506,6 +488,6 @@ int32_t GfxUninitialize(GfxFuncs *funcs)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(funcs, DISPLAY_NULL_PTR);
     free(funcs);
-    DISPLAY_DEBUGLOG("%s: gfx uninitialize success", __func__);
+    DISPLAY_LOGD("%s: gfx uninitialize success", __func__);
     return DISPLAY_SUCCESS;
 }

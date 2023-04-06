@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,8 @@
 #define HDI_SHARED_FD
 #include <fcntl.h>
 #include <memory>
-#include "display_common.h"
+#include <unistd.h>
+#include "display_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -26,11 +27,11 @@ class HdiFd {
 public:
     HdiFd()
     {
-        DISPLAY_DEBUGLOG();
+        DISPLAY_LOGD();
     }
     explicit HdiFd(int fd) : mFd(fd)
     {
-        DISPLAY_DEBUGLOG("mFd %{public}d", mFd);
+        DISPLAY_LOGD("mFd %{public}d", mFd);
     }
     int GetFd() const
     {
