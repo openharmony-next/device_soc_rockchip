@@ -924,11 +924,10 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                         pframe.DisplayHeight, pVideoDec->codecProfile);
                     OMX_U32 verStride = Get_Video_VerAlign(pVideoDec->codecId, pframe.DisplayHeight,
                         pVideoDec->codecProfile);
-                    outputUseBuffer->remainDataLen =
-                        horStride * verStride * 3 / 2; // 3:byte alignment, 2:byte alignment
+                    outputUseBuffer->remainDataLen = GetDataSize(horStride, verStride, eColorFormat);
                 } else
                     outputUseBuffer->remainDataLen =
-                        pframe.DisplayHeight * pframe.DisplayWidth * 3 / 2; // 3:byte alignment, 2:byte alignment
+                        GetDataSize(pframe.DisplayWidth, pframe.DisplayHeight, eColorFormat);
                 outputUseBuffer->timeStamp = pOutput.timeUs;
                 omx_trace("outputUseBuffer->remainDataLen = %d", (int)outputUseBuffer->remainDataLen);
                 if (pVideoDec->fp_out != NULL && (pVideoDec->bOhosBufferHandle == OMX_FALSE)) {
