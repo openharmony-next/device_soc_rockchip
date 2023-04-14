@@ -68,6 +68,10 @@ public:
     {
         return mNeedModeSet;
     }
+    void ClearModeSet()
+    {
+        mNeedModeSet = false;
+    }
     uint32_t GetPlaneMask()
     {
         return mPlaneMask;

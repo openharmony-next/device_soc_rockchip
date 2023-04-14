@@ -17,18 +17,21 @@
 #include <string>
 #include <cerrno>
 #include <memory>
+#include <sys/ioctl.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
-#include "display_gralloc.h"
-#include "display_common.h"
+#include "display_buffer_vdi_impl.h"
+#include "display_log.h"
 #include "drm_device.h"
 #include "drm_vsync_worker.h"
 #include "hdi_drm_composition.h"
 #include "hdi_gfx_composition.h"
+#include "idisplay_buffer_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
+using namespace OHOS::HDI::Display::Buffer::V1_0;
 DrmDisplay::DrmDisplay(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
     std::shared_ptr<DrmDevice> drmDevice)
     : mDrmDevice(drmDevice), mConnector(connector), mCrtc(crtc)
@@ -108,7 +111,7 @@ int32_t DrmDisplay::SetDisplayPowerStatus(DispPowerStatus status)
     const uint32_t FB_BLANK_UNBLANK = 0;  /* screen: unblanked, hsync: on,  vsync: on */
     const uint32_t FB_BLANK_POWERDOWN = 4; /* screen: blanked,   hsync: off, vsync: off */
 
-    DISPLAY_DEBUGLOG("SetDisplayPowerStatus power state %{public}u", status);
+    DISPLAY_LOGD("SetDisplayPowerStatus power state %{public}u", status);
     if (fb_fd < 0) {
         fb_fd = open("/dev/graphics/fb0", O_RDWR);
         if (fb_fd < 0) {
@@ -158,7 +161,7 @@ int32_t DrmDisplay::ConvertToHdiPowerState(uint32_t drmPowerState, DispPowerStat
             ret = DISPLAY_FAILURE;
             break;
     }
-    DISPLAY_DEBUGLOG("hdi power state %{public}u", hdiPowerState);
+    DISPLAY_LOGD("hdi power state %{public}u", hdiPowerState);
     return ret;
 }
 
@@ -187,7 +190,7 @@ int32_t DrmDisplay::ConvertToDrmPowerState(DispPowerStatus hdiPowerState, uint32
 
 std::unique_ptr<HdiLayer> DrmDisplay::CreateHdiLayer(LayerType type)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     return std::make_unique<HdiDrmLayer>(type);
 }
 
@@ -212,20 +215,19 @@ int32_t DrmDisplay::WaitForVBlank(uint64_t *ns)
 
 bool DrmDisplay::IsConnected()
 {
-    DISPLAY_DEBUGLOG("conneted %{public}d", mConnector->IsConnected());
+    DISPLAY_LOGD("conneted %{public}d", mConnector->IsConnected());
     return mConnector->IsConnected();
 }
 
 int32_t DrmDisplay::PushFirstFrame()
 {
-    GrallocFuncs *grallocFucs = nullptr;
-    int ret = GrallocInitialize(&grallocFucs);
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("Gralloc init failed"));
+    std::shared_ptr<IDisplayBufferVdi> hdiImpl = std::make_shared<DisplayBufferVdiImpl>();
+    int ret = DISPLAY_SUCCESS;
     DrmMode mode;
     ret = mConnector->GetModeFromId(mCrtc->GetActiveModeId(), mode);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not get the mode from id %{public}d", mCrtc->GetActiveModeId()));
-    AllocInfo info = {
+    const AllocInfo info = {
         .width = mode.GetModeInfoPtr()->hdisplay,
         .height = mode.GetModeInfoPtr()->vdisplay,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
@@ -233,7 +235,7 @@ int32_t DrmDisplay::PushFirstFrame()
     };
 
     BufferHandle *buffer = nullptr;
-    ret = grallocFucs->AllocMem(&info, &buffer);
+    ret = hdiImpl->AllocMem(info, buffer);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not alloc memory"));
     mClientLayer->SetLayerBuffer(buffer, -1);
 
@@ -262,16 +264,16 @@ int32_t DrmDisplay::ChosePreferenceMode()
 
 int32_t DrmDisplay::RegDisplayVBlankCallback(VBlankCallback cb, void *data)
 {
-    DISPLAY_DEBUGLOG("the VBlankCallback %{public}p ", cb);
+    DISPLAY_LOGD("the VBlankCallback %{public}p ", cb);
     (void)data;
-    std::shared_ptr<VsyncCallBack> vsyncCb = std::make_shared<VsyncCallBack>(cb, nullptr, mCrtc->GetPipe());
+    std::shared_ptr<VsyncCallBack> vsyncCb = std::make_shared<VsyncCallBack>(cb, data, mCrtc->GetPipe());
     DrmVsyncWorker::GetInstance().ReqesterVBlankCb(vsyncCb);
     return DISPLAY_SUCCESS;
 }
 
 int32_t DrmDisplay::SetDisplayVsyncEnabled(bool enabled)
 {
-    DISPLAY_DEBUGLOG("enable %{public}d", enabled);
+    DISPLAY_LOGD("enable %{public}d", enabled);
     DrmVsyncWorker::GetInstance().EnableVsync(enabled);
     return DISPLAY_SUCCESS;
 }

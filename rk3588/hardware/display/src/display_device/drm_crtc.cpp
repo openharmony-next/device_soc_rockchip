@@ -14,7 +14,7 @@
  */
 
 #include "drm_crtc.h"
-#include "display_common.h"
+#include "display_log.h"
 #include "drm_device.h"
 
 namespace OHOS {
@@ -38,7 +38,7 @@ DrmCrtc::DrmCrtc(drmModeCrtcPtr c, uint32_t pipe) : mId(c->crtc_id), mPipe(pipe)
 
 int32_t DrmCrtc::Init(DrmDevice &drmDevice)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     int32_t ret;
     DrmProperty prop;
     ret = drmDevice.GetCrtcProperty(*this, PROP_MODEID, prop);
@@ -84,7 +84,7 @@ int32_t DrmCrtc::BindToDisplay(uint32_t id)
 
 void DrmCrtc::UnBindDisplay(uint32_t id)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     if (mDisplayId == id) {
         mDisplayId = INVALIDE_DISPLAY_ID;
     } else {

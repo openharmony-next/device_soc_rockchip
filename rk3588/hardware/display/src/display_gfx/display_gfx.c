@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2021-2023 Rockchip Electronics Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +17,11 @@
 #include <string.h>
 #include "im2d.h"
 #include "rga.h"
-#include "display_common.h"
-#include "display_gralloc.h"
+#include "display_log.h"
 #include "securec.h"
 #include "display_gfx.h"
 
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-GrallocFuncs *grallocFucs = NULL;
 int32_t rkInitGfx()
 {
     DISPLAY_LOGE("%s\n", querystring(RGA_ALL));
@@ -175,14 +173,14 @@ int32_t rkFillRect(ISurface *iSurface, IRect *rect, uint32_t color, GfxOpt *opt)
     dst.vir_addr = 0; // iSurface->virAddr;
     dst.fd = (int32_t)iSurface->phyAddr;
     if (dst.fd == 0) {
-        DISPLAY_LOGE("gfx source fd is invalid");
+        DISPLAY_LOGE("source fd is invalid");
         return DISPLAY_PARAM_ERR;
     }
-    DISPLAY_LOGE("gfx vir %{public}p phy 0x%{public}p fd %{public}d", dst.vir_addr, dst.phy_addr, dst.fd);
+    DISPLAY_LOGD("fd %{public}d", dst.fd);
     dst.width = iSurface->width;
     dst.height = iSurface->height;
     dst.wstride = ALIGN_UP(iSurface->width, 16);
-    dst.hstride = ALIGN_UP(iSurface->height, 16);
+    dst.hstride = ALIGN_UP(iSurface->height, 2);
     dst.format = colorSpaceModeChange(iSurface->enColorFmt, &isYuv);
     dst.color_space_mode = IM_COLOR_SPACE_DEFAULT;
     dst.color = color;
@@ -235,39 +233,34 @@ int32_t blendTypeChange(BlendType blendType)
 
 int32_t TransformTypeChange(TransformType type)
 {
-    int32_t rkRotateType;
+    int32_t rkTransformType;
     switch (type) {
         case ROTATE_90:            /**< Rotation by 90 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_90;
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90;
             break;
-        case ROTATE_180:             /**< Rotation by 180 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_180;
+        case ROTATE_180:           /**< Rotation by 180 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_180;
             break;
-        case ROTATE_270:             /**< Rotation by 270 degrees */
-            rkRotateType = IM_HAL_TRANSFORM_ROT_270;
+        case ROTATE_270:           /**< Rotation by 270 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_270;
             break;
-        default:
-            rkRotateType = 0;        /**< No rotation */
+        case MIRROR_H:             /**< Mirror transform horizontally */
+            rkTransformType = IM_HAL_TRANSFORM_FLIP_H;
             break;
-    }
-    return rkRotateType;
-}
-
-int32_t mirrorTypeChange(MirrorType type)
-{
-    int32_t rkMirrorType;
-    switch (type) {
-        case MIRROR_LR:            /**< Left and right mirrors */
-            rkMirrorType = IM_HAL_TRANSFORM_FLIP_H;
+        case MIRROR_V:             /**< Mirror transform vertically */
+            rkTransformType = IM_HAL_TRANSFORM_FLIP_V;
             break;
-        case MIRROR_TB:            /**< Top and bottom mirrors */
-            rkMirrorType = IM_HAL_TRANSFORM_FLIP_V;
+        case MIRROR_H_ROTATE_90:   /**< Mirror transform horizontally, rotation by 90 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90 | IM_HAL_TRANSFORM_FLIP_V;
+            break;
+        case MIRROR_V_ROTATE_90:   /**< Mirror transform vertically, rotation by 90 degrees */
+            rkTransformType = IM_HAL_TRANSFORM_ROT_90 | IM_HAL_TRANSFORM_FLIP_H;
             break;
         default:
-            rkMirrorType = 0;
+            rkTransformType = 0;   /**< No rotation */
             break;
     }
-    return rkMirrorType;
+    return rkTransformType;
 }
 
 int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect *dstRect, GfxOpt *opt)
@@ -280,8 +273,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     im_rect drect;
     im_rect prect;
     int32_t rkBlendType = 0;
-    int32_t rkRotateType = 0;
-    int32_t rkMirrorType = 0;
+    int32_t rkTransformType = 0;
 
     errno_t eok = memset_s(&dstRgaBuffer, sizeof(dstRgaBuffer), 0, sizeof(dstRgaBuffer));
     if (eok != EOK) {
@@ -320,7 +312,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     dstRgaBuffer.width = dstSurface->width;
     dstRgaBuffer.height = dstSurface->height;
     dstRgaBuffer.wstride = ALIGN_UP(dstSurface->width, 16);
-    dstRgaBuffer.hstride = ALIGN_UP(dstSurface->height, 16);
+    dstRgaBuffer.hstride = ALIGN_UP(dstSurface->height, 2);
     dstRgaBuffer.format = colorSpaceModeChange(dstSurface->enColorFmt, &isYuv);
     dstRgaBuffer.phy_addr = 0; // (void *)dstSurface->phyAddr;
     dstRgaBuffer.vir_addr = 0; // dstSurface->virAddr;
@@ -334,7 +326,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
     srcRgaBuffer.width = srcSurface->width;
     srcRgaBuffer.height = srcSurface->height;
     srcRgaBuffer.wstride = ALIGN_UP(srcSurface->width, 16);
-    srcRgaBuffer.hstride = ALIGN_UP(srcSurface->height, 16);
+    srcRgaBuffer.hstride = ALIGN_UP(srcSurface->height, 2);
     srcRgaBuffer.phy_addr = 0; // (void *)srcSurface->phyAddr;
     srcRgaBuffer.vir_addr = 0; // srcSurface->virAddr;
     srcRgaBuffer.format = colorSpaceModeChange(srcSurface->enColorFmt, &isYuv);
@@ -346,41 +338,42 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
         return DISPLAY_PARAM_ERR;
     }
 
-    DISPLAY_LOGE("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d vir %{public}p",
+    DISPLAY_LOGD("gfx src fd %{public}d, w %{public}d, h %{publuc}d, sw %{public}d sh %{public}d",
         (int32_t)srcSurface->phyAddr, srcSurface->width, srcSurface->height, ALIGN_UP(srcSurface->width, 16),
-        ALIGN_UP(srcSurface->height, 16), srcRgaBuffer.vir_addr);
-    DISPLAY_LOGE("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d vir %{public}p",
+        ALIGN_UP(srcSurface->height, 2));
+    DISPLAY_LOGD("gfx dst fd %{public}d, w %{public}d, h %{public}d, sw %{public}d sh %{public}d",
         (int32_t)dstSurface->phyAddr, dstSurface->width, dstSurface->height, ALIGN_UP(dstSurface->width, 16),
-        ALIGN_UP(dstSurface->height, 16), dstRgaBuffer.vir_addr);
+        ALIGN_UP(dstSurface->height, 2));
 
     srect.x = srcRect->x;
+    srect.x = (srect.x % 2 == 1) ? (srect.x - 1) : srect.x; // 2: Is it odd?
     srect.y = srcRect->y;
+    srect.y = (srect.y % 2 == 1) ? (srect.y - 1) : srect.y; // 2: Is it odd?
     srect.height = srcRect->h;
+    srect.height = (srect.height % 2 == 1) ? (srect.height + 1) : srect.height; // 2: Is it odd?
     srect.width = srcRect->w;
+    srect.width = (srect.width % 2 == 1) ? (srect.width + 1) : srect.width; // 2: Is it odd?
     drect.x = dstRect->x;
+    drect.x = (drect.x % 2 == 1) ? (drect.x - 1) : drect.x; // 2: Is it odd?
     drect.y = dstRect->y;
+    drect.y = (drect.y % 2 == 1) ? (drect.y - 1) : drect.y; // 2: Is it odd?
     drect.height = dstRect->h;
+    drect.height = (drect.height % 2 == 1) ? (drect.height + 1) : drect.height; // 2: Is it odd?
     drect.width = dstRect->w;
+    drect.width = (drect.width % 2 == 1) ? (drect.width + 1) : drect.width; // 2: Is it odd?
 
     if (opt->blendType) {
         rkBlendType = blendTypeChange(opt->blendType);
         if (rkBlendType > 0) {
             usage |= rkBlendType;
-            if (rkBlendType == IM_ALPHA_BLEND_DST_OVER || rkBlendType == IM_ALPHA_BLEND_SRC_OVER)
-                usage |= IM_ALPHA_BLEND_PRE_MUL;
         } else if (rkBlendType == IM_STATUS_NOT_SUPPORTED) {
             return DISPLAY_NOT_SUPPORT;
         }
     }
     if (opt->rotateType) {
-        rkRotateType = TransformTypeChange(opt->rotateType);
-        if (rkRotateType != 0)
-            usage |= rkRotateType;
-    }
-    if (opt->mirrorType == MIRROR_LR || opt->mirrorType == MIRROR_TB) {
-        rkMirrorType = mirrorTypeChange(opt->mirrorType);
-        if (rkMirrorType != 0)
-            usage |= rkMirrorType;
+        rkTransformType = TransformTypeChange(opt->rotateType);
+        if (rkTransformType != 0)
+            usage |= rkTransformType;
     }
     if (opt->enableScale) {
         DISPLAY_LOGE("gfx scale from (%{puhblic}d, %{public}d) to (%{public}d, %{public}d)", \
@@ -409,27 +402,13 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                 drect.width = srcRgaBuffer.width;
                 drect.height = srcRgaBuffer.height;
             }
-            usage = rkRotateType | rkMirrorType | IM_SYNC;
+            srcRgaBuffer.wstride = srcSurface->stride;
+            usage = rkTransformType | IM_SYNC;
             ret = improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
             if (ret != IM_STATUS_SUCCESS) {
                 DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
             }
         } else if (rkBlendType == IM_ALPHA_BLEND_DST_OVER) {
-            if (grallocFucs == NULL) {
-                ret = GrallocInitialize(&grallocFucs);
-                DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("Gralloc init failed"));
-            }
-            AllocInfo info = {
-                .width = dstRgaBuffer.width,
-                .height = dstRgaBuffer.height,
-                .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
-                .format = PIXEL_FMT_RGBA_8888, // srcSurface->enColorFmt,
-            };
-            BufferHandle *buffer = NULL;
-
-            ret = grallocFucs->AllocMem(&info, &buffer);
-            DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not alloc memory"));
-
             bRgbBuffer.width = dstRgaBuffer.width;
             bRgbBuffer.height = dstRgaBuffer.height;
             bRgbBuffer.wstride = dstRgaBuffer.wstride;
@@ -438,7 +417,7 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
             bRgbBuffer.phy_addr = 0; // (void *) buffer->phyAddr;
             bRgbBuffer.vir_addr = 0; // buffer->virAddr;
             bRgbBuffer.color_space_mode = dstRgaBuffer.color_space_mode;
-            bRgbBuffer.fd = (int32_t)buffer->phyAddr;
+            bRgbBuffer.fd = -1;
             int ret = memcpy_s(&prect, sizeof(drect), &drect, sizeof(drect));
             if (!ret) {
                 printf("memcpy_s failed!\n");
@@ -452,7 +431,6 @@ int32_t doFlit(ISurface *srcSurface, IRect *srcRect, ISurface *dstSurface, IRect
                     DISPLAY_LOGE("gfx improcess %{public}s", imStrError(ret));
                 }
             }
-            grallocFucs->FreeMem(buffer);
         }
     } else {
         ret = improcess(srcRgaBuffer, dstRgaBuffer, bRgbBuffer, srect, drect, prect, usage);
@@ -510,6 +488,6 @@ int32_t GfxUninitialize(GfxFuncs *funcs)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(funcs, DISPLAY_NULL_PTR);
     free(funcs);
-    DISPLAY_DEBUGLOG("%s: gfx uninitialize success", __func__);
+    DISPLAY_LOGD("%s: gfx uninitialize success", __func__);
     return DISPLAY_SUCCESS;
 }

@@ -18,7 +18,6 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include "buffer_handle.h"
-#include "display_common.h"
 #include "drm_fourcc.h"
 #include "hdi_layer.h"
 #include "hdi_device_common.h"
