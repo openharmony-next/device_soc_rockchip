@@ -226,7 +226,7 @@ ohos_shared_library("display_gfx") {
   output_name = "display_gfx"
   cflags = [ "-Wno-macro-redefined" ]
 
-  deps = [ "${root_path}/device/soc/rockchip/rk3588/hardware/rga:librga", ]
+  deps = [ "${root_path}/device/soc/rockchip/rk3588/hardware/rga:librga" ]
 
   external_deps = [
     "c_utils:utils",
