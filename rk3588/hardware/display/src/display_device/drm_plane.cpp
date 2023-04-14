@@ -45,7 +45,7 @@ DrmPlane::DrmPlane(drmModePlane &p)
 
 DrmPlane::~DrmPlane()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
 }
 
 int DrmPlane::GetCrtcProp(DrmDevice &drmDevice)
@@ -114,7 +114,7 @@ int  DrmPlane::GetSrcProp(DrmDevice &drmDevice)
 
 int32_t DrmPlane::Init(DrmDevice &drmDevice)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     int32_t ret;
     DrmProperty prop;
     GetCrtcProp(drmDevice);

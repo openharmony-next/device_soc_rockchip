@@ -15,7 +15,7 @@
 
 #include "drm_vsync_worker.h"
 #include <chrono>
-#include "display_common.h"
+#include "display_log.h"
 #include "drm_device.h"
 
 namespace OHOS {
@@ -27,7 +27,7 @@ int32_t DrmVsyncWorker::Init(int fd)
 {
     DISPLAY_CHK_RETURN((fd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the fd is invalid"));
     mDrmFd = fd;
-    DISPLAY_DEBUGLOG("the drm fd is %{public}d", fd);
+    DISPLAY_LOGD("the drm fd is %{public}d", fd);
     mThread = std::make_unique<std::thread>([this]() { WorkThread(); });
     DISPLAY_CHK_RETURN((mThread == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("can not create thread"));
     mRunning = true;
@@ -49,17 +49,17 @@ DrmVsyncWorker &DrmVsyncWorker::GetInstance()
 
 DrmVsyncWorker::~DrmVsyncWorker()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     {
         std::lock_guard<std::mutex> lg(mMutex);
         mRunning = false;
     }
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     mCondition.notify_one();
     if (mThread != nullptr) {
         mThread->join();
     }
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
 }
 
 bool DrmVsyncWorker::WaitSignalAndCheckRuning()
@@ -105,7 +105,7 @@ uint64_t DrmVsyncWorker::WaitNextVBlank(unsigned int &sq)
 
 void DrmVsyncWorker::EnableVsync(bool enable)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     {
         std::lock_guard<std::mutex> lg(mMutex);
         mEnable = enable;
@@ -115,7 +115,7 @@ void DrmVsyncWorker::EnableVsync(bool enable)
 
 void DrmVsyncWorker::WorkThread()
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     unsigned int seq = 0;
     while (WaitSignalAndCheckRuning()) {
         // wait the vblank
@@ -130,7 +130,7 @@ void DrmVsyncWorker::WorkThread()
 
 void DrmVsyncWorker::ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((cb == nullptr), DISPLAY_LOGE("the VBlankCallback is nullptr "));
     mCallBack = cb;
 }

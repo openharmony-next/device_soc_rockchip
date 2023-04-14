@@ -18,6 +18,7 @@
 #include <xf86drmMode.h>
 #include <cinttypes>
 #include <securec.h>
+#include "display_log.h"
 #include "drm_device.h"
 #include "drm_vsync_worker.h"
 
@@ -40,43 +41,43 @@ DrmConnector::DrmConnector(drmModeConnector c, FdPtr &fd)
       mConnectState(c.connection),
       mDrmFdPtr(fd)
 {
-    DISPLAY_DEBUGLOG("encoder_id %{public}d", mEncoderId);
-    DISPLAY_DEBUGLOG("the connect state is %{public}d", mConnectState);
+    DISPLAY_LOGD("encoder_id %{public}d", mEncoderId);
+    DISPLAY_LOGD("the connect state is %{public}d", mConnectState);
 
     for (int i = 0; i < c.count_encoders; i++) {
         mPossibleEncoders.push_back(c.encoders[i]);
-        DISPLAY_DEBUGLOG("add possible encoder id %{public}d", c.encoders[i]);
+        DISPLAY_LOGD("add possible encoder id %{public}d", c.encoders[i]);
     }
 
     ConvertToHdiType(c.connector_type, mType);
     ConvertTypeToName(mType, mName);
     InitModes(c);
-    DISPLAY_DEBUGLOG("name %{public}s", mName.c_str());
+    DISPLAY_LOGD("name %{public}s", mName.c_str());
 }
 
 void DrmConnector::InitModes(drmModeConnector c)
 {
-    DISPLAY_DEBUGLOG("id %{public}d  mode size %{public}d", mId, c.count_modes);
+    DISPLAY_LOGD("id %{public}d  mode size %{public}d", mId, c.count_modes);
     mModes.clear();
     mPreferenceId = INVALID_MODE_ID;
     for (int i = 0; i < c.count_modes; i++) {
         drmModeModeInfoPtr mode = c.modes + i;
-        DISPLAY_DEBUGLOG("mode: hdisplay %{public}d, vdisplay %{public}d vrefresh %{public}d type %{public}d",
+        DISPLAY_LOGD("mode: hdisplay %{public}d, vdisplay %{public}d vrefresh %{public}d type %{public}d",
             mode->hdisplay, mode->vdisplay, mode->vrefresh, mode->type);
         if ((mPreferenceId == INVALID_MODE_ID) && (mode->type & DRM_MODE_TYPE_PREFERRED)) {
-            DISPLAY_DEBUGLOG("set it to prefernce id %{public}d", i);
+            DISPLAY_LOGD("set it to prefernce id %{public}d", i);
             mPreferenceId = i;
         }
         mModes.emplace(i, DrmMode { *mode, i });
     }
-    DISPLAY_DEBUGLOG("mode count %{public}zd", mModes.size());
+    DISPLAY_LOGD("mode count %{public}zd", mModes.size());
 }
 
 int32_t DrmConnector::Init(DrmDevice &drmDevice)
 {
     int32_t ret;
     DrmProperty prop;
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((mDrmFdPtr == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("the mDrmFdPtr is NULL"));
     DISPLAY_CHK_RETURN((mDrmFdPtr->GetFd() == -1), DISPLAY_FAILURE, DISPLAY_LOGE("the drm fd is -1"));
     // find dpms prop
@@ -84,19 +85,19 @@ int32_t DrmConnector::Init(DrmDevice &drmDevice)
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not get mode prop id"));
     mPropDpmsId = prop.propId;
     mDpmsState = prop.value;
-    DISPLAY_DEBUGLOG("dpms state : %{public}" PRIu64 "", mDpmsState);
+    DISPLAY_LOGD("dpms state : %{public}" PRIu64 "", mDpmsState);
     // find the crtcid
     ret = drmDevice.GetConnectorProperty(*this, PROP_CRTCID, prop);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get out fence prop id"));
     mPropCrtcId = prop.propId;
-    DISPLAY_DEBUGLOG("encoder_id %{public}d", mEncoderId);
-    DISPLAY_DEBUGLOG("mPropCrtcId %{public}d", mPropCrtcId);
+    DISPLAY_LOGD("encoder_id %{public}d", mEncoderId);
+    DISPLAY_LOGD("mPropCrtcId %{public}d", mPropCrtcId);
     // find the brightness
     ret = drmDevice.GetConnectorProperty(*this, PROP_BRIGHTNESS, prop);
     if (ret == DISPLAY_SUCCESS) {
         mPropBrightnessId =  prop.propId;
         mBrightnessLevel = static_cast<uint32_t>(prop.value);
-        DISPLAY_DEBUGLOG("prop brightness is %{public}d, level is %{public}d", mPropBrightnessId, mBrightnessLevel);
+        DISPLAY_LOGD("prop brightness is %{public}d, level is %{public}d", mPropBrightnessId, mBrightnessLevel);
     } else {
         DISPLAY_LOGW("can not get the brightness prop, can not set the brightness");
     }
@@ -120,7 +121,7 @@ int32_t DrmConnector::SetBrightness(uint32_t level)
     const int32_t buffer_size = 10; /* buffer size */
     char buffer[buffer_size];
 
-    DISPLAY_DEBUGLOG("set %{public}d", level);
+    DISPLAY_LOGD("set %{public}d", level);
     if (mPropBrightnessId == DRM_INVALID_ID) {
         DISPLAY_LOGE("the prop id of brightness is invalid");
         return DISPLAY_NOT_SUPPORT;
@@ -155,7 +156,7 @@ void DrmConnector::GetDisplayCap(DisplayCapability &cap)
     cap.phyHeight = mPhyHeight;
     cap.phyWidth = mPhyWidth;
     cap.type = mType;
-    memcpy_s(cap.name, sizeof(cap.name), mName.c_str(), mName.size());
+    memcpy_s(const_cast<char*>(cap.name.c_str()), cap.name.size(), mName.c_str(), mName.size());
     if (mName.size() >= sizeof(cap.name)) {
         cap.name[sizeof(cap.name) - 1] = 0;
     } else {
@@ -169,7 +170,7 @@ void DrmConnector::GetDisplayCap(DisplayCapability &cap)
 
 void DrmConnector::ConvertTypeToName(uint32_t type, std::string &name)
 {
-    DISPLAY_DEBUGLOG("type %{public}d", type);
+    DISPLAY_LOGD("type %{public}d", type);
     switch (type) {
         case DISP_INTF_VGA:
             name = "VGA";
@@ -215,26 +216,26 @@ int32_t DrmConnector::TryPickEncoder(IdMapPtr<DrmEncoder> &encoders, uint32_t en
     }
 
     auto &encoder = encoderIter->second;
-    DISPLAY_DEBUGLOG("connector : %{public}d encoder : %{public}d", mId, encoder->GetId());
+    DISPLAY_LOGD("connector : %{public}d encoder : %{public}d", mId, encoder->GetId());
     ret = encoder->PickIdleCrtcId(crtcs, crtcId);
     DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
-        DISPLAY_DEBUGLOG("connector : %{public}d pick encoder : %{public}d", mId, encoder->GetId()));
+        DISPLAY_LOGD("connector : %{public}d pick encoder : %{public}d", mId, encoder->GetId()));
     return DISPLAY_FAILURE;
 }
 
 int32_t DrmConnector::PickIdleCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
 {
-    DISPLAY_DEBUGLOG();
-    DISPLAY_DEBUGLOG("encoder_id %{public}d", mEncoderId);
+    DISPLAY_LOGD();
+    DISPLAY_LOGD("encoder_id %{public}d", mEncoderId);
     int ret = TryPickEncoder(encoders, mEncoderId, crtcs, crtcId);
     DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
-        DISPLAY_DEBUGLOG("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d",
+        DISPLAY_LOGD("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d",
         mId, mEncoderId, crtcId));
 
     for (auto encoder : mPossibleEncoders) {
         ret = TryPickEncoder(encoders, encoder, crtcs, crtcId);
         DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
-            DISPLAY_DEBUGLOG("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d", mId, mEncoderId,
+            DISPLAY_LOGD("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d", mId, mEncoderId,
             crtcId));
     }
 
@@ -271,7 +272,7 @@ std::shared_ptr<DrmCrtc> DrmConnector::UpdateCrtcId(IdMapPtr<DrmEncoder> &encode
     for (auto crtcIter = crtcs.begin(); crtcIter != crtcs.end(); ++crtcIter) {
         auto &posCrts = crtcIter->second;
         if (possibleCrtcs == (1<<posCrts->GetPipe())) {
-            DISPLAY_DEBUGLOG("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
+            DISPLAY_LOGD("find crtc id %{public}d, pipe %{public}d", posCrts->GetId(), posCrts->GetPipe());
             crtc = posCrts;
             *crtc_id = posCrts->GetId();
         }
@@ -290,7 +291,7 @@ std::shared_ptr<DrmCrtc> DrmConnector::UpdateCrtcId(IdMapPtr<DrmEncoder> &encode
 bool DrmConnector::HandleHotplug(IdMapPtr<DrmEncoder> &encoders,
     IdMapPtr<DrmCrtc> &crtcs, bool plugIn)
 {
-    DISPLAY_DEBUGLOG("plug %{public}d", plugIn);
+    DISPLAY_LOGD("plug %{public}d", plugIn);
     int drmFd = mDrmFdPtr->GetFd();
     int crtc_id = 0;
     std::shared_ptr<DrmCrtc> crtc;
@@ -309,7 +310,7 @@ bool DrmConnector::HandleHotplug(IdMapPtr<DrmEncoder> &encoders,
         if (crtc == nullptr) {
             return DISPLAY_FAILURE;
         }
-        DISPLAY_DEBUGLOG("get crtc id %{public}d ", crtc_id);
+        DISPLAY_LOGD("get crtc id %{public}d ", crtc_id);
 
         DrmVsyncWorker::GetInstance().EnableVsync(plugIn);
         drmModeCreatePropertyBlob(drmFd, &c->modes[0],
@@ -349,7 +350,7 @@ int32_t DrmConnector::GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *m
 
 int32_t DrmConnector::SetDpmsState(uint64_t dmps)
 {
-    DISPLAY_DEBUGLOG("dmps %{public}" PRIu64 "", dmps);
+    DISPLAY_LOGD("dmps %{public}" PRIu64 "", dmps);
     int ret = drmModeConnectorSetProperty(mDrmFdPtr->GetFd(), mId, mPropDpmsId, dmps);
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE, DISPLAY_LOGE("can not set dpms"));
     mDpmsState = dmps;
@@ -363,7 +364,7 @@ bool DrmConnector::IsConnected()
 
 int32_t DrmConnector::GetModeFromId(int32_t id, DrmMode &mode)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     auto iter = mModes.find(id);
     if (iter == mModes.end()) {
         return DISPLAY_FAILURE;
@@ -374,7 +375,7 @@ int32_t DrmConnector::GetModeFromId(int32_t id, DrmMode &mode)
 
 std::unique_ptr<DrmModeBlock> DrmConnector::GetModeBlockFromId(int32_t id)
 {
-    DISPLAY_DEBUGLOG("id %{public}d", id);
+    DISPLAY_LOGD("id %{public}d", id);
     auto iter = mModes.find(id);
     DISPLAY_CHK_RETURN((iter == mModes.end()), nullptr, DISPLAY_LOGE("can not the mode %{public}d", id));
     return std::make_unique<DrmModeBlock>(mModes[id]);
@@ -382,7 +383,7 @@ std::unique_ptr<DrmModeBlock> DrmConnector::GetModeBlockFromId(int32_t id)
 
 DrmModeBlock::DrmModeBlock(DrmMode &mode)
 {
-    DISPLAY_DEBUGLOG();
+    DISPLAY_LOGD();
     Init(mode);
 }
 
@@ -394,13 +395,13 @@ int32_t DrmModeBlock::Init(DrmMode &mode)
     drmModeModeInfo modeInfo = *(mode.GetModeInfoPtr());
     ret = drmModeCreatePropertyBlob(drmFd, static_cast<void *>(&modeInfo), sizeof(modeInfo), &mBlockId);
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE, DISPLAY_LOGE("create property blob failed"));
-    DISPLAY_DEBUGLOG("mBlockId %{public}d", mBlockId);
+    DISPLAY_LOGD("mBlockId %{public}d", mBlockId);
     return DISPLAY_SUCCESS;
 }
 
 DrmModeBlock::~DrmModeBlock()
 {
-    DISPLAY_DEBUGLOG("mBlockId %{public}d", mBlockId);
+    DISPLAY_LOGD("mBlockId %{public}d", mBlockId);
     int drmFd = DrmDevice::GetDrmFd();
     if ((mBlockId != DRM_INVALID_ID) && (drmFd >= 0)) {
         int ret = drmModeDestroyPropertyBlob(drmFd, mBlockId);

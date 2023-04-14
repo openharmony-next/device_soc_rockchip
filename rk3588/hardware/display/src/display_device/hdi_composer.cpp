@@ -37,6 +37,7 @@ int32_t HdiComposer::Commit(bool modeSet)
 {
     int ret = mPreComp->Apply(modeSet);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("pre composition apply failed"));
+    DISPLAY_LOGD("commit modSet=%{public}d", modeSet);
     ret = mPostComp->Apply(modeSet);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("post composition apply failed"));
     return DISPLAY_SUCCESS;

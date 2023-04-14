@@ -20,7 +20,6 @@
 #include <vector>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
-#include "display_type.h"
 #include "drm_encoder.h"
 #include "hdi_device_common.h"
 #include "hdi_shared_fd.h"

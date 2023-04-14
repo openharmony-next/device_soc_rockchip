@@ -18,13 +18,14 @@
 #include <unordered_set>
 #include <memory>
 #include "buffer_handle.h"
-#include "display_common.h"
+#include "v1_0/display_composer_type.h"
 #include "hdi_device_common.h"
 #include "hdi_shared_fd.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
+using namespace OHOS::HDI::Display::Composer::V1_0;
 const uint32_t INVALIDE_LAYER_ID = 0xffffffff;
 const uint32_t FENCE_TIMEOUT = 3000;
 struct HdiLayerBuffer {
@@ -113,7 +114,7 @@ public:
     }
     void SetDeviceSelect(CompositionType type)
     {
-        DISPLAY_DEBUGLOG("%{public}d", type);
+        DISPLAY_LOGD("%{public}d", type);
         mDeviceSelect = type;
     }
     CompositionType GetDeviceSelect() const
@@ -138,12 +139,12 @@ public:
     void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color);
 
     void WaitAcquireFence();
-    virtual int32_t SetLayerSize(IRect *rect);
+    virtual int32_t SetLayerRegion(IRect *rect);
     virtual int32_t SetLayerCrop(IRect *rect);
     virtual void SetLayerZorder(uint32_t zorder);
     virtual int32_t SetLayerPreMulti(bool preMul);
     virtual int32_t SetLayerAlpha(LayerAlpha *alpha);
-    virtual int32_t SetTransformMode(TransformType type);
+    virtual int32_t SetLayerTransformMode(TransformType type);
     virtual int32_t SetLayerDirtyRegion(IRect *region);
     virtual int32_t SetLayerVisibleRegion(uint32_t num, IRect *rect);
     virtual int32_t SetLayerBuffer(const BufferHandle *buffer, int32_t fence);
