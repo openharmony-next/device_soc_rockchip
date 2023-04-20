@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2013 Rockchip Electronics Co., LTD.
+ * Copyright 2013-2023 Rockchip Electronics Co., LTD.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,6 +279,7 @@ static int drm_handle_to_fd(int fd, RK_U32 handle, int *map_fd, RK_U32 flags)
 }
 
 #ifdef AVS80
+#ifndef OHOS_BUFFER_HANDLE
 static int drm_fd_to_handle(int fd, int map_fd, RK_U32 *handle, RK_U32 flags)
 {
     int ret;
@@ -295,6 +296,7 @@ static int drm_fd_to_handle(int fd, int map_fd, RK_U32 *handle, RK_U32 flags)
     *handle = dph.handle;
     return ret;
 }
+#endif
 #endif
 
 static int drm_map(int fd, RK_U32 handle, size_t length, int prot,
@@ -377,18 +379,16 @@ static int drm_free(int fd, RK_U32 handle)
 #ifdef AVS80
 OMX_U32 Rockchip_OSAL_SharedMemory_HandleToAddress(OMX_HANDLETYPE handle, OMX_HANDLETYPE handle_ptr)
 {
+    #ifndef OHOS_BUFFER_HANDLE
     int map_fd = -1;
-    native_handle_t* pnative_handle_t = NULL;
     RK_S32 err = 0;
     RK_S32 mClient = 0;
     RK_U32 mHandle = 0;
-    struct drm_rockchip_gem_phys phys_arg;
-
     (void)handle;
-
+    struct drm_rockchip_gem_phys phys_arg;
+    native_handle_t* pnative_handle_t = NULL;
     pnative_handle_t = (native_handle_t*)handle_ptr;
     map_fd = pnative_handle_t->data[0];
-
     mClient = open("/dev/dri/card0", O_RDWR);
     if (mClient < 0) {
         omx_err("Rockchip_OSAL_SharedMemory_HandleToAddress open drm fail");
@@ -403,16 +403,19 @@ OMX_U32 Rockchip_OSAL_SharedMemory_HandleToAddress(OMX_HANDLETYPE handle, OMX_HA
     close(mClient);
     mClient = -1;
     return (OMX_U32)phys_arg.phy_addr;
+    #endif
+    return -1;
 }
 
 OMX_U32 Rockchip_OSAL_SharedMemory_HandleToSecureAddress(OMX_HANDLETYPE handle, OMX_HANDLETYPE handle_ptr, RK_S32 size)
 {
+    RK_U8* pBuffer = NULL;
+    #ifndef OHOS_BUFFER_HANDLE
     int map_fd = -1;
     native_handle_t* pnative_handle_t = NULL;
     RK_S32 err = 0;
     RK_S32 mClient = 0;
     RK_U32 mHandle = 0;
-    RK_U8* pBuffer = NULL;
     int ret;
     struct drm_mode_map_dumb dmmd;
     memset_s(&dmmd, sizeof(dmmd), 0, sizeof(dmmd));
@@ -447,6 +450,7 @@ OMX_U32 Rockchip_OSAL_SharedMemory_HandleToSecureAddress(OMX_HANDLETYPE handle, 
 
     close(mClient);
     mClient = -1;
+    #endif
     return (OMX_U32)pBuffer;
 }
 #endif
@@ -511,6 +515,7 @@ void Rockchip_OSAL_SharedMemory_Close(OMX_HANDLETYPE handle, OMX_BOOL b_secure)
         pCurrentElement = pCurrentElement->pNextMemory;
         if (b_secure) {
 #ifdef AVS80
+#ifndef OHOS_BUFFER_HANDLE
             native_handle_t* pnative_handle_t = NULL;
             int map_fd = 0;
             void *pTrueAddree = NULL;
@@ -521,6 +526,7 @@ void Rockchip_OSAL_SharedMemory_Close(OMX_HANDLETYPE handle, OMX_BOOL b_secure)
             pDeleteElement->mapAddr = pTrueAddree;
             close(map_fd);
             map_fd = -1;
+#endif
 #endif
         }
         if (munmap(pDeleteElement->mapAddr, pDeleteElement->allocSize)) {
@@ -600,7 +606,7 @@ OMX_PTR Rockchip_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, ME
             mask = ION_HEAP(ION_SECURE_HEAP_ID);
             omx_info("pHandle->fd = %d,size = %lu, mem_type = %d", pHandle->fd, size, mem_type);
             if (mem_type == MEMORY_TYPE_DRM) {
-                err = drm_alloc(pHandle->fd, size, 4096, (RK_U32 *)&ion_hdl, 0); // 40966:byte alignment
+                err = drm_alloc(pHandle->fd, size, 4096, (RK_U32 *)&ion_hdl, 0); // 4096:byte alignment
             } else {
                 err = ion_alloc(pHandle->fd, size,
                     4096, mask, 0, (ion_user_handle_t *)&ion_hdl); // 4096:byte alignment
@@ -619,6 +625,7 @@ OMX_PTR Rockchip_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, ME
             pElement->pNextMemory = NULL;
 
 #ifdef AVS80
+#ifndef OHOS_BUFFER_HANDLE
             native_handle_t* pnative_handle_t = NULL;
             pnative_handle_t = native_handle_create(1, 0);
             err = drm_handle_to_fd(pHandle->fd, ion_hdl, &map_fd, 0);
@@ -634,6 +641,8 @@ OMX_PTR Rockchip_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, ME
             } else {
                 pElement->mapAddr = (OMX_PTR)((__u64)pnative_handle_t);
             }
+ // Add BufferHandle later
+#endif
 #endif
             break;
         case SYSTEM_MEMORY:

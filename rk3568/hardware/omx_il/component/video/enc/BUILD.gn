@@ -39,44 +39,44 @@ ohos_shared_library("libomxvpu_enc") {
     "//drivers/peripheral/display/interfaces/include",
     "//third_party/openmax/api/1.1.2",
   ]
-
+  defines = [ "AVS100" ]
   cflags = [
     "-Wno-unused-variable",
     "-Wno-implicit-function-declaration",
     "-Wno-format",
     "-Wno-switch",
-    "-DAVS100=1",
     "-Wno-pointer-to-int-cast",
   ]
 
   if (USE_DRM) {
-    cflags += [
-      "-DUSE_DRM",
-      "-DHAVE_L1_SVP_MODE",
-    ]
+    defines += [ "USE_DRM" ]
+    defines += [ "HAVE_L1_SVP_MODE" ]
   }
 
   if (USE_AFBC) {
-    cflags += [ "-DSUPPORT_AFBC" ]
+    defines += [ "SUPPORT_AFBC" ]
   }
 
   if (USE_GPU) {
-    cflags += [ "-DROCKCHIP_GPU_LIB_ENABLE" ]
+    defines += [ "ROCKCHIP_GPU_LIB_ENABLE" ]
   }
 
   if (USE_RGA) {
-    cflags += [ "-DSUPPORT_RGA" ]
+    defines += [ "SUPPORT_RGA" ]
   }
 
   if (USE_HEVC_ENC) {
-    cflags += [ "-DSUPPORT_HEVC_ENC" ]
+    defines += [ "SUPPORT_HEVC_ENC" ]
   }
 
   if (USE_VP8_ENC) {
-    cflags += [ "-DSUPPORT_VP8_ENC" ]
+    defines += [ "SUPPORT_VP8_ENC" ]
   }
 
-  cflags += [ "-DOHOS_BUFFER_HANDLE" ]
+  if (USE_AVS80) {
+    defines += [ "AVS80" ]
+  }
+  defines += [ "OHOS_BUFFER_HANDLE" ]
 
   deps = [
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/common:RkOMX_Basecomponent",

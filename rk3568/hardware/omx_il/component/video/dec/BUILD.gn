@@ -39,39 +39,41 @@ ohos_shared_library("libomxvpu_dec") {
     "//third_party/libdrm/include/drm",
     "//third_party/openmax/api/1.1.2",
   ]
-
+  defines = [ "AVS100" ]
   cflags = [
     "-Wno-unused-variable",
     "-Wno-implicit-function-declaration",
     "-Wno-switch",
-    "-DAVS100=1",
   ]
 
   if (USE_DRM) {
-    cflags += [ "-DUSE_DRM" ]
+    defines += [ "USE_DRM" ]
   }
 
   if (USE_AFBC) {
-    cflags += [ "-DSUPPORT_AFBC" ]
+    defines += [ "SUPPORT_AFBC" ]
   }
 
   if (USE_GPU) {
-    cflags += [ "-DROCKCHIP_GPU_LIB_ENABLE" ]
+    defines += [ "ROCKCHIP_GPU_LIB_ENABLE" ]
   }
 
   if (USE_RGA) {
-    cflags += [ "-DSUPPORT_RGA" ]
+    defines += [ "SUPPORT_RGA" ]
   }
 
   if (USE_HEVC_DEC) {
-    cflags += [ "-DSUPPORT_HEVC" ]
+    defines += [ "SUPPORT_HEVC" ]
   }
 
   if (USE_VP9_DEC) {
-    cflags += [ "-DSUPPORT_VP9" ]
+    defines += [ "SUPPORT_VP9" ]
   }
 
-  cflags += [ "-DOHOS_BUFFER_HANDLE" ]
+  if (USE_AVS80) {
+    defines += [ "AVS80" ]
+  }
+  defines += [ "OHOS_BUFFER_HANDLE" ]
 
   deps = [
     "//device/soc/rockchip/rk3568/hardware/omx_il/component/common:RkOMX_Basecomponent",
