@@ -32,5 +32,5 @@ ohos_shared_library("libOMX_Pluginhw") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "product_rk3568"
+  part_name = "rockchip_products"
 }
