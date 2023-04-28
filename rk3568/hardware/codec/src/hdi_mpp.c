@@ -420,6 +420,12 @@ int32_t GetMppParam(RKHdiBaseComponent* component, Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
+        case KEY_INPUT_BUFFER_COUNT:
+            ret = GetParamInputBufferCount(component, param);
+            break;
+        case KEY_OUTPUT_BUFFER_COUNT:
+            ret = GetParamOutputBufferCount(component, param);
+            break;
         case KEY_BUFFERSIZE:
             ret = GetParamBufferSize(component, param);
             break;
