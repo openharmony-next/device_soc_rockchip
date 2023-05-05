@@ -395,9 +395,9 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
                     extraData = inputUseBuffer->bufferHeader->pBuffer + inputUseBuffer->usedDataLen;
                     if (pVideoDec->bDRMPlayerMode == OMX_TRUE) {
 #ifdef AVS80
-                        OMX_U32 trueAddress = Rockchip_OSAL_SharedMemory_HandleToSecureAddress(
+                        OMX_PTR trueAddress = Rockchip_OSAL_SharedMemory_HandleToSecureAddress(
                             pVideoDec->hSharedMemory, (OMX_HANDLETYPE)extraData, DEFAULT_VIDEO_INPUT_BUFFER_SIZE);
-                        extraData = (OMX_PTR)((__u64)trueAddress);
+                        extraData = trueAddress;
 #endif
                     }
                 } else {
@@ -484,9 +484,9 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
         omx_trace("in sendInputData data = %p", pkt.data);
         if (pVideoDec->bDRMPlayerMode == OMX_TRUE) {
 #ifdef AVS80
-            OMX_U32 trueAddress = Rockchip_OSAL_SharedMemory_HandleToSecureAddress(pVideoDec->hSharedMemory,
+            OMX_PTR trueAddress = Rockchip_OSAL_SharedMemory_HandleToSecureAddress(pVideoDec->hSharedMemory,
                 (OMX_HANDLETYPE)pkt.data, DEFAULT_VIDEO_INPUT_BUFFER_SIZE);
-            pkt.data = (OMX_PTR)((__u64)trueAddress);
+            pkt.data = trueAddress;
 #endif
             omx_trace("out sendInputData data = %p", pkt.data);
         }

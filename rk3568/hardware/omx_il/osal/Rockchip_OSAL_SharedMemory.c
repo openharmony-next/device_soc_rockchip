@@ -407,7 +407,7 @@ OMX_U32 Rockchip_OSAL_SharedMemory_HandleToAddress(OMX_HANDLETYPE handle, OMX_HA
     return -1;
 }
 
-OMX_U32 Rockchip_OSAL_SharedMemory_HandleToSecureAddress(OMX_HANDLETYPE handle, OMX_HANDLETYPE handle_ptr, RK_S32 size)
+OMX_PTR Rockchip_OSAL_SharedMemory_HandleToSecureAddress(OMX_HANDLETYPE handle, OMX_HANDLETYPE handle_ptr, RK_S32 size)
 {
     RK_U8* pBuffer = NULL;
     #ifndef OHOS_BUFFER_HANDLE
@@ -451,7 +451,7 @@ OMX_U32 Rockchip_OSAL_SharedMemory_HandleToSecureAddress(OMX_HANDLETYPE handle, 
     close(mClient);
     mClient = -1;
     #endif
-    return (OMX_U32)pBuffer;
+    return pBuffer;
 }
 #endif
 
