@@ -641,7 +641,6 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
 
 #ifdef OHOS_BUFFER_HANDLE
         BufferHandle *bufferHandle = 0;
-        omx_info("pVideoEnc->bOhosDynamicBuffer is %d", pVideoEnc->bOhosDynamicBuffer);
         if (pVideoEnc->bOhosDynamicBuffer) {
             struct DynamicBuffer *dynaBuffer =
                 (struct DynamicBuffer *)((uint8_t *)inputUseBuffer->bufferHeader->pBuffer);
@@ -653,17 +652,17 @@ OMX_BOOL Rkvpu_SendInputData(OMX_COMPONENTTYPE *pOMXComponent)
             bufferHandle = dynaBuffer->buffer;
             OMX_U32 new_width = 0;
             OMX_U32 new_height = 0;
-            omx_info("bCurrent_width = %d, bCurrent_height = %d, bufferHandle->width = %d", pVideoEnc->bCurrent_width,
-                     pVideoEnc->bCurrent_height, bufferHandle->width);
             new_width = bufferHandle->width;
             new_height = bufferHandle->height;
 
             aInput.buf = NULL;
             aInput.bufPhyAddr = bufferHandle->fd;
 
-            omx_info("inputUseBuffer->dataLen = %d, width = %d, stride = %d, height = %d", inputUseBuffer->dataLen,
-                     bufferHandle->width, bufferHandle->stride, bufferHandle->height);
-            aInput.size = bufferHandle->stride * bufferHandle->height;
+            if (pRockchipComponent->bSaveFlagEOS == OMX_TRUE) {
+                aInput.size = 0;
+            } else {
+                aInput.size = bufferHandle->size;
+            }
             aInput.timeUs = inputUseBuffer->timeStamp;
         } else {
             OMX_BUFFERHEADERTYPE *pInputBuffer = inputUseBuffer->bufferHeader;
