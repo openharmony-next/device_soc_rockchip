@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 HiHope Open Source Organization .
+ * Copyright (C) 2021-2023 HiHope Open Source Organization .
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -689,7 +689,7 @@ OMX_COLOR_FORMATTYPE Rockchip_OSAL_CheckFormat(
 
     return eColorFormat;
 }
-
+#ifdef USE_STOREMETADATA
 #ifdef AVS80
 OMX_U32 Rockchip_OSAL_GetVideoNativeMetaSize()
 {
@@ -700,6 +700,7 @@ OMX_U32 Rockchip_OSAL_GetVideoGrallocMetaSize()
 {
     return sizeof(VideoGrallocMetadata);
 }
+#endif
 #endif
 OMX_U32 GetDataSize(OMX_U32 width, OMX_U32 height, OMX_COLOR_FORMATTYPE format)
 {
