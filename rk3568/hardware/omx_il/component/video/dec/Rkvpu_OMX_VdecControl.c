@@ -1846,6 +1846,31 @@ OMX_ERRORTYPE Rkvpu_OMX_SetParameter(OMX_IN OMX_HANDLETYPE hComponent,
             ret = OMX_ErrorNone;
             break;
         }
+        case OMX_IndexCodecExtEnableNativeBuffer: {
+            struct CodecEnableNativeBufferParams *enableParam =
+                (struct CodecEnableNativeBufferParams *)ComponentParameterStructure;
+            if (enableParam == NULL) {
+                omx_err_f("enableParam is null");
+                ret = OMX_ErrorBadParameter;
+                goto EXIT;
+            }
+            
+            OMX_U32  portIndex = enableParam->portIndex;
+            if (portIndex != OUTPUT_PORT_INDEX) {
+                omx_err_f("portIndex is %d", portIndex);
+                ret = OMX_ErrorBadPortIndex;
+                goto EXIT;
+            }
+            ret = Rockchip_OMX_Check_SizeVersion(enableParam, sizeof(struct CodecEnableNativeBufferParams));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("check version ret err");
+                goto EXIT;
+            }
+            RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec =
+                    (RKVPU_OMX_VIDEODEC_COMPONENT *)pRockchipComponent->hComponentHandle;
+            pVideoDec->bOhosBufferHandle = enableParam->enable ? OMX_TRUE : OMX_FALSE;
+            break;
+        }
 #endif
 #ifdef USE_ANB
         case OMX_IndexParamEnableAndroidBuffers:
