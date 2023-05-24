@@ -2,6 +2,8 @@
 #ifndef _LINUX_MM_H
 #define _LINUX_MM_H
 
+#include <linux/errno.h>
+
 #ifdef __KERNEL__
 
 #include <linux/mmdebug.h>
@@ -328,6 +330,7 @@ extern unsigned int kobjsize(const void *objp);
 #define VM_HIGH_ARCH_BIT_4 36 /* bit only usable on 64-bit architectures */
 #define VM_HIGH_ARCH_BIT_5 37 /* bit only usable on 64-bit architectures */
 #define VM_HIGH_ARCH_BIT_6 38 /* bit only usable on 64-bit architectures */
+#define VM_HIGH_ARCH_BIT_7 39 /* bit only usable on 64-bit architectures */
 #define VM_HIGH_ARCH_0 BIT(VM_HIGH_ARCH_BIT_0)
 #define VM_HIGH_ARCH_1 BIT(VM_HIGH_ARCH_BIT_1)
 #define VM_HIGH_ARCH_2 BIT(VM_HIGH_ARCH_BIT_2)
@@ -335,6 +338,7 @@ extern unsigned int kobjsize(const void *objp);
 #define VM_HIGH_ARCH_4 BIT(VM_HIGH_ARCH_BIT_4)
 #define VM_HIGH_ARCH_5 BIT(VM_HIGH_ARCH_BIT_5)
 #define VM_HIGH_ARCH_6 BIT(VM_HIGH_ARCH_BIT_6)
+#define VM_HIGH_ARCH_7 BIT(VM_HIGH_ARCH_BIT_7)
 #endif /* CONFIG_ARCH_USES_HIGH_VMA_FLAGS */
 
 #ifdef CONFIG_MEM_PURGEABLE
@@ -343,6 +347,12 @@ extern unsigned int kobjsize(const void *objp);
 #else /* CONFIG_MEM_PURGEABLE */
 #define VM_PURGEABLE 0
 #define VM_USEREXPTE 0
+#endif /* CONFIG_MEM_PURGEABLE */
+
+#ifdef CONFIG_SECURITY_XPM
+#define VM_XPM	VM_HIGH_ARCH_7
+#else /* CONFIG_MEM_PURGEABLE */
+#define VM_XPM	VM_NONE
 #endif /* CONFIG_MEM_PURGEABLE */
 
 #ifdef CONFIG_ARCH_HAS_PKEYS
