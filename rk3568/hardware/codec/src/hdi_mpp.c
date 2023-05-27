@@ -540,11 +540,13 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
             return HDF_FAILURE;
     }
 
-    UINTPTR userData = (UINTPTR)component->ctx;
-    EventType event = EVENT_FLUSH_COMPLETE;
-    uint32_t length = 0;
-    int32_t *eventData = NULL;
-    component->pCallbacks->OnEvent(userData, event, length, eventData);
+    if (component->pCallbacks != NULL) {
+        UINTPTR userData = (UINTPTR)component->ctx;
+        EventType event = EVENT_FLUSH_COMPLETE;
+        uint32_t length = 0;
+        int32_t *eventData = NULL;
+        component->pCallbacks->OnEvent(userData, event, length, eventData);
+    }
 
     return HDF_SUCCESS;
 }
