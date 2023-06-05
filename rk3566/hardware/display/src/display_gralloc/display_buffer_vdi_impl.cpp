@@ -46,68 +46,32 @@ DisplayBufferVdiImpl::~DisplayBufferVdiImpl()
 
 int32_t DisplayBufferVdiImpl::AllocMem(const AllocInfo& info, BufferHandle*& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (info.usage & HBM_USE_MEM_DMA) {
-        return GbmAllocMem(&info, &handle);
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x(%{public}" PRIx64 ")", info.usage);
-    return HDF_ERR_NOT_SUPPORT;
+    return GbmAllocMem(&info, &handle);
 }
 
 void DisplayBufferVdiImpl::FreeMem(const BufferHandle& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle.usage & HBM_USE_MEM_DMA) {
-        GbmFreeMem(const_cast<BufferHandle *>(&handle));
-        return;
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", handle.usage);
+    GbmFreeMem(const_cast<BufferHandle *>(&handle));
 }
 
 void* DisplayBufferVdiImpl::Mmap(const BufferHandle& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle.usage & HBM_USE_MEM_DMA) {
-        return GbmMmap(const_cast<BufferHandle *>(&handle));
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", handle.usage);
-    return nullptr;
+    return GbmMmap(const_cast<BufferHandle *>(&handle));
 }
 
 int32_t DisplayBufferVdiImpl::Unmap(const BufferHandle& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle.usage & HBM_USE_MEM_DMA) {
-        return GbmUnmap(const_cast<BufferHandle *>(&handle));
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", handle.usage);
-    return HDF_ERR_NOT_SUPPORT;
+    return GbmUnmap(const_cast<BufferHandle *>(&handle));
 }
 
 int32_t DisplayBufferVdiImpl::FlushCache(const BufferHandle& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle.usage & HBM_USE_MEM_DMA) {
-        return GbmFlushCache(const_cast<BufferHandle *>(&handle));
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", handle.usage);
-    return HDF_ERR_NOT_SUPPORT;
+    return GbmFlushCache(const_cast<BufferHandle *>(&handle));
 }
 
 int32_t DisplayBufferVdiImpl::InvalidateCache(const BufferHandle& handle) const
 {
-#ifdef GRALLOC_GBM_SUPPORT
-    if (handle.usage & HBM_USE_MEM_DMA) {
-        return GbmInvalidateCache(const_cast<BufferHandle *>(&handle));
-    }
-#endif
-    DISPLAY_LOGE("the usage is not support 0x%{public}" PRIx64 "", handle.usage);
-    return HDF_ERR_NOT_SUPPORT;
+    return GbmInvalidateCache(const_cast<BufferHandle *>(&handle));
 }
 
 int32_t DisplayBufferVdiImpl::IsSupportedAlloc(const std::vector<VerifyAllocInfo>& infos,
