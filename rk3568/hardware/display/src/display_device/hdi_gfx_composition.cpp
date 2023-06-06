@@ -19,6 +19,7 @@
 #include <cerrno>
 #include "display_log.h"
 #include "display_gfx.h"
+#include "hitrace_meter.h"
 #include "v1_0/display_composer_type.h"
 
 using namespace OHOS::HDI::Display::Composer::V1_0;
@@ -129,7 +130,9 @@ int32_t HdiGfxComposition::BlitLayer(HdiLayer &src, HdiLayer &dst)
     ISurface srcSurface = { 0 };
     ISurface dstSurface = { 0 };
     GfxOpt opt = { 0 };
+    StartTrace(HITRACE_TAG_HDF, "HDI:DISP:WaitAcquireFence");
     src.WaitAcquireFence();
+    FinishTrace(HITRACE_TAG_HDF);
     DISPLAY_LOGD();
     HdiLayerBuffer *srcBuffer = src.GetCurrentBuffer();
     DISPLAY_CHK_RETURN((srcBuffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the srcbuffer is null"));
@@ -177,6 +180,7 @@ int32_t HdiGfxComposition::ClearRect(HdiLayer &src, HdiLayer &dst)
 
 int32_t HdiGfxComposition::Apply(bool modeSet)
 {
+    StartTrace(HITRACE_TAG_HDF, "HDI:DISP:Apply");
     int32_t ret;
     DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
@@ -198,6 +202,7 @@ int32_t HdiGfxComposition::Apply(bool modeSet)
                 break;
         }
     }
+    FinishTrace(HITRACE_TAG_HDF);
     return DISPLAY_SUCCESS;
 }
 } // namespace OHOS
