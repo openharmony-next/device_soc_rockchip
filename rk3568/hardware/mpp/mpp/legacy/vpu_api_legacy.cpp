@@ -82,7 +82,7 @@ static MppFrameFormat vpu_pic_type_remap_to_mpp(EncInputPictureType type)
             ret = MPP_FMT_BGR101010;
             } break;
         default : {
-            HDF_LOGE("There is no match format, err!!!!!!");
+            HDF_LOGE("%s There is no match format, err!!!!!!", __func__);
             } break;
     }
     return ret;
@@ -110,12 +110,12 @@ static MPP_RET vpu_api_set_enc_cfg(MppCtx mpp_ctx, MppApi *mpi, MppEncCfg enc_cf
     RK_S32 rc_mode  = cfg->rc_mode;
     RK_U32 is_fix_qp = (rc_mode == MPP_ENC_RC_MODE_FIXQP) ? 1 : 0;
 
-    HDF_LOGE("setup encoder rate control config:\n");
-    HDF_LOGE("width %4d height %4d format %d:%x\n", width, height, cfg->format, fmt);
-    HDF_LOGE("rc_mode %s qp %d bps %d\n", (rc_mode) ? ("CBR") : ("CQP"), qp, bps);
-    HDF_LOGE("fps in %d fps out %d gop %d\n", fps_in, fps_out, gop);
-    HDF_LOGE("setup encoder stream feature config:\n");
-    HDF_LOGE("profile %d level %d cabac %d\n", profile, level, cabac_en);
+    HDF_LOGI("setup encoder rate control config:");
+    HDF_LOGI("width %4d height %4d format %d:%x", width, height, cfg->format, fmt);
+    HDF_LOGI("rc_mode %s qp %d bps %d", (rc_mode) ? ("CBR") : ("CQP"), qp, bps);
+    HDF_LOGI("fps in %d fps out %d gop %d", fps_in, fps_out, gop);
+    HDF_LOGI("setup encoder stream feature config:");
+    HDF_LOGI("profile %d level %d cabac %d", profile, level, cabac_en);
 
     (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "prep:width", width);
     (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "prep:height", height);
@@ -139,7 +139,7 @@ static MPP_RET vpu_api_set_enc_cfg(MppCtx mpp_ctx, MppApi *mpi, MppEncCfg enc_cf
             (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "prep:hor_stride", 4 * MPP_ALIGN(width, 16)); // hor_stride 4 * 16
             } break;
         default: {
-            HDF_LOGE("unsupport format 0x%x\n", fmt & MPP_FRAME_FMT_MASK);
+            HDF_LOGE("%s unsupport format 0x%x", __func__, fmt & MPP_FRAME_FMT_MASK);
             } break;
     }
     (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "prep:ver_stride", MPP_ALIGN(height, 8)); // height 8 bit
@@ -184,13 +184,13 @@ static MPP_RET vpu_api_set_enc_cfg(MppCtx mpp_ctx, MppApi *mpi, MppEncCfg enc_cf
             (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "jpeg:quant", qp);
             } break;
         default : {
-            HDF_LOGE("support encoder coding type %d\n", coding);
+            HDF_LOGE("%s support encoder coding type %d", __func__, coding);
             } break;
     }
 
     ret = mpi->control(mpp_ctx, MPP_ENC_SET_CFG, enc_cfg);
     if (ret) {
-        HDF_LOGE("setup enc config failed ret %d\n", ret);
+        HDF_LOGE("%s setup enc config failed ret %d", __func__, ret);
         goto RET;
     }
 RET:
@@ -227,13 +227,13 @@ static int copy_align_raw_buffer_to_dest(RK_U8 *dst, RK_U8 *src, RK_U32 width,
         case MPP_FMT_YUV420SP : {
             for (row = 0; row < height; row++) {
                 if (memcpy_s(dst_buf + row * hor_stride, width, src_buf + index, width) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 index += width;
             }
             for (row = 0; row < height / 2; row++) { // height : / 2
                 if (memcpy_s(dst_u + row * hor_stride, width, src_buf + index, width) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 index += width;
             }
@@ -241,21 +241,21 @@ static int copy_align_raw_buffer_to_dest(RK_U8 *dst, RK_U8 *src, RK_U32 width,
         case MPP_FMT_YUV420P : {
             for (row = 0; row < height; row++) {
                 if (memcpy_s(dst_buf + row * hor_stride, width, src_buf + index, width) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 index += width;
             }
             for (row = 0; row < height / 2; row++) { // height : / 2
                 if (memcpy_s(dst_u + row * hor_stride / 2, // height : / 2
                     width / 2, src_buf + index, width / 2) != EOK) { // height : / 2
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 index += width / 2; // width / 2
             }
             for (row = 0; row < height / 2; row++) { // height : / 2
                 if (memcpy_s(dst_v + row * hor_stride / 2, // height : / 2
                     width / 2, src_buf + index, width / 2) != EOK) { // height : / 2
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 index += width / 2; // width / 2
             }
@@ -267,12 +267,12 @@ static int copy_align_raw_buffer_to_dest(RK_U8 *dst, RK_U8 *src, RK_U32 width,
             for (row = 0; row < height; row++) {
                 if (memcpy_s(dst_buf + row * hor_stride * 4, // width 4
                     width * 4, src_buf + row * width * 4, width * 4) != EOK) { // width 4
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 }
             } break;
         default : {
-            HDF_LOGE("unsupport align fmt:%d now\n", fmt);
+            HDF_LOGE("%s unsupport align fmt:%d now", __func__, fmt);
             } break;
         }
 
@@ -294,7 +294,7 @@ VpuApiLegacy::VpuApiLegacy() : mpp_ctx(nullptr),
     enc_hdr_buf(nullptr),
     enc_hdr_buf_size(0)
 {
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     (*(mRKMppApi.HdiMppCreate))(&mpp_ctx, &mpi);
 
@@ -303,12 +303,12 @@ VpuApiLegacy::VpuApiLegacy() : mpp_ctx(nullptr),
     mlvec = nullptr;
     memset_s(&mlvec_dy_cfg, sizeof(mlvec_dy_cfg), 0, sizeof(mlvec_dy_cfg));
 
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
 }
 
 VpuApiLegacy::~VpuApiLegacy()
 {
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     (*(mRKMppApi.HdiMppDestroy))(mpp_ctx);
 
@@ -338,7 +338,7 @@ VpuApiLegacy::~VpuApiLegacy()
 
     enc_hdr_buf_size = 0;
 
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
 }
 
 static RK_S32 init_frame_info(VpuCodecContext *ctx,
@@ -393,13 +393,13 @@ static RK_S32 init_frame_info(VpuCodecContext *ctx,
 
 RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_size)
 {
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     MPP_RET ret = MPP_OK;
     MppCtxType type;
 
     if (mpp_ctx == nullptr || mpi == nullptr) {
-        HDF_LOGE("found invalid context input");
+        HDF_LOGE("%s found invalid context input", __func__);
         return MPP_ERR_NULL_PTR;
     }
 
@@ -408,13 +408,13 @@ RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_s
     } else if (CODEC_ENCODER == ctx->codecType) {
         type = MPP_CTX_ENC;
     } else {
-        HDF_LOGE("found invalid codec type %d\n", ctx->codecType);
+        HDF_LOGE("%s found invalid codec type %d", __func__, ctx->codecType);
         return MPP_ERR_VPU_CODEC_INIT;
     }
 
     ret = (*(mRKMppApi.HdiMppInit))(mpp_ctx, type, (MppCodingType)ctx->videoCoding);
     if (ret) {
-        HDF_LOGE(" init error. \n");
+        HDF_LOGE("%s  init error.", __func__);
         return ret;
     }
 
@@ -427,25 +427,25 @@ RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_s
         /* setup input / output block mode */
         ret = mpi->control(mpp_ctx, MPP_SET_INPUT_TIMEOUT, (MppParam)&block);
         if (MPP_OK != ret)
-            HDF_LOGE("mpi control MPP_SET_INPUT_TIMEOUT failed\n");
+            HDF_LOGE("%s mpi control MPP_SET_INPUT_TIMEOUT failed", __func__);
 
         /* disable sei by default */
         ret = mpi->control(mpp_ctx, MPP_ENC_SET_SEI_CFG, &sei_mode);
         if (ret)
-            HDF_LOGE("mpi control MPP_ENC_SET_SEI_CFG failed ret %d\n", ret);
+            HDF_LOGE("%s mpi control MPP_ENC_SET_SEI_CFG failed ret %d", __func__, ret);
 
         if (memGroup == nullptr) {
             ret = (*(mRKMppApi.HdiMppBufferGroupGet)) \
                 (&memGroup, MPP_BUFFER_TYPE_ION, MPP_BUFFER_INTERNAL, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("memGroup (*(mRKMppApi.HdiMppBufferGroupGet)) failed %d\n", ret);
+                HDF_LOGE("%s memGroup (*(mRKMppApi.HdiMppBufferGroupGet)) failed %d", __func__, ret);
                 return ret;
             }
         }
 
         ret = (*(mRKMppApi.HdiMppEncCfgInit))(&enc_cfg);
         if (ret) {
-            HDF_LOGE("(*(mRKMppApi.HdiMppEncCfgInit)) failed %d\n", ret);
+            HDF_LOGE("%s (*(mRKMppApi.HdiMppEncCfgInit)) failed %d", __func__, ret);
             (*(mRKMppApi.HdiMppBufferGroupPut))(memGroup);
             memGroup = nullptr;
             return ret;
@@ -453,7 +453,7 @@ RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_s
 
         format = vpu_pic_type_remap_to_mpp((EncInputPictureType)param->format);
         if (memcpy_s(&enc_param, sizeof(enc_param), param, sizeof(enc_param)) != EOK) {
-            HDF_LOGE("memcpy_s no");
+            HDF_LOGE("%s memcpy_s no", __func__);
         }
 
         if (MPP_OK == vpu_api_mlvec_check_cfg(param)) {
@@ -503,25 +503,25 @@ RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_s
         RK_U32 flag = 0;
         ret = mpi->control(mpp_ctx, MPP_DEC_SET_ENABLE_DEINTERLACE, &flag);
         if (ret)
-            HDF_LOGE("disable mpp deinterlace failed ret %d\n", ret);
+            HDF_LOGE("%s disable mpp deinterlace failed ret %d", __func__, ret);
     }
 
     init_ok = 1;
 
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
     return ret;
 }
 
 RK_S32 VpuApiLegacy::flush(VpuCodecContext *ctx)
 {
     (void)ctx;
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
     if (mpi && mpi->reset && init_ok) {
         mpi->reset(mpp_ctx);
         set_eos = 0;
         mEosSet = 0;
     }
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
     return 0;
 }
 
@@ -633,24 +633,24 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
     MppFrame mframe = nullptr;
     MppPacket packet = nullptr;
 
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     if (ctx->videoCoding == OMX_RK_VIDEO_CodingMJPEG) {
         MppTask task = nullptr;
 
         if (!init_ok) {
-            HDF_LOGE("init failed!\n");
+            HDF_LOGE("%s init failed!", __func__);
             return VPU_API_ERR_VPU_CODEC_INIT;
         }
 
         /* check input param */
         if (!pkt || !aDecOut) {
-            HDF_LOGE("invalid input %p and output %p\n", pkt, aDecOut);
+            HDF_LOGE("%s invalid input %p and output %p", __func__, pkt, aDecOut);
             return VPU_API_ERR_UNKNOW;
         }
 
         if (pkt->size <= 0) {
-            HDF_LOGE("invalid input size %d\n", pkt->size);
+            HDF_LOGE("%s invalid input size %d", __func__, pkt->size);
             return VPU_API_ERR_UNKNOW;
         }
 
@@ -665,7 +665,7 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
 
         ret = (*(mRKMppApi.HdiMppFrameInit))(&mframe);
         if (MPP_OK != ret) {
-            HDF_LOGE("(*(mRKMppApi.HdiMppFrameInit)) failed\n");
+            HDF_LOGE("%s (*(mRKMppApi.HdiMppFrameInit)) failed", __func__);
             goto DECODE_OUT;
         }
 
@@ -685,7 +685,7 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
             ret = (*(mRKMppApi.Hdimpp_buffer_import_with_tag))(nullptr, \
                 &inputCommit, &str_buf, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("import input picture buffer failed\n");
+                HDF_LOGE("%s import input picture buffer failed", __func__);
                 goto DECODE_OUT;
             }
         } else {
@@ -696,12 +696,12 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
 
             ret = (*(mRKMppApi.HdiMppBufferGetWithTag))(memGroup, &str_buf, pkt->size, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("allocate input picture buffer failed\n");
+                HDF_LOGE("%s allocate input picture buffer failed", __func__);
                 goto DECODE_OUT;
             }
             if (memcpy_s((RK_U8*) (*(mRKMppApi.HdiMppBufferGetPtrWithCaller))(str_buf, __FUNCTION__), \
                 pkt->size, pkt->data, pkt->size) != EOK) {
-                HDF_LOGE("memcpy_s no");
+                HDF_LOGE("%s memcpy_s no", __func__);
             }
         }
 
@@ -723,14 +723,14 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
             ret = (*(mRKMppApi.Hdimpp_buffer_import_with_tag)) \
                 (nullptr, &outputCommit, &pic_buf, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("import output stream buffer failed\n");
+                HDF_LOGE("%s import output stream buffer failed", __func__);
                 goto DECODE_OUT;
             }
         } else {
             ret = (*(mRKMppApi.HdiMppBufferGetWithTag))
                 (memGroup, &pic_buf, hor_stride * ver_stride * 3 / 2, MODULE_TAG, __FUNCTION__); // size 3 / 2 bit
             if (ret) {
-                HDF_LOGE("allocate output stream buffer failed\n");
+                HDF_LOGE("%s allocate output stream buffer failed", __func__);
                 goto DECODE_OUT;
             }
         }
@@ -738,19 +738,19 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
         (*(mRKMppApi.HdiMppPacketInitWithBuffer))(&packet, str_buf); /* input */
         (*(mRKMppApi.HdiMppFrameSetBuffer))(mframe, pic_buf); /* output */
 
-        HDF_LOGE("mpp import input fd %d output fd %d", \
+        HDF_LOGI("mpp import input fd %d output fd %d", \
             (*(mRKMppApi.HdiMppBufferGetFdWithCaller))(str_buf, __FUNCTION__), \
             (*(mRKMppApi.HdiMppBufferGetFdWithCaller))(pic_buf, __FUNCTION__));
 
         ret = mpi->poll(mpp_ctx, MPP_PORT_INPUT, MPP_POLL_BLOCK);
         if (ret) {
-            HDF_LOGE("mpp input poll failed\n");
+            HDF_LOGE("%s mpp input poll failed", __func__);
             goto DECODE_OUT;
         }
 
         ret = mpi->dequeue(mpp_ctx, MPP_PORT_INPUT, &task);
         if (ret) {
-            HDF_LOGE("mpp task input dequeue failed\n");
+            HDF_LOGE("%s mpp task input dequeue failed", __func__);
             goto DECODE_OUT;
         }
 
@@ -759,7 +759,7 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
 
         ret = mpi->enqueue(mpp_ctx, MPP_PORT_INPUT, task);
         if (ret) {
-            HDF_LOGE("mpp task input enqueue failed\n");
+            HDF_LOGE("%s mpp task input enqueue failed", __func__);
             goto DECODE_OUT;
         }
 
@@ -768,13 +768,13 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
 
         ret = mpi->poll(mpp_ctx, MPP_PORT_INPUT, MPP_POLL_BLOCK);
         if (ret) {
-            HDF_LOGE("mpp output poll failed\n");
+            HDF_LOGE("%s mpp output poll failed", __func__);
             goto DECODE_OUT;
         }
 
         ret = mpi->dequeue(mpp_ctx, MPP_PORT_OUTPUT, &task);
         if (ret) {
-            HDF_LOGE("ret %d mpp task output dequeue failed\n", ret);
+            HDF_LOGE("%s ret %d mpp task output dequeue failed", __func__, ret);
             goto DECODE_OUT;
         }
 
@@ -782,12 +782,12 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
             MppFrame frame_out = nullptr;
 
             (*(mRKMppApi.Hdimpp_task_meta_get_frame))(task, KEY_OUTPUT_FRAME, &frame_out);
-            HDF_LOGE("decoded frame %d\n", frame_count);
+            HDF_LOGD("decoded frame %d", frame_count);
             frame_count++;
 
             ret = mpi->enqueue(mpp_ctx, MPP_PORT_OUTPUT, task);
             if (ret) {
-                HDF_LOGE("mpp task output enqueue failed\n");
+                HDF_LOGE("%s mpp task output enqueue failed", __func__);
                 goto DECODE_OUT;
             }
             task = nullptr;
@@ -800,21 +800,21 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
             aDecOut->size = len;
 
             if (fd_output) {
-                HDF_LOGE("fd for output is invalid!\n");
+                HDF_LOGE("%s fd for output is invalid!", __func__);
                 aDecOut->data = (RK_U8*)(*(mRKMppApi.Hdimpp_osal_malloc))
                     (__FUNCTION__, sizeof(RK_U8) * (width * height * 3 / 2)); // size 3 / 2 bit
                 if ( memcpy_s(aDecOut->data,  aDecOut->size, \
                     (RK_U8*) (*(mRKMppApi.HdiMppBufferGetPtrWithCaller))(pic_buf, __FUNCTION__), \
                     aDecOut->size) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
             }
 
-            HDF_LOGE("get frame %p size %d\n", mframe, len);
+            HDF_LOGI("get frame %p size %d", mframe, len);
 
             (*(mRKMppApi.HdiMppFrameDeinit))(&mframe);
         } else {
-            HDF_LOGE("outputPacket is nullptr!");
+            HDF_LOGE("%s outputPacket is nullptr!", __func__);
         }
 
     DECODE_OUT:
@@ -834,7 +834,7 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
             (*(mRKMppApi.HdiMppPacketSetEos))(packet);
         }
 
-        HDF_LOGE("input size %-6d flag %x pts %lld\n", \
+        HDF_LOGD("input size %-6d flag %x pts %lld", \
             pkt->size, pkt->nFlags, pkt->pts);
 
         ret = mpi->decode(mpp_ctx, packet, &mframe);
@@ -860,7 +860,7 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
                 }
             }
             if (vpu_api_debug & VPU_API_DBG_OUTPUT) {
-                HDF_LOGE("get one frame pts %lld, fd 0x%x, poc %d, errinfo %x, discard %d, eos %d, verr %d", \
+                HDF_LOGD("get one frame pts %lld, fd 0x%x, poc %d, errinfo %x, discard %d, eos %d, verr %d", \
                     aDecOut->timeUs, \
                     ((buf) ? ((*(mRKMppApi.HdiMppBufferGetFdWithCaller))(buf, __FUNCTION__)) : (-1)), \
                     (*(mRKMppApi.Hdimpp_frame_get_poc))(mframe), \
@@ -885,13 +885,13 @@ RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut
     if (mframe)
         (*(mRKMppApi.HdiMppFrameDeinit))(&mframe);
 
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
     return ret;
 }
 
 RK_S32 VpuApiLegacy::decode_sendstream(VideoPacket_t *pkt)
 {
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     RK_S32 ret = MPP_OK;
     MppPacket mpkt = nullptr;
@@ -906,7 +906,7 @@ RK_S32 VpuApiLegacy::decode_sendstream(VideoPacket_t *pkt)
         (*(mRKMppApi.HdiMppPacketSetEos))(mpkt);
     }
 
-    HDF_LOGE("input size %-6d flag %x pts %lld\n", \
+    HDF_LOGD("input size %-6d flag %x pts %lld", \
         pkt->size, pkt->nFlags, pkt->pts);
 
     ret = mpi->decode_put_packet(mpp_ctx, mpkt);
@@ -919,7 +919,7 @@ RK_S32 VpuApiLegacy::decode_sendstream(VideoPacket_t *pkt)
 
     (*(mRKMppApi.HdiMppPacketDeinit))(&mpkt);
 
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
     /* NOTE: always return success for old player compatibility */
     return MPP_OK;
 }
@@ -930,7 +930,7 @@ RK_S32 VpuApiLegacy::decode_getoutframe(DecoderOut_t *aDecOut)
     VPU_FRAME *vframe = (VPU_FRAME *)aDecOut->data;
     MppFrame  mframe = nullptr;
 
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     if (!init_ok) {
         return VPU_API_ERR_VPU_CODEC_INIT;
@@ -972,7 +972,7 @@ RK_S32 VpuApiLegacy::decode_getoutframe(DecoderOut_t *aDecOut)
             }
         }
         if (vpu_api_debug & VPU_API_DBG_OUTPUT) {
-            HDF_LOGE("get one frame pts %lld, fd 0x%x, poc %d, errinfo %x, discard %d, eos %d, verr %d", \
+            HDF_LOGD("get one frame pts %lld, fd 0x%x, poc %d, errinfo %x, discard %d, eos %d, verr %d", \
                 aDecOut->timeUs, \
                 ((buf) ? ((*(mRKMppApi.HdiMppBufferGetFdWithCaller))(buf, __FUNCTION__)) : (-1)), \
                 (*(mRKMppApi.Hdimpp_frame_get_poc))(mframe), \
@@ -990,7 +990,7 @@ RK_S32 VpuApiLegacy::decode_getoutframe(DecoderOut_t *aDecOut)
         (*(mRKMppApi.HdiMppFrameDeinit))(&mframe);
     }
 
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
 
     return ret;
 }
@@ -999,19 +999,19 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 {
     MPP_RET ret = MPP_OK;
     MppTask task = nullptr;
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     if (!init_ok)
         return VPU_API_ERR_VPU_CODEC_INIT;
 
     /* check input param */
     if (!aEncInStrm || !aEncOut) {
-        HDF_LOGE("invalid input %p and output %p\n", aEncInStrm, aEncOut);
+        HDF_LOGE("%s invalid input %p and output %p", __func__, aEncInStrm, aEncOut);
         return VPU_API_ERR_UNKNOW;
     }
 
     if (aEncInStrm->buf == nullptr || aEncInStrm->size == 0) {
-        HDF_LOGE("invalid input buffer %p size %d\n", aEncInStrm->buf, aEncInStrm->size);
+        HDF_LOGE("%s invalid input buffer %p size %d", __func__, aEncInStrm->buf, aEncInStrm->size);
         return VPU_API_ERR_UNKNOW;
     }
 
@@ -1028,7 +1028,7 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 
     ret = (*(mRKMppApi.HdiMppFrameInit))(&frame);
     if (MPP_OK != ret) {
-        HDF_LOGE("(*(mRKMppApi.HdiMppFrameInit)) failed\n");
+        HDF_LOGE("%s (*(mRKMppApi.HdiMppFrameInit)) failed", __func__);
         goto ENCODE_OUT;
     }
 
@@ -1052,7 +1052,7 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
         ret = (*(mRKMppApi.Hdimpp_buffer_import_with_tag))(nullptr, &inputCommit, \
             &pic_buf, MODULE_TAG, __FUNCTION__);
         if (ret) {
-            HDF_LOGE("import input picture buffer failed\n");
+            HDF_LOGE("%s import input picture buffer failed", __func__);
             goto ENCODE_OUT;
         }
     } else {
@@ -1063,12 +1063,12 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 
         ret = (*(mRKMppApi.HdiMppBufferGetWithTag))(memGroup, &pic_buf, aEncInStrm->size, MODULE_TAG, __FUNCTION__);
         if (ret) {
-            HDF_LOGE("allocate input picture buffer failed\n");
+            HDF_LOGE("%s allocate input picture buffer failed", __func__);
             goto ENCODE_OUT;
         }
         if (memcpy_s((RK_U8*) (*(mRKMppApi.HdiMppBufferGetPtrWithCaller))(pic_buf, __FUNCTION__), \
             aEncInStrm->size, aEncInStrm->buf, aEncInStrm->size) != EOK) {
-            HDF_LOGE("memcpy_s no");
+            HDF_LOGE("%s memcpy_s no", __func__);
         }
     }
 
@@ -1090,14 +1090,14 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 
         ret = (*(mRKMppApi.Hdimpp_buffer_import_with_tag))(nullptr, &outputCommit, &str_buf, MODULE_TAG, __FUNCTION__);
         if (ret) {
-            HDF_LOGE("import output stream buffer failed\n");
+            HDF_LOGE("%s import output stream buffer failed", __func__);
             goto ENCODE_OUT;
         }
     } else {
         ret = (*(mRKMppApi.HdiMppBufferGetWithTag))(memGroup, \
             &str_buf, hor_stride * ver_stride, MODULE_TAG, __FUNCTION__);
         if (ret) {
-            HDF_LOGE("allocate output stream buffer failed\n");
+            HDF_LOGE("%s allocate output stream buffer failed", __func__);
             goto ENCODE_OUT;
         }
     }
@@ -1106,23 +1106,23 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
     (*(mRKMppApi.HdiMppPacketInitWithBuffer))(&packet, str_buf);
     (*(mRKMppApi.HdiMppPacketSetLength))(packet, 0);
 
-    HDF_LOGE("mpp import input fd %d output fd %d", \
+    HDF_LOGD("mpp import input fd %d output fd %d", \
         (*(mRKMppApi.HdiMppBufferGetFdWithCaller))(pic_buf, __FUNCTION__), \
         (*(mRKMppApi.HdiMppBufferGetFdWithCaller))(str_buf, __FUNCTION__));
 
     ret = mpi->poll(mpp_ctx, MPP_PORT_INPUT, MPP_POLL_BLOCK);
     if (ret) {
-        HDF_LOGE("mpp input poll failed\n");
+        HDF_LOGE("%s mpp input poll failed", __func__);
         goto ENCODE_OUT;
     }
 
     ret = mpi->dequeue(mpp_ctx, MPP_PORT_INPUT, &task);
     if (ret) {
-        HDF_LOGE("mpp task input dequeue failed\n");
+        HDF_LOGE("%s mpp task input dequeue failed", __func__);
         goto ENCODE_OUT;
     }
     if (task == nullptr) {
-        HDF_LOGE("mpi dequeue from MPP_PORT_INPUT fail, task equal with nullptr!");
+        HDF_LOGE("%s mpi dequeue from MPP_PORT_INPUT fail, task equal with nullptr!", __func__);
         goto ENCODE_OUT;
     }
 
@@ -1131,20 +1131,20 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 
     ret = mpi->enqueue(mpp_ctx, MPP_PORT_INPUT, task);
     if (ret) {
-        HDF_LOGE("mpp task input enqueue failed\n");
+        HDF_LOGE("%s mpp task input enqueue failed", __func__);
         goto ENCODE_OUT;
     }
     task = nullptr;
 
     ret = mpi->poll(mpp_ctx, MPP_PORT_OUTPUT, MPP_POLL_BLOCK);
     if (ret) {
-        HDF_LOGE("mpp output poll failed\n");
+        HDF_LOGE("%s mpp output poll failed", __func__);
         goto ENCODE_OUT;
     }
 
     ret = mpi->dequeue(mpp_ctx, MPP_PORT_OUTPUT, &task);
     if (ret) {
-        HDF_LOGE("ret %d mpp task output dequeue failed\n", ret);
+        HDF_LOGE("%s ret %d mpp task output dequeue failed", __func__, ret);
         goto ENCODE_OUT;
     }
 
@@ -1154,32 +1154,32 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
 
         (*(mRKMppApi.HdiMppTaskMetaGetPacket))(task, KEY_OUTPUT_PACKET, &packet_out);
 
-        HDF_LOGE("encoded frame %d\n", frame_count);
+        HDF_LOGD("encoded frame %d", frame_count);
         frame_count++;
 
         ret = mpi->enqueue(mpp_ctx, MPP_PORT_OUTPUT, task);
         if (ret) {
-            HDF_LOGE("mpp task output enqueue failed\n");
+            HDF_LOGE("%s mpp task output enqueue failed", __func__);
             goto ENCODE_OUT;
         }
         task = nullptr;
 
         ret = mpi->poll(mpp_ctx, MPP_PORT_INPUT, MPP_POLL_BLOCK);
         if (ret) {
-            HDF_LOGE("mpp input poll failed\n");
+            HDF_LOGE("%s mpp input poll failed", __func__);
             goto ENCODE_OUT;
         }
 
         // dequeue task from MPP_PORT_INPUT
         ret = mpi->dequeue(mpp_ctx, MPP_PORT_INPUT, &task);
         if (ret) {
-            HDF_LOGE("failed to dequeue from input port ret %d\n", ret);
+            HDF_LOGE("%s failed to dequeue from input port ret %d", __func__, ret);
             goto ENCODE_OUT;
         }
         ret = (*(mRKMppApi.Hdimpp_task_meta_get_frame))(task, KEY_INPUT_FRAME, &frame_out);
         ret = mpi->enqueue(mpp_ctx, MPP_PORT_INPUT, task);
         if (ret) {
-            HDF_LOGE("mpp task output enqueue failed\n");
+            HDF_LOGE("%s mpp task output enqueue failed", __func__);
             goto ENCODE_OUT;
         }
         task = nullptr;
@@ -1203,11 +1203,11 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
                 // remove first 00 00 00 01
                 length -= 4; // length -= 4
                 if (memcpy_s(aEncOut->data, length, src + 4, length) != EOK) { // length -= 4
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
             } else {
                 if (memcpy_s(aEncOut->data, length, src, length) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
             }
         }
@@ -1218,12 +1218,12 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
         aEncOut->timeUs = pts;
         aEncOut->keyFrame = is_intra;
 
-        HDF_LOGE("get packet %p size %d pts %lld keyframe %d eos %d\n", \
+        HDF_LOGD("get packet %p size %d pts %lld keyframe %d eos %d", \
             packet, length, pts, aEncOut->keyFrame, eos);
 
         (*(mRKMppApi.HdiMppPacketDeinit))(&packet);
     } else {
-        HDF_LOGE("outputPacket is nullptr!");
+        HDF_LOGE("%s outputPacket is nullptr!", __func__);
     }
 
 ENCODE_OUT:
@@ -1243,7 +1243,7 @@ ENCODE_OUT:
     if (packet)
         (*(mRKMppApi.HdiMppPacketDeinit))(&packet);
 
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
 
     return ret;
 }
@@ -1251,7 +1251,7 @@ ENCODE_OUT:
 RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm)
 {
     RK_S32 ret = 0;
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     RK_U32 width        = ctx->width;
     RK_U32 height       = ctx->height;
@@ -1266,7 +1266,7 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
 
     ret = (*(mRKMppApi.HdiMppFrameInit))(&frame);
     if (MPP_OK != ret) {
-        HDF_LOGE("(*(mRKMppApi.HdiMppFrameInit)) failed\n");
+        HDF_LOGE("%s (*(mRKMppApi.HdiMppFrameInit)) failed", __func__);
         goto FUNC_RET;
     }
 
@@ -1277,14 +1277,14 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
     (*(mRKMppApi.Hdimpp_frame_set_pts))(frame, pts);
 
     if (aEncInStrm->nFlags) {
-        HDF_LOGE("found eos true\n");
+        HDF_LOGE("%s found eos true", __func__);
         (*(mRKMppApi.HdiMppFrameSetEos))(frame, 1);
     }
 
     if (size <= 0) {
         (*(mRKMppApi.HdiMppFrameSetBuffer))(frame, nullptr);
         if (!aEncInStrm->nFlags)
-            HDF_LOGE("found empty frame without eos flag set!\n");
+            HDF_LOGE("%s found empty frame without eos flag set!", __func__);
         goto PUT_FRAME;
     }
 
@@ -1303,7 +1303,7 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
             ret = (*(mRKMppApi.Hdimpp_buffer_import_with_tag))(nullptr, \
                 &inputCommit, &buffer, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("import input picture buffer failed\n");
+                HDF_LOGE("%s import input picture buffer failed", __func__);
                 goto FUNC_RET;
             }
             (*(mRKMppApi.HdiMppFrameSetBuffer))(frame, buffer);
@@ -1324,7 +1324,7 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
         } else if (format >= MPP_FMT_RGB101010 && format < MPP_FMT_RGB_BUTT) {
             align_size = hor_stride * MPP_ALIGN(ver_stride, 16) * 4; // (ver_stride, 16) * 4 bit
         } else {
-            HDF_LOGE("unsupport input format:%d\n", format);
+            HDF_LOGE("%s unsupport input format:%d", __func__, format);
             ret = MPP_NOK;
             goto FUNC_RET;
         }
@@ -1332,7 +1332,7 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
             MppBuffer buffer = nullptr;
             ret = (*(mRKMppApi.HdiMppBufferGetWithTag))(memGroup, &buffer, align_size, MODULE_TAG, __FUNCTION__);
             if (ret) {
-                HDF_LOGE("allocate input picture buffer failed\n");
+                HDF_LOGE("%s allocate input picture buffer failed", __func__);
                 goto FUNC_RET;
             }
             copy_align_raw_buffer_to_dest((RK_U8 *)(*(mRKMppApi.HdiMppBufferGetPtrWithCaller))(buffer, __FUNCTION__),
@@ -1345,7 +1345,7 @@ RK_S32 VpuApiLegacy::encoder_sendframe(VpuCodecContext *ctx, EncInputStream_t *a
 
 PUT_FRAME:
 
-    HDF_LOGE("w %d h %d input fd %d size %d pts %lld, flag %d \n", \
+    HDF_LOGD("w %d h %d input fd %d size %d pts %lld, flag %d ", \
         width, height, fd, size, aEncInStrm->timeUs, aEncInStrm->nFlags);
     if (mlvec) {
         MppMeta meta = (*(mRKMppApi.HdiMppFrameGetMeta))(frame);
@@ -1355,7 +1355,7 @@ PUT_FRAME:
 
     ret = mpi->encode_put_frame(mpp_ctx, frame);
     if (ret)
-        HDF_LOGE("encode_put_frame ret %d\n", ret);
+        HDF_LOGE("%s encode_put_frame ret %d", __func__, ret);
     else
         aEncInStrm->size = 0;
 
@@ -1363,7 +1363,7 @@ FUNC_RET:
     if (frame)
         (*(mRKMppApi.HdiMppFrameDeinit))(&frame);
 
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
     return ret;
 }
 
@@ -1371,11 +1371,11 @@ RK_S32 VpuApiLegacy::encoder_getstream(VpuCodecContext *ctx, EncoderOut_t *aEncO
 {
     RK_S32 ret = 0;
     MppPacket packet = nullptr;
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
 
     ret = mpi->encode_get_packet(mpp_ctx, &packet);
     if (ret) {
-        HDF_LOGE("encode_get_packet failed ret %d\n", ret);
+        HDF_LOGE("%s encode_get_packet failed ret %d", __func__, ret);
         goto FUNC_RET;
     }
     if (packet) {
@@ -1397,7 +1397,7 @@ RK_S32 VpuApiLegacy::encoder_getstream(VpuCodecContext *ctx, EncoderOut_t *aEncO
                 (__FUNCTION__, sizeof(RK_U8)*MPP_ALIGN(length + 16, SZ_4K)); // length + 16
             if (aEncOut->data) {
                 if (memcpy_s(aEncOut->data, length, src + offset, length) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
             }
         }
@@ -1408,26 +1408,26 @@ RK_S32 VpuApiLegacy::encoder_getstream(VpuCodecContext *ctx, EncoderOut_t *aEncO
         aEncOut->timeUs = pts;
         aEncOut->keyFrame = is_intra;
 
-        HDF_LOGE("get packet %p size %d pts %lld keyframe %d eos %d\n", \
+        HDF_LOGD("get packet %p size %d pts %lld keyframe %d eos %d", \
             packet, length, pts, aEncOut->keyFrame, eos);
 
         mEosSet = eos;
         (*(mRKMppApi.HdiMppPacketDeinit))(&packet);
     } else {
         aEncOut->size = 0;
-        HDF_LOGE("get nullptr packet, eos %d\n", mEosSet);
+        HDF_LOGE("%s get nullptr packet, eos %d", __func__, mEosSet);
         if (mEosSet)
             ret = -1;
     }
 
 FUNC_RET:
-    HDF_LOGE("leave ret %d\n", ret);
+    HDF_LOGD("leave ret %d", ret);
     return ret;
 }
 
 RK_S32 VpuApiLegacy::perform(PerformCmd cmd, RK_S32 *data)
 {
-    HDF_LOGE("enter\n");
+    HDF_LOGD("enter");
     switch (cmd) {
         case INPUT_FORMAT_MAP : {
             EncInputPictureType vpu_frame_fmt = *(EncInputPictureType *)data;
@@ -1435,16 +1435,16 @@ RK_S32 VpuApiLegacy::perform(PerformCmd cmd, RK_S32 *data)
             *(MppFrameFormat *)data = mpp_frame_fmt;
             } break;
         default:
-            HDF_LOGE("cmd can not match with any option!");
+            HDF_LOGE("%s cmd can not match with any option!", __func__);
             break;
     }
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
     return 0;
 }
 
 RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
 {
-    HDF_LOGE("enter cmd 0x%x param %p\n", cmd, param);
+    HDF_LOGD("enter cmd 0x%x param %p", cmd, param);
 
     if (mpi == nullptr && !init_ok) {
         return 0;
@@ -1459,13 +1459,13 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
             MppCodingType coding = (MppCodingType)ctx->videoCoding;
 
             if (memcpy_s(&enc_param, sizeof(enc_param), param, sizeof(enc_param)) != EOK) {
-                HDF_LOGE("memcpy_s no");
+                HDF_LOGE("%s memcpy_s no", __func__);
             }
             return vpu_api_set_enc_cfg(mpp_ctx, mpi, enc_cfg, coding, format, &enc_param);
             } break;
         case VPU_API_ENC_GETCFG : {
             if (memcpy_s(param, sizeof(enc_param), &enc_param, sizeof(enc_param)) != EOK) {
-                HDF_LOGE("memcpy_s no");
+                HDF_LOGE("%s memcpy_s no", __func__);
             }
             return 0;
             } break;
@@ -1502,11 +1502,11 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
 
                 if (timeout) {
                     if (timeout < 0)
-                        HDF_LOGE("set output mode to block\n");
+                        HDF_LOGI("set output mode to block");
                     else
-                        HDF_LOGE("set output timeout %d ms\n", timeout);
+                        HDF_LOGI("set output timeout %d ms", timeout);
                 } else {
-                    HDF_LOGE("set output mode to non-block\n");
+                    HDF_LOGI("set output mode to non-block");
                 }
             }
             } break;
@@ -1539,7 +1539,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_ENC_SET_MAX_TID: {
             RK_S32 max_tid = *(RK_S32 *)param;
 
-            HDF_LOGE("VPU_API_ENC_SET_MAX_TID %d\n", max_tid);
+            HDF_LOGI("VPU_API_ENC_SET_MAX_TID %d", max_tid);
             mlvec_dy_cfg.max_tid = max_tid;
             mlvec_dy_cfg.updated |= VPU_API_ENC_MAX_TID_UPDATED;
 
@@ -1551,7 +1551,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_ENC_SET_MARK_LTR: {
             RK_S32 mark_ltr = *(RK_S32 *)param;
 
-            HDF_LOGE("VPU_API_ENC_SET_MARK_LTR %d\n", mark_ltr);
+            HDF_LOGI("VPU_API_ENC_SET_MARK_LTR %d", mark_ltr);
 
             mlvec_dy_cfg.mark_ltr = mark_ltr;
             if (mark_ltr >= 0)
@@ -1562,7 +1562,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_ENC_SET_USE_LTR: {
             RK_S32 use_ltr = *(RK_S32 *)param;
 
-            HDF_LOGE("VPU_API_ENC_SET_USE_LTR %d\n", use_ltr);
+            HDF_LOGI("VPU_API_ENC_SET_USE_LTR %d", use_ltr);
 
             mlvec_dy_cfg.use_ltr = use_ltr;
             mlvec_dy_cfg.updated |= VPU_API_ENC_USE_LTR_UPDATED;
@@ -1572,7 +1572,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_ENC_SET_FRAME_QP: {
             RK_S32 frame_qp = *(RK_S32 *)param;
 
-            HDF_LOGE("VPU_API_ENC_SET_FRAME_QP %d\n", frame_qp);
+            HDF_LOGI("VPU_API_ENC_SET_FRAME_QP %d", frame_qp);
 
             mlvec_dy_cfg.frame_qp = frame_qp;
             mlvec_dy_cfg.updated |= VPU_API_ENC_FRAME_QP_UPDATED;
@@ -1582,7 +1582,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_ENC_SET_BASE_LAYER_PID: {
             RK_S32 base_layer_pid = *(RK_S32 *)param;
 
-            HDF_LOGE("VPU_API_ENC_SET_BASE_LAYER_PID %d\n", base_layer_pid);
+            HDF_LOGI("VPU_API_ENC_SET_BASE_LAYER_PID %d", base_layer_pid);
 
             mlvec_dy_cfg.base_layer_pid = base_layer_pid;
             mlvec_dy_cfg.updated |= VPU_API_ENC_BASE_PID_UPDATED;
@@ -1592,7 +1592,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
         case VPU_API_GET_EXTRA_INFO: {
             EncoderOut_t *out = (EncoderOut_t *)param;
 
-            HDF_LOGE("VPU_API_GET_EXTRA_INFO\n");
+            HDF_LOGI("VPU_API_GET_EXTRA_INFO");
 
             if (enc_hdr_pkt == nullptr) {
                 if (enc_hdr_buf == nullptr) {
@@ -1611,7 +1611,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
                 void *src = (*(mRKMppApi.Hdimpp_packet_get_data))(enc_hdr_pkt);
 
                 if (memcpy_s(out->data, length, src, length) != EOK) {
-                    HDF_LOGE("memcpy_s no");
+                    HDF_LOGE("%s memcpy_s no", __func__);
                 }
                 out->size = length;
             }
@@ -1628,7 +1628,7 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
     if (mpicmd < MPI_CMD_BUTT)
         ret = mpi->control(mpp_ctx, mpicmd, (MppParam)param);
 
-    HDF_LOGE("leave\n");
+    HDF_LOGD("leave");
     return ret;
 }
 

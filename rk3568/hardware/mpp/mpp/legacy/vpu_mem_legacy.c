@@ -38,7 +38,7 @@ commit_memory_handle(vpu_display_mem_pool *p, RK_S32 mem_hdl, RK_S32 size)
     MppBufferInfo info;
     vpu_display_mem_pool_impl *p_mempool = (vpu_display_mem_pool_impl *)p;
 
-    HDF_LOGE("in  pool %p hnl %p size %d\n", p, mem_hdl, size);
+    HDF_LOGD("in  pool %p hnl %p size %d", p, mem_hdl, size);
     memset_s(&info, sizeof(MppBufferInfo), 0, sizeof(MppBufferInfo));
     info.type = MPP_BUFFER_TYPE_ION;
     info.fd = mem_hdl;
@@ -49,7 +49,7 @@ commit_memory_handle(vpu_display_mem_pool *p, RK_S32 mem_hdl, RK_S32 size)
     p_mempool->buff_size = size;
 
     (*(mRKMppApi.Hdimpp_buffer_import_with_tag))(p_mempool->group, &info, NULL, MODULE_TAG, __FUNCTION__);
-    HDF_LOGE("out pool %p fd %d\n", p, info.fd);
+    HDF_LOGD("out pool %p fd %d", p, info.fd);
     return info.fd;
 }
 
@@ -62,7 +62,7 @@ static void* get_free_memory_vpumem(vpu_display_mem_pool *p)
     if (dmabuf == NULL) {
         return NULL;
     }
-    HDF_LOGE("in  pool %p\n", p);
+    HDF_LOGD("in pool %p", p);
     ret = (*(mRKMppApi.HdiMppBufferGetWithTag))(p_mempool->group, &buffer, p_mempool->size, MODULE_TAG, __FUNCTION__);
     if (MPP_OK != ret) {
         (*(mRKMppApi.Hdimpp_osal_free))(__FUNCTION__, dmabuf);
@@ -72,7 +72,7 @@ static void* get_free_memory_vpumem(vpu_display_mem_pool *p)
     dmabuf->vir_addr = (RK_U32*)(*(mRKMppApi.HdiMppBufferGetPtrWithCaller))(buffer, __FUNCTION__);
     dmabuf->size = p_mempool->size;
     dmabuf->offset = (RK_U32*)buffer;
-    HDF_LOGE("out pool %p ret %p fd %d size %d buffer %p\n", p, dmabuf, \
+    HDF_LOGD("out pool %p ret %p fd %d size %d buffer %p", p, dmabuf, \
         dmabuf->phy_addr, dmabuf->size, buffer);
     return dmabuf;
 }
@@ -81,7 +81,7 @@ static RK_S32 inc_used_memory_handle_ref(vpu_display_mem_pool *p, void * hdl)
 {
     VPUMemLinear_t *dmabuf = (VPUMemLinear_t *)hdl;
     MppBuffer buffer = (MppBuffer)dmabuf->offset;
-    HDF_LOGE("pool %p hnd %p buffer %p\n", p, hdl, buffer);
+    HDF_LOGD("pool %p hnd %p buffer %p", p, hdl, buffer);
     if (buffer != NULL) {
         (*(mRKMppApi.Hdimpp_buffer_inc_ref_with_caller))(buffer, __FUNCTION__);
     }
@@ -94,7 +94,7 @@ static RK_S32 put_used_memory_handle(vpu_display_mem_pool *p, void *hdl)
 {
     VPUMemLinear_t *dmabuf = (VPUMemLinear_t *)hdl;
     MppBuffer buf = (MppBuffer)dmabuf->offset;
-    HDF_LOGE("pool %p hnd %p buffer %p\n", p, hdl, buf);
+    HDF_LOGD("pool %p hnd %p buffer %p", p, hdl, buf);
     if (buf != NULL) {
         (*(mRKMppApi.HdiMppBufferPutWithCaller))(buf, __FUNCTION__);
         memset_s(dmabuf, sizeof(VPUMemLinear_t), 0, sizeof(VPUMemLinear_t));
@@ -109,7 +109,7 @@ static RK_S32 get_free_memory_num(vpu_display_mem_pool *p)
     RK_S32 ret = (p_mempool->group) ?
                  ((*(mRKMppApi.Hdimpp_buffer_group_unused))(p_mempool->group)) : (0);
 
-    HDF_LOGE("pool %p ret %d\n", p, ret);
+    HDF_LOGD("pool %p ret %d", p, ret);
     return ret;
 }
 
@@ -127,7 +127,7 @@ vpu_display_mem_pool* open_vpu_memory_pool()
     (*(mRKMppApi.Hdimpp_osal_calloc))(__FUNCTION__, sizeof(vpu_display_mem_pool_impl));
 
     (*(mRKMppApi.HdiMppEnvGetU32))("vpu_mem_debug", &vpu_mem_debug, 0);
-    HDF_LOGE("in  pool %p\n", p_mempool);
+    HDF_LOGD("in pool %p", p_mempool);
 
     if (p_mempool == NULL) {
         return NULL;
@@ -146,7 +146,7 @@ vpu_display_mem_pool* open_vpu_memory_pool()
     p_mempool->version        = 1;
     p_mempool->buff_size      = -1;
 
-    HDF_LOGE("out pool %p group %p\n", p_mempool, p_mempool->group);
+    HDF_LOGD("out pool %p group %p", p_mempool, p_mempool->group);
     return (vpu_display_mem_pool*)p_mempool;
 }
 
@@ -154,7 +154,7 @@ void close_vpu_memory_pool(vpu_display_mem_pool *p)
 {
     vpu_display_mem_pool_impl *p_mempool = (vpu_display_mem_pool_impl *)p;
 
-    HDF_LOGE("pool %p group %p\n", p_mempool, p_mempool->group);
+    HDF_LOGD("pool %p group %p", p_mempool, p_mempool->group);
     (*(mRKMppApi.HdiMppBufferGroupPut))(p_mempool->group);
     (*(mRKMppApi.Hdimpp_osal_free))(__FUNCTION__, p_mempool);
     return;
@@ -167,7 +167,7 @@ int create_vpu_memory_pool_allocator(vpu_display_mem_pool **ipool,
     (*(mRKMppApi.Hdimpp_osal_calloc))(__FUNCTION__, sizeof(vpu_display_mem_pool_impl));
 
     (*(mRKMppApi.HdiMppEnvGetU32))("vpu_mem_debug", &vpu_mem_debug, 0);
-    HDF_LOGE("in  pool %p num %d size %d\n", p_mempool, num, size);
+    HDF_LOGD("in pool %p num %d size %d", p_mempool, num, size);
 
     if (p_mempool == NULL) {
         return -1;
@@ -187,7 +187,7 @@ int create_vpu_memory_pool_allocator(vpu_display_mem_pool **ipool,
     p_mempool->size           = size;
     *ipool = (vpu_display_mem_pool*)p_mempool;
 
-    HDF_LOGE("out pool %p group %p\n", p_mempool, p_mempool->group);
+    HDF_LOGD("out pool %p group %p", p_mempool, p_mempool->group);
     return 0;
 }
 
@@ -198,14 +198,14 @@ void release_vpu_memory_pool_allocator(vpu_display_mem_pool *ipool)
         return;
     }
 
-    HDF_LOGE("pool %p group %p\n", p_mempool, p_mempool->group);
+    HDF_LOGD("pool %p group %p", p_mempool, p_mempool->group);
 
     if (p_mempool->group) {
         (*(mRKMppApi.HdiMppBufferGroupPut))(p_mempool->group);
         p_mempool->group = NULL;
     }
 
-    HDF_LOGE("free %p\n", p_mempool);
+    HDF_LOGD("free %p", p_mempool);
     (*(mRKMppApi.Hdimpp_osal_free))(__FUNCTION__, p_mempool);
     return;
 }
@@ -253,7 +253,7 @@ RK_S32 VPUMallocLinearFromRender(VPUMemLinear_t *p, RK_U32 size, void *ctx)
             return -1;
         }
         if (memcpy_s(p, sizeof(VPUMemLinear_t), dma_buf, sizeof(VPUMemLinear_t)) != EOK) {
-            HDF_LOGE("memcpy_s no");
+            HDF_LOGE("%s memcpy_s no", __func__);
         }
         (*(mRKMppApi.Hdimpp_osal_free))(__FUNCTION__, dma_buf);
         return 0;
@@ -276,7 +276,7 @@ RK_S32 VPUMemDuplicate(VPUMemLinear_t *dst, VPUMemLinear_t *src)
         (*(mRKMppApi.Hdimpp_buffer_inc_ref_with_caller))(buffer, __FUNCTION__);
     }
     if (memcpy_s(dst, sizeof(VPUMemLinear_t), src, sizeof(VPUMemLinear_t)) != EOK) {
-        HDF_LOGE("memcpy_s no");
+        HDF_LOGE("%s memcpy_s no", __func__);
     }
     return 0;
 }

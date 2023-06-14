@@ -43,52 +43,52 @@ typedef struct VpuApiMlvecImpl_t {
 MPP_RET vpu_api_mlvec_init(VpuApiMlvec *ctx)
 {
     if (ctx == nullptr) {
-        HDF_LOGE("invalid nullptr input\n");
+        HDF_LOGE("%s invalid nullptr input", __func__);
         return MPP_ERR_NULL_PTR;
     }
 
-    HDF_LOGE("enter %p\n", ctx);
+    HDF_LOGD("enter %p", ctx);
 
     VpuApiMlvecImpl *impl = (VpuApiMlvecImpl*)(*(mRKMppApi.Hdimpp_osal_calloc))(__FUNCTION__, sizeof(VpuApiMlvecImpl));
     if (impl == nullptr)
-        HDF_LOGE("failed to create MLVEC context\n");
+        HDF_LOGE("%s failed to create MLVEC context", __func__);
 
     /* default disable frame_qp setup */
     impl->dy_cfg.frame_qp = -1;
 
     *ctx = impl;
 
-    HDF_LOGE("leave %p %p\n", ctx, impl);
+    HDF_LOGD("leave %p %p", ctx, impl);
     return (impl) ? (MPP_OK) : (MPP_NOK);
 }
 
 MPP_RET vpu_api_mlvec_deinit(VpuApiMlvec ctx)
 {
-    HDF_LOGE("enter %p\n", ctx);
+    HDF_LOGD("enter %p", ctx);
     if (ctx) {
         (*(mRKMppApi.Hdimpp_osal_free))(__FUNCTION__, ctx);
     }
     ctx = nullptr;
-    HDF_LOGE("leave %p\n", ctx);
+    HDF_LOGD("leave %p", ctx);
     return MPP_OK;
 }
 
 MPP_RET vpu_api_mlvec_setup(VpuApiMlvec ctx, MppCtx mpp, MppApi *mpi, MppEncCfg enc_cfg)
 {
     if (ctx == nullptr || mpp == nullptr || mpi == nullptr || enc_cfg == nullptr) {
-        HDF_LOGE("invalid nullptr input ctx %p mpp %p mpi %p cfg %p\n",
-            ctx, mpp, mpi, enc_cfg);
+        HDF_LOGE("%s invalid nullptr input ctx %p mpp %p mpi %p cfg %p",
+            __func__, ctx, mpp, mpi, enc_cfg);
         return MPP_ERR_NULL_PTR;
     }
 
-    HDF_LOGE("enter %p\n", ctx);
+    HDF_LOGD("enter %p", ctx);
 
     VpuApiMlvecImpl *impl = (VpuApiMlvecImpl *)ctx;
     impl->mpp = mpp;
     impl->mpi = mpi;
     impl->enc_cfg = enc_cfg;
 
-    HDF_LOGE("leave %p\n", ctx);
+    HDF_LOGD("leave %p", ctx);
 
     return MPP_OK;
 }
@@ -96,7 +96,7 @@ MPP_RET vpu_api_mlvec_setup(VpuApiMlvec ctx, MppCtx mpp, MppApi *mpi, MppEncCfg 
 MPP_RET vpu_api_mlvec_check_cfg(void *p)
 {
     if (p == nullptr) {
-        HDF_LOGE("invalid nullptr input\n");
+        HDF_LOGE("%s invalid nullptr input", __func__);
         return MPP_ERR_NULL_PTR;
     }
 
@@ -108,7 +108,7 @@ MPP_RET vpu_api_mlvec_check_cfg(void *p)
         (((magic >> 16) & 0xff) != MLVEC_VERSION)) // (magic >> 16)
         ret = MPP_NOK;
 
-    HDF_LOGE("check mlvec cfg magic %08x %s\n", magic,
+    HDF_LOGD("check mlvec cfg magic %08x %s", magic,
         (ret == MPP_OK) ? "success" : "failed");
 
     return ret;
@@ -117,11 +117,11 @@ MPP_RET vpu_api_mlvec_check_cfg(void *p)
 MPP_RET vpu_api_mlvec_set_st_cfg(VpuApiMlvec ctx, VpuApiMlvecStaticCfg *cfg)
 {
     if (ctx == nullptr || cfg == nullptr) {
-        HDF_LOGE("invalid nullptr input ctx %p cfg %p\n");
+        HDF_LOGE("%s invalid nullptr input ctx %p cfg %p", __func__, ctx, cfg);
         return MPP_ERR_NULL_PTR;
     }
 
-    HDF_LOGE("enter ctx %p cfg %p\n", ctx, cfg);
+    HDF_LOGD("enter ctx %p cfg %p", ctx, cfg);
 
     /* check mlvec magic word */
     if (vpu_api_mlvec_check_cfg(cfg))
@@ -132,7 +132,7 @@ MPP_RET vpu_api_mlvec_set_st_cfg(VpuApiMlvec ctx, VpuApiMlvecStaticCfg *cfg)
     VpuApiMlvecImpl *impl = (VpuApiMlvecImpl *)ctx;
 
     if (memcpy_s(&impl->st_cfg, sizeof(impl->st_cfg), cfg, sizeof(impl->st_cfg)) != EOK) {
-        HDF_LOGE("memcpy_s no");
+        HDF_LOGE("%s memcpy_s no", __func__);
     }
     cfg = &impl->st_cfg;
 
@@ -142,19 +142,19 @@ MPP_RET vpu_api_mlvec_set_st_cfg(VpuApiMlvec ctx, VpuApiMlvecStaticCfg *cfg)
     MppEncCfg enc_cfg = impl->enc_cfg;
 
     /* start control mpp */
-    HDF_LOGE("hdr_on_idr %d\n", cfg->hdr_on_idr);
+    HDF_LOGD("hdr_on_idr %d", cfg->hdr_on_idr);
     MppEncHeaderMode mode = cfg->hdr_on_idr ?
                             MPP_ENC_HEADER_MODE_EACH_IDR :
                             MPP_ENC_HEADER_MODE_DEFAULT;
 
     ret = mpi->control(mpp_ctx, MPP_ENC_SET_HEADER_MODE, &mode);
     if (ret)
-        HDF_LOGE("setup enc header mode %d failed ret %d\n", mode, ret);
+        HDF_LOGE("%s setup enc header mode %d failed ret %d", __func__, mode, ret);
 
-    HDF_LOGE("add_prefix %d\n", cfg->add_prefix);
+    HDF_LOGD("add_prefix %d", cfg->add_prefix);
     (*(mRKMppApi.HdiMppEncCfgSetS32))(enc_cfg, "h264:prefix_mode", cfg->add_prefix);
 
-    HDF_LOGE("slice_mbs  %d\n", cfg->slice_mbs);
+    HDF_LOGD("slice_mbs  %d", cfg->slice_mbs);
     if (cfg->slice_mbs) {
         (*(mRKMppApi.HdiMppEncCfgSetU32))(enc_cfg, "split:mode", MPP_ENC_SPLIT_BY_CTU);
         (*(mRKMppApi.HdiMppEncCfgSetU32))(enc_cfg, "split:arg", cfg->slice_mbs);
@@ -164,7 +164,7 @@ MPP_RET vpu_api_mlvec_set_st_cfg(VpuApiMlvec ctx, VpuApiMlvecStaticCfg *cfg)
     /* NOTE: ltr_frames is already configured */
     vpu_api_mlvec_set_dy_max_tid(ctx, cfg->max_tid);
 
-    HDF_LOGE("leave ctx %p ret %d\n", ctx, ret);
+    HDF_LOGD("leave ctx %p ret %d", ctx, ret);
 
     return ret;
 }
@@ -172,12 +172,12 @@ MPP_RET vpu_api_mlvec_set_st_cfg(VpuApiMlvec ctx, VpuApiMlvecStaticCfg *cfg)
 MPP_RET vpu_api_mlvec_set_dy_cfg(VpuApiMlvec ctx, VpuApiMlvecDynamicCfg *cfg, MppMeta meta)
 {
     if (ctx == nullptr || cfg == nullptr || meta == nullptr) {
-        HDF_LOGE("invalid nullptr input ctx %p cfg %p meta %p\n",
-            ctx, cfg, meta);
+        HDF_LOGE("%s invalid nullptr input ctx %p cfg %p meta %p",
+            __func__, ctx, cfg, meta);
         return MPP_ERR_NULL_PTR;
     }
 
-    HDF_LOGE("enter ctx %p cfg %p meta %p\n", ctx, cfg, meta);
+    HDF_LOGD("enter ctx %p cfg %p meta %p", ctx, cfg, meta);
 
     MPP_RET ret = MPP_OK;
     VpuApiMlvecImpl *impl = (VpuApiMlvecImpl *)ctx;
@@ -206,7 +206,7 @@ MPP_RET vpu_api_mlvec_set_dy_cfg(VpuApiMlvec ctx, VpuApiMlvecDynamicCfg *cfg, Mp
         cfg->updated = 0;
     }
 
-    HDF_LOGE("ltr mark %2d use %2d frm qp %2d blpid %d\n", dst->mark_ltr,
+    HDF_LOGD("ltr mark %2d use %2d frm qp %2d blpid %d", dst->mark_ltr,
         dst->use_ltr, dst->frame_qp, dst->base_layer_pid);
 
     /* setup next frame configure */
@@ -222,7 +222,7 @@ MPP_RET vpu_api_mlvec_set_dy_cfg(VpuApiMlvec ctx, VpuApiMlvecDynamicCfg *cfg, Mp
     if (dst->base_layer_pid >= 0)
         (*(mRKMppApi.Hdimpp_meta_set_s32))(meta, KEY_ENC_BASE_LAYER_PID, dst->base_layer_pid);
 
-    HDF_LOGE("leave ctx %p ret %d\n", ctx, ret);
+    HDF_LOGD("leave ctx %p ret %d", ctx, ret);
 
     return ret;
 }
@@ -230,11 +230,11 @@ MPP_RET vpu_api_mlvec_set_dy_cfg(VpuApiMlvec ctx, VpuApiMlvecDynamicCfg *cfg, Mp
 MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 {
     if (ctx == nullptr) {
-        HDF_LOGE("invalid nullptr input\n");
+        HDF_LOGE("%s invalid nullptr input", __func__);
         return MPP_ERR_NULL_PTR;
     }
 
-    HDF_LOGE("enter ctx %p max_tid %d\n", ctx, max_tid);
+    HDF_LOGD("enter ctx %p max_tid %d", ctx, max_tid);
 
     MPP_RET ret = MPP_OK;
     VpuApiMlvecImpl *impl = (VpuApiMlvecImpl *)ctx;
@@ -251,8 +251,7 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
     memset_s(lt_ref, sizeof(lt_ref), 0, sizeof(lt_ref));
     memset_s(st_ref, sizeof(st_ref), 0, sizeof(st_ref));
 
-    HDF_LOGE("ltr_frames %d\n", ltr_frames);
-    HDF_LOGE("max_tid    %d\n", max_tid);
+    HDF_LOGD("ltr_frames %d, max_tid    %d", ltr_frames, max_tid);
 
     switch (max_tid) {
         case 0 : {
@@ -264,7 +263,6 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 
             st_cfg_cnt = 1;
             tid0_loop = 1;
-            HDF_LOGE("no tsvc\n");
             } break;
         case 1 : {
             /* set tsvc2 st-ref struct */
@@ -289,7 +287,6 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 
             st_cfg_cnt = 3; // st_cfg_cnt = 3
             tid0_loop = 2; // tid0_loop = 2
-            HDF_LOGE("tsvc2\n");
             } break;
         case 2 : { // st 2 layer
             /* set tsvc3 st-ref struct */
@@ -326,7 +323,6 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 
             st_cfg_cnt = 5; // st_cfg_cnt = 5
             tid0_loop = 4; // tid0_loop = 4
-            HDF_LOGE("tsvc3\n");
             } break;
         case 3 : { // set tsvc3
             /* set tsvc3 st-ref struct */
@@ -387,10 +383,9 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 
             st_cfg_cnt = 9; // st_cfg_cnt = 9
             tid0_loop = 8; // tid0_loop = 8
-            HDF_LOGE("tsvc4\n");
             } break;
         default : {
-            HDF_LOGE("invalid max temporal layer id %d\n", max_tid);
+            HDF_LOGE("%s invalid max temporal layer id %d", __func__, max_tid);
             } break;
         }
 
@@ -407,7 +402,7 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
         }
     }
 
-    HDF_LOGE("lt_cfg_cnt %d st_cfg_cnt %d\n", lt_cfg_cnt, st_cfg_cnt);
+    HDF_LOGD("lt_cfg_cnt %d st_cfg_cnt %d", lt_cfg_cnt, st_cfg_cnt);
     if (lt_cfg_cnt || st_cfg_cnt) {
         MppEncRefCfg ref = nullptr;
 
@@ -421,16 +416,16 @@ MPP_RET vpu_api_mlvec_set_dy_max_tid(VpuApiMlvec ctx, RK_S32 max_tid)
 
         ret = mpi->control(mpp_ctx, MPP_ENC_SET_REF_CFG, ref);
         if (ret)
-            HDF_LOGE("mpi control enc set ref cfg failed ret %d\n", ret);
+            HDF_LOGE("%s mpi control enc set ref cfg failed ret %d", __func__, ret);
 
         (*(mRKMppApi.HdiMppEncRefCfgDeinit))(&ref);
     } else {
         ret = mpi->control(mpp_ctx, MPP_ENC_SET_REF_CFG, nullptr);
         if (ret)
-            HDF_LOGE("mpi control enc set ref cfg failed ret %d\n", ret);
+            HDF_LOGE("%s mpi control enc set ref cfg failed ret %d", __func__, ret);
     }
 
-    HDF_LOGE("leave ctx %p ret %d\n", ctx, ret);
+    HDF_LOGD("leave ctx %p ret %d", ctx, ret);
 
     return ret;
 }

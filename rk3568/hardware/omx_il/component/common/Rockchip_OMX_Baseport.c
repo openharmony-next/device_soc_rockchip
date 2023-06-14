@@ -442,13 +442,7 @@ OMX_ERRORTYPE Rockchip_OMX_EmptyThisBuffer(
     }
 
     if (pBuffer->nFlags & OMX_BUFFERFLAG_EXTRADATA) {
-        VIDEO_DBG(VIDEO_DBG_LOG_PORT, "[%s]: empty this extradata buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
-                  pRockchipComponent->componentName,
-                  pBuffer->pBuffer,
-                  pBuffer->nTimeStamp,
-                  pBuffer->nFilledLen,
-                  pBuffer->nFlags);
-        omx_info("[%s]: empty this extradata buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
+        omx_trace("[%s]: empty this extradata buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
                   pRockchipComponent->componentName,
                   pBuffer->pBuffer,
                   pBuffer->nTimeStamp,
@@ -456,26 +450,14 @@ OMX_ERRORTYPE Rockchip_OMX_EmptyThisBuffer(
                   pBuffer->nFlags);
 
     } else if (pBuffer->nFlags & OMX_BUFFERFLAG_EOS) {
-        VIDEO_DBG(VIDEO_DBG_LOG_PORT, "[%s]: empty this EOS buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
-                  pRockchipComponent->componentName,
-                  pBuffer->pBuffer,
-                  pBuffer->nTimeStamp,
-                  pBuffer->nFilledLen,
-                  pBuffer->nFlags);
-        omx_info("[%s]: empty this EOS buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
+        omx_trace("[%s]: empty this EOS buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
                   pRockchipComponent->componentName,
                   pBuffer->pBuffer,
                   pBuffer->nTimeStamp,
                   pBuffer->nFilledLen,
                   pBuffer->nFlags);
     } else {
-        VIDEO_DBG(VIDEO_DBG_LOG_PORT, "[%s]: empty this buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
-                  pRockchipComponent->componentName,
-                  pBuffer->pBuffer,
-                  pBuffer->nTimeStamp,
-                  pBuffer->nFilledLen,
-                  pBuffer->nFlags);
-        omx_info("[%s]: empty this buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
+        omx_trace("[%s]: empty this buffer(%p) timeus: %lld us, size: %ld, flags: 0x%lx",
                   pRockchipComponent->componentName,
                   pBuffer->pBuffer,
                   pBuffer->nTimeStamp,
@@ -590,12 +572,7 @@ OMX_ERRORTYPE Rockchip_OMX_FillThisBuffer(
         goto EXIT;
     }
 
-    VIDEO_DBG(VIDEO_DBG_LOG_PORT, "[%s]: fill this buffer(%p) flags: 0x%lx",
-              pRockchipComponent->componentName,
-              pBuffer->pBuffer,
-              pBuffer->nFlags);
-
-    omx_info("[%s]: fill this buffer(%p) flags: 0x%lx",
+    omx_trace("[%s]: fill this buffer(%p) flags: 0x%lx",
               pRockchipComponent->componentName,
               pBuffer->pBuffer,
               pBuffer->nFlags);

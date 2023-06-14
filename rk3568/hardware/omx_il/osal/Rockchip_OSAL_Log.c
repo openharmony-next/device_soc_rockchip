@@ -62,7 +62,7 @@ void _Rockchip_OSAL_Log(ROCKCHIP_LOG_LEVEL logLevel, OMX_U32 flag, const char *t
             fwrite(str, strlen(str), 1, fp);
             fflush(fp);
 #else
-            HDF_LOGI("%{public}s %{public}s", tag, str);
+            HDF_LOGD("%{public}s %{public}s", tag, str);
 #endif
             break;
         }

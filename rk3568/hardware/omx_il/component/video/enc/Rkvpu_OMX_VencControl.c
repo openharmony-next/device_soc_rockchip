@@ -261,7 +261,6 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(OMX_IN OMX_HANDLETYPE hComponent,
     int                    temp_buffer_fd = -1;
     OMX_U32                i = 0;
     MEMORY_TYPE            mem_type = NORMAL_MEMORY;
-    omx_err("Rkvpu_OMX_AllocateBuffer in");
     if (hComponent == NULL) {
         ret = OMX_ErrorBadParameter;
         omx_err_f("hComponent is null");
@@ -341,7 +340,6 @@ OMX_ERRORTYPE Rkvpu_OMX_AllocateBuffer(OMX_IN OMX_HANDLETYPE hComponent,
     ret = OMX_ErrorInsufficientResources;
 EXIT:
     FunctionOut();
-    omx_err("Rkvpu_OMX_AllocateBuffer in ret = 0x%x", ret);
     return ret;
 }
 
@@ -414,7 +412,6 @@ OMX_ERRORTYPE Rkvpu_OMX_FreeBuffer(OMX_IN OMX_HANDLETYPE hComponent,
     omx_trace("pRockchipPort->assignedBufferNum = %d", pRockchipPort->assignedBufferNum);
 EXIT:
     if (ret == OMX_ErrorNone) {
-        omx_trace("ret == OMX_ErrorNone");
         if (pRockchipPort->assignedBufferNum == 0) {
             omx_trace("pRockchipPort->unloadedResource signal set");
             Rockchip_OSAL_SemaphorePost(pRockchipPort->unloadedResource);
@@ -707,7 +704,7 @@ OMX_ERRORTYPE Rkvpu_OutputBufferReturn(OMX_COMPONENTTYPE *pOMXComponent, ROCKCHI
         }
 
         if ((bufferHeader->nFlags & OMX_BUFFERFLAG_EOS) == OMX_BUFFERFLAG_EOS) {
-            omx_trace("event OMX_BUFFERFLAG_EOS!!!");
+            omx_info("event OMX_BUFFERFLAG_EOS!!!");
             pRockchipComponent->pCallbacks->EventHandler(pOMXComponent,
                                                          pRockchipComponent->callbackData,
                                                          OMX_EventBufferFlag,
@@ -736,16 +733,16 @@ OMX_ERRORTYPE Rkvpu_InputBufferReturn(OMX_COMPONENTTYPE *pOMXComponent, ROCKCHIP
     OMX_BUFFERHEADERTYPE     *bufferHeader = NULL;
     bufferHeader = dataBuffer->bufferHeader;
     if (bufferHeader != NULL) {
-        omx_info_f("bufferHeader is not null");
+        omx_trace_f("bufferHeader is not null");
         if (rockchipOMXInputPort->markType.hMarkTargetComponent != NULL) {
-            omx_info_f("hMarkTargetComponent is not null");
+            omx_trace_f("hMarkTargetComponent is not null");
             bufferHeader->hMarkTargetComponent      = rockchipOMXInputPort->markType.hMarkTargetComponent;
             bufferHeader->pMarkData                 = rockchipOMXInputPort->markType.pMarkData;
             rockchipOMXInputPort->markType.hMarkTargetComponent = NULL;
             rockchipOMXInputPort->markType.pMarkData = NULL;
         }
         if (bufferHeader->hMarkTargetComponent != NULL) {
-            omx_info_f("bufferHeader->hMarkTargetComponent is not null");
+            omx_trace_f("bufferHeader->hMarkTargetComponent is not null");
             if (bufferHeader->hMarkTargetComponent == pOMXComponent) {
                 omx_trace("hMarkTargetComponent == pOMXComponent, send OMX_EventMark");
                 pRockchipComponent->pCallbacks->EventHandler(pOMXComponent, pRockchipComponent->callbackData,
