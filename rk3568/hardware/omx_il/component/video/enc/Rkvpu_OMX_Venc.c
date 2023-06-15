@@ -179,7 +179,7 @@ OMX_BOOL Rkvpu_Check_BufferProcess_State(ROCKCHIP_OMX_BASECOMPONENT *pRockchipCo
         omx_trace("currentState is OMX_StateExecuting");
         ret = OMX_TRUE;
     } else {
-        omx_trace("current status is incorrect");
+        omx_warn("current status is incorrect");
         ret = OMX_FALSE;
     }
 
@@ -524,7 +524,7 @@ H264EncPictureType RkGetPicTypeInBufferHandle(ROCKCHIP_OMX_DATABUFFER *inputUseB
     }
 
     BufferHandle *bufferHandle = dynaBuffer->buffer;
-    omx_info("bufferHandle is %p", bufferHandle);
+    omx_trace("bufferHandle is %p", bufferHandle);
     if (!bufferHandle) {
         omx_err("%s :bufferHandle is null", __func__);
         return encType;
@@ -762,7 +762,7 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
                 Rockchip_OSAL_Memcpy(aOut_buf, pVideoEnc->bSpsPpsbuf, pVideoEnc->bSpsPpsLen);
                 outputUseBuffer->remainDataLen = pVideoEnc->bSpsPpsLen;
                 outputUseBuffer->nFlags |= OMX_BUFFERFLAG_CODECCONFIG;
-                omx_info("set bSpsPpsLen %d", (int)pVideoEnc->bSpsPpsLen);
+                omx_trace("set bSpsPpsLen %d", (int)pVideoEnc->bSpsPpsLen);
                 pVideoEnc->bSpsPpsHeaderFlag = OMX_TRUE;
                 ret = OMX_TRUE;
                 if (pVideoEnc->fp_enc_out != NULL) {
@@ -804,7 +804,7 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
 #endif
             if (pVideoEnc->codecId == OMX_VIDEO_CodingAVC) {
                 if (pVideoEnc->bPrependSpsPpsToIdr && pOutput.keyFrame) {
-                    omx_info("IDR outputUseBuffer->remainDataLen  %d spslen %d size %d",
+                    omx_trace("IDR outputUseBuffer->remainDataLen  %d spslen %d size %d",
                         (int)outputUseBuffer->remainDataLen, (int)pVideoEnc->bSpsPpsLen,
                         (int)outputUseBuffer->allocSize);
                     Rockchip_OSAL_Memcpy(aOut_buf, pVideoEnc->bSpsPpsbuf, pVideoEnc->bSpsPpsLen);
@@ -815,7 +815,7 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
                     outputUseBuffer->usedDataLen += pVideoEnc->bSpsPpsLen;
                     outputUseBuffer->usedDataLen += 4; // 4:byte alignment
                     outputUseBuffer->usedDataLen += pOutput.size;
-                    omx_info("IDR outputUseBuffer->remainDataLen 1 %d spslen %d size %d",
+                    omx_trace("IDR outputUseBuffer->remainDataLen 1 %d spslen %d size %d",
                         (int)outputUseBuffer->remainDataLen,
                         (int)pVideoEnc->bSpsPpsLen,
                         (int)outputUseBuffer->allocSize);
@@ -828,7 +828,7 @@ OMX_BOOL Rkvpu_Post_OutputStream(OMX_COMPONENTTYPE *pOMXComponent)
                 }
             } else if (pVideoEnc->codecId == CODEC_OMX_VIDEO_CodingHEVC &&
                       (pVideoEnc->bPrependSpsPpsToIdr && pOutput.keyFrame)) {
-                    omx_info("IDR outputUseBuffer->remainDataLen  %d spslen %d size %d",
+                    omx_trace("IDR outputUseBuffer->remainDataLen  %d spslen %d size %d",
                         (int)outputUseBuffer->remainDataLen, (int)pVideoEnc->bSpsPpsLen,
                         (int)outputUseBuffer->allocSize);
                     // The start code is included in pOutput.data
@@ -1128,7 +1128,7 @@ EXIT:
 static OMX_ERRORTYPE ConvertOmxAvcLevelToAvcSpecLevel(
     int32_t omxLevel, AVCLevel *pvLevel)
 {
-    omx_err("ConvertOmxAvcLevelToAvcSpecLevel: %d", omxLevel);
+    omx_trace("ConvertOmxAvcLevelToAvcSpecLevel: %d", omxLevel);
     AVCLevel level = AVC_LEVEL5_1;
     switch (omxLevel) {
         case OMX_VIDEO_AVCLevel1:
@@ -1362,10 +1362,10 @@ OMX_ERRORTYPE Rkvpu_Enc_ComponentInit(OMX_COMPONENTTYPE *pOMXComponent)
     }
 
     if (p_vpu_ctx->extra_cfg.reserved[0] == 1) {
-        omx_info("use vpuapi.");
+        omx_trace("use vpuapi.");
         pVideoEnc->bIsUseMpp = OMX_FALSE;
     } else {
-        omx_info("use mpp.");
+        omx_trace("use mpp.");
         pVideoEnc->bIsUseMpp = OMX_TRUE;
     }
     p_vpu_ctx->private_data = Rockchip_OSAL_Malloc(sizeof(EncParameter_t));
@@ -1517,7 +1517,7 @@ OMX_ERRORTYPE Rkvpu_Enc_GetEncParams(OMX_COMPONENTTYPE *pOMXComponent, EncParame
         }
         enum CodecColorFormatExt eColorFormatExt =
             (enum CodecColorFormatExt)pRockchipInputPort->portDefinition.format.video.eColorFormat;
-        omx_err("inputPort colorformat= %d", eColorFormatExt);
+        omx_trace("inputPort colorformat= %d", eColorFormatExt);
         switch (pRockchipInputPort->portDefinition.format.video.eColorFormat) {
             case OMX_COLOR_FormatYUV420Planar: {
                 (*encParams)->format = VPU_H264ENC_YUV420_PLANAR;

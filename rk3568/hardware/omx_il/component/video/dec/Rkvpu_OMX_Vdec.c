@@ -805,7 +805,7 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                     outputUseBuffer->dataValid = OMX_FALSE;
                     ret = OMX_TRUE;
                     pVideoDec->bDecSendEOS = OMX_TRUE;
-                    omx_err("OMX_BUFFERFLAG_EOS");
+                    omx_info("OMX_BUFFERFLAG_EOS");
                 } else {
                     omx_err("OMX_DECODER ERROR");
                     pRockchipComponent->pCallbacks->EventHandler((OMX_HANDLETYPE)pOMXComponent,
@@ -938,12 +938,11 @@ OMX_BOOL Rkvpu_Post_OutputFrame(OMX_COMPONENTTYPE *pOMXComponent)
                 if (VPU_API_EOS_STREAM_REACHED == (VPU_API_ERR)pOutput.nFlags) {
                     outputUseBuffer->nFlags |= OMX_BUFFERFLAG_EOS;
                     pVideoDec->bDecSendEOS = OMX_TRUE;
-                    omx_err("OMX_BUFFERFLAG_EOS");
+                    omx_info("OMX_BUFFERFLAG_EOS");
                 }
                 if ((outputUseBuffer->remainDataLen > 0) ||
                     ((outputUseBuffer->nFlags & OMX_BUFFERFLAG_EOS) == OMX_BUFFERFLAG_EOS) ||
                     (CHECK_PORT_BEING_FLUSHED(pOutputPort))) {
-                    omx_trace("Rkvpu_OutputBufferReturn");
                     Rkvpu_OutputBufferReturn(pOMXComponent, outputUseBuffer);
                 }
                 ret = OMX_TRUE;

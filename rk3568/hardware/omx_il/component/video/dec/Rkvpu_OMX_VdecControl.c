@@ -790,7 +790,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
     
 #ifdef OHOS_BUFFER_HANDLE
     if (pVideoDec->bOhosBufferHandle == OMX_TRUE) {
-        omx_info("bOhosBufferHandle is TRUE");
+        omx_trace("bOhosBufferHandle is TRUE");
         OMX_U32 mWidth = pOutputPort->portDefinition.format.video.nFrameWidth;
         OMX_U32 mHeight = pOutputPort->portDefinition.format.video.nFrameHeight;
         OMX_U32 mStride = 0;
@@ -807,7 +807,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         
         if (bufferHandle->format != PIXEL_FMT_YCRCB_420_SP && bufferHandle->format != PIXEL_FMT_YCBCR_420_SP &&
             bufferHandle->format != PIXEL_FMT_YCBCR_420_P && bufferHandle->format != PIXEL_FMT_YCRCB_420_P) {
-            omx_err("bufferhandle format is %d", bufferHandle->format);
+            omx_warn("bufferhandle format is %d", bufferHandle->format);
         }
 
         pOutputBuffer->nFilledLen = bufferHandle->size;
@@ -847,7 +847,7 @@ OMX_ERRORTYPE Rkvpu_Frame2Outbuf(OMX_COMPONENTTYPE *pOMXComponent,
         FunctionOut();
         return ret;
     } else {
-        omx_info("bOhosBufferHandle is FALSE");
+        omx_trace("bOhosBufferHandle is FALSE");
     }
 #endif // OHOS_BUFFER_HANDLE
 #ifdef USE_STOREMETADATA
@@ -1132,7 +1132,7 @@ OMX_ERRORTYPE Rkvpu_OutputBufferReturn(OMX_COMPONENTTYPE *pOMXComponent, ROCKCHI
         }
 
         if ((bufferHeader->nFlags & OMX_BUFFERFLAG_EOS) == OMX_BUFFERFLAG_EOS) {
-            omx_err("event OMX_BUFFERFLAG_EOS!!!");
+            omx_info("event OMX_BUFFERFLAG_EOS!!!");
             pRockchipComponent->pCallbacks->EventHandler(pOMXComponent,
                 pRockchipComponent->callbackData,
                 OMX_EventBufferFlag,
