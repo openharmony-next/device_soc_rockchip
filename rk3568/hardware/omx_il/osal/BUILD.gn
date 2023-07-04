@@ -89,7 +89,7 @@ ohos_static_library("RkOMX_OSAL") {
 
   external_deps = [
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "init:libbegetutil",
   ]
 }

@@ -37,7 +37,7 @@ ohos_static_library("higbm") {
   deps = [ "//third_party/libdrm:libdrm" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }
 
@@ -68,7 +68,7 @@ ohos_shared_library("display_gralloc") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   install_enable = true
@@ -98,7 +98,7 @@ ohos_shared_library("display_gfx") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   install_enable = true
@@ -150,7 +150,7 @@ ohos_shared_library("display_device") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   symlink_target_name = [ "libdisplay_layer.z.so" ]
