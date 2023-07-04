@@ -37,7 +37,7 @@ ohos_shared_library("libjpeg_vdi_interface") {
     external_deps = [
       "c_utils:utils",
       "graphic_chipsetsdk:buffer_handle",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
