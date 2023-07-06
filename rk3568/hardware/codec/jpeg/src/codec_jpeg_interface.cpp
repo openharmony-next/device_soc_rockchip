@@ -12,108 +12,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <ashmem.h>
 #include <codec_jpeg_vdi.h>
-#include <display_type.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <memory>
-#include <securec.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include "codec_jpeg_decoder.h"
+#include "codec_jpeg_impl.h"
 #include "codec_log_wrapper.h"
 using namespace OHOS::VDI::JPEG;
-static std::shared_ptr<CodecJpegDecoder> g_JpegDecoder = nullptr;
+static std::shared_ptr<CodecJpegImpl> g_JpegImpl = nullptr;
 static int32_t JpegInit()
 {
     CODEC_LOGI("enter.");
-    if (g_JpegDecoder != nullptr) {
-        CODEC_LOGE("jpeg decoder is inited.");
+    if (g_JpegImpl != nullptr) {
+        CODEC_LOGE("jpeg impl is inited.");
         return HDF_ERR_DEVICE_BUSY;
     }
-    g_JpegDecoder = std::make_shared<CodecJpegDecoder>();
-    return g_JpegDecoder->Init();
+    g_JpegImpl = std::make_shared<CodecJpegImpl>();
+    return g_JpegImpl->Init();
 }
 
 static int32_t JpegDeInit()
 {
     CODEC_LOGI("enter.");
-    if (g_JpegDecoder) {
-        g_JpegDecoder->DeInit();
+    if (g_JpegImpl) {
+        g_JpegImpl->DeInit();
     }
-    g_JpegDecoder = nullptr;
+    g_JpegImpl = nullptr;
     return HDF_SUCCESS;
 }
 
 static int32_t AllocateBuffer(BufferHandle **buffer, uint32_t size)
 {
     CODEC_LOGI("enter.");
-    if (g_JpegDecoder == nullptr) {
+    if (g_JpegImpl == nullptr) {
         CODEC_LOGE("jpeg decoder is not init.");
         return HDF_ERR_NOPERM;
     }
-    int fd = OHOS::AshmemCreate(0, size);
-    OHOS::AshmemSetProt(fd, PROT_READ | PROT_WRITE);
-    BufferHandle *bufferHandle = reinterpret_cast<BufferHandle *>(malloc(sizeof(BufferHandle)));
-    if (bufferHandle == nullptr) {
-        CODEC_LOGE("malloc ret nullptr");
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    auto ret = memset_s(bufferHandle, sizeof(BufferHandle), 0, sizeof(BufferHandle));
-    if (ret != EOK) {
-        CODEC_LOGE("memset_s ret err %{public}d", ret);
-        return HDF_ERR_MALLOC_FAIL;
-    }
-
-    bufferHandle->width = size;
-    bufferHandle->height = 1;
-    bufferHandle->stride = size;
-    bufferHandle->size = size;
-    bufferHandle->format = 0;
-    bufferHandle->usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_SHARE;
-    bufferHandle->fd = fd;
-    *buffer = bufferHandle;
-    return HDF_SUCCESS;
+    return g_JpegImpl->AllocateBuffer(buffer, size);
 }
 
 static int32_t FreeBuffer(BufferHandle *buffer)
 {
     CODEC_LOGI("enter.");
-    if (g_JpegDecoder == nullptr) {
+    if (g_JpegImpl == nullptr) {
         CODEC_LOGE("jpeg decoder is not init.");
         return HDF_ERR_NOPERM;
     }
-    if (buffer == nullptr) {
-        CODEC_LOGE("buffer is null.");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (buffer->fd > -1) {
-        close(buffer->fd);
-    }
-    CODEC_LOGD("free bufferhandle %p width[%{public}d] height[%{public}d] ", buffer, buffer->width, buffer->height);
-    free(buffer);
-    return HDF_SUCCESS;
+    return g_JpegImpl->FreeBuffer(buffer);
 }
 
-static int32_t DoJpegDecode(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo *decInfo,
-    CodecJpegCallbackHwi *callback)
+static int32_t DoJpegDecode(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo *decInfo)
 {
     CODEC_LOGI("enter.");
-    if (g_JpegDecoder == nullptr) {
+    if (g_JpegImpl == nullptr) {
         CODEC_LOGE("jpeg decoder is not init.");
         return HDF_ERR_NOPERM;
     }
-    if (buffer == nullptr || outBuffer == nullptr) {
-        CODEC_LOGE("invalid param.");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    auto ret = g_JpegDecoder->DeCode(buffer, outBuffer, *decInfo, callback);
-    if (ret != HDF_SUCCESS) {
-        CODEC_LOGE("jpeg decode err %{public}d.", ret);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return ret;
+
+    return g_JpegImpl->DeCode(buffer, outBuffer, *decInfo);
 }
 
 static ICodecJpegHwi g_jpegHwi = {.JpegInit = JpegInit,

@@ -63,6 +63,6 @@ ohos_shared_library("libcodec_oem_interface") {
 group("codec_oem_interface") {
   deps = [
     ":libcodec_oem_interface",
-    "jpeg:libjpeg_vdi_interface",
+    "jpeg:libjpeg_vdi_impl",
   ]
 }

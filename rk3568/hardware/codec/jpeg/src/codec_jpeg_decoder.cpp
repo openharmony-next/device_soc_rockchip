@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "codec_jpeg_decoder.h"
-#include <ashmem.h>
 #include <display_type.h>
 #include <hdf_base.h>
 #include <securec.h>
@@ -28,10 +27,9 @@
 namespace OHOS {
 namespace VDI {
 namespace JPEG {
-RKMppApi *CodecJpegDecoder::mppApi_ = nullptr;
-CodecJpegDecoder::CodecJpegDecoder()
-    : width_(0), height_(0), format_(MPP_FMT_YUV420SP), mppCtx_(nullptr), mpi_(nullptr), memGroup_(nullptr),
-      packet_(nullptr), frame_(nullptr), callback_(nullptr), running_(false), threadTask_(nullptr)
+CodecJpegDecoder::CodecJpegDecoder(RKMppApi *mppApi)
+    : width_(0), height_(0), format_(MPP_FMT_YUV420SP), mppCtx_(nullptr), mpi_(nullptr), mppApi_(mppApi),
+      memGroup_(nullptr), packet_(nullptr), frame_(nullptr)
 {}
 
 CodecJpegDecoder::~CodecJpegDecoder()
@@ -39,55 +37,28 @@ CodecJpegDecoder::~CodecJpegDecoder()
     CODEC_LOGI("enter");
     width_ = 0;
     height_ = 0;
-    running_.store(false);
-    // DeInit();// mpp_destroy in descontruct may crash
+    Destory();
     format_ = MPP_FMT_YUV420SP;
 }
 
-int32_t CodecJpegDecoder::Init()
+void CodecJpegDecoder::Destory()
 {
-    CODEC_LOGI("enter");
-
-    if (mppApi_ == nullptr && GetMppApi(&mppApi_) != HDF_SUCCESS) {
-        CODEC_LOGE("GetMppApi error");
-        return HDF_FAILURE;
+    ResetMppBuffer();
+    if (memGroup_) {
+        mppApi_->HdiMppBufferGroupPut(memGroup_);
+        memGroup_ = nullptr;
     }
-    return HDF_SUCCESS;
+    if (mppCtx_) {
+        mppApi_->HdiMppDestroy(mppCtx_);
+        mppCtx_ = nullptr;
+    }
+    mpi_ = nullptr;
+    mppApi_ = nullptr;
 }
-void CodecJpegDecoder::DeInit()
-{
-    CODEC_LOGI("enter");
-    if (threadTask_) {
-        threadTask_->join();
-        threadTask_ = nullptr;
-    }
 
-    if (mppApi_ != NULL) {
-        ResetMppBuffer();
-        if (memGroup_) {
-            mppApi_->HdiMppBufferGroupPut(memGroup_);
-            memGroup_ = nullptr;
-        }
-        if (mppCtx_) {
-            mppApi_->HdiMppDestroy(mppCtx_);
-            mppCtx_ = nullptr;
-            mpi_ = nullptr;
-        }
-    }
-    std::lock_guard<std::mutex> lk(mutex_);
-    callback_ = nullptr;
-}
-int32_t CodecJpegDecoder::DeCode(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo &decInfo,
-    CodecJpegCallbackHwi *callback)
+int32_t CodecJpegDecoder::DeCode(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo &decInfo)
 {
     CODEC_LOGI("enter");
-    if (running_.load()) {
-        CODEC_LOGE("task is running");
-        return HDF_ERR_DEVICE_BUSY;
-    }
-    if (threadTask_ != nullptr) {
-        threadTask_->join();
-    }
 
     if (!PrePare()) {
         CODEC_LOGE("PrePare failed");
@@ -97,34 +68,24 @@ int32_t CodecJpegDecoder::DeCode(BufferHandle *buffer, BufferHandle *outBuffer, 
         CODEC_LOGE("format %{public}d set error", outBuffer->format);
         return HDF_ERR_INVALID_PARAM;
     }
-    callback_ = callback;
-    // thread start
-    threadTask_ = std::make_shared<std::thread>([&, buffer, outBuffer, decInfo] {
-        CODEC_LOGI("jpeg task decode run.");
-        running_.store(true);
-        width_ = decInfo.imageWidth;
-        height_ = decInfo.imageHeight;
-        if (SendData(decInfo, buffer->fd, outBuffer) != MPP_OK) {
-            CODEC_LOGE("Send data error");
-            running_.store(false);
-            OnEvent(HDF_FAILURE);
-            return;
-        }
-        if (GetFrame() != MPP_OK) {
-            CODEC_LOGE("Recv frame error");
-            running_.store(false);
-            OnEvent(HDF_FAILURE);
-            return;
-        }
-        DumpOutFile();
-        CODEC_LOGI("jpeg decode end.");
-        OnEvent(HDF_SUCCESS);
-        running_.store(false);
-    });
+
+    width_ = decInfo.imageWidth;
+    height_ = decInfo.imageHeight;
+    if (SendData(decInfo, buffer, outBuffer) != MPP_OK) {
+        CODEC_LOGE("Send data error");
+        return HDF_FAILURE;
+    }
+
+    if (GetFrame() != MPP_OK) {
+        CODEC_LOGE("Recv frame error");
+        return HDF_FAILURE;
+    }
+    DumpOutFile();
+    CODEC_LOGI("jpeg decode end.");
     return HDF_SUCCESS;
 }
 
-MPP_RET CodecJpegDecoder::SendData(const struct CodecJpegDecInfo &decInfo, int32_t fd, BufferHandle *outHandle)
+MPP_RET CodecJpegDecoder::SendData(const struct CodecJpegDecInfo &decInfo, BufferHandle* buffer, BufferHandle *outHandle)
 {
     CODEC_LOGI("enter");
     MppBuffer pktBuf = nullptr;
@@ -140,20 +101,28 @@ MPP_RET CodecJpegDecoder::SendData(const struct CodecJpegDecInfo &decInfo, int32
         }
     });
     ResetMppBuffer();
-    auto ret = InitPacketBuffer(decInfo, fd, pktBuf);
+    MppBufferInfo info;
+    memset(&info, 0, sizeof(MppBufferInfo));
+    info.type = MPP_BUFFER_TYPE_DRM;
+    info.fd =  buffer->fd;
+    info.size = buffer->size;
+    auto ret = mppApi_->HdiMppBufferImportWithTag(nullptr, &info, &pktBuf, MODULE_TAG, __func__);
     if (ret != MPP_OK) {
-        CODEC_LOGE("InitPacketBuffer error %{public}d", ret);
+        CODEC_LOGE("import input packet error %{public}d", ret);
         return ret;
     }
+    mppApi_->HdiMppPacketInitWithBuffer(&packet_, pktBuf); // input
+   
+    DumpInFile(pktBuf);
     // init frame_
     mppApi_->HdiMppFrameInit(&frame_);
 #ifndef USE_RGA
-    MppBufferInfo inputCommit;
-    memset_s(&inputCommit, sizeof(inputCommit), 0, sizeof(inputCommit));
-    inputCommit.type = MPP_BUFFER_TYPE_DRM;
-    inputCommit.size = outHandle->size;
-    inputCommit.fd = outHandle->fd;
-    ret = mppApi_->HdiMppBufferImportWithTag(nullptr, &inputCommit, &frmBuf, MODULE_TAG, __func__);
+    MppBufferInfo outputCommit;
+    memset_s(&outputCommit, sizeof(outputCommit), 0, sizeof(outputCommit));
+    outputCommit.type = MPP_BUFFER_TYPE_DRM;
+    outputCommit.size = outHandle->size;
+    outputCommit.fd = outHandle->fd;
+    ret = mppApi_->HdiMppBufferImportWithTag(nullptr, &outputCommit, &frmBuf, MODULE_TAG, __func__);
 #else
     ret = mppApi_->HdiMppBufferGetWithTag(memGroup_, &frmBuf, horStride * verStride * 2,  // 2: max len = 2*width*height
         MODULE_TAG, __func__);
@@ -165,33 +134,6 @@ MPP_RET CodecJpegDecoder::SendData(const struct CodecJpegDecInfo &decInfo, int32
     mppApi_->HdiMppFrameSetBuffer(frame_, frmBuf);
     ret = MppTaskProcess();
     return ret;
-}
-MPP_RET CodecJpegDecoder::InitPacketBuffer(const struct CodecJpegDecInfo &decInfo, int32_t fd, MppBuffer &pktBuf)
-{
-    uint32_t horStride = AlignUp(width_, 16);   // 16: width alignment
-    uint32_t verStride = AlignUp(height_, 16);  // 16: height alignment
-    // get pkt
-    MPP_RET ret = mppApi_->HdiMppBufferGetWithTag(memGroup_, &pktBuf, horStride * verStride * 2, MODULE_TAG, __func__);
-    if (ret != MPP_OK) {
-        CODEC_LOGE(" mpp_buffer_get packet buffer error %{public}d", ret);
-        return ret;
-    }
-    mppApi_->HdiMppPacketInitWithBuffer(&packet_, pktBuf);
-    int8_t *bufAddr = reinterpret_cast<int8_t *>(mppApi_->HdiMppBufferGetPtrWithCaller(pktBuf, __func__));
-    if (bufAddr == nullptr) {
-        CODEC_LOGE(" mpp_buffer_get_ptr  error");
-        return MPP_NOK;
-    }
-    CodecJpegHelper jpegHelper;
-    auto len = jpegHelper.JpegAssemble(decInfo, bufAddr, fd);
-    if (len < 0) {
-        CODEC_LOGE(" JpegAssemble error %{public}d", len);
-        return MPP_NOK;
-    }
-    DumpInFile(reinterpret_cast<char *>(bufAddr), len);
-    mppApi_->HdiMppPacketSetLength(packet_, len);
-    mppApi_->HdiMppPacketSetEos(packet_);
-    return MPP_OK;
 }
 
 MPP_RET CodecJpegDecoder::MppTaskProcess()
@@ -238,19 +180,24 @@ MPP_RET CodecJpegDecoder::GetFrame()
 
     MppFrame frameOut = NULL;
     mppApi_->HdiMppTaskMetaGetFrame(task, KEY_OUTPUT_FRAME, &frameOut);
+    if (frameOut != frame_) {
+        CODEC_LOGE("frameOut is not match with frame_ %{public}d", ret);
+        mppApi_->HdiMppFrameDeinit(&frameOut);
+        return MPP_NOK;
+    }
     auto err = mppApi_->HdiMppFrameGetErrinfo(frameOut) | mppApi_->HdiMppFrameGetDiscard(frameOut);
-    (void)err;
+    if (err) {
+        CODEC_LOGE("err = %{public}d", err);
+        return MPP_NOK;
+    }
+
     /* output queue */
     ret = mpi_->enqueue(mppCtx_, MPP_PORT_OUTPUT, task);
     if (ret != MPP_OK) {
         CODEC_LOGE("enqueue output error %{public}d", ret);
         return ret;
     }
-    if (frameOut != frame_) {
-        CODEC_LOGE("frameOut is not match with frame_ %{public}d", ret);
-        mppApi_->HdiMppFrameDeinit(&frameOut);
-        return MPP_NOK;
-    }
+
     return MPP_OK;
 }
 
@@ -265,19 +212,27 @@ void CodecJpegDecoder::DumpOutFile()
         CODEC_LOGE("file open error");
         return;
     }
-    out.write(reinterpret_cast<char *>(ptr), size);  // 3: byte alignment, 2:byte alignment
+    out.write(reinterpret_cast<char *>(ptr), size);
     out.flush();
 #endif
 }
-void CodecJpegDecoder::DumpInFile(char *data, int32_t size)
+void CodecJpegDecoder::DumpInFile(MppBuffer pktBuf)
 {
 #ifdef DUMP_FILE
+    auto size = mppApi_->HdiMppBufferGetSizeWithCaller(pktBuf, __func__);
+    auto data = mppApi_->HdiMppBufferGetPtrWithCaller(pktBuf, __func__);
+    CODEC_LOGD("size %{public}d", size);
+    if (data == nullptr || size == 0) {
+        CODEC_LOGE("have no data in pktbuf");
+        return;
+    }
+    
     std::ofstream out("/data/in.raw", std::ios::trunc | std::ios::binary);
     if (!out.is_open()) {
         CODEC_LOGE("file open error");
         return;
     }
-    out.write(data, size);  // 3: byte alignment, 2:byte alignment
+    out.write(reinterpret_cast<char*>(data), size);
     out.flush();
 #endif
 }

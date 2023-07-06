@@ -25,7 +25,7 @@ namespace VDI {
 namespace JPEG {
 int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t fd)
 {
-    CODEC_LOGI("enter");
+    CODEC_LOGD("enter");
     int32_t curPos = 0;
     // SOI
     curPos = PutInt16(buffer, curPos, 0xffd8);
@@ -84,7 +84,7 @@ int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, in
 bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct CodecJpegDecInfo &decInfo,
     std::unique_ptr<int8_t[]> &compressBuffer, int32_t &comBufLen)
 {
-    CODEC_LOGI("enter");
+    CODEC_LOGD("enter");
     int8_t *start = buffer;
     const int8_t *end = buffer + bufferLen;
     while (start < end) {
@@ -133,7 +133,7 @@ bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct Cod
 }
 int32_t CodecJpegHelper::JpegDqtAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    CODEC_LOGI("enter. curPos = %{public}d, quantTbl.size= %{public}zu", curPos, decInfo.quantTbl.size());
+    CODEC_LOGD("enter. curPos = %{public}d, quantTbl.size= %{public}zu", curPos, decInfo.quantTbl.size());
     // flag
     curPos = PutInt16(buffer, curPos, 0xffdb);
     if (curPos < 0) {
@@ -179,7 +179,7 @@ int32_t CodecJpegHelper::JpegDqtAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegDriAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    CODEC_LOGI("enter, restartInterval = %{public}d curPos = %{public}d", decInfo.restartInterval, curPos);
+    CODEC_LOGD("enter, restartInterval = %{public}d curPos = %{public}d", decInfo.restartInterval, curPos);
     if (decInfo.restartInterval <= 0) {
         return curPos;
     }
@@ -204,7 +204,7 @@ int32_t CodecJpegHelper::JpegDriAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegDhtAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    CODEC_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGD("enter. curPos = %{public}d", curPos);
     curPos = JpegDhtAssemble(decInfo.dcHuffTbl, buffer, curPos);
     if (curPos < 0) {
         CODEC_LOGE("assemble dc hufman error");
@@ -220,7 +220,7 @@ int32_t CodecJpegHelper::JpegDhtAssemble(const struct CodecJpegDecInfo &decInfo,
 int32_t CodecJpegHelper::JpegDhtAssemble(
     const std::vector<CodecJpegHuffTable> &table, int8_t *buffer, int32_t curPos, bool dc)
 {
-    CODEC_LOGI("enter. curPos = %{public}d, table.size() = %{public}zu", curPos, table.size());
+    CODEC_LOGD("enter. curPos = %{public}d, table.size() = %{public}zu", curPos, table.size());
     // DC Hufman
     curPos = PutInt16(buffer, curPos, 0xffc4);
     if (curPos < 0) {
@@ -272,7 +272,7 @@ int32_t CodecJpegHelper::JpegDhtAssemble(
 
 int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    CODEC_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGD("enter. curPos = %{public}d", curPos);
     // flag
     curPos = PutInt16(buffer, curPos, 0xffc0);
     if (curPos < 0) {
@@ -332,7 +332,7 @@ int32_t CodecJpegHelper::JpegSofAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegSosAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t curPos)
 {
-    CODEC_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGD("enter. curPos = %{public}d", curPos);
     // flag
     curPos = PutInt16(buffer, curPos, 0xffda);
     if (curPos < 0) {
@@ -375,7 +375,7 @@ int32_t CodecJpegHelper::JpegSosAssemble(const struct CodecJpegDecInfo &decInfo,
 }
 int32_t CodecJpegHelper::JpegDataAssemble(int8_t *buffer, int32_t curPos, int32_t fd)
 {
-    CODEC_LOGI("enter. curPos = %{public}d", curPos);
+    CODEC_LOGD("enter. curPos = %{public}d", curPos);
     int32_t size = OHOS::AshmemGetSize(fd);
     OHOS::Ashmem mem(fd, size);
     // check ret value
@@ -398,7 +398,7 @@ int32_t CodecJpegHelper::JpegDataAssemble(int8_t *buffer, int32_t curPos, int32_
 
 int32_t CodecJpegHelper::DessambleSof(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    CODEC_LOGI("dessamble SOI");
+    CODEC_LOGD("dessamble SOI");
     // len
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
@@ -443,7 +443,7 @@ int32_t CodecJpegHelper::DessambleSof(int8_t *buffer, struct CodecJpegDecInfo &d
 }
 int32_t CodecJpegHelper::DessambleSos(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    CODEC_LOGI("dessamble SOS");
+    CODEC_LOGD("dessamble SOS");
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2:marker len
 
@@ -500,7 +500,7 @@ int32_t CodecJpegHelper::DessambleCompressData(
 }
 int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    CODEC_LOGI("dessamble DQT");
+    CODEC_LOGD("dessamble DQT");
     int8_t *bufferOri = buffer;
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
@@ -529,7 +529,7 @@ int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &d
 }
 int32_t CodecJpegHelper::DessambleDht(int8_t *buffer, struct CodecJpegDecInfo &decInfo)
 {
-    CODEC_LOGI("dessamble DHT");
+    CODEC_LOGD("dessamble DHT");
     int8_t *bufferOri = buffer;
     int32_t len = GetInt16(buffer);
     buffer += 2;  // 2: marker len
