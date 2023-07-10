@@ -23,11 +23,7 @@
 
 void *mLibHandle = NULL;
 
-#if defined(__arm64__) || defined(__aarch64__)
-char *mLibName = "/vendor/lib64/librockchip_mpp.z.so";
-#else
-char *mLibName = "/vendor/lib/librockchip_mpp.z.so";
-#endif
+char *mLibName = "librockchip_mpp.z.so";
 RKMppApi *GetPacketApi(RKMppApi *pMppApi)
 {
     pMppApi->HdiMppPacketNew = (hdiMppPacketNew)dlsym(mLibHandle, "mpp_packet_new");

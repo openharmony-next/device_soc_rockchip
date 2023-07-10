@@ -20,6 +20,7 @@ ohos_prebuilt_shared_library("librga") {
   } else if (target_cpu == "arm64") {
     source = "lib64/librga.z.so"
   }
+  innerapi_tags = [ "passthrough_indirect" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "rockchip_products"
   part_name = "rockchip_products"
