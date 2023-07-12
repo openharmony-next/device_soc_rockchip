@@ -73,6 +73,7 @@ ohos_source_set("rockchip_vpu_src") {
 
 ohos_shared_library("librockchip_vpu") {
   deps = [ ":rockchip_vpu_src" ]
+  innerapi_tags = [ "passthrough_indirect" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "rockchip_products"

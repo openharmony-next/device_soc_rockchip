@@ -57,6 +57,7 @@ ohos_shared_library("libRkOMX_Resourcemanager") {
 
   deps = [ ".:RkOMX_Basecomponent" ]
   external_deps = [ "hilog:libhilog" ]
+  innerapi_tags = [ "passthrough_indirect" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "rockchip_products"
