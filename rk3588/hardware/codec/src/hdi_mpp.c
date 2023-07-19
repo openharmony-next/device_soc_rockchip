@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +15,9 @@
 
 #include "hdi_mpp.h"
 #include <dlfcn.h>
-#include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <securec.h>
 #include "hdi_mpp_component_manager.h"
 #include "hdi_mpp_config.h"
 #include "im2d.h"
@@ -29,30 +29,16 @@
 #define BITWISE_LEFT_SHIFT_WITH_ONE     (1 << 20)
 #define SLEEP_INTERVAL_MICROSECONDS     1000
 #define BUFFER_GROUP_LIMIT_NUM          24
-#define DFAULT_ENC_FPS_NUM              24
-#define DFAULT_ENC_DROP_THD             20
-#define DFAULT_ENC_GOP_OPERATOR         2
 #define FRAME_STRIDE_ALIGNMENT          16
 
-static void InitComponentSetup(RKHdiEncodeSetup *setup)
+static void InitComponentSetup(RKHdiBaseComponent *component)
 {
-    setup->fmt = PIXEL_FMT_BUTT;
-
-    setup->fps.fpsInNum = DFAULT_ENC_FPS_NUM;
-    setup->fps.fpsInDen = 1;
-    setup->fps.fpsOutNum = DFAULT_ENC_FPS_NUM;
-    setup->fps.fpsOutDen = 1;
-
-    setup->drop.dropMode = MPP_ENC_RC_DROP_FRM_DISABLED;
-    setup->drop.dropThd = DFAULT_ENC_DROP_THD;
-    setup->drop.dropGap = 1;
-
-    setup->rc.rcMode = MPP_ENC_RC_MODE_BUTT;
-
-    setup->gop.gopMode = VID_CODEC_GOPMODE_NORMALP;
-    setup->gop.gopLen = 0;
-    setup->gop.viLen = 0;
-    setup->gop.gop = setup->fps.fpsOutNum * DFAULT_ENC_GOP_OPERATOR;
+    component->setup.fmt = PIXEL_FMT_BUTT;
+    component->fmt = MPP_FMT_BUTT;
+    SetDefaultFps(&component->setup);
+    SetDefaultDropMode(&component->setup);
+    component->setup.rc.rcMode = MPP_ENC_RC_MODE_VBR;
+    SetDefaultGopMode(&component->setup);
 }
 
 static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType codingType)
@@ -66,7 +52,7 @@ static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType 
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memset failed, error code: %{public}d", __func__, ret);
     }
-    InitComponentSetup(&component->setup);
+    InitComponentSetup(component);
 
     ret = GetMppApi(&component->mppApi);
     if ((ret != HDF_SUCCESS) || (component->mppApi == NULL)) {
@@ -79,11 +65,7 @@ static RKHdiBaseComponent* CreateMppComponent(MppCtxType ctxType, MppCodingType 
     component->ctxType = ctxType;
     component->codingType = codingType;
     component->frameNum = 0;
-    if (ctxType == MPP_CTX_ENC) {
-        ret = component->mppApi->HdiMppEncCfgInit(&component->cfg);
-    } else if (component->ctxType == MPP_CTX_DEC) {
-        ret = component->mppApi->HdiMppDecCfgInit(&component->cfg);
-    }
+    ret = InitMppConfig(component);
     if (ret != 0) {
         HDF_LOGE("%{public}s: config mpp cfg init failed!", __func__);
         ReleaseMppApi(component->mppApi);
@@ -100,11 +82,7 @@ static void DestroyMppComponent(RKHdiBaseComponent *component)
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
     }
-    if (component->ctxType == MPP_CTX_ENC) {
-        component->mppApi->HdiMppEncCfgDeinit(component->cfg);
-    } else if (component->ctxType == MPP_CTX_DEC) {
-        component->mppApi->HdiMppDecCfgDeinit(component->cfg);
-    }
+    DeinitMppConfig(component);
     ReleaseMppApi(component->mppApi);
     component->mppApi = NULL;
     free(component);
@@ -266,11 +244,6 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
     }
 
     RKMppApi *mppApi = component->mppApi;
-    if (component->cfg != NULL) {
-        mppApi->HdiMppDecCfgDeinit(component->cfg);
-        component->cfg = NULL;
-    }
-
     if (component->packet != NULL) {
         mppApi->HdiMppPacketDeinit(&component->packet);
         component->packet = NULL;
@@ -340,15 +313,6 @@ int32_t SetExtMppParam(RKHdiBaseComponent* component, Param *param)
         case KEY_EXT_SETUP_DROP_MODE_RK:
             ret = SetParamDrop(component, param);
             break;
-        case KEY_EXT_ENC_VALIDATE_SETUP_RK:
-            ret = ValidateEncSetup(component, param);
-            if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s: config validata setup failed", __func__);
-            }
-            break;
-        case KEY_EXT_ENC_SETUP_AVC_RK:
-            ret = SetParamEncSetupAVC(component, param);
-            break;
         default:
             HDF_LOGE("%{public}s: param key unsupport, key:%{public}d", __func__, paramKey);
             return HDF_FAILURE;
@@ -369,7 +333,7 @@ int32_t SetMppParam(RKHdiBaseComponent* component, Param *param)
             ret = SetParamHeight(component, param);
             break;
         case KEY_PIXEL_FORMAT:
-            ret = SetParamPixleFmt(component, param);
+            ret = SetParamPixelFmt(component, param);
             break;
         case KEY_VIDEO_STRIDE:
             ret = SetParamStride(component, param);
@@ -427,12 +391,6 @@ int32_t GetExtMppParam(RKHdiBaseComponent* component, Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
-        case KEY_EXT_DEFAULT_CFG_RK:
-            ret = GetDefaultConfig(component);
-            if (ret != 0) {
-                HDF_LOGE("%{public}s: config get default config failed", __func__);
-            }
-            break;
         case KEY_EXT_SPLIT_PARSE_RK:
             ret = GetParamSplitParse(component, param);
             if (ret != HDF_SUCCESS) {
@@ -462,6 +420,12 @@ int32_t GetMppParam(RKHdiBaseComponent* component, Param *param)
     int32_t paramKey = param->key;
 
     switch (paramKey) {
+        case KEY_INPUT_BUFFER_COUNT:
+            ret = GetParamInputBufferCount(component, param);
+            break;
+        case KEY_OUTPUT_BUFFER_COUNT:
+            ret = GetParamOutputBufferCount(component, param);
+            break;
         case KEY_BUFFERSIZE:
             ret = GetParamBufferSize(component, param);
             break;
@@ -526,39 +490,27 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
-    MPP_RET ret = MPP_OK;
-    MppCtx ctx = handle;
     RKHdiBaseComponent* component = FindInMppComponentManager(handle);
 
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
         return HDF_FAILURE;
     }
-    RKMppApi *mppApi = component->mppApi;
-
-    ret = mppApi->HdiMppStart(ctx);
-    if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: mpp start failed", __func__);
-        return HDF_FAILURE;
+    int32_t ret = HDF_FAILURE;
+    if (component->ctxType == MPP_CTX_ENC) {
+        ret = SetEncCfg(component);
+    } else if (component->ctxType == MPP_CTX_DEC) {
+        ret = SetDecCfg(component);
     }
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t CodecStop(CODEC_HANDLETYPE handle)
 {
-    MPP_RET ret = MPP_OK;
-    MppCtx ctx = handle;
     RKHdiBaseComponent* component = FindInMppComponentManager(handle);
 
     if (component == NULL) {
         HDF_LOGE("%{public}s: component is NULL", __func__);
-        return HDF_FAILURE;
-    }
-    RKMppApi *mppApi = component->mppApi;
-
-    ret = mppApi->HdiMppStop(ctx);
-    if (ret != MPP_OK) {
-        HDF_LOGE("%{public}s: mpp stop failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -588,11 +540,13 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
             return HDF_FAILURE;
     }
 
-    UINTPTR userData = (UINTPTR)component->ctx;
-    EventType event = EVENT_FLUSH_COMPLETE;
-    uint32_t length = 0;
-    int32_t *eventData = NULL;
-    component->pCallbacks->OnEvent(userData, event, length, eventData);
+    if (component->pCallbacks != NULL) {
+        UINTPTR userData = (UINTPTR)component->ctx;
+        EventType event = EVENT_FLUSH_COMPLETE;
+        uint32_t length = 0;
+        int32_t *eventData = NULL;
+        component->pCallbacks->OnEvent(userData, event, length, eventData);
+    }
 
     return HDF_SUCCESS;
 }
@@ -652,6 +606,10 @@ int32_t HandleDecodeFrameInfoChange(RKHdiBaseComponent* component, MppFrame fram
     RK_U32 hor_stride = mppApi->HdiMppFrameGetHorStride(frame);
     RK_U32 ver_stride = mppApi->HdiMppFrameGetVerStride(frame);
     RK_U32 buf_size = mppApi->HdiMppFrameGetBufferSize(frame);
+
+    component->setup.width = width;
+    component->setup.height = height;
+    CheckSetupStride(component);
 
     HDF_LOGI("%{public}s: decode_get_frame get info changed found", __func__);
     HDF_LOGI("%{public}s: decoder require buffer w:h [%{public}d:%{public}d]", __func__, width, height);
@@ -729,9 +687,9 @@ static IM_STATUS PutDecodeFrameToOutput(RKHdiBaseComponent* component, MppFrame 
     }
     dst.width    = src.width;
     dst.height   = src.height;
-    dst.wstride  = MPP_ALIGN(dst.width, FRAME_STRIDE_ALIGNMENT);
-    dst.hstride  = dst.height;
-    dst.format   = RK_FORMAT_YCbCr_420_SP;
+    dst.wstride  = component->setup.stride.horStride;
+    dst.hstride  = component->setup.stride.verStride;
+    dst.format   = ConvertHdiFormat2RgaFormat(component->setup.fmt);
 
     rect.x = 0;
     rect.y = 0;
@@ -920,7 +878,7 @@ static IM_STATUS GetEncodeFrameFromInput(RKHdiBaseComponent* component, MppFrame
     dst.hstride  = mppApi->HdiMppFrameGetVerStride(frame);
     dst.width    = mppApi->HdiMppFrameGetWidth(frame);
     dst.height   = mppApi->HdiMppFrameGetHeight(frame);
-    dst.format   = RK_FORMAT_YCbCr_420_SP;
+    dst.format   = ConvertMppFormat2RgaFormat(component->fmt);
 
     if (inputInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
         BufferHandle *bufferHandle = (BufferHandle *)inputInfo->buffer[0].buf;
@@ -930,9 +888,9 @@ static IM_STATUS GetEncodeFrameFromInput(RKHdiBaseComponent* component, MppFrame
     }
     src.width    = dst.width;
     src.height   = dst.height;
-    src.wstride  = MPP_ALIGN(src.width, FRAME_STRIDE_ALIGNMENT);
-    src.hstride  = src.height;
-    src.format   = RK_FORMAT_YCbCr_420_SP;
+    src.wstride  = component->setup.stride.horStride;
+    src.hstride  = component->setup.stride.verStride;
+    src.format   = ConvertHdiFormat2RgaFormat(component->setup.fmt);
 
     rect.x = 0;
     rect.y = 0;
@@ -956,8 +914,8 @@ int32_t EncodeInitFrame(RKHdiBaseComponent* component, MppFrame *pFrame, RK_U32 
     }
     mppApi->HdiMppFrameSetWidth(*pFrame, component->setup.width);
     mppApi->HdiMppFrameSetHeight(*pFrame, component->setup.height);
-    mppApi->HdiMppFrameSetHorStride(*pFrame, component->setup.stride.horStride);
-    mppApi->HdiMppFrameSetVerStride(*pFrame, component->setup.stride.verStride);
+    mppApi->HdiMppFrameSetHorStride(*pFrame, component->horStride);
+    mppApi->HdiMppFrameSetVerStride(*pFrame, component->verStride);
     mppApi->HdiMppFrameSetFormat(*pFrame, component->fmt);
     mppApi->HdiMppFrameSetEos(*pFrame, frm_eos);
 

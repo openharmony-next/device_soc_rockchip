@@ -15,26 +15,20 @@
 
 #include "hdi_mpp_mpi.h"
 #include <dlfcn.h>
-#include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <securec.h>
 
 #define HDF_LOG_TAG codec_hdi_mpp_mpi
 
 void *mLibHandle = NULL;
 
-#if defined(__arm64__) || defined(__aarch64__)
-char *mLibName = "/vendor/lib64/librockchip_mpp.z.so";
-#else
-char *mLibName = "/vendor/lib/librockchip_mpp.z.so";
-#endif
-
+char *mLibName = "librockchip_mpp.z.so";
 RKMppApi *GetPacketApi(RKMppApi *pMppApi)
 {
     pMppApi->HdiMppPacketNew = (hdiMppPacketNew)dlsym(mLibHandle, "mpp_packet_new");
     pMppApi->HdiMppPacketInit = (hdiMppPacketInit)dlsym(mLibHandle, "mpp_packet_init");
-    pMppApi->HdiMppPacketInitWithBuffer =
-        (hdiMppPacketInitWithBuffer)dlsym(mLibHandle, "mpp_packet_init_with_buffer");
+    pMppApi->HdiMppPacketInitWithBuffer = (hdiMppPacketInitWithBuffer)dlsym(mLibHandle, "mpp_packet_init_with_buffer");
     pMppApi->HdiMppPacketCopyInit = (hdiMppPacketCopyInit)dlsym(mLibHandle, "mpp_packet_copy_init");
     pMppApi->HdiMppPacketDeinit = (hdiMppPacketDeinit)dlsym(mLibHandle, "mpp_packet_deinit");
     pMppApi->HdiMppPacketGetEos = (hdiMppPacketGetEos)dlsym(mLibHandle, "mpp_packet_get_eos");
@@ -89,7 +83,7 @@ RKMppApi *GetConfigApi(RKMppApi *pMppApi)
     pMppApi->HdiMppEncCfgInit = (hdiMppEncCfgInit)dlsym(mLibHandle, "mpp_enc_cfg_init");
     pMppApi->HdiMppEncCfgDeinit = (hdiMppEncCfgDeinit)dlsym(mLibHandle, "mpp_enc_cfg_deinit");
     pMppApi->HdiMppEncCfgSetS32 = (hdiMppEncCfgSetS32)dlsym(mLibHandle, "mpp_enc_cfg_set_s32");
-    pMppApi->HdiMppEncCfgSetU32 = (hdiMppEncCfgSetS32)dlsym(mLibHandle, "mpp_enc_cfg_set_u32");
+    pMppApi->HdiMppEncCfgSetU32 = (hdiMppEncCfgSetU32)dlsym(mLibHandle, "mpp_enc_cfg_set_u32");
     pMppApi->HdiMppEncRefCfgInit = (hdiMppEncRefCfgInit)dlsym(mLibHandle, "mpp_enc_ref_cfg_init");
     pMppApi->HdiMppEncRefCfgDeinit = (hdiMppEncRefCfgDeinit)dlsym(mLibHandle, "mpp_enc_ref_cfg_deinit");
     pMppApi->HdiMppEncGenRefCfg = (hdiMppEncGenRefCfg)dlsym(mLibHandle, "mpi_enc_gen_ref_cfg");
@@ -108,11 +102,15 @@ RKMppApi *GetBufferGroupApi(RKMppApi *pMppApi)
     pMppApi->HdiMppBufferGetFdWithCaller =
         (hdiMppBufferGetFdWithCaller)dlsym(mLibHandle, "mpp_buffer_get_fd_with_caller");
     pMppApi->HdiMppBufferGetWithTag = (hdiMppBufferGetWithTag)dlsym(mLibHandle, "mpp_buffer_get_with_tag");
+    pMppApi->HdiMppBufferImportWithTag = (hdiMppBufferImportWithTag)dlsym(mLibHandle, "mpp_buffer_import_with_tag");
+    pMppApi->HdiMppBufferWriteWithCaller =
+        (hdiMppBufferWriteWithCaller)dlsym(mLibHandle, "mpp_buffer_write_with_caller");
     pMppApi->HdiMppBufferGetPtrWithCaller =
         (hdiMppBufferGetPtrWithCaller)dlsym(mLibHandle, "mpp_buffer_get_ptr_with_caller");
+    pMppApi->HdiMppBufferGetSizeWithCaller =
+        (hdiMppBufferGetSizeWithCaller)dlsym(mLibHandle, "mpp_buffer_get_size_with_caller");
     pMppApi->HdiMppBufferGroupUsage = (hdiMppBufferGroupUsage)dlsym(mLibHandle, "mpp_buffer_group_usage");
-    pMppApi->HdiMppBufferPutWithCaller =
-        (hdiMppBufferPutWithCaller)dlsym(mLibHandle, "mpp_buffer_put_with_caller");
+    pMppApi->HdiMppBufferPutWithCaller = (hdiMppBufferPutWithCaller)dlsym(mLibHandle, "mpp_buffer_put_with_caller");
     return pMppApi;
 }
 
@@ -148,6 +146,9 @@ int32_t GetMppApi(RKMppApi **mppApi)
     GetConfigApi(pMppApi);
     GetBufferGroupApi(pMppApi);
     pMppApi->HdiMppTaskMetaGetPacket = (hdiMppTaskMetaGetPacket)dlsym(mLibHandle, "mpp_task_meta_get_packet");
+    pMppApi->HdiMppTaskMetaSetPacket = (hdiMppTaskMetaSetPacket)dlsym(mLibHandle, "mpp_task_meta_set_packet");
+    pMppApi->HdiMppTaskMetaGetFrame = (hdiMppTaskMetaGetFrame)dlsym(mLibHandle, "mpp_task_meta_get_frame");
+    pMppApi->HdiMppTaskMetaSetFrame = (hdiMppTaskMetaSetFrame)dlsym(mLibHandle, "mpp_task_meta_set_frame");
     pMppApi->HdiMppEnvGetU32 = (hdiMppEnvGetU32)dlsym(mLibHandle, "mpp_env_get_u32");
     return HDF_SUCCESS;
 }

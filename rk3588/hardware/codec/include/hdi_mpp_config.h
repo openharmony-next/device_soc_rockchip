@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 HiHope Open Source Organization .
+ * Copyright (c) 2022-2023 HiHope Open Source Organization .
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,17 +17,32 @@
 #define HDI_MPP_CONFIG_H
 
 #include "codec_type.h"
+#include "hdi_mpp.h"
 #include "rk_mpi.h"
 #include "rk_vdec_cfg.h"
 #include "rk_venc_cfg.h"
-#include "hdi_mpp.h"
+#include "rga.h"
 
-int32_t GetDefaultConfig(RKHdiBaseComponent *pBaseComponent);
+typedef struct {
+    PixelFormat pixFormat;
+    MppFrameFormat mppFormat;
+    RgaSURF_FORMAT rgaFormat;
+} CodecPixelFormatConvertTbl;
+
+int32_t InitMppConfig(RKHdiBaseComponent *pBaseComponent);
+int32_t DeinitMppConfig(RKHdiBaseComponent *pBaseComponent);
+void SetDefaultFps(RKHdiEncodeSetup *setup);
+void SetDefaultDropMode(RKHdiEncodeSetup *setup);
+void SetDefaultGopMode(RKHdiEncodeSetup *setup);
+MppFrameFormat ConvertHdiFormat2RKFormat(PixelFormat fmtHDI);
+RgaSURF_FORMAT ConvertHdiFormat2RgaFormat(PixelFormat fmtHDI);
+RgaSURF_FORMAT ConvertMppFormat2RgaFormat(MppFrameFormat mppFmt);
+int32_t SetEncCfg(RKHdiBaseComponent *pBaseComponent);
+int32_t SetDecCfg(RKHdiBaseComponent *pBaseComponent);
 int32_t GetDefaultHorStride(int32_t width, PixelFormat fmtHDI);
-int32_t InitConfig(RKHdiBaseComponent *pBaseComponent);
 int32_t SetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);
-int32_t SetParamPixleFmt(RKHdiBaseComponent *pBaseComponent, Param *param);
+int32_t SetParamPixelFmt(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamHorStride(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamVerStride(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamFps(RKHdiBaseComponent *pBaseComponent, Param *param);
@@ -38,8 +53,9 @@ int32_t SetParamMimeCodecType(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamCodecType(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamSplitParse(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t SetParamCodecFrameNum(RKHdiBaseComponent *pBaseComponent, Param *param);
-int32_t ValidateEncSetup(RKHdiBaseComponent *pBaseComponent, Param *param);
-int32_t SetParamEncSetupAVC(RKHdiBaseComponent *pBaseComponent, Param *param);
+int32_t CheckSetupStride(RKHdiBaseComponent *pBaseComponent);
+int32_t GetParamInputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param);
+int32_t GetParamOutputBufferCount(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamBufferSize(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamWidth(RKHdiBaseComponent *pBaseComponent, Param *param);
 int32_t GetParamHeight(RKHdiBaseComponent *pBaseComponent, Param *param);
