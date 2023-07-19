@@ -15,9 +15,10 @@
 
 #ifndef HDI_MPP_MPI_H
 #define HDI_MPP_MPI_H
-
 #include "rk_mpi.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 // mpp base api
 typedef MPP_RET (*hdiMppCreate)(MppCtx *, MppApi **);
 typedef MPP_RET (*hdiMppInit)(MppCtx, MppCtxType, MppCodingType);
@@ -88,13 +89,19 @@ typedef MPP_RET (*hdiMppBufferGroupGet)(MppBufferGroup *, MppBufferType,
 typedef MPP_RET (*hdiMppBufferGroupPut)(MppBufferGroup);
 typedef MPP_RET (*hdiMppBufferGroupClear)(MppBufferGroup);
 typedef MPP_RET (*hdiMppBufferGroupLimitConfig)(MppBufferGroup, size_t, RK_S32);
-typedef MPP_RET (*hdiMppBufferGetFdWithCaller)(MppBufferGroup *, const char *);
+typedef MPP_RET (*hdiMppBufferGetFdWithCaller)(MppBuffer, const char *);
 typedef MPP_RET (*hdiMppBufferGetWithTag)(MppBufferGroup, MppBuffer *, size_t, const char *, const char *);
-typedef void* (*hdiMppBufferGetPtrWithCaller)(MppBuffer, const char *);
+typedef MPP_RET (*hdiMppBufferWriteWithCaller)(MppBuffer, size_t, void *, size_t, const char *);
+typedef void *(*hdiMppBufferGetPtrWithCaller)(MppBuffer, const char *);
+typedef size_t (*hdiMppBufferGetSizeWithCaller)(MppBuffer, const char *);
+typedef MPP_RET (*hdiMppBufferImportWithTag)(MppBufferGroup, MppBufferInfo *, MppBuffer *, const char *, const char *);
 typedef size_t (*hdiMppBufferGroupUsage)(MppBufferGroup);
 typedef MPP_RET (*hdiMppBufferPutWithCaller)(MppBuffer, const char *);
 // mpp task api
-typedef MPP_RET (*hdiMppTaskMetaGetPacket)(MppBufferGroup);
+typedef MPP_RET (*hdiMppTaskMetaGetPacket)(MppTask task, MppMetaKey key, MppPacket *packet);
+typedef MPP_RET (*hdiMppTaskMetaGetFrame)(MppTask task, MppMetaKey key, MppFrame *frame);
+typedef MPP_RET (*hdiMppTaskMetaSetPacket)(MppTask task, MppMetaKey key, MppPacket packet);
+typedef MPP_RET (*hdiMppTaskMetaSetFrame)(MppTask task, MppMetaKey key, MppFrame frame);
 // mpp env api
 typedef RK_S32 (*hdiMppEnvGetU32)(const char *, RK_U32 *, RK_U32);
 
@@ -170,16 +177,25 @@ typedef struct {
     hdiMppBufferGroupLimitConfig HdiMppBufferGroupLimitConfig;
     hdiMppBufferGetFdWithCaller HdiMppBufferGetFdWithCaller;
     hdiMppBufferGetWithTag HdiMppBufferGetWithTag;
+    hdiMppBufferImportWithTag HdiMppBufferImportWithTag;
+    hdiMppBufferWriteWithCaller HdiMppBufferWriteWithCaller;
     hdiMppBufferGetPtrWithCaller HdiMppBufferGetPtrWithCaller;
+    hdiMppBufferGetSizeWithCaller HdiMppBufferGetSizeWithCaller;
     hdiMppBufferGroupUsage HdiMppBufferGroupUsage;
     hdiMppBufferPutWithCaller HdiMppBufferPutWithCaller;
     // mpp task api
     hdiMppTaskMetaGetPacket HdiMppTaskMetaGetPacket;
+    hdiMppTaskMetaSetPacket HdiMppTaskMetaSetPacket;
+    hdiMppTaskMetaGetFrame HdiMppTaskMetaGetFrame;
+    hdiMppTaskMetaSetFrame HdiMppTaskMetaSetFrame;
     // mpp env api
     hdiMppEnvGetU32 HdiMppEnvGetU32;
 }RKMppApi;
 
 int32_t GetMppApi(RKMppApi **mppApi);
 void ReleaseMppApi(RKMppApi *mppApi);
+#ifdef __cplusplus
+}
+#endif
+#endif  // HDI_MPP_MPI_H
 
-#endif // HDI_MPP_MPI_H
