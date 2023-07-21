@@ -190,6 +190,13 @@
                 <filteritem type="filepath" name="rk3588/hardware/gra/lib64/*" desc="gra 64bit libs file"/>
                 <filteritem type="filepath" name="rk3588/hardware/wifi/*" desc="wifi lib and bin files"/>
                 <filteritem type="filepath" name="rk3588/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>
+                <filteritem type="filepath" name="rk3568/hardware/rga/lib/librga.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3568/hardware/rga/lib64/librga.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3568/hardware/isp/lib/librkaiq.z.so" desc="isp lib files"/>
+                <filteritem type="filepath" name="rk3568/hardware/isp/lib64/librkaiq.z.so" desc="isp lib files"/>
+                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/*" desc="wifi lib and bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/mpp/lib/librockchip_mpp.z.so" desc="lib files"/>
+                <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/librockchip_mpp.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
                 <filteritem type="filepath" name="rk3568/hardware/camera_adapter/lib/*" desc="libcamera 32bit libs file"/>              
                 <filteritem type="filepath" name="rk3399/hardware/mpp/lib/librockchip_mpp.z.so" desc="lib files"/>
