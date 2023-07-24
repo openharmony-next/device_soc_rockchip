@@ -194,7 +194,11 @@
                 <filteritem type="filepath" name="rk3568/hardware/rga/lib64/librga.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3568/hardware/isp/lib/librkaiq.z.so" desc="isp lib files"/>
                 <filteritem type="filepath" name="rk3568/hardware/isp/lib64/librkaiq.z.so" desc="isp lib files"/>
-                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/*" desc="wifi lib and bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/isp/bin/ispserver" desc="isp bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/isp/bin64/ispserver" desc="isp bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/clm_bcm43752a2_ag.blob" desc="wifi bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/fw_bcm43752a2_ag.bin" desc="wifi bin files"/>
+                <filteritem type="filepath" name="rk3568/hardware/wifi/ap6xxx/fw_bcm43752a2_ag_apsta.bin" desc="wifi bin files"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib/librockchip_mpp.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3568/hardware/mpp/lib64/librockchip_mpp.z.so" desc="lib files"/>
                 <filteritem type="filepath" name="rk3568/hardware/wifi/*" desc="wifi lib and bin files"/>
