@@ -90,15 +90,17 @@ bool HdiGfxComposition::CanHandle(HdiLayer &hdiLayer)
 bool HdiGfxComposition::UseCompositionClient(std::vector<HdiLayer *> &layers)
 {
     int32_t layerCount = 0;
+    bool hasCompositionClient = false;
 
     for (auto &layer : layers) {
         if (!CanHandle(*layer)) {
             continue;
         }
-        layerCount += (layer->GetCompositionType() != COMPOSITION_VIDEO) &&
-            (layer->GetCompositionType() != COMPOSITION_CURSOR);
+        CompositionType type = layer->GetCompositionType();
+        layerCount += (type != COMPOSITION_VIDEO) && (type != COMPOSITION_CURSOR);
+        hasCompositionClient = hasCompositionClient || (type == COMPOSITION_CLIENT);
     }
-    return layerCount > 4;
+    return hasCompositionClient || (layerCount > 4);
 }
 
 int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
