@@ -87,21 +87,39 @@ bool HdiGfxComposition::CanHandle(HdiLayer &hdiLayer)
     return true;
 }
 
+bool HdiGfxComposition::UseCompositionClient(std::vector<HdiLayer *> &layers)
+{
+    int32_t layerCount = 0;
+
+    for (auto &layer : layers) {
+        if (!CanHandle(*layer)) {
+            continue;
+        }
+        layerCount += (layer->GetCompositionType() != COMPOSITION_VIDEO) &&
+            (layer->GetCompositionType() != COMPOSITION_CURSOR);
+    }
+    return layerCount > 4;
+}
+
 int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
 {
     DISPLAY_LOGD("layers size %{public}zd", layers.size());
+    CompositionType defaultCompType = UseCompositionClient(layers) ? COMPOSITION_CLIENT : COMPOSITION_DEVICE;
     mClientLayer = &clientLayer;
     mCompLayers.clear();
     for (auto &layer : layers) {
-        if (CanHandle(*layer)) {
-            if ((layer->GetCompositionType() != COMPOSITION_VIDEO) &&
-                (layer->GetCompositionType() != COMPOSITION_CURSOR)) {
-                layer->SetDeviceSelect(COMPOSITION_DEVICE);
-            } else {
-                layer->SetDeviceSelect(layer->GetCompositionType());
-            }
-            mCompLayers.push_back(layer);
+        if (!CanHandle(*layer)) {
+            continue;
         }
+
+        if ((layer->GetCompositionType() == COMPOSITION_VIDEO) ||
+            (layer->GetCompositionType() == COMPOSITION_CURSOR)) {
+            layer->SetDeviceSelect(layer->GetCompositionType());
+        } else {
+            layer->SetDeviceSelect(defaultCompType);
+        }
+
+        mCompLayers.push_back(layer);
     }
     DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
     return DISPLAY_SUCCESS;
