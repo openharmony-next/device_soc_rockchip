@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 HiHope Open Source Organization .
+ * Copyright (C) 2021-2023 HiHope Open Source Organization .
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,15 +15,19 @@
 
 #include "hdi_mpp_mpi.h"
 #include <dlfcn.h>
+#include <pthread.h>
 #include "mpp_platform.h"
 #include "hdf_log.h"
 
-
-void *mLibHandle = nullptr;
-
+static void *mLibHandle = nullptr;
+static pthread_mutex_t g_Mutex = PTHREAD_MUTEX_INITIALIZER;
 void GetMppAPI(RKMppApi *pMppApi)
 {
-    mLibHandle = dlopen("librockchip_mpp.z.so", RTLD_NOW);
+    pthread_mutex_lock(&g_Mutex);
+    if (mLibHandle == nullptr) {
+        mLibHandle = dlopen("librockchip_mpp.z.so", RTLD_NOW);
+    }
+    pthread_mutex_unlock(&g_Mutex);
     if (mLibHandle == nullptr) {
         HDF_LOGE("jkf open no\n");
         return ;
@@ -240,8 +244,10 @@ void GetMppAPI(RKMppApi *pMppApi)
 
 void ReleaseMppAPI()
 {
+    pthread_mutex_lock(&g_Mutex);
     if (mLibHandle != nullptr) {
         dlclose(mLibHandle);
         mLibHandle = nullptr;
     }
+    pthread_mutex_unlock(&g_Mutex);
 }

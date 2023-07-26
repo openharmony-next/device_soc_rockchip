@@ -35,7 +35,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <dirent.h>
-
+#include <pthread.h>
 #include "OMX_Component.h"
 #include "Rockchip_OSAL_Memory.h"
 #include "Rockchip_OSAL_ETC.h"
@@ -43,9 +43,16 @@
 #include "Rockchip_OMX_Macros.h"
 #include "Rockchip_OMX_Component_Register.h"
 #include "Rockchip_OSAL_Log.h"
+#include "Rockchip_OSAL_Mutex.h"
+
 static const ROCKCHIP_COMPONENT_INFO kCompInfo[] = {
     { "rk.omx_dec", "libomxvpu_dec.z.so" },
     { "rk.omx_enc", "libomxvpu_enc.z.so" },
+};
+
+static ROCKCHIP_OPENED_LIB gOpenedLIb[] = {
+    {"libomxvpu_dec.z.so", NULL },
+    {"libomxvpu_enc.z.so", NULL }
 };
 
 OMX_ERRORTYPE Rockchip_OMX_Component_Register(ROCKCHIP_OMX_COMPONENT_REGLIST **compList, OMX_U32 *compNum)
@@ -109,7 +116,7 @@ OMX_ERRORTYPE Rockchip_OMX_Component_Register(ROCKCHIP_OMX_COMPONENT_REGLIST **c
                 if ((errorMsg = Rockchip_OSAL_dlerror()) != NULL)
                     omx_warn("dlsym failed: %s", errorMsg);
             }
-            Rockchip_OSAL_dlclose(soHandle);
+            gOpenedLIb[i].libHandle = soHandle;
         }
         omx_err_f("Rockchip_OSAL_dlerror: %s", Rockchip_OSAL_dlerror());
     }
@@ -162,14 +169,17 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentAPICheck(OMX_COMPONENTTYPE *component)
 OMX_ERRORTYPE Rockchip_OMX_ComponentLoad(ROCKCHIP_OMX_COMPONENT *rockchip_component)
 {
     OMX_ERRORTYPE      ret = OMX_ErrorNone;
-    OMX_HANDLETYPE     libHandle;
+    OMX_HANDLETYPE     libHandle = NULL;
     OMX_COMPONENTTYPE *pOMXComponent;
-
+    
     FunctionIn();
-
     OMX_ERRORTYPE (*Rockchip_OMX_ComponentConstructor)(OMX_HANDLETYPE hComponent, OMX_STRING componentName);
-
-    libHandle = Rockchip_OSAL_dlopen((OMX_STRING)rockchip_component->libName, RTLD_NOW);
+    for (size_t i = 0; i < ARRAY_SIZE(gOpenedLIb); i++) {
+        if (!strcmp(gOpenedLIb[i].lib_name, (const char*)rockchip_component->libName)) {
+            libHandle = (OMX_HANDLETYPE)gOpenedLIb[i].libHandle;
+            break;
+        }
+    }
     if (!libHandle) {
         ret = OMX_ErrorInvalidComponentName;
         omx_err("OMX_ErrorInvalidComponentName, Line:%d", __LINE__);
@@ -178,7 +188,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentLoad(ROCKCHIP_OMX_COMPONENT *rockchip_compon
 
     Rockchip_OMX_ComponentConstructor = Rockchip_OSAL_dlsym(libHandle, "Rockchip_OMX_ComponentConstructor");
     if (!Rockchip_OMX_ComponentConstructor) {
-        Rockchip_OSAL_dlclose(libHandle);
         ret = OMX_ErrorInvalidComponent;
         omx_err("OMX_ErrorInvalidComponent, Line:%d", __LINE__);
         goto EXIT;
@@ -190,7 +199,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentLoad(ROCKCHIP_OMX_COMPONENT *rockchip_compon
         (OMX_STRING)rockchip_component->componentName);
     if (ret != OMX_ErrorNone) {
         Rockchip_OSAL_Free(pOMXComponent);
-        Rockchip_OSAL_dlclose(libHandle);
         ret = OMX_ErrorInvalidComponent;
         omx_err("OMX_ErrorInvalidComponent, Line:%d", __LINE__);
         goto EXIT;
@@ -199,7 +207,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentLoad(ROCKCHIP_OMX_COMPONENT *rockchip_compon
             if (pOMXComponent->ComponentDeInit != NULL)
                 pOMXComponent->ComponentDeInit(pOMXComponent);
             Rockchip_OSAL_Free(pOMXComponent);
-            Rockchip_OSAL_dlclose(libHandle);
             ret = OMX_ErrorInvalidComponent;
             omx_err("OMX_ErrorInvalidComponent, Line:%d", __LINE__);
             goto EXIT;
@@ -221,7 +228,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentUnload(ROCKCHIP_OMX_COMPONENT *rockchip_comp
     OMX_COMPONENTTYPE *pOMXComponent = NULL;
 
     FunctionIn();
-
     if (!rockchip_component) {
         ret = OMX_ErrorBadParameter;
         goto EXIT;
@@ -235,7 +241,6 @@ OMX_ERRORTYPE Rockchip_OMX_ComponentUnload(ROCKCHIP_OMX_COMPONENT *rockchip_comp
     }
 
     if (rockchip_component->libHandle != NULL) {
-        Rockchip_OSAL_dlclose(rockchip_component->libHandle);
         rockchip_component->libHandle = NULL;
     }
 
