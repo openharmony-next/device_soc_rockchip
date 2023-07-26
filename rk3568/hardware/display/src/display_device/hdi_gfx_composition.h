@@ -32,7 +32,6 @@ public:
 
 private:
     bool CanHandle(HdiLayer &hdiLayer);
-    bool UseCompositionClient(std::vector<HdiLayer *> &layers);
     void InitGfxSurface(ISurface &iSurface, HdiLayerBuffer &buffer);
     int32_t BlitLayer(HdiLayer &src, HdiLayer &dst);
     int32_t ClearRect(HdiLayer &src, HdiLayer &dst);
