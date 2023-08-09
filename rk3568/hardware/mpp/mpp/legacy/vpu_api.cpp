@@ -453,7 +453,6 @@ RK_S32 vpu_close_context(VpuCodecContext **ctx)
 
         *ctx = s = nullptr;
     }
-    ReleaseMppAPI();
     HDF_LOGD("leave");
 
     return ret;

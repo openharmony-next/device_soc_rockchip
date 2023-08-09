@@ -58,6 +58,10 @@ typedef struct __ROCKCHIP_COMPONENT_INFO {
     char *lib_name;
 } ROCKCHIP_COMPONENT_INFO;
 
+typedef struct __ROCKCHIP_OPENED_LIB {
+    char *lib_name;
+    void *libHandle;
+} ROCKCHIP_OPENED_LIB;
 #ifdef __cplusplus
 extern "C" {
 #endif

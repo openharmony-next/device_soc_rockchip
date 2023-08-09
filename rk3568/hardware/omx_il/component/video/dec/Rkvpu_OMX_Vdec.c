@@ -1213,35 +1213,45 @@ EXIT:
 
     return ret;
 }
-
+static const char* g_libVpu[] = {
+    "librockchip_vpu.z.so",
+    "librk_vpuapi.so"
+};
+static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 OMX_ERRORTYPE omx_open_vpudec_context(RKVPU_OMX_VIDEODEC_COMPONENT *pVideoDec)
 {
-    pVideoDec->rkapi_hdl = dlopen("librockchip_vpu.z.so", RTLD_LAZY);
-    pVideoDec->bOld_api = OMX_FALSE;
-    if (pVideoDec->rkapi_hdl == NULL) {
+    static void* handle = NULL;
+    static OMX_BOOL oldApi = OMX_FALSE;
+    static void* openCtx = NULL;
+    Rockchip_OSAL_MutexLock(&g_mutex);
+    if (handle == NULL) {
+        for (int i = 0; i < (int)ARRAY_SIZE(g_libVpu); i++) {
+            if ((handle = dlopen(g_libVpu[i], RTLD_LAZY))== NULL) {
+                continue;
+            }
+            openCtx = dlsym(handle, "vpu_open_context");
+            if (openCtx == NULL) {
+                dlclose(handle);
+                handle = NULL;
+                continue;
+            }
+            if (i == 0) {
+                oldApi = OMX_FALSE;
+            } else {
+                oldApi = OMX_TRUE;
+            }
+            break;
+        }
+    }
+    Rockchip_OSAL_MutexUnlock(&g_mutex);
+    if (handle == NULL) {
         return OMX_ErrorHardware;
     }
-    pVideoDec->rkvpu_open_cxt = (OMX_S32 (*)(VpuCodecContext_t **ctx))dlsym(pVideoDec->rkapi_hdl, "vpu_open_context");
-    if (pVideoDec->rkvpu_open_cxt == NULL) {
-        dlclose(pVideoDec->rkapi_hdl);
-        pVideoDec->rkapi_hdl = NULL;
-        omx_trace("used old version lib");
-        pVideoDec->rkapi_hdl = dlopen("librk_vpuapi.so", RTLD_LAZY);
-        if (pVideoDec->rkapi_hdl == NULL) {
-            omx_err("dll open fail librk_vpuapi.so");
-            return OMX_ErrorHardware;
-        }
-        pVideoDec->rkvpu_open_cxt =
-            (OMX_S32 (*)(VpuCodecContext_t **ctx))dlsym(pVideoDec->rkapi_hdl, "vpu_open_context");
-
-        if (pVideoDec->rkvpu_open_cxt == NULL) {
-            omx_err("dlsym vpu_open_context fail");
-            dlclose(pVideoDec->rkapi_hdl);
-            return OMX_ErrorHardware;
-        }
-        pVideoDec->bOld_api = OMX_TRUE;
-    }
-    pVideoDec->rkvpu_close_cxt = (OMX_S32 (*)(VpuCodecContext_t **ctx))dlsym(pVideoDec->rkapi_hdl, "vpu_close_context");
+    pVideoDec->bOld_api = oldApi;
+    pVideoDec->rkapi_hdl = handle;
+    pVideoDec->rkvpu_open_cxt = (OMX_S32 (*)(VpuCodecContext_t **ctx))openCtx;
+    pVideoDec->rkvpu_close_cxt = (OMX_S32 (*)(VpuCodecContext_t **ctx))dlsym(pVideoDec->rkapi_hdl,
+        "vpu_close_context");
     return OMX_ErrorNone;
 }
 
@@ -1370,7 +1380,6 @@ OMX_ERRORTYPE Rkvpu_Dec_Terminate(OMX_COMPONENTTYPE *pOMXComponent)
         }
         pVideoDec->vpu_ctx = NULL;
         if (pVideoDec->rkapi_hdl) {
-            dlclose(pVideoDec->rkapi_hdl);
             pVideoDec->rkapi_hdl = NULL;
         }
     }
