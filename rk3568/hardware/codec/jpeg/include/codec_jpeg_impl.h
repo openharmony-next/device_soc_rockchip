@@ -12,56 +12,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef HDI_JPEG_DECODER_H
-#define HDI_JPEG_DECODER_H
+#ifndef HDI_JPEG_IMPL_H
+#define HDI_JPEG_IMPL_H
 #include <cinttypes>
 #include <codec_jpeg_vdi.h>
 #include "hdi_mpp_mpi.h"
+#include "idisplay_buffer_vdi.h"
+#include "v1_0/display_buffer_type.h"
 namespace OHOS {
 namespace VDI {
 namespace JPEG {
-class CodecJpegDecoder {
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+class CodecJpegImpl {
 public:
-    explicit CodecJpegDecoder(RKMppApi *mppApi);
+    explicit CodecJpegImpl();
 
-    ~CodecJpegDecoder();
+    ~CodecJpegImpl();
+
+    int32_t Init();
+
+    void DeInit();
+
+    int32_t AllocateBuffer(BufferHandle **buffer, uint32_t size);
+
+    int32_t FreeBuffer(BufferHandle *buffer);
 
     int32_t DeCode(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo &decInfo);
 
 private:
-    void Destory();
-
-    void ResetMppBuffer();
-
-    bool PrePare(bool isDecoder = true);
-
     inline uint32_t AlignUp(uint32_t val, uint32_t align)
     {
         return (val + align - 1) & (~(align - 1));
     }
-
-    MPP_RET SendData(const struct CodecJpegDecInfo &decInfo, BufferHandle* buffer, BufferHandle *outHandle);
-
-    MPP_RET MppTaskProcess();
-
-    MPP_RET GetFrame();
-
-    void DumpOutFile();
-
-    void DumpInFile(MppBuffer pktBuf);
-
-    bool SetFormat(int32_t format);
-
 private:
-    uint32_t width_;
-    uint32_t height_;
-    MppFrameFormat format_;
-    MppCtx mppCtx_;
-    MppApi *mpi_;
-    RKMppApi *mppApi_;
-    MppBufferGroup memGroup_;
-    MppPacket packet_;
-    MppFrame frame_;
+    static RKMppApi *mppApi_;
+    static IDisplayBufferVdi* displayVdi_;
+    static intptr_t libHandle_;
 };
 }  // namespace JPEG
 }  // namespace VDI
