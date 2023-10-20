@@ -17,7 +17,7 @@ import("//build/ohos/ndk/ndk.gni")
 ohos_prebuilt_shared_library("libmpp") {
   source = "lib64/librockchip_mpp.z.so"
   install_images = [ chipset_base_dir ]
-  part_name = "rockchip_products"
+  part_name = "device_rk3588"
   install_enable = true
 }
 
