@@ -21,8 +21,8 @@ ohos_prebuilt_shared_library("librga") {
     source = "lib64/librga.z.so"
   }
   install_images = [ chipset_base_dir ]
-  subsystem_name = "rockchip_products"
-  part_name = "rockchip_products"
+  subsystem_name = "device_rk3588"
+  part_name = "device_rk3588"
   install_enable = true
 }
 
