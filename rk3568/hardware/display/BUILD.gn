@@ -59,7 +59,6 @@ ohos_shared_library("libdisplay_buffer_vdi_impl") {
 
   install_enable = true
   install_images = [ chipset_base_dir ]
-  innerapi_tags = [ "chipsetsdk" ]
   subsystem_name = "hdf"
   part_name = "rockchip_products"
 }
@@ -97,7 +96,6 @@ ohos_shared_library("libdisplay_buffer_vendor") {
 
   install_enable = true
   install_images = [ chipset_base_dir ]
-  innerapi_tags = [ "chipsetsdk" ]
   subsystem_name = "hdf"
   part_name = "rockchip_products"
 }
