@@ -327,6 +327,18 @@ int32_t DisplayComposerVdiImpl::SetLayerColor(uint32_t devId, uint32_t layerId, 
     return HDF_ERR_NOT_SUPPORT;
 }
 
+int32_t GetDumpInfo(std::string& result)
+{
+	DISPLAY_LOGE("%s is not supported", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t UpdateConfig(std::string& result)
+{
+	DISPLAY_LOGE("%s is not supported", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 extern "C" IDisplayComposerVdi *CreateComposerVdi()
 {
     return new DisplayComposerVdiImpl();
@@ -336,6 +348,7 @@ extern "C" void DestroyComposerVdi(IDisplayComposerVdi* vdi)
 {
     delete vdi;
 }
+
 } // DISPLAY
 } // HDI
 } // OHOS
