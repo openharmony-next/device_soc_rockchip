@@ -36,7 +36,7 @@ ohos_shared_library("libjpeg_vdi_interface") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hilog:libhilog",
     ]
   } else {
