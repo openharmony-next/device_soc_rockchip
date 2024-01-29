@@ -21,7 +21,7 @@ ohos_prebuilt_shared_library("libmpp") {
     source = "lib64/librockchip_mpp.z.so"
   }
   install_images = [ chipset_base_dir ]
-  part_name = "rockchip_products"
+  part_name = "device_yangfan"
   install_enable = true
 }
 
