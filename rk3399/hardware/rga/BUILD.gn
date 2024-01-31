@@ -22,7 +22,7 @@ ohos_prebuilt_shared_library("librga") {
   }
   install_images = [ system_base_dir ]
   relative_install_dir = "chipset-sdk"
-  subsystem_name = "rockchip_products"
-  part_name = "rockchip_products"
+  subsystem_name = "device_yangfan"
+  part_name = "device_yangfan"
   install_enable = true
 }
