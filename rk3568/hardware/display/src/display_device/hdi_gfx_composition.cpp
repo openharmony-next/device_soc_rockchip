@@ -203,6 +203,21 @@ int32_t HdiGfxComposition::Apply(bool modeSet)
     StartTrace(HITRACE_TAG_HDF, "HDI:DISP:Apply");
     int32_t ret;
     DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
+	
+    bool needClear = false;
+    for (uint32_t i = 0; i < mCompLayers.size(); i++) {
+        HdiLayer *layer = mCompLayers[i];
+        CompositionType compType = layer->GetCompositionType();
+        if (compType == COMPOSITION_DEVICE) {
+            needClear = true;
+            break;
+        }
+    }
+
+    if (needClear) {
+        ClearRect(*mClientLayer, *mClientLayer);
+    }
+
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiLayer *layer = mCompLayers[i];
         CompositionType compType = layer->GetCompositionType();

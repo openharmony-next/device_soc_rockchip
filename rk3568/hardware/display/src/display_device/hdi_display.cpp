@@ -205,6 +205,10 @@ int32_t HdiDisplay::Commit(int32_t *fence)
 int32_t HdiDisplay::SetDisplayClientBuffer(const BufferHandle *buffer, int32_t fence)
 {
     mClientLayer->SetLayerBuffer(buffer, fence);
+    
+    IRect rect = {0, 0, buffer->width, buffer->height};
+    mClientLayer->SetLayerRegion(&rect);
+    
     return DISPLAY_SUCCESS;
 }
 
