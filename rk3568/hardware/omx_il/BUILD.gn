@@ -14,12 +14,10 @@
 import("//build/ohos.gni")
 
 group("lib_omx") {
-  if (product_name == "rk3568") {
-    deps = [
-      "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/dec:libomxvpu_dec",
-      "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/enc:libomxvpu_enc",
-      "//device/soc/rockchip/rk3568/hardware/omx_il/core:libOMX_Core",
-      "//device/soc/rockchip/rk3568/hardware/omx_il/libOMXPlugin:libOMX_Pluginhw",
-    ]
-  }
+  deps = [
+    "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/dec:libomxvpu_dec",
+    "//device/soc/rockchip/rk3568/hardware/omx_il/component/video/enc:libomxvpu_enc",
+    "//device/soc/rockchip/rk3568/hardware/omx_il/core:libOMX_Core",
+    "//device/soc/rockchip/rk3568/hardware/omx_il/libOMXPlugin:libOMX_Pluginhw",
+  ]
 }
