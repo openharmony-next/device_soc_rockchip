@@ -88,6 +88,7 @@ ohos_static_library("RkOMX_OSAL") {
       [ "//device/soc/rockchip/rk3568/hardware/mpp/mpp/legacy:librockchip_vpu" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "init:libbegetutil",
