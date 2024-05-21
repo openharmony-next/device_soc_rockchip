@@ -17,6 +17,7 @@
 #define _DISPLAY_COMPOSER_VDI_IMPL_H
 
 #include <vector>
+#include <mutex>
 #include "hdi_session.h"
 #include "idisplay_composer_vdi.h"
 #include "v1_0/display_composer_type.h"
@@ -72,6 +73,8 @@ public:
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) override;
     virtual int32_t SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo) override;
     virtual int32_t SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor) override;
+private:
+    std::mutex mMutex;
 };
 
 extern "C" int32_t GetDumpInfo(std::string& result);
