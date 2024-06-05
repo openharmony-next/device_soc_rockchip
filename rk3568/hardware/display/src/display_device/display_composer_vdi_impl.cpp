@@ -37,6 +37,7 @@ int32_t DisplayComposerVdiImpl::RegHotPlugCallback(HotPlugCallback cb, void* dat
 
 int32_t DisplayComposerVdiImpl::GetDisplayCapability(uint32_t devId, DisplayCapability& info)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayCapability, &info);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -44,6 +45,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayCapability(uint32_t devId, DisplayCapa
 
 int32_t DisplayComposerVdiImpl::GetDisplaySupportedModes(uint32_t devId, std::vector<DisplayModeInfo>& modes)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     DisplayModeInfo* placeHoler = nullptr;
     uint32_t num = 0;
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplaySupportedModes,
@@ -63,6 +65,7 @@ int32_t DisplayComposerVdiImpl::GetDisplaySupportedModes(uint32_t devId, std::ve
 
 int32_t DisplayComposerVdiImpl::GetDisplayMode(uint32_t devId, uint32_t& modeId)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayMode, &modeId);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -70,6 +73,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayMode(uint32_t devId, uint32_t& modeId)
 
 int32_t DisplayComposerVdiImpl::SetDisplayMode(uint32_t devId, uint32_t modeId)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetDisplayMode, modeId);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -77,6 +81,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayMode(uint32_t devId, uint32_t modeId)
 
 int32_t DisplayComposerVdiImpl::GetDisplayPowerStatus(uint32_t devId, DispPowerStatus& status)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayPowerStatus, &status);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -84,6 +89,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayPowerStatus(uint32_t devId, DispPowerS
 
 int32_t DisplayComposerVdiImpl::SetDisplayPowerStatus(uint32_t devId, DispPowerStatus status)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetDisplayPowerStatus, status);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -91,6 +97,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayPowerStatus(uint32_t devId, DispPowerS
 
 int32_t DisplayComposerVdiImpl::GetDisplayBacklight(uint32_t devId, uint32_t& level)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayBacklight, &level);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -98,6 +105,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayBacklight(uint32_t devId, uint32_t& le
 
 int32_t DisplayComposerVdiImpl::SetDisplayBacklight(uint32_t devId, uint32_t level)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetDisplayBacklight, level);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -112,6 +120,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayProperty(uint32_t devId, uint32_t id, 
 int32_t DisplayComposerVdiImpl::GetDisplayCompChange(uint32_t devId, std::vector<uint32_t>& layers,
     std::vector<int32_t>& types)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     uint32_t* layersHoler = nullptr;
     int32_t* typesHoler = nullptr;
     uint32_t num = 0;
@@ -135,6 +144,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayClientCrop(uint32_t devId, const IRect
 
 int32_t DisplayComposerVdiImpl::SetDisplayClientBuffer(uint32_t devId, const BufferHandle& buffer, int32_t fence)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetDisplayClientBuffer, &buffer,
         fence);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -149,6 +159,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayClientDamage(uint32_t devId, std::vect
 
 int32_t DisplayComposerVdiImpl::SetDisplayVsyncEnabled(uint32_t devId, bool enabled)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetDisplayVsyncEnabled, enabled);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -156,6 +167,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayVsyncEnabled(uint32_t devId, bool enab
 
 int32_t DisplayComposerVdiImpl::RegDisplayVBlankCallback(uint32_t devId, VBlankCallback cb, void* data)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::RegDisplayVBlankCallback, cb, data);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -164,6 +176,7 @@ int32_t DisplayComposerVdiImpl::RegDisplayVBlankCallback(uint32_t devId, VBlankC
 int32_t DisplayComposerVdiImpl::GetDisplayReleaseFence(uint32_t devId, std::vector<uint32_t>& layers,
     std::vector<int32_t>& fences)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     uint32_t* layersHoler = nullptr;
     int32_t* typesHoler = nullptr;
     uint32_t num = 0;
@@ -205,6 +218,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayProperty(uint32_t devId, uint32_t id, 
 
 int32_t DisplayComposerVdiImpl::Commit(uint32_t devId, int32_t& fence)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::Commit, &fence);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -212,6 +226,7 @@ int32_t DisplayComposerVdiImpl::Commit(uint32_t devId, int32_t& fence)
 
 int32_t DisplayComposerVdiImpl::CreateLayer(uint32_t devId, const LayerInfo& layerInfo, uint32_t& layerId)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::CreateLayer, &layerInfo, &layerId);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -219,6 +234,7 @@ int32_t DisplayComposerVdiImpl::CreateLayer(uint32_t devId, const LayerInfo& lay
 
 int32_t DisplayComposerVdiImpl::DestroyLayer(uint32_t devId, uint32_t layerId)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::DestroyLayer, layerId);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -226,6 +242,7 @@ int32_t DisplayComposerVdiImpl::DestroyLayer(uint32_t devId, uint32_t layerId)
 
 int32_t DisplayComposerVdiImpl::PrepareDisplayLayers(uint32_t devId, bool& needFlushFb)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::PrepareDisplayLayers, &needFlushFb);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -233,6 +250,7 @@ int32_t DisplayComposerVdiImpl::PrepareDisplayLayers(uint32_t devId, bool& needF
 
 int32_t DisplayComposerVdiImpl::SetLayerAlpha(uint32_t devId, uint32_t layerId, const LayerAlpha& alpha)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerAlpha,
         const_cast<LayerAlpha*>(&alpha));
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -241,6 +259,7 @@ int32_t DisplayComposerVdiImpl::SetLayerAlpha(uint32_t devId, uint32_t layerId, 
 
 int32_t DisplayComposerVdiImpl::SetLayerRegion(uint32_t devId, uint32_t layerId, const IRect& rect)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerRegion,
         const_cast<IRect*>(&rect));
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -249,6 +268,7 @@ int32_t DisplayComposerVdiImpl::SetLayerRegion(uint32_t devId, uint32_t layerId,
 
 int32_t DisplayComposerVdiImpl::SetLayerCrop(uint32_t devId, uint32_t layerId, const IRect& rect)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerCrop,
         const_cast<IRect*>(&rect));
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -257,6 +277,7 @@ int32_t DisplayComposerVdiImpl::SetLayerCrop(uint32_t devId, uint32_t layerId, c
 
 int32_t DisplayComposerVdiImpl::SetLayerZorder(uint32_t devId, uint32_t layerId, uint32_t zorder)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::SetLayerZorder, layerId, zorder);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -264,6 +285,7 @@ int32_t DisplayComposerVdiImpl::SetLayerZorder(uint32_t devId, uint32_t layerId,
 
 int32_t DisplayComposerVdiImpl::SetLayerPreMulti(uint32_t devId, uint32_t layerId, bool preMul)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerPreMulti, preMul);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -271,6 +293,7 @@ int32_t DisplayComposerVdiImpl::SetLayerPreMulti(uint32_t devId, uint32_t layerI
 
 int32_t DisplayComposerVdiImpl::SetLayerTransformMode(uint32_t devId, uint32_t layerId, TransformType type)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerTransformMode, type);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -278,6 +301,7 @@ int32_t DisplayComposerVdiImpl::SetLayerTransformMode(uint32_t devId, uint32_t l
 
 int32_t DisplayComposerVdiImpl::SetLayerDirtyRegion(uint32_t devId, uint32_t layerId, const std::vector<IRect>& rects)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerDirtyRegion,
         const_cast<IRect*>(rects.data()));
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -293,6 +317,7 @@ int32_t DisplayComposerVdiImpl::SetLayerVisibleRegion(uint32_t devId, uint32_t l
 int32_t DisplayComposerVdiImpl::SetLayerBuffer(uint32_t devId, uint32_t layerId, const BufferHandle& buffer,
     int32_t fence)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     const BufferHandle* holder = &buffer;
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerBuffer, holder, fence);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
@@ -301,6 +326,7 @@ int32_t DisplayComposerVdiImpl::SetLayerBuffer(uint32_t devId, uint32_t layerId,
 
 int32_t DisplayComposerVdiImpl::SetLayerCompositionType(uint32_t devId, uint32_t layerId, CompositionType type)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerCompositionType, type);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
@@ -308,6 +334,7 @@ int32_t DisplayComposerVdiImpl::SetLayerCompositionType(uint32_t devId, uint32_t
 
 int32_t DisplayComposerVdiImpl::SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     int32_t ec = HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerBlendType, type);
     DISPLAY_CHK_RETURN(ec != DISPLAY_SUCCESS, HDF_FAILURE, DISPLAY_LOGE("failed, ec=%{public}d", ec));
     return HDF_SUCCESS;
