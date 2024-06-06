@@ -244,6 +244,12 @@ void Rkvpu_Wait_ProcessPause(ROCKCHIP_OMX_BASECOMPONENT *pRockchipComponent, OMX
 
     FunctionIn();
 
+    if (!pRockchipComponent || !pRockchipComponent->pRockchipPort) {
+        omx_err_f("component or port is null.");
+        FunctionOut();
+        return;
+    }
+    
     rockchipOMXPort = &pRockchipComponent->pRockchipPort[nPortIndex];
 
     if (((pRockchipComponent->currentState == OMX_StatePause) ||
