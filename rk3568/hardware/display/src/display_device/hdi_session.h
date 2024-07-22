@@ -38,6 +38,10 @@ public:
     {
         DISPLAY_LOGD("device Id : %{public}d", devId);
         DISPLAY_CHK_RETURN((devId == INVALIDE_DISPLAY_ID), DISPLAY_FAILURE, DISPLAY_LOGE("invalide device id"));
+        if (mHdiDisplays.empty()) {
+            DISPLAY_LOGE("mHdiDisplays is empty");
+            return DISPLAY_FAILURE;
+        }
         auto iter = mHdiDisplays.find(devId);
         DISPLAY_CHK_RETURN((iter == mHdiDisplays.end()), DISPLAY_FAILURE,
             DISPLAY_LOGE("can not find display %{public}d", devId));
@@ -51,6 +55,10 @@ public:
         DISPLAY_LOGD("device Id : %{public}d", devId);
         DISPLAY_CHK_RETURN((devId == INVALIDE_DISPLAY_ID), DISPLAY_FAILURE, DISPLAY_LOGE("invalide device id"));
         auto iter = mHdiDisplays.find(devId);
+        if (mHdiDisplays.empty()) {
+            DISPLAY_LOGE("mHdiDisplays is empty");
+            return DISPLAY_FAILURE;
+        }
         DISPLAY_CHK_RETURN((iter == mHdiDisplays.end()), DISPLAY_FAILURE,
             DISPLAY_LOGE("can not find display %{public}d", devId));
         auto display = iter->second.get();
