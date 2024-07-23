@@ -23,7 +23,7 @@ using namespace Media;
 using namespace OMX;
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "OMXPluginhw"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN_PLAYER, "OMXPluginhw"};
 }
 
 extern "C" IOMXComponentMgr *createOMXPlugin()
