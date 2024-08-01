@@ -1781,6 +1781,12 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
                 (OMX_VIDEO_CONFIG_AVCINTRAPERIOD *)pComponentConfigStructure;
             OMX_U32           portIndex = pAVCIntraPeriod->nPortIndex;
 
+            ret = Rockchip_OMX_Check_SizeVersion(pAVCIntraPeriod, sizeof(OMX_VIDEO_CONFIG_AVCINTRAPERIOD));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
+
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
@@ -1795,6 +1801,12 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
             OMX_U32                       portIndex = pEncodeBitrate->nPortIndex;
             ROCKCHIP_OMX_BASEPORT          *pRockchipPort = NULL;
 
+            ret = Rockchip_OMX_Check_SizeVersion(pEncodeBitrate, sizeof(OMX_VIDEO_CONFIG_BITRATETYPE));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
+
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
@@ -1808,6 +1820,12 @@ OMX_ERRORTYPE Rkvpu_OMX_GetConfig(
             OMX_CONFIG_FRAMERATETYPE *pFramerate = (OMX_CONFIG_FRAMERATETYPE *)pComponentConfigStructure;
             OMX_U32                   portIndex = pFramerate->nPortIndex;
             ROCKCHIP_OMX_BASEPORT      *pRockchipPort = NULL;
+
+            ret = Rockchip_OMX_Check_SizeVersion(pFramerate, sizeof(OMX_CONFIG_FRAMERATETYPE));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
 
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
@@ -1878,6 +1896,12 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(OMX_HANDLETYPE hComponent, OMX_INDEXTYPE nInde
                 (OMX_VIDEO_CONFIG_AVCINTRAPERIOD *)pComponentConfigStructure;
             OMX_U32           portIndex = pAVCIntraPeriod->nPortIndex;
 
+            ret = Rockchip_OMX_Check_SizeVersion(pAVCIntraPeriod, sizeof(OMX_VIDEO_CONFIG_AVCINTRAPERIOD));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
+
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
@@ -1896,6 +1920,12 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(OMX_HANDLETYPE hComponent, OMX_INDEXTYPE nInde
             OMX_U32                       portIndex = pEncodeBitrate->nPortIndex;
             ROCKCHIP_OMX_BASEPORT          *pRockchipPort = NULL;
             VpuCodecContext_t *p_vpu_ctx = pVideoEnc->vpu_ctx;
+
+            ret = Rockchip_OMX_Check_SizeVersion(pEncodeBitrate, sizeof(OMX_VIDEO_CONFIG_BITRATETYPE));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
 
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
@@ -1919,6 +1949,12 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(OMX_HANDLETYPE hComponent, OMX_INDEXTYPE nInde
             ROCKCHIP_OMX_BASEPORT      *pRockchipPort = NULL;
             VpuCodecContext_t *p_vpu_ctx = pVideoEnc->vpu_ctx;
 
+            ret = Rockchip_OMX_Check_SizeVersion(pFramerate, sizeof(OMX_CONFIG_FRAMERATETYPE));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
+
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
                 goto EXIT;
@@ -1941,6 +1977,12 @@ OMX_ERRORTYPE Rkvpu_OMX_SetConfig(OMX_HANDLETYPE hComponent, OMX_INDEXTYPE nInde
             OMX_U32 portIndex = pIntraRefreshVOP->nPortIndex;
 
             VpuCodecContext_t *p_vpu_ctx = pVideoEnc->vpu_ctx;
+
+            ret = Rockchip_OMX_Check_SizeVersion(pIntraRefreshVOP, sizeof(OMX_CONFIG_INTRAREFRESHVOPTYPE));
+            if (ret != OMX_ErrorNone) {
+                omx_err_f("size check err");
+                goto EXIT;
+            }
 
             if ((portIndex != OUTPUT_PORT_INDEX)) {
                 ret = OMX_ErrorBadPortIndex;
