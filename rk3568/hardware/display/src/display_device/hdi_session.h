@@ -24,6 +24,7 @@
 #include "hdi_display.h"
 #include "hdi_netlink_monitor.h"
 #include "v1_0/display_composer_type.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
@@ -38,6 +39,7 @@ public:
     {
         DISPLAY_LOGD("device Id : %{public}d", devId);
         DISPLAY_CHK_RETURN((devId == INVALIDE_DISPLAY_ID), DISPLAY_FAILURE, DISPLAY_LOGE("invalide device id"));
+        std::lock_guard<std::mutex> lock(mMutex);
         auto iter = mHdiDisplays.find(devId);
         DISPLAY_CHK_RETURN((iter == mHdiDisplays.end()), DISPLAY_FAILURE,
             DISPLAY_LOGE("can not find display %{public}d", devId));
@@ -50,6 +52,7 @@ public:
     {
         DISPLAY_LOGD("device Id : %{public}d", devId);
         DISPLAY_CHK_RETURN((devId == INVALIDE_DISPLAY_ID), DISPLAY_FAILURE, DISPLAY_LOGE("invalide device id"));
+        std::lock_guard<std::mutex> lock(mMutex);
         auto iter = mHdiDisplays.find(devId);
         DISPLAY_CHK_RETURN((iter == mHdiDisplays.end()), DISPLAY_FAILURE,
             DISPLAY_LOGE("can not find display %{public}d", devId));
@@ -69,6 +72,7 @@ private:
     std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> mHdiDisplays;
     std::vector<std::shared_ptr<HdiDeviceInterface>> mHdiDevices;
     std::unordered_map<HotPlugCallback, void *> mHotPlugCallBacks;
+    std::mutex mMutex;
 };
 } // namespace OHOS
 } // namespace HDI
